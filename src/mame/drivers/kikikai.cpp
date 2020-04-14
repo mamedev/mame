@@ -2,7 +2,13 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
+KiKi KaiKai - (c) 1987 Taito
+	+ Knight Boy (bootleg with 68705)
+
 Kick & Run - (c) 1987 Taito
+	+ Mexico 86 (bootleg with 68705)
+
+
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -50,7 +56,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mexico86.h"
+#include "includes/kikikai.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"
@@ -434,11 +440,6 @@ void mexico86_state::mexico86(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mexico86_state::mexico86_sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(mexico86_state::irq0_line_hold));
 
-	M68705P3(config, m_mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
-	m_mcu->portc_r().set_ioport("IN0");
-	m_mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
-	m_mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
-	m_mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
 
 	Z80(config, m_subcpu, 8000000/2); /* 4 MHz, Uses 8Mhz OSC */
 	m_subcpu->set_addrmap(AS_PROGRAM, &mexico86_state::mexico86_sub_cpu_map);
@@ -471,9 +472,20 @@ void mexico86_state::mexico86(machine_config &config)
 	m_ymsnd->add_route(3, "mono", 1.00);
 }
 
-void mexico86_state::knightb(machine_config &config)
+void mexico86_state::mexico86_68705(machine_config& config)
 {
 	mexico86(config);
+
+	M68705P3(config, m_mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	m_mcu->portc_r().set_ioport("IN0");
+	m_mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
+	m_mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
+	m_mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
+}
+
+void mexico86_state::knightb(machine_config &config)
+{
+	mexico86_68705(config);
 	config.device_remove("sub");
 	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
 }
@@ -556,9 +568,8 @@ ROM_START( kicknrun )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
-	/* MCU labeled TAITO A78 01,  JPH1021P, 185, PS4 */
-	ROM_LOAD( "a87-01.g8", 0x0000, 0x0800, BAD_DUMP CRC(8e821fa0) SHA1(331f5da31d8767674e2b5bf0e7f5b5ad2535e044)  )  /* manually crafted from the Mexico '86 one */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "jph1021.bin", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A78 01,  JPH1021P, 185, PS4 */	
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -588,9 +599,8 @@ ROM_START( kicknrunu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
-	/* MCU labeled TAITO A78 01,  JPH1021P, 185, PS4 */
-	ROM_LOAD( "a87-01.g8", 0x0000, 0x0800, BAD_DUMP CRC(8e821fa0) SHA1(331f5da31d8767674e2b5bf0e7f5b5ad2535e044)  )  /* manually crafted from the Mexico '86 one */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
+	ROM_LOAD( "jph1021.bin", 0x0000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A78 01,  JPH1021P, 185, PS4 */	
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -697,5 +707,5 @@ GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, empty_init, 
 GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

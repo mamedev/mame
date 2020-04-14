@@ -27,6 +27,7 @@ public:
 
 	void knightb(machine_config &config);
 	void mexico86(machine_config &config);
+	void mexico86_68705(machine_config &config);
 	void kikikai(machine_config &config);
 
 private:

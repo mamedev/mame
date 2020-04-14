@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/mexico86.h"
+#include "includes/kikikai.h"
 
 
 WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
