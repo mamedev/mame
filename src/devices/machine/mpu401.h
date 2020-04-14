@@ -20,8 +20,8 @@ public:
 	auto irq_cb() { return write_irq.bind(); }
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
-	DECLARE_READ8_MEMBER(mpu_r);
-	DECLARE_WRITE8_MEMBER(mpu_w);
+	uint8_t mpu_r(offs_t offset);
+	void mpu_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -32,16 +32,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
+	void midi_rx_w(int state);
 
-	DECLARE_READ8_MEMBER(regs_mode2_r);
-	DECLARE_WRITE8_MEMBER(regs_mode2_w);
-	DECLARE_READ8_MEMBER(asic_r);
-	DECLARE_WRITE8_MEMBER(asic_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t asic_r(offs_t offset);
+	void asic_w(offs_t offset, uint8_t data);
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
 
 	void mpu401_map(address_map &map);
 

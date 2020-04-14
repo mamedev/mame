@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
 	int code = m_tx_tileram[tile_index*2];
 	int colr = m_tx_tileram[tile_index*2+1];
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	tileinfo.set(0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
 	int code = m_fg_tileram[tile_index*2];
 	int colr = m_fg_tileram[tile_index*2+1]+0x80;
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	tileinfo.set(0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
 	int code = m_bg_tileram[tile_index*2];
 	int colr = m_bg_tileram[tile_index*2+1]+ 0x100;
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	tileinfo.set(0,code,colr,0);
 }
 
 

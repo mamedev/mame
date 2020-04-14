@@ -202,7 +202,7 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void hvyunit_state::video_start()

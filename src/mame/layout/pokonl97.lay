@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
-<mamelayout version="2">
 <!--
-        Poker Only '97 control panel
-        May or may not match arrangement/colour of real control panel
-        Written by Vas Crabb.
--->
+license:CC0
+copyright-holders:Vas Crabb
 
-<!-- define button-lamps -->
+Poker Only '97 control panel
+May or may not match arrangement/colour of real control panel
+-->
+<mamelayout version="2">
+
+	<!-- define button-lamps -->
 
 	<element name="big" defstate="0">
 		<rect state="1">
@@ -127,7 +129,7 @@
 	</element>
 
 
-<!-- define basic elements -->
+	<!-- define basic elements -->
 
 	<element name="cpanel">
 		<rect>
@@ -173,7 +175,7 @@
 
 
 
-<!-- define cpanel degradee elements -->
+	<!-- define cpanel degradee elements -->
 
 
 	<element name="cpanel1">
@@ -201,7 +203,7 @@
 	</element>
 
 
-<!-- define background -->
+	<!-- define background -->
 
 	<view name="Button Lamps">
 		<screen index="0">
@@ -233,7 +235,7 @@
 		</bezel>
 
 
-<!-- define lamps -->
+		<!-- define lamps -->
 
 		<bezel name="lamp0" element="bet_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="0.05" y="3.08" width="0.50" height="0.34" />

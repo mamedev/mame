@@ -115,8 +115,8 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 void human_interface_device::device_start()
 {
 	program_space().install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
-			read8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_r)),
-			write8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
+			read8sm_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_r)),
+			write8sm_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
 
 	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
 			read8_delegate(*this, FUNC(human_interface_device::gpib_r)),

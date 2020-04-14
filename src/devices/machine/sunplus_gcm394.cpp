@@ -10,12 +10,11 @@
 #include "sunplus_gcm394.h"
 
 
-
-#define LOG_GCM394_SPI            (1U << 4)
-#define LOG_GCM394_IO             (1U << 3)
-#define LOG_GCM394_SYSDMA         (1U << 2)
-#define LOG_GCM394                (1U << 1)
-#define LOG_GCM394_UNMAPPED       (1U << 0)
+#define LOG_GCM394_SPI            (1U << 5)
+#define LOG_GCM394_IO             (1U << 4)
+#define LOG_GCM394_SYSDMA         (1U << 3)
+#define LOG_GCM394                (1U << 2)
+#define LOG_GCM394_UNMAPPED       (1U << 1)
 
 #define VERBOSE             (LOG_GCM394 | LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
@@ -124,7 +123,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 	// bit 0 = channel 0 ready
 	// bit 1 = channel 1 ready
 
-	return 0x00FF;
+	return 0x00ff;
 }
 
 void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int channel)
@@ -152,6 +151,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 	address_space& mem = this->space(AS_PROGRAM);
 	source &= 0x0fffffff;
+	length &= 0x0fffffff; // gormiti
 
 	for (int i = 0; i < length; i++)
 	{
@@ -662,6 +662,10 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x00702e, 0x00702e).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap2_tilebase_msb_w));           // written with other tmap2 regs (roz layer or line layer?)
 	map(0x00702f, 0x00702f).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap3_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap3_tilebase_msb_w));           // written with other tmap3 regs (roz layer or line layer?)
 
+	map(0x007036, 0x007036).w(m_spg_video, FUNC(gcm394_base_video_device::split_irq_xpos_w));
+	map(0x007037, 0x007037).w(m_spg_video, FUNC(gcm394_base_video_device::split_irq_ypos_w));
+
+
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x007038, 0x007038).r(m_spg_video, FUNC(gcm394_base_video_device::video_curline_r));
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w));
@@ -695,6 +699,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007086, 0x007086).w(m_spg_video, FUNC(gcm394_base_video_device::video_7086_w));
 	map(0x007087, 0x007087).w(m_spg_video, FUNC(gcm394_base_video_device::video_7087_w));
 	map(0x007088, 0x007088).w(m_spg_video, FUNC(gcm394_base_video_device::video_7088_w));
+
+	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_r)); // gormiti checks this
 
 	// ######################################################################################################################################################################################
 	// 73xx-77xx = video ram

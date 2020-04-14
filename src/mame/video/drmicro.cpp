@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg1_tile_info)
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
 	col &= 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, col, flags);
+	tileinfo.set(0, code, col, flags);
 }
 
 TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
 	col &= 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, code, col, flags);
+	tileinfo.set(1, code, col, flags);
 }
 
 /****************************************************************************/

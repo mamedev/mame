@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(pb_r) { return m_port_buf[1]; }
 	DECLARE_READ8_MEMBER(pc_r) { return m_port_buf[2]; }
 	DECLARE_READ8_MEMBER(pd_r) { return m_port_buf[3]; }
-	DECLARE_WRITE8_MEMBER(pa_w);
+	void pa_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(pc_w);
 	DECLARE_WRITE8_MEMBER(pd_w);

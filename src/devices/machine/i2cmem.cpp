@@ -18,22 +18,22 @@ outputs:
 
 The memory address is only 8 bits, devices larger than this have multiple slave addresses.
 The top five address bits are set at manufacture time, two values are standard.
-Up to 4096 bytes can be addressed.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/i2cmem.h"
 
-#define STATE_IDLE ( 0 )
-#define STATE_DEVSEL ( 1 )
-#define STATE_BYTEADDR ( 2 )
-#define STATE_DATAIN ( 3 )
-#define STATE_DATAOUT ( 4 )
-#define STATE_RESET ( 5 )
+constexpr int STATE_IDLE(0);
+constexpr int STATE_DEVSEL(1);
+constexpr int STATE_ADDRESSHIGH(2);
+constexpr int STATE_ADDRESSLOW(3);
+constexpr int STATE_DATAIN(4);
+constexpr int STATE_DATAOUT(5);
+constexpr int STATE_RESET(6);
 
-#define DEVSEL_RW ( 1 )
-#define DEVSEL_ADDRESS ( 0xfe )
+constexpr int DEVSEL_RW(1);
+constexpr int DEVSEL_ADDRESS(0xfe);
 
 //**************************************************************************
 //  DEBUGGING
@@ -100,6 +100,8 @@ i2cmem_device::i2cmem_device(
 	m_sdar(1),
 	m_state(STATE_IDLE),
 	m_shift(0),
+	m_devsel(0),
+	m_addresshigh(0),
 	m_byteaddr(0),
 	m_page_offset(0),
 	m_page_written_size(0)
@@ -173,6 +175,8 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_bits) );
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
+	if (!skip_addresshigh())
+		save_item( NAME(m_addresshigh) );
 	save_item( NAME(m_byteaddr) );
 	save_item( NAME(m_page_offset) );
 	save_item( NAME(m_page_written_size) );
@@ -315,7 +319,8 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 		switch( m_state )
 		{
 		case STATE_DEVSEL:
-		case STATE_BYTEADDR:
+		case STATE_ADDRESSHIGH:
+		case STATE_ADDRESSLOW:
 		case STATE_DATAIN:
 			if( m_bits < 8 )
 			{
@@ -350,7 +355,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						else if( ( m_devsel & DEVSEL_RW ) == 0 )
 						{
 							verboselog( this, 1, "devsel %02x: write\n", m_devsel );
-							m_state = STATE_BYTEADDR;
+							m_state = skip_addresshigh() ? STATE_ADDRESSLOW : STATE_ADDRESSHIGH;
 						}
 						else
 						{
@@ -359,12 +364,20 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						}
 						break;
 
-					case STATE_BYTEADDR:
-						m_byteaddr = ((m_devsel << 7) & 0xff00) | m_shift;
+					case STATE_ADDRESSHIGH:
+						m_addresshigh = m_shift;
+
+						verboselog(this, 1, "addresshigh %02x\n", m_addresshigh);
+
+						m_state = STATE_ADDRESSLOW;
+						break;
+
+					case STATE_ADDRESSLOW:
+						m_byteaddr = m_shift | (skip_addresshigh() ? (m_devsel & DEVSEL_ADDRESS) << 7 : m_addresshigh << 8);
 						m_page_offset = 0;
 						m_page_written_size = 0;
 
-						verboselog( this, 1, "byteaddr %02x\n", m_shift );
+						verboselog( this, 1, "addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
 
 						m_state = STATE_DATAIN;
 						break;
@@ -508,7 +521,7 @@ int i2cmem_device::address_mask()
 int i2cmem_device::select_device()
 {
 	int device = ( m_slave_address & 0xf0 ) | ( m_e2 << 3 ) | ( m_e1 << 2 ) | ( m_e0 << 1 );
-	int mask = DEVSEL_ADDRESS & ~( address_mask() >> 7 );
+	int mask = DEVSEL_ADDRESS & ~( skip_addresshigh() ? address_mask() >> 7 : 0 );
 
 	if( ( m_devsel & mask ) == ( device & mask ) )
 	{

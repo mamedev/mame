@@ -318,8 +318,7 @@ void sigmab52_state::jwildb52_map(address_map &map)
 
 	map(0xf720, 0xf727).rw("6840ptm_1", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 
-	map(0xf730, 0xf730).rw("hd63484", FUNC(hd63484_device::status8_r), FUNC(hd63484_device::address8_w));
-	map(0xf731, 0xf731).rw("hd63484", FUNC(hd63484_device::data8_r), FUNC(hd63484_device::data8_w));
+	map(0xf730, 0xf731).rw("hd63484", FUNC(hd63484_device::read8), FUNC(hd63484_device::write8));
 
 	map(0xf740, 0xf740).r(FUNC(sigmab52_state::in0_r));
 	map(0xf741, 0xf741).portr("IN1");

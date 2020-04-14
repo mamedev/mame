@@ -124,7 +124,7 @@ class chd_lzma_compressor : public chd_compressor
 public:
 	// construction/destruction
 	chd_lzma_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy);
-	~chd_lzma_compressor() = default;
+	~chd_lzma_compressor();
 
 	// core functionality
 	virtual uint32_t compress(const uint8_t *src, uint32_t srclen, uint8_t *dest) override;
@@ -492,6 +492,15 @@ chd_codec::chd_codec(chd_file &chd, uint32_t hunkbytes, bool lossy)
 	: m_chd(chd),
 		m_hunkbytes(hunkbytes),
 		m_lossy(lossy)
+{
+}
+
+
+//-------------------------------------------------
+//  ~chd_codec - destructor
+//-------------------------------------------------
+
+chd_codec::~chd_codec()
 {
 }
 
@@ -1041,6 +1050,15 @@ chd_lzma_compressor::chd_lzma_compressor(chd_file &chd, uint32_t hunkbytes, bool
 {
 	// initialize the properties
 	configure_properties(m_props, hunkbytes);
+}
+
+
+//-------------------------------------------------
+//  ~chd_lzma_compressor - destructor
+//-------------------------------------------------
+
+chd_lzma_compressor::~chd_lzma_compressor()
+{
 }
 
 

@@ -820,7 +820,7 @@ WRITE8_MEMBER(digdug_state::earom_write)
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(digdug_state::earom_control_w)
+void digdug_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB1, C2 = DB2, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 1), BIT(data, 2));
@@ -841,7 +841,7 @@ void galaga_state::machine_start()
 void digdug_state::machine_start()
 {
 	galaga_state::machine_start();
-	earom_control_w(machine().dummy_space(), 0, 0);
+	earom_control_w(0);
 }
 
 void galaga_state::machine_reset()

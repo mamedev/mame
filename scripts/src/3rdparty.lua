@@ -2191,7 +2191,7 @@ end
 --------------------------------------------------
 
 project "wdlfft"
-    uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
+	uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
 	kind "StaticLib"
 
 	configuration { "gmake or ninja" }

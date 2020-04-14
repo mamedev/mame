@@ -275,7 +275,7 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 	int bank = (attr & 0x03);
 	int color = 0;  /* fixed colors: one rom for each R, G and B. */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 

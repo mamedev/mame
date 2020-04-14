@@ -20,7 +20,7 @@
  @053     1655A   1979, Atari Touch Me
  @0??     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (custom label)
  @061     1655A   1980, Lakeside Le Boom
- *081     1655A   19??, Ramtex Space Invaders/Block Buster
+ *081     1655A   1981, Ramtex Space Invaders/Block Buster
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *123     1655A?  1980, Kingsford Match Me/Mini Match Me

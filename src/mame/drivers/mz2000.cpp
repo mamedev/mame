@@ -920,6 +920,7 @@ void mz2000_state::mz2000(machine_config &config)
 	m_cass->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass");
+	SOFTWARE_LIST(config, "cass_list2").set_original("mz2200_cass");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

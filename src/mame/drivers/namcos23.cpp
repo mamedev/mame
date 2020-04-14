@@ -2391,7 +2391,7 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
+	tileinfo.set(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
 }
 
 WRITE32_MEMBER(namcos23_state::textram_w)
@@ -2881,7 +2881,9 @@ WRITE16_MEMBER(namcos23_state::mcuen_w)
 		break;
 
 	default:
-		logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
+		// For some reason, the main program write the high 16bits of the
+		// 32 bits words of itself there...
+		//		logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
 		break;
 	}
 }

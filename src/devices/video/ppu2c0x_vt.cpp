@@ -27,8 +27,6 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
-	for (int i = 0; i < 6; i++)
-		m_2012_2017_descramble[i] = 2 + i;
 }
 
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -47,7 +45,7 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 }
 
 
-READ8_MEMBER(ppu_vt03_device::palette_read)
+uint8_t ppu_vt03_device::palette_read(offs_t offset)
 {
 	if (m_201x_regs[0] & 0x80)
 	{
@@ -55,7 +53,7 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 	}
 	else
 	{
-		return ppu2c0x_device::palette_read(space, offset);
+		return ppu2c0x_device::palette_read(offset);
 	}
 }
 
@@ -157,7 +155,7 @@ void ppu_vt03_device::set_new_pen(int i)
 
 }
 
-WRITE8_MEMBER(ppu_vt03_device::palette_write)
+void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 {
 	//logerror("pal write %d %02x\n", offset, data);
 	// why is the check pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80 in set_2010_reg and 0x04 : 0x80 here?
@@ -172,78 +170,70 @@ WRITE8_MEMBER(ppu_vt03_device::palette_write)
 	{
 		//if(m_pal_mode == PAL_MODE_NEW_VG) // ddrdismx writes the palette before setting the register but doesn't use 'PAL_MODE_NEW_VG', Konami logo is missing if you don't allow writes to be stored for when we switch
 		m_newpal[offset & 0xff] = data;
-		ppu2c0x_device::palette_write(space, offset, data);
+		ppu2c0x_device::palette_write(offset, data);
 	}
 }
 
-READ8_MEMBER(ppu_vt03_device::read)
+
+uint8_t ppu_vt03_device::read_extended(offs_t offset)
 {
-	if (offset <= 0xf)
+	offset += 0x10;
+	logerror("%s: read from extended PPU reg %02x\n", machine().describe_context(), offset);
+
+	switch (offset)
 	{
-		return ppu2c0x_device::read(space, offset);
-	}
-	else if (offset <= 0x1f)
-	{
-		logerror("%s: read from reg %02x\n", machine().describe_context(), offset);
+	case 0x10:
+		return m_201x_regs[0x0];
 
-		switch (offset)
-		{
-		case 0x10:
-			return m_201x_regs[0x0];
+	case 0x11:
+		return m_201x_regs[0x1];
 
-		case 0x11:
-			return m_201x_regs[0x1];
+	case 0x12:
+		return m_201x_regs[m_2012_2017_descramble[0]];
 
-		case 0x12:
-			return m_201x_regs[m_2012_2017_descramble[0]];
+	case 0x13:
+		return m_201x_regs[m_2012_2017_descramble[1]];
 
-		case 0x13:
-			return m_201x_regs[m_2012_2017_descramble[1]];
+	case 0x14:
+		return m_201x_regs[m_2012_2017_descramble[2]];
 
-		case 0x14:
-			return m_201x_regs[m_2012_2017_descramble[2]];
+	case 0x15:
+		return m_201x_regs[m_2012_2017_descramble[3]];
 
-		case 0x15:
-			return m_201x_regs[m_2012_2017_descramble[3]];
+	case 0x16:
+		return m_201x_regs[m_2012_2017_descramble[4]];
 
-		case 0x16:
-			return m_201x_regs[m_2012_2017_descramble[4]];
+	case 0x17:
+		return m_201x_regs[m_2012_2017_descramble[5]];
 
-		case 0x17:
-			return m_201x_regs[m_2012_2017_descramble[5]];
+	case 0x18:
+		return m_201x_regs[0x8];
 
-		case 0x18:
-			return m_201x_regs[0x8];
+	case 0x19:
+		return 0x00;
 
-		case 0x19:
-			return 0x00;
+	case 0x1a:
+		return m_201x_regs[0xa];
 
-		case 0x1a:
-			return m_201x_regs[0xa];
+	case 0x1b:
+		return 0x00;
 
-		case 0x1b:
-			return 0x00;
+	case 0x1c:
+		return 0x00;
 
-		case 0x1c:
-			return 0x00;
+	case 0x1d:
+		return 0x00;
 
-		case 0x1d:
-			return 0x00;
+	case 0x1e:
+		return 0x00;
 
-		case 0x1e:
-			return 0x00;
-
-		case 0x1f:
-			return 0x00;
-		}
-	}
-	else
-	{
+	case 0x1f:
 		return 0x00;
 	}
 
 	return 0x00;
 }
+
 
 void ppu_vt03_device::init_palette()
 {
@@ -500,83 +490,78 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	m_201x_regs[0x0] = data;
 }
 
-WRITE8_MEMBER(ppu_vt03_device::write)
+void ppu_vt03_device::write_extended(offs_t offset, uint8_t data)
 {
-	if (offset < 0x10)
+	offset += 0x10;
+	logerror("%s: write to extended PPU reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
+	switch (offset)
 	{
-		ppu2c0x_device::write(space, offset, data);
-	}
-	else
-	{
-		logerror("%s: write to reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
-		switch (offset)
-		{
-		case 0x10:
-			set_2010_reg(data);
-			break;
+	case 0x10:
+		set_2010_reg(data);
+		break;
 
-		case 0x11:
-			m_201x_regs[0x1] = data;
-			break;
+	case 0x11:
+		m_201x_regs[0x1] = data;
+		break;
 
-		case 0x12:
-			m_201x_regs[m_2012_2017_descramble[0]] = data;
-			break;
+	case 0x12:
+		m_201x_regs[m_2012_2017_descramble[0]] = data;
+		break;
 
-		case 0x13:
-			m_201x_regs[m_2012_2017_descramble[1]] = data;
-			break;
+	case 0x13:
+		m_201x_regs[m_2012_2017_descramble[1]] = data;
+		break;
 
-		case 0x14:
-			m_201x_regs[m_2012_2017_descramble[2]] = data;
-			break;
+	case 0x14:
+		m_201x_regs[m_2012_2017_descramble[2]] = data;
+		break;
 
-		case 0x15:
-			m_201x_regs[m_2012_2017_descramble[3]] = data;
-			break;
+	case 0x15:
+		m_201x_regs[m_2012_2017_descramble[3]] = data;
+		break;
 
-		case 0x16:
-			m_201x_regs[m_2012_2017_descramble[4]] = data;
-			break;
+	case 0x16:
+		m_201x_regs[m_2012_2017_descramble[4]] = data;
+		break;
 
-		case 0x17:
-			logerror("set reg 7 %02x\n", data);
-			m_201x_regs[m_2012_2017_descramble[5]] = data;
-			break;
+	case 0x17:
+		logerror("set reg 7 %02x\n", data);
+		m_201x_regs[m_2012_2017_descramble[5]] = data;
+		break;
 
-		case 0x18:
-			logerror("set reg 8 %02x\n", data);
-			m_201x_regs[0x8] = data;
-			break;
+	case 0x18:
+		logerror("set reg 8 %02x\n", data);
+		m_201x_regs[0x8] = data;
+		break;
 
-		case 0x19:
-			// reset gun port (value doesn't matter)
-			break;
+	case 0x19:
+		// reset gun port (value doesn't matter)
+		break;
 
-		case 0x1a:
-			m_201x_regs[0xa] = data;
-			break;
+	case 0x1a:
+		m_201x_regs[0xa] = data;
+		break;
 
-		case 0x1b:
-			// unused
-			break;
+	case 0x1b:
+		// unused
+		break;
 
-		case 0x1c:
-			// (READ) x-coordinate of gun
-			break;
+	case 0x1c:
+		// (READ) x-coordinate of gun
+		break;
 
-		case 0x1d:
-			// (READ) y-coordinate of gun
-			break;
+	case 0x1d:
+		// (READ) y-coordinate of gun
+		break;
 
-		case 0x1e:
-			// (READ) x-coordinate of gun 2
-			break;
+	case 0x1e:
+		// (READ) x-coordinate of gun 2
+		break;
 
-		case 0x1f:
-			// (READ) y-coordinate of gun 2
-			break;
-		}
+	case 0x1f:
+		// (READ) y-coordinate of gun 2
+		break;
 	}
 }
+
 

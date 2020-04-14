@@ -725,7 +725,7 @@ void fitfight_state::fitfight(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fitfight_state::fitfight_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fitfight_state::irq2_line_hold));
 
-	upd7810_device &audiocpu(UPD7810(config, m_audiocpu, 12000000));
+	upd78c10_device &audiocpu(UPD78C10(config, m_audiocpu, 12000000));
 	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
 	audiocpu.pa_in_cb().set(FUNC(fitfight_state::snd_porta_r));
 	audiocpu.pa_out_cb().set(FUNC(fitfight_state::snd_porta_w));

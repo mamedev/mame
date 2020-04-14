@@ -47,8 +47,8 @@ public:
 	void set_type(asc_type type) { m_chip_type = type; }
 	auto irqf_callback() { return write_irq.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	enum

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 There appear to exist some undumped N64 protos
 
   - Air Boardin' USA
@@ -17,9 +18,8 @@ Canceled games (possibly never got to the proto stage)
   - Freak Boy
   - Ikazuchi No Go Toku
   - X-Men Mutant Academy
--->
 
-<!--
+
     Undumped
 
     007: Goldeneye (demo)                      DIS-NUS-NGEE-USA
@@ -46,9 +46,6 @@ Canceled games (possibly never got to the proto stage)
     Super Mario 64 (demo)                      DIS-NUS-NSME-USA
     Turok 2: Seeds of Evil (demo)              NUS-NTYE-USA
 
--->
-
-<!--
 
 Info on N64 chip labels (from The Cart Scan Repository)
 
@@ -561,8 +558,14 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19991225"/>
 		<info name="alt_title" value="悪魔城ドラキュラ黙示録外伝 レジェンド オブ コーネル"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-ND4J-0]" />
+			<feature name="u2" value="U2 [BK16D]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="akumajou dracula mokushiroku gaiden - legend of cornell (japan).bin" size="16777216" crc="420ce37b" sha1="10b15a7ceb6d56720ddd7755dac6102832407110" />
+				<rom name="nus-nd4j-0.u1" size="16777216" crc="420ce37b" sha1="10b15a7ceb6d56720ddd7755dac6102832407110" />
 			</dataarea>
 		</part>
 	</software>
@@ -1211,8 +1214,18 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="20000128"/>
 		<info name="alt_title" value="バイオハザード2"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-04B-01" />
+			<feature name="u1" value="U1 [NUS-NB5J-0 02]" />
+			<feature name="u2" value="U2 [NUS-NB5J-0 12]" />
+			<feature name="u3" value="U3 [LH52V246AN]" />
+			<feature name="u4" value="U4 BU9803 [LV2416]" />
+			<feature name="u5" value="U5 CIC-NUS [CIC6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="67108864">
-				<rom name="biohazard 2 (japan).bin" size="67108864" crc="31a3b913" sha1="8651451a9363da0b6783dee6bb99eb077b318bd5" />
+				<rom name="nus-nb5j-0 02.u1" size="33554432" crc="bab2006f" sha1="866989ca17afb6def592674a5707a2c8c44cd99c" offset="0x0000000" />
+				<rom name="nus-nb5j-0 12.u2" size="33554432" crc="95922d14" sha1="843ce2a4030b47fd5325e960ffa45fc962c6455b" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2559,8 +2572,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19990730"/>
 		<info name="alt_title" value="電車でGO ! 64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-ND6J-0]" />
+			<feature name="u2" value="U2 [BK16DA]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="densha de go! 64 (japan).bin" size="33554432" crc="8f63474f" sha1="ad5b14c3c571db911b2896d6c80e200b12cafdcd" />
+				<rom name="nus-nd6j-0.u1" size="33554432" crc="8f63474f" sha1="ad5b14c3c571db911b2896d6c80e200b12cafdcd" />
 			</dataarea>
 		</part>
 	</software>
@@ -4094,8 +4113,16 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="20000927"/>
 		<info name="alt_title" value="不思議のダンジョン 風来のシレン2 鬼襲来!シレン城!"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NSIJ-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="fushigi no dungeon fuurai no shiren 2 - oni shuurai! shiren jou! (japan).bin" size="33554432" crc="af0a22ef" sha1="a50ef01ec653ed48a2b857fe2834d815cbd8e972" />
+				<rom name="nus-nsij-0.u1" size="33554432" crc="af0a22ef" sha1="a50ef01ec653ed48a2b857fe2834d815cbd8e972" />
 			</dataarea>
 		</part>
 	</software>
@@ -4926,8 +4953,14 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="20000421"/>
 		<info name="alt_title" value="井出洋介の麻雀塾"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NIMJ-0]" />
+			<feature name="u2" value="U2 [BK16D]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="ide yosuke no mahjong juku (japan).bin" size="12582912" crc="32003c85" sha1="278e45431689b52ce28955957b444ae4f8539199" />
+				<rom name="nus-nimj-0.u1" size="12582912" crc="32003c85" sha1="278e45431689b52ce28955957b444ae4f8539199" />
 			</dataarea>
 		</part>
 	</software>
@@ -8683,8 +8716,14 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="release" value="19980529"/>
 		<info name="alt_title" value="パチンコ365日"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NPCJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="pachinko 365 nichi (japan).bin" size="12582912" crc="41363874" sha1="a14f8b56f1f40d982e3636b328911ccc96b58bd5" />
+				<rom name="nus-npcj-0.u1" size="12582912" crc="41363874" sha1="a14f8b56f1f40d982e3636b328911ccc96b58bd5" />
 			</dataarea>
 		</part>
 	</software>
@@ -9781,8 +9820,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19980723"/>
 		<info name="alt_title" value="らくがきっず"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NKRJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="rakuga kids (japan).bin" size="12582912" crc="4c07c266" sha1="9cb434635987e947f25d0ebd0e1a0f500e63adc6" />
+				<rom name="nus-nkrj-0.u1" size="12582912" crc="4c07c266" sha1="9cb434635987e947f25d0ebd0e1a0f500e63adc6" />
 			</dataarea>
 		</part>
 	</software>
@@ -13162,6 +13207,17 @@ clips onto the player's ear.
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nus-nvce-0.u1" size="4194304" crc="3cd894c4" sha1="9f57ec795e3c62d88ea823a5866a7b1012b731db" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="vpointp">
+		<description>Viewpoint 2064 (Prototype)</description>
+		<year>1999</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="Viewpoint2064.z64" size="16777216" crc="93a630cb" sha1="defacaf6dbd22962ec0184849ed4a4c53a147454" />
 			</dataarea>
 		</part>
 	</software>

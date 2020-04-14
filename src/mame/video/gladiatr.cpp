@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state_base::bg_get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_videoram[tile_index] + ((attr & 0x07) << 8) + (m_bg_tile_bank << 11),
 			(attr >> 3) ^ 0x1f,
 			0);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state_base::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(gladiatr_state_base::fg_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),
 			0,
 			0);

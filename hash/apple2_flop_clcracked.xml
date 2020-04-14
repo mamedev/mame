@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25&quot; disks">
 
@@ -36241,6 +36244,124 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pick the part (4am crack).dsk" size="143360" crc="4ef73c91" sha1="b4900ba310892fc33eb8c6b4bff54f224edf2701" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teltm320">
+		<description>Telling Time (Version 3.2.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2020-03-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="telling time v3.2.0 (4am crack).dsk" size="143360" crc="e8745ab8" sha1="84cd18cb483369a29f46050d5ccaa84143e59224"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="money316">
+		<description>Money (Version 3.1.6) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2020-03-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="money v3.1.6 (4am crack).dsk" size="143360" crc="d27e714f" sha1="d8238aedd8f1312621d29c794eb62a53dd948bbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyborgv2">
+		<description>Cyborg (Version 2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Sentient Software</publisher>
+		<info name="release" value="2020-03-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cyborg v2 (4am crack).dsk" size="143360" crc="8521d84b" sha1="7030a8ce8b0bc42504e6cea68e8345bf3f7265ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcarmen">
+		<description>Where in North Dakota is Carmen Sandiego? (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-09"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side a.dsk" size="143360" crc="72421125" sha1="9f673c85383c89b2ddd92d8379af8c130daf2d0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cndalman">
+		<description>Carmen's North Dakota Almanac Database (version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-11"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="carmen's north dakota almanac database (4am crack).dsk" size="143360" crc="20248891" sha1="579eb26ce965ed79ebd47ff6262c82a3ad93cf82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaflndd">
+		<description>Governors and First Ladies of North Dakota Database (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-20"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="governors and first ladies of north dakota (4am crack).dsk" size="143360" crc="29c548b7" sha1="6d12533696ccf49e17c99921b2ec58c429dcb592"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndagridb">
+		<description>North Dakota Agriculture Database (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-20"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota agriculture (4am crack).dsk" size="143360" crc="3d6e4023" sha1="880a5232ce130ee7199f4168c8657e0b04ed9884"/>
 			</dataarea>
 		</part>
 	</software>

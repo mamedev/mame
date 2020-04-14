@@ -245,7 +245,7 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(spg2xx_game_mysprt_orig_state::porta_w)
 {
-	// this seems like nice clean logic, based on writes and how the port direction is set, 
+	// this seems like nice clean logic, based on writes and how the port direction is set,
 	// mysprtch and mysptqvc work fine with this logic, but mysprtcp is more problematic, especially in test mode, see other function
 
 	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
@@ -394,15 +394,7 @@ void spg2xx_game_mysprt_plus_state::init_mysprtcp()
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
-	for (int i = 0; i < size / 2; i++)
-	{
-		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,
-									 7,  6,  5,  4,
-									 11, 10, 9,  8,
-									 3,  1,  2,  0);
-
-		ROM[i] = ROM[i] ^ 0xfafa;
-	}
+	decrypt_ac_ff(ROM, size);
 }
 
 

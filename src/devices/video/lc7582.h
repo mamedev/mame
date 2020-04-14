@@ -59,7 +59,7 @@ private:
 	int m_duty = 0;
 	int m_addsp = 0;
 	u64 m_shift = 0;
-	u64 m_latch[2];
+	u64 m_latch[2] = { 0, 0 };
 
 	// callbacks
 	devcb_write64 m_write_segs;

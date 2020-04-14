@@ -81,6 +81,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(mutantf_2_bank_callback);
 
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	u16 robocop2_mix_callback(u16 p, u16 p2);
 
 	DECLARE_READ16_MEMBER( edrandy_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( edrandy_protection_region_6_146_w );

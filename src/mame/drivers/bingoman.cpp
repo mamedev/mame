@@ -240,7 +240,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/h8/h83002.h"
+#include "cpu/h8500/h8520.h"
+#include "cpu/h8500/h8534.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -264,12 +265,11 @@ protected:
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<h8520_device> m_maincpu;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bingoman_palette(palette_device &palette) const;
-	void bingoman_io_map(address_map &map);
 	void bingoman_prg_map(address_map &map);
 };
 
@@ -285,11 +285,6 @@ uint32_t bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 void bingoman_state::bingoman_prg_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-}
-
-void bingoman_state::bingoman_io_map(address_map &map)
-{
-//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( bingoman )
@@ -382,9 +377,10 @@ void bingoman_state::bingoman_palette(palette_device &palette) const
 void bingoman_state::bingoman(machine_config &config)
 {
 	/* basic machine hardware */
-	H83002(config, m_maincpu, XTAL(20'000'000)); /* TODO: correct CPU type */
+	HD6435208(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingoman_state::bingoman_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &bingoman_state::bingoman_io_map);
+
+	HD6475348(config, "subcpu", 20_MHz_XTAL).set_disable();
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -412,6 +408,9 @@ void bingoman_state::bingoman(machine_config &config)
 ROM_START( bingoman )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
+
+	ROM_REGION( 0x8000, "subcpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd6475348cp16.u33", 0x0000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )    // banked
 	ROM_LOAD( "p03_036.015.u01", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) ) // Game 1 (Gold Jackpot)
@@ -441,6 +440,9 @@ ROM_END
 ROM_START( bingomana )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
+
+	ROM_REGION( 0x8000, "subcpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd6475348cp16.u33", 0x0000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )    // banked
 	ROM_LOAD( "a03_037.013.u01", 0x000000, 0x080000, CRC(9c3ed8e9) SHA1(263431ed6db314bee64709bae16fa8c6d5adbd41) ) // Game 1 (Gold Jackpot)

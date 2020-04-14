@@ -384,7 +384,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	const u8 extra_planes = ((tile >> (16 + 10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile & 0xffff,
 			(tile >> 16) & 0x1ff & (~extra_planes),
 			TILE_FLIPYX(tile >> 30));
@@ -402,7 +402,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_text)
 	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
 	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			vram_tile & 0xff,
 			(vram_tile >> 9) & 0x3f,
 			flags);
@@ -426,7 +426,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	if (vram_tile & 0x0100) flags |= TILE_FLIPX;
 	if (vram_tile & 0x8000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile_index,
 			(vram_tile >> 9) & 0x3f,
 			flags);

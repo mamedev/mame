@@ -663,7 +663,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
@@ -675,7 +675,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	tile &= 0x1fff;
 	tile |= m_back_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
@@ -688,7 +688,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	tile |= 0x2000;
 	tile |= m_midl_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
+	tileinfo.set(1, tile, color + 16, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
@@ -702,7 +702,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 	tile |= m_fore_layer_d13;
 	tile |= m_fore_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
+	tileinfo.set(1, tile, color + 8, 0);
 }
 
 

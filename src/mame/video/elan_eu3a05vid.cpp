@@ -16,7 +16,8 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this)),
 	m_bytes_per_tile_entry(4),
 	m_vrambase(0x600),
-	m_spritebase(0x3e00)
+	m_spritebase(0x3e00),
+	m_use_spritepages(false)
 {
 }
 
@@ -85,6 +86,13 @@ void elan_eu3a05vid_device::set_is_sudoku()
 	m_spritebase = 0x1000;
 }
 
+void elan_eu3a05vid_device::set_is_pvmilfin()
+{
+	m_bytes_per_tile_entry = 4;
+	m_vrambase = 0x200;
+	m_spritebase = 0x1000; // not verified
+}
+
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 {
 	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
@@ -130,9 +138,12 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    xx = x position
 	    XX = texture x start
 	    YY = texture y start
-	    aa = same as unk2 on tiles
 	    bb = sometimes set in invaders
 	    AA = same as attr on tiles (colour / priority?)
+
+
+	    aa = same as unk2 on tiles? ( --pp ---- )
+		p = page
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
@@ -214,6 +225,13 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		}
 
 		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
+		int page = (unk2 & 0x30) >> 4;
+		
+		// rad_sinv menu screen and phoenix don't agree with this, but carlecfg needs it
+		if (m_use_spritepages)
+		{
+			base += 0x10000 * page;
+		}
 
 		if (doubleX)
 			sizex = sizex * 2;

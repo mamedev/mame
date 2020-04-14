@@ -67,12 +67,12 @@ public:
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( dack_w );
-	DECLARE_WRITE_LINE_MEMBER( lpen_w );
-	DECLARE_READ_LINE_MEMBER( hrtc_r );
-	DECLARE_READ_LINE_MEMBER( vrtc_r );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void dack_w(uint8_t data);
+	void lpen_w(int state);
+	int hrtc_r();
+	int vrtc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

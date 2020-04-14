@@ -63,10 +63,10 @@ public:
 
 	template <std::size_t Line> auto out_f() { return m_out_fx_cbs[Line-1].bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE8_MEMBER(rate_select_w);
-	DECLARE_WRITE_LINE_MEMBER(rsa_w);
-	DECLARE_WRITE_LINE_MEMBER(rsb_w);
+	void reset_w(int state);
+	void rate_select_w(uint8_t data);
+	void rsa_w(int state);
+	void rsb_w(int state);
 
 	void timer_enable(timer_id i, bool enable);
 	void timer_disable_all();

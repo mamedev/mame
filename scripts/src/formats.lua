@@ -931,6 +931,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/h8_cas.h,FORMATS["H8_CAS"] = true
+--------------------------------------------------
+
+if (FORMATS["H8_CAS"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/h8_cas.cpp",
+		MAME_DIR.. "src/lib/formats/h8_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hector_minidisc.h,FORMATS["HECTOR_MINIDISC"] = true
 --------------------------------------------------
 

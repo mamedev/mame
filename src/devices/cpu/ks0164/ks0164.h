@@ -8,14 +8,35 @@
 
 #pragma once
 
-class ks0164_device : public cpu_device
+class ks0164_cpu_device : public cpu_device
 {
 public:
-	ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	enum {
+		R_SP = 4,
+		R_PSW = 5,
+		R_PC = 6,
+		R_ZERO = 7
+	};
+
+	enum {
+		F_MASK = 0xf0,
+
+		F_Z = 0x10,
+		F_C = 0x20,
+		F_N = 0x40,
+		F_V = 0x80,
+
+		F_I = 0x8000
+	};
+
+	static const u16 imask[16];
+
 	int m_icount;
-	u32 m_pc;
+	u16 m_r[8];
+	u32 m_irq;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -29,8 +50,25 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	const address_space_config m_program_config;
+	address_space *m_program;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_program_cache;
+
+	void handle_irq();
+	u16 snz(u16 r);
+	void do_alu(u16 opcode, u16 v);
+	void unk(u16 opcode);
 };
 
-DECLARE_DEVICE_TYPE(KS0164, ks0164_device)
+enum {
+	KS0164_R0,
+	KS0164_R1,
+	KS0164_R2,
+	KS0164_R3,
+	KS0164_SP,
+	KS0164_PSW,
+	KS0164_PC,
+};
+
+DECLARE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device)
 
 #endif

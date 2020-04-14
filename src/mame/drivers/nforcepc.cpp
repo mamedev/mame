@@ -897,7 +897,7 @@ void it8703f_device::map_fdc_addresses()
 {
 	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
 
-	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
 }
 
 void it8703f_device::map_lpt(address_map& map)
@@ -907,12 +907,12 @@ void it8703f_device::map_lpt(address_map& map)
 
 READ8_MEMBER(it8703f_device::lpt_read)
 {
-	return pc_lpt_lptdev->read(space, offset, mem_mask);
+	return pc_lpt_lptdev->read(offset);
 }
 
 WRITE8_MEMBER(it8703f_device::lpt_write)
 {
-	pc_lpt_lptdev->write(space, offset, data, mem_mask);
+	pc_lpt_lptdev->write(offset, data);
 }
 
 void it8703f_device::map_lpt_addresses()
@@ -977,7 +977,7 @@ READ8_MEMBER(it8703f_device::at_keybc_r)
 	switch (offset) //m_kbdc
 	{
 	case 0:
-		return m_kbdc->data_r(space, 0);
+		return m_kbdc->data_r(0);
 	}
 
 	return 0xff;
@@ -988,18 +988,18 @@ WRITE8_MEMBER(it8703f_device::at_keybc_w)
 	switch (offset)
 	{
 	case 0:
-		m_kbdc->data_w(space, 0, data);
+		m_kbdc->data_w(0, data);
 	}
 }
 
 READ8_MEMBER(it8703f_device::keybc_status_r)
 {
-	return m_kbdc->data_r(space, 4);
+	return m_kbdc->data_r(4);
 }
 
 WRITE8_MEMBER(it8703f_device::keybc_command_w)
 {
-	m_kbdc->data_w(space, 4, data);
+	m_kbdc->data_w(4, data);
 }
 
 void it8703f_device::map_keyboard_addresses()

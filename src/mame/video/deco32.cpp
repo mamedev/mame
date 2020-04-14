@@ -104,7 +104,6 @@ void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4
 
 void captaven_state::video_start()
 {
-	m_deco_tilegen[1]->set_pf1_8bpp_mode(1);
 	deco32_state::allocate_spriteram(0);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::video_start();
@@ -134,7 +133,6 @@ void nslasher_state::video_start()
 
 void dragngun_state::video_start()
 {
-	//m_deco_tilegen[0]->set_pf1_8bpp_mode(1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::allocate_buffered_palette();
@@ -322,7 +320,7 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int alpha = ((!alpha1) || alpha2) ? m_deco_ace->get_alpha((col1 & 0x8) ? (0x4 + ((col1 & 0x3) / 2)) : ((col1 & 0x7) / 2)) : 0xff;
 
 			/* I don't really understand how object ACE ram is really hooked up,
-				 the only obvious place in Night Slashers is the stagecoach in level 2 */
+			     the only obvious place in Night Slashers is the stagecoach in level 2 */
 
 			col1 = (col1 % gfx1->colors()) * gfx1->granularity();
 			// Apply sprite bitmap 1 according to priority rules
@@ -423,7 +421,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1, 1);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
@@ -524,7 +522,7 @@ void nslasher_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, co
 			int alpha = m_deco_ace->get_alpha(col1 / 8);
 
 			/* I don't really understand how object ACE ram is really hooked up,
-				 the only obvious place in Night Slashers is the stagecoach in level 2 */
+			     the only obvious place in Night Slashers is the stagecoach in level 2 */
 
 			col1 = ((col1 & 0xf) % gfx1->colors()) * gfx1->granularity();
 			// Apply sprite bitmap 1 according to priority rules
@@ -625,7 +623,7 @@ u32 nslasher_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &b
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1, 1);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else

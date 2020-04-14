@@ -730,10 +730,10 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 
 	z80pio_device& pio_rd(Z80PIO(config, Z80PIO_RD_TAG, 20_MHz_XTAL / 8));
 	pio_rd.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio_rd.in_pa_callback().set("sasi_data_in", FUNC(input_buffer_device::bus_r));
-	pio_rd.out_pa_callback().set("sasi_data_out", FUNC(output_latch_device::bus_w));
+	pio_rd.in_pa_callback().set("sasi_data_in", FUNC(input_buffer_device::read));
+	pio_rd.out_pa_callback().set("sasi_data_out", FUNC(output_latch_device::write));
 	pio_rd.out_ardy_callback().set(FUNC(xerox820ii_state::rdpio_pardy_w));
-	pio_rd.in_pb_callback().set("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	pio_rd.in_pb_callback().set("sasi_ctrl_in", FUNC(input_buffer_device::read));
 	pio_rd.out_pb_callback().set(FUNC(xerox820ii_state::rdpio_pb_w));
 
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);

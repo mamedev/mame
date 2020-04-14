@@ -126,17 +126,17 @@ void luxor_4105_device::device_add_mconfig(machine_config &config)
 
 INPUT_PORTS_START( luxor_4105 )
 	PORT_START("1E")
-	PORT_DIPNAME( 0x03, 0x00, "Stepping" ) PORT_DIPLOCATION("1E:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Stepping" ) PORT_DIPLOCATION("1E:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, "Half (Seagate/Texas)" )
 	PORT_DIPSETTING(    0x02, "Half (Tandon)" )
 	PORT_DIPSETTING(    0x03, "Buffered" )
-	PORT_DIPNAME( 0x0c, 0x00, "Heads" ) PORT_DIPLOCATION("1E:3,4")
+	PORT_DIPNAME( 0x0c, 0x04, "Heads" ) PORT_DIPLOCATION("1E:3,4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x08, "6" )
 	PORT_DIPSETTING(    0x0c, "8" )
-	PORT_DIPNAME( 0xf0, 0x00, "Drive Type" ) PORT_DIPLOCATION("1E:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x30, "Drive Type" ) PORT_DIPLOCATION("1E:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "Seagate ST506" )
 	PORT_DIPSETTING(    0x10, "Rodime RO100" )
 	PORT_DIPSETTING(    0x20, "Shugart SA600" )
@@ -285,7 +285,7 @@ uint8_t luxor_4105_device::abcbus_stat()
 		    1       ?
 		    2       ?
 		    3       ?
-		    4
+		    4       0
 		    5
 		    6       ? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
 		    7

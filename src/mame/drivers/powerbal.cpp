@@ -527,7 +527,7 @@ TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 	if (m_videoram1[tile_index] & 0x800)
 		code |= 0x8000;
 
-	SET_TILE_INFO_MEMBER(1, code, colr >> 12, 0);
+	tileinfo.set(1, code, colr >> 12, 0);
 }
 
 void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -569,8 +569,8 @@ VIDEO_START_MEMBER(powerbal_state,atombjt)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbal_state::powerbal_get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
-	m_xoffset = 32;
-	m_yoffset = 8;
+	m_xoffset = 0x23;
+	m_yoffset = 0x09;
 	m_sprtranspen = 0xf;
 
 	m_bg_tilemap->set_scrollx(0, -64);
@@ -875,4 +875,4 @@ void powerbal_state::init_magicstk()
 GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original, does this really support flip screen?

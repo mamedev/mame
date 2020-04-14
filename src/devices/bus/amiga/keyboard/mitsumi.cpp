@@ -109,7 +109,7 @@ public:
 	virtual WRITE_LINE_MEMBER(kdat_w) override
 	{
 		m_kdat_in = state ? 0x01U : 0x00U;
-		m_mcu->pa_w(machine().dummy_space(), 0, m_meta->read());
+		m_mcu->pa_w(m_meta->read());
 	}
 
 	READ_LINE_MEMBER(kdat_r)

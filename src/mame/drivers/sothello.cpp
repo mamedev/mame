@@ -343,7 +343,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	m_msm->write_data(m_msm_data & 0x0f);
+	m_msm->data_w(m_msm_data & 0x0f);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 

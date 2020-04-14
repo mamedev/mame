@@ -267,12 +267,13 @@ public:
 	u64 last_value() const { return m_result; }
 	u64 value() { recompute(); return m_result; }
 	const char *string() const { return m_string.c_str(); }
-	symbol_table *context() const { return m_parsed.symbols(); }
+	symbol_table &context() const { return m_parsed.symbols(); }
 
 	// setters
 	void mark_dirty() { m_dirty = true; }
 	template <typename... Params> void set_string(Params &&... args) { m_string.assign(std::forward<Params>(args)...); m_dirty = true; }
 	void set_context(symbol_table *context);
+	void set_default_base(int base) { m_parsed.set_default_base(base); }
 
 private:
 	// internal helpers

@@ -44,7 +44,7 @@ private:
 	void pio_pa_w(u8 data);
 	u8 pio_pb_r();
 	void pio_pb_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
+	void vsyn_w(int state);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -93,7 +93,7 @@ void adm36_state::pio_pb_w(u8 data)
 	m_earom->c1_w(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER(adm36_state::vsyn_w)
+void adm36_state::vsyn_w(int state)
 {
 	m_vsyn = bool(state);
 }

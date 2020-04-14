@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_bg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, code + m_bg_bank, m_bg_color_bank, 0);
+	tileinfo.set(2, code + m_bg_bank, m_bg_color_bank, 0);
 }
 
 TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 
 	code |= (attr & 0x01) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
+	tileinfo.set(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
 VIDEO_START_MEMBER(cntsteer_state,cntsteer)

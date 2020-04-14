@@ -176,7 +176,7 @@ void kdt6_state::psi98_mem(address_map &map)
 void kdt6_state::psi98_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x04, 0x07).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -696,8 +696,8 @@ void kdt6_state::psi98(machine_config &config)
 	z80pio_device &pio(Z80PIO(config, "pio", 16_MHz_XTAL / 4));
 	pio.out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	pio.out_pa_callback().set(FUNC(kdt6_state::pio_porta_w));
-	pio.in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer("cent_data_in");

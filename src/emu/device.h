@@ -529,7 +529,7 @@ public:
 	device_type type() const { return m_type; }
 	const char *name() const { return m_type.fullname(); }
 	const char *shortname() const { return m_type.shortname(); }
-	const char *searchpath() const { return m_searchpath.c_str(); }
+	virtual std::vector<std::string> searchpath() const;
 	const char *source() const { return m_type.source(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
@@ -798,7 +798,6 @@ protected:
 
 	// core device properties
 	device_type             m_type;                 // device type
-	std::string             m_searchpath;           // search path, used for media loading
 
 	// device relationships & interfaces
 	device_t *              m_owner;                // device that owns us

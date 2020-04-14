@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 	<view name="Screen 0 Pixel Aspect (~scr0nativexaspect~:~scr0nativeyaspect~)">

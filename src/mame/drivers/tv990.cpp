@@ -303,17 +303,17 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 READ8_MEMBER(tv990_state::kbdc_r)
 {
 	if(offset)
-		return m_kbdc->data_r(space, 4);
+		return m_kbdc->data_r(4);
 	else
-		return m_kbdc->data_r(space, 0);
+		return m_kbdc->data_r(0);
 }
 
 WRITE8_MEMBER(tv990_state::kbdc_w)
 {
 	if(offset)
-		m_kbdc->data_w(space, 4, data);
+		m_kbdc->data_w(4, data);
 	else
-		m_kbdc->data_w(space, 0, data);
+		m_kbdc->data_w(0, data);
 }
 
 void tv990_state::tv990_mem(address_map &map)

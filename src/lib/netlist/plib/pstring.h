@@ -13,10 +13,10 @@
 #include <exception>
 #include <iterator>
 #include <limits>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <ostream>
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...
@@ -249,7 +249,7 @@ struct putf8_traits
 	}
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
-		const auto p1 = reinterpret_cast<const unsigned char *>(p);
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0xE0) == 0xC0)
 			return 2;
 		if ((*p1 & 0xF0) == 0xE0)
@@ -276,7 +276,7 @@ struct putf8_traits
 
 	static code_t code(const mem_t *p) noexcept
 	{
-		const auto p1 = reinterpret_cast<const unsigned char *>(p);
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0x80) == 0x00)
 			return *p1;
 		if ((*p1 & 0xE0) == 0xC0)

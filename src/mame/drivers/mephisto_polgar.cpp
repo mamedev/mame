@@ -35,6 +35,7 @@ class mephisto_polgar_state : public driver_device
 public:
 	mephisto_polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_keys(*this, "KEY")
 	{ }
 
@@ -44,6 +45,7 @@ public:
 	void polgar(machine_config &config);
 	void polgar_mem(address_map &map);
 protected:
+	required_device<cpu_device> m_maincpu;
 	required_ioport m_keys;
 };
 
@@ -174,13 +176,13 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 
 READ8_MEMBER(mephisto_milano_state::milano_input_r)
 {
-	return m_board->input_r(space, offset) ^ 0xff;
+	return m_board->input_r() ^ 0xff;
 }
 
 WRITE8_MEMBER(mephisto_milano_state::milano_led_w)
 {
 	m_led_latch = data;
-	m_board->mux_w(space, offset, data);
+	m_board->mux_w(data);
 }
 
 WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
@@ -197,7 +199,7 @@ WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
 			m_leds[i] = 0;
 	}
 
-	m_display->io_w(space, offset, data & 0x0f);
+	m_display->io_w(data & 0x0f);
 }
 
 void mephisto_milano_state::milano_mem(address_map &map)
@@ -239,10 +241,10 @@ WRITE8_MEMBER(mephisto_academy_state::academy_led_w)
 READ8_MEMBER(mephisto_academy_state::academy_input_r)
 {
 	uint8_t data;
-	if (m_board->mux_r(space, offset) == 0xff)
+	if (m_board->mux_r() == 0xff)
 		data = m_keys->read();
 	else
-		data = m_board->input_r(space, offset);
+		data = m_board->input_r();
 
 	return data ^ 0xff;
 }
@@ -300,9 +302,9 @@ void mephisto_academy_state::machine_reset()
 
 void mephisto_polgar_state::polgar(machine_config &config)
 {
-	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(4'915'200))); // RP65C02G
-	maincpu.set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
-	maincpu.set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
+	M65C02(config, m_maincpu, XTAL(4'915'200)); // RP65C02G
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -322,17 +324,18 @@ void mephisto_polgar_state::polgar(machine_config &config)
 void mephisto_polgar_state::polgar10(machine_config &config)
 {
 	polgar(config);
-	subdevice<m65c02_device>("maincpu")->set_clock(9.8304_MHz_XTAL); // W65C02P-8
+	m_maincpu->set_clock(9.8304_MHz_XTAL); // W65C02P-8
+	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(9.8304_MHz_XTAL / (1 << 13)));
 }
 
 void mephisto_risc_state::mrisc(machine_config &config)
 {
-	m65sc02_device &maincpu(M65SC02(config, "maincpu", XTAL(10'000'000) / 4)); // G65SC02P-4
-	maincpu.set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
-	maincpu.set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
+	M65SC02(config, m_maincpu, XTAL(10'000'000) / 4); // G65SC02P-4
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
 
 	CHESSMACHINE(config, m_chessm, 14'000'000); // Tasc ChessMachine EC PCB, Mephisto manual says 14MHz (no XTAL)
-	config.set_perfect_quantum("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -353,7 +356,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 void mephisto_milano_state::milano(machine_config &config)
 {
 	polgar(config); // CPU: W65C02P-8, 4.9152Mhz
-	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_disable_leds(true);
@@ -363,7 +366,7 @@ void mephisto_milano_state::milano(machine_config &config)
 void mephisto_academy_state::academy(machine_config &config)
 {
 	polgar(config); // CPU: VL65NC02-04PC, 4.9152Mhz
-	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_academy_state::academy_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_academy_state::academy_mem);
 
 	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));

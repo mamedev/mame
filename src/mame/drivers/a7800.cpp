@@ -133,15 +133,15 @@ public:
 	void a7800_ntsc(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_READ8_MEMBER(tia_r);
-	DECLARE_WRITE8_MEMBER(tia_w);
+	uint8_t bios_or_cart_r(address_space &space, offs_t offset);
+	uint8_t tia_r(offs_t offset);
+	void tia_w(offs_t offset, uint8_t data);
 	void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
-	DECLARE_READ8_MEMBER(riot_joystick_r);
-	DECLARE_READ8_MEMBER(riot_console_button_r);
-	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+	uint8_t riot_joystick_r();
+	uint8_t riot_console_button_r();
+	void riot_button_pullup_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -192,17 +192,17 @@ protected:
  ***************************************************************************/
 
 // RIOT
-READ8_MEMBER(a7800_state::riot_joystick_r)
+uint8_t a7800_state::riot_joystick_r()
 {
 	return m_io_joysticks->read();
 }
 
-READ8_MEMBER(a7800_state::riot_console_button_r)
+uint8_t a7800_state::riot_console_button_r()
 {
 	return m_io_console_buttons->read();
 }
 
-WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
+void a7800_state::riot_button_pullup_w(uint8_t data)
 {
 	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
 		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
@@ -210,7 +210,7 @@ WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 		m_p2_one_button = data & 0x10;
 }
 
-READ8_MEMBER(a7800_state::tia_r)
+uint8_t a7800_state::tia_r(offs_t offset)
 {
 	switch (offset & 0x0f)
 	{
@@ -250,7 +250,7 @@ READ8_MEMBER(a7800_state::tia_r)
 }
 
 // TIA
-WRITE8_MEMBER(a7800_state::tia_w)
+void a7800_state::tia_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x20)
 	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
@@ -267,7 +267,7 @@ WRITE8_MEMBER(a7800_state::tia_w)
 			m_ctrl_reg = data;
 		}
 	}
-	m_tia->tia_sound_w(space, offset, data);
+	m_tia->tia_sound_w(offset, data);
 }
 
 
@@ -288,7 +288,7 @@ TIMER_CALLBACK_MEMBER(a7800_state::maria_startdma)
 
 
 // ROM
-READ8_MEMBER(a7800_state::bios_or_cart_r)
+uint8_t a7800_state::bios_or_cart_r(address_space &space, offs_t offset)
 {
 	if (!(m_ctrl_reg & 0x04))
 		return m_bios[offset];

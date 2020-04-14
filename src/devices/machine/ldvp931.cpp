@@ -335,7 +335,7 @@ int32_t philips_22vp931_device::player_update(const vbi_metadata &vbi, int field
 //  and other bits
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_output0_w )
+void philips_22vp931_device::i8049_output0_w(uint8_t data)
 {
 	/*
 	    $80 = n/c
@@ -374,7 +374,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_output0_w )
 //  i8049_output1_w - controls scanning behaviors
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_output1_w )
+void philips_22vp931_device::i8049_output1_w(uint8_t data)
 {
 	/*
 	    $80 = n/c
@@ -418,7 +418,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_output1_w )
 //  i8049_lcd_w - vestigial LCD frame display
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_lcd_w )
+void philips_22vp931_device::i8049_lcd_w(uint8_t data)
 {
 	/*
 	    Frame number is written as 5 digits here; however, it is not actually
@@ -431,7 +431,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_lcd_w )
 //  i8049_unknown_r - unknown input port
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_unknown_r )
+uint8_t philips_22vp931_device::i8049_unknown_r()
 {
 	// only bit $80 is checked and its effects are minor
 	return 0x00;
@@ -443,7 +443,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_unknown_r )
 //  controls
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_keypad_r )
+uint8_t philips_22vp931_device::i8049_keypad_r()
 {
 	/*
 	    From the code, this is apparently a vestigial keypad with basic controls:
@@ -465,7 +465,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_keypad_r )
 //  DATIC circuit
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_datic_r )
+uint8_t philips_22vp931_device::i8049_datic_r()
 {
 	return m_daticval;
 }
@@ -476,7 +476,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_datic_r )
 //  external controller wrote
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_from_controller_r )
+uint8_t philips_22vp931_device::i8049_from_controller_r()
 {
 	// clear the pending flag and return the data
 	m_fromcontroller_pending = false;
@@ -489,7 +489,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_from_controller_r )
 //  the external controller
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_to_controller_w )
+void philips_22vp931_device::i8049_to_controller_w(uint8_t data)
 {
 	// set the pending flag and stash the data
 	m_tocontroller_pending = true;
@@ -508,7 +508,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_to_controller_w )
 //  i8049_port1_r - read the 8048 I/O port 1
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_port1_r )
+uint8_t philips_22vp931_device::i8049_port1_r()
 {
 	/*
 	    $80 = P17 = (in) unsure
@@ -527,7 +527,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_port1_r )
 //  i8049_port1_w - write the 8048 I/O port 1
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_port1_w )
+void philips_22vp931_device::i8049_port1_w(uint8_t data)
 {
 	/*
 	    $10 = P14 = (out) D104 -> /SPEED
@@ -598,7 +598,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_port1_w )
 //  i8049_port2_r - read from the 8048 I/O port 2
 //-------------------------------------------------
 
-READ8_MEMBER( philips_22vp931_device::i8049_port2_r )
+uint8_t philips_22vp931_device::i8049_port2_r()
 {
 	/*
 	    $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
@@ -619,7 +619,7 @@ READ8_MEMBER( philips_22vp931_device::i8049_port2_r )
 //  i8049_port2_w - write the 8048 I/O port 2
 //-------------------------------------------------
 
-WRITE8_MEMBER( philips_22vp931_device::i8049_port2_w )
+void philips_22vp931_device::i8049_port2_w(uint8_t data)
 {
 	/*
 	    $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
@@ -633,7 +633,7 @@ WRITE8_MEMBER( philips_22vp931_device::i8049_port2_w )
 //  connected to the DATIC's data strobe line
 //-------------------------------------------------
 
-READ_LINE_MEMBER( philips_22vp931_device::i8049_t0_r )
+int philips_22vp931_device::i8049_t0_r()
 {
 	return m_datastrobe;
 }
@@ -645,7 +645,7 @@ READ_LINE_MEMBER( philips_22vp931_device::i8049_t0_r )
 //  to count the number of tracks advanced
 //-------------------------------------------------
 
-READ_LINE_MEMBER( philips_22vp931_device::i8049_t1_r )
+int philips_22vp931_device::i8049_t1_r()
 {
 	return m_trackstate;
 }

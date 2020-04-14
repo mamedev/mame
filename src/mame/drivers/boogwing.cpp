@@ -60,7 +60,6 @@
           (Addendum - all known issues seem to be correct - see Sprite Priority Notes below).
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
-        * A shadow effect (used in level 1) is not implemented.
         * ACE Chip aren't fully emulated.
 
     Sprite Priority Notes:
@@ -351,8 +350,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x1f);  // pf2 has 5bpp graphics
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
 	m_deco_tilegen[0]->set_pf2_col_bank(0);   // pf2 is non default
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -366,8 +363,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);

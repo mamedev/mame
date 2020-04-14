@@ -25,14 +25,14 @@ DEFINE_DEVICE_TYPE(ELECTRON_AP34, electron_ap34_device, "electron_ap34", "P.R.E.
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( ap34 )
+//  FLOPPY_FORMATS( ap34 )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(electron_ap34_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 void ap34_floppies(device_slot_interface &device)
 {
@@ -167,5 +167,5 @@ void electron_ap34_device::wd1770_control_w(uint8_t data)
 	//m_slot->nmi_w(!BIT(data, 4));
 
 	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 }

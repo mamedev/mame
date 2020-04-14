@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -47,7 +47,7 @@ Language:
 |        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
-|        | 80-084045(FR)     | Scooby-Doo - Panique A Funland                                                            |
+|   XX   | 80-084045(FR)     | Scooby-Doo! - Panique à Funland                                                            |
 |   XX   | 80-084047(SP)     | ¡¡Scooby-Doo!! - Misterio en el Parque                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
@@ -57,7 +57,7 @@ Language:
 |   XX   | 80-084080(US)     | Wall-E                                                                                    |
 |        | 80-084083(UK)     | Wall-E                                                                                    |
 |   XX   | 80-084084(GE)     | Wall-E                                                                                    |
-|        | 80-084085(FR)     | Wall-E                                                                                    |
+|   XX   | 80-084085(FR)     | Wall-E                                                                                    |
 |   XX   | 80-084087(SP)     | Wall-E                                                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
@@ -71,7 +71,7 @@ Language:
 |        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)|
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
 |   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                  |
-|        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                               |
+|   XX   | 80-084145(FR)     | Spider-Man and ses amis - Missions Secrètes                                               |
 |        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas (no # on label)                                    |
 +========+===================+===========================================================================================+
 |   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
@@ -85,7 +85,8 @@ Language:
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
 |   XX   | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
-|        | 80-084185(FR)     | La Maison de Mickey                                                                       |
+|        | 80-084185(FR)     | La Maison de Mickey (ever released?)                                                      |
+|   XX   | 80-084185-005(FR) | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
 |   XX   | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
 +========+===================+===========================================================================================+
@@ -98,13 +99,13 @@ Language:
 |        | 80-084225(FR)     | ?????? picture too fuzzy for positive confirm                                             |
 +========+===================+===========================================================================================+
 |   XX   | 80-084240(US)     | Ni Hao Kai Lan                                                                            |
-|        | 80-084245(FR)     | Ni Hao Kai Lan                                                                            |
+|   XX   | 80-084245(FR)     | Ni Hao Kai Lan - Joyeux Nouvel an chinois!                                                |
 +========+===================+===========================================================================================+
 |        | 80-084260(US)     | My Pet Puppy (unreleased in USA? UK version plays OK on NTSC console)                     |
 |   XX   | 80-084262(NL)     | Mijn Puppy!                                                                               |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
 |   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
-|        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                                      |
+|   XX   | 80-084265(FR)     | Mon Toutou tout fou!                                                                      |
 |        | 80-084267(SP)     | Dakota y su Mascota                                                                       |
 +========+===================+===========================================================================================+
 |        | 80-084280(US)     | Wild Waves                                                                                |
@@ -132,7 +133,7 @@ Language:
 |        | 80-084340(US)     | Up!                                                                                       |
 |        | 80-084342(NL)     | Up!                                                                                       |
 |        | 80-084344(GE)     | Oben                                                                                      |
-|        | 80-084345(FR)     | La-Haut                                                                                   |
+|   XX   | 80-084345(FR)     | Là-Haut                                                                                   |
 |   XX   | 80-084347(SP)     | Up!                                                                                       |
 |        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                                 |
 +========+===================+===========================================================================================+
@@ -148,17 +149,17 @@ Language:
 |        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???                                               |
 |        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt                                                          |
 |   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                               |
-|        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie                                              |
+|   XX   | 80-084385(FR)     | Winnie L'ourson - La Chasse au miel de Winnie                                             |
 |        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                                  |
 |   XX   | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
 +========+===================+===========================================================================================+
-|        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                                       |
-|        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                                       |
-|        | 80-084403(UK)     | Cars: Rev it up in Radiator Springs                                                       |
-|   XX   | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                                         |
-|        | 80-084405(FR)     | Cars: Quatre Roues                                                                        |
-|        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)                                        |
-|   XX   | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                                |
+|        | 80-084400(US)     | Cars - Rev It Up in Radiator Springs                                                       |
+|        | 80-084402(NL)     | Cars - Spektakel in Radiator Springs                                                       |
+|        | 80-084403(UK)     | Cars - Rev it up in Radiator Springs                                                       |
+|   XX   | 80-084404(GE)     | Cars - Vollgas in Radiator Springs                                                         |
+|   XX   | 80-084405(FR)     | Cars - Quatre Roues                                                                        |
+|        | 80-084406(PT)     | Cars - Aventura Em Radiator Springs (84416 on cart)                                        |
+|   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                                |
 +========+===================+===========================================================================================+
 |        | 80-084420(US)     | Toy Story 3                                                                               |
 |        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
@@ -173,12 +174,12 @@ Language:
 |        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
 |        | 80-084443(UK)     | Monsters vs. Aliens                                                                       |
 |   XX   | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
-|        | 80-084445(FR)     | Monsters vs. Aliens                                                                       |
+|   XX   | 80-084445(FR)     | Monstres contre Aliens                                                                    |
 |   XX   | 80-084447(SP)     | Monstruos contra Alienígenas                                                              |
 +========+===================+===========================================================================================+
 |        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540                           |
 |        | 80-084463(UK)     | Noddy - Detective for a Day                                                               |
-|        | 80-084465(FR)     | Oui-Oui - Detective d'un jour                                                             |
+|   XX   | 80-084465(FR)     | Oui-Oui - Détective d'un jour                                                             |
 |        | 80-084467(SP)     | Noddy - Detective por un día                                                              |
 +========+===================+===========================================================================================+
 |        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
@@ -218,7 +219,7 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
 |        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                                  |
-|        | 80-084625(FR)     | Le Monde de Nemo - Nemo a la decourverte de l'ocean                                       |
+|   XX   | 80-084625(FR)     | Le Monde de Nemo - Nemo à la decourverte de l'océan                                       |
 |        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                                             |
 +========+===================+===========================================================================================+
 |        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                                            |
@@ -304,7 +305,7 @@ Language:
 	</software>
 
 	<software name="carsmg" supported="no">
-		<description>Cars: Vollgas in Radiator Springs (Germany)</description>
+		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084404(GE)" />
@@ -314,6 +315,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsmf" cloneof="carsmg" supported="no">
+		<description>Disney/Pixar Cars - Quatre Roues (France)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084405(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084405 - Cars (MOTION) (FR).bin" size="8388608" crc="9a206452" sha1="f76538de9b6c730e0b9dec7dd35b37e6ed3c94d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -388,21 +402,6 @@ Language:
 		</part>
 	</software>
 
-	<software name="kfpandamg" supported="no">
-		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Germany)</description>
-		<year>2008?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-084124(GE)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="pcb" value="708201" />
-			<feature name="pcb_model" value="708201-4" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="doram" supported="no">
 		<description>Nickelodeon Dora the Explorer: Dora's Fix It Adventure (USA, Rev. 3?)</description>
 		<year>2008</year>
@@ -461,6 +460,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="findnemomf" supported="no">
+		<description>Le Monde de Nemo - Nemo à la decourverte de l'océan (France)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084625(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084625 - Nemo (MOTION) (FR).bin" size="8388608" crc="9c0074ff" sha1="1541117ae29196b797976a8ebf47c5099a4feb08" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hmannym" cloneof="doram" supported="no">
 		<description>Disney Handy Manny (USA, Rev. 2?)</description>
 		<year>2009</year>
@@ -470,6 +482,21 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpandamg" supported="no">
+		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Germany)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084124(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" />
 			</dataarea>
 		</part>
 	</software>
@@ -550,6 +577,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="mickeychmfr005" cloneof="mickeychm" supported="no">
+		<description>Disney La Maison de Mickey (France, Rev. 005)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="084185-005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084185-005 - LaMaisonDeMickey (MOTION) (FR).bin" size="8388608" crc="7d77f657" sha1="90cea293ebd539ac22baa343a1efb771d91ffe4d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickeychms" cloneof="mickeychm" supported="no">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>2009</year>
@@ -589,6 +629,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-084444 - Monsters vs Aliens (GER) (Motion).bin" size="8388608" crc="25760320" sha1="6cddb7a2b733b366609e33e1ebec3385e10a834e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monvsalienmf" supported="no" cloneof="monvsalienm">
+		<description>DreamWorks Monstres contre Aliens (France)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084445(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084445 - Monstres Contre Aliens (MOTION) (FR).bin" size="8388608" crc="62b63a0a" sha1="0012b363e643b386908d912df74b38d276cdc4c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -638,6 +691,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="mypuppymf" cloneof="mypuppymnl" supported="no">
+		<description>Mon Youtou tout fou! (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084265(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084265 - MonToutouToutFou (MOTION) (FR).bin" size="8388608" crc="d4bf54aa" sha1="2a411d6bf8c46e67ed29c308ede2b0c740a9d083" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nascarm" supported="no">
 		<description>NASCAR Academy - Race Car Superstar (USA)</description>
 		<year>2009?</year>
@@ -664,6 +730,32 @@ Language:
 		</part>
 	</software>
 
+	<software name="nihaoklmf" cloneof="nihaoklm" supported="no">
+		<description>Nickelodeon Ni Hao Kai Lan - Joyeux Nouvel an chinois! (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084245(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084245 - Ni Hao Kai Lan (MOTION) (FR).bin" size="8388608" crc="2e0596e1" sha1="b55e6f7c3eab9636cf12da29e0a8c3cd77916fe7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noddymf" supported="no">
+		<description>Oui-Oui - Détective d'un Jour (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084465(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084465 - OuiOui (MOTION) (FR).bin" size="8388608" crc="f60bd69b" sha1="3f80d4bce478b57efcd3da965963d5374042f288" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohmg" supported="no">
 		<description>Winnie Puuh - Die Honigjagd (Germany)</description>
 		<year>2009?</year>
@@ -675,6 +767,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohmf" cloneof="poohmg" supported="no">
+		<description>Disney Winnie L'ourson - La Chasse au miel de Winnie (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084385(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084385 - Winnie L Ourson (MOTION) (FR).bin" size="8388608" crc="c71c2280" sha1="f59a96402eadba3f937e13a4569c4b309fdec7b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -721,7 +826,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="scoobyffms" supported="no">
+	<software name="scoobyffmf" supported="no">
+		<description>Scooby-Doo! - Panique à Funland (France)</description>
+		<year>2008</year> <!-- (s08) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084045(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084045 - Scooby Doo (MOTION) (FR).bin" size="8388608" crc="7531dda5" sha1="8e9bbf17219df98bcad56241d367ebe35f3cc5a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobyffms" cloneof="scoobyffmf" supported="no">
 		<description>¡¡Scooby-Doo!! - Misterio en el parque (Spain)</description>
 		<year>2009</year> <!-- (s09) -->
 		<publisher>VTech</publisher>
@@ -795,6 +913,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermnmf" cloneof="spidermnmg" supported="no">
+		<description>Marvel Spider-Man and ses amis - Missions Secrètes (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084145(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084145 - SpidermanMissionsSecretes (MOTION) (FR).bin" size="8388608" crc="e5bf01a9" sha1="0216559867626205a8c00c6d64cf64eb239be641" />
 			</dataarea>
 		</part>
 	</software>
@@ -901,7 +1032,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="upms" supported="no">
+	<software name="upmf" supported="no">
+		<description>Disney/Pixar Là-Haut (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084345(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="084345 - La-Haut (MOTION) (FR).bin" size="0x0800000" crc="57bf92d0" sha1="4fb3f99392bb2c9c45c0b64041a766156d1a2292" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upms" cloneof="upmf" supported="no">
 		<description>Disney/Pixar UP (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -942,6 +1086,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x0800000">
 				<rom name="80-084084 - Wall-E (Ger) (Motion).bin" size="0x0800000" crc="038dd57c" sha1="698bbe384d9019217b58efefe927262e40d34e1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallemf" cloneof="wallem" supported="no">
+		<description>Disney/Pixar Wall-E (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084085(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="084085 - Wall E (MOTION) (FR).bin" size="0x0800000" crc="7f9f5395" sha1="4af7cbd4807c818b6c56aa09447c16c4643178c1" />
 			</dataarea>
 		</part>
 	</software>

@@ -87,15 +87,15 @@ void mephisto_modena_state::machine_reset()
 
 READ8_MEMBER(mephisto_modena_state::input_r)
 {
-	if (m_board->mux_r(space, offset) == 0xff)
+	if (m_board->mux_r() == 0xff)
 		return m_keys->read();
 	else
-		return m_board->input_r(space, offset) ^ 0xff;
+		return m_board->input_r() ^ 0xff;
 }
 
 WRITE8_MEMBER(mephisto_modena_state::led_w)
 {
-	m_board->mux_w(space, offset, data);
+	m_board->mux_w(data);
 
 	for (int sel = 0; sel < 3; sel++)
 	{

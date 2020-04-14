@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
   Credits:
   - Maintainers : Fabio Priuli, Yakushi~Kabuto
   - Cart profiles : Yakushi~Kabuto
@@ -13,9 +14,8 @@
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
   - - Ecco and RedScorpion (72 carts)
--->
 
-<!--
+
 Undumped
 
  Confirmed?   Source     Title
@@ -136,9 +136,8 @@ Undumped
   - Waterworld - USA, for 199?, unknown dev
   - Whirlo - USA, for 199?, Namco
   - Wile E Coyote's Revenge (later prototype) - USA, for 199?, Sunsoft
--->
 
-<!--
+
 Documentation of Super Famicom PCB labels
 
 The labels printed on the PCB can be analysed as four parts: [Code 1]-[Code 2]-[Code 3]-[Code 4]
@@ -262,9 +261,8 @@ Known revisions and their timeline approximaions (W.I.P):
 -?                 ⊆ t(F413)
 -?                 ⊆ t(F413A)
 -[1995/42,1995/42] ⊆ t(F413B)
--->
 
-<!--
+
 Cartridges labels (W.I.P)
 
 - Japan catalogue product code:
@@ -348,9 +346,8 @@ SHVC-039 : (To be confirmed) Broadcast Satellaview-X ROM pak, unlike memory paks
 SHVC-040 : Broadcast Satellaview-X cassette (衛星放送対応カセット), later revision although the difference is unclear
 SHVC-041 : Super Famicom memory cassette (SFメモリカセット), white cartridges hosting flashed titles from the 'Nintendo Power' library
 SHVC-042 : Super Game Boy 2 cartridge, only released in Japan
--->
 
-<!--
+
 The software list will be divided into the following categories:
 [L01] Documented prototype and demo cartridges : images from confirmed non-retail cartridges
 [L02] Unconfirmed prototype and demo cartridges : roms not confirmed to exist on a non-retail cartridge at this time
@@ -6454,7 +6451,7 @@ more investigation needed...
 
 	<software name="asterix">
 		<description>Astérix (Euro)</description>
-		<year>1996</year>
+		<year>1993</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="SNSP-XE-FAH, SNSP-XE-NOE" />
 		<part name="cart" interface="snes_cart">
@@ -36816,6 +36813,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="coolsknk">
+		<description>Cooly Skunk (Jpn, Prototype)</description>
+		<year>1996</year>
+		<publisher>Visit</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cooly skunk prototype.sfc" size="1048576" crc="90fd3134" sha1="135c5330be85ba72a7417c6773ca0c352446c216" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cornbust">
 		<description>Corn Buster (Euro, Prototype)</description>
 		<year>199?</year>
@@ -52604,6 +52613,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="rayman">
+		<description>Rayman (early prototype)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rayman (early prototype).sfc" size="1048576" crc="366d9177" sha1="cc97835e5789e6b708cadf6d7213ac0bae5716e9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="realm">
 		<description>Realm (Euro)</description>
 		<year>1996</year>
@@ -55803,6 +55824,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sports illustrated championship football &amp; baseball (usa) (beta).sfc" size="2097152" crc="ed9aa0e1" sha1="0871060a91f939010283ec230750f378d1e7d8ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spotgo">
+		<description>Spot Goes to Hollywood (prototype 19950805)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spot goes to hollywood (prototype 19950805).sfc" size="2097152" crc="2fa40bf4" sha1="232bf12780458d0793b48a3a17839dc30d0718ca" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spotgop2" cloneof="spotgo">
+		<description>Spot Goes to Hollywood (prototype 19950307)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spot goes to hollywood (prototype 19950307).sfc" size="2097152" crc="fe751be3" sha1="f93c786202a85d9e42a888d561a1aef7f3015bfa" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -60035,6 +60080,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tarot mystery (japan).sfc" size="1048576" crc="3ce00f85" sha1="e4bb6214f740efc3b5e2d0482cd8d4f10b205044" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarzan">
+		<description>Edgar Rice Burroughs' Tarzan: Lord of the Jungle (Prototype)</description>
+		<year>199?</year>
+		<publisher>Gametek</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="tarzan prototype.sfc" size="4194304" crc="61290299" sha1="7127e7a39da36ec509280e27c72494a827bb6a5a" />
 			</dataarea>
 		</part>
 	</software>

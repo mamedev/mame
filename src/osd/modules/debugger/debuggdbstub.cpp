@@ -327,7 +327,7 @@ public:
 	{
 	}
 
-	virtual ~debug_gdbstub() = default;
+	virtual ~debug_gdbstub() { }
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;

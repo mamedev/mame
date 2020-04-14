@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
-<mamelayout version="2">
 <!--
-        Poker Master (Tony-Poker) control panel
-        May or may not match arrangement/colour of real control panel
-        Written by Vas Crabb.
--->
+license:CC0
+copyright-holders:Vas Crabb
 
-<!-- define button-lamps -->
+Poker Master (Tony-Poker) control panel
+May or may not match arrangement/colour of real control panel
+-->
+<mamelayout version="2">
+
+	<!-- define button-lamps -->
 
 	<element name="hold1" defstate="0">
 		<text string="SMALL/BLACK" state="1">
@@ -144,7 +146,7 @@
 	</element>
 
 
-<!-- define basic elements -->
+	<!-- define basic elements -->
 
 	<element name="cpanel">
 		<rect>
@@ -260,8 +262,7 @@
 
 
 
-<!-- define cpanel degradee elements -->
-
+	<!-- define cpanel degradee elements -->
 
 	<element name="cpanel1">
 		<rect>
@@ -287,8 +288,6 @@
 		</rect>
 	</element>
 
-
-<!-- define background -->
 
 	<view name="Button Lamps">
 		<screen index="0">
@@ -320,7 +319,7 @@
 		</bezel>
 
 
-<!-- define lamps -->
+		<!-- define lamps -->
 
 		<bezel element="small_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />

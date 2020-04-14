@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Micro Model B (German) Tapes -->
+Acorn BBC Micro Model B (German) Tapes
 
-<!-- I believe all the Cassette images here are original, so some require the manuals for additional copy protection -->
+I believe all the Cassette images here are original, so some require the manuals for additional copy protection
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       If the system has a disk drive (which the BBC Model B does by default in MAME) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 

@@ -120,14 +120,14 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
 	int color = (m_colorram[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, m_color_bank, 0);
+	tileinfo.set(0, code, m_color_bank, 0);
 }
 
 void ssozumo_state::video_start()

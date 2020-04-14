@@ -1265,7 +1265,7 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 void homedata_state::mrokumei(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 16000000/4);  /* 4MHz ? */
+	MC6809E(config, m_maincpu, 16000000/8);  /* 2MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::mrokumei_map);
 	m_maincpu->set_vblank_int("screen", FUNC(homedata_state::homedata_irq)); /* also triggered by the blitter */
 
@@ -1314,7 +1314,7 @@ void homedata_state::mrokumei(machine_config &config)
 void homedata_state::reikaids(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 16_MHz_XTAL/4);  /* MC68B09EP 4MHz ? */
+	MC6809E(config, m_maincpu, 16_MHz_XTAL/8);  /* MC68B09EP 2MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::reikaids_map);
 	m_maincpu->set_vblank_int("screen", FUNC(homedata_state::homedata_irq)); /* also triggered by the blitter */
 
@@ -1372,7 +1372,7 @@ void homedata_state::reikaids(machine_config &config)
 void homedata_state::pteacher(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 16000000/4);  /* 4MHz ? */
+	MC6809E(config, m_maincpu, 16000000/8);  /* 2MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::pteacher_map);
 	m_maincpu->set_vblank_int("screen", FUNC(homedata_state::homedata_irq)); /* also triggered by the blitter */
 

@@ -4436,11 +4436,6 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 	}
 }
 
-void newport_base_device::install_device()
-{
-	m_gio64->install_graphics(*this, &newport_base_device::mem_map);
-}
-
 void newport_base_device::device_add_mconfig(machine_config &config)
 {
 	VC2(config, m_vc2, 0);

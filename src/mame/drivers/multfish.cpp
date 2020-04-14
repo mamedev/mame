@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)
 
 	tileinfo.category = (attr&0x100)>>8;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code&0x1fff,
 			attr&0x7,
 			0);
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info)
 {
 	int code = m_vid[tile_index*2+0x2000] | (m_vid[tile_index*2+0x2001] << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code&0x1fff)+0x2000,
 			(code>>14)+0x8,
 			0);

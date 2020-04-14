@@ -143,18 +143,61 @@ gsword notes:
 
 There are two 8041 MCUs and one 8741 MCU:
 * One connected to the main CPU for communicating with the sub CPU and
-  reading DIP switch C.
+  reading DIP switch C (D8741A-8 AA-013 at 9.5A).
 * One connected to the sub CPU for communicating with the main CPU and
-  reading DIP switches A and B.
+  reading DIP switches A and B (8041AH AA-016 at 9C).
 * One connected to the sub CPU for reading player, start and coin
-  inputs, and driving the coin counter outputs.
-* TODO: confirm which MCU is connected to which CPU.
+  inputs, and driving the coin counter outputs (8041AH AA-017 at 9G).
 
-So far, only the AA-016 MCU has been dumped successfully.  There's no
-reason to believe that the AA-017 MCU runs a different program.  Other
-Allumer-developed games are known to have different silkscreen on
-identical parts.  It's not clear which of the MCUs (AA-013 at 5A, AA-016
-at 9C and AA-017 at 9G) plays which role.
+So far, the AA-016 and AA-017 MCUs have been dumped successfully.
+
+At least two Great Swordsman boards have been seen with a UVEPROM-based
+D8741A-8 MCU for AA-013 at 9.5A.  This suggests the developers made some
+last-minute change to the code that only the main CPU.
+
+It appears that during development, the developers worked with three
+copies of what became the AA-016 MCU.  Protection code was added to the
+I/O MCU program, and this became AA-017.  At this point they intended to
+use two copies of AA-016 for communications, and one AA-017 for I/O.  It
+turned out that some last-minute change was required for the master CPU,
+but it was too late to order new mask ROM MUCs.  This resulted in the
+use of UVEPROM parts for AA-013.
+
+There are problems with sound.  Many effects aren't playing or are cut
+off almost immediately.  It's not clear why - possibly due to some of
+the I/O that isn't understood.
+
+The audio CPU seems to have some unmapped peripheral(s) around $FEB0.
+
++-----+-----------------+-----------------+----------------+
+| Pin | AA-013          | AA-016          | AA-017         |
++-----+-----------------+-----------------+----------------+
+| P10 | to AA-016 P10   | to AA-013 P10   | P1 right       |
+| P11 | to AA-016 T1    | to AA-013 T1    | P1 left        |
+| P12 | unknown         | DSW A 3         | unknown        |
+| P13 | unknown         | DSW A 4         | P1 lower       |
+| P14 | unknown         | DSW A 5         | P1 raise       |
+| P15 | unknown         | unknown         | P1 middle      |
+| P16 | unknown         | unknown         | 1P start       |
+| P17 | unknown         | unknown         | 2P start       |
++-----+-----------------+-----------------+----------------+
+| P20 | DSW C 1?        | DSW B 1?        | P2 right       |
+| P21 | DSW C 2?        | DSW B 2?        | P2 left        |
+| P22 | DSW C 3         | DSW B 3         | unknown        |
+| P23 | DSW C 4         | DSW B 4         | P2 lower       |
+| P24 | DSW C 5         | DSW B 5         | P2 raise       |
+| P25 | DSW C 6         | DSW B 6         | P2 middle      |
+| P26 | DSW C 7         | DSW B 7         | coin counter 1 |
+| P27 | DSW C 8?        | DSW B 8         | coin counter 2 |
++-----+-----------------+-----------------+----------------+
+| T0  | serial clock    | serial clock    | coin chute 1   |
+| T1  | from AA-016 P11 | from AA-013 P11 | coin chute 2   |
++-----+-----------------+-----------------+----------------+
+
+
+**************
+* AA-016 MCU *
+**************
 
 The AA-016 MCU program is divided into several parts, each entirely
 contained in a single program page.  The initialisation/self test, mode
@@ -168,15 +211,6 @@ insufficient space in page 3 for the program checksum fragment, so the
 coin handling subroutines are not checksummed, despite plenty of zero-
 filled space elsewhere in the ROM.
 
-At least two Great Swordsman boards have been seen with a UVEPROM-based
-D8741A-8 MCU for AA-103 at 5A.  This suggests the developers made some
-last-minute change to the code that only affected one of the three use
-cases.  The AA-016 program contains complete code for communication and
-input/coin handling, so it would have to be some change in behaviour.
-One possibility is that they decided they needed to ensure the coin
-handling code is checksummed, and rearranged or refactored the code to
-allow this.
-
 The clock inputs for the MCUs are unknown - the values used are taken
 from gladiatr, where a superficially similar arrangement is used.  It
 would be good if we could get frequency measurements for all the clock
@@ -188,41 +222,6 @@ Communication between MCUs is working - the handlers for parity error
 ($187), premature end of data ($194) and excess data bits are not being
 hit.  This confirms that the MCUs are synchronising correctly and the
 serial clock is not excessively fast in relation to the MCU core clock.
-
-The I/O MCU is correctly reading inputs, counting coins, driving coin
-counters, and driving coin counters.  However, a problem elsewhere is
-causing the main program to not reliably register credits.  It registers
-credits occasionally, and once you start a game, it's playable - player
-inputs work fine.
-
-There are problems with sound.  Many effects aren't playing or are cut
-off almost immediately.  It's not clear why - possibly due to some of
-the I/O that isn't understood.
-
-+-----+----------------+----------------+----------------+
-| Pin | MCU 1          | MCU 2          | MCU 3          |
-+-----+----------------+----------------+----------------+
-| P10 | to MCU 2 P10   | to MCU 1 P10   | P1 right       |
-| P11 | to MCU 2 T1    | to MCU 1 T1    | P1 left        |
-| P12 | unknown        | DSW A 3        | unknown        |
-| P13 | unknown        | DSW A 4        | P1 lower       |
-| P14 | unknown        | DSW A 5        | P1 raise       |
-| P15 | unknown        | unknown        | P1 middle      |
-| P16 | unknown        | unknown        | 1P start       |
-| P17 | unknown        | unknown        | 2P start       |
-+-----+----------------+----------------+----------------+
-| P20 | DSW C 1?       | DSW B 1?       | P2 right       |
-| P21 | DSW C 2?       | DSW B 2?       | P2 left        |
-| P22 | DSW C 3        | DSW B 3        | unknown        |
-| P23 | DSW C 4        | DSW B 4        | P2 lower       |
-| P24 | DSW C 5        | DSW B 5        | P2 raise       |
-| P25 | DSW C 6        | DSW B 6        | P2 middle      |
-| P26 | DSW C 7        | DSW B 7        | coin counter 1 |
-| P27 | DSW C 8?       | DSW B 8        | coin counter 2 |
-+-----+----------------+----------------+----------------+
-| T0  | serial clock   | serial clock   | coin chute 1   |
-| T1  | from MCU 2 P11 | from MCU 1 P11 | coin chute 2   |
-+-----+----------------+----------------+----------------+
 
 The communication MCUs transfer data bidirectionally on their P10 pins
 which are tied together.  An MCU indicates that it is sending data by
@@ -238,6 +237,47 @@ an odd parity bit.  Useful addresses for debugging communication:
 * $187: Receive parity error
 * $194: Premature end-of-data
 * $199: Excess data
+
+AA-016 P15, P16 and P17 seem to have some effect, although it's not
+clear what they're supposed to do.  Tying them low during startup
+prevents the sub CPU from correctly programming the I/O MCU.  It's not
+clear whether pins corresponding to unused DIP switches have some other
+purpose. Fake DIP switches have been included to make it easier to mess
+with some of the unknown I/O.
+
+
+**************
+* AA-017 MCU *
+**************
+
+The AA-017 MCU program is divided into several distinct parts, each
+contained within a single page.  The initialisation/self test and mode
+selection, the subroutine for receiving configuration, and an unused
+subroutine for sending a negated program byte to the host are in page 0.
+The subroutines that implement coin handling are in page 1.  There are
+three input handling and protection programs of increasing of increasing
+complexity in page 2 and page 3.  The host selects the input handling
+program to use with the high nybble of the first command.
+
+The subroutine for receiving configuration from the host is identical to
+the one in the AA-016 MCU besides being shifted to a different address.
+The entire content of page 1 is identical to page 3 in AA-016 besides
+being shifted to a different address.  This MCU does not contain program
+ROM checksum code, so there is no way to verify the integrity of the
+program.
+
+After the self test and initialisation complete, the MCU waits for a
+command from the host and checks the high nybble.  If it is 0x6x, the
+program at $200 is used; if it is 0x5x, the program at $23C is used; if
+it is 0x4x, the program at 0x300 is used; any other value will be
+ignored and result in the MCU waiting for another command.  Great
+Swordsman uses the simplest input handling program which starts at
+$200 (beginning of page 2).  This is similar to the input handling
+program in the AA-016 MCU with the addition of a call to a protection
+subroutine at $3CA added to the beginning of the main loop.  Lack of the
+protection code in AA-016 causes the game to register credits unreliably
+if AA-016 is used in place of AA-017.  The values stored at $29 and $2A
+are used by the protection code.
 
 The I/O MCU handles rejecting coin pulses that are too long or too short
 and converting coins to credits.  The duration is measured in terms of
@@ -256,8 +296,9 @@ and a value in the low five bits.  Instructions recognised are:
 * 0x60: Set coin 2 coins per credit ($3D, default 1)
 * 0x80: Set coin 1 credits per coin ($33, default 1)
 * 0xa0: Set coin 2 credits per coin ($3B, default 1)
-* 0xc0: Set value at $2A (never read, default $08)
-* 0xe0: Swap nybbles and set value at $29 (never read, default $80)
+* 0xc0: Set protection delay ($2A, default $08)
+* 0xe0: Swap nybbles and set protection time ($29, default $80)
+The protection delay is not used by Great Swordsman.
 
 The setup phase is terminated by writing a command to the I/O MCU's data
 port.  The MCU return a data byte depending on the low three bits of the
@@ -279,18 +320,18 @@ byte of program memory from page 2 using the received byte as the
 offset, twos-complement it, return it, and then immediately re-execute
 the previous command received on the data port.
 
+The protection routine sends a sequence of incrementing values to the
+host.  The value is incremented by 1 or 2 if its most significant bit is
+clear or set, respectively.  Every 256 iterations, the value will be
+replaced with a byte read from an incrementing offset in program page 3.
+The iteration count, protection value and offset all start at zero and
+persist between invocations of the protection subroutine.  The
+protection subroutine runs for a configurable amount of time after each
+command is received.
+
 The I/O MCU indicates status via the user-defined status flags.  It sets
-them to 0000 while waiting for a command, or 1111 while processing a
-command.
-
-MCU 2 P15, P16 and P17 seem to have some effect, although it's not clear
-what they're supposed to do.  Tying them low during startup prevents the
-sub CPU from correctly programming the I/O MCU.  It's not clear whether
-pins corresponding to unused DIP switches have some other purpose. Fake
-DIP switches have been included to make it easier to mess with some of
-the unknown I/O.
-
-The audio CPU seems to have some unmapped peripheral(s) around $FEB0.
+them to 0000 while waiting for a command, or 1111 while running the
+protection subroutine and processing the command.
 
 ******************************************/
 
@@ -401,7 +442,7 @@ WRITE8_MEMBER(gsword_state::sound_command_w)
 
 WRITE8_MEMBER(gsword_state::adpcm_data_w)
 {
-	m_msm->write_data(data & 0x0f); // bit 0..3
+	m_msm->data_w(data & 0x0f);     // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w(BIT(data, 4));    // bit 4
 }
@@ -1070,13 +1111,13 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-17.4d",   0x6000, 0x2000, CRC(87817985) SHA1(370399a4622958829ca6d1545e614b121f09c2c0) )
 
 	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
-	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-013.9.5a",  0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
 	ROM_LOAD( "aa-016.9c",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu3", 0 )    // 8041AH
-	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(8672007d) SHA1(7f3e30b5a0332fae987d280ed944ada53f16fc95) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ac1-10.9n",    0x0000, 0x2000, CRC(517c571b) SHA1(05572a8ea416922da50143936fda9ba038f0b91e) )    // tiles
@@ -1117,13 +1158,13 @@ ROM_START( gsword2 )
 	// 6000-7fff empty
 
 	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
-	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-013.9.5a",  0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
 	ROM_LOAD( "aa-016.9c",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu3", 0 )    // 8041AH
-	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(8672007d) SHA1(7f3e30b5a0332fae987d280ed944ada53f16fc95) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ac1-10.9n",    0x0000, 0x2000, CRC(517c571b) SHA1(05572a8ea416922da50143936fda9ba038f0b91e) )    // tiles
@@ -1189,5 +1230,5 @@ ROM_END
 
 
 GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, empty_init,   ROT90, "Allumer / Taito Corporation", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   init_gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   init_gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   init_gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   init_gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

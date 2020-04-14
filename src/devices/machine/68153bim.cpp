@@ -287,7 +287,7 @@ void bim68153_device::trigger_interrupt(int ch)
 //-------------------------------------------------
 //  read
 //-------------------------------------------------
-READ8_MEMBER( bim68153_device::read )
+uint8_t bim68153_device::read(offs_t offset)
 {
 	int vc = offset & REG_VECTOR;
 	int ch = offset & CHN_MSK;
@@ -301,7 +301,7 @@ READ8_MEMBER( bim68153_device::read )
 //-------------------------------------------------
 //  write
 //-------------------------------------------------
-WRITE8_MEMBER( bim68153_device::write )
+void bim68153_device::write(offs_t offset, uint8_t data)
 {
 	int vc = offset & REG_VECTOR;
 	int ch = offset & CHN_MSK;

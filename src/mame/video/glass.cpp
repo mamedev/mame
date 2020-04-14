@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info)
 	int data2 = m_videoram[(Layer * 0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
+	tileinfo.set(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 /***************************************************************************

@@ -150,7 +150,7 @@ public:
 private:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
+	void gfxram_w(offs_t offset, uint8_t data);
 	uint8_t   m_io_regs[8];
 	uint8_t   m_fd_data;
 
@@ -197,7 +197,7 @@ void pv1000_state::pv1000_io(address_map &map)
 }
 
 
-WRITE8_MEMBER( pv1000_state::gfxram_w )
+void pv1000_state::gfxram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *gfxram = memregion( "gfxram" )->base();
 
@@ -382,7 +382,7 @@ void pv1000_state::pv1000_postload()
 {
 	// restore GFX ram
 	for (int i = 0; i < 0x400; i++)
-		gfxram_w(m_maincpu->space(AS_PROGRAM), i, m_gfxram[i]);
+		gfxram_w(i, m_gfxram[i]);
 }
 
 void pv1000_state::machine_start()

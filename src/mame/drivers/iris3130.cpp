@@ -49,7 +49,7 @@
 #define LOG_INVALID_SEGMENT (1 << 1)
 #define LOG_OTHER           (1 << 2)
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 

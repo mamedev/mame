@@ -305,9 +305,9 @@ void samcoupe_state::samcoupe_io(address_map &map)
 {
 	map(0x0080, 0x0081).select(0xff00).w(FUNC(samcoupe_state::samcoupe_ext_mem_w));
 	map(0x00e0, 0x00e7).select(0xff10).rw(FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
-	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::write));
 	map(0x00e9, 0x00e9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
-	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::write));
 	map(0x00eb, 0x00eb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
 	map(0x00f8, 0x00f8).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
 	map(0x00f9, 0x00f9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));

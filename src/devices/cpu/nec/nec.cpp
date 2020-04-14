@@ -207,7 +207,7 @@ bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &addr
 
 std::unique_ptr<util::disasm_interface> nec_common_device::create_disassembler()
 {
-	return std::make_unique<nec_disassembler>();
+	return std::make_unique<nec_disassembler>(this);
 }
 
 
@@ -288,7 +288,8 @@ void nec_common_device::device_reset()
 	m_TF = 0;
 	m_IF = 0;
 	m_DF = 0;
-	m_MF = 1;  // brkem should set to 0 when implemented
+	m_MF = 1;
+	m_em = 1;
 	m_SignVal = 0;
 	m_AuxVal = 0;
 	m_OverVal = 0;
@@ -319,6 +320,7 @@ void nec_common_device::nec_interrupt(unsigned int_num, int/*INTSOURCES*/ source
 
 	i_pushf();
 	m_TF = m_IF = 0;
+	m_MF = 1;
 
 	if (source == INT_IRQ)  /* get vector */
 		int_num = (standard_irq_callback)(0);
@@ -341,6 +343,14 @@ void nec_common_device::nec_trap()
 
 void nec_common_device::nec_brk(unsigned int_num)
 {
+	if (m_chip_type != V33_TYPE)
+	{
+		m_em = 0;
+		m_MF = 0;
+		i_pushf();
+		PUSH(Sreg(PS));
+		PUSH(m_ip);
+	}
 	m_ip = read_mem_word(int_num*4);
 	Sreg(PS) = read_mem_word(int_num*4+2);
 	CHANGE_PC;
@@ -368,6 +378,7 @@ void nec_common_device::external_int()
 /****************************************************************************/
 
 #include "necinstr.hxx"
+#include "nec80inst.hxx"
 
 /*****************************************************************************/
 
@@ -625,7 +636,10 @@ void nec_common_device::execute_run()
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		prev_ICount = m_icount;
-		(this->*s_nec_instruction[fetchop()])();
+		if (m_MF)
+			(this->*s_nec_instruction[fetchop()])();
+		else
+			(this->*s_nec80_instruction[fetchop()])();
 		do_prefetch(prev_ICount);
 	}
 }

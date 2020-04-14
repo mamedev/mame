@@ -22,7 +22,7 @@ public:
 	void digitalker_0_wr_w(int line);
 	int digitalker_0_intr_r();
 
-	DECLARE_WRITE8_MEMBER(digitalker_data_w);
+	void digitalker_data_w(uint8_t data);
 
 protected:
 	// device-level overrides

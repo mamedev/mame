@@ -135,7 +135,7 @@ TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 	int code = m_videoram[tile_index] | (m_charbank << 8);
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO_MEMBER(0,code,attr,0);
+	tileinfo.set(0,code,attr,0);
 }
 
 /***************************************************************************
@@ -358,7 +358,7 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 	code = m_videoram[tile_index] + (colbank << 8);
 	attr = m_colorram[tile_index & 0x1f];
 
-	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
+	tileinfo.set(0,code,attr & 0x1f,0);
 }
 
 VIDEO_START_MEMBER(pacman_state,s2650games)
@@ -503,7 +503,7 @@ TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 	code = m_videoram[tile_index] | (m_charbank << 8);
 	attr = (m_videoram[color_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO_MEMBER(0,code,attr,0);
+	tileinfo.set(0,code,attr,0);
 }
 
 void pacman_state::jrpacman_mark_tile_dirty( int offset )

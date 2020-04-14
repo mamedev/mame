@@ -10,7 +10,7 @@ Fidelity CSC(and derived) hardware
 - Reversi Sensory Challenger
 
 TODO:
-- verify csce original roms (current set came from an overclock mod)
+- dump/add original csce
 - hook up csce I/O properly, it doesn't have PIAs
 
 *******************************************************************************
@@ -461,7 +461,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 WRITE8_MEMBER(csc_state::pia1_pa_w)
 {
 	// d0-d5: TSI C0-C5
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
 	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);
@@ -663,7 +663,7 @@ void csc_state::csce(machine_config &config)
 	csc(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(4_MHz_XTAL);
+	m_maincpu->set_clock(5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
 }
 
@@ -718,11 +718,11 @@ void csc_state::rsc(machine_config &config)
 
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-64019", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("1025a03",   0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
-	ROM_LOAD("1025a02",   0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
-	ROM_LOAD("1025a01",   0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
-	ROM_LOAD("74s474",    0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
+	ROM_LOAD("101-64019",   0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-1025a03", 0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_LOAD("101-1025a02", 0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
+	ROM_LOAD("101-1025a01", 0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
+	ROM_LOAD("74s474",      0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -822,7 +822,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger (Travemuende version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super 9 Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

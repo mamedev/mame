@@ -15,9 +15,8 @@
 #include "am53cf96.h"
 #include "bus/scsi/scsihle.h"
 
-READ8_MEMBER( am53cf96_device::read )
+uint8_t am53cf96_device::read(offs_t offset)
 {
-	int rv;
 	static constexpr int states[] = { 0, 0, 1, 1, 2, 3, 4, 5, 6, 7, 0 };
 
 	if (offset == REG_STATUS)
@@ -30,7 +29,7 @@ READ8_MEMBER( am53cf96_device::read )
 		}
 	}
 
-	rv = scsi_regs[offset];
+	int rv = scsi_regs[offset];
 
 	if (offset == REG_FIFO)
 	{
@@ -55,7 +54,7 @@ void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 	m_irq_handler(1);
 }
 
-WRITE8_MEMBER( am53cf96_device::write )
+void am53cf96_device::write(offs_t offset, uint8_t data)
 {
 //  logerror("53cf96: w %x to reg %d %s\n", data, offset, machine().describe_context());
 

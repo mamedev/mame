@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dragon 32/64 DOS floppy disks -->
+Dragon 32/64 DOS floppy disks
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Some disks are bootable and can be booted using:
         BOOT

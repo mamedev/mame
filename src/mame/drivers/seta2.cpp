@@ -2439,7 +2439,7 @@ void staraudi_state::staraudi(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &staraudi_state::staraudi_map);
 
 	SHARP_LH28F016S_16BIT(config, "flash");
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	// video hardware
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate

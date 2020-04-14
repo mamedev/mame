@@ -15,17 +15,17 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN		(1 << 1)
-#define LOG_I2S			(1 << 2)
-#define LOG_DMA			(1 << 3)
-#define LOG_OSTIMER		(1 << 4)
-#define LOG_INTC		(1 << 5)
-#define LOG_GPIO		(1 << 6)
-#define LOG_LCD_DMA		(1 << 7)
-#define LOG_LCD			(1 << 8)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD)
+#define LOG_UNKNOWN     (1 << 1)
+#define LOG_I2S         (1 << 2)
+#define LOG_DMA         (1 << 3)
+#define LOG_OSTIMER     (1 << 4)
+#define LOG_INTC        (1 << 5)
+#define LOG_GPIO        (1 << 6)
+#define LOG_LCD_DMA     (1 << 7)
+#define LOG_LCD         (1 << 8)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_I2S | LOG_DMA | LOG_OSTIMER | LOG_INTC | LOG_GPIO | LOG_LCD_DMA | LOG_LCD)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device, "pxa255_periphs", "Intel XScale PXA255 Peripherals")

@@ -346,7 +346,7 @@ READ8_MEMBER(odyssey2_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(space, offset);
+		return m_i8244->read(offset);
 	}
 	if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -370,7 +370,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		m_i8244->write(space, offset, data);
+		m_i8244->write(offset, data);
 	}
 }
 
@@ -379,7 +379,7 @@ READ8_MEMBER(g7400_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(space, offset);
+		return m_i8244->read(offset);
 	}
 	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -407,7 +407,7 @@ WRITE8_MEMBER(g7400_state::io_write)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		m_i8244->write(space, offset, data);
+		m_i8244->write(offset, data);
 	}
 	else if (!(m_p1 & P1_VPP_ENABLE))
 	{

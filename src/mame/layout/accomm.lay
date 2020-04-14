@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
-<!-- Basic display of keyboard LEDs for the Acorn Communicator -->
+<!--
+license:CC0
+
+Basic display of keyboard LEDs for the Acorn Communicator
+-->
 
 <mamelayout version="2">
 

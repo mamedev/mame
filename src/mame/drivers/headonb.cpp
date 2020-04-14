@@ -76,7 +76,7 @@ private:
 TILE_GET_INFO_MEMBER(headonb_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void headonb_state::video_start()

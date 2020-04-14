@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     Game cartridges for Bandai Design Master
 
     Game carts, these plug into the system
@@ -71,6 +73,17 @@
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom loadflag="load16_word_swap" name="g01_dragonballz.bin" size="0x20000" crc="94107404" sha1="c86d48e9f0262da36ac9bbcffd9cea8e9bb672b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddiver" supported="no">
+		<description>Dungeon Diver (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g02_dungeondiver.bin" size="0x20000" crc="877781b7" sha1="3a1ec0bd594b31e9ea4e5b28471ff709c89989f0" />
 			</dataarea>
 		</part>
 	</software>

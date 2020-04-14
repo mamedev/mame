@@ -1306,8 +1306,8 @@ ROM_START( raiden2 )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1347,8 +1347,8 @@ ROM_START( raiden2g )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1407,8 +1407,8 @@ ROM_START( raiden2hk )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1483,8 +1483,8 @@ ROM_START( raiden2j )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1524,8 +1524,8 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1565,8 +1565,8 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1606,8 +1606,8 @@ ROM_START( raiden2nl )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1647,8 +1647,8 @@ ROM_START( raiden2u )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1688,8 +1688,8 @@ ROM_START( raiden2i )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1730,8 +1730,8 @@ ROM_START( raiden2k )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1788,8 +1788,8 @@ ROM_START( raiden2e )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1829,8 +1829,8 @@ ROM_START( raiden2ea )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1870,8 +1870,8 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1915,8 +1915,8 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -1960,8 +1960,8 @@ ROM_START( raiden2eg ) // this is the same code revision as raiden2eua but a ger
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -2005,8 +2005,8 @@ ROM_START( raiden2eup )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
@@ -2586,10 +2586,10 @@ ROM_START( zeroteam ) // Fabtek, US licensee, displays 'USA' under zero team log
 	ROM_LOAD( "seibu__6.u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // alternate label "6"
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 ROM_START( zeroteama ) // No licensee, original japan?
@@ -2623,10 +2623,10 @@ ROM_START( zeroteama ) // No licensee, original japan?
 	ROM_LOAD( "6.u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 /* this set, consisting of updated program ROMs, is a later version or hack of zero team to incorporate the writing
@@ -2667,10 +2667,10 @@ ROM_START( zeroteamb ) // No licensee, later japan?
 	ROM_LOAD( "6.u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 ROM_START( zeroteamc ) // Liang Hwa, Taiwan licensee, no special word under logo on title
@@ -2704,10 +2704,10 @@ ROM_START( zeroteamc ) // Liang Hwa, Taiwan licensee, no special word under logo
 	ROM_LOAD( "6.c.u105.4a", 0x00000, 0x40000,  CRC(b4a6e899) SHA1(175ab656db3c3258ff10eede89890f62435d2298) )
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 ROM_START( zeroteamd ) // Dream Soft, Korea licensee, no special word under logo on title; board had serial 'no 1041' on it.
@@ -2742,10 +2742,10 @@ ROM_START( zeroteamd ) // Dream Soft, Korea licensee, no special word under logo
 	ROM_LOAD( "8.u105.4a", 0x00000, 0x40000,  CRC(b4a6e899) SHA1(175ab656db3c3258ff10eede89890f62435d2298) ) // same ROM as '6' labeled one in zeroteamc above but has '8' written on label in pen
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 // A version of the above exists (which dr.kitty used to own) which DOES have 'Korea' under the logo on title, needs dumping
 
@@ -2780,10 +2780,10 @@ ROM_START( zeroteams ) // No license, displays 'Selection' under logo
 	ROM_LOAD( "6.u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 /*
@@ -2829,10 +2829,10 @@ ROM_START( zeroteamsr )
 	ROM_LOAD( "6.u105.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
 
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "v3c001.pal.u0310.jed", 0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
-	ROM_LOAD( "v3c002.tibpal16l8-25.u0322.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c003.ami18cv8p-15.u0619.jed", 0x0000, 0x288, NO_DUMP)
-	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310.jed", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
+	ROM_LOAD( "v3c001.pal.u0310",            0x0000, 0x288, NO_DUMP) // located UNDER v3c004x, unknown pal type
+	ROM_LOAD( "v3c002.tibpal16l8-25.u0322",  0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c003.ami18cv8p-15.u0619",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "v3c004x.ami18cv8pc-25.u0310", 0x0000, 0x288, NO_DUMP) // located piggybacking on v3c001 and attached to some rework wires
 ROM_END
 
 

@@ -59,8 +59,6 @@ protected:
 	static const int divisors_16X_1_8432MHz[16];
 	static const int divisors_16X_5_0688MHz_030[16];
 	static const int divisors_16X_4_6080MHz[16];
-	static const int divisors_16X_4_9152MHz_SY2661_1[16];
-	static const int divisors_16X_4_9152MHz_SY2661_2[16];
 
 	// device-level overrides
 	virtual void device_start() override;

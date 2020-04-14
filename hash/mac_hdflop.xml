@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="mac_hdflop" description="Macintosh High Density Disk images">
 
 	<!-- S/N: Z93350-001A -->

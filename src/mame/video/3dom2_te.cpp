@@ -757,22 +757,11 @@ void m2_te_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_post_load - device-specific post-load
-//-------------------------------------------------
-
-void m2_te_device::device_post_load()
-{
-
-}
-
-
-
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER( m2_te_device::read )
+uint32_t m2_te_device::read(offs_t offset)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -828,7 +817,7 @@ READ32_MEMBER( m2_te_device::read )
 	return 0;
 }
 
-WRITE32_MEMBER( m2_te_device::write )
+void m2_te_device::write(offs_t offset, uint32_t data)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -3334,8 +3323,6 @@ void m2_te_device::illegal_inst()
 
 void m2_te_device::execute()
 {
-	address_space &space = machine().driver_data()->generic_space();
-
 #if TEST_TIMING
 	memset(g_statistics, 0, sizeof(g_statistics));
 #endif
@@ -3353,7 +3340,7 @@ void m2_te_device::execute()
 
 				while (cnt-- >= 0)
 				{
-					write(space, offs >> 2, irp_fetch(), 0xffffffff);
+					write(offs >> 2, irp_fetch());
 					offs += 4;
 
 					if (m_state != TE_RUNNING)

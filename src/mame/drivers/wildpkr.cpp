@@ -317,8 +317,7 @@ void wildpkr_state::wildpkr_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x113fff).ram();
-	map(0x800000, 0x800001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800002, 0x800003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800000, 0x800003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800080, 0x80009f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x800180, 0x800180).r(FUNC(wildpkr_state::unknown_read8));
 	map(0x800181, 0x800181).w(FUNC(wildpkr_state::unknown_write8));
@@ -336,8 +335,7 @@ void wildpkr_state::tabpkr_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x300000, 0x303fff).ram();
 	map(0x400000, 0x400fff).ram().w(FUNC(wildpkr_state::nvram_w)).share("nvram");
-	map(0x500000, 0x500001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x500002, 0x500003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x500000, 0x500003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x500021, 0x500021).rw("ramdac", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
 	map(0x500023, 0x500023).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x500025, 0x500025).rw("ramdac", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));

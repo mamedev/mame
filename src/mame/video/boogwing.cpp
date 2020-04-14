@@ -14,6 +14,15 @@ void boogwing_state::video_start()
 	save_item(NAME(m_priority));
 }
 
+constexpr u32 sub_blend_r32(u32 d, u32 s, u8 level)
+{
+	// stage 1 boss for ragtime, inverts source layer for a shadow effect,
+	// >> 9 instead of >> 8 is a guess
+	s^=0xffffff;
+	return ((((s & 0x0000ff) * level + (d & 0x0000ff) * int(256 - level)) >> 9)) |
+			((((s & 0x00ff00) * level + (d & 0x00ff00) * int(256 - level)) >> 9) & 0x00ff00) |
+			((((s & 0xff0000) * level + (d & 0xff0000) * int(256 - level)) >> 9) & 0xff0000);
+}
 
 /* Mix the 2 sprite planes with the already rendered tilemaps..
  note, if we implement tilemap blending etc. too we'll probably have to mix those in here as well..
@@ -239,7 +248,12 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 					if ((bg2_drawed) || ((sprite1_drawed && (~drawnpixe1 & 2)) || (sprite2_drawed && (~drawnpixe1 & 1)) || (sprite1_drawed && sprite2_drawed)))
 					{
 						if (((pix2 & 0x900) != 0x900) || ((spri2 <= spri1) && sprite1_drawed))
-							dstline[x] = alpha_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3);
+						{
+							// TODO: make it functional, check out modes 0x21 and 0x1000.
+							dstline[x] = (m_deco_ace->get_aceram(0x1f) == 0x22) ?
+								sub_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3) :
+								alpha_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3);
+						}
 					}
 				}
 			}

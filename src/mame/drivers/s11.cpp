@@ -310,7 +310,7 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 WRITE8_MEMBER( s11_state::pia34_pb_w )
 {
 	if(m_pia40)
-		m_pia40->write_portb(data);
+		m_pia40->portb_w(data);
 	else
 		m_bg->data_w(data);
 }
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
 
 WRITE8_MEMBER( s11_state::pia40_pb_w )
 {
-	m_pia34->write_portb(data);
+	m_pia34->portb_w(data);
 }
 
 void s11_state::init_s11()

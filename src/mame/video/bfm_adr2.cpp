@@ -167,7 +167,7 @@ TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile0_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile1_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 // video initialisation ///////////////////////////////////////////////////

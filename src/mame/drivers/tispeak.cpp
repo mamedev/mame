@@ -672,14 +672,14 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
-	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
+	m_tms5100->ctl_w(bitswap<4>(data,3,0,1,2));
 	m_o = data;
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
 {
 	// K4: TMS5100 CTL1
-	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+	u8 k4 = m_tms5100->ctl_r() << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return k4 | m_inputs[9]->read() | read_inputs(9);
@@ -747,7 +747,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
 	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
-	m_tms5100->ctl_w(space, 0, r & 0xf);
+	m_tms5100->ctl_w(r & 0xf);
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -773,7 +773,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_o)
 READ8_MEMBER(tispeak_state::k28_read_k)
 {
 	// K: TMS5100 CTL, multiplexed inputs (also tied to R1234)
-	return m_tms5100->ctl_r(space, 0) | read_inputs(9) | (m_r & 0xf);
+	return m_tms5100->ctl_r() | read_inputs(9) | (m_r & 0xf);
 }
 
 

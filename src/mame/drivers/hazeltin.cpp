@@ -346,12 +346,12 @@ WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
 
 READ8_MEMBER( hazl1500_state::uart_r )
 {
-	return (m_uart->get_received_data() & 0x7f) | (m_uart->pe_r() << 7);
+	return (m_uart->receive() & 0x7f) | (m_uart->pe_r() << 7);
 }
 
 WRITE8_MEMBER( hazl1500_state::uart_w )
 {
-	m_uart->set_transmit_data((data & 0x7f) | (BIT(m_misc_dips->read(), 3) ? 0x00 : 0x80));
+	m_uart->transmit((data & 0x7f) | (BIT(m_misc_dips->read(), 3) ? 0x00 : 0x80));
 }
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )

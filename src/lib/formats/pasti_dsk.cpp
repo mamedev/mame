@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include "emu.h" // logerror
 #include "pasti_dsk.h"
 
 // Pasti format supported using the documentation at

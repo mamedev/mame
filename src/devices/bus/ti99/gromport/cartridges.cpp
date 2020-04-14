@@ -25,7 +25,7 @@
 #define LOG_GROM         (1U<<8)   // GROM access
 #define LOG_RPK          (1U<<9)   // RPK handler
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::gromport, ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
@@ -634,7 +634,7 @@ void ti99_paged12k_cartridge::write(offs_t offset, uint8_t data)
 	{
 		m_rom_page = (offset >> 1) & 1;
 		if ((offset & 1)==0)
-			LOGMASKED(LOG_WARN, "Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
+			LOGMASKED(LOG_BANKSWITCH, "Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{

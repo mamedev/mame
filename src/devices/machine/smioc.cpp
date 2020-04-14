@@ -439,7 +439,7 @@ void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_n
 	reg = newValue;
 }
 
-READ8_MEMBER(smioc_device::ram2_mmio_r)
+u8 smioc_device::ram2_mmio_r(offs_t offset)
 {
 	const char *description = "";
 	u8 data = m_logic_ram[offset & 0xFFF];
@@ -497,7 +497,7 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 	return data;
 }
 
-WRITE8_MEMBER(smioc_device::ram2_mmio_w)
+void smioc_device::ram2_mmio_w(offs_t offset, u8 data)
 {
 	const char *description = "";
 
@@ -557,7 +557,7 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 	LOG_PARAMETER_RAM("ram2[%04X] <= %02X %s\n", offset, data, description);
 }
 
-READ8_MEMBER(smioc_device::dma68k_r)
+u8 smioc_device::dma68k_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -575,7 +575,7 @@ READ8_MEMBER(smioc_device::dma68k_r)
 	return data;
 }
 
-WRITE8_MEMBER(smioc_device::dma68k_w)
+void smioc_device::dma68k_w(offs_t offset, u8 data)
 {
 
 	m_dma_timer->adjust(attotime::from_usec(10));
@@ -585,7 +585,7 @@ WRITE8_MEMBER(smioc_device::dma68k_w)
 	LOG_REGISTER_ACCESS("%s dma68k[%04X] <= %02X\n", machine().time().as_string(), offset, data);
 }
 
-READ8_MEMBER(smioc_device::boardlogic_mmio_r)
+u8 smioc_device::boardlogic_mmio_r(offs_t offset)
 {
 	u8 data = 0xFF;
 	switch (offset)
@@ -619,7 +619,7 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 	return data;
 }
 
-WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
+void smioc_device::boardlogic_mmio_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -695,16 +695,16 @@ void smioc_device::AdvanceStatus2()
 }
 
 
-READ8_MEMBER(smioc_device::dma8237_2_dmaread)
+u8 smioc_device::dma8237_2_dmaread(offs_t offset)
 {
 	int data = m_smioccpu->space(AS_PROGRAM).read_byte(offset);
 	LOG_REGISTER_ACCESS("dma2read [0x%x] => 0x%x\n", offset, data);
-	m_scc2698b->write_reg(0x03, data);
+	m_scc2698b->write(0x03, data);
 	return data;
 }
-WRITE8_MEMBER(smioc_device::dma8237_2_dmawrite)
+void smioc_device::dma8237_2_dmawrite(offs_t offset, u8 data)
 {
-	data = m_scc2698b->read_reg(0x03);
+	data = m_scc2698b->read(0x03);
 	LOG_REGISTER_ACCESS("dma2write [0x%x] <= 0x%x\n", offset, data);
 	m_smioccpu->space(AS_PROGRAM).write_byte(offset, data);
 }

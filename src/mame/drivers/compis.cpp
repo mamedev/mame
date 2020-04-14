@@ -762,7 +762,7 @@ void compis_state::compis(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
 	I8255(config, m_ppi);
-	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi->in_pb_callback().set(FUNC(compis_state::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(compis_state::ppi_pc_w));
 

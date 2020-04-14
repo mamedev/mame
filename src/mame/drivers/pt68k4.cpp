@@ -57,7 +57,6 @@ TODO: 68230 device
 
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
-#include "machine/pc_fdc.h"
 #include "machine/timekpr.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"

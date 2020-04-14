@@ -230,7 +230,7 @@ WRITE8_MEMBER(microterm_f8_state::vram_w)
 
 WRITE8_MEMBER(microterm_f8_state::uart_transmit_w)
 {
-	m_uart->set_transmit_data((data & 0x7f) | (m_dsw[2]->read() & 0x10) << 3);
+	m_uart->transmit((data & 0x7f) | (m_dsw[2]->read() & 0x10) << 3);
 }
 
 bool microterm_f8_state::poll_keyboard()

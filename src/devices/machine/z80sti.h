@@ -64,8 +64,8 @@ public:
 	void set_rx_clock(int clock) { m_rx_clock = clock; }
 	void set_tx_clock(int clock) { m_tx_clock = clock; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );

@@ -112,7 +112,7 @@ void upd7004_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER(upd7004_device::read)
+uint8_t upd7004_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -135,7 +135,7 @@ READ8_MEMBER(upd7004_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(upd7004_device::write)
+void upd7004_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

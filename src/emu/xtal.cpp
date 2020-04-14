@@ -63,6 +63,7 @@ const double XTAL::known_xtals[] = {
 		400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
 		430'000, /* 430_kHz_XTAL           Resonator */
 		455'000, /* 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w */
+		500'000, /* 500_kHz_XTAL           Resonator - MIDI clock on various synthesizers (31250 * 16) */
 		512'000, /* 512_kHz_XTAL           Resonator - Toshiba TC8830F */
 		600'000, /* 600_kHz_XTAL           - */
 		640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
@@ -71,6 +72,7 @@ const double XTAL::known_xtals[] = {
 	  1'008'000, /* 1.008_MHz_XTAL         Acorn Microcomputer (System 1) */
 	  1'056'000, /* 1.056_MHz_XTAL         Resonator - OKI M6295 on Trio The Punch h/w */
 	  1'294'400, /* 1.2944_MHz_XTAL        BBN BitGraph PSG */
+	  1'600'000, /* 1.6_MHz_XTAL           Resonator - Roland TR-707 */
 	  1'689'600, /* 1.6896_MHz_XTAL        Diablo 1355WP Printer */
 	  1'750'000, /* 1.75_MHz_XTAL          RCA CDP1861 */
 	  1'797'100, /* 1.7971_MHz_XTAL        SWTPC 6800 (with MIKBUG) */
@@ -121,10 +123,11 @@ const double XTAL::known_xtals[] = {
 	  6'000'000, /* 6_MHz_XTAL             American Poker II, Taito SJ System */
 	  6'144'000, /* 6.144_MHz_XTAL         Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	  6'400'000, /* 6.4_MHz_XTAL           Textel Compact */
-	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace */
+	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace, Roland QDD interface */
 	  6'880'000, /* 6.88_MHz_XTAL          Barcrest MPU4 */
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
+	  7'056'000, /* 7.056_MHz_XTAL         Alesis QS FXCHIP (LCM of 44.1 kHz and 48 kHz) */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
@@ -141,6 +144,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
+	  8'960'000, /* 8.96_MHz_XTAL          Casio CZ-101 (divided by 2 for Music LSI) */
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
@@ -209,6 +213,7 @@ const double XTAL::known_xtals[] = {
 	 14'300'000, /* 14.3_MHz_XTAL          Agat-7 */
 	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board  */
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
+	 14'349'600, /* 14.3496_MHz_XTAL       Roland S-50 VDP */
 	 14'580'000, /* 14.58_MHz_XTAL         Fortune 32:16 Video Controller */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'728'000, /* 14.728_MHz_XTAL        ADM 36 */
@@ -299,6 +304,7 @@ const double XTAL::known_xtals[] = {
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
+	 23'200'000, /* 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock */
 	 23'814'000, /* 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950 */
 	 23'961'600, /* 23.9616_MHz_XTAL       Osborne 4 (Vixen) */
 	 24'000'000, /* 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games */
@@ -324,6 +330,7 @@ const double XTAL::known_xtals[] = {
 	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4100/I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */
 	 26'686'000, /* 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
+	 26'880'000, /* 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896) */
 	 26'989'200, /* 26.9892_MHz_XTAL       TeleVideo 965 */
 	 27'000'000, /* 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	 27'164'000, /* 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */

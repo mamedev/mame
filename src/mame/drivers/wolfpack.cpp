@@ -101,7 +101,7 @@ WRITE8_MEMBER(wolfpack_state::word_w)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
-	m_s14001a->data_w(space, 0, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+	m_s14001a->data_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
 WRITE8_MEMBER(wolfpack_state::start_speech_w)

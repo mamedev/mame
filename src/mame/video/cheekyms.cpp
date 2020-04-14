@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(cheekyms_state::get_tile_info)
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void cheekyms_state::video_start()

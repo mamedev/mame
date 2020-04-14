@@ -69,6 +69,7 @@ protected:
 	int address_mask();
 	int select_device();
 	int data_offset();
+	bool skip_addresshigh() const { return m_data_size <= 0x800; }
 
 	optional_memory_region m_region;
 
@@ -88,6 +89,7 @@ protected:
 	int m_bits;
 	int m_shift;
 	int m_devsel;
+	int m_addresshigh;
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;

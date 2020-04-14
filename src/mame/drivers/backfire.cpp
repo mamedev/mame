@@ -401,8 +401,6 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[0]->set_screen(m_lscreen);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -417,8 +415,6 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[1]->set_screen(m_lscreen);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x50);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);

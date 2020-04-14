@@ -21,10 +21,8 @@
 
 ***************************************************************************/
 
-#ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE   1
-	#include "netlist/devices/net_lib.h"
-#endif
+#define NL_PROHIBIT_BASEH_INCLUDE   1
+#include "netlist/devices/net_lib.h"
 
 #define SLOW_BUT_ACCURATE 0
 

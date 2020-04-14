@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dick Smith hardware catalog numbers, taken from advertisements:
+Dick Smith hardware catalog numbers, taken from advertisements:
 
 X-7200  VZ-200 Computer
 X-7205  16K RAM pac (VZ-200 only)
@@ -25,9 +27,6 @@ X-7310  Data Cassette (recorder)
 X-7312  Joysticks
 X-7315  Joysticks and Interface pac
 
--->
-
-<!--
 
 List of known tape releases by Dick Smith Electronics in Australia:
 

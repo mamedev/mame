@@ -176,7 +176,7 @@ void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_
 }
 
 
-WRITE8_MEMBER(qsound_hle_device::qsound_w)
+void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -200,7 +200,7 @@ WRITE8_MEMBER(qsound_hle_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_hle_device::qsound_r)
+uint8_t qsound_hle_device::qsound_r()
 {
 	// ready bit (0x00 = busy, 0x80 == ready)
 	m_stream->update();

@@ -260,7 +260,7 @@ uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 READ64_MEMBER( cv1k_state::flash_port_e_r )
 {
-	return ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
+	return ((m_serflash->flash_ready_r() ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -281,7 +281,7 @@ READ8_MEMBER( cv1k_state::flash_io_r )
 			return 0xff;
 
 		case 0x00:
-			return m_serflash->flash_io_r(space,offset);
+			return m_serflash->flash_io_r();
 	}
 }
 
@@ -295,15 +295,15 @@ WRITE8_MEMBER( cv1k_state::flash_io_w )
 			break;
 
 		case 0x00:
-			m_serflash->flash_data_w(space, offset, data);
+			m_serflash->flash_data_w( data);
 			break;
 
 		case 0x01:
-			m_serflash->flash_cmd_w(space, offset, data);
+			m_serflash->flash_cmd_w(data);
 			break;
 
 		case 0x2:
-			m_serflash->flash_addr_w(space, offset, data);
+			m_serflash->flash_addr_w(data);
 			break;
 	}
 }
@@ -332,7 +332,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 			m_eepromout->write(data, 0xff);
 			break;
 		case 0x03:
-			m_serflash->flash_enab_w(space,offset,data);
+			m_serflash->flash_enab_w(data);
 			break;
 
 		default:

@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	tileinfo.set(m_gfx_index, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	tileinfo.set(m_gfx_index, tile, color, flags);
 }
 
 

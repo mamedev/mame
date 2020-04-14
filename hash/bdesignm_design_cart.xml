@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     Game cartridges for Bandai Design Master
 
     Design carts, these plug into the Game carts, they're data ROMs, they do not contain boot vectors
@@ -100,6 +102,17 @@
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom loadflag="load16_word_swap" name="m04_rockman.bin" size="0x20000" crc="54c0e613" sha1="2927224268b0ef0a99513d8fda10be23395cabf6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shonen" supported="no">
+		<description>Weekly Shonen Jump Special (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="weekly_shonen_jump_special.bin" size="0x20000" crc="eb255397" sha1="c16b4f7194dbf486775ace47a54afee198565a80" />
 			</dataarea>
 		</part>
 	</software>

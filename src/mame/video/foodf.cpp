@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (data & 0xff) | ((data >> 7) & 0x100);
 	int color = (data >> 8) & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, color, m_playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	tileinfo.set(0, code, color, m_playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 

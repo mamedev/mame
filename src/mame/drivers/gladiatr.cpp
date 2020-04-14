@@ -232,7 +232,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	// bit 6 = bank offset
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
-	m_msm->write_data(data);        // bit 0..3
+	m_msm->data_w(data);        // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
@@ -242,7 +242,7 @@ WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
 	// bit 6 = bank offset
 	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
-	m_msm->write_data(data);        // bit 0..3
+	m_msm->data_w(data);        // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }

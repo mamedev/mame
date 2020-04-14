@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(leland_state::leland_get_tile_info)
 	int char_bank = ((m_gfxbank >> 4) & 0x03) << 10;
 	int prom_bank = ((m_gfxbank >> 3) & 0x01) << 13;
 	int tile = m_bg_prom[prom_bank | tile_index] | ((tile_index >> 7) & 0x300) | char_bank;
-	SET_TILE_INFO_MEMBER(0, tile, m_bg_prom[prom_bank | tile_index] >> 5, 0);
+	tileinfo.set(0, tile, m_bg_prom[prom_bank | tile_index] >> 5, 0);
 }
 
 
@@ -83,7 +83,7 @@ TILEMAP_MAPPER_MEMBER(ataxx_state::ataxx_scan)
 TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 {
 	u16 tile = m_ataxx_qram[tile_index] | ((m_ataxx_qram[0x4000 | tile_index] & 0x7f) << 8);
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 }
 
 

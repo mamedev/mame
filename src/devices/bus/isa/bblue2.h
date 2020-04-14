@@ -11,8 +11,6 @@
 
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/terminal.h"
-#include "bus/rs232/null_modem.h"
 #include "machine/pc_lpt.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -31,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_control_w);
 	DECLARE_READ8_MEMBER(z80_ram_r) { return m_ram->read(offset); }
 	DECLARE_WRITE8_MEMBER(z80_ram_w) { m_ram->write(offset,data); }
-	
+
 	DECLARE_WRITE_LINE_MEMBER(port1_irq) { m_isa->irq4_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(port2_irq) { m_isa->irq3_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
@@ -57,9 +55,11 @@ private:
 	required_ioport m_dsw3;
 	required_ioport m_h2;
 	required_device<ram_device> m_ram;
-	
+
 	void z80_program_map(address_map &map);
 	void z80_io_map(address_map &map);
+
+	bool m_devices_installed;
 };
 
 // device type definition

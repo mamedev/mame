@@ -12,7 +12,8 @@
 #include "upd78k3.h"
 #include "upd78k3d.h"
 
-// device type definition
+// device type definitions
+DEFINE_DEVICE_TYPE(UPD78310, upd78310_device, "upd78310", "NEC uPD78310")
 DEFINE_DEVICE_TYPE(UPD78312, upd78312_device, "upd78312", "NEC uPD78312")
 
 //**************************************************************************
@@ -268,9 +269,23 @@ void upd78k3_device::state_string_export(const device_state_entry &entry, std::s
 //-------------------------------------------------
 
 upd78312_device::upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: upd78k3_device(mconfig, UPD78312, tag, owner, clock,
-						address_map_constructor(FUNC(upd78312_device::mem_map), this),
+	: upd78312_device(mconfig, UPD78312, tag, owner, clock, address_map_constructor(FUNC(upd78312_device::mem_map), this))
+{
+}
+
+upd78312_device::upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+	: upd78k3_device(mconfig, type, tag, owner, clock, map,
 						address_map_constructor(FUNC(upd78312_device::sfr_map), this))
+{
+}
+
+
+//-------------------------------------------------
+//  upd78310_device - constructor
+//-------------------------------------------------
+
+upd78310_device::upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: upd78312_device(mconfig, UPD78310, tag, owner, clock, address_map_constructor())
 {
 }
 

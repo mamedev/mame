@@ -254,8 +254,9 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
-	void abc802_io(address_map &map);
+	void abc802_m1(address_map &map);
 	void abc802_mem(address_map &map);
+	void abc802_io(address_map &map);
 };
 
 
@@ -306,7 +307,7 @@ public:
 	DECLARE_READ8_MEMBER( cli_r );
 	DECLARE_WRITE8_MEMBER( sso_w );
 	DECLARE_READ8_MEMBER( sti_r );
-	DECLARE_WRITE8_MEMBER( sto_w );
+	void sto_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );

@@ -20,10 +20,12 @@ public:
 		: cps_state(mconfig, type, tag, 1)
 		, m_msm_1(*this, "msm1")
 		, m_msm_2(*this, "msm2")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void fcrash(machine_config &config);
 	void cawingbl(machine_config &config);
+	void ffightblb(machine_config &config);
 	void kodb(machine_config &config);
 	void mtwinsb(machine_config &config);
 	void sf2m1(machine_config &config);
@@ -41,10 +43,12 @@ protected:
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_MACHINE_START(ffightblb);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
+	DECLARE_MACHINE_START(wofabl);
 
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
@@ -74,6 +78,8 @@ protected:
 	void varthb_map(address_map &map);
 
 	void fcrash_sound_map(address_map &map);
+	void ffightblb_sound_map(address_map &map);
+	void ffightblb_oki_map(address_map &map);
 	void kodb_sound_map(address_map &map);
 	void sgyxz_sound_map(address_map &map);
 
@@ -97,6 +103,8 @@ protected:
 
 	optional_device<msm5205_device> m_msm_1;
 	optional_device<msm5205_device> m_msm_2;
+
+	optional_memory_bank m_okibank;
 };
 
 #endif // MAME_INCLUDES_FCRASH_H

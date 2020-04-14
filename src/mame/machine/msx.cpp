@@ -294,12 +294,12 @@ WRITE8_MEMBER( msx2_state::msx_rtc_latch_w )
 
 WRITE8_MEMBER( msx2_state::msx_rtc_reg_w )
 {
-	m_rtc->write(space, m_rtc_latch, data);
+	m_rtc->write(m_rtc_latch, data);
 }
 
 READ8_MEMBER( msx2_state::msx_rtc_reg_r )
 {
-	return m_rtc->read(space, m_rtc_latch);
+	return m_rtc->read(m_rtc_latch);
 }
 
 

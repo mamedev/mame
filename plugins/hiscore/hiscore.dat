@@ -10083,8 +10083,8 @@ hcrashc:
 ;@s:neogeo.cpp
 
 viewpoin:
-@:100000:2:42:41
-@:1000c8:3d:00:00
+@:maincpu,program,100000,2,42,41
+@:maincpu,program,1000c8,3d,00,00
 
 
 ;******metal slug 2 turbo 

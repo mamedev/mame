@@ -33,11 +33,11 @@ public:
 	auto hsync_changed() { return m_hsync_changed_cb.bind(); }
 
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	READ8_MEMBER(palette_direct_read);
-	WRITE8_MEMBER(palette_direct_write);
+	uint8_t palette_direct_read(offs_t offset);
+	void palette_direct_write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual void port_w(u8 data);
+	void set_start_delay(uint32_t data) { m_start_delay = data; };
 
 protected:
 	// chip states
@@ -89,6 +90,7 @@ protected:
 	uint8_t       m_first_valid_header;         /* did we get our first valid header yet? */
 	uint32_t      m_offset;                     /* current ROM offset */
 	uint32_t      m_repeat_offset;              /* current ROM repeat offset */
+	uint32_t      m_start_delay;
 
 	/* ADPCM processing */
 	int8_t        m_adpcm_state;                /* ADPCM state index */

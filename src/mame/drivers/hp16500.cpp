@@ -50,7 +50,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ds1386.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "video/mc6845.h"
@@ -235,7 +235,7 @@ void hp16500_state::hp1650_map(address_map &map)
 	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
 	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x20a000, 0x20a007).rw("epci", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write)).umask16(0x00ff);
 
 	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -264,7 +264,7 @@ void hp16500_state::hp1651_map(address_map &map)
 	map(0x206001, 0x206001).w(FUNC(hp16500_state::pal_g_w));
 	map(0x207001, 0x207001).w(FUNC(hp16500_state::pal_b_w));
 
-	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x20a000, 0x20a007).rw("epci", FUNC(scn_pci_device::read), FUNC(scn_pci_device::write)).umask16(0x00ff);
 
 	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -432,7 +432,7 @@ void hp16500_state::hp1650(machine_config &config)
 	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MC2661(config, "epci", 5000000);
+	SCN2661A(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -455,7 +455,7 @@ void hp16500_state::hp1651(machine_config &config)
 	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MC2661(config, "epci", 5000000);
+	SCN2661A(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

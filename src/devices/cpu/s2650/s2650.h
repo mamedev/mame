@@ -68,7 +68,7 @@ private:
 
 	devcb_read_line m_sense_handler;
 	devcb_write_line m_flag_handler;
-	devcb_write_line m_intack_handler;
+	devcb_read8 m_intack_handler;
 
 	uint16_t  m_ppc;    /* previous program counter (page + iar) */
 	uint16_t  m_page;   /* 8K page select register (A14..A13) */

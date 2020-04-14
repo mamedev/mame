@@ -291,8 +291,8 @@ void ps2_gif_device::process_tag(tag_t &tag, uint64_t hi, uint64_t lo)
 			tag.loop();
 			break;
 		default:
-			m_gs->regs_w(machine().dummy_space(), 0x54, lo);
-			m_gs->regs_w(machine().dummy_space(), 0x54, hi);
+			m_gs->regs_w(0x54, lo);
+			m_gs->regs_w(0x54, hi);
 			tag.loop();
 			break;
 	}

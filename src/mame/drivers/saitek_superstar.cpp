@@ -61,7 +61,6 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_extrom(*this, "extrom"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -78,7 +77,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	optional_device<generic_slot_device> m_extrom;
 	required_ioport_array<2> m_inputs;
 
 	// address maps
@@ -89,14 +87,11 @@ private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
 
-	u8 m_inp_mux;
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
+	u8 m_inp_mux = 0;
 };
 
 void star_state::machine_start()
 {
-	m_inp_mux = 0;
 	save_item(NAME(m_inp_mux));
 }
 
@@ -105,20 +100,6 @@ void star_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// Extension ROM
-
-DEVICE_IMAGE_LOAD_MEMBER(star_state::extrom_load)
-{
-	u32 size = m_extrom->common_get_size("rom");
-	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
-// TTL
 
 WRITE8_MEMBER(star_state::control_w)
 {
@@ -242,9 +223,7 @@ void star_state::tstar432(machine_config &config)
 	config.set_default_layout(layout_saitek_tstar432);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_kso", "bin");
-	m_extrom->set_device_load(FUNC(star_state::extrom_load));
-
+	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
 

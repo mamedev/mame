@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 {
 	int code;
 	code = m_vram1[tile_index<<1] + (m_vram1[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		(code>>12)&0x3,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 {
 	int code;
 	code = m_vram2[tile_index<<1] + (m_vram2[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		((code>>12)&0x3)+4,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 {
 	int code;
 	code = m_vram4[tile_index<<1] + (m_vram4[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		((code>>12)&0x3)+12,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );

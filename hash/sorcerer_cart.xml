@@ -1,18 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
+
 Compiled by K1W1 (thanks to Robbbert)
--->
 
-<!--
 
 The Exidy Sorcerer was the first computer to use cartridge software and Exidy used 8 Track music cartridges to encase the ROM Pacs.
 Four cartridges were made for this computer one of which was a hardware device, the "EPROM Burner Pac (DP 2001)".
 
--->
 
-<!-- Dick Smith catalog numbers, taken from advertisements:
+Dick Smith catalog numbers, taken from advertisements:
 
 X-1190, X-3000 : Sorcerer 8K
 X-1192, X-3001 : Sorcerer 16K

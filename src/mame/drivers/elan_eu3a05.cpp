@@ -242,7 +242,11 @@ public:
 	void airblsjs(machine_config& config);
 
 	void elan_sudoku(machine_config &config);
+	void elan_sudoku_pal(machine_config &config);
+	void elan_pvmilfin(machine_config &config);
 
+	void init_sudelan();
+	void init_sudelan3();
 
 protected:
 	// driver_device overrides
@@ -771,9 +775,26 @@ void elan_eu3a05_state::elan_sudoku(machine_config& config)
 	elan_eu3a05(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
 	m_vid->set_is_sudoku();
+	m_vid->set_use_spritepages();
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
+void elan_eu3a05_state::elan_sudoku_pal(machine_config& config)
+{
+	elan_sudoku(config);
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
+}
+
+void elan_eu3a05_state::elan_pvmilfin(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_vid->set_is_pvmilfin();
+	m_sys->set_alt_timer();
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
+}
 
 void elan_eu3a05_state::airblsjs(machine_config& config)
 {
@@ -781,6 +802,9 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 	m_screen->set_refresh_hz(50);
 	m_sys->set_pal(); // TODO: also set PAL clocks
 }
+
+
+
 
 ROM_START( rad_tetr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -803,13 +827,21 @@ ROM_START( airblsjs )
 	ROM_LOAD( "airblsjs.bin", 0x000000, 0x400000, BAD_DUMP CRC(d10a6a84) SHA1(fa65f06e7da229006ddaffb245eef2cc4f90a66d) ) // ROM probably ok, but needs verification pass
 ROM_END
 
-ROM_START( sudoelan )
+ROM_START( sudelan3 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sudoku.bin", 0x00000, 0x100000, CRC(c2596173) SHA1(cc74932648b577b735151014e8c04ed778e11704) )
 	ROM_RELOAD(0x100000,0x100000)
 	ROM_RELOAD(0x200000,0x100000)
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
+
+ROM_START( sudelan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x200000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 
 ROM_START( carlecfg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -819,6 +851,13 @@ ROM_START( carlecfg )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( pvmilfin )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 
 ROM_START( buzztime )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -827,6 +866,24 @@ ROM_START( buzztime )
 	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
 ROM_END
 
+
+void elan_eu3a05_state::init_sudelan3()
+{
+	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
+	uint8_t* ROM = memregion("maincpu")->base();
+	ROM[0x0fcc] = 0xea;
+	ROM[0x0fcd] = 0xea;
+	ROM[0x0fce] = 0xea;
+}
+
+void elan_eu3a05_state::init_sudelan()
+{
+	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
+	uint8_t* ROM = memregion("maincpu")->base();
+	ROM[0xd0f] = 0xea;
+	ROM[0xd10] = 0xea;
+	ROM[0xd11] = 0xea;
+}
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
@@ -839,6 +896,11 @@ CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, e
 
 // Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
 
-CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
+CONS( 2006, sudelan3, 0,        0, elan_sudoku,      sudoku,   elan_eu3a05_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
+// Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
+CONS( 2005, sudelan, 0,         0, elan_sudoku_pal,  sudoku,   elan_eu3a05_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+
+// see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
+CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )

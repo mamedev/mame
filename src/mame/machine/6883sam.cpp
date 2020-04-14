@@ -88,6 +88,8 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	, m_space_FFE0(*this)
 	, m_space_FFF2(*this)
 {
+	for (int i = 0; i < 8; i++)
+		m_banks[i].m_memory_offset = 0;
 }
 
 sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider)

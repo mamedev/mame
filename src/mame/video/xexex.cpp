@@ -26,11 +26,11 @@ K053246_CB_MEMBER(xexex_state::sprite_callback)
 K056832_CB_MEMBER(xexex_state::tile_callback)
 {
 	/*
-		Color format
-		xxxx ---- Color
-		---- -x-- Alpha blend enable
-		---- --x- Used, Unknown
-		Everything else : unknown
+	    Color format
+	    xxxx ---- Color
+	    ---- -x-- Alpha blend enable
+	    ---- --x- Used, Unknown
+	    Everything else : unknown
 	*/
 	*priority = *color & 1; // alpha flag
 	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);

@@ -99,12 +99,12 @@ WRITE8_MEMBER(bagman_state::ls259_w)
 
 WRITE_LINE_MEMBER(bagman_state::tmsprom_bit_w)
 {
-	m_tmsprom->bit_w(machine().dummy_space(), 0, 7 - ((m_tmslatch->q0_r()<<2) | (m_tmslatch->q1_r()<<1) | (m_tmslatch->q2_r()<<0)));
+	m_tmsprom->bit_w(7 - ((m_tmslatch->q0_r()<<2) | (m_tmslatch->q1_r()<<1) | (m_tmslatch->q2_r()<<0)));
 }
 
 WRITE_LINE_MEMBER(bagman_state::tmsprom_csq0_w)
 {
-	m_tmsprom->rom_csq_w(machine().dummy_space(), 0, state);
+	m_tmsprom->rom_csq_w(0, state);
 }
 
 WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(bagman_state::tmsprom_csq1_w)
 	// reset signal, which would pull /OE active low on both 2732s at once. How
 	// does that situation manage not to overload the circuitry?
 	if (state || m_tmslatch->q4_r())
-		m_tmsprom->rom_csq_w(machine().dummy_space(), 1, state);
+		m_tmsprom->rom_csq_w(1, state);
 }
 
 WRITE_LINE_MEMBER(bagman_state::coin_counter_w)

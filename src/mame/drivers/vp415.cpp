@@ -222,7 +222,7 @@ WRITE8_MEMBER(vp415_state::ctrl_regs_w)
 			break;
 		case 1: // WR3
 			logerror("%s: ctrl_regs_w: WR3 (UPI-41): %d=%02x\n", machine().describe_context(), (offset >> 9) & 1, data);
-			m_ctrlmcu->upi41_master_w(space, (offset >> 9) & 1, data);
+			m_ctrlmcu->upi41_master_w((offset >> 9) & 1, data);
 			break;
 		case 2:
 			logerror("%s: ctrl_regs_w: N.C. write %02x\n", machine().describe_context(), data);
@@ -244,7 +244,7 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 			logerror("%s: ctrl_regs_r: RDEN: %02x\n", machine().describe_context(), value);
 			break;
 		case 1: // /RD3
-			value = m_ctrlmcu->upi41_master_r(space, (offset >> 9) & 1);
+			value = m_ctrlmcu->upi41_master_r((offset >> 9) & 1);
 			logerror("%s: ctrl_regs_r: RD3 (UPI-41): %d (%02x)\n", machine().describe_context(), (offset >> 9) & 1, value);
 			break;
 		case 2: // /RD2

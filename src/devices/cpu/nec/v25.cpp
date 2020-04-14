@@ -513,7 +513,7 @@ void v25_common_device::execute_set_input(int irqline, int state)
 
 std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 {
-	return std::make_unique<nec_disassembler>(m_v25v35_decryptiontable);
+	return std::make_unique<nec_disassembler>(this, m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()

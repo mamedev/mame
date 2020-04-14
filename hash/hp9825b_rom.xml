@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- HP9825B/T option ROMs -->
-<!-- Compiled by F.Ulivi with data from http://www.hpmuseum.net/ (mostly) -->
+HP9825B/T option ROMs
+Compiled by F.Ulivi with data from http://www.hpmuseum.net/ (mostly)
+-->
 
 <softwarelist name="hp9825b_rom" description="HP 9825B Option ROMs">
 	<software name="mass">

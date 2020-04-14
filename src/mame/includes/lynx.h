@@ -178,7 +178,7 @@ private:
 	DECLARE_READ8_MEMBER(mikey_read);
 	DECLARE_WRITE8_MEMBER(mikey_write);
 	DECLARE_READ8_MEMBER(lynx_memory_config_r);
-	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
+	void lynx_memory_config_w(uint8_t data);
 	void lynx_divide();
 	void lynx_multiply();
 	uint8_t lynx_timer_read(int which, int offset);

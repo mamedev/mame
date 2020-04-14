@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
     First load the Disk Operating System software into the Lynx memory. This is done by using the external ROM command:
     XROM [Return]

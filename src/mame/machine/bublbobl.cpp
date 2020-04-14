@@ -40,7 +40,7 @@ void bublbobl_state::common_sreset(int state)
 // 44 74 74 76 or 76 36 76 once or more per frame...
 */
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
+void bublbobl_state::bublbobl_bankswitch_w(uint8_t data)
 {
 	//logerror("bankswitch_w:  write of %02X\n", data);
 	/* bits 0-2 select ROM bank */
@@ -72,7 +72,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
    \-------- ? used (idle high, /SRESET?)
 // bublboblp: test and main: 00 C8 C9 C8 C9...; tokio: test 00 09 09 49 main 00 09 C8 CF
 */
-WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
+void bublbobl_state::tokio_bankswitch_w(uint8_t data)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 7);
@@ -99,7 +99,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
    |\------- ? used (idle high, /SBRES? or /SBINT?)
    \-------- VHINV (flip screen)
 */
-WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
+void bublbobl_state::tokio_videoctrl_w(uint8_t data)
 {
 	//logerror("tokio_videoctrl_w:  write of %02X\n", data);
 	/* bits 0-3 not used? */
@@ -424,7 +424,7 @@ WRITE8_MEMBER(bub68705_state::port_b_w)
 	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 
 	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
-		m_mcu->pa_w(space, 0, m_latch);
+		m_mcu->pa_w(m_latch);
 
 	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{

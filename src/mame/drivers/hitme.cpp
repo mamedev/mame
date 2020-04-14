@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
 	/* the code is the low 6 bits */
 	uint8_t code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 

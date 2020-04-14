@@ -123,6 +123,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tile_callback(u32 &tile, u32 &colour, int layer, bool is_8x8);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
@@ -193,6 +194,7 @@ private:
 
 	u16 port_b_tattass();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	u16 mix_callback(u16 p, u16 p2);
 
 	void nslasher_map(address_map &map);
 	void tattass_map(address_map &map);

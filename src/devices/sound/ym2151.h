@@ -282,10 +282,19 @@ protected:
 	virtual void write_reg(int r, int v) override;
 };
 
+// ======================> ym2414_device
+
+class ym2414_device : public ym2151_device
+{
+public:
+	// construction/destruction
+	ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(YM2151, ym2151_device)
 DECLARE_DEVICE_TYPE(YM2164, ym2164_device)
+DECLARE_DEVICE_TYPE(YM2414, ym2414_device)
 
 
 #endif // MAME_SOUND_YM2151_H

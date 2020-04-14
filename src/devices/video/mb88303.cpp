@@ -166,19 +166,19 @@ void mb88303_device::device_reset()
 }
 
 
-WRITE8_MEMBER( mb88303_device::da_w )
+void mb88303_device::da_w(uint8_t data)
 {
 	//logerror("%s: mb88303_device::da_w: %02x\n", machine().describe_context(), data);
 	m_da = data;
 }
 
-WRITE_LINE_MEMBER( mb88303_device::adm_w )
+void mb88303_device::adm_w(int state)
 {
 	//logerror("%s: mb88303_device::adm_w: %02x\n", machine().describe_context(), state);
 	m_adm = state;
 }
 
-WRITE_LINE_MEMBER( mb88303_device::reset_n_w )
+void mb88303_device::reset_n_w(int state)
 {
 	logerror("%s: mb88303_device::reset_n_w: %02x\n", machine().describe_context(), state);
 	uint8_t old = m_reset_n;
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER( mb88303_device::reset_n_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mb88303_device::ldi_w )
+void mb88303_device::ldi_w(int state)
 {
 	//logerror("%s: mb88303_device::ldi_w: %02x\n", machine().describe_context(), state);
 	uint8_t old = m_ldi;
@@ -260,12 +260,12 @@ void mb88303_device::process_data()
 	}
 }
 
-WRITE_LINE_MEMBER( mb88303_device::hsync_n_w )
+void mb88303_device::hsync_n_w(int state)
 {
 	m_hsync_n = state;
 }
 
-WRITE_LINE_MEMBER( mb88303_device::vsync_n_w )
+void mb88303_device::vsync_n_w(int state)
 {
 	m_vsync_n = state;
 }

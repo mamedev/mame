@@ -360,7 +360,7 @@ void at_keyboard_device::device_reset()
 	m_leds[1] = 0;
 }
 
-WRITE_LINE_MEMBER(pc_keyboard_device::enable)
+void pc_keyboard_device::enable(int state)
 {
 	if(state && !m_on)
 	{
@@ -614,7 +614,7 @@ void pc_keyboard_device::polling(void)
 	}
 }
 
-READ8_MEMBER(pc_keyboard_device::read)
+uint8_t pc_keyboard_device::read()
 {
 	int data;
 	if (m_tail == m_head)
@@ -688,7 +688,7 @@ Note:   each command is acknowledged by FAh (ACK), if not mentioned otherwise.
 SeeAlso: #P046
 */
 
-WRITE8_MEMBER(at_keyboard_device::write)
+void at_keyboard_device::write(uint8_t data)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard write %.2x\n",data);
@@ -775,7 +775,7 @@ WRITE8_MEMBER(at_keyboard_device::write)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				write(space, offset, data);
+				write(data);
 			}
 			else
 			{
@@ -799,7 +799,7 @@ WRITE8_MEMBER(at_keyboard_device::write)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				write(space, offset, data);
+				write(data);
 			}
 			else
 			{
@@ -830,7 +830,7 @@ WRITE8_MEMBER(at_keyboard_device::write)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				write(space, offset, data);
+				write(data);
 			}
 			else
 			{

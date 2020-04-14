@@ -520,6 +520,66 @@ static INPUT_PORTS_START(bbc_keypad)
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START(autoc15)
+	PORT_MODIFY("COL0")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INFO")               PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT COL")           PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
+
+	PORT_MODIFY("COL1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SETUP")              PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
+
+	PORT_MODIFY("COL2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("XFER")               PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
+
+	PORT_MODIFY("COL3")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MOVE")               PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
+
+	PORT_MODIFY("COL4")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FIND")               PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEF")                PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
+
+	PORT_MODIFY("COL5")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FORM")               PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
+
+	PORT_MODIFY("COL6")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COUNT")              PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
+
+	PORT_MODIFY("COL7")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CUE")                PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
+
+	PORT_MODIFY("COL10")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PARA")               PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL SHOT")           PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS CHAR")           PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS COL")            PORT_CODE(KEYCODE_SLASH_PAD)    PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL MARK")           PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT MATCH")         PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS/OVER")           PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+
+	PORT_MODIFY("COL11")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL CHAR")           PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL COL")            PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS SHOT")           PORT_CODE(KEYCODE_MINUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GOTO")               PORT_CODE(KEYCODE_BS_PAD)       PORT_CHAR(UCHAR_MAMEKEY(BS_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS MARK")           PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CMD")                PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MAR REL")            PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+
+	PORT_MODIFY("COL12")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("END")                PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("APPLY")              PORT_CODE(KEYCODE_COMMA_PAD)    PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FONT")               PORT_CODE(KEYCODE_3_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LINE STYLE")         PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START(torch_keyboard)
 	PORT_MODIFY("COL9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -791,6 +851,12 @@ static INPUT_PORTS_START(bbcm)
 	PORT_INCLUDE(bbc_keypad)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(autoc)
+	PORT_INCLUDE(bbc_config)
+	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(autoc15)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(ltmpbp)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
@@ -962,7 +1028,7 @@ void bbc_state::bbcb(machine_config &config)
 
 	/* user via */
 	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
-	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->writepb_handler().append(m_internal, FUNC(bbc_internal_slot_device::latch_fe60_w));
@@ -1019,6 +1085,8 @@ void bbc_state::bbcb(machine_config &config)
 	BBC_INTERNAL_SLOT(config, m_internal, 16_MHz_XTAL, bbcb_internal_devices, nullptr);
 	m_internal->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<5>));
 	m_internal->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
+
+	m_irqs->output_handler().append(m_internal, FUNC(bbc_internal_slot_device::irq6502_w));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_ls_b").set_original("bbcb_cass");
@@ -1434,7 +1502,7 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* user via */
 	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
-	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
@@ -2527,7 +2595,7 @@ COMP ( 1987, daisy,    bbcm,   0,     daisy,    bbcm,   bbcm_state,  init_bbc,  
 COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbcm_state,  init_bbc,  "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  bbcm,   bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500",                       MACHINE_NOT_WORKING)
+COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500",                       MACHINE_NOT_WORKING)
 COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbcm_state,  init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)

@@ -73,7 +73,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
+		setup.register_source<netlist::source_proc_t>(# name, &NETLIST_NAME(name));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -277,8 +277,12 @@ namespace netlist
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
 		// register a source
-		void register_source(plib::unique_ptr<plib::psource_t> &&src)
+		template <typename S, typename... Args>
+		void register_source(Args&&... args)
 		{
+		    static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+
+			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
 			m_sources.add_source(std::move(src));
 		}
 
@@ -305,9 +309,13 @@ namespace netlist
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
 
-		void add_include(plib::unique_ptr<plib::psource_t> &&inc)
+		template <typename S, typename... Args>
+		void add_include(Args&&... args)
 		{
-			m_includes.add_source(std::move(inc));
+		    static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+
+			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
+			m_includes.add_source(std::move(src));
 		}
 
 		void add_define(const pstring &def, const pstring &val)

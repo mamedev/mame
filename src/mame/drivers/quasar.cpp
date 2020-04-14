@@ -272,7 +272,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 // ****************************************
@@ -307,6 +307,7 @@ void quasar_state::quasar(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &quasar_state::quasar_data);
 	m_maincpu->set_vblank_int("screen", FUNC(quasar_state::quasar_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	i8035_device &soundcpu(I8035(config, "soundcpu", 6000000)); /* 6MHz crystal divide by 15 in CPU */
 	soundcpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);

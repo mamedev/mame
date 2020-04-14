@@ -26,6 +26,8 @@ i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag,
 	m_rom(nullptr)
 {
 	m_smram.smiact_n = 1;
+	m_smram.tseg_size = 0;
+	m_smram.mapping = 0;
 }
 
 void i82439tx_device::i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end)

@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+license:CC0
+-->
 <hashfile>
 	<!-- use A13MIRRORING for 16kb cartridge which do not work without it -->
 	<!-- (normally 16kb cartridges ignore address line A14, but ...) -->

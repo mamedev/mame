@@ -47,7 +47,7 @@ private:
 
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 	virtual void machine_start() override;
 
 	void digdug_map(address_map &map);

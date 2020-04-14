@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     UNDUMPED / TO BE REDUMPED LIST
 
     ADVANCED DAISENRYAKU                JAPAN       we have Rev A, Rev 0 needed (does it exist?)
@@ -29,9 +31,7 @@
     WONDER MIDI                         JAPAN
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
--->
 
-<!--
 
 Known undumped protos
 
@@ -65,9 +65,6 @@ NOTE
   * Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
     thanks to VDP compatibility mode. Since this is currently not emulated in MESS, the dump is in sms.xml
 
--->
-
-<!--
 
 Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
@@ -7767,7 +7764,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sor">
-		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tetsuken (Jpn, Rev. A)</description>
+		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tekken (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7785,7 +7782,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sora" cloneof="sor">
-		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tetsuken (Jpn)</description>
+		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tekken (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7803,7 +7800,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="sor2">
-		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
+		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Requiem (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4091 (JPN)"/>

@@ -112,7 +112,7 @@ WRITE8_MEMBER(imds2ioc_device::start_timer_w)
 
 READ8_MEMBER(imds2ioc_device::kb_read)
 {
-	return m_kbcpu->upi41_master_r(space, (offset & 2) >> 1);
+	return m_kbcpu->upi41_master_r((offset & 2) >> 1);
 }
 
 READ8_MEMBER(imds2ioc_device::kb_port_p2_r)
@@ -399,12 +399,12 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 
 READ8_MEMBER(imds2ioc_device::pio_master_r)
 {
-	return m_iocpio->upi41_master_r(space, offset);
+	return m_iocpio->upi41_master_r(offset);
 }
 
 WRITE8_MEMBER(imds2ioc_device::pio_master_w)
 {
-	m_iocpio->upi41_master_w(space, offset, data);
+	m_iocpio->upi41_master_w(offset, data);
 }
 
 void imds2ioc_device::device_resolve_objects()

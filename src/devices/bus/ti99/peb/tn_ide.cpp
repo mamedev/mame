@@ -2,376 +2,534 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    Thierry Nouspikel's IDE card emulation
+    IDE adapter card
+    designed by Thierry Nouspikel in 2001, revised in 2004
 
-    This card is just a prototype.  It has been designed by Thierry Nouspikel,
-    and its description was published in 2001.  The card has been revised in
-    2004.
+    The IDE card is quite simple, since it only implements PIO transfer. A DMA
+    support was also included, requiring a separate card, which did not become
+    available.
 
-    The specs have been published in <http://www.nouspikel.com/ti99/ide.html>.
+    Detailed descriptions can be found on Thierry Nouspikel's website. [1]
 
-    The IDE interface is quite simple, since it only implements PIO transfer.
-    The card includes a clock chip to timestamp files, and an SRAM for the DSR.
-    It should be possible to use a battery backed DSR SRAM, but since the clock
-    chip includes 4kb of battery-backed RAM, a bootstrap loader can be saved in
-    the clock SRAM in order to load the DSR from the HD when the computer
-    starts.
+    The card includes a clock chip to timestamp files, and a SRAM for the DSR.
 
-    Raphael Nabet, 2002-2004.
+    SRAM: 512 KiB (may be battery-backed)
+    Clock chip: RTC-65271 (alternatives: BQ4847, BQ4842, BQ4852, not implemented)
 
-    Michael Zapf
-    September 2010: Rewritten as device
-    February 2012: Rewritten as class
+    The card does not contain any ROM. The firmware must be loaded into the
+    card or saved on the IDE drive. It is part of the IDEAL software package [2]
+    ("IDE Access Layer").
 
-    FIXME: Completely untested and likely to be broken
+    DIP switches
+    - SW1: SP3T switch, located on card area outside of the box
+           selects 16 bit (TI) or 21 bit (Geneve) address decoding or disables
+           the card
+
+    - SW2: DPDT switch, located at center of the card
+           selects TI (LSB/MSB) vs. Geneve byte order (MSB/LSB)
+
+    - SW3: 4xDIP, located near front edge, lower edge
+           A resets the RTC65271 chip to clear interrupts that occured while
+              the power was off (clock continues running)
+              Not implemented since the clock does not run outside of MAME
+           B selects whether clock or SRAM is mapped into the 4000 address space
+             on powerup. SRAM should only be mapped when it is battery-backed.
+           (Switches A and B may have changed position between revisions, or the
+           existing PCBs do not match the specification.)
+           C, D not used
+
+    - SW4: 16-position rotary switch, located near front edge
+           selects second digit for CRU base address (1x00, x=0..F)
+
+    The card supports a battery-backed or normal SRAM of 512KiB size. The battery
+    power may be taken from the clock chip (which offers a battery holder).
+
+    Suggested configuration procedure:
+    (The IDELOAD program is part of the IDEAL package.)
+
+    1) Battery-backed SRAM
+    The IDELOAD program must be used to load the firmware into the SRAM.
+    Bootstrap code in the clock is not required, since the SRAM will be mapped
+    into the 4000 memory space on power-up.
+
+    2) Normal SRAM
+    The IDELOAD program must be used to load the firmware into the SRAM and
+    to install the bootstrap code in the clock memory. The bootstrap code
+    must be inactive until the IDEAL files have been copied on the hard disk.
+    Once this is done, the bootstrap code must be activated; it will load the
+    IDEAL files into the SRAM on each power-up of the system.
+
+    Original version by Raphael Nabet
+    Rewritten by Michael Zapf
+
+    References
+
+    [1] Th. Nouspikel: IDE Interface card version 2
+        https://www.unige.ch/medecine/nouspikel/ti99/ide2.htm
+
+    [2] Th. Nouspikel: Description of the IDEAL software.
+        https://www.unige.ch/medecine/nouspikel/ti99/ideal.htm
 
 *****************************************************************************/
 
 #include "emu.h"
 #include "tn_ide.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_interface_device, "ti99_ide", "Nouspikel IDE interface card")
+#define LOG_WARN       (1U<<1)
+#define LOG_CRU        (1U<<2)
+#define LOG_RTC        (1U<<3)
+#define LOG_XRAM       (1U<<4)
+#define LOG_SRAM       (1U<<5)
+#define LOG_ATA        (1U<<6)
+
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device, "ti99_ide", "Nouspikel IDE interface card")
+
+#define CLOCK_TAG "rtc65271"
+#define ATA_TAG "ata"
+#define LATCH_TAG "crulatch"
+#define ATALATCHEV_TAG "atalatch_even"
+#define ATALATCHODD_TAG "atalatch_odd"
+#define RAM512_TAG "sram512"
 
 namespace bus { namespace ti99 { namespace peb {
 
-#define CRU_BASE 0x1000
-
-#define RAMREGION "ram"
-
-/* previously 0xff */
-#define PAGE_MASK 0x3f
-
 enum
 {
-	cru_reg_page_switching = 0x04,
-	cru_reg_page_0 = 0x08,
-	/*cru_reg_rambo = 0x10,*/   /* not emulated */
-	cru_reg_wp = 0x20,
-	cru_reg_int_en = 0x40,
-	cru_reg_reset = 0x80
+	MODE_OFF = 0,
+	MODE_GENEVE,
+	MODE_TI
 };
 
-nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_IDE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_cru_register(0),
-	m_rtc(*this, "ide_rtc"),
-	m_ata(*this, "ata"),
-	m_clk_irq(false), m_sram_enable(false),
-	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
-	m_input_latch(0), m_output_latch(0), m_ram(*this, RAMREGION)
+	m_rtc(*this, CLOCK_TAG),
+	m_ata(*this, ATA_TAG),
+	m_sram(*this, RAM512_TAG),
+	m_crulatch(*this, LATCH_TAG),
+	m_latch0_7(*this, ATALATCHEV_TAG),
+	m_latch8_15(*this, ATALATCHODD_TAG),
+	m_ideint(false),
+	m_mode(MODE_OFF),
+	m_page(0)
 {
 }
 
-/*
-    CRU read
-*/
-READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
+READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 {
-	uint8_t reply = 0;
-	if ((offset & 0xff00)==m_cru_base)
+	bool mmap = false;
+	bool sramsel = false;
+	bool xramsel = false;
+	bool rtcsel = false;
+	bool cs1fx = false;
+	bool cs3fx = false;
+
+	decode(offset, mmap, sramsel, xramsel, rtcsel, cs1fx, cs3fx);
+
+	bool idesel = cs1fx || cs3fx;
+
+	if (xramsel || rtcsel)
 	{
-		if ((offset & 0x0070) == 0)
+		// Swap the address bits (TI numbering vs. standard)
+		// A8->A5, A15->A4, A14->A3, A13->A2, A12->A1, A11->A0
+		// .... .... 5..0 1234
+		// .... .... ..54 3210
+
+		// int addr = ((offset & 0x80)>>2) | ((offset & 1)<<4) | ((offset & 2)<<2)
+		//          | (offset & 4) | ((offset & 8)>>2) | ((offset & 16)>>4);
+		// *value = m_rtc->read(xramsel, addr);
+		// LOGMASKED(LOG_RTC, "rtc %04x (%02x, %s) -> %02x\n", offset&0xffff, addr, xramsel? "xram" : "rtc", *value);
+
+		// However, We take the simple way and keep the address as is.
+		// This makes debugging less tedious.
+
+		if (rtcsel)
 		{
-			reply = m_cru_register & 0x30;
-			reply |= 8; /* IDE bus IORDY always set */
-			if (!m_clk_irq)
-				reply |= 4;
-			if (m_sram_enable_dip)
-				reply |= 2;
-			if (!m_ata_irq)
-				reply |= 1;
+			if ((offset&0x0010)!=0)
+			{
+				*value = m_rtc->read(0, 1);
+				LOGMASKED(LOG_RTC, "rtc read -> %02x\n", *value);
+			}
 		}
-		*value = BIT(reply, (offset >> 1) & 7);
+		else
+		{
+			int addr = (offset & 0x1f) | ((offset&0x80)>>2);
+			*value = m_rtc->read(1, addr);
+			LOGMASKED(LOG_XRAM, "xram %02x -> %02x\n", addr, *value);
+		}
+	}
+
+	if (sramsel)
+	{
+		int page = m_page;
+		// When addressing in 4000-4fff, and bit 3 = 0, lock page to 0
+		if (((offset & 0x3000)==0x0000) && m_crulatch->q3_r()==0)
+			page = 0;
+
+		offs_t addr = (offset & 0x1fff) | (page<<13);
+		*value = m_sram->read(addr);
+		if (m_mode==MODE_TI)
+		{
+			if ((offset & 1)==0)
+				LOGMASKED(LOG_SRAM, "sram %04x (%02x) -> %04x\n", offset&0xffff, page, (*value<<8) | m_sram->read(addr+1));
+		}
+	}
+
+	if (idesel)
+	{
+		// Don't let the debugger mess with the latches
+		if (machine().side_effects_disabled())
+		{
+			*value = 0;
+			return;
+		}
+
+		int reg = (offset >> 1)&7;
+		bool even = ((offset & 1)==0);
+
+		// Geneve writes even/odd, TI writes odd/even
+		bool first = (even != (m_mode==MODE_TI));
+
+		m_latch0_7->leba_w(first? 0:1);
+		m_latch8_15->leba_w(first? 0:1);
+
+		uint16_t atavalue = 0;
+
+		// On the first read, get the 16-bit value
+		// but only when addressing in the area 4040-404F / 4060-406F
+		// (check A11=0). That way, Read-before-Write does not interfere
+		if (first && ((offset & 0x0010)==0))
+		{
+			if (cs1fx)
+				atavalue = m_ata->read_cs0(reg);
+			else
+				atavalue = m_ata->read_cs1(reg);
+			LOGMASKED(LOG_ATA, "%s %02x -> %04x\n", cs1fx? "cs1" : "cs3", reg, atavalue);
+		}
+
+		// Load latches (no change during second access)
+		m_latch0_7->b_w(atavalue&0xff);
+		m_latch8_15->b_w((atavalue >> 8)&0xff);
+
+		// Activate the respective latch
+		m_latch0_7->oeba_w(even? 0:1);
+		m_latch8_15->oeba_w(even? 1:0);
+
+		// Only one of them delivers a value, the other is Z
+		m_latch0_7->outputa_rz(*value);
+		m_latch8_15->outputa_rz(*value);
+
+		// Reads in the upper half are RBW and should be ignored
+		if ((offset & 0x0010)==0)
+			LOGMASKED(LOG_ATA, "ata %04x -> %02x\n", offset&0xffff, *value);
+	}
+}
+
+void nouspikel_ide_card_device::write(offs_t offset, uint8_t data)
+{
+	bool mmap = false;
+	bool sramsel = false;
+	bool xramsel = false;
+	bool rtcsel = false;
+	bool cs1fx = false;
+	bool cs3fx = false;
+
+	decode(offset, mmap, sramsel, xramsel, rtcsel, cs1fx, cs3fx);
+	bool idesel = cs1fx || cs3fx;
+
+	if (xramsel || rtcsel)
+	{
+		// Swap the address bits (TI numbering vs. standard)
+		// Actually, this is almost irrelevant for the RTC access, since only
+		// A0 determines the mode.
+		// A8->A5, A15->A4, A14->A3, A13->A2, A12->A1, A11->A0
+		// .... .... 5..0 1234
+		// .... .... ..54 3210
+
+		// int addr = ((offset & 0x80)>>2) | ((offset & 1)<<4) | ((offset & 2)<<2)
+		//          | (offset & 4) | ((offset & 8)>>2) | ((offset & 16)>>4);
+
+		// LOGMASKED(LOG_RTC, "rtc %04x (%02x, %s) <- %02x\n", offset&0xffff, addr, xramsel? "xram" : "rtc", data);
+		// m_rtc->write(xramsel, addr, data);
+
+		// See above (read), don't swap the lines.
+
+		if (rtcsel)
+		{
+			if ((offset&0x0010)==0)
+			{
+				m_rtc->write(0, 0, data);
+				LOGMASKED(LOG_RTC, "rtc set <- %02x\n", data);
+			}
+			else
+			{
+				m_rtc->write(0, 1, data);
+				LOGMASKED(LOG_RTC, "rtc write <- %02x\n", data);
+			}
+		}
+		else
+		{
+			int addr = (offset & 0x1f) | ((offset&0x80)>>2);
+			m_rtc->write(1, addr, data);
+
+			if (addr & 0x20)
+				LOGMASKED(LOG_XRAM, "xram set page %02x\n", data);
+			else
+				LOGMASKED(LOG_XRAM, "xram %02x <- %02x\n", addr & 0x1f, data);
+		}
+	}
+
+	if (sramsel)
+	{
+		if (m_crulatch->q2_r()==1)
+		{
+			m_page = (offset & 0x007e)>>1;
+			LOGMASKED(LOG_SRAM, "sram page set %02x (%04x)\n", m_page, offset&0xffff);
+		}
+
+		// Software must ensure that CRU bit 5 is 1 (SRAM write protect)
+		// when bit 2 is 1 (page select)
+		if (m_crulatch->q5_r()==0)
+		{
+			int page = m_page;
+
+			// When addressing in 4000-4fff, and bit 3 = 0, lock page to 0
+			if (((offset & 0x3000)==0x0000) && m_crulatch->q3_r()==0)
+				page = 0;
+			m_sram->write((offset & 0x1fff) | (page<<13), data);
+			LOGMASKED(LOG_SRAM, "sram %04x (%02x) <- %02x\n", offset&0xffff, page, data);
+		}
+	}
+
+	if (idesel)
+	{
+		// Don't let the debugger mess with the latches
+		if (machine().side_effects_disabled())
+		{
+			return;
+		}
+		LOGMASKED(LOG_ATA, "ata %04x <- %02x\n", offset&0xffff, data);
+
+		bool even = ((offset & 1)==0);
+		m_latch0_7->leab_w(even? 0:1);
+		m_latch8_15->leab_w(even? 1:0);
+
+		// Load the value into the respective latch
+		m_latch0_7->a_w(data);
+		m_latch8_15->a_w(data);
+
+		// Geneve writes even/odd, TI writes odd/even
+		bool first = (even != (m_mode==MODE_TI));
+
+		// Output on second access
+		m_latch0_7->oeab_w(first? 1:0);
+		m_latch8_15->oeab_w(first? 1:0);
+
+		// No output during the first access
+		int reg = (offset >> 1)&7;
+		uint8_t out = 0;
+		m_latch8_15->outputb_rz(out);
+		uint16_t atavalue = (out << 8);
+		m_latch0_7->outputb_rz(out);
+		atavalue |= out;
+
+		if (!first)
+		{
+			LOGMASKED(LOG_ATA, "%s %02x <- %04x\n", cs1fx? "cs1" : "cs3", reg, atavalue);
+
+			if (cs1fx)
+				m_ata->write_cs0(reg, atavalue);
+			else
+				m_ata->write_cs1(reg, atavalue);
+		}
+	}
+}
+
+void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel, bool& xramsel, bool& rtcsel, bool& cs1fx, bool& cs3fx)
+{
+	bool inspace = false;
+
+	// A0=0
+	if (m_mode == MODE_TI) inspace = ((offset & 0x8000)==0);
+	else
+	{
+		// AME=1, AMD=0, AMC/AMB/AMA=111, A0=0
+		if (m_mode == MODE_GENEVE) inspace = ((offset & 0x1f8000)==0x170000);
+		// else mode=off
+	}
+
+	// mmap = 0x4000 - 0x40ff (if bit 1 == DIP setting)
+	// sramsel = 0x4100 - 0x4fff (if bit 0 = 1)
+	// sramsel = 0x6000 - 0x7fff (if bit 4 = 1, bit 0 unchecked)
+
+	// A0 is not checked again (subsumed in inspace)
+
+	mmap = ((offset & 0x7f00)==0x4000) && (m_crulatch->q0_r()==1)
+			&& ((m_crulatch->q1_r()!=0) == m_buffered) && inspace;
+	sramsel = ((((offset & 0x6000)==0x4000) && !mmap && (m_crulatch->q4_r()==0) && (m_crulatch->q0_r()==1))
+				|| (((offset & 0x6000)==0x6000) && (m_crulatch->q4_r()==1))) && inspace;
+
+	xramsel = false;
+	rtcsel = false;
+	cs1fx = false;
+	cs3fx = false;
+
+	if (mmap)
+	{
+		xramsel = ((offset & 0x60)==0x00);
+		rtcsel = ((offset & 0x60)==0x20);
+		cs1fx = ((offset & 0x60)==0x40);
+		cs3fx = ((offset & 0x60)==0x60);
 	}
 }
 
 /*
-    CRU write
+    CRU read access to the LS251 multiplexer.
 */
-void nouspikel_ide_interface_device::cruwrite(offs_t offset, uint8_t data)
+READ8Z_MEMBER( nouspikel_ide_card_device::crureadz )
 {
+	uint8_t bit = 0;
+
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		int bit = (offset >>1) & 7;
-		switch (bit)
+		switch ((offset>>1) & 0x07)
 		{
 		case 0:
-			m_selected = (data!=0);
-
-		case 1:         // enable SRAM or registers in 0x4000-0x40ff
-			m_sram_enable = (data!=0);
+			bit = m_ideint? 1:0;
 			break;
-
-		case 2:         // enable SRAM page switching
-		case 3:         // force SRAM page 0
-		case 4:         // enable SRAM in 0x6000-0x7000 ("RAMBO" mode)
-		case 5:         // write-protect RAM
-		case 6:         // irq and reset enable
-		case 7:         // reset drive
-			if (data!=0)
-				m_cru_register |= 1 << bit;
-			else
-				m_cru_register &= ~(1 << bit);
-
-			if (bit == 6)
-				m_slot->set_inta((m_cru_register & cru_reg_int_en) && m_ata_irq);
-
-			if ((bit == 6) || (bit == 7))
-				if ((m_cru_register & cru_reg_int_en) && !(m_cru_register & cru_reg_reset))
-					m_ata->reset();
+		case 1:
+			bit = m_buffered? 1:0;
+			break;
+		case 2:
+			bit = (m_rtc->intrq_r()==ASSERT_LINE)? 0:1;
+			break;
+		case 3:
+			bit = 1;
+			break;
+		case 4:
+			bit = m_crulatch->q4_r();
+			break;
+		case 5:
+			bit = m_crulatch->q5_r();
+			break;
+		case 6:
+		case 7:
 			break;
 		}
+		*value = bit;
+		LOGMASKED(LOG_CRU, "cru %04x (bit %d) -> %d\n", offset, (offset & 0xff)>>1, bit);
 	}
 }
 
 /*
-    Memory read
+    CRU write access to the latch.
 */
-READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
+void nouspikel_ide_card_device::cruwrite(offs_t offset, uint8_t data)
 {
-	uint8_t reply = 0;
-	if (machine().side_effects_disabled()) return;
-
-	if (in_dsr_space(offset, true) && m_selected)
+	if ((offset & 0xff00)==m_cru_base)
 	{
-		int addr = offset & 0x1fff;
-
-		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
-		{   /* registers */
-			switch ((addr >> 5) & 0x3)
-			{
-			case 0:     /* RTC RAM */
-				if (addr & 0x80)
-					/* RTC RAM page register */
-					reply = m_rtc->xram_r((addr & 0x1f) | 0x20);
-				else
-					/* RTC RAM read */
-					reply = m_rtc->xram_r(addr);
-				break;
-			case 1:     /* RTC registers */
-				if (addr & 0x10)
-					/* register data */
-					reply = m_rtc->rtc_r(1);
-				else
-					/* register select */
-					reply = m_rtc->rtc_r(0);
-				break;
-			case 2:     /* IDE registers set 1 (CS1Fx) */
-				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
-				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs0((addr >> 1) & 0x7) : 0;
-				}
-
-				/* return latched input */
-				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
-				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = ((addr & 1) ? (m_input_latch >> 8) : m_input_latch) & 0xff;
-				break;
-			case 3:     /* IDE registers set 2 (CS3Fx) */
-				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
-				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? m_ata->read_cs1((addr >> 1) & 0x7) : 0;
-				}
-
-				/* return latched input */
-				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
-				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = ((addr & 1) ? (m_input_latch >> 8) : m_input_latch) & 0xff;
-				break;
-			}
-		}
-		else
-		{   /* sram */
-			if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-				reply = m_ram->pointer()[addr+0x2000 * m_cur_page];
-			else
-				reply = m_ram->pointer()[addr];
-		}
-		*value = reply;
+		LOGMASKED(LOG_CRU, "cru %04x (bit %d) <- %d\n", offset, (offset & 0xff)>>1, data);
+		int bitnumber = (offset >> 1) & 0x07;
+		m_crulatch->write_bit(bitnumber, data&1);
 	}
 }
 
-/*
-    Memory write. The controller is 16 bit, so we need to demultiplex again.
-*/
-void nouspikel_ide_interface_device::write(offs_t offset, uint8_t data)
-{
-	if (machine().side_effects_disabled()) return;
-
-	if (in_dsr_space(offset, true) && m_selected)
-	{
-		if (m_cru_register & cru_reg_page_switching)
-		{
-			m_cur_page = (offset >> 1) & PAGE_MASK;
-		}
-
-		int addr = offset & 0x1fff;
-
-		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
-		{   /* registers */
-			switch ((addr >> 5) & 0x3)
-			{
-			case 0:     /* RTC RAM */
-				if (addr & 0x80)
-					/* RTC RAM page register */
-					m_rtc->xram_w((addr & 0x1f) | 0x20, data);
-				else
-					/* RTC RAM write */
-					m_rtc->xram_w(addr, data);
-				break;
-			case 1:     /* RTC registers */
-				if (addr & 0x10)
-					/* register data */
-					m_rtc->rtc_w(1, data);
-				else
-					/* register select */
-					m_rtc->rtc_w(0, data);
-				break;
-			case 2:     /* IDE registers set 1 (CS1Fx) */
-/*
-                if (addr & 1)
-                    m_output_latch = (m_output_latch & 0xff00) | data;
-                else
-                    m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
-*/
-				/* latch write - bytes are swapped in 2004 IDE card */
-				if (addr & 1)
-					m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
-				else
-					m_output_latch = (m_output_latch & 0xff00) | data;
-
-				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
-				{   /* second write triggers 16-bit write cycle */
-					m_ata->write_cs0((addr >> 1) & 0x7, m_output_latch);
-				}
-				break;
-			case 3:     /* IDE registers set 2 (CS3Fx) */
-/*
-                if (addr & 1)
-                    m_output_latch = (m_output_latch & 0xff00) | data;
-                else
-                    m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
-*/
-				/* latch write - bytes are swapped in 2004 IDE card */
-				if (addr & 1)
-					m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
-				else
-					m_output_latch = (m_output_latch & 0xff00) | data;
-
-				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
-				{   /* second write triggers 16-bit write cycle */
-					m_ata->write_cs1((addr >> 1) & 0x7, m_output_latch);
-				}
-				break;
-			}
-		}
-		else
-		{   /* sram */
-			if (! (m_cru_register & cru_reg_wp))
-			{
-				if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-					m_ram->pointer()[addr+0x2000 * m_cur_page] = data;
-				else
-					m_ram->pointer()[addr] = data;
-			}
-		}
-	}
-}
-
-void nouspikel_ide_interface_device::do_inta(int state)
+WRITE_LINE_MEMBER(nouspikel_ide_card_device::clock_interrupt_callback)
 {
 	m_slot->set_inta(state);
 }
 
-/*
-    ti99_ide_interrupt()
-    IDE interrupt callback
-*/
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::ide_interrupt_callback)
+WRITE_LINE_MEMBER(nouspikel_ide_card_device::ide_interrupt_callback)
 {
-	m_ata_irq = state;
-	if (m_cru_register & cru_reg_int_en)
-		do_inta(state);
+	m_ideint = (state==ASSERT_LINE);
+	if (m_crulatch->q6_r()==1) m_slot->set_inta(state);
 }
 
-/*
-    clk_interrupt_callback()
-    clock interrupt callback
-*/
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
+WRITE_LINE_MEMBER(nouspikel_ide_card_device::resetdr_callback)
 {
-	m_clk_irq = (state!=0);
-	m_slot->set_inta(state);
+	if (m_crulatch->q6_r()==1 && (state==0))
+		// not implemented
+		LOGMASKED(LOG_ATA, "Drive reset\n");
 }
 
-void nouspikel_ide_interface_device::device_start()
+void nouspikel_ide_card_device::device_add_mconfig(machine_config &config)
 {
-	m_sram_enable_dip = false; // TODO: what is this?
+	RTC65271(config, m_rtc, 0);
+	m_rtc->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
 
-	save_item(NAME(m_ata_irq));
-	save_item(NAME(m_cru_register));
-	save_item(NAME(m_clk_irq));
-	save_item(NAME(m_sram_enable));
-	save_item(NAME(m_sram_enable_dip));
-	save_item(NAME(m_cur_page));
-	save_item(NAME(m_tms9995_mode));
-	save_item(NAME(m_input_latch));
-	save_item(NAME(m_output_latch));
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->irq_handler().set(FUNC(nouspikel_ide_card_device::ide_interrupt_callback));
+
+	TTL74543(config, m_latch0_7, 0);
+	m_latch0_7->set_ceab_pin_value(0);
+	m_latch0_7->set_ceba_pin_value(0);
+
+	TTL74543(config, m_latch8_15, 0);
+	m_latch8_15->set_ceab_pin_value(0);
+	m_latch8_15->set_ceba_pin_value(0);
+
+	LS259(config, m_crulatch);
+	m_crulatch->q_out_cb<7>().set(FUNC(nouspikel_ide_card_device::resetdr_callback));
+
+	BUFF_RAM(config, RAM512_TAG, 0).set_size(512*1024);
 }
 
-void nouspikel_ide_interface_device::device_reset()
+void nouspikel_ide_card_device::device_start()
 {
-	m_cur_page = 0;
-	m_sram_enable = false;
-	m_cru_register = 0;
+	save_item(NAME(m_ideint));
+	save_item(NAME(m_page));
+}
 
-	m_selected = false;
-
-	m_cru_base = ioport("CRUIDE")->read();
-	m_clk_irq = false;
-
-	m_tms9995_mode =  false; // (device->type()==TMS9995);
+void nouspikel_ide_card_device::device_reset()
+{
+	m_page = 0;
+	m_ideint = false;
+	m_cru_base = (ioport("CRUIDE")->read() << 8) | 0x1000;
+	m_mode = ioport("MODE")->read();
+	m_buffered = (ioport("BUFFERED")->read()!=0);
+	m_sram->set_buffered(m_buffered);
 }
 
 INPUT_PORTS_START( tn_ide )
+
+	PORT_START("BUFFERED")
+	PORT_DIPNAME(0x1, 0, "SRAM type")
+		PORT_DIPSETTING(0, "unbuffered")
+		PORT_DIPSETTING(1, "buffered")
+
+	PORT_START("MODE")
+	PORT_DIPNAME(0x3, MODE_TI, "Card mode")
+		PORT_DIPSETTING(MODE_OFF, "Off")
+		PORT_DIPSETTING(MODE_GENEVE, "Geneve")
+		PORT_DIPSETTING(MODE_TI, "TI")
+
 	PORT_START( "CRUIDE" )
-	PORT_DIPNAME( 0x1f00, 0x1000, "IDE CRU base" )
-		PORT_DIPSETTING( 0x1000, "1000" )
-		PORT_DIPSETTING( 0x1100, "1100" )
-		PORT_DIPSETTING( 0x1200, "1200" )
-		PORT_DIPSETTING( 0x1300, "1300" )
-		PORT_DIPSETTING( 0x1400, "1400" )
-		PORT_DIPSETTING( 0x1500, "1500" )
-		PORT_DIPSETTING( 0x1600, "1600" )
-		PORT_DIPSETTING( 0x1700, "1700" )
-		PORT_DIPSETTING( 0x1800, "1800" )
-		PORT_DIPSETTING( 0x1900, "1900" )
-		PORT_DIPSETTING( 0x1a00, "1A00" )
-		PORT_DIPSETTING( 0x1b00, "1B00" )
-		PORT_DIPSETTING( 0x1c00, "1C00" )
-		PORT_DIPSETTING( 0x1d00, "1D00" )
-		PORT_DIPSETTING( 0x1e00, "1E00" )
-		PORT_DIPSETTING( 0x1f00, "1F00" )
+	PORT_DIPNAME( 0xf, 0x0, "IDE CRU base" )
+		PORT_DIPSETTING( 0x0, "1000" )
+		PORT_DIPSETTING( 0x1, "1100" )
+		PORT_DIPSETTING( 0x2, "1200" )
+		PORT_DIPSETTING( 0x3, "1300" )
+		PORT_DIPSETTING( 0x4, "1400" )
+		PORT_DIPSETTING( 0x5, "1500" )
+		PORT_DIPSETTING( 0x6, "1600" )
+		PORT_DIPSETTING( 0x7, "1700" )
+		PORT_DIPSETTING( 0x8, "1800" )
+		PORT_DIPSETTING( 0x9, "1900" )
+		PORT_DIPSETTING( 0xa, "1A00" )
+		PORT_DIPSETTING( 0xb, "1B00" )
+		PORT_DIPSETTING( 0xc, "1C00" )
+		PORT_DIPSETTING( 0xd, "1D00" )
+		PORT_DIPSETTING( 0xe, "1E00" )
+		PORT_DIPSETTING( 0xf, "1F00" )
 INPUT_PORTS_END
 
-void nouspikel_ide_interface_device::device_add_mconfig(machine_config &config)
-{
-	RTC65271(config, m_rtc, 0);
-	m_rtc->interrupt_cb().set(FUNC(nouspikel_ide_interface_device::clock_interrupt_callback));
-
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
-	m_ata->irq_handler().set(FUNC(nouspikel_ide_interface_device::ide_interrupt_callback));
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("512K");
-	m_ram->set_default_value(0);
-}
-
-ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
+ioport_constructor nouspikel_ide_card_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tn_ide);
 }
 
 } } } // end namespace bus::ti99::peb
-

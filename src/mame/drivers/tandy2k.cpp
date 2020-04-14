@@ -86,10 +86,10 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	uint16_t data = program.read_word(addr);
 
 	// character
-	m_drb0->write(space, 0, data & 0xff);
+	m_drb0->write(data & 0xff);
 
 	// attributes
-	m_drb1->write(space, 0, data >> 8);
+	m_drb1->write(data >> 8);
 
 	return data & 0xff;
 }
@@ -213,7 +213,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		return m_pc_keyboard->read(space, 0);
+		return m_pc_keyboard->read();
 	}
 
 	return 0xff;
@@ -1025,7 +1025,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 
 	// devices
 	I8255A(config, m_i8255a);
-	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
 	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 

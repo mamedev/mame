@@ -150,7 +150,7 @@ void luxor_55_21056_device::luxor_55_21056_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xf8);
-	map(0x00, 0x00).mirror(0xf0).rw(Z80DMA_TAG, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x00, 0x00).mirror(0xf0).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x08, 0x08).r(FUNC(luxor_55_21056_device::sasi_status_r));
 	map(0x18, 0x18).w(FUNC(luxor_55_21056_device::stat_w));
 	map(0x28, 0x28).r(FUNC(luxor_55_21056_device::out_r));

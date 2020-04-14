@@ -351,7 +351,7 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 	{
 	case 0x10:  /* FF50 */
 		if (real_time_clock() == rtc_type::DISTO)
-			result = m_disto_msm6242->read(space, m_msm6242_rtc_address);
+			result = m_disto_msm6242->read(m_msm6242_rtc_address);
 		break;
 
 	case 0x38:  /* FF78 */
@@ -404,7 +404,7 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 	{
 		case 0x10:  /* FF50 */
 			if (real_time_clock() == rtc_type::DISTO)
-				m_disto_msm6242->write(space,m_msm6242_rtc_address, data);
+				m_disto_msm6242->write(m_msm6242_rtc_address, data);
 			break;
 
 		case 0x11:  /* FF51 */

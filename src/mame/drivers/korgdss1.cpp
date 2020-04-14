@@ -405,9 +405,7 @@ void korg_dssmsrk_state::msrk_io_map(address_map &map)
 
 void korg_dss1_state::cpu2_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_cpu2, FUNC(hd6303x_cpu_device::m6801_io_r), FUNC(hd6303x_cpu_device::m6801_io_w)); // FIXME: internalize this
-	map(0x0015, 0x0015).r(FUNC(korg_dss1_state::cpu2_p5_r));
-	map(0x0017, 0x0017).w(FUNC(korg_dss1_state::ad_select_w));
+	map(0x0000, 0x001f).m(m_cpu2, FUNC(hd6303x_cpu_device::hd6301x_io)); // FIXME: internalize this
 	map(0x0040, 0x00ff).ram(); // FIXME: internalize this
 	map(0x0100, 0x0100).mirror(0x3cff).w(FUNC(korg_dss1_state::da_lsb_w));
 	map(0x0200, 0x0200).mirror(0x3cff).w(FUNC(korg_dss1_state::da_msb_w));
@@ -484,6 +482,8 @@ void korg_dss1_state::klm781(machine_config &config)
 	HD6303X(config, m_cpu2, 8_MHz_XTAL); // HD63B03X
 	m_cpu2->set_addrmap(AS_PROGRAM, &korg_dss1_state::cpu2_map);
 	m_cpu2->out_p2_cb().set(FUNC(korg_dss1_state::vcf_vca_ef_w));
+	m_cpu2->in_p5_cb().set(FUNC(korg_dss1_state::cpu2_p5_r));
+	m_cpu2->out_p6_cb().set(FUNC(korg_dss1_state::ad_select_w));
 	m_cpu2->out_ser_tx_cb().set("midi_out", FUNC(midi_port_device::write_txd));
 
 	MIDI_PORT(config, "midi_in", midiin_slot, "midiin");

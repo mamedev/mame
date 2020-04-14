@@ -88,7 +88,6 @@ void spg2xx_device::device_start()
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
-	m_portc_out.resolve_safe();
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);

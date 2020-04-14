@@ -497,7 +497,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 				/* busy */
 				m_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;
 				/* keyboard takes data */
-				m_keyboard->write(space, 0, m_keyboard_data_shift);
+				m_keyboard->write(m_keyboard_data_shift);
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */
@@ -532,7 +532,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 	{
 		int data;
 
-		data = m_keyboard->read(machine().dummy_space(), 0);
+		data = m_keyboard->read();
 
 		if (data)
 		{

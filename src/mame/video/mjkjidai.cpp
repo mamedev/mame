@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 	int attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
 	int color = m_videoram[tile_index + 0x1000];
-	SET_TILE_INFO_MEMBER(0,code,color >> 3,0);
+	tileinfo.set(0,code,color >> 3,0);
 }
 
 

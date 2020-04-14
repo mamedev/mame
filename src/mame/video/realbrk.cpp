@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 {
 	const u16 attr = m_vram[Layer][tile_index * 2 + 0];
 	const u16 code = m_vram[Layer][tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x7f,
 			TILE_FLIPYX( attr >> 14 ));
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 {
 	const u16 code = m_vram[2][tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0x0fff,
 			((code & 0xf000) >> 12) | ((m_vregs[0xa/2] & 0x7f) << 4),
 			0);

@@ -2,10 +2,10 @@
 // copyright-holders:Barry Rodewald
 /*
  * Microlog Baby Blue II CPU Plus
- * 
+ *
  * ISA card used to emulate CP/M-80 on a PC or XT
  * Includes a Z80B CPU, 2 DB25 RS-232C serial ports (8250), a Centronics parallel port, and an RTC
- * 
+ *
  * Issues:
  *   RTC type is unknown
  *   Z80 location test and Interrupt test sometimes fail
@@ -13,8 +13,10 @@
  */
 
 #include "emu.h"
-#include "bblue2.h"
 
+#include "bblue2.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/null_modem.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -24,14 +26,14 @@ DEFINE_DEVICE_TYPE(ISA8_BABYBLUE2, isa8_babyblue2_device, "isa_bblue2", "Microlo
 
 static void isa_com(device_slot_interface &device)
 {
-//	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-//	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-//	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-//	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-//	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+//  device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+//  device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+//  device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+//  device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+//  device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
-//	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+//  device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void isa8_babyblue2_device::z80_program_map(address_map &map)
@@ -56,10 +58,10 @@ void isa8_babyblue2_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_z80, 6_MHz_XTAL);
 	m_z80->set_addrmap(AS_PROGRAM, &isa8_babyblue2_device::z80_program_map);
 	m_z80->set_addrmap(AS_IO, &isa8_babyblue2_device::z80_io_map);
-	
+
 	RAM(config, m_ram);
 	m_ram->set_default_size("64k");
-	
+
 	INS8250(config, m_serial1, XTAL(1'843'200));
 	m_serial1->out_tx_callback().set("rs232_1", FUNC(rs232_port_device::write_txd));
 	m_serial1->out_dtr_callback().set("rs232_1", FUNC(rs232_port_device::write_dtr));
@@ -83,7 +85,7 @@ void isa8_babyblue2_device::device_add_mconfig(machine_config &config)
 	m_rs232_2->dsr_handler().set(m_serial2, FUNC(ins8250_uart_device::dsr_w));
 	m_rs232_2->ri_handler().set(m_serial2, FUNC(ins8250_uart_device::ri_w));
 	m_rs232_2->cts_handler().set(m_serial2, FUNC(ins8250_uart_device::cts_w));
-	
+
 	PC_LPT(config, m_parallel);
 }
 
@@ -108,7 +110,7 @@ static INPUT_PORTS_START( babyblue2 )
 	PORT_DIPSETTING( 0x0e, "RAM: E0000  I/O: 31c" )
 	PORT_DIPSETTING( 0x0f, "RAM: F0000  I/O: 31f" )
 	PORT_DIPUNKNOWN( 0x70, 0x00 )  PORT_DIPLOCATION( "SW1:3,2,1" )
-	
+
 	// exact setting unknown at this stage
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x07, 0x07, "Device Module Ports" )  PORT_DIPLOCATION( "SW2:3,2,1" )
@@ -150,7 +152,7 @@ static INPUT_PORTS_START( babyblue2 )
 	PORT_DIPNAME(0x10, 0x40, "RAM Bank III" )  PORT_DIPLOCATION( "SW3:3" )
 	PORT_DIPSETTING( 0x00, "Enabled" )
 	PORT_DIPSETTING( 0x10, "Disabled" )
-	
+
 	PORT_START("H2")
 	PORT_CONFNAME( 0x01, 0x01, "LPT port config" )
 	PORT_CONFSETTING( 0x00, "LPT1" )
@@ -175,6 +177,7 @@ isa8_babyblue2_device::isa8_babyblue2_device(const machine_config &mconfig, cons
 	, m_dsw3(*this, "SW3")
 	, m_h2(*this, "H2")
 	, m_ram(*this, "z80ram")
+	, m_devices_installed(false)
 {
 }
 
@@ -206,19 +209,22 @@ void isa8_babyblue2_device::device_reset()
 	lptloc = (m_h2->read() & 0x01) ? 0x278 : 0x378;
 	z80lptloc = (m_h2->read() & 0x01) ? 0x10 : 0x50;
 
-	// map Z80 LPT port based on jumper setting
-	m_z80->space(AS_IO).install_readwrite_handler(z80lptloc, z80lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
-	
 	// halt Z80
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	
-	m_isa->install_device(ioloc, ioloc+1, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
-	m_isa->install_device(lptloc, lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
-	m_isa->install_device(0x3f8, 0x03ff, read8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_w)));
-	m_isa->install_device(0x2f8, 0x02ff, read8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_w)));
-	// TODO: RTC
-	m_isa->install_memory(ramloc, ramloc+0xffff, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
-	
+
+	if(!m_devices_installed)  // will need a hard reset to put DIP switch and jumper changes into effect
+	{
+		// map Z80 LPT port based on jumper setting
+		m_z80->space(AS_IO).install_readwrite_handler(z80lptloc, z80lptloc+7, read8sm_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8sm_delegate(m_parallel, FUNC(pc_lpt_device::write)));
+
+		m_isa->install_device(ioloc, ioloc+1, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
+		m_isa->install_device(lptloc, lptloc+7, read8sm_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8sm_delegate(m_parallel, FUNC(pc_lpt_device::write)));
+		m_isa->install_device(0x3f8, 0x03ff, read8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_w)));
+		m_isa->install_device(0x2f8, 0x02ff, read8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_w)));
+		// TODO: RTC
+		m_isa->install_memory(ramloc, ramloc+0xffff, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
+		m_devices_installed = true;
+	}
 }
 
 READ8_MEMBER(isa8_babyblue2_device::z80_control_r)

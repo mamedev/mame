@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0xf0) << 4,
 			attr & 0x0f,
 			0);
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f) << 8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -68,7 +68,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel1_ram[tile_index],
 			m_bgcolor,
 			0);
@@ -83,7 +83,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel2_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel2_ram[tile_index],
 			m_bgcolor,
 			0);
@@ -97,7 +97,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_reel3_ram[tile_index],
 			m_bgcolor,
 			0);
@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code | (attr & 0xf0)<<4) + (m_tile_bank * 0x1000),
 			attr & 0x0f,
 			0);
@@ -548,7 +548,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -559,7 +559,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -570,7 +570,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70) >> 4,
 			0);
@@ -581,7 +581,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -592,7 +592,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0x70)>>4,
 			0);
@@ -675,7 +675,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -686,7 +686,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -697,7 +697,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | (attr & 0x0f)<<8,
 			(attr & 0xf0) >> 4,
 			0);

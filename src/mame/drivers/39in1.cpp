@@ -20,6 +20,16 @@
  * TODO:
  *   PXA255 peripherals
  *
+ * 39in1 notes:
+ * The actual PCB just normally boots up to the game, whereas in MAME it
+ * defaults to test mode and checks the rom, then jumps out to the game
+ * after loading all 39 games. It is almost like it is defaulting to test
+ * mode on at bootup. On the real PCB, it just loads the 39 games then
+ * shows the game selection menu. Going into the test mode does the same
+ * code check but then shows  a test screen with color bars. Pressing
+ * next shows a high score clear screen (if the HS dip is on). Pressing
+ * next shows the game dips screens and allows you to set up soft dip
+ * switches for each of the 39 games.
  **************************************************************************/
 
 #include "emu.h"
@@ -238,6 +248,23 @@ static INPUT_PORTS_START( 39in1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80000000, IP_ACTIVE_LOW )
+
+/*  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
+
+    PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
+    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
+    PORT_DIPSETTING(    0x02, "CGA 15.75kHz" )
+    PORT_DIPSETTING(    0x00, "VGA 31.5kHz" )
+    PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
+    PORT_DIPSETTING(    0x04, "Disabled" )
+    PORT_DIPSETTING(    0x00, "Enabled" )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+*/
 INPUT_PORTS_END
 
 void _39in1_state::machine_start()

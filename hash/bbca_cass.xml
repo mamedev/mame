@@ -1,16 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Micro Model A Tapes -->
+Acorn BBC Micro Model A Tapes
 
-<!-- I believe all the Cassette images here are original, so some may require the manuals for additional copy protection. -->
+I believe all the Cassette images here are original, so some may require the manuals for additional copy protection.
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
--->
 
-<!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
+This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum.
+-->
 
 <softwarelist name="bbca_cass" description="Acorn BBC Micro Model A cassettes">
 

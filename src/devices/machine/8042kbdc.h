@@ -41,8 +41,8 @@ public:
 	auto output_buffer_empty_callback() { return m_output_buffer_empty_cb.bind(); }
 	auto speaker_callback() { return m_speaker_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_out2 );
 

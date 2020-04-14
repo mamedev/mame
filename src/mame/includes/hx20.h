@@ -54,8 +54,8 @@ public:
 	void cm6127(machine_config &config);
 
 private:
-	required_device<hd63701_cpu_device> m_maincpu;
-	required_device<hd63701_cpu_device> m_subcpu;
+	required_device<hd6301v1_cpu_device> m_maincpu;
+	required_device<hd6301v1_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device_array<upd7227_device, 6> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;

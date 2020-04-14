@@ -15,7 +15,7 @@
 inline void hexion_state::get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *ram)
 {
 	tile_index *= 4;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			ram[tile_index] + ((ram[tile_index+1] & 0x3f) << 8),
 			ram[tile_index+2] & 0x0f,
 			0);

@@ -320,7 +320,7 @@ uint8_t wd1000_device::data_r()
 	return data;
 }
 
-READ8_MEMBER( wd1000_device::read )
+uint8_t wd1000_device::read(offs_t offset)
 {
 	if ((m_status & S_BSY) && offset != 7)
 	{
@@ -441,7 +441,7 @@ void wd1000_device::data_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( wd1000_device::write )
+void wd1000_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x07)
 	{

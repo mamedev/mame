@@ -69,7 +69,7 @@ private:
 	int m_remap_address[16];
 
 	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
-	DECLARE_WRITE8_MEMBER(joinem_control_w);
+	void joinem_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
 	DECLARE_WRITE8_MEMBER(jack_videoram_w);

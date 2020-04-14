@@ -205,12 +205,12 @@ WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 
 READ8_MEMBER( nascom_state::nascom1_port_01_r )
 {
-	return m_hd6402->get_received_data();
+	return m_hd6402->receive();
 }
 
 WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
 {
-	m_hd6402->set_transmit_data(data);
+	m_hd6402->transmit(data);
 }
 
 READ8_MEMBER( nascom_state::nascom1_port_02_r )

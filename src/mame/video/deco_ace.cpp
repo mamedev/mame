@@ -30,7 +30,10 @@
     Bytes 0x1a(0x34) to 0x1e(0x3c) - unused/unknown
     Bytes 0x1f(0x3e) - 2nd tilemap chip, 'tilemap_1' alpha control, used at shadowing
 
-    0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent, 0x21/0x22/0x1000 = used,unknown
+    0 = opaque, 0x10 = 50% transparent,
+    0x20 = fully transparent (doesn't make sense bitwise -AS),
+    0x22 = stage 1 boss dark effect in Boogie Wings (incorrectly emulated, reverses source pixel + shifts down by 1? -AS)
+    0x21/0x1000 = used,unknown (by what!? -AS)
 
     Byte 0x00: ACEO000P0
                         P8

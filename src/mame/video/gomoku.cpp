@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
 	int color = (attr& 0x0f);
 	int flipyx = (attr & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			TILE_FLIPYX(flipyx));

@@ -53,6 +53,7 @@ public:
 	void init_goldstar();
 	void init_jkrmast();
 	void init_pkrmast();
+	void init_crazybonb();
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
@@ -73,6 +74,7 @@ public:
 	void ladylinrb(machine_config &config);
 	void wcherry(machine_config &config);
 	void crazybon(machine_config &config);
+	void crazybonb(machine_config &config);
 	void pkrmast(machine_config &config);
 	void moonlght(machine_config &config);
 	void kkotnoli(machine_config &config);

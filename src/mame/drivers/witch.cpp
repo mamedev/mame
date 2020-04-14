@@ -231,7 +231,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0_tile_info)
 
 	code=code | ((color & 0xe0) << 3);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
@@ -244,7 +244,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xf0) << 4),
 			(color>>0) & 0x0f,
 			0);
@@ -255,7 +255,7 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0xc0) << 2) | (m_bg_bank << 10),
 			(color>>0) & 0xf,
 			0);

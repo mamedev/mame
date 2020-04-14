@@ -224,8 +224,8 @@ uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 
 	m_spritegen_mxc->set_flip_screen(flip);
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 1);
-	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 2);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 1);
+	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 2);
 	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -240,7 +240,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0xfff,
 			color,
 			0);
@@ -254,15 +254,13 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_game_uses_priority = 0;
-	m_tilegen[0]->set_colmask(0x3);
-	m_tilegen[1]->set_colmask(0x3);
 }
 
 /******************************************************************************/
 
 uint32_t dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0);
 	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -274,7 +272,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0x3ff,
 			color,
 			0);
@@ -287,13 +285,19 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_game_uses_priority = 0;
-	m_tilegen[0]->set_colmask(0xf);
 
 	m_nmi_enable = false;
 	save_item(NAME(m_nmi_enable));
 }
 
 /******************************************************************************/
+
+// we mimic the priority scheme in dec0.cpp, this was originally a bit different, so this could be wrong
+void dec8_state::oscar_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags)
+{
+	tileinfo.group = BIT(colour, 3) ? 1 : 0;
+	colour &= 7;
+}
 
 uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -302,10 +306,9 @@ uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bi
 	m_spritegen_mxc->set_flip_screen(flip);
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	// we mimic the priority scheme in dec0.cpp, this was originally a bit different, so this could be wrong
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER1, 0);
 	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
-	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x08,0x08,0x08,0x08, 0);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER0, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -316,7 +319,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -328,9 +331,10 @@ VIDEO_START_MEMBER(dec8_state,oscar)
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dec8_state::get_oscar_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
+	m_tilegen[0]->set_transmask(0, 0xffff, 0x0000);
+	m_tilegen[0]->set_transmask(1, 0x00ff, 0xff00);
 
 	m_game_uses_priority = 1;
-	m_tilegen[0]->set_colmask(0x7);
 }
 
 /******************************************************************************/
@@ -377,7 +381,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile & 0xfff,
 			color,
 			0);
@@ -389,7 +393,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -437,7 +441,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -452,7 +456,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tile = tile & 0x3ff;
 	bank = (tile / 0x100) + 2;
 
-	SET_TILE_INFO_MEMBER(bank,
+	tileinfo.set(bank,
 			tile,
 			color,
 			0);
@@ -511,7 +515,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -528,7 +532,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile&0xfff,
 			color,
 			0);

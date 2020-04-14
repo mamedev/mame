@@ -2343,8 +2343,8 @@ void thomson_state::mo5nr_map(address_map &map)
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7d0, 0xa7d9).rw(FUNC(thomson_state::mo5nr_net_r), FUNC(thomson_state::mo5nr_net_w));
 	map(0xa7da, 0xa7dd).rw(FUNC(thomson_state::mo6_vreg_r), FUNC(thomson_state::mo6_vreg_w));
-	map(0xa7e1, 0xa7e1).r("cent_data_in", FUNC(input_buffer_device::bus_r));
-	map(0xa7e1, 0xa7e1).w(m_cent_data_out, FUNC(output_latch_device::bus_w));
+	map(0xa7e1, 0xa7e1).r("cent_data_in", FUNC(input_buffer_device::read));
+	map(0xa7e1, 0xa7e1).w(m_cent_data_out, FUNC(output_latch_device::write));
 	map(0xa7e3, 0xa7e3).rw(FUNC(thomson_state::mo5nr_prn_r), FUNC(thomson_state::mo5nr_prn_w));
 	map(0xa7e4, 0xa7e7).rw(FUNC(thomson_state::mo6_gatearray_r), FUNC(thomson_state::mo6_gatearray_w));
 	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));

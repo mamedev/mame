@@ -1,5 +1,26 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Dick Smith catalog numbers, taken from advertisements:
+
+X-6000 : Aquarius computer (2K RAM)
+X-6005 : Mini Expander
+X-6010 : Data Recorder
+X-6015 : 16K RAM cart
+X-6020 : 32K RAM cart
+X-6025 : Thermal Printer
+X-6026 : Roll of paper for the printer
+X-6109 : Space Ram
+X-6110 : Invaders
+X-6200 : Maths Armada
+X-6201 : Read It
+X-6202 : Spell It
+X-6203 : Chess
+?-???? : Ghost Hunter
+
+-->
 
 <softwarelist name="aquarius" description="Mattel Aquarius cartridges">
 

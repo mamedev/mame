@@ -50,7 +50,7 @@ WRITE8_MEMBER(compgolf_state::compgolf_back_w)
 TILE_GET_INFO_MEMBER(compgolf_state::get_text_info)
 {
 	tile_index <<= 1;
-	SET_TILE_INFO_MEMBER(2, m_videoram[tile_index + 1] | (m_videoram[tile_index] << 8), m_videoram[tile_index] >> 2, 0);
+	tileinfo.set(2, m_videoram[tile_index + 1] | (m_videoram[tile_index] << 8), m_videoram[tile_index] >> 2, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(compgolf_state::back_scan)
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(compgolf_state::get_back_info)
 	int code = m_bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);
 	int color = (attr & 0x3e) >> 1;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void compgolf_state::video_start()

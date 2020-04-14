@@ -598,8 +598,8 @@ void menu_export::handle()
 {
 	// process the menu
 	process_parent();
-	const event *menu_event = process(PROCESS_NOIMAGE);
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	const event *const menu_event = process(PROCESS_NOIMAGE);
+	if (menu_event && menu_event->itemref)
 	{
 		switch (uintptr_t(menu_event->itemref))
 		{
@@ -609,11 +609,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename, ".xml") == osd_file::error::NONE)
+				if (infile.open(filename + ".xml") == osd_file::error::NONE)
 					for (int seq = 0; ; ++seq)
 					{
-						std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext, ".xml") != osd_file::error::NONE)
+						const std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext + ".xml") != osd_file::error::NONE)
 						{
 							filename = seqtext;
 							break;
@@ -622,9 +622,9 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename, ".xml") == osd_file::error::NONE)
+				if (file.open(filename + ".xml") == osd_file::error::NONE)
 				{
-					std::string fullpath(file.fullpath());
+					const std::string fullpath(file.fullpath());
 					file.close();
 					std::ofstream pfile(fullpath);
 
@@ -654,11 +654,11 @@ void menu_export::handle()
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-				if (infile.open(filename, ".txt") == osd_file::error::NONE)
+				if (infile.open(filename + ".txt") == osd_file::error::NONE)
 					for (int seq = 0; ; ++seq)
 					{
-						std::string seqtext = string_format("%s_%04d", filename, seq);
-						if (infile.open(seqtext, ".txt") != osd_file::error::NONE)
+						const std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext + ".txt") != osd_file::error::NONE)
 						{
 							filename = seqtext;
 							break;
@@ -667,7 +667,7 @@ void menu_export::handle()
 
 				// attempt to open the output file
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-				if (file.open(filename, ".txt") == osd_file::error::NONE)
+				if (file.open(filename + ".txt") == osd_file::error::NONE)
 				{
 					// print the header
 					std::ostringstream buffer;
@@ -762,9 +762,9 @@ void menu_machine_configure::handle()
 			{
 			case SAVE:
 				{
-					std::string filename(m_drv.name);
+					const std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-					osd_file::error filerr = file.open(filename, ".ini");
+					osd_file::error filerr = file.open(filename + ".ini");
 					if (filerr == osd_file::error::NONE)
 					{
 						std::string inistring = m_opts.output_ini();

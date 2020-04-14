@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			(attr & 0x78) >> 3,     /* seems correct */
 			0);
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x78) >> 3,     /* seems correct */
 			0);
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),    /* seems correct */
 			0);
@@ -199,7 +199,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 
 	int attr = m_videoram[index + 0x400];
 	int code = m_videoram[index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x1c) >> 2,     /* seems correct ? */
 			0);

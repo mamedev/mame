@@ -44,8 +44,7 @@
         * Check the ASCI interface, there probably is fully working debug code.
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
-        * Is the clock divide 3 or 4?
-        * Galaga attract mode isn't correct; referenct : https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct; reference : https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -73,14 +72,14 @@
 |  D4     +-------------+   +-------+                   |
 +-------------------------------------------------------+
 
-     CPU: Z8S18020VSC ZiLOG Z180 (20MHz part)
+     CPU: Z8S18020VSC ZiLOG Z180 (20MHz part) at 18.432MHz
 Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macrocells, 83MHz speed)
   MEMORY: CY7C199-15VC 32K x 8 Static RAM x 3 (or equivalent ISSI IS61C256AH-15J)
      OSC: 73.728MHz
   EEPROM: 93LC46A 128 x 8-bit 1K microwire compatible Serial EEPROM
      VOL: Volume adjust
       D4: Diode - Status light
-      J1: 5 2-pin jumper array
+      J1: 10 pin JTAG interface for programming the CY37256P160 CPLDs
 
 ***************************************************************************/
 
@@ -102,7 +101,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *************************************/
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 2)
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 
@@ -400,7 +399,7 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
 	/* basic machine hardware */
-	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK);
+	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK); // 18.432MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 

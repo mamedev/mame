@@ -117,7 +117,7 @@ hp_1ma6_device::hp_1ma6_device(const machine_config &mconfig, const char *tag, d
 	clear_state();
 }
 
-WRITE8_MEMBER(hp_1ma6_device::reg_w)
+void hp_1ma6_device::reg_w(offs_t offset, uint8_t data)
 {
 	LOG("WR %u=%02x\n" , offset , data);
 	switch(offset) {
@@ -133,7 +133,7 @@ WRITE8_MEMBER(hp_1ma6_device::reg_w)
 	}
 }
 
-READ8_MEMBER(hp_1ma6_device::reg_r)
+uint8_t hp_1ma6_device::reg_r(offs_t offset)
 {
 	uint8_t res = 0;
 

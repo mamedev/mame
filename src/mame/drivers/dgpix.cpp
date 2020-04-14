@@ -153,10 +153,11 @@ Notes:
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "cpu/ks0164/ks0164.h"
+#include "sound/ks0164.h"
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class dgpix_state : public driver_device
@@ -166,7 +167,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
+		m_sound(*this, "ks0164"),
 		m_vblank(*this, "VBLANK")
 	{ }
 
@@ -188,7 +189,7 @@ private:
 	required_memory_region m_flash;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<ks0164_device> m_soundcpu;
+	required_device<ks0164_device> m_sound;
 	required_ioport m_vblank;
 
 	std::unique_ptr<u16[]> m_vram;
@@ -209,9 +210,36 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-	void snd_map(address_map &map);
+
+	void mpu401_data_w(offs_t, u32 data, u32 mem_mask);
+	void mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask);
+	u32 mpu401_data_r(offs_t, u32 mem_mask);
+	u32 mpu401_status_r();
 };
 
+void dgpix_state::mpu401_data_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_data_w(data);
+}
+
+void dgpix_state::mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_ctrl_w(data);
+}
+
+u32 dgpix_state::mpu401_data_r(offs_t, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		return m_sound->mpu401_data_r();
+	return 0;
+}
+
+u32 dgpix_state::mpu401_status_r()
+{
+	return m_sound->mpu401_status_r();
+}
 
 u32 dgpix_state::flash_r(offs_t offset)
 {
@@ -341,14 +369,8 @@ void dgpix_state::io_map(address_map &map)
 	map(0x0a10, 0x0a13).portr("INPUTS");
 	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
-	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
-	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE
-	map(0x0c84, 0x0c87).nopr(); // sound status, checks bit 0x40 and 0x80
-}
-
-void dgpix_state::snd_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
+	map(0x0c80, 0x0c83).rw(FUNC(dgpix_state::mpu401_data_r), FUNC(dgpix_state::mpu401_data_w));
+	map(0x0c84, 0x0c87).rw(FUNC(dgpix_state::mpu401_status_r), FUNC(dgpix_state::mpu401_ctrl_w));
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -432,9 +454,6 @@ void dgpix_state::dgpix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
-	KS0164(config, m_soundcpu, 16.9344_MHz_XTAL);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &dgpix_state::snd_map);
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
@@ -447,6 +466,13 @@ void dgpix_state::dgpix(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BGR_555);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	KS0164(config, m_sound, 16.9344_MHz_XTAL);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -465,7 +491,7 @@ ROM_START( elfin )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(eb56d7ca) SHA1(7c1cfcc68579cf3bdd9707da7d745a410223b8d9) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(cbf64ef4) SHA1(1a231872ee14e6d718c3f8888185ede7483e79dd) ) /* game settings & highscores are saved in here */
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(d378fe55) SHA1(5cc7bc5ae258cd48816857793a262e7c6c330795) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -487,7 +513,7 @@ ROM_START( jumpjump )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u8", 0x1800000, 0x400000, CRC(210dfd8b) SHA1(a1aee4ec8c01832e77d2e4e334a62c246d7e3635) )
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u9", 0x1c00000, 0x400000, CRC(16d1e352) SHA1(3c43974fb8d90b0c84472dd9f2167eb983142095) )
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "jumpjump.u10", 0x000000, 0x400000, CRC(2152ecce) SHA1(522d389952a07fa0830ca8aaa6de3aacf834e32e) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */
@@ -512,7 +538,7 @@ ROM_START( xfiles )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(231ad82a) SHA1(a1cc5c4122605e564d51137f1dca2afa82616202) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(d68994b7) SHA1(c1752d6795f7aaa6beef73643327205a1c32f0f5) )
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(1af33cda) SHA1(9bbcfb07a4a5bcff3efc1c7bcc51bc16c47ca9e6) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -545,7 +571,7 @@ ROM_START( xfilesk )
 	ROM_LOAD16_WORD_SWAP( "u8.bin",  0x1800000, 0x400000, CRC(3b2c2bc1) SHA1(1c07fb5bd8a8c9b5fb169e6400fef845f3aee7aa) )
 	ROM_LOAD16_WORD_SWAP( "u9.bin",  0x1c00000, 0x400000, CRC(6ecdd1eb) SHA1(e26c9711e589865cc75ec693d382758fa52528b8) )
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -569,7 +595,7 @@ ROM_START( kdynastg )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(1016b61c) SHA1(eab4934e1f41cc26259e5187a94ceebd45888a94) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(093d9243) SHA1(2a643acc7144193aaa3606a84b0c67aadb4c543b) )
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(3f103cb1) SHA1(2ff9bd73f3005f09d872018b81c915b01d6703f5) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 ) /* PIC */
@@ -593,7 +619,7 @@ ROM_START( fmaniac3 )
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(dc08a224) SHA1(4d14145eb84ad13674296f81e90b9d60403fa0de) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(c1fee95f) SHA1(0ed5ed9fa18e7da9242a6df2c210c46de25a2281) )
 
-	ROM_REGION( 0x400000, "soundcpu", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "ks0164", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(dfeb91a0) SHA1(a4a79073c3f6135957ea8a4a66a9c71a3a39893c) )
 
 	ROM_REGION( 0x1000, "cpu2", ROMREGION_ERASEFF ) /* PIC */

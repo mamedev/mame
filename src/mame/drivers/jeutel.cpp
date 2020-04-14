@@ -119,13 +119,13 @@ WRITE8_MEMBER( jeutel_state::porta_w )
 {
 	if ((data & 0xf0) == 0xf0)
 	{
-		m_tms->ctl_w(space, offset, tms5110_device::CMD_RESET);
+		m_tms->ctl_w(tms5110_device::CMD_RESET);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
 	else if ((data & 0xf0) == 0xd0)
 	{
-		m_tms->ctl_w(space, offset, tms5110_device::CMD_SPEAK);
+		m_tms->ctl_w(tms5110_device::CMD_SPEAK);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}

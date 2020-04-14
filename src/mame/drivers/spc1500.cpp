@@ -906,7 +906,7 @@ void spc1500_state::spc1500(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	I8255(config, m_pio);
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
 	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
 	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));

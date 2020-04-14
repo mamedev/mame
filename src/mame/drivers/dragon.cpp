@@ -29,6 +29,7 @@
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_gmc.h"
+#include "bus/coco/coco_psg.h"
 
 
 //**************************************************************************
@@ -179,6 +180,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
+	device.option_add("ccpsg", COCO_PSG);
 	device.option_add_internal("amtor", DRAGON_AMTOR);
 }
 

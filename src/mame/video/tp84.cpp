@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
 				(m_bg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_bg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
 				(m_fg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_fg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 

@@ -23,11 +23,11 @@ TODO:
   text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
 - firebatl: bad sprite colors;
 - firebatl: remove ROM patch;
-- firebatl: reads $6000-$6002 and $6100 at POST, and in the range $6100-$61ff before every start 
+- firebatl: reads $6000-$6002 and $6100 at POST, and in the range $6100-$61ff before every start
   of gameplay/after player dies.
   Currently 0-filled in ROM loading:
   - $6100 is actually OR-ed with the coinage work RAM buffer setting at $8022;
-  - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later checked at PC=0x187 and must 
+  - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later checked at PC=0x187 and must
     be $01 otherwise game goes into an infinite loop after dying (without ROM patch);
   - (more ...)
 

@@ -102,17 +102,17 @@ WRITE8_MEMBER(bwing_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	SET_TILE_INFO_MEMBER(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(bwing_state::scan_cols)

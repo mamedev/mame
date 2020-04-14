@@ -270,7 +270,7 @@ void z80ne_state::base_reset()
 	m_uart->write_cs(1);
 	m_uart_clock->set_unscaled_clock(m_cass_data.speed * 16);
 
-	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	lx385_ctrl_w(0);
 
 }
 
@@ -473,7 +473,7 @@ READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
 
-WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
+void z80ne_state::lx385_ctrl_w(uint8_t data)
 {
 	/* Translate data to control signals
 	 *     0 bit1=0, bit0=0   UART Reset pulse
@@ -555,7 +555,7 @@ READ8_MEMBER(z80net_state::lx388_mc6847_videoram_r)
 
 READ8_MEMBER(z80net_state::lx387_data_r)
 {
-	uint8_t data = m_lx387_kr2376->data_r(space, 0) & 0x7f;
+	uint8_t data = m_lx387_kr2376->data_r() & 0x7f;
 	data |= m_lx387_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }

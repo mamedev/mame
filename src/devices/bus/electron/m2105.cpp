@@ -74,7 +74,7 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 
 	/* user via */
 	VIA6522(config, m_via6522_1, DERIVED_CLOCK(1, 16));
-	m_via6522_1->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via6522_1->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via6522_1->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 

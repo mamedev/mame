@@ -21,10 +21,10 @@ public:
 	template <unsigned N> auto dma_write_callback() { return m_dma_write_cb[N].bind(); }
 	template <unsigned N> auto out_dack_callback() { return m_out_dack_cb[N].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER(set_hreq);
-	DECLARE_WRITE_LINE_MEMBER(set_eop);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void set_hreq(int state);
+	void set_eop(int state);
 
 	int dmarq(int state, int channel);
 
