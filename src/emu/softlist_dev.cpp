@@ -9,10 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "diimage.h"
-#include "romload.h"
 #include "softlist_dev.h"
+
+#include "diimage.h"
+#include "emuopts.h"
+#include "romload.h"
 #include "validity.h"
 
 #include <cctype>
