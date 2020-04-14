@@ -14,7 +14,7 @@ bit 2 = sound cpu reset line
 bit 1 = microcontroller reset line
 bit 0 = ? (unused?)
 */
-WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
+WRITE8_MEMBER(kikikai_state::mexico86_f008_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -43,7 +43,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 
 ***************************************************************************/
 
-void mexico86_state::mcu_simulate(  )
+void kikikai_state::mcu_simulate(  )
 {
 	if (!m_kikikai_simulated_mcu_initialised)
 	{
@@ -179,7 +179,7 @@ void mexico86_state::mcu_simulate(  )
 }
 
 
-INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
+INTERRUPT_GEN_MEMBER(kikikai_state::kikikai_interrupt)
 {
 	if (m_kikikai_simulated_mcu_running)
 		mcu_simulate();
@@ -201,7 +201,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 #define DCWIDTH 0
 #define DCHEIGHT 0
 
-void mexico86_state::kiki_clogic(int address, int latch)
+void kikikai_state::kiki_clogic(int address, int latch)
 {
 	static const u8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
 	int sy, sx, hw, i, qptr, diff1, diff2;
@@ -244,13 +244,13 @@ void mexico86_state::kiki_clogic(int address, int latch)
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
+INTERRUPT_GEN_MEMBER(kikikai_state::mexico86_m68705_interrupt)
 {
 	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
+WRITE8_MEMBER(kikikai_state::mexico86_68705_port_a_w)
 {
 	//logerror("%s: 68705 port A write %02x\n", machine().describe_context(), data);
 	m_port_a_out = data;
@@ -274,7 +274,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
  *  7   W  not used?
  */
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
+WRITE8_MEMBER(kikikai_state::mexico86_68705_port_b_w)
 {
 	//logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
 
@@ -324,4 +324,154 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 		logerror("%s: 68705 unknown port B bit %02x\n", machine().describe_context(), data);
 
 	m_port_b_out = data;
+}
+
+
+/***************************************************************************
+
+Bubble Bobble MCU (assume all this to be wrong - not yet adapted for Kick and Run)
+
+***************************************************************************/
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_ddr1_r)
+{
+	return m_ddr1;
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_ddr1_w)
+{
+	m_ddr1 = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_ddr2_r)
+{
+	return m_ddr2;
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_ddr2_w)
+{
+	m_ddr2 = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_ddr3_r)
+{
+	return m_ddr3;
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_ddr3_w)
+{
+	m_ddr3 = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_ddr4_r)
+{
+	return m_ddr4;
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_ddr4_w)
+{
+	m_ddr4 = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_port1_r)
+{
+	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
+	m_port1_in = ioport("IN0")->read();
+	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_port1_w)
+{
+	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
+
+	// bit 4: coin lockout
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
+
+	// bit 5: select 1-way or 2-way coin counter
+
+	// bit 6: trigger IRQ on main CPU (jumper switchable to vblank)
+	// trigger on high->low transition
+	if ((m_port1_out & 0x40) && (~data & 0x40))
+	{
+		// logerror("triggering IRQ on main CPU\n");
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+
+	// bit 7: select read or write shared RAM
+
+	m_port1_out = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_port2_r)
+{
+	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
+	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_port2_w)
+{
+	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
+	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
+
+	// bits 0-3: bits 8-11 of shared RAM address
+
+	// bit 4: clock (goes to PAL A78-04.12)
+	// latch on low->high transition
+	if ((~m_port2_out & 0x10) && (data & 0x10))
+	{
+		int address = m_port4_out | ((data & 0x0f) << 8);
+
+		if (m_port1_out & 0x80)
+		{
+			// read
+			if ((address & 0x0800) == 0x0000)
+			{
+				m_port3_in = ioport(portnames[address & 3])->read();
+			}
+			else if ((address & 0x0c00) == 0x0c00)
+			{
+				logerror("reading %02x from shared RAM %04x\n", m_port3_in, address);
+				m_port3_in = m_mcu_sharedram[address & 0xff /* & 0x03ff */];
+			}
+		}
+		else
+		{
+			// write
+			 if ((address & 0x0c00) == 0x0c00)
+			 {
+				 m_mcu_sharedram[address & 0xff /* & 0x03ff */] = m_port3_out;
+				 logerror("writing %02x to shared RAM %04x\n", m_port3_out, address);
+			 }
+		}
+	}
+
+	m_port2_out = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_port3_r)
+{
+	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
+	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_port3_w)
+{
+	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
+	m_port3_out = data;
+}
+
+READ8_MEMBER(kikikai_state::bublbobl_mcu_port4_r)
+{
+	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
+	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
+}
+
+WRITE8_MEMBER(kikikai_state::bublbobl_mcu_port4_w)
+{
+	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
+
+	// bits 0-7 of shared RAM address
+
+	m_port4_out = data;
 }

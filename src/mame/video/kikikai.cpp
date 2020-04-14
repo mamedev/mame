@@ -4,7 +4,7 @@
 #include "includes/kikikai.h"
 
 
-WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
+WRITE8_MEMBER(kikikai_state::mexico86_bankswitch_w)
 {
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
@@ -16,7 +16,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
 
 
 
-uint32_t mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kikikai_state::screen_update_mexico86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, xc, yc;
@@ -98,7 +98,7 @@ uint32_t mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kikikai_state::screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, yc;

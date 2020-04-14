@@ -8,10 +8,10 @@
 #include "emupal.h"
 #include "screen.h"
 
-class mexico86_state : public driver_device
+class kikikai_state : public driver_device
 {
 public:
-	mexico86_state(const machine_config &mconfig, device_type type, const char *tag)
+	kikikai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mcu_sharedram(*this, "mcu_sharedram"),
 		m_mainram(*this, "mainram"),
@@ -86,4 +86,35 @@ private:
 	void mexico86_sound_map(address_map &map);
 	void mexico86_sub_cpu_map(address_map &map);
 	void mcu_map(address_map& map);
+
+	/* Bubble Bobble MCU */
+	uint8_t    m_ddr1;
+	uint8_t    m_ddr2;
+	uint8_t    m_ddr3;
+	uint8_t    m_ddr4;
+	uint8_t    m_port1_in;
+	uint8_t    m_port2_in;
+	uint8_t    m_port3_in;
+	uint8_t    m_port4_in;
+	uint8_t    m_port1_out;
+	uint8_t    m_port2_out;
+	uint8_t    m_port3_out;
+	uint8_t    m_port4_out;
+
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr1_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr1_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr2_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr2_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr3_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr3_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_ddr4_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_ddr4_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port1_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port1_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port2_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port2_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port3_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port3_w);
+	DECLARE_READ8_MEMBER(bublbobl_mcu_port4_r);
+	DECLARE_WRITE8_MEMBER(bublbobl_mcu_port4_w);
 };
