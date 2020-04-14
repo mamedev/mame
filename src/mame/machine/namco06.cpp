@@ -176,20 +176,16 @@ void namco_06xx_device::data_w(offs_t offset, uint8_t data)
 
 uint8_t namco_06xx_device::ctrl_r()
 {
-	LOG("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag());
 	return m_control;
 }
 
 void namco_06xx_device::ctrl_w(uint8_t data)
 {
-	LOG("%s: 06XX '%s' control %02x\n",machine().describe_context(),tag(),data);
-
 	m_control = data;
 
 	// The upper 3 control bits are the clock divider.
 	if ((m_control & 0xE0) == 0)
 	{
-		LOG("disabling nmi generate timer\n");
 		m_nmi_timer->adjust(attotime::never);
 		set_nmi(CLEAR_LINE);
 		m_chipsel[0](0, CLEAR_LINE);
@@ -223,8 +219,6 @@ void namco_06xx_device::set_nmi(int state)
 	{
 		m_nmicpu->set_input_line(INPUT_LINE_NMI, state);
 	}
-	else
-		LOG("NMI not set because cpu '%s' is suspended\n",m_nmicpu->tag());
 }
 
 

@@ -60,10 +60,6 @@
 #include "namco53.h"
 
 
-#define VERBOSE 0
-#include "logmacro.h"
-
-
 WRITE_LINE_MEMBER( namco_53xx_device::reset )
 {
 	// The incoming signal is active low
