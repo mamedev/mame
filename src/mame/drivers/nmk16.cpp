@@ -4112,19 +4112,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	const int NUM_SCANLINES = 256;
 	const int IRQ1_SCANLINE = 25; // guess
 	const int VBIN_SCANLINE = 0;
-	const int VBOUT_sCANLINE = 240;
-	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
+	const int VBOUT_SCANLINE = 240;
 
 	int scanline = param;
 
-	if (scanline == VBOUT_sCANLINE) // vblank-out irq
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	if (scanline == SPRDMA_SCANLINE)
+	if (scanline == VBOUT_SCANLINE) // vblank-out irq
 	{
-		// 2 buffers confirmed on PCB
-		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
-		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_dma_timer->adjust(attotime::from_usec(256)); // 256 USEC after VBOUT
 	}
 
 	/* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
@@ -4139,6 +4134,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	/* 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time) */
 	if (scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
 		m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(nmk16_state::dma_callback)
+{
+	// 2 buffers confirmed on PCB, 1 on sabotenb
+	memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+	memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+	//m_maincpu->spin_until_time(attotime::from_usec(694)); // stop cpu during DMA?
 }
 
 void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
@@ -4850,7 +4853,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); /* Z0840006PSC 4 MHz  */
+	Z80(config, m_audiocpu, 4000000); /* Z0840006PSC 4? MHz  */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -4974,12 +4977,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 	int scanline = param;
 
 	if (scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	if (scanline == 248)
 	{
 		// only a single buffer
 		memcpy(m_spriteram_old2.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	/* This is either vblank-in or sprite dma irq complete */
