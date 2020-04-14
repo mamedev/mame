@@ -30,6 +30,7 @@ punipic, punipic2: No sound. Problems in Central Park. Patches used.
 punipic3:          Same as punipic, and doors are missing.
 slampic:           No sound. Some minor gfx issues (sprites on character select screen).
 slampic2:          No sound. All gfx issues confirmed present on real board.
+wofpic:            No sound. Some gfx glitches, some (1st level trees etc.) seem to be due to a bad rom(s).
 
 all dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
 
@@ -106,13 +107,18 @@ public:
 	{ }
 	
 	void dinopic(machine_config &config);
+	void wofpic(machine_config &config);
 	void init_wofpic();
 	void init_jurassic99();
 
 private:
 	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
+	DECLARE_WRITE16_MEMBER(wofpic_layer_w);
+	DECLARE_WRITE16_MEMBER(wofpic_layer2_w);
 	DECLARE_MACHINE_START(dinopic);
+	DECLARE_MACHINE_START(wofpic);
 	void dinopic_map(address_map &map);
+	void wofpic_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -254,6 +260,53 @@ WRITE16_MEMBER(slampic2_state::slampic2_sound2_w)
 	//logerror("Sound2 command: %04x\n", data);
 }
 
+WRITE16_MEMBER(dinopic_state::wofpic_layer_w)
+{
+	switch (offset)
+	{
+	case 0x00:
+		m_cps_a_regs[0x0e / 2] = data;
+		break;
+	case 0x01:
+		m_cps_a_regs[0x0c / 2] = data;
+		break;
+	case 0x02:
+		m_cps_a_regs[0x12 / 2] = data;
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+		break;
+	case 0x03:
+		m_cps_a_regs[0x10 / 2] = data;
+		break;
+	case 0x04:
+		m_cps_a_regs[0x16 / 2] = data;
+		break;
+	case 0x05:
+		m_cps_a_regs[0x14 / 2] = data;
+		break;
+	case 0x06:
+		{
+			// see bootleggers routines starting at $101000
+			// writes values 0-f to 98000c
+			// logerror("0x%04x  0x%04x\n", m_mainram[0x6398 / 2], data);
+			// how does this relate to layer control reg value?
+			
+			// just get values from ram for now...
+			m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x6398 / 2];
+			m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x639a / 2];
+			m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x639c / 2];
+			m_cps_b_regs[m_layer_mask_reg[3] / 2] = m_mainram[0x639e / 2];
+		}
+		break;
+	default:
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
+	}
+}
+
+WRITE16_MEMBER(dinopic_state::wofpic_layer2_w)
+{
+	m_cps_a_regs[0x06 / 2] = data;
+}
+
 
 void dinopic_state::dinopic(machine_config &config)
 {
@@ -387,6 +440,13 @@ void slampic2_state::slampic2(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
+void dinopic_state::wofpic(machine_config &config)
+{
+	dinopic(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::wofpic_map);
+	MCFG_MACHINE_START_OVERRIDE(dinopic_state, wofpic)
+}
+
 
 void dinopic_state::dinopic_map(address_map &map)
 {
@@ -483,6 +543,26 @@ void slampic2_state::slampic2_map(address_map &map)
 	*/
 }
 
+void dinopic_state::wofpic_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
+	map(0x800006, 0x800007).w(FUNC(dinopic_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800008, 0x800009).w(FUNC(dinopic_state::wofpic_layer2_w));
+	map(0x800018, 0x80001f).r(FUNC(dinopic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(dinopic_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(dinopic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(dinopic_state::cps1_cps_b_r), FUNC(dinopic_state::cps1_cps_b_w)).share("cps_b_regs");  /* Only writes here at boot */
+	map(0x880000, 0x880001).nopw(); // always 0
+	map(0x900000, 0x92ffff).ram().w(FUNC(dinopic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x980000, 0x98000d).w(FUNC(dinopic_state::wofpic_layer_w));
+	map(0xf18000, 0xf19fff).ram();
+	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(dinopic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
+	map(0xff0000, 0xffffff).ram().share("mainram");
+}
+
 
 MACHINE_START_MEMBER(dinopic_state, dinopic)
 {
@@ -539,6 +619,21 @@ MACHINE_START_MEMBER(slampic2_state, slampic2)
 	m_layer_scroll3x_offset = 15;  // y offset 1px too low
 	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0xff00;
+	m_sprite_x_offset = 0;
+}
+
+MACHINE_START_MEMBER(dinopic_state, wofpic)
+{
+	m_layer_enable_reg = 0x26;
+	m_layer_mask_reg[0] = 0x28;
+	m_layer_mask_reg[1] = 0x2a;
+	m_layer_mask_reg[2] = 0x2c;
+	m_layer_mask_reg[3] = 0x2e;
+	m_layer_scroll1x_offset = 0x40;
+	m_layer_scroll2x_offset = 0x40;
+	m_layer_scroll3x_offset = 0x40;
+	m_sprite_base = 0x1000;
+	m_sprite_list_end_marker = 0x8000;
 	m_sprite_x_offset = 0;
 }
 
@@ -1529,4 +1624,4 @@ GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  ini
 GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,    ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
 GAME( 1993,  slampic2,   slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
 
-GAME( 1992,  wofpic,     wof,       dinopic,   wof,       dinopic_state,     init_wofpic,     ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 021002 ETC, needs correct layers enable, etc. Currently only sprites show.
+GAME( 1992,  wofpic,     wof,       wofpic,    wof,       dinopic_state,     init_wofpic,     ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 021002 ETC
