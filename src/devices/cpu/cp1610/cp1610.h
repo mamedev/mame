@@ -32,6 +32,7 @@ public:
 
 	auto bext() { return m_read_bext.bind(); }
 	auto iab() { return m_read_iab.bind(); }
+	auto intak() { return m_write_intak.bind(); }
 
 protected:
 	// device-level overrides
@@ -72,6 +73,7 @@ private:
 
 	devcb_read8 m_read_bext;
 	devcb_read16 m_read_iab;
+	devcb_write16 m_write_intak;
 
 	void cp1610_illegal();
 	void cp1610_hlt();
