@@ -484,6 +484,7 @@ public:
 	int execute_method_m2mf(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t maddress, uint32_t address, uint32_t data, int &countlen);
 	int execute_method_surf2d(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t maddress, uint32_t address, uint32_t data, int &countlen);
 	int execute_method_blit(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t maddress, uint32_t address, uint32_t data, int &countlen);
+	void surface_2d_blit();
 	uint32_t texture_get_texel(int number, int x, int y);
 	uint8_t *read_pixel(int x, int y, int32_t c[4]);
 	void write_pixel(int x, int y, uint32_t color, int depth);
@@ -551,8 +552,8 @@ public:
 	uint32_t pmc[0x1000 / 4];
 	uint32_t pgraph[0x2000 / 4];
 	uint32_t ramin[0x100000 / 4];
-	uint32_t dma_offset[10];
-	uint32_t dma_size[10];
+	uint32_t dma_offset[13];
+	uint32_t dma_size[13];
 	uint8_t *basemempointer;
 	uint8_t *topmempointer;
 	std::function<void(int state)> irq_callback;
@@ -768,6 +769,17 @@ public:
 	int enabled_vertex_attributes;
 	int vertex_attribute_words[16];
 	int vertex_attribute_offset[16];
+
+	struct {
+		int format;
+		int pitch_source;
+		int pitch_destination;
+		uint32_t source_address;
+		uint32_t destination_address;
+		int op;
+		int width;
+		int heigth;
+	} bitblit;
 	emu_timer *puller_timer;
 	int puller_waiting;
 	address_space *puller_space;

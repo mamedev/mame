@@ -3415,7 +3415,10 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 	if (maddress == 0x0100) {
 		countlen--;
 		if (data != 0) {
-			pgraph[0x704 / 4] = 0x100;
+#ifdef LOG_NV2A
+			machine().logerror("Software method %04x\n", data);
+#endif
+			pgraph[0x704 / 4] = 0x100 | (chanel << 20) | (subchannel << 16);
 			pgraph[0x708 / 4] = data;
 			pgraph[0x100 / 4] |= 1;
 			pgraph[0x108 / 4] |= 1;
@@ -3922,6 +3925,7 @@ int nv2a_renderer::execute_method_m2mf(address_space &space, uint32_t chanel, ui
 #ifdef LOG_NV2A
 		machine().logerror("m2mf method 0180 notify\n");
 #endif
+		geforce_read_dma_object(data, dma_offset[10], dma_size[10]);
 	}
 	return 0;
 }
@@ -3932,11 +3936,26 @@ int nv2a_renderer::execute_method_surf2d(address_space &space, uint32_t chanel, 
 #ifdef LOG_NV2A
 		machine().logerror("surf2d method 0184 source\n");
 #endif
+		geforce_read_dma_object(data, dma_offset[11], dma_size[11]);
 	}
 	if (method == 0x0188) {
 #ifdef LOG_NV2A
 		machine().logerror("surf2d method 0188 destination\n");
 #endif
+		geforce_read_dma_object(data, dma_offset[12], dma_size[12]);
+	}
+	if (method == 0x0300) {
+		bitblit.format = data; // 0xa is a8r8g8b8
+	}
+	if (method == 0x0304) {
+		bitblit.pitch_source = data & 0xffff;
+		bitblit.pitch_destination = data >> 16;
+	}
+	if (method == 0x0308) {
+		bitblit.source_address = dma_offset[11] + data;
+	}
+	if (method == 0x030c) {
+		bitblit.destination_address = dma_offset[12] + data;
 	}
 	return 0;
 }
@@ -3945,15 +3964,60 @@ int nv2a_renderer::execute_method_blit(address_space &space, uint32_t chanel, ui
 {
 	if (method == 0x019c) {
 #ifdef LOG_NV2A
-		machine().logerror("blit method 019c surf\n");
+		machine().logerror("blit method 019c surface objecct handle %d\n", data); // set to 0x11
 #endif
 	}
 	if (method == 0x02fc) {
 #ifdef LOG_NV2A
-		machine().logerror("blit method 02fc op\n");
+		machine().logerror("blit method 02fc operation %d\n", data); // 3 is copy from source to destination
 #endif
+		bitblit.op = data;
+	}
+#if 0
+	if (method == 0x0300) {
+		int x, y;
+
+		x = data & 0xffff;
+		y = data >> 16;
+	}
+	if (method == 0x0304) {
+		int x, y;
+
+		x = data & 0xffff;
+		y = data >> 16;
+	}
+#endif
+	if (method == 0x0308) {
+		bitblit.width = data & 0xffff;
+		bitblit.heigth = data >> 16;
+		surface_2d_blit();
 	}
 	return 0;
+}
+
+void nv2a_renderer::surface_2d_blit()
+{
+	int x, y;
+	uint32_t *src, *dest;
+	uint32_t *srcrow, *destrow;
+
+	if (bitblit.format != 0xa) {
+		machine().logerror("Unsupported format %d in surface_2d_blit\n", bitblit.format);
+		return;
+	}
+	srcrow = (uint32_t *)(basemempointer + bitblit.source_address);
+	destrow = (uint32_t*)(basemempointer + bitblit.destination_address);
+	for (y = 0; y < bitblit.heigth; y++) {
+		src = srcrow;
+		dest = destrow;
+		for (x = 0; x < bitblit.width; x++) {
+			*dest = *src;
+			dest++;
+			src++;
+		}
+		srcrow += bitblit.pitch_source >> 2;
+		destrow += bitblit.pitch_destination >> 2;
+	}
 }
 
 bool nv2a_renderer::toggle_register_combiners_usage()
