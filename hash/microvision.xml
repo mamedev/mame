@@ -254,6 +254,19 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 
 <!-- Homebrew (real hardware) -->
 
+	<software name="microbrd">
+		<description>MicroBird</description>
+		<year>2018</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="3000000" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
+				<rom name="microbrd.bin" size="0x400" crc="475a093d" sha1="6e3d2f47c836c43e8a3e74fffe30a64964e8df8c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tetris">
 		<description>Tetris (TMS1100 version)</description>
 		<year>2019</year>
@@ -281,19 +294,6 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 		</part>
 	</software>
 
-	<software name="microbrd">
-		<description>MicroBird</description>
-		<year>2018</year>
-		<publisher>Ayza</publisher>
-		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="3000000" />
-			<feature name="paddle" value="0" />
-			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
-				<rom name="microbrd.bin" size="0x400" crc="475a093d" sha1="6e3d2f47c836c43e8a3e74fffe30a64964e8df8c"/>
-			</dataarea>
-		</part>
-	</software>
-
 
 <!-- Homebrew (emulator or Arduino version, untested on real console) -->
 
@@ -309,7 +309,7 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 	</software>
 
 	<software name="invaders">
-		<description>Invaders</description>
+		<description>Space Invaders</description>
 		<year>2014</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
