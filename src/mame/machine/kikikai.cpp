@@ -18,18 +18,18 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (m_mcu != nullptr)
+	if (m_68705mcu != nullptr)
 	{
 		// mexico 86, knight boy
-		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		m_68705mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
 		// simulation for KiKi KaiKai
-		m_mcu_running = data & 2;
+		m_68705mcu_running = data & 2;
 
-		if (!m_mcu_running)
-			m_mcu_initialised = 0;
+		if (!m_68705mcu_running)
+			m_68705mcu_initialised = 0;
 	}
 }
 
@@ -45,7 +45,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 
 void mexico86_state::mcu_simulate(  )
 {
-	if (!m_mcu_initialised)
+	if (!m_68705mcu_initialised)
 	{
 		if (m_protection_ram[0x01] == 0x00)
 		{
@@ -57,11 +57,11 @@ void mexico86_state::mcu_simulate(  )
 			m_protection_ram[0x06] = 0xff;   // must be FF otherwise PS4 ERROR
 			m_protection_ram[0x07] = 0x03;   // must be 03 otherwise PS4 ERROR
 			m_protection_ram[0x00] = 0x00;
-			m_mcu_initialised = 1;
+			m_68705mcu_initialised = 1;
 		}
 	}
 
-	if (m_mcu_initialised)
+	if (m_68705mcu_initialised)
 	{
 		int i;
 		bool coin_curr;
@@ -181,7 +181,7 @@ void mexico86_state::mcu_simulate(  )
 
 INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 {
-	if (m_mcu_running)
+	if (m_68705mcu_running)
 		mcu_simulate();
 
 	device.execute().set_input_line_vector(0, m_protection_ram[0]); // Z80
@@ -302,7 +302,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 		}
 	}
 
-	m_mcu->pa_w((BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
+	m_68705mcu->pa_w((BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
 
 	if (BIT(mem_mask, 1) && !BIT(data, 1) && BIT(m_port_b_out, 1))
 	{
@@ -314,7 +314,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	{
 		m_maincpu->set_input_line_vector(0, m_protection_ram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE); // HOLD_LINE works better in Z80 interrupt mode 1.
-		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_68705mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
 	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))

@@ -17,7 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_mcu(*this, "mcu"),
+		m_68705mcu(*this, "mcu"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -45,8 +45,8 @@ private:
 	int      m_address;
 	u8       m_latch;
 	/* kikikai mcu simulation */
-	int      m_mcu_running;
-	int      m_mcu_initialised;
+	int      m_68705mcu_running;
+	int      m_68705mcu_initialised;
 	bool     m_coin_last[2];
 	u8       m_coin_fract;
 
@@ -54,7 +54,7 @@ private:
 	required_device<cpu_device>         m_maincpu;
 	required_device<cpu_device>         m_audiocpu;
 	optional_device<cpu_device>         m_subcpu;
-	optional_device<m68705p_device>     m_mcu;
+	optional_device<m68705p_device>     m_68705mcu;
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;

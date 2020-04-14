@@ -401,8 +401,8 @@ void mexico86_state::machine_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_latch));
 
-	save_item(NAME(m_mcu_running));
-	save_item(NAME(m_mcu_initialised));
+	save_item(NAME(m_68705mcu_running));
+	save_item(NAME(m_68705mcu_initialised));
 	save_item(NAME(m_coin_last));
 	save_item(NAME(m_coin_fract));
 
@@ -421,8 +421,8 @@ void mexico86_state::machine_reset()
 	m_address = 0;
 	m_latch = 0;
 
-	m_mcu_running = 0;
-	m_mcu_initialised = 0;
+	m_68705mcu_running = 0;
+	m_68705mcu_initialised = 0;
 	m_coin_last[0] = false;
 	m_coin_last[1] = false;
 	m_coin_fract = 0;
@@ -476,11 +476,11 @@ void mexico86_state::mexico86_68705(machine_config& config)
 {
 	mexico86(config);
 
-	M68705P3(config, m_mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
-	m_mcu->portc_r().set_ioport("IN0");
-	m_mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
-	m_mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
-	m_mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
+	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	m_68705mcu->portc_r().set_ioport("IN0");
+	m_68705mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
+	m_68705mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
+	m_68705mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
 }
 
 void mexico86_state::knightb(machine_config &config)
