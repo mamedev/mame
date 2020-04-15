@@ -3352,7 +3352,7 @@ Beyond that last category are the roms waiting to be classified.
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="chou makai taisen! dorabocchan (japan) (beta) (1992-12-21).sfc" size="1048576" crc="0c34d7b5" sha1="68c77c52e5d91c379a897ce4048922e15ac9b9ed" offset="0x000000" />
+				<rom name="chou makai taisen dorabocchan (japan) (beta) (1992-12-21).sfc" size="1048576" crc="0c34d7b5" sha1="68c77c52e5d91c379a897ce4048922e15ac9b9ed" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -3581,7 +3581,7 @@ Beyond that last category are the roms waiting to be classified.
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mickey's playtown adventure - a day of discovery! (usa) (proto).sfc" size="1048576" crc="53524952" sha1="4c3cf0fe8f4b662414660977d913c0372ee7fe0e" offset="0x000000" />
+				<rom name="mickey's playtown adventure - a day of discovery (usa) (proto).sfc" size="1048576" crc="53524952" sha1="4c3cf0fe8f4b662414660977d913c0372ee7fe0e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3947,8 +3947,8 @@ Beyond that last category are the roms waiting to be classified.
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="wizap! - ankoku no ou (japan) (beta) (45768).sfc" size="2097152" crc="fd4da80c" sha1="ca10c92533951f47ecd2fc869c134a30d0be4db9" offset="0x000000" />
-				<!-- rom name="wizap! - ankoku no ou (japan) (beta) (45768) [h1].sfc" size="2097152" crc="2cbc2f72" sha1="d0450f09729844188a0a17a2fb9fc365dd0484cc" offset="0x000000" /-->
+				<rom name="wizap - ankoku no ou (japan) (beta) (45768).sfc" size="2097152" crc="fd4da80c" sha1="ca10c92533951f47ecd2fc869c134a30d0be4db9" offset="0x000000" />
+				<!-- rom name="wizap - ankoku no ou (japan) (beta) (45768) [h1].sfc" size="2097152" crc="2cbc2f72" sha1="d0450f09729844188a0a17a2fb9fc365dd0484cc" offset="0x000000" /-->
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4037,7 +4037,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom_pija" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bananas de pijamas (unl) [!].sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="0x000000" />
+				<rom name="bananas de pijamas (unl).sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4430,7 +4430,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="futbol argentino '96 (unl) [!].sfc" size="2097152" crc="552737c1" sha1="a91310125846680dc95bc22e168a75ca5a13032f" offset="0x000000" status="baddump" />
+				<rom name="futbol argentino '96 (unl).sfc" size="2097152" crc="552737c1" sha1="a91310125846680dc95bc22e168a75ca5a13032f" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4442,7 +4442,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="ronaldinho soccer 97 (unl) [!].sfc" size="2097152" crc="d209fe59" sha1="7e9ff7dff0ff8e8d8e7ce448148a71a3fa103897" offset="0x000000" />
+				<rom name="ronaldinho soccer 97 (unl).sfc" size="2097152" crc="d209fe59" sha1="7e9ff7dff0ff8e8d8e7ce448148a71a3fa103897" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33807,7 +33807,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="aaahh!!! real monsters (europe).sfc" size="2097152" crc="946313fb" sha1="ed042967a8528405ba7c67f9bad0af624e8c8497" offset="0x000000" />
+				<rom name="aaahh real monsters (europe).sfc" size="2097152" crc="946313fb" sha1="ed042967a8528405ba7c67f9bad0af624e8c8497" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33856,7 +33856,7 @@ List of unclassified roms
 			<feature name="enhancement" value="DSP1 A" />
 			<feature name="slot" value="hirom_dsp" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ace o nerae! (japan).sfc" size="1048576" crc="6c5f1a18" sha1="065bf1bbf4662383e2e42105ad76e0ed93213a57" offset="0x000000" />
+				<rom name="ace o nerae (japan).sfc" size="1048576" crc="6c5f1a18" sha1="065bf1bbf4662383e2e42105ad76e0ed93213a57" offset="0x000000" />
 			</dataarea>
 			<dataarea name="addon" size="10240">
 				<rom name="dsp1a.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
@@ -34904,7 +34904,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="barkley shut up and jam! (europe).sfc" size="1572864" crc="29fbd13d" sha1="00a4567aa3b1a190bf12000f6063118bbc3cb5a1" offset="0x000000" />
+				<rom name="barkley shut up and jam (europe).sfc" size="1572864" crc="29fbd13d" sha1="00a4567aa3b1a190bf12000f6063118bbc3cb5a1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34946,7 +34946,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="bastard!! - ankoku no hakaishin (japan).sfc" size="1572864" crc="6742d51c" sha1="5512a076116639e36e1bfde38ca86b126ca0d867" offset="0x000000" />
+				<rom name="bastard - ankoku no hakaishin (japan).sfc" size="1572864" crc="6742d51c" sha1="5512a076116639e36e1bfde38ca86b126ca0d867" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35177,7 +35177,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="bazoe! mahou sekai (japan).sfc" size="1572864" crc="d5b09eef" sha1="5e4af718ae159244102a3afc53456f6c34caff91" offset="0x000000" />
+				<rom name="bazoe mahou sekai (japan).sfc" size="1572864" crc="d5b09eef" sha1="5e4af718ae159244102a3afc53456f6c34caff91" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -35227,7 +35227,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="beethoven - the ultimate canine caper! (europe).sfc" size="524288" crc="4d1352ad" sha1="3b33dfe11d5f964340a278d3e857127f773d2eb9" offset="0x000000" />
+				<rom name="beethoven - the ultimate canine caper (europe).sfc" size="524288" crc="4d1352ad" sha1="3b33dfe11d5f964340a278d3e857127f773d2eb9" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35300,7 +35300,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="big ichigeki! pachi-slot daikouryaku 2 - universal collection (japan).sfc" size="1572864" crc="3aee8812" sha1="ce0b6476692569be42834bbe7f78b0c08873908f" offset="0x000000" />
+				<rom name="big ichigeki pachi-slot daikouryaku 2 - universal collection (japan).sfc" size="1572864" crc="3aee8812" sha1="ce0b6476692569be42834bbe7f78b0c08873908f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -35346,7 +35346,7 @@ List of unclassified roms
 			<feature name="enhancement" value="DSP1" />
 			<feature name="slot" value="hirom_dsp" />
 			<dataarea name="rom" size="524288">
-				<rom name="bike daisuki! hashiriya tamashii (japan).sfc" size="524288" crc="b363fc99" sha1="d0457fc27adff1b0ad236535f60f91711b15f0db" offset="0x000000" />
+				<rom name="bike daisuki hashiriya tamashii (japan).sfc" size="524288" crc="b363fc99" sha1="d0457fc27adff1b0ad236535f60f91711b15f0db" offset="0x000000" />
 			</dataarea>
 			<dataarea name="addon" size="10240">
 				<rom name="dsp1.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
@@ -35469,7 +35469,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="bishoujo senshi sailormoon s - kondo wa puzzle de oshioki yo! (japan).sfc" size="524288" crc="10f03e3c" sha1="feab726c9a8a664435ae177a163c36b09e694d85" offset="0x000000" />
+				<rom name="bishoujo senshi sailormoon s - kondo wa puzzle de oshioki yo (japan).sfc" size="524288" crc="10f03e3c" sha1="feab726c9a8a664435ae177a163c36b09e694d85" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35514,7 +35514,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="bishoujo senshi sailormoon super s - zenin sanka!! shuyaku soudatsusen (japan).sfc" size="3145728" crc="25440331" sha1="1ada34177e7384612ae83464288f3860e4c4426e" offset="0x000000" />
+				<rom name="bishoujo senshi sailormoon super s - zenin sanka shuyaku soudatsusen (japan).sfc" size="3145728" crc="25440331" sha1="1ada34177e7384612ae83464288f3860e4c4426e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35529,7 +35529,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2621440">
-				<rom name="bishoujo wrestler retsuden - blizzard yuki rannyuu!! (japan).sfc" size="2621440" crc="f4d20413" sha1="de5fc2caae6803bfcb2eaf831a346b0e422a4e77" offset="0x000000" />
+				<rom name="bishoujo wrestler retsuden - blizzard yuki rannyuu (japan).sfc" size="2621440" crc="f4d20413" sha1="de5fc2caae6803bfcb2eaf831a346b0e422a4e77" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -35659,7 +35659,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bonkers - hollywood daisakusen! (japan).sfc" size="1048576" crc="9401d956" sha1="ae55ff828d17cccd712516f587d4e8ef7fff3afb" offset="0x000000" />
+				<rom name="bonkers - hollywood daisakusen (japan).sfc" size="1048576" crc="9401d956" sha1="ae55ff828d17cccd712516f587d4e8ef7fff3afb" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35830,7 +35830,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="brawl brothers - rival turf! 2 (europe).sfc" size="1572864" crc="410cee18" sha1="3c613aaa25d26148ffd36e65a9696ef69dce5d9f" offset="0x000000" />
+				<rom name="brawl brothers - rival turf 2 (europe).sfc" size="1572864" crc="410cee18" sha1="3c613aaa25d26148ffd36e65a9696ef69dce5d9f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36358,7 +36358,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="chibi maruko-chan - mezase! minami no island!! (japan).sfc" size="2097152" crc="f4defcae" sha1="08a2415362f69788ec76b1a36044dc1f1a5f2ea1" offset="0x000000" />
+				<rom name="chibi maruko-chan - mezase minami no island (japan).sfc" size="2097152" crc="f4defcae" sha1="08a2415362f69788ec76b1a36044dc1f1a5f2ea1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36374,7 +36374,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="chibi maruko-chan - mezase! minami no island!! (japan) (sample).sfc" size="2097152" crc="178d0201" sha1="77617120d5a3c4ed2dfe6427a4c98a3aa172feea" offset="0x000000" />
+				<rom name="chibi maruko-chan - mezase minami no island (japan) (sample).sfc" size="2097152" crc="178d0201" sha1="77617120d5a3c4ed2dfe6427a4c98a3aa172feea" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36767,7 +36767,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="524288">
-				<rom name="conveni wars barcode battler senki - super senshi shutsugeki seyo! (japan).sfc" size="524288" crc="115233db" sha1="72ca858f50d67121b06868633b8588a79316c3e2" offset="0x000000" />
+				<rom name="conveni wars barcode battler senki - super senshi shutsugeki seyo (japan).sfc" size="524288" crc="115233db" sha1="72ca858f50d67121b06868633b8588a79316c3e2" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -37592,7 +37592,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dino dini's soccer! (europe) (en,fr,de).sfc" size="1048576" crc="dbf4a8ab" sha1="80c4f508801146cd5cc4848bd5d1ed54456b937e" offset="0x000000" />
+				<rom name="dino dini's soccer (europe) (en,fr,de).sfc" size="1048576" crc="dbf4a8ab" sha1="80c4f508801146cd5cc4848bd5d1ed54456b937e" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -37879,7 +37879,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dossun! ganseki battle (japan).sfc" size="1048576" crc="1aa002d6" sha1="544201ff2f0ad09a14142d3d7c02a2e07cfc7c5a" offset="0x000000" />
+				<rom name="dossun ganseki battle (japan).sfc" size="1048576" crc="1aa002d6" sha1="544201ff2f0ad09a14142d3d7c02a2e07cfc7c5a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37967,7 +37967,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="downtown nekketsu baseball monogatari - yakyuu de shoubu da! kunio-kun (japan).sfc" size="1572864" crc="e71b7c31" sha1="f7b89946f22f1e8b6c4ee8094f0c212ab78ed22a" offset="0x000000" />
+				<rom name="downtown nekketsu baseball monogatari - yakyuu de shoubu da kunio-kun (japan).sfc" size="1572864" crc="e71b7c31" sha1="f7b89946f22f1e8b6c4ee8094f0c212ab78ed22a" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -38619,7 +38619,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="eek! the cat (europe).sfc" size="1048576" crc="812555a3" sha1="4edeb0755f577474e96864abd91e3042163f9674" offset="0x000000" />
+				<rom name="eek the cat (europe).sfc" size="1048576" crc="812555a3" sha1="4edeb0755f577474e96864abd91e3042163f9674" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38632,7 +38632,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="eek! the cat (usa).sfc" size="1048576" crc="216f2fc7" sha1="db072bcb550a0704830a383f7c39fcbf71f5a11b" offset="0x000000" />
+				<rom name="eek the cat (usa).sfc" size="1048576" crc="216f2fc7" sha1="db072bcb550a0704830a383f7c39fcbf71f5a11b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39445,7 +39445,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="fighter's history - mizoguchi kikiippatsu!! (japan).sfc" size="3145728" crc="65bb5dc4" sha1="2269681db3bca3730024dfa601e6648fd8af4e02" offset="0x000000" />
+				<rom name="fighter's history - mizoguchi kikiippatsu (japan).sfc" size="3145728" crc="65bb5dc4" sha1="2269681db3bca3730024dfa601e6648fd8af4e02" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40112,7 +40112,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="from tv animation slam dunk - sd heat up!! (japan).sfc" size="1572864" crc="d05114c0" sha1="cadba14e8c79aff27c5ca948be708fd2d7588064" offset="0x000000" />
+				<rom name="from tv animation slam dunk - sd heat up (japan).sfc" size="1572864" crc="d05114c0" sha1="cadba14e8c79aff27c5ca948be708fd2d7588064" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40497,7 +40497,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ganbare! daiku no gen-san (japan).sfc" size="1048576" crc="206bd866" sha1="90b419d3e71b17490f3aed0ad2ae3158af94ed33" offset="0x000000" />
+				<rom name="ganbare daiku no gen-san (japan).sfc" size="1048576" crc="206bd866" sha1="90b419d3e71b17490f3aed0ad2ae3158af94ed33" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40886,7 +40886,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="go! go! dodge league (japan) (rev 1).sfc" size="524288" crc="06e6e66d" sha1="e1a8a3542510a276b23dd46bbe8a530b49fe2b79" offset="0x000000" />
+				<rom name="go go dodge league (japan) (rev 1).sfc" size="524288" crc="06e6e66d" sha1="e1a8a3542510a276b23dd46bbe8a530b49fe2b79" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40902,7 +40902,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="go! go! dodge league (japan).sfc" size="524288" crc="184b07dc" sha1="c4da1ceca565db529ca39eb911a1f0830fdc77d0" offset="0x000000" />
+				<rom name="go go dodge league (japan).sfc" size="524288" crc="184b07dc" sha1="c4da1ceca565db529ca39eb911a1f0830fdc77d0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40915,7 +40915,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="goal! (usa).sfc" size="1048576" crc="935ea22c" sha1="2f4dcc8ae4553be208ca71a353261adfc11d0e9d" offset="0x000000" />
+				<rom name="goal (usa).sfc" size="1048576" crc="935ea22c" sha1="2f4dcc8ae4553be208ca71a353261adfc11d0e9d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -41694,7 +41694,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="hatayama hatch no pro yakyuu news! - jitsumei ban (japan).sfc" size="1048576" crc="7a585763" sha1="27b381b003445ef9bd1db0ecf9f018093a3e586b" offset="0x000000" />
+				<rom name="hatayama hatch no pro yakyuu news - jitsumei ban (japan).sfc" size="1048576" crc="7a585763" sha1="27b381b003445ef9bd1db0ecf9f018093a3e586b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -41813,7 +41813,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="524288">
-				<rom name="heisei inu monogatari bow - pop'n smash!! (japan).sfc" size="524288" crc="fe4a2622" sha1="e50d6cdf138716bad867200198405d40e48ccef5" offset="0x000000" />
+				<rom name="heisei inu monogatari bow - pop'n smash (japan).sfc" size="524288" crc="fe4a2622" sha1="e50d6cdf138716bad867200198405d40e48ccef5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41913,7 +41913,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="heiwa parlor! mini 8 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="aaf45e59" sha1="1b8ece1b76034ae72c96f06c703007f900509b77" offset="0x000000" />
+				<rom name="heiwa parlor mini 8 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="aaf45e59" sha1="1b8ece1b76034ae72c96f06c703007f900509b77" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41928,7 +41928,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="hello! pac-man (japan).sfc" size="1572864" crc="0318fd8c" sha1="bafe9438730174a6d1c8c3078b22d1f852e22d2f" offset="0x000000" />
+				<rom name="hello pac-man (japan).sfc" size="1572864" crc="0318fd8c" sha1="bafe9438730174a6d1c8c3078b22d1f852e22d2f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -42220,7 +42220,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2621440">
-				<rom name="holy umbrella - dondera no mubou!! (japan).sfc" size="2621440" crc="f0a9dead" sha1="d3a26291aedcbbc4725165dd4eff569236086ac0" offset="0x000000" />
+				<rom name="holy umbrella - dondera no mubou (japan).sfc" size="2621440" crc="f0a9dead" sha1="d3a26291aedcbbc4725165dd4eff569236086ac0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -42506,7 +42506,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="hourai gakuen no bouken! - tenkousei scramble (japan).sfc" size="2097152" crc="6299fb1c" sha1="25e107e21d45b0c4095e623a723e2020a55c9253" offset="0x000000" />
+				<rom name="hourai gakuen no bouken - tenkousei scramble (japan).sfc" size="2097152" crc="6299fb1c" sha1="25e107e21d45b0c4095e623a723e2020a55c9253" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -42867,7 +42867,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="inazuma serve da! super beach volley (japan).sfc" size="1048576" crc="879edee8" sha1="cb0c5b6b4a4011520888be6007816165f3a20e89" offset="0x000000" />
+				<rom name="inazuma serve da super beach volley (japan).sfc" size="1048576" crc="879edee8" sha1="cb0c5b6b4a4011520888be6007816165f3a20e89" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43453,7 +43453,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="jeopardy! (usa).sfc" size="524288" crc="65bf3a7e" sha1="ffd18e23d5f77e92146035f473ffd27a17c510e1" offset="0x000000" />
+				<rom name="jeopardy (usa).sfc" size="524288" crc="65bf3a7e" sha1="ffd18e23d5f77e92146035f473ffd27a17c510e1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43466,7 +43466,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="jeopardy! - deluxe edition (usa).sfc" size="524288" crc="6301060c" sha1="71918d099db1cc35496b9dd71f48ad78bbb2d815" offset="0x000000" />
+				<rom name="jeopardy - deluxe edition (usa).sfc" size="524288" crc="6301060c" sha1="71918d099db1cc35496b9dd71f48ad78bbb2d815" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43479,7 +43479,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="jeopardy! - sports edition (usa).sfc" size="524288" crc="bda7de29" sha1="9219ce57cf98943928a8f31695701c30d3094556" offset="0x000000" />
+				<rom name="jeopardy - sports edition (usa).sfc" size="524288" crc="bda7de29" sha1="9219ce57cf98943928a8f31695701c30d3094556" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43763,7 +43763,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="524288">
-				<rom name="jissen pachi-slot hisshouhou! twin (japan).sfc" size="524288" crc="acbef43d" sha1="eaee7feadba8c14cbe5f7453300528f91472fc8c" offset="0x000000" />
+				<rom name="jissen pachi-slot hisshouhou twin (japan).sfc" size="524288" crc="acbef43d" sha1="eaee7feadba8c14cbe5f7453300528f91472fc8c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43780,7 +43780,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="jissen pachi-slot hisshouhou! twin vol. 2 (japan).sfc" size="524288" crc="1013bcf3" sha1="b15fe02c973b98daaa4a7f65df5bce496f5bfedd" offset="0x000000" />
+				<rom name="jissen pachi-slot hisshouhou twin vol. 2 (japan).sfc" size="524288" crc="1013bcf3" sha1="b15fe02c973b98daaa4a7f65df5bce496f5bfedd" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43798,7 +43798,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="jissen pachinko hisshouhou! 2 (japan).sfc" size="1572864" crc="59884df2" sha1="36acd095ff832c32fda8f81cff601176a6c6fccf" offset="0x000000" />
+				<rom name="jissen pachinko hisshouhou 2 (japan).sfc" size="1572864" crc="59884df2" sha1="36acd095ff832c32fda8f81cff601176a6c6fccf" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43815,7 +43815,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="jissen! mahjong shinan (japan).sfc" size="1048576" crc="457f3020" sha1="0b7785d0a778f48556d272001010e732b044b396" offset="0x000000" />
+				<rom name="jissen mahjong shinan (japan).sfc" size="1048576" crc="457f3020" sha1="0b7785d0a778f48556d272001010e732b044b396" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43832,7 +43832,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="jissen! pachi-slot hisshouhou! classic (japan).sfc" size="1048576" crc="f28358c0" sha1="f1115ef15688ecba048e41c4372624c469379cc2" offset="0x000000" />
+				<rom name="jissen pachi-slot hisshouhou classic (japan).sfc" size="1048576" crc="f28358c0" sha1="f1115ef15688ecba048e41c4372624c469379cc2" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43850,7 +43850,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="jissen! pachi-slot hisshouhou! yamasa densetsu (japan).sfc" size="1048576" crc="8fb6a868" sha1="c39fc0b5035ebc7d94ba911f53ec4577afd1cb81" offset="0x000000" />
+				<rom name="jissen pachi-slot hisshouhou yamasa densetsu (japan).sfc" size="1048576" crc="8fb6a868" sha1="c39fc0b5035ebc7d94ba911f53ec4577afd1cb81" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -44522,7 +44522,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kamen rider sd - shutsugeki!! rider machine (japan).sfc" size="1048576" crc="a2c7cb5f" sha1="9ca328cd2e6ced05e0d0571f425a781c185e6d41" offset="0x000000" />
+				<rom name="kamen rider sd - shutsugeki rider machine (japan).sfc" size="1048576" crc="a2c7cb5f" sha1="9ca328cd2e6ced05e0d0571f425a781c185e6d41" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45129,7 +45129,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="kingyo chuuihou! - tobidase! game gakuen (japan).sfc" size="2097152" crc="c819109c" sha1="4d1dd9561323f42ee3505aa4301d9d510cac6908" offset="0x000000" />
+				<rom name="kingyo chuuihou - tobidase game gakuen (japan).sfc" size="2097152" crc="c819109c" sha1="4d1dd9561323f42ee3505aa4301d9d510cac6908" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45560,7 +45560,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="kunio-kun no dodge ball dayo zenin shuugou! (japan).sfc" size="1572864" crc="7bf62174" sha1="3474ca5cc8af0f73faca4fc8c83c5ab1eaf62031" offset="0x000000" />
+				<rom name="kunio-kun no dodge ball dayo zenin shuugou (japan).sfc" size="1572864" crc="7bf62174" sha1="3474ca5cc8af0f73faca4fc8c83c5ab1eaf62031" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -45578,7 +45578,7 @@ List of unclassified roms
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="kunio-kun no dodge ball dayo zenin shuugou! - tournament special (japan).sfc" size="524288" crc="b267576d" sha1="33258f1a9ba8e498de99c4656eb49565621b3531" offset="0x000000" />
+				<rom name="kunio-kun no dodge ball dayo zenin shuugou - tournament special (japan).sfc" size="524288" crc="b267576d" sha1="33258f1a9ba8e498de99c4656eb49565621b3531" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -46486,7 +46486,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="lupin sansei - densetsu no hihou o oe! (japan).sfc" size="1572864" crc="74adc6e2" sha1="99ae1fcd0b778d221d04f8980458824b809392e7" offset="0x000000" />
+				<rom name="lupin sansei - densetsu no hihou o oe (japan).sfc" size="1572864" crc="74adc6e2" sha1="99ae1fcd0b778d221d04f8980458824b809392e7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46574,7 +46574,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="maerchen adventure cotton 100% (japan).sfc" size="2097152" crc="5fb7a31d" sha1="5e12d00f5da6c4a7cb9ac1731ba77d11dcb61d6d" offset="0x000000" />
+				<rom name="maerchen adventure cotton 100 (japan).sfc" size="2097152" crc="5fb7a31d" sha1="5e12d00f5da6c4a7cb9ac1731ba77d11dcb61d6d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46911,7 +46911,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mahou poi poi poitto! (japan).sfc" size="1048576" crc="bdf35044" sha1="9903ada5efa56d644ae0d2fe1f5fd378bddc135b" offset="0x000000" />
+				<rom name="mahou poi poi poitto (japan).sfc" size="1048576" crc="bdf35044" sha1="9903ada5efa56d644ae0d2fe1f5fd378bddc135b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47012,7 +47012,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="makeruna! makendou (japan).sfc" size="1048576" crc="bb95bc9f" sha1="ea0d895a6830df5195f489bfda0727c44ffc2c2c" offset="0x000000" />
+				<rom name="makeruna makendou (japan).sfc" size="1048576" crc="bb95bc9f" sha1="ea0d895a6830df5195f489bfda0727c44ffc2c2c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47027,7 +47027,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="makeruna! makendou 2 - kimero! youkai souridaijin (japan).sfc" size="2097152" crc="a20fbb88" sha1="f42ef34806a6cef98400d95f923d827380a65430" offset="0x000000" />
+				<rom name="makeruna makendou 2 - kimero youkai souridaijin (japan).sfc" size="2097152" crc="a20fbb88" sha1="f42ef34806a6cef98400d95f923d827380a65430" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47064,7 +47064,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mario is missing! (europe).sfc" size="1048576" crc="5e04efb5" sha1="6787b42040b2e6ac79246e6b439af2281a396cd0" offset="0x000000" />
+				<rom name="mario is missing (europe).sfc" size="1048576" crc="5e04efb5" sha1="6787b42040b2e6ac79246e6b439af2281a396cd0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47076,7 +47076,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mario is missing! (france).sfc" size="1048576" crc="2ec7c6fe" sha1="c7fac77270ecc64cd1541be9a86a007231b06cc6" offset="0x000000" />
+				<rom name="mario is missing (france).sfc" size="1048576" crc="2ec7c6fe" sha1="c7fac77270ecc64cd1541be9a86a007231b06cc6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47089,7 +47089,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mario's early years! - fun with letters (usa).sfc" size="1048576" crc="480b043a" sha1="d88373e0dc6f21711ee103d787dc5369f322d15e" offset="0x000000" />
+				<rom name="mario's early years - fun with letters (usa).sfc" size="1048576" crc="480b043a" sha1="d88373e0dc6f21711ee103d787dc5369f322d15e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47102,7 +47102,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mario's early years! - fun with numbers (usa).sfc" size="1048576" crc="8c0c37f4" sha1="012d92c1afed571a2c4b79845e4b382ed1ece429" offset="0x000000" />
+				<rom name="mario's early years - fun with numbers (usa).sfc" size="1048576" crc="8c0c37f4" sha1="012d92c1afed571a2c4b79845e4b382ed1ece429" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47115,7 +47115,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mario's early years! - preschool fun (usa).sfc" size="1048576" crc="85a6b2a8" sha1="cd4b58d8b12e91ae537f5cf2111f95f7b11cf969" offset="0x000000" />
+				<rom name="mario's early years - preschool fun (usa).sfc" size="1048576" crc="85a6b2a8" sha1="cd4b58d8b12e91ae537f5cf2111f95f7b11cf969" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47391,7 +47391,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="matsumura kunihiro den - saikyou no rekishi o nurikaero! (japan).sfc" size="3145728" crc="8f3da172" sha1="e8ebc058a74ac7e5f88376dbbebadcd9fc43d7fb" offset="0x000000" />
+				<rom name="matsumura kunihiro den - saikyou no rekishi o nurikaero (japan).sfc" size="3145728" crc="8f3da172" sha1="e8ebc058a74ac7e5f88376dbbebadcd9fc43d7fb" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48363,7 +48363,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="motteke oh! dorobou (japan).sfc" size="1572864" crc="843506bb" sha1="1c3ecdd32de0a5aa1604a1bcede99eda35d7fa4a" offset="0x000000" />
+				<rom name="motteke oh dorobou (japan).sfc" size="1572864" crc="843506bb" sha1="1c3ecdd32de0a5aa1604a1bcede99eda35d7fa4a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48415,7 +48415,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
-				<rom name="mr. do! (europe).sfc" size="262144" crc="ccebb6e8" sha1="b81d186807854094718a7cdc6f8fc927a081da0e" offset="0x000000" />
+				<rom name="mr. do (europe).sfc" size="262144" crc="ccebb6e8" sha1="b81d186807854094718a7cdc6f8fc927a081da0e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48430,7 +48430,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
-				<rom name="mr. do! (japan).sfc" size="262144" crc="3847cf64" sha1="3dd5b75afe94e28f9c0d82a18fc2b2ecca100b64" offset="0x000000" />
+				<rom name="mr. do (japan).sfc" size="262144" crc="3847cf64" sha1="3dd5b75afe94e28f9c0d82a18fc2b2ecca100b64" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48443,7 +48443,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
-				<rom name="mr. do! (usa).sfc" size="262144" crc="1c1025e2" sha1="34cf15e802feafda7ed224b69e1f9f2ca692857a" offset="0x000000" />
+				<rom name="mr. do (usa).sfc" size="262144" crc="1c1025e2" sha1="34cf15e802feafda7ed224b69e1f9f2ca692857a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50703,7 +50703,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="parlor! mini - pachinko jikki simulation game (japan).sfc" size="1048576" crc="836e5194" sha1="e30a33d57fdc68d48a19ca281182a3ff78cb3938" offset="0x000000" />
+				<rom name="parlor mini - pachinko jikki simulation game (japan).sfc" size="1048576" crc="836e5194" sha1="e30a33d57fdc68d48a19ca281182a3ff78cb3938" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50718,7 +50718,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="parlor! mini 3 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="55b93658" sha1="1cef7a96b3ba263e6771e7f6d7ca655fb495b4ef" offset="0x000000" />
+				<rom name="parlor mini 3 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="55b93658" sha1="1cef7a96b3ba263e6771e7f6d7ca655fb495b4ef" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50733,7 +50733,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="parlor! mini 5 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="3571f873" sha1="56936365dc66de078263b790cbbdd50e017bde66" offset="0x000000" />
+				<rom name="parlor mini 5 - pachinko jikki simulation game (japan).sfc" size="1048576" crc="3571f873" sha1="56936365dc66de078263b790cbbdd50e017bde66" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50749,7 +50749,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="parlor! parlor! 2 (japan).sfc" size="2097152" crc="05d73187" sha1="404029bad5359184a623812f330ef180231e2eaf" offset="0x000000" />
+				<rom name="parlor parlor 2 (japan).sfc" size="2097152" crc="05d73187" sha1="404029bad5359184a623812f330ef180231e2eaf" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -50766,7 +50766,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="parlor! parlor! 5 (japan).sfc" size="1572864" crc="fe6c5da7" sha1="244c67e0d47c61b278aa81721fcd304b64c06570" offset="0x000000" />
+				<rom name="parlor parlor 5 (japan).sfc" size="1572864" crc="fe6c5da7" sha1="244c67e0d47c61b278aa81721fcd304b64c06570" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -50784,7 +50784,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="parlor! parlor! iv cr (japan).sfc" size="2097152" crc="f6d7210f" sha1="b4c1d6466d1b05ffccedaadef54816ff55627a69" offset="0x000000" />
+				<rom name="parlor parlor iv cr (japan).sfc" size="2097152" crc="f6d7210f" sha1="b4c1d6466d1b05ffccedaadef54816ff55627a69" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -51216,7 +51216,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="pikiinya! (japan).sfc" size="2097152" crc="9fe1b94a" sha1="bf4017c26bb4b33736d96b38d2cf334cff68928d" offset="0x000000" />
+				<rom name="pikiinya (japan).sfc" size="2097152" crc="9fe1b94a" sha1="bf4017c26bb4b33736d96b38d2cf334cff68928d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -51492,7 +51492,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="plok! (europe).sfc" size="1048576" crc="026f2c19" sha1="6defc4aa66a3d7534adb32b21b48576a45ac2c03" offset="0x000000" />
+				<rom name="plok (europe).sfc" size="1048576" crc="026f2c19" sha1="6defc4aa66a3d7534adb32b21b48576a45ac2c03" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51508,7 +51508,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="plok! (japan).sfc" size="1048576" crc="57dcd2a1" sha1="7590045ac3c4fb85c56c47eed646327a718ae33b" offset="0x000000" />
+				<rom name="plok (japan).sfc" size="1048576" crc="57dcd2a1" sha1="7590045ac3c4fb85c56c47eed646327a718ae33b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51522,7 +51522,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="plok! (usa).sfc" size="1048576" crc="bbd678f6" sha1="e2c19e9f434f7791ff9f2e48fdad37fd11ae9933" offset="0x000000" />
+				<rom name="plok (usa).sfc" size="1048576" crc="bbd678f6" sha1="e2c19e9f434f7791ff9f2e48fdad37fd11ae9933" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51598,7 +51598,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="poko nyan! - henpokorin adventure (japan).sfc" size="1048576" crc="d16810cd" sha1="618413e6092b9fe935dbb2e6c42fd3ce93a65775" offset="0x000000" />
+				<rom name="poko nyan - henpokorin adventure (japan).sfc" size="1048576" crc="d16810cd" sha1="618413e6092b9fe935dbb2e6c42fd3ce93a65775" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52286,7 +52286,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="puzzle'n desu! (japan).sfc" size="1048576" crc="689a7a79" sha1="9b44c78894dff33915a76c71e6a6a8ec75807924" offset="0x000000" />
+				<rom name="puzzle'n desu (japan).sfc" size="1048576" crc="689a7a79" sha1="9b44c78894dff33915a76c71e6a6a8ec75807924" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -52738,7 +52738,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ren &amp; stimpy show, the - veediots! (europe).sfc" size="1048576" crc="06ddbb0d" sha1="94c4261c46a5811eb323dd6a1d5d2830d7fe502c" offset="0x000000" />
+				<rom name="ren &amp; stimpy show, the - veediots (europe).sfc" size="1048576" crc="06ddbb0d" sha1="94c4261c46a5811eb323dd6a1d5d2830d7fe502c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52751,7 +52751,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ren &amp; stimpy show, the - veediots! (usa).sfc" size="1048576" crc="fd1c12a3" sha1="f6a33d59f2222e9661dc89c205388ffc5a622a2e" offset="0x000000" />
+				<rom name="ren &amp; stimpy show, the - veediots (usa).sfc" size="1048576" crc="fd1c12a3" sha1="f6a33d59f2222e9661dc89c205388ffc5a622a2e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53557,7 +53557,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
-				<rom name="sanrio world smash ball! (japan).sfc" size="262144" crc="0e318416" sha1="f182eb75f21e46e516cbb6e6bef0324724bc0f04" offset="0x000000" />
+				<rom name="sanrio world smash ball (japan).sfc" size="262144" crc="0e318416" sha1="f182eb75f21e46e516cbb6e6bef0324724bc0f04" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53867,7 +53867,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sgt. saunders' combat! (japan).sfc" size="1572864" crc="da5888c7" sha1="27342ab63d1681272ea90a7e081e3ec654502b8a" offset="0x000000" />
+				<rom name="sgt. saunders' combat (japan).sfc" size="1572864" crc="da5888c7" sha1="27342ab63d1681272ea90a7e081e3ec654502b8a" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -55226,7 +55226,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="soreyuke ebisumaru karakuri meiro - kieta goemon no nazo!! (japan).sfc" size="1048576" crc="885fb1b9" sha1="51e1b12190103c102c39762abac71803311d7bef" offset="0x000000" />
+				<rom name="soreyuke ebisumaru karakuri meiro - kieta goemon no nazo (japan).sfc" size="1048576" crc="885fb1b9" sha1="51e1b12190103c102c39762abac71803311d7bef" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -55254,7 +55254,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sotsugyou bangai hen - nee mahjong shiyo! (japan).sfc" size="1048576" crc="d44ceb2f" sha1="3e39a072878737f0d285d426f500a0d3169a5e36" offset="0x000000" />
+				<rom name="sotsugyou bangai hen - nee mahjong shiyo (japan).sfc" size="1048576" crc="d44ceb2f" sha1="3e39a072878737f0d285d426f500a0d3169a5e36" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -55877,7 +55877,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sprinter monogatari - mezase!! ikkakusenkin (japan).sfc" size="1572864" crc="411f4d0a" sha1="84d3155fe541939e99b5052b684379c2a17ffdaa" offset="0x000000" />
+				<rom name="sprinter monogatari - mezase ikkakusenkin (japan).sfc" size="1572864" crc="411f4d0a" sha1="84d3155fe541939e99b5052b684379c2a17ffdaa" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -57717,7 +57717,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super goal! (europe).sfc" size="1048576" crc="bb624450" sha1="d5d677eb2a2804d7b88e29351cf99b6e669b71a1" offset="0x000000" />
+				<rom name="super goal (europe).sfc" size="1048576" crc="bb624450" sha1="d5d677eb2a2804d7b88e29351cf99b6e669b71a1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -58411,7 +58411,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="super moero!! pro yakyuu (japan).sfc" size="1572864" crc="da5ad200" sha1="66161ba909b204225f2000829079fd7c231de80f" offset="0x000000" />
+				<rom name="super moero pro yakyuu (japan).sfc" size="1572864" crc="da5ad200" sha1="66161ba909b204225f2000829079fd7c231de80f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -58761,7 +58761,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="super punch-out!! (japan) (np).sfc" size="2097152" crc="b5d92af4" sha1="0f42b17e721671931e1eb3d9701d464db163cfd3" offset="0x000000" />
+				<rom name="super punch-out (japan) (np).sfc" size="2097152" crc="b5d92af4" sha1="0f42b17e721671931e1eb3d9701d464db163cfd3" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -58776,7 +58776,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="super punch-out!! (usa).sfc" size="2097152" crc="e2f92f84" sha1="3604c855790f37db567e9b425252625045f86697" offset="0x000000" />
+				<rom name="super punch-out (usa).sfc" size="2097152" crc="e2f92f84" sha1="3604c855790f37db567e9b425252625045f86697" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -59297,7 +59297,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1310720">
-				<rom name="super tekkyuu fight! (japan).sfc" size="1310720" crc="5be4a7e3" sha1="12910b4ef21a8ff5171f84d70defe5637c9d2d37" offset="0x000000" />
+				<rom name="super tekkyuu fight (japan).sfc" size="1310720" crc="5be4a7e3" sha1="12910b4ef21a8ff5171f84d70defe5637c9d2d37" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -59853,7 +59853,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="table game daishuugou!! (japan).sfc" size="1048576" crc="661e791e" sha1="5d4bfe205a35af01c3dd787ec7ff599b848ae3da" offset="0x000000" />
+				<rom name="table game daishuugou (japan).sfc" size="1048576" crc="661e791e" sha1="5d4bfe205a35af01c3dd787ec7ff599b848ae3da" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -59965,7 +59965,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="taiketsu!! brass numbers (japan).sfc" size="1048576" crc="27815b78" sha1="c68658e255797f8aeb674300bbc025e7cbe2db1e" offset="0x000000" />
+				<rom name="taiketsu brass numbers (japan).sfc" size="1048576" crc="27815b78" sha1="c68658e255797f8aeb674300bbc025e7cbe2db1e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -60434,7 +60434,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tenchi muyou! game hen (japan) (sample).sfc" size="2097152" crc="f0e82b14" sha1="54adc1ad028394b55c991e1e17ed414abde44eb0" offset="0x000000" />
+				<rom name="tenchi muyou game hen (japan) (sample).sfc" size="2097152" crc="f0e82b14" sha1="54adc1ad028394b55c991e1e17ed414abde44eb0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -60816,7 +60816,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="thunderbirds - kokusai kyuujotai shutsudou seyo! (japan).sfc" size="1048576" crc="623f2197" sha1="06f72963ffab3850399eaf9d4af311a988e883f0" offset="0x000000" />
+				<rom name="thunderbirds - kokusai kyuujotai shutsudou seyo (japan).sfc" size="1048576" crc="623f2197" sha1="06f72963ffab3850399eaf9d4af311a988e883f0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -60942,7 +60942,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="tiny toon adventures - buster busts loose! (spain).sfc" size="1048576" crc="eeb4180c" sha1="7e8b79ea0e23aaa6e8212dad9082d7a16fe2c67b" offset="0x000000" />
+				<rom name="tiny toon adventures - buster busts loose (spain).sfc" size="1048576" crc="eeb4180c" sha1="7e8b79ea0e23aaa6e8212dad9082d7a16fe2c67b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -60954,7 +60954,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="tiny toon adventures - buster busts loose! (usa) (beta).sfc" size="1048576" crc="f1f8f87a" sha1="3bee604951621e20912cd6eadcc80534e30e27ee" offset="0x000000" />
+				<rom name="tiny toon adventures - buster busts loose (usa) (beta).sfc" size="1048576" crc="f1f8f87a" sha1="3bee604951621e20912cd6eadcc80534e30e27ee" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61313,7 +61313,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="tottemo! lucky man - lucky cookie roulette de totsugeki!! (japan).sfc" size="1048576" crc="8488759e" sha1="15f3a610fd47707639e96ffad06abd35457d9a32" offset="0x000000" />
+				<rom name="tottemo lucky man - lucky cookie roulette de totsugeki (japan).sfc" size="1048576" crc="8488759e" sha1="15f3a610fd47707639e96ffad06abd35457d9a32" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61912,7 +61912,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="uchuu race - astro go! go! (japan).sfc" size="1048576" crc="e949d47f" sha1="5ce834eaca982791916c10df4f40e3214a0d976c" offset="0x000000" />
+				<rom name="uchuu race - astro go go (japan).sfc" size="1048576" crc="e949d47f" sha1="5ce834eaca982791916c10df4f40e3214a0d976c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -62130,7 +62130,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="ultra league - moero! soccer daikessen!! (japan).sfc" size="1572864" crc="845790ef" sha1="986eba16b04e47de3e2d4e6df481ae280dbfe821" offset="0x000000" />
+				<rom name="ultra league - moero soccer daikessen (japan).sfc" size="1572864" crc="845790ef" sha1="986eba16b04e47de3e2d4e6df481ae280dbfe821" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -62640,7 +62640,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="wally o sagase! - ehon no kuni no daibouken (japan).sfc" size="1048576" crc="6c864780" sha1="b0c4122d0c3de32987955dca52d1219436e7c940" offset="0x000000" />
+				<rom name="wally o sagase - ehon no kuni no daibouken (japan).sfc" size="1048576" crc="6c864780" sha1="b0c4122d0c3de32987955dca52d1219436e7c940" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -62683,7 +62683,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="waratte iitomo! tamorin pick (japan).sfc" size="1048576" crc="14cc9c86" sha1="031bb1a01a3067f71a8372afd5543328f72f9198" offset="0x000000" />
+				<rom name="waratte iitomo tamorin pick (japan).sfc" size="1048576" crc="14cc9c86" sha1="031bb1a01a3067f71a8372afd5543328f72f9198" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -62838,7 +62838,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="we're back! - a dinosaur's story (usa).sfc" size="1048576" crc="3f654414" sha1="5dfed05ffbdf6565cbfc56becc0a2d432f1a027a" offset="0x000000" />
+				<rom name="we're back - a dinosaur's story (usa).sfc" size="1048576" crc="3f654414" sha1="5dfed05ffbdf6565cbfc56becc0a2d432f1a027a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64241,7 +64241,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zen-nihon pro wrestling - fight da pon! (japan).sfc" size="1048576" crc="379645bd" sha1="52aa5ce4612b81c90fd07f6c3dc9a712afb32668" offset="0x000000" />
+				<rom name="zen-nihon pro wrestling - fight da pon (japan).sfc" size="1048576" crc="379645bd" sha1="52aa5ce4612b81c90fd07f6c3dc9a712afb32668" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64516,7 +64516,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2621440">
-				<rom name="zootto mahjong! (japan) (np).sfc" size="2621440" crc="c167987d" sha1="21286747d360c03e3bf86cd4504508ce55deff8f" offset="0x000000" />
+				<rom name="zootto mahjong (japan) (np).sfc" size="2621440" crc="c167987d" sha1="21286747d360c03e3bf86cd4504508ce55deff8f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>

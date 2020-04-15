@@ -425,6 +425,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 	auto const valid_name_char = [] (char ch) { return ((ch >= '0') && (ch <= '9')) || ((ch >= 'a') && (ch <= 'z')) || (ch == '_'); };
 	auto const valid_tag_char = [] (char ch) { return ((ch >= '0') && (ch <= '9')) || ((ch >= 'a') && (ch <= 'z')) || strchr("$.:_", u8(ch)); };
 	auto const valid_year_char = [] (char ch) { return isdigit(u8(ch)) || (ch == '?') || (ch == '+'); };
+	auto const valid_label_char = [] (char ch) { return (ch >= ' ') && (ch <= '~') && !strchr("!$%/:\\", u8(ch)); };
 
 	softlist_map names;
 	softlist_map descriptions;
@@ -526,6 +527,10 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 				{
 					if (ROMENTRY_ISREGION(romp)) // if this is a region, make sure it's valid, and record the length
 					{
+						// if we haven't seen any items since the last region, print a warning
+						if (!items_since_region)
+							osd_printf_verbose("%s: %s part %s has empty data area '%s' (warning)\n", filename(), shortname, part.name(), last_region_name);
+
 						// reset our region tracking states
 						items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 						//last_region_name = romp->name().c_str();
@@ -547,6 +552,12 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 						// track the last filename we found
 						last_name = romp->name().c_str();
 
+						// validate the name
+						if (romp->name().length() > 127)
+							osd_printf_error("%s: %s part %s ROM label '%s' exceeds maximum 127 characters\n", filename(), shortname, part.name(), romp->name());
+						if (std::find_if_not(romp->name().begin(), romp->name().end(), valid_label_char) != romp->name().end())
+							osd_printf_error("%s: %s part %s ROM label '%s' contains invalid characters\n", filename(), shortname, part.name(), romp->name());
+
 						// make sure the hash is valid
 						util::hash_collection hashes;
 						if (!hashes.from_internal_string(romp->hashdata().c_str()))
@@ -561,6 +572,10 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 							osd_printf_error("%s: %s part %s ROM '%s' extends past the defined data area\n", filename(), shortname, part.name(), last_name);
 					}
 				}
+
+				// if we haven't seen any items since the last region, print a warning
+				if (!items_since_region)
+					osd_printf_verbose("%s: %s part %s has empty data area '%s' (warning)\n", filename(), shortname, part.name(), last_region_name);
 			}
 		}
 	}

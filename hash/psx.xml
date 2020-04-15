@@ -1561,7 +1561,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arthur! ready to race (usa)" sha1="f2f7bce386550f01d41251fb58612d2f6226f527"/>
+				<disk name="arthur ready to race (usa)" sha1="f2f7bce386550f01d41251fb58612d2f6226f527"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3541,7 +3541,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bratz - dress up, get down and be a bratz superstar! (usa) (en,fr,es)" sha1="6fe1a814a583419fbf1c1162698fd3589fd6b4bd"/>
+				<disk name="bratz - dress up, get down and be a bratz superstar (usa) (en,fr,es)" sha1="6fe1a814a583419fbf1c1162698fd3589fd6b4bd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4113,7 +4113,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="burstrick - wake boarding!! (usa)" sha1="9df786b47a1ca5062d9329cfceb77218f6d9d0d0"/>
+				<disk name="burstrick - wake boarding (usa)" sha1="9df786b47a1ca5062d9329cfceb77218f6d9d0d0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6868,7 +6868,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="discworld ii - mortality bytes! (usa)" sha1="7b2297b7bd6a2bf37bf7eb6d97b942563987bb67"/>
+				<disk name="discworld ii - mortality bytes (usa)" sha1="7b2297b7bd6a2bf37bf7eb6d97b942563987bb67"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10990,7 +10990,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hi-octane - the track fights back! (usa) (en,fr,de,es)" sha1="5b33dca79cd2165282f34ef1decce1ae2f97b860"/>
+				<disk name="hi-octane - the track fights back (usa) (en,fr,de,es)" sha1="5b33dca79cd2165282f34ef1decce1ae2f97b860"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11874,7 +11874,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jeopardy! 2nd edition (usa)" sha1="6e1f7450e22b538d123bc2a1ea19d6c5566ab959"/>
+				<disk name="jeopardy 2nd edition (usa)" sha1="6e1f7450e22b538d123bc2a1ea19d6c5566ab959"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11891,7 +11891,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jeopardy! (usa)" sha1="2e278b7771041c79c78a770ef54e890768abc734"/>
+				<disk name="jeopardy (usa)" sha1="2e278b7771041c79c78a770ef54e890768abc734"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12209,7 +12209,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jumping flash! 2 (usa)" sha1="5b30817d38693bfef8242d2066d31787695fef64"/>
+				<disk name="jumping flash 2 (usa)" sha1="5b30817d38693bfef8242d2066d31787695fef64"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12226,7 +12226,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jumping flash! (usa)" sha1="854035e24649238122f192ee98fb000f37369501"/>
+				<disk name="jumping flash (usa)" sha1="854035e24649238122f192ee98fb000f37369501"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13220,7 +13220,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lemmings &amp; oh no! more lemmings (usa)" sha1="3f40166a86b6ea28ed6f9e8e891f2e943e3109e0"/>
+				<disk name="lemmings &amp; oh no more lemmings (usa)" sha1="3f40166a86b6ea28ed6f9e8e891f2e943e3109e0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -18478,7 +18478,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandemonium! (usa)" sha1="40c7499febe8ccf3d62e81bac6876c128d845bca"/>
+				<disk name="pandemonium (usa)" sha1="40c7499febe8ccf3d62e81bac6876c128d845bca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -19503,7 +19503,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pro pinball - timeshock! (usa)" sha1="b167931677dc208d460f5a4ab4adf0efb8d82cfb"/>
+				<disk name="pro pinball - timeshock (usa)" sha1="b167931677dc208d460f5a4ab4adf0efb8d82cfb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20397,7 +20397,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rat attack! (usa)" sha1="f3fba16da6449dd33577231be1f6f28899a43690"/>
+				<disk name="rat attack (usa)" sha1="f3fba16da6449dd33577231be1f6f28899a43690"/>
 			</diskarea>
 		</part>
 	</software>
@@ -20621,7 +20621,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rc de go! (usa)" sha1="6d5bd7305164593f1f1a085e3e517965a3e557a6"/>
+				<disk name="rc de go (usa)" sha1="6d5bd7305164593f1f1a085e3e517965a3e557a6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22190,7 +22190,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sabrina the teenage witch - a twitch in time! (usa)" sha1="636272cd688e8b70462cfd2cf90bfe83aa1e35bb"/>
+				<disk name="sabrina the teenage witch - a twitch in time (usa)" sha1="636272cd688e8b70462cfd2cf90bfe83aa1e35bb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23227,7 +23227,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shipwreckers! (usa)" sha1="9162ee7e7376ec90fa996b88856056e9e929f150"/>
+				<disk name="shipwreckers (usa)" sha1="9162ee7e7376ec90fa996b88856056e9e929f150"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23585,7 +23585,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="smurf racer! (usa) (en,fr,es)" sha1="aeffba07550a52ae5a3540bb92eddddfa0655f65"/>
+				<disk name="smurf racer (usa) (en,fr,es)" sha1="aeffba07550a52ae5a3540bb92eddddfa0655f65"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24433,7 +24433,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro 2 - ripto's rage! (usa)" sha1="4df448b9cfe122821ac8f812f76891209f31d4fe"/>
+				<disk name="spyro 2 - ripto's rage (usa)" sha1="4df448b9cfe122821ac8f812f76891209f31d4fe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -24578,7 +24578,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="superstar dance club - 1 hits!!! (usa)" sha1="1c967d46d1357a43d5acc445dddd9e6a07b6fe3d"/>
+				<disk name="superstar dance club - 1 hits (usa)" sha1="1c967d46d1357a43d5acc445dddd9e6a07b6fe3d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26745,7 +26745,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba! (usa)" sha1="e543a25583ef211010dd6736b88c43f8b4132931"/>
+				<disk name="tomba (usa)" sha1="e543a25583ef211010dd6736b88c43f8b4132931"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26763,7 +26763,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba! 2 - the evil swine return (usa)" sha1="34859016049661e1083391e9015f73f67a919f24"/>
+				<disk name="tomba 2 - the evil swine return (usa)" sha1="34859016049661e1083391e9015f73f67a919f24"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26827,7 +26827,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="top gun - fire at will! (usa)" sha1="ed01b6018b6af0c0c43d770c9515920ffed19e89"/>
+				<disk name="top gun - fire at will (usa)" sha1="ed01b6018b6af0c0c43d770c9515920ffed19e89"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26978,7 +26978,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa) (v1.1)" sha1="4a11d05ba86c1ecbee178d3c931c93d440319533"/>
+				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue (usa) (v1.1)" sha1="4a11d05ba86c1ecbee178d3c931c93d440319533"/>
 			</diskarea>
 		</part>
 	</software>
@@ -26995,7 +26995,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue! (usa) (v1.0)" sha1="3bb8e056c1ab462e4babfb934901b864acb06e08"/>
+				<disk name="disney-pixar toy story 2 - buzz lightyear to the rescue (usa) (v1.0)" sha1="3bb8e056c1ab462e4babfb934901b864acb06e08"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28335,7 +28335,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tiny toon adventures - toonenstein - dare to scare! (usa)" sha1="836c972c01206fcffd713e08c9bfb3d50d0397c9"/>
+				<disk name="tiny toon adventures - toonenstein - dare to scare (usa)" sha1="836c972c01206fcffd713e08c9bfb3d50d0397c9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30433,7 +30433,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf smackdown! 2 - know your role (usa)" sha1="719420ef4ebaa7d48dcf64eb363129b29bcaadc2"/>
+				<disk name="wwf smackdown 2 - know your role (usa)" sha1="719420ef4ebaa7d48dcf64eb363129b29bcaadc2"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30450,7 +30450,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wwf smackdown! (usa)" sha1="188a1e58141544712ef6dc9e75ebbbe26831b40c"/>
+				<disk name="wwf smackdown (usa)" sha1="188a1e58141544712ef6dc9e75ebbbe26831b40c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30948,7 +30948,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yu-gi-oh! forbidden memories (usa)" sha1="614358755d3aab9f19c6ee1f8c34d78dd726e5c4"/>
+				<disk name="yu-gi-oh forbidden memories (usa)" sha1="614358755d3aab9f19c6ee1f8c34d78dd726e5c4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30970,7 +30970,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zoboomafoo - leapin' lemurs! (usa)" sha1="3fc71f27847ee1be4936e53daae8aa2d18dec6e9"/>
+				<disk name="zoboomafoo - leapin' lemurs (usa)" sha1="3fc71f27847ee1be4936e53daae8aa2d18dec6e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31010,7 +31010,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zoop - america's largest killer of time! (usa)" sha1="00a65a7f777602bae08022ccea3d3a689332d21c"/>
+				<disk name="zoop - america's largest killer of time (usa)" sha1="00a65a7f777602bae08022ccea3d3a689332d21c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31029,7 +31029,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="action replay 2 version 2.30 (usa) (en,fr,es,pt) (disc 2) (bonus psone codes!) (unl)" sha1="baa6b1104f0f2f69016b159cbdb441e6a9cd1df6"/>
+				<disk name="action replay 2 version 2.30 (usa) (en,fr,es,pt) (disc 2) (bonus psone codes) (unl)" sha1="baa6b1104f0f2f69016b159cbdb441e6a9cd1df6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31895,7 +31895,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="k9.5 2 - we are the dogs! (usa)" sha1="27cc6affd2bb46dc449a57d4d3ec9d2ad87b4725"/>
+				<disk name="k9.5 2 - we are the dogs (usa)" sha1="27cc6affd2bb46dc449a57d4d3ec9d2ad87b4725"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32133,7 +32133,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="math on the move! 1 - addition &amp; subtraction - advanced (usa)" sha1="dfa2f07313ae9c83736bd6596632f00783d33fab"/>
+				<disk name="math on the move 1 - addition &amp; subtraction - advanced (usa)" sha1="dfa2f07313ae9c83736bd6596632f00783d33fab"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32150,7 +32150,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="math on the move! 1 - addition &amp; subtraction - intermediate (usa)" sha1="d30f7f4b382ac31eee15daf3762ef19bc03fdaaf"/>
+				<disk name="math on the move 1 - addition &amp; subtraction - intermediate (usa)" sha1="d30f7f4b382ac31eee15daf3762ef19bc03fdaaf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32167,7 +32167,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="math on the move! 2 - multiplication &amp; division - advanced (usa)" sha1="4f80695986b525f4ea78cb915bce624f2fb1bf9f"/>
+				<disk name="math on the move 2 - multiplication &amp; division - advanced (usa)" sha1="4f80695986b525f4ea78cb915bce624f2fb1bf9f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32184,7 +32184,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="math on the move! 2 - multiplication &amp; division - intermediate (usa)" sha1="2b5c6cd8256482f7648963c28ea81dd1217ee521"/>
+				<disk name="math on the move 2 - multiplication &amp; division - intermediate (usa)" sha1="2b5c6cd8256482f7648963c28ea81dd1217ee521"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32354,7 +32354,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mona &amp; moki 1 - drive me wild! (usa)" sha1="9d1e4ee9255bedbb7bf95b3b3167b7115e4c0829"/>
+				<disk name="mona &amp; moki 1 - drive me wild (usa)" sha1="9d1e4ee9255bedbb7bf95b3b3167b7115e4c0829"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32371,7 +32371,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mona &amp; moki 2 - drive me wilder! (usa)" sha1="4f32c31683fe78041d348edf4af0199f741c67bd"/>
+				<disk name="mona &amp; moki 2 - drive me wilder (usa)" sha1="4f32c31683fe78041d348edf4af0199f741c67bd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32405,7 +32405,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="p.k.'s place 1 - party on the patio! (usa)" sha1="f58eaeddcdd8cb2daf387d097ebe673f08e87c9c"/>
+				<disk name="p.k.'s place 1 - party on the patio (usa)" sha1="f58eaeddcdd8cb2daf387d097ebe673f08e87c9c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32422,7 +32422,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="p.k.'s place 2 - hoopo at sea! (usa)" sha1="719f7a63121310cd0a8b847709bbb6e03a7294a7"/>
+				<disk name="p.k.'s place 2 - hoopo at sea (usa)" sha1="719f7a63121310cd0a8b847709bbb6e03a7294a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32439,7 +32439,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="p.k.'s place 3 - carlos at the races! (usa)" sha1="d4c5242db1c1f71e334ea20b583a9161dfdc97da"/>
+				<disk name="p.k.'s place 3 - carlos at the races (usa)" sha1="d4c5242db1c1f71e334ea20b583a9161dfdc97da"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32558,7 +32558,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 2 - matchamania! (usa)" sha1="454762c6a9bd0badb2acd174acf86f1cdcb3d056"/>
+				<disk name="str.at.e.s. 2 - matchamania (usa)" sha1="454762c6a9bd0badb2acd174acf86f1cdcb3d056"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32575,7 +32575,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 3 - title this! title that! (usa)" sha1="02b0b40a0f22697c2ec48c06c43313502d4e47d4"/>
+				<disk name="str.at.e.s. 3 - title this title that (usa)" sha1="02b0b40a0f22697c2ec48c06c43313502d4e47d4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32592,7 +32592,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 4 - titlerama! (usa)" sha1="823b61dc6c1112edf55c53437dfc421e19f58cdb"/>
+				<disk name="str.at.e.s. 4 - titlerama (usa)" sha1="823b61dc6c1112edf55c53437dfc421e19f58cdb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32609,7 +32609,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 5 - parallel lives! (usa)" sha1="eb790a2938589162340e9c214e19e5e4ee8baa79"/>
+				<disk name="str.at.e.s. 5 - parallel lives (usa)" sha1="eb790a2938589162340e9c214e19e5e4ee8baa79"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32626,7 +32626,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 6 - analogy-ology! (usa)" sha1="5397ea940f3dbb9845c08f8aa07aa4e2f3910b8f"/>
+				<disk name="str.at.e.s. 6 - analogy-ology (usa)" sha1="5397ea940f3dbb9845c08f8aa07aa4e2f3910b8f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32643,7 +32643,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 7 - riddle roundup! (usa)" sha1="e586a2c8e7d4a7fde51ad38d8b5be011bb66b4aa"/>
+				<disk name="str.at.e.s. 7 - riddle roundup (usa)" sha1="e586a2c8e7d4a7fde51ad38d8b5be011bb66b4aa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -32660,7 +32660,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="str.at.e.s. 8 - riddle wrangler! (usa)" sha1="e8434696bf9789ea128a65a7f4e90156f0e52c91"/>
+				<disk name="str.at.e.s. 8 - riddle wrangler (usa)" sha1="e8434696bf9789ea128a65a7f4e90156f0e52c91"/>
 			</diskarea>
 		</part>
 	</software>
@@ -34086,7 +34086,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shipwreckers! (usa) (demo)" sha1="9c8525261228feb96c817ed7a18935b1b29e0528"/>
+				<disk name="shipwreckers (usa) (demo)" sha1="9c8525261228feb96c817ed7a18935b1b29e0528"/>
 			</diskarea>
 		</part>
 	</software>
@@ -34121,7 +34121,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="spyro 2 - ripto's rage! (usa) (demo)" sha1="cb34c01d0956bb2c4e9389ec4f9415f04060f225"/>
+				<disk name="spyro 2 - ripto's rage (usa) (demo)" sha1="cb34c01d0956bb2c4e9389ec4f9415f04060f225"/>
 			</diskarea>
 		</part>
 	</software>
@@ -34244,7 +34244,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba! (usa) (demo)" sha1="839b055cc29820b9ed45ac0a78ddeeb3871235f1"/>
+				<disk name="tomba (usa) (demo)" sha1="839b055cc29820b9ed45ac0a78ddeeb3871235f1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -34262,7 +34262,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba! 2 - the evil swine return (usa) (demo)" sha1="8650220f2f41ad6b44fa8249949d501b38aaf768"/>
+				<disk name="tomba 2 - the evil swine return (usa) (demo)" sha1="8650220f2f41ad6b44fa8249949d501b38aaf768"/>
 			</diskarea>
 		</part>
 	</software>
@@ -35276,7 +35276,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="playstation demo disc - shock your system! (usa) (scus-94496)" sha1="da57a4f9dc00b0729ae657261d5b2de92d8cad32"/>
+				<disk name="playstation demo disc - shock your system (usa) (scus-94496)" sha1="da57a4f9dc00b0729ae657261d5b2de92d8cad32"/>
 			</diskarea>
 		</part>
 	</software>
@@ -35293,7 +35293,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="playstation demo disc - shock your system! (usa) (scus-94483)" sha1="c2160d3bc4f4fcb3f4c8bcf814e2efcff5b478ae"/>
+				<disk name="playstation demo disc - shock your system (usa) (scus-94483)" sha1="c2160d3bc4f4fcb3f4c8bcf814e2efcff5b478ae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -35310,7 +35310,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="playstation demo disc - shock your system! (usa) (scus-94482)" sha1="f1988c825913bc11d437d82664be0ebc770b6c71"/>
+				<disk name="playstation demo disc - shock your system (usa) (scus-94482)" sha1="f1988c825913bc11d437d82664be0ebc770b6c71"/>
 			</diskarea>
 		</part>
 	</software>
@@ -35400,7 +35400,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="toys r us - attack of the killer demos! (usa)" sha1="799092352ea1d97961b9571c3e6d8748f0d9baf6"/>
+				<disk name="toys r us - attack of the killer demos (usa)" sha1="799092352ea1d97961b9571c3e6d8748f0d9baf6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38121,7 +38121,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kids station - soreike! anpanman 2 (japan) [slps-03197]" sha1="94a2ecfa790a4bca617a5bae8bd3c35211b5f087"/>
+				<disk name="kids station - soreike anpanman 2 (japan) [slps-03197]" sha1="94a2ecfa790a4bca617a5bae8bd3c35211b5f087"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38186,7 +38186,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="saru! get you! (japan) [scps-10091]" sha1="c956fd585b246e72e204f4710d2b60245228d560"/>
+				<disk name="saru get you (japan) [scps-10091]" sha1="c956fd585b246e72e204f4710d2b60245228d560"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38461,7 +38461,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asuka 120% burning festival excellent (japan) [slps-00849]" sha1="5c60e0bb779058f9693e698eff84076280d51a28"/>
+				<disk name="asuka 120 burning festival excellent (japan) [slps-00849]" sha1="5c60e0bb779058f9693e698eff84076280d51a28"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38480,7 +38480,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asuka 120% burning festival final (japan) [slps-02074]" sha1="552e1ca801d1cf1ea4442b49e3e128d1882afd5e"/>
+				<disk name="asuka 120 burning festival final (japan) [slps-02074]" sha1="552e1ca801d1cf1ea4442b49e3e128d1882afd5e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38523,7 +38523,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="asuka 120% special burning festival (japan) [slps-00231]" sha1="9b74899e6c0467c52d8d58813df117c5c748ecaa"/>
+				<disk name="asuka 120 special burning festival (japan) [slps-00231]" sha1="9b74899e6c0467c52d8d58813df117c5c748ecaa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39061,7 +39061,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="susume! kaizoku (japan) [slps-01737]" sha1="3230f9a74272d8c28b1bdf7e7ed94c4cb1e559d9"/>
+				<disk name="susume kaizoku (japan) [slps-01737]" sha1="3230f9a74272d8c28b1bdf7e7ed94c4cb1e559d9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39321,7 +39321,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blam! machinehead (japan) [slps-00798]" sha1="d437c29a088689d63bbcba44cf37f4e34db6b838"/>
+				<disk name="blam machinehead (japan) [slps-00798]" sha1="d437c29a088689d63bbcba44cf37f4e34db6b838"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39360,7 +39360,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="block kuzushi kowashite help! (japan) [slps-03042]" sha1="5f76b744b0c6a5e1050426f962b51bcc47226ce7"/>
+				<disk name="block kuzushi kowashite help (japan) [slps-03042]" sha1="5f76b744b0c6a5e1050426f962b51bcc47226ce7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39868,7 +39868,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="buckle up! (japan) [slps-01105]" sha1="ab733b71a18341a1977134463cea2a8f856aa17c"/>
+				<disk name="buckle up (japan) [slps-01105]" sha1="ab733b71a18341a1977134463cea2a8f856aa17c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39966,7 +39966,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="calcolo! (japan) [slps-01071]" sha1="26a2f748579d6d05d27322bf60d8facd027f8696"/>
+				<disk name="calcolo (japan) [slps-01071]" sha1="26a2f748579d6d05d27322bf60d8facd027f8696"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40180,7 +40180,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="choro-q wonderful! (japan) [slps-02205]" sha1="daf3e93d1f331b0692b319184838183f6400d86e"/>
+				<disk name="choro-q wonderful (japan) [slps-02205]" sha1="daf3e93d1f331b0692b319184838183f6400d86e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40489,7 +40489,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cotton 100% (japan) [slpm-87211]" sha1="9875be77df81d4dd10d5c7aff0b549a2050328fb"/>
+				<disk name="cotton 100 (japan) [slpm-87211]" sha1="9875be77df81d4dd10d5c7aff0b549a2050328fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40843,17 +40843,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dancing blade - katteni momotenshi! (japan) (disc 1) [slpm-86100]" sha1="56154bf21d90180c4a8498d93f4c3bcaa50a5a8b"/>
+				<disk name="dancing blade - katteni momotenshi (japan) (disc 1) [slpm-86100]" sha1="56154bf21d90180c4a8498d93f4c3bcaa50a5a8b"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dancing blade - katteni momotenshi! (japan) (disc 2) [slpm-86101]" sha1="6b94f4da43f7a01a7e4196c70dc951663b5f68f0"/>
+				<disk name="dancing blade - katteni momotenshi (japan) (disc 2) [slpm-86101]" sha1="6b94f4da43f7a01a7e4196c70dc951663b5f68f0"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dancing blade - katteni momotenshi! (japan) (disc 3) [slpm-86102]" sha1="e7a484e51ac7fc9496d08d0bde65c57d9ec4c399"/>
+				<disk name="dancing blade - katteni momotenshi (japan) (disc 3) [slpm-86102]" sha1="e7a484e51ac7fc9496d08d0bde65c57d9ec4c399"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41177,7 +41177,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="densha de go! nagoya railroad - let's go by train (japan) [slpm-86424]" sha1="84e8ee5d760fa12429b4457cbb53affe785f21d4"/>
+				<disk name="densha de go nagoya railroad - let's go by train (japan) [slpm-86424]" sha1="84e8ee5d760fa12429b4457cbb53affe785f21d4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41295,12 +41295,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dezaemon kids! (japan) (disc 1) [slps-01503]" sha1="318ff9d74c47c2291986e426709b95f6e3709a60"/>
+				<disk name="dezaemon kids (japan) (disc 1) [slps-01503]" sha1="318ff9d74c47c2291986e426709b95f6e3709a60"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dezaemon kids! (japan) (disc 2) [slps-01504]" sha1="5d48db16e3e4313abac5a862bfef01c782133375"/>
+				<disk name="dezaemon kids (japan) (disc 2) [slps-01504]" sha1="5d48db16e3e4313abac5a862bfef01c782133375"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41474,7 +41474,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="docchi mecha! (japan) [scps-10129]" sha1="069ed3aeedb16150e1e161eb8c36fff51b3408c8"/>
+				<disk name="docchi mecha (japan) [scps-10129]" sha1="069ed3aeedb16150e1e161eb8c36fff51b3408c8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41493,7 +41493,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dodge de ball! (japan) [slps-01362]" sha1="c2d5573bd647b403b59a6511f647ebafc46519fe"/>
+				<disk name="dodge de ball (japan) [slps-01362]" sha1="c2d5573bd647b403b59a6511f647ebafc46519fe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41685,7 +41685,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="doraemon 2 - sos! otogi no kuni (japan) [slps-00628]" sha1="98ecccb1cdb9f8fd2d68709490ceef69490cc433"/>
+				<disk name="doraemon 2 - sos otogi no kuni (japan) [slps-00628]" sha1="98ecccb1cdb9f8fd2d68709490ceef69490cc433"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41802,7 +41802,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="drug store, the - matsumoto kiyoshi de okaimono! (japan) [slps-01516]" sha1="34ce0e5cf400106ff1c59bb9cbd0fe08228e4517"/>
+				<disk name="drug store, the - matsumoto kiyoshi de okaimono (japan) [slps-01516]" sha1="34ce0e5cf400106ff1c59bb9cbd0fe08228e4517"/>
 			</diskarea>
 		</part>
 	</software>
@@ -42238,7 +42238,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="engacho! (japan) [slps-02263]" sha1="8d1a0d1c02cbd63d637f89b0fa53e40a5afd34ac"/>
+				<disk name="engacho (japan) [slps-02263]" sha1="8d1a0d1c02cbd63d637f89b0fa53e40a5afd34ac"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43061,7 +43061,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fun! fun! ping (japan) [slps-02306]" sha1="0cfa311c6f0ddec333502591ce64bbf843c97fca"/>
+				<disk name="fun fun ping (japan) [slps-02306]" sha1="0cfa311c6f0ddec333502591ce64bbf843c97fca"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43185,7 +43185,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkou no kowai uwasa - hanakosan ga kita!! (japan) [slps-00078]" sha1="b1020fd2bf86f6e2f2f2cc54715c69d940f9010c"/>
+				<disk name="gakkou no kowai uwasa - hanakosan ga kita (japan) [slps-00078]" sha1="b1020fd2bf86f6e2f2f2cc54715c69d940f9010c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43204,7 +43204,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkou wo tsukurou!! 2 (japan) [slps-01660]" sha1="fcb99635ef112fc2ac559c4c9d141043b6d675bb"/>
+				<disk name="gakkou wo tsukurou 2 (japan) [slps-01660]" sha1="fcb99635ef112fc2ac559c4c9d141043b6d675bb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43223,7 +43223,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gakkou wo tsukurou!! kouchou sensei monogatari (japan) [slps-02998]" sha1="2be10b2b2fa43fe39b606dbd47a382c66d8fca8d"/>
+				<disk name="gakkou wo tsukurou kouchou sensei monogatari (japan) [slps-02998]" sha1="2be10b2b2fa43fe39b606dbd47a382c66d8fca8d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43327,7 +43327,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gambler jiko chuushinka ippatsu shoubu! tokyo mahjong land (japan) [slps-02509]" sha1="2849d82b70c50defd4b090c63719485a3256bdc3"/>
+				<disk name="gambler jiko chuushinka ippatsu shoubu tokyo mahjong land (japan) [slps-02509]" sha1="2849d82b70c50defd4b090c63719485a3256bdc3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43385,7 +43385,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gunbare! game tengoku 2 (japan) [slps-01322]" sha1="6878ba9f94341ba668fd651d365d3fe73c479d18"/>
+				<disk name="gunbare game tengoku 2 (japan) [slps-01322]" sha1="6878ba9f94341ba668fd651d365d3fe73c479d18"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43584,7 +43584,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gegege no kitarou - gyakushuu! youkai daikessen (japan) [slpm-87286]" sha1="d58191f697928fee53baccfd57b7a69ee99abc0d"/>
+				<disk name="gegege no kitarou - gyakushuu youkai daikessen (japan) [slpm-87286]" sha1="d58191f697928fee53baccfd57b7a69ee99abc0d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43912,7 +43912,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="goo! goo! soundy (japan) [slpm-86250]" sha1="efbad579e127a65379b191a2643d1aa3dac032b6"/>
+				<disk name="goo goo soundy (japan) [slpm-86250]" sha1="efbad579e127a65379b191a2643d1aa3dac032b6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44562,7 +44562,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="haunted junction - seitokai badge wo oe! (japan) [slps-00668]" sha1="847d2d9449ea9f88d6b44d1742309a8cba8e6b0f"/>
+				<disk name="haunted junction - seitokai badge wo oe (japan) [slps-00668]" sha1="847d2d9449ea9f88d6b44d1742309a8cba8e6b0f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44581,7 +44581,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heiwa parlor! pro dolphin ring special (japan) [slps-02689]" sha1="57e36bc9e3fc98d596426c1a86f323f0d4432bb7"/>
+				<disk name="heiwa parlor pro dolphin ring special (japan) [slps-02689]" sha1="57e36bc9e3fc98d596426c1a86f323f0d4432bb7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44600,7 +44600,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heiwa parlor! pro lupin sansei special (japan) [slps-02541]" sha1="22fd75baae932b72397b9f99c5c2cb2409ae4f8c"/>
+				<disk name="heiwa parlor pro lupin sansei special (japan) [slps-02541]" sha1="22fd75baae932b72397b9f99c5c2cb2409ae4f8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44657,7 +44657,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heiwa parlor! pro tsunatori monogatari special (japan) [slps-03370]" sha1="5435cb1a6189d5e583279a5db57c99a0283ef9a3"/>
+				<disk name="heiwa parlor pro tsunatori monogatari special (japan) [slps-03370]" sha1="5435cb1a6189d5e583279a5db57c99a0283ef9a3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44676,7 +44676,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eggs of steel - hello charlie!! (japan) [slpm-86083]" sha1="30236e05afda91a1eba9680cb4ecadd8efcd6457"/>
+				<disk name="eggs of steel - hello charlie (japan) [slpm-86083]" sha1="30236e05afda91a1eba9680cb4ecadd8efcd6457"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45062,7 +45062,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hooockey!! (japan) [slpm-86488]" sha1="71c0af97da516f43ab8c156ca35435b5a1793db4"/>
+				<disk name="hooockey (japan) [slpm-86488]" sha1="71c0af97da516f43ab8c156ca35435b5a1793db4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45310,7 +45310,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="minna atsumare! igo kyoushitsu (japan) [slps-03554]" sha1="967f7baeecac40ce03994e39f5a7ad8e458672f1"/>
+				<disk name="minna atsumare igo kyoushitsu (japan) [slps-03554]" sha1="967f7baeecac40ce03994e39f5a7ad8e458672f1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46123,7 +46123,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kenki ippatsu! crane master ni narou! (japan) [slps-02831]" sha1="50c254b40a133784f10e3610e166d0087f3c9f30"/>
+				<disk name="kenki ippatsu crane master ni narou (japan) [slps-02831]" sha1="50c254b40a133784f10e3610e166d0087f3c9f30"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46265,7 +46265,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="muscle ranking - kinniku banzuke vol.2 - aratanaru genkai he no chousen! (japan) [slpm-86457]" sha1="e64631e2c00519dbfa176a58295dfc778ba4747c"/>
+				<disk name="muscle ranking - kinniku banzuke vol.2 - aratanaru genkai he no chousen (japan) [slpm-86457]" sha1="e64631e2c00519dbfa176a58295dfc778ba4747c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46286,7 +46286,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kisya de go! (japan) [slpm-86449]" sha1="a41979643640716c6d16bec25cb75c913bf60e3c" status="baddump"/>
+				<disk name="kisya de go (japan) [slpm-86449]" sha1="a41979643640716c6d16bec25cb75c913bf60e3c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46816,7 +46816,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kururin pa! (japan) [slps-00066]" sha1="1828fb138034b7558aefbaf0f055cfa279f7fa38"/>
+				<disk name="kururin pa (japan) [slps-00066]" sha1="1828fb138034b7558aefbaf0f055cfa279f7fa38"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47543,7 +47543,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="magical drop f - daibouken mo rakujyanai! (japan) [slps-02337]" sha1="a7a7e7481de4b60fb9998f76b2121c7f941346ef"/>
+				<disk name="magical drop f - daibouken mo rakujyanai (japan) [slps-02337]" sha1="a7a7e7481de4b60fb9998f76b2121c7f941346ef"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47648,7 +47648,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="makeruna! makendo 2 (japan) [slps-00128]" sha1="b89af4e7e54c854e00d5ea49d971095847d5aeb9"/>
+				<disk name="makeruna makendo 2 (japan) [slps-00128]" sha1="b89af4e7e54c854e00d5ea49d971095847d5aeb9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47725,7 +47725,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="marl jong!! limited edition (japan) [slps-03537]" sha1="aee6d7fb13bde6f98b949c94f2a12f4c3accbfc8"/>
+				<disk name="marl jong limited edition (japan) [slps-03537]" sha1="aee6d7fb13bde6f98b949c94f2a12f4c3accbfc8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48162,7 +48162,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mezase! senkyuuou (japan) [slps-00313]" sha1="736bc4a0ad6b3315516ceaf5ced58f044a466ca8"/>
+				<disk name="mezase senkyuuou (japan) [slps-00313]" sha1="736bc4a0ad6b3315516ceaf5ced58f044a466ca8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48286,7 +48286,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mini moni - shaker &amp; tambourine! dapyon! (japan) [slpm-87132]" sha1="da020789e94ef440bb46eb4e9c5b61cafc8d2340"/>
+				<disk name="mini moni - shaker &amp; tambourine dapyon (japan) [slpm-87132]" sha1="da020789e94ef440bb46eb4e9c5b61cafc8d2340"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48305,7 +48305,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mini-yonku hakusou kyoudai - rettsu &amp; go!! - wgp hyper heat (japan) [slps-01078]" sha1="81fbd10222fcdc35ca2160933c5005e272d788c5"/>
+				<disk name="mini-yonku hakusou kyoudai - rettsu &amp; go - wgp hyper heat (japan) [slps-01078]" sha1="81fbd10222fcdc35ca2160933c5005e272d788c5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48324,7 +48324,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="misaki-aggressive! (japan) [slps-01474]" sha1="9a17567c640c6c5a775dbe183f3e7795c6deda0c"/>
+				<disk name="misaki-aggressive (japan) [slps-01474]" sha1="9a17567c640c6c5a775dbe183f3e7795c6deda0c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48419,7 +48419,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mahjong yarouze! (japan) [slpm-86173]" sha1="d37e86d019ca4c4fa392d52a4fbe33418caa990a"/>
+				<disk name="mahjong yarouze (japan) [slpm-86173]" sha1="d37e86d019ca4c4fa392d52a4fbe33418caa990a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49479,7 +49479,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="oja majo doremi dokkan! nijiro paradise (japan) [slps-03497]" sha1="fa82af5ce48ed5aa2610588d292d00bbbd3f4c20"/>
+				<disk name="oja majo doremi dokkan nijiro paradise (japan) [slps-03497]" sha1="fa82af5ce48ed5aa2610588d292d00bbbd3f4c20"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49943,7 +49943,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="parlor! pro jr. collection (japan) [slps-02781]" sha1="a99e3b7698ba9833d3db01117bfff4b7699702dc"/>
+				<disk name="parlor pro jr. collection (japan) [slps-02781]" sha1="a99e3b7698ba9833d3db01117bfff4b7699702dc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -50105,7 +50105,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="picnic! excellent (japan) [slps-01345]" sha1="0ad2b3c7fcb3ff938959e39249af4cf437b91170"/>
+				<disk name="picnic excellent (japan) [slps-01345]" sha1="0ad2b3c7fcb3ff938959e39249af4cf437b91170"/>
 			</diskarea>
 		</part>
 	</software>
@@ -50355,7 +50355,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pop'n tanks! (japan) [slpm-86146]" sha1="8c595e77213df35882ada74390f7c80c397dad92"/>
+				<disk name="pop'n tanks (japan) [slpm-86146]" sha1="8c595e77213df35882ada74390f7c80c397dad92"/>
 			</diskarea>
 		</part>
 	</software>
@@ -50412,7 +50412,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="princess maker - go! go! princess (japan) [slps-01505]" sha1="4faa6469f107df8afa4c583e5b60ede728491fa1"/>
+				<disk name="princess maker - go go princess (japan) [slps-01505]" sha1="4faa6469f107df8afa4c583e5b60ede728491fa1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -50906,7 +50906,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="power shovel ni norou!! (japan) [slpm-86629]" sha1="df87356e9a69fdd1983e8caa52e8342fb7525b46"/>
+				<disk name="power shovel ni norou (japan) [slpm-86629]" sha1="df87356e9a69fdd1983e8caa52e8342fb7525b46"/>
 			</diskarea>
 		</part>
 	</software>
@@ -50965,7 +50965,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="quiz charaokedon! toei tokusatsu hero part 2 (japan) [slps-02310]" sha1="bd241dcb69cf4a52f6a3cb4e070ce918fcd11304"/>
+				<disk name="quiz charaokedon toei tokusatsu hero part 2 (japan) [slps-02310]" sha1="bd241dcb69cf4a52f6a3cb4e070ce918fcd11304"/>
 			</diskarea>
 		</part>
 	</software>
@@ -51048,7 +51048,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="race drivin' a go! go! (japan) [slps-00167]" sha1="e689874565e244d6e3fd4507ce3e2ff1b8c0f9a8"/>
+				<disk name="race drivin' a go go (japan) [slps-00167]" sha1="e689874565e244d6e3fd4507ce3e2ff1b8c0f9a8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -52147,7 +52147,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple characters 2000 series vol.10 - sakigake!! otojo juku - the dodgeball (japan) [slps-03457]" sha1="aba175045b3b7335d32f323de56da192989e4a78"/>
+				<disk name="simple characters 2000 series vol.10 - sakigake otojo juku - the dodgeball (japan) [slps-03457]" sha1="aba175045b3b7335d32f323de56da192989e4a78"/>
 			</diskarea>
 		</part>
 	</software>
@@ -52353,7 +52353,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sd gundam eiyuuden - daikessen!! knight vs. musha (japan) [slps-03145]" sha1="cc3d301227705403184526be508f317f32e81d99"/>
+				<disk name="sd gundam eiyuuden - daikessen knight vs. musha (japan) [slps-03145]" sha1="cc3d301227705403184526be508f317f32e81d99"/>
 			</diskarea>
 		</part>
 	</software>
@@ -52467,7 +52467,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="senryaku shidan - tora! tora! tora! rikusen-hen (japan) [slps-02631]" sha1="b21f96633430f8f4887080955960ba6d1e994bce"/>
+				<disk name="senryaku shidan - tora tora tora rikusen-hen (japan) [slps-02631]" sha1="b21f96633430f8f4887080955960ba6d1e994bce"/>
 			</diskarea>
 		</part>
 	</software>
@@ -52662,7 +52662,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shibasu 1-2-3 destiny! (japan) [slps-01893]" sha1="0f69dbc9c68cbda6e0204fd4a959cb5a5759b2c9"/>
+				<disk name="shibasu 1-2-3 destiny (japan) [slps-01893]" sha1="0f69dbc9c68cbda6e0204fd4a959cb5a5759b2c9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -53413,7 +53413,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kids station - motto! oja majo dorami - maho-dou smile party (japan) [slps-03247]" sha1="5aa2abd47c52de690a55160d5a70122ddba60391"/>
+				<disk name="kids station - motto oja majo dorami - maho-dou smile party (japan) [slps-03247]" sha1="5aa2abd47c52de690a55160d5a70122ddba60391"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54015,7 +54015,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 series vol.089 - the power shovel ni norou!! (japan) [slpm-87035]" sha1="3857cddf2ac433999a3afa9f048c11de08718663"/>
+				<disk name="simple 1500 series vol.089 - the power shovel ni norou (japan) [slpm-87035]" sha1="3857cddf2ac433999a3afa9f048c11de08718663"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54133,7 +54133,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 series vol.102 - the densha untenshi - densha de go! nagoya tetsudo-hen (japan) [slpm-87144]" sha1="84e78ee96499e8d022086e17230e06ec94eac532"/>
+				<disk name="simple 1500 series vol.102 - the densha untenshi - densha de go nagoya tetsudo-hen (japan) [slpm-87144]" sha1="84e78ee96499e8d022086e17230e06ec94eac532"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54152,7 +54152,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 series vol.103 - the ganso densha untenshi - densha de go! (japan) [slpm-87212]" sha1="c632825bca27acc68d0353b6e63fd568453c3c13"/>
+				<disk name="simple 1500 series vol.103 - the ganso densha untenshi - densha de go (japan) [slpm-87212]" sha1="c632825bca27acc68d0353b6e63fd568453c3c13"/>
 			</diskarea>
 		</part>
 	</software>
@@ -54609,12 +54609,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! toukou muyou - no need for school (japan) (disc 1) [slps-00451]" sha1="ce26c41f4c3530868b9ad2eb282b64d49773be7c"/>
+				<disk name="tenchi muyou toukou muyou - no need for school (japan) (disc 1) [slps-00451]" sha1="ce26c41f4c3530868b9ad2eb282b64d49773be7c"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tenchi muyou! toukou muyou - no need for school (japan) (disc 2) [slps-00452]" sha1="31ef34a273db00b6955df05ce766a37ffc408932"/>
+				<disk name="tenchi muyou toukou muyou - no need for school (japan) (disc 2) [slps-00452]" sha1="31ef34a273db00b6955df05ce766a37ffc408932"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55380,7 +55380,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ore! tomba (japan) [slps-01144]" sha1="d55669905f0c545f81f296ff5f83a47210e0ef4f"/>
+				<disk name="ore tomba (japan) [slps-01144]" sha1="d55669905f0c545f81f296ff5f83a47210e0ef4f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55400,7 +55400,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomba! the wild adventures (japan) [slps-02350]" sha1="acfece1679d0479dc2b09f8c79e85b824b62148f"/>
+				<disk name="tomba the wild adventures (japan) [slps-02350]" sha1="acfece1679d0479dc2b09f8c79e85b824b62148f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55420,7 +55420,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomikatown wo tukurou! (japan) [slps-01935]" sha1="4cd45ac3419e28c253439181621af08117533742"/>
+				<disk name="tomikatown wo tukurou (japan) [slps-01935]" sha1="4cd45ac3419e28c253439181621af08117533742"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55561,7 +55561,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="trump shiyouyo! (japan) [slps-01440]" sha1="721747d0cb09bfd034c98e77e4d0e9fdb423b2bc"/>
+				<disk name="trump shiyouyo (japan) [slps-01440]" sha1="721747d0cb09bfd034c98e77e4d0e9fdb423b2bc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55952,12 +55952,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="taiho shichauzo! - you're under arrest (japan) (disc 1) [slpm-86782]" sha1="52c7ba04a50123449916de373ab1e75801245953"/>
+				<disk name="taiho shichauzo - you're under arrest (japan) (disc 1) [slpm-86782]" sha1="52c7ba04a50123449916de373ab1e75801245953"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="taiho shichauzo! - you're under arrest (japan) (disc 2) [slpm-86783]" sha1="f3f685c91c178af15fbd6af06d7bb0536292d4e8"/>
+				<disk name="taiho shichauzo - you're under arrest (japan) (disc 2) [slpm-86783]" sha1="f3f685c91c178af15fbd6af06d7bb0536292d4e8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56317,7 +56317,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="wagamama fairy mirumo de pon! (japan) [slpm-87220]" sha1="39794de6fc2e007219d38ea8577762d15d16be68"/>
+				<disk name="wagamama fairy mirumo de pon (japan) [slpm-87220]" sha1="39794de6fc2e007219d38ea8577762d15d16be68"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56365,7 +56365,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="warera mitsurin tankentai!! (japan) [slps-02658]" sha1="d5f11cc233a598923ff7cf6bf55d2ab938fb8870"/>
+				<disk name="warera mitsurin tankentai (japan) [slps-02658]" sha1="d5f11cc233a598923ff7cf6bf55d2ab938fb8870"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56506,7 +56506,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="world league soccer - challenge nippon! (japan) [slps-02687]" sha1="9a28fa97a3490527d9fc709866b458897ea0abd9"/>
+				<disk name="world league soccer - challenge nippon (japan) [slps-02687]" sha1="9a28fa97a3490527d9fc709866b458897ea0abd9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56911,7 +56911,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yu-gi-oh! monster capsule breed &amp; battle (japan) [slpm-86096]" sha1="fcf30c3e44a5072adbac0dc89b7c705001e2d694"/>
+				<disk name="yu-gi-oh monster capsule breed &amp; battle (japan) [slpm-86096]" sha1="fcf30c3e44a5072adbac0dc89b7c705001e2d694"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57030,7 +57030,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zap! snowboarding trix '98 (japan) [slps-00909]" sha1="ef10c209ea83250aec690bdfeae0fb3182888099"/>
+				<disk name="zap snowboarding trix '98 (japan) [slps-00909]" sha1="ef10c209ea83250aec690bdfeae0fb3182888099"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57149,7 +57149,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="zipangutou - unmei wa saikoro ga kimeru! (japan) [slps-02260]" sha1="f699ad7fc3fef9ce9d7078e7f20cb88b81fc498a" status="baddump"/>
+				<disk name="zipangutou - unmei wa saikoro ga kimeru (japan) [slps-02260]" sha1="f699ad7fc3fef9ce9d7078e7f20cb88b81fc498a" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>

@@ -1619,6 +1619,10 @@ void validity_checker::validate_roms(device_t &root)
 			}
 		}
 
+		// if we haven't seen any items since the last region, print a warning
+		if (items_since_region == 0)
+			osd_printf_warning("Empty ROM region '%s' (warning)\n", last_region_name);
+
 		// check that default BIOS exists
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);

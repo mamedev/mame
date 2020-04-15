@@ -56,7 +56,7 @@ license:CC0
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MX23L3211B"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-00090 RVB - Music - Hit it, Maestro!.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" />
+				<rom name="500-00090 RVB - Music - Hit it, Maestro.bin" size="0x400000" crc="a2770684" sha1="4f389c6dbcd3ff2a647a6d18df86c472444074e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@ license:CC0
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="LeapFrog 2000 8Mb DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="500-00260 - Vocabulary - Richard Scarry's Best Little Word Book Ever!.bin" size="0x100000" crc="8797ae77" sha1="fa24e718287a0e15f4ae3b371e9ee73c590abaf5" />
+				<rom name="500-00260 - Vocabulary - Richard Scarry's Best Little Word Book Ever.bin" size="0x100000" crc="8797ae77" sha1="fa24e718287a0e15f4ae3b371e9ee73c590abaf5" />
 			</dataarea>
 		</part>
 	</software>
@@ -224,7 +224,7 @@ license:CC0
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00538 - Leap 1 - Reading - Scooby-Doo! and the Disappearing Donuts.bin" size="0x200000" crc="cd887b33" sha1="c51c83f0abe6ede9aa03abcc38fc3a3feb1f249c" />
+				<rom name="500-00538 - Leap 1 - Reading - Scooby-Doo and the Disappearing Donuts.bin" size="0x200000" crc="cd887b33" sha1="c51c83f0abe6ede9aa03abcc38fc3a3feb1f249c" />
 			</dataarea>
 		</part>
 	</software>
@@ -614,7 +614,7 @@ license:CC0
 			<feature name="pcb" value="30004+003+38"/>
 			<feature name="u1" value="OKI 32M(L)-XXWE"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-10875 UBL - Fiesta in the House! - Party en la Casa!.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" />
+				<rom name="500-10875 UBL - Fiesta in the House - Party en la Casa.bin" size="0x400000" crc="0b058df5" sha1="06931683c181c04b967da63e9fab160f6596c5e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -648,7 +648,7 @@ license:CC0
 	</software>
 
 	<software name="tiggerbncg" cloneof="tiggerbnc" supported="no">
-		<description>Disney H&#252;pf, Tigger, h&#252;pf! (Germany)</description>
+		<description>Disney Hüpf, Tigger, hüpf! (Germany)</description>
 		<year>1999</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11538-B"/>
@@ -657,7 +657,7 @@ license:CC0
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-11538-B - Hupf, Tigger, hupf! (GER).bin" size="0x200000" crc="250db2f8" sha1="192721a38befb7be26f9c3c604cd2e5b87828b46" />
+				<rom name="500-11538-B - Huepf, Tigger, huepf (GER).bin" size="0x200000" crc="250db2f8" sha1="192721a38befb7be26f9c3c604cd2e5b87828b46" />
 			</dataarea>
 		</part>
 	</software>
@@ -789,7 +789,7 @@ license:CC0
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="u1" value="MR27V3202L (WE)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12153 - Yo aprendo ingles! - Mis Primeras 500 Palabras en Ingles (SP).bin" size="0x400000" crc="67602011" sha1="492304abf2670f4388d7e38b8d7a95c98e77f15d" />
+				<rom name="500-12153 - Yo aprendo ingles - Mis Primeras 500 Palabras en Ingles (SP).bin" size="0x400000" crc="67602011" sha1="492304abf2670f4388d7e38b8d7a95c98e77f15d" />
 			</dataarea>
 		</part>
 	</software>
@@ -819,7 +819,7 @@ license:CC0
 			<feature name="pcb_rev" value="Rev:00"/>
 			<feature name="u1" value="OKI 16M(Ver:L)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-12560 - Bob der Baumeister - Bob und Heppo - Alles im Griff! (GER).bin" size="0x200000" crc="4821cae5" sha1="80e9743ae8870e8ef03eb8c7c882fe42fdd545b2" />
+				<rom name="500-12560 - Bob der Baumeister - Bob und Heppo - Alles im Griff (GER).bin" size="0x200000" crc="4821cae5" sha1="80e9743ae8870e8ef03eb8c7c882fe42fdd545b2" />
 			</dataarea>
 		</part>
 	</software>

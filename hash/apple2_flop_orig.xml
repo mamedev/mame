@@ -6278,25 +6278,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A - Program"/>
 			<dataarea name="flop" size="235558">
-				<rom name="alge-blaster plus! disk 1a - program.woz" size="235558" crc="8949439c" sha1="324a964cdc85587b58406e681b53ff6f4a34c6b5" />
+				<rom name="alge-blaster plus disk 1a - program.woz" size="235558" crc="8949439c" sha1="324a964cdc85587b58406e681b53ff6f4a34c6b5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side B - Program"/>
 			<dataarea name="flop" size="235558">
-				<rom name="alge-blaster plus! disk 1b - program.woz" size="235558" crc="fe90af41" sha1="99c0687e3528fa68051819525d853f3364987112" />
+				<rom name="alge-blaster plus disk 1b - program.woz" size="235558" crc="fe90af41" sha1="99c0687e3528fa68051819525d853f3364987112" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side A - Data"/>
 			<dataarea name="flop" size="242211">
-				<rom name="alge-blaster plus! disk 2a - data.woz" size="242211" crc="9f5c5a16" sha1="90df326dae57a73c6e0026a266d4c9ea4b36d883" />
+				<rom name="alge-blaster plus disk 2a - data.woz" size="242211" crc="9f5c5a16" sha1="90df326dae57a73c6e0026a266d4c9ea4b36d883" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side B - Data"/>
 			<dataarea name="flop" size="235555">
-				<rom name="alge-blaster plus! disk 2b - data.woz" size="235555" crc="5ec77a0c" sha1="9e927f169102d39a1c882ca1c41755f0527ef08d" />
+				<rom name="alge-blaster plus disk 2b - data.woz" size="235555" crc="5ec77a0c" sha1="9e927f169102d39a1c882ca1c41755f0527ef08d" />
 			</dataarea>
 		</part>
 	</software>
@@ -10220,97 +10220,97 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 1a.woz" size="234823" crc="353becc5" sha1="4017229d3201a124fd6e3279e5636a22f1db2ed4"/>
+				<rom name="gold rush disk 1a.woz" size="234823" crc="353becc5" sha1="4017229d3201a124fd6e3279e5636a22f1db2ed4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 1b.woz" size="234823" crc="65579b17" sha1="719361e313bdbec9750d905cc9e6df1fcd0b4309"/>
+				<rom name="gold rush disk 1b.woz" size="234823" crc="65579b17" sha1="719361e313bdbec9750d905cc9e6df1fcd0b4309"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 2a.woz" size="234823" crc="402a1809" sha1="e7bfc6707a0dc06a3a056e65ff97e98ba5c832f6"/>
+				<rom name="gold rush disk 2a.woz" size="234823" crc="402a1809" sha1="e7bfc6707a0dc06a3a056e65ff97e98ba5c832f6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 2b.woz" size="234823" crc="00c89187" sha1="851bd9fba6b918fa53db274f02325d8e3940609b"/>
+				<rom name="gold rush disk 2b.woz" size="234823" crc="00c89187" sha1="851bd9fba6b918fa53db274f02325d8e3940609b"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 3a.woz" size="234823" crc="b1f9a9cf" sha1="a3c335e3dcdcaa46a0a98f709f64fbdef4cfaf0b"/>
+				<rom name="gold rush disk 3a.woz" size="234823" crc="b1f9a9cf" sha1="a3c335e3dcdcaa46a0a98f709f64fbdef4cfaf0b"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 3b.woz" size="234823" crc="846d5ff7" sha1="11d4faa4492c0bb7fe6bc444b4ff7426aec449c3"/>
+				<rom name="gold rush disk 3b.woz" size="234823" crc="846d5ff7" sha1="11d4faa4492c0bb7fe6bc444b4ff7426aec449c3"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 4a.woz" size="234823" crc="aa7a4cd6" sha1="c6487a07ca5841aafcaa3674dfe3a7e695b66fc3"/>
+				<rom name="gold rush disk 4a.woz" size="234823" crc="aa7a4cd6" sha1="c6487a07ca5841aafcaa3674dfe3a7e695b66fc3"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 4b.woz" size="234823" crc="98a27bfc" sha1="bb7bb6bcf6fd0e25007ebd179c2cc9f8b321d4b7"/>
+				<rom name="gold rush disk 4b.woz" size="234823" crc="98a27bfc" sha1="bb7bb6bcf6fd0e25007ebd179c2cc9f8b321d4b7"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 5a.woz" size="234823" crc="52f1b57d" sha1="70a2741ef18489ccb8b9e219e9d7a2092a7ab02d"/>
+				<rom name="gold rush disk 5a.woz" size="234823" crc="52f1b57d" sha1="70a2741ef18489ccb8b9e219e9d7a2092a7ab02d"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 5b.woz" size="234823" crc="5c286071" sha1="fbfa17119806934af718514aa6622861c2d7b16c"/>
+				<rom name="gold rush disk 5b.woz" size="234823" crc="5c286071" sha1="fbfa17119806934af718514aa6622861c2d7b16c"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 6a.woz" size="234823" crc="3308207f" sha1="41aff7efcf1775f675ada82eccb89fe7fc19e981"/>
+				<rom name="gold rush disk 6a.woz" size="234823" crc="3308207f" sha1="41aff7efcf1775f675ada82eccb89fe7fc19e981"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 6b.woz" size="234823" crc="51bd3df5" sha1="124f7cba9bef89e63674209ff44f30207f405ade"/>
+				<rom name="gold rush disk 6b.woz" size="234823" crc="51bd3df5" sha1="124f7cba9bef89e63674209ff44f30207f405ade"/>
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 7a.woz" size="234823" crc="ba529141" sha1="eaadffc83064fc9f709f79fbb47a63569b96e8d1"/>
+				<rom name="gold rush disk 7a.woz" size="234823" crc="ba529141" sha1="eaadffc83064fc9f709f79fbb47a63569b96e8d1"/>
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 7b.woz" size="234823" crc="a985bb4d" sha1="c10dbcc84e67fccd627a17a0e7a1f86a38463162"/>
+				<rom name="gold rush disk 7b.woz" size="234823" crc="a985bb4d" sha1="c10dbcc84e67fccd627a17a0e7a1f86a38463162"/>
 			</dataarea>
 		</part>
 		<part name="flop15" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8 Side A"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 8a.woz" size="234823" crc="0d6cd2e5" sha1="5fd0a83ea530e010a34353f3a663887aa16c3964"/>
+				<rom name="gold rush disk 8a.woz" size="234823" crc="0d6cd2e5" sha1="5fd0a83ea530e010a34353f3a663887aa16c3964"/>
 			</dataarea>
 		</part>
 		<part name="flop16" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8 Side B"/>
 			<dataarea name="flop" size="234823">
-				<rom name="gold rush! disk 8b.woz" size="234823" crc="9894e285" sha1="63a441f0bee1b130b7883e2bbfc20882884c40ef"/>
+				<rom name="gold rush disk 8b.woz" size="234823" crc="9894e285" sha1="63a441f0bee1b130b7883e2bbfc20882884c40ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11394,7 +11394,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241427">
-				<rom name="rescue on fractalus!.woz" size="241427" crc="3dceafc7" sha1="9295da82b1fa5e213c70ed11cfa2963e4662f1c7"/>
+				<rom name="rescue on fractalus.woz" size="241427" crc="3dceafc7" sha1="9295da82b1fa5e213c70ed11cfa2963e4662f1c7"/>
 			</dataarea>
 		</part>
 	</software>

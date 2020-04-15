@@ -241,7 +241,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="860602">
-				<rom name="Agent_X_II-_The_Mad_Prof's_Back!.tap" size="860602" crc="8f9b14d5" sha1="8cca587622c32c9fa2a8276203a9d523d14f6df1"/>
+				<rom name="Agent_X_II-_The_Mad_Prof's_Back.tap" size="860602" crc="8f9b14d5" sha1="8cca587622c32c9fa2a8276203a9d523d14f6df1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2690,7 +2690,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="569573">
-				<rom name="Gary_Lineker's_Hot-Shot!.tap" size="569573" crc="68ccedcf" sha1="a46a875909293d14930779bdec8a24ca15fc2fa6"/>
+				<rom name="Gary_Lineker's_Hot-Shot.tap" size="569573" crc="68ccedcf" sha1="a46a875909293d14930779bdec8a24ca15fc2fa6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5011,7 +5011,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="375074">
-				<rom name="Oh_No!.tap" size="375074" crc="96625901" sha1="2b25b7a0b04a4bbc3d043e2c56f6783bc2476ec8"/>
+				<rom name="Oh_No.tap" size="375074" crc="96625901" sha1="2b25b7a0b04a4bbc3d043e2c56f6783bc2476ec8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5023,13 +5023,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="619099">
-				<rom name="Oink!.tap" size="619099" crc="de5e5603" sha1="bd60bfdea81b5a6f169bc1f0a17d404e092f5f17"/>
+				<rom name="Oink.tap" size="619099" crc="de5e5603" sha1="bd60bfdea81b5a6f169bc1f0a17d404e092f5f17"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="619099">
-				<rom name="Oink!_a1.tap" size="619099" crc="d747631a" sha1="2ff65ddf63619645874dadda6b3a3e5e302d4e73"/>
+				<rom name="Oink_a1.tap" size="619099" crc="d747631a" sha1="2ff65ddf63619645874dadda6b3a3e5e302d4e73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6028,7 +6028,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="429826">
-				<rom name="Rescue_on_Fractalus!.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
+				<rom name="Rescue_on_Fractalus.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7971,13 +7971,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="518131">
-				<rom name="Wanted!_Monty_Mole.tap" size="518131" crc="41e484a4" sha1="430b33c240f4d11e8b48941a4e3bd12957085291"/>
+				<rom name="Wanted_Monty_Mole.tap" size="518131" crc="41e484a4" sha1="430b33c240f4d11e8b48941a4e3bd12957085291"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="518132">
-				<rom name="Wanted!_Monty_Mole_a1.tap" size="518132" crc="429cddc7" sha1="c5fc773a41880338aa481853bf037121166beab7"/>
+				<rom name="Wanted_Monty_Mole_a1.tap" size="518132" crc="429cddc7" sha1="c5fc773a41880338aa481853bf037121166beab7"/>
 			</dataarea>
 		</part>
 	</software>

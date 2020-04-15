@@ -1942,7 +1942,7 @@ X-1414 : Streetracer
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bi! bi! (aka skindiver) (2600 screen search console) (jone yuan telephonic enterprise co) (pal).bin" size="4096" crc="1cc3c6a8" sha1="d370e020567e488e9a694dffcf36bef8e45448bc"/>
+				<rom name="bi bi (aka skindiver) (2600 screen search console) (jone yuan telephonic enterprise co) (pal).bin" size="4096" crc="1cc3c6a8" sha1="d370e020567e488e9a694dffcf36bef8e45448bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2485,7 +2485,7 @@ X-1414 : Streetracer
 		<publisher>First Star Software</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="boing! (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell) (pal).bin" size="4096" crc="d2f06299" sha1="d7a079a8874dcf059d10dc49831d6d9e2db68917"/>
+				<rom name="boing (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell) (pal).bin" size="4096" crc="d2f06299" sha1="d7a079a8874dcf059d10dc49831d6d9e2db68917"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2496,7 +2496,7 @@ X-1414 : Streetracer
 		<publisher>First Star Software</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="boing! (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell).bin" size="4096" crc="ad380487" sha1="d106bb41a38ed222dead608d839e8a3f0d0ecc18"/>
+				<rom name="boing (bubbles, soap suds, the emphysema game) (1983) (first star software, alex leavens, shirley ann russell).bin" size="4096" crc="ad380487" sha1="d106bb41a38ed222dead608d839e8a3f0d0ecc18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6358,7 +6358,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="frogger ii - threeedeep! (1984) (parker brothers, mark lesser) (pb5590).bin" size="8192" crc="3ba0d9bf" sha1="6b9e591cc53844795725fc66c564f0364d1fbe40"/>
+				<rom name="frogger ii - threeedeep (1984) (parker brothers, mark lesser) (pb5590).bin" size="8192" crc="3ba0d9bf" sha1="6b9e591cc53844795725fc66c564f0364d1fbe40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6370,7 +6370,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="frogger ii - threeedeep! (1984) (parker brothers, mark lesser) (pb5590) (pal).bin" size="8192" crc="09cdd3ea" sha1="bce92de22fc8950f0eebb643d96fe9fa5dba2b72"/>
+				<rom name="frogger ii - threeedeep (1984) (parker brothers, mark lesser) (pb5590) (pal).bin" size="8192" crc="09cdd3ea" sha1="bce92de22fc8950f0eebb643d96fe9fa5dba2b72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6492,7 +6492,7 @@ X-1414 : Streetracer
 		<publisher>Quelle</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="fuchs &amp; schweinchen schlau (aka oink!) (1983) (quelle) (806.174 9) (pal).bin" size="4096" crc="ff3f327b" sha1="4de5d915b58402f5018173120f42be7a7dfabb8e"/>
+				<rom name="fuchs &amp; schweinchen schlau (aka oink) (1983) (quelle) (806.174 9) (pal).bin" size="4096" crc="ff3f327b" sha1="4de5d915b58402f5018173120f42be7a7dfabb8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7337,7 +7337,7 @@ X-1414 : Streetracer
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="hey! stop! (aka keystone kapers) (rainbow vision - suntek) (ss-012) (pal).bin" size="4096" crc="6f3a278e" sha1="4b808c975f8a8345c72d0f6281ea5ba93963d7fb"/>
+				<rom name="hey stop (aka keystone kapers) (rainbow vision - suntek) (ss-012) (pal).bin" size="4096" crc="6f3a278e" sha1="4b808c975f8a8345c72d0f6281ea5ba93963d7fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7980,7 +7980,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! (paddle) (1981) (activision, larry kaplan, david crane) (ag-010, ag-010-04).bin" size="2048" crc="813f00f6" sha1="40d4df4f8e4a69a299ae7678c17e72bedeb70105"/>
+				<rom name="kaboom (paddle) (1981) (activision, larry kaplan, david crane) (ag-010, ag-010-04).bin" size="2048" crc="813f00f6" sha1="40d4df4f8e4a69a299ae7678c17e72bedeb70105"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7991,7 +7991,7 @@ X-1414 : Streetracer
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! (paddle) (cce).bin" size="2048" crc="b4901d54" sha1="ae5af59b3503858bd847c07fea8033139890ff34"/>
+				<rom name="kaboom (paddle) (cce).bin" size="2048" crc="b4901d54" sha1="ae5af59b3503858bd847c07fea8033139890ff34"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8002,7 +8002,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="kaboom! - schneller als der knall (paddle) (1981) (activision, larry kaplan, david crane - ariola) (eag-010, pag-010 - 711 010-720) (pal).bin" size="2048" crc="63f8f529" sha1="a257546271b33d7e3b9e7ea0ec4606ec47cfbc94"/>
+				<rom name="kaboom - schneller als der knall (paddle) (1981) (activision, larry kaplan, david crane - ariola) (eag-010, pag-010 - 711 010-720) (pal).bin" size="2048" crc="63f8f529" sha1="a257546271b33d7e3b9e7ea0ec4606ec47cfbc94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8453,7 +8453,7 @@ X-1414 : Streetracer
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="kwibble (quick step! beta) (1983) (imagic, dave johnson) (720119-1a, 03211) (prototype).bin" size="4096" crc="45628bd3" sha1="696cc5c94de107940e0b22feb3089aaf62e96996"/>
+				<rom name="kwibble (quick step beta) (1983) (imagic, dave johnson) (720119-1a, 03211) (prototype).bin" size="4096" crc="45628bd3" sha1="696cc5c94de107940e0b22feb3089aaf62e96996"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10017,7 +10017,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do! (1983) (coleco, ed english) (2656).bin" size="8192" crc="860a47a1" sha1="e4c912199779bba25f1b9950007f14dca3d19c84"/>
+				<rom name="mr. do (1983) (coleco, ed english) (2656).bin" size="8192" crc="860a47a1" sha1="e4c912199779bba25f1b9950007f14dca3d19c84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10030,7 +10030,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do! (1983) (cbs electronics, ed english) (4l4478) (pal).bin" size="8192" crc="9fedc6ae" sha1="85c693ef75fb62f26f9977acf63790a00cc0cb5e"/>
+				<rom name="mr. do (1983) (cbs electronics, ed english) (4l4478) (pal).bin" size="8192" crc="9fedc6ae" sha1="85c693ef75fb62f26f9977acf63790a00cc0cb5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10042,7 +10042,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
-				<rom name="mr. do!'s castle (1984) (parker brothers) (pb5820).bin" size="8192" crc="044735b9" sha1="330c2c67399e07c40f4101f9e18670fef070475e"/>
+				<rom name="mr. do's castle (1984) (parker brothers) (pb5820).bin" size="8192" crc="044735b9" sha1="330c2c67399e07c40f4101f9e18670fef070475e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10344,7 +10344,7 @@ X-1414 : Streetracer
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="no escape! (escape from argos) (1982) (imagic, michael greene) (720055-1a, ia3312).bin" size="4096" crc="8941caea" sha1="e2e8750b8856dd44d914c43a7d277188cc148e5c"/>
+				<rom name="no escape (escape from argos) (1982) (imagic, michael greene) (720055-1a, ia3312).bin" size="4096" crc="8941caea" sha1="e2e8750b8856dd44d914c43a7d277188cc148e5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10356,7 +10356,7 @@ X-1414 : Streetracer
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="no escape! (escape from argos) (1982) (imagic, michael greene) (720055-2a, ia3312p) (pal).bin" size="4096" crc="ae03d1b3" sha1="fb9fc3e2b2e391952bfb090ec6e189dcc40aa0fa"/>
+				<rom name="no escape (escape from argos) (1982) (imagic, michael greene) (720055-2a, ia3312p) (pal).bin" size="4096" crc="ae03d1b3" sha1="fb9fc3e2b2e391952bfb090ec6e189dcc40aa0fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10487,7 +10487,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (1982) (activision, mike lorenzen) (ax-023).bin" size="4096" crc="86f99b5e" sha1="ea674cf2c90d407b8f8b96eac692690b602b73f9"/>
+				<rom name="oink (1982) (activision, mike lorenzen) (ax-023).bin" size="4096" crc="86f99b5e" sha1="ea674cf2c90d407b8f8b96eac692690b602b73f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10498,7 +10498,7 @@ X-1414 : Streetracer
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (cce).bin" size="4096" crc="d63bbf34" sha1="03eb4a3b3db04c1782e1a91d27ea515163d258fb"/>
+				<rom name="oink (cce).bin" size="4096" crc="d63bbf34" sha1="03eb4a3b3db04c1782e1a91d27ea515163d258fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10509,7 +10509,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! - das schweinchen und der wolf (1982) (activision, mike lorenzen - ariola) (eax-023 - 711 023-720) (pal).bin" size="4096" crc="7eb46148" sha1="96f71b08725ab78cac3d0ebb9dcffcf1d4895fba"/>
+				<rom name="oink - das schweinchen und der wolf (1982) (activision, mike lorenzen - ariola) (eax-023 - 711 023-720) (pal).bin" size="4096" crc="7eb46148" sha1="96f71b08725ab78cac3d0ebb9dcffcf1d4895fba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10520,7 +10520,7 @@ X-1414 : Streetracer
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="oink! (unknown) (pal).bin" size="4096" crc="95121f77" sha1="f8c9e7d65b9924da6fac0ce7dc9eec8c0040057d"/>
+				<rom name="oink (unknown) (pal).bin" size="4096" crc="95121f77" sha1="f8c9e7d65b9924da6fac0ce7dc9eec8c0040057d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10545,7 +10545,7 @@ X-1414 : Streetracer
 		<publisher>Bit Corporation</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="open, sesame! - sesam, oeffne dich (1982) (bit corporation) (pg204) (pal).bin" size="4096" crc="0d12fd9b" sha1="cd968c2a983f9adf4d8d8d56823923b31c33980f"/>
+				<rom name="open, sesame - sesam, oeffne dich (1982) (bit corporation) (pg204) (pal).bin" size="4096" crc="0d12fd9b" sha1="cd968c2a983f9adf4d8d8d56823923b31c33980f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11252,7 +11252,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04).bin" size="4096" crc="42ad47bf" sha1="8d525480445d48cc48460dc666ebad78c8fb7b73"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04).bin" size="4096" crc="42ad47bf" sha1="8d525480445d48cc48460dc666ebad78c8fb7b73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11274,7 +11274,7 @@ X-1414 : Streetracer
 		<publisher>Supergame</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (1984) (supergame) (32).bin" size="4096" crc="ad2224e6" sha1="861196f2425b9374c1aba5703bc15b88241e066b"/>
+				<rom name="pitfall (aka pitfall) (1984) (supergame) (32).bin" size="4096" crc="ad2224e6" sha1="861196f2425b9374c1aba5703bc15b88241e066b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11285,7 +11285,7 @@ X-1414 : Streetracer
 		<publisher>Genus</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (genus).bin" size="4096" crc="1fc7038f" sha1="a0a548bc6cc9e6af1401c37d43783590b670ae1d"/>
+				<rom name="pitfall (aka pitfall) (genus).bin" size="4096" crc="1fc7038f" sha1="a0a548bc6cc9e6af1401c37d43783590b670ae1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11296,7 +11296,7 @@ X-1414 : Streetracer
 		<publisher>Star Game</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall (aka pitfall!) (star game) (012).bin" size="4096" crc="4e11f28d" sha1="fd68866b59bc9ff2fdeba0cb92012bfcc044de32"/>
+				<rom name="pitfall (aka pitfall) (star game) (012).bin" size="4096" crc="4e11f28d" sha1="fd68866b59bc9ff2fdeba0cb92012bfcc044de32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11307,7 +11307,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - abenteuer im urwald (1982) (activision, david crane - ariola) (eax-018, eax-018-04b, eax-018-04i - 711 018-725) (pal).bin" size="4096" crc="ff7841d2" sha1="d0ec08b88d032627701ad72337524d91b26c656b"/>
+				<rom name="pitfall - abenteuer im urwald (1982) (activision, david crane - ariola) (eax-018, eax-018-04b, eax-018-04i - 711 018-725) (pal).bin" size="4096" crc="ff7841d2" sha1="d0ec08b88d032627701ad72337524d91b26c656b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11318,7 +11318,7 @@ X-1414 : Streetracer
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (unknown) (pal).bin" size="4096" crc="38630571" sha1="f1b5fd9eefd04eec2df9aca6d7ca514f9495ba4e"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (unknown) (pal).bin" size="4096" crc="38630571" sha1="f1b5fd9eefd04eec2df9aca6d7ca514f9495ba4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11329,7 +11329,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="61e6f17a" sha1="c084539ef888ef0ac8bde9e81cd497697ba2b42a"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1982) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="61e6f17a" sha1="c084539ef888ef0ac8bde9e81cd497697ba2b42a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11340,7 +11340,7 @@ X-1414 : Streetracer
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pitfall! - pitfall harry's jungle adventure (1981) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="79c93300" sha1="fd79516f3db60978dc2645625ee028f5af76b637"/>
+				<rom name="pitfall - pitfall harry's jungle adventure (1981) (activision, david crane) (ax-018, ax-018-04) (prototype).bin" size="4096" crc="79c93300" sha1="fd79516f3db60978dc2645625ee028f5af76b637"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11992,7 +11992,7 @@ X-1414 : Streetracer
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="quick step! (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-1a, 03211).bin" size="4096" crc="057440fe" sha1="33a47f79610c4525802c9881f67ad1f3f8c1b55d"/>
+				<rom name="quick step (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-1a, 03211).bin" size="4096" crc="057440fe" sha1="33a47f79610c4525802c9881f67ad1f3f8c1b55d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12003,7 +12003,7 @@ X-1414 : Streetracer
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="quick step! (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-2a, 13211, eix-004-04i) (pal).bin" size="4096" crc="a8ebe2dc" sha1="80875ea38c58c64e787fbf1c4b9948ad6625f2c9"/>
+				<rom name="quick step (hop to it, kwibble) (1983) (imagic, dave johnson) (720119-2a, 13211, eix-004-04i) (pal).bin" size="4096" crc="a8ebe2dc" sha1="80875ea38c58c64e787fbf1c4b9948ad6625f2c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12236,7 +12236,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="rampage! (1989) (activision, robert c. polaro) (ak-049-04).bin" size="16384" crc="f0b446ac" sha1="7bb7df255829d5fbbee0d944915e50f89a5e7075"/>
+				<rom name="rampage (1989) (activision, robert c. polaro) (ak-049-04).bin" size="16384" crc="f0b446ac" sha1="7bb7df255829d5fbbee0d944915e50f89a5e7075"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12248,7 +12248,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="rampage! (1989) (activision, robert c. polaro) (eak-049-04b) (pal).bin" size="16384" crc="5b2c2f22" sha1="c42f6da3aa0c8b5db68dd25ac5d6aa56d59baf48"/>
+				<rom name="rampage (1989) (activision, robert c. polaro) (eak-049-04b) (pal).bin" size="16384" crc="5b2c2f22" sha1="c42f6da3aa0c8b5db68dd25ac5d6aa56d59baf48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13120,7 +13120,7 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (04-03-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="ef858ab2" sha1="1ddedcf4ffe4fc96a2870e11d9cca5fc73e93f59"/>
+				<rom name="save mary (saving mary) (04-03-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="ef858ab2" sha1="1ddedcf4ffe4fc96a2870e11d9cca5fc73e93f59"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13133,7 +13133,7 @@ X-1414 : Streetracer
 			<!-- SuperChip -->
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (10-24-1991) (atari - axlon, tod frye) (cx26178) (prototype) (pal).bin" size="16384" crc="eb2e801d" sha1="44357b828b3214441d702d4912a1949951d80472"/>
+				<rom name="save mary (saving mary) (10-24-1991) (atari - axlon, tod frye) (cx26178) (prototype) (pal).bin" size="16384" crc="eb2e801d" sha1="44357b828b3214441d702d4912a1949951d80472"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
@@ -13148,7 +13148,7 @@ X-1414 : Streetracer
 			<!-- SuperChip -->
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
-				<rom name="save mary! (saving mary) (11-21-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="01e18f53" sha1="ecd8ef49ae23ddd3e10ec60839b95c8e7764ea27"/>
+				<rom name="save mary (saving mary) (11-21-1989) (atari - axlon, tod frye) (cx26178) (prototype).bin" size="16384" crc="01e18f53" sha1="ecd8ef49ae23ddd3e10ec60839b95c8e7764ea27"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
@@ -14931,7 +14931,7 @@ X-1414 : Streetracer
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="squoosh (vat's incredible!, the grape escape) (1983) (apollo) (ap-2012) (prototype).bin" size="4096" crc="b4212adb" sha1="7405d4b427cb278062fa44db918c0a702062e55c"/>
+				<rom name="squoosh (vat's incredible, the grape escape) (1983) (apollo) (ap-2012) (prototype).bin" size="4096" crc="b4212adb" sha1="7405d4b427cb278062fa44db918c0a702062e55c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14942,7 +14942,7 @@ X-1414 : Streetracer
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="squoosh (vat's incredible!, the grape escape) (1983) (apollo) (ap-2012) (prototype) [a].bin" size="4096" crc="fe44446e" sha1="11a9dd44787f011ec540159248377cb27fb8f7bb"/>
+				<rom name="squoosh (vat's incredible, the grape escape) (1983) (apollo) (ap-2012) (prototype) [a].bin" size="4096" crc="fe44446e" sha1="11a9dd44787f011ec540159248377cb27fb8f7bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16082,7 +16082,7 @@ X-1414 : Streetracer
 		<publisher>Video Gems</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="surfer's paradise - but danger below! (1983) (video gems) (vg-02) (pal).bin" size="4096" crc="8c68f2ae" sha1="e754c8985ca7f5780c23a856656099b710e89919"/>
+				<rom name="surfer's paradise - but danger below (1983) (video gems) (vg-02) (pal).bin" size="4096" crc="8c68f2ae" sha1="e754c8985ca7f5780c23a856656099b710e89919"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16447,7 +16447,7 @@ X-1414 : Streetracer
 		<publisher>Quelle</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="teller-jonglieren! (aka dancing plate) (1983) (quelle) (685.996 1) (pal).bin" size="4096" crc="3e039461" sha1="d144243c0afc541df0400654ae37f38f0bdb5967"/>
+				<rom name="teller-jonglieren (aka dancing plate) (1983) (quelle) (685.996 1) (pal).bin" size="4096" crc="3e039461" sha1="d144243c0afc541df0400654ae37f38f0bdb5967"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16738,7 +16738,7 @@ X-1414 : Streetracer
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tom boy (aka pitfall!) (rainbow vision - suntek) (ss-005) (pal).bin" size="4096" crc="aa168aaa" sha1="f536dea39f64d1fd72e4ee0a98394eda39ddc3da"/>
+				<rom name="tom boy (aka pitfall) (rainbow vision - suntek) (ss-005) (pal).bin" size="4096" crc="aa168aaa" sha1="f536dea39f64d1fd72e4ee0a98394eda39ddc3da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16749,7 +16749,7 @@ X-1414 : Streetracer
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tom boy (aka pitfall!) (unknown).bin" size="4096" crc="5d6580fc" sha1="396a96c91c0992f8726933766099a3f2c0669b31"/>
+				<rom name="tom boy (aka pitfall) (unknown).bin" size="4096" crc="5d6580fc" sha1="396a96c91c0992f8726933766099a3f2c0669b31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16841,7 +16841,7 @@ X-1414 : Streetracer
 		<publisher>Funvision</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="treasure hunting (aka pitfall!) (funvision - fund. international co.).bin" size="4096" crc="b1600d79" sha1="461d91dee959958f9107f1d72e716a17af3c1c92"/>
+				<rom name="treasure hunting (aka pitfall) (funvision - fund. international co.).bin" size="4096" crc="b1600d79" sha1="461d91dee959958f9107f1d72e716a17af3c1c92"/>
 			</dataarea>
 		</part>
 	</software>

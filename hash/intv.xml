@@ -2125,7 +2125,7 @@ license:CC0
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="league of light (prototype) (1983) (activision) [a1][!].50" size="16384" crc="19360442" sha1="9c36d2fec6c1c2bc01bb3863997e267f74325e06" />
+				<rom name="league of light (prototype) (1983) (activision) [a1].50" size="16384" crc="19360442" sha1="9c36d2fec6c1c2bc01bb3863997e267f74325e06" />
 			</dataarea>
 		</part>
 	</software>
@@ -2189,7 +2189,7 @@ license:CC0
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="minotaur v2 (1981) (mattel) [!].50" size="16384" crc="5a4ce519" sha1="3f6939a673f0ace5d02d7ebb5d9e44dfd4d80413" />
+				<rom name="minotaur v2 (1981) (mattel).50" size="16384" crc="5a4ce519" sha1="3f6939a673f0ace5d02d7ebb5d9e44dfd4d80413" />
 			</dataarea>
 		</part>
 	</software>
@@ -2201,7 +2201,7 @@ license:CC0
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="minotaur v1.1 (1981) (mattel) [!].50" size="16384" crc="6746607b" sha1="227d64182bc8adf46a17903c57c553353dd5e65a" />
+				<rom name="minotaur v1.1 (1981) (mattel).50" size="16384" crc="6746607b" sha1="227d64182bc8adf46a17903c57c553353dd5e65a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2417,7 +2417,7 @@ license:CC0
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="thin ice (prototype) (1983) (intv corp) [!].50" size="16384" crc="d6495910" sha1="e038024463fc6b5577983621d861152602b281a6" />
+				<rom name="thin ice (prototype) (1983) (intv corp).50" size="16384" crc="d6495910" sha1="e038024463fc6b5577983621d861152602b281a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -2567,7 +2567,7 @@ license:CC0
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="16384">
-				<rom name="zzzzz! spina the bee.50" size="16384" crc="01efa214" sha1="1a70d73512da0f78957bbd74b14077303e4fb905" />
+				<rom name="zzzzz spina the bee.50" size="16384" crc="01efa214" sha1="1a70d73512da0f78957bbd74b14077303e4fb905" />
 			</dataarea>
 		</part>
 	</software>

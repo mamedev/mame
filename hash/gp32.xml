@@ -362,7 +362,7 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 		<info name="alt_title" value="W.B.W. - 마법사가 되고 싶어!, W.B.W. - Wanna Be Wizard! (Box/Card)"/>
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="w.b.w. - wanna be wizard! (korea).smc" size="17302528" crc="25386f14" sha1="cb19613a9377aef5be77bb00138fd8d0b201737e"/>
+				<rom name="w.b.w. - wanna be wizard (korea).smc" size="17302528" crc="25386f14" sha1="cb19613a9377aef5be77bb00138fd8d0b201737e"/>
 			</dataarea>
 		</part>
 	</software>

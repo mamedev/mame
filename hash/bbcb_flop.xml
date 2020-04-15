@@ -1088,7 +1088,7 @@ All images in this list contain no protection, they are either deprotected disc 
 		<info name="author" value="Jamie Woodhouse" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="44032">
-				<rom name="Zap! (2009)(Retro Software).ssd" size="44032" crc="12dbbc47" sha1="535e24688f3a9c00aee9b9cba678c25961c4564c" />
+				<rom name="Zap (2009)(Retro Software).ssd" size="44032" crc="12dbbc47" sha1="535e24688f3a9c00aee9b9cba678c25961c4564c" />
 			</dataarea>
 		</part>
 	</software>

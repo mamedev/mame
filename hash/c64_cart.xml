@@ -341,8 +341,8 @@ license:CC0
 			<feature name="pcb" value="SC041/1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
-				<rom name="shelp-$9.ba2" size="0x1000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x1000" />
+				<rom name="shelp-8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
+				<rom name="shelp-9.ba2" size="0x1000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="shelp$.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb"/>
+				<rom name="shelp.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb"/>
 				<rom size="0x1000" offset="0x1000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -1954,7 +1954,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="choplifter! (1982)(broderbund).80" size="0x4000" crc="a16862ec" sha1="a020bddb7ae847ea10186072d308d03e02127206"/>
+				<rom name="choplifter (1982)(broderbund).80" size="0x4000" crc="a16862ec" sha1="a020bddb7ae847ea10186072d308d03e02127206"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1995,7 +1995,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="coco-notes featuring... the jazz scats! (1984)(cbs software).80" size="0x4000" crc="2350e33c" sha1="ead7b91509492ba8b820aacfa9223523ba6d42ce"/>
+				<rom name="coco-notes featuring... the jazz scats (1984)(cbs software).80" size="0x4000" crc="2350e33c" sha1="ead7b91509492ba8b820aacfa9223523ba6d42ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2211,7 +2211,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="ducks ahoy! (1984)(cbs software).80" size="0x4000" crc="6cae58e6" sha1="b2942757f94a28a9c0fab3a9583721ce649883ff"/>
+				<rom name="ducks ahoy (1984)(cbs software).80" size="0x4000" crc="6cae58e6" sha1="b2942757f94a28a9c0fab3a9583721ce649883ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2333,7 +2333,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="frogger ii - threeedeep! (1984)(parker brothers).80" size="0x4000" crc="f662f748" sha1="bb7c51bc09c534b5ac690dd3036c6cd6438c4ad3"/>
+				<rom name="frogger ii - threeedeep (1984)(parker brothers).80" size="0x4000" crc="f662f748" sha1="bb7c51bc09c534b5ac690dd3036c6cd6438c4ad3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2584,7 +2584,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="juice! (1983)(tronix).80" size="0x4000" crc="126834a0" sha1="95b19e6bbbe850db4650383e5d5359262edc1106"/>
+				<rom name="juice (1983)(tronix).80" size="0x4000" crc="126834a0" sha1="95b19e6bbbe850db4650383e5d5359262edc1106"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3206,7 +3206,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="pitfall! (1984)(activision).80" size="0x2000" crc="fe349f64" sha1="b44ce22bafff6aab73698ee4c4ed06bacdcc7ac9"/>
+				<rom name="pitfall (1984)(activision).80" size="0x2000" crc="fe349f64" sha1="b44ce22bafff6aab73698ee4c4ed06bacdcc7ac9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4831,7 +4831,7 @@ license:CC0
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2"/>
+				<rom name="c-64 warpspeed v1.0 (1987)(alien technology).80" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5467,7 +5467,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="write now! 64 (1983)(computer applications).80" size="0x4000" crc="9a35343d" sha1="b5ad016343635b17f3f8ffdb37ad6bd7cf682702"/>
+				<rom name="write now 64 (1983)(computer applications).80" size="0x4000" crc="9a35343d" sha1="b5ad016343635b17f3f8ffdb37ad6bd7cf682702"/>
 			</dataarea>
 		</part>
 	</software>

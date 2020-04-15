@@ -1357,7 +1357,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="24466">
-				<rom name="jump!.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
+				<rom name="jump.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
 			</dataarea>
 		</part>
 	</software>

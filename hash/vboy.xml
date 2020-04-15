@@ -42,7 +42,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152" width="32">
-				<rom name="bound high! (ju).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
+				<rom name="bound high (ju).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -116,7 +116,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19950929"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="1048576" width="32">
-				<rom name="jack bros. no meiro de hiihoo! (japan).bin" size="1048576" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" offset="000000" />
+				<rom name="jack bros. no meiro de hiihoo (japan).bin" size="1048576" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -301,7 +301,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19950721"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="524288" width="32">
-				<rom name="tobidase! panibon (japan).bin" size="524288" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" offset="000000" />
+				<rom name="tobidase panibon (japan).bin" size="524288" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

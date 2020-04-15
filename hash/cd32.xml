@@ -267,7 +267,7 @@ license:CC0
 		<info name="release" value="199405xx" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 01 (1994-05)(paragon publishing)(gb)[!]" sha1="ceb082a7eaf0fb98008d4398edf4883de7a61496" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 01 (1994-05)(paragon publishing)(gb)" sha1="ceb082a7eaf0fb98008d4398edf4883de7a61496" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@ license:CC0
 		<info name="release" value="19940714" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 03 (1994-07-14)(paragon publishing)(gb)[!]" sha1="ef8be0a94897bc1a3c8504e931fdf7470084f1c7" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 03 (1994-07-14)(paragon publishing)(gb)" sha1="ef8be0a94897bc1a3c8504e931fdf7470084f1c7" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@ license:CC0
 		<info name="release" value="19940808" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 04 (1994-08-08)(paragon publishing)(gb)[!]" sha1="2f1ed16a7a604a64c2ffe1beafb08d08588bd9b2" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 04 (1994-08-08)(paragon publishing)(gb)" sha1="2f1ed16a7a604a64c2ffe1beafb08d08588bd9b2" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@ license:CC0
 		<info name="release" value="19941013" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 05 (1994-10-13)(paragon publishing)(gb)[!]" sha1="e249c7096e87a942e7c166bda8bd4bd5972cdb97" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 05 (1994-10-13)(paragon publishing)(gb)" sha1="e249c7096e87a942e7c166bda8bd4bd5972cdb97" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -334,7 +334,7 @@ license:CC0
 		<info name="release" value="19941110" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 06 (1994-11-10)(paragon publishing)(gb)[!]" sha1="be226accca732c8243223c84e9c7786ca08cb85c" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 06 (1994-11-10)(paragon publishing)(gb)" sha1="be226accca732c8243223c84e9c7786ca08cb85c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -347,7 +347,7 @@ license:CC0
 		<info name="release" value="19941208" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 07 (1994-12-08)(paragon publishing)(gb)[!]" sha1="59b82a04d92adfb8f5eded0351bc54bb4846b620" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 07 (1994-12-08)(paragon publishing)(gb)" sha1="59b82a04d92adfb8f5eded0351bc54bb4846b620" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -375,7 +375,7 @@ license:CC0
 		<info name="release" value="19950209" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 09 (1995-02-09)(paragon publishing)(gb)[!]" sha1="29df212d20f7b035514ee3b275cd3a50347e9387" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 09 (1995-02-09)(paragon publishing)(gb)" sha1="29df212d20f7b035514ee3b275cd3a50347e9387" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -388,7 +388,7 @@ license:CC0
 		<info name="release" value="19950309" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 10 (1995-03-09)(paragon publishing)(gb)[!][amiga cd32 issue 10]" sha1="14f61389485768d9de93c061372eae34d3bf55c1" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 10 (1995-03-09)(paragon publishing)(gb)[amiga cd32 issue 10]" sha1="14f61389485768d9de93c061372eae34d3bf55c1" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -401,7 +401,7 @@ license:CC0
 		<info name="release" value="19950413" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 11 (1995-04-13)(paragon publishing)(gb)[!]" sha1="6391a4ee14dc13cfe2bf6c9d4f0318783af5e3be" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 11 (1995-04-13)(paragon publishing)(gb)" sha1="6391a4ee14dc13cfe2bf6c9d4f0318783af5e3be" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -414,7 +414,7 @@ license:CC0
 		<info name="release" value="19950511" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 12 (1995-05-11)(paragon publishing)(gb)[!][cd 32 gamer 00449, 00471]" sha1="6117859767922a931d418f1abe32bb39f3c0acfa" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 12 (1995-05-11)(paragon publishing)(gb)[cd 32 gamer 00449, 00471]" sha1="6117859767922a931d418f1abe32bb39f3c0acfa" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -427,7 +427,7 @@ license:CC0
 		<info name="release" value="19950608" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 13 (1995-06-08)(paragon publishing)(gb)[!]" sha1="996b4ede3fa5378e377e34d9d886747d2cd570b6" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 13 (1995-06-08)(paragon publishing)(gb)" sha1="996b4ede3fa5378e377e34d9d886747d2cd570b6" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -440,7 +440,7 @@ license:CC0
 		<info name="release" value="19950713" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 14 (1995-07-13)(paragon publishing)(gb)[!]" sha1="d5e6787cbb7e588c74ee88002c076c9bfea4629b" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 14 (1995-07-13)(paragon publishing)(gb)" sha1="d5e6787cbb7e588c74ee88002c076c9bfea4629b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@ license:CC0
 		<info name="release" value="19950810" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 15 (1995-08-10)(paragon publishing)(gb)[!]" sha1="4cd5d8f0fb5118503518182ec8c7530114ebde03" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 15 (1995-08-10)(paragon publishing)(gb)" sha1="4cd5d8f0fb5118503518182ec8c7530114ebde03" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -466,7 +466,7 @@ license:CC0
 		<info name="release" value="19950914" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 16 (1995-09-14)(paragon publishing)(gb)[!]" sha1="21aa69e223625e96ced9d641e9370d5cf7ed9879" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 16 (1995-09-14)(paragon publishing)(gb)" sha1="21aa69e223625e96ced9d641e9370d5cf7ed9879" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@ license:CC0
 		<info name="release" value="19951109" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 18 (1995-11-09)(paragon publishing)(gb)[!]" sha1="01a2c58e29ea6ebabedd3964b12207d451a1a222" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 18 (1995-11-09)(paragon publishing)(gb)" sha1="01a2c58e29ea6ebabedd3964b12207d451a1a222" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -505,7 +505,7 @@ license:CC0
 		<info name="release" value="19951214" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 19 (1995-12-14)(paragon publishing)(gb)[!]" sha1="298c48dd32596170623dc5160829ab32040313f3" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 19 (1995-12-14)(paragon publishing)(gb)" sha1="298c48dd32596170623dc5160829ab32040313f3" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -518,7 +518,7 @@ license:CC0
 		<info name="release" value="19960111" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="amiga cd32 gamer vol. 20 (1996-01-11)(paragon publishing)(gb)[!]" sha1="656d334358c915114f447fc44cdcbbf89a75c45d" status="baddump"/>
+				<disk name="amiga cd32 gamer vol. 20 (1996-01-11)(paragon publishing)(gb)" sha1="656d334358c915114f447fc44cdcbbf89a75c45d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -598,7 +598,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="atr - all terrain racing (1995)(team 17)[!]" sha1="79a835dda3cc84bf82e4f65e5a99a072c22bcc5c" status="baddump"/>
+				<disk name="atr - all terrain racing (1995)(team 17)" sha1="79a835dda3cc84bf82e4f65e5a99a072c22bcc5c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -711,7 +711,7 @@ license:CC0
 		<publisher>Codemasters</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="big 6, the (1994)(codemasters)(en-de)[!][compilation]" sha1="ecea85b6f6bd167b0b5164fde31b782e6b188e30"/>
+				<disk name="big 6, the (1994)(codemasters)(en-de)[compilation]" sha1="ecea85b6f6bd167b0b5164fde31b782e6b188e30"/>
 			</diskarea>
 		</part>
 	</software>
@@ -898,7 +898,7 @@ license:CC0
 		<publisher>Rasputin</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="clockwiser (1994)(rasputin)[!]" sha1="0d92ecfc00175486022c4c3bcfd7e26a21568d20"/>
+				<disk name="clockwiser (1994)(rasputin)" sha1="0d92ecfc00175486022c4c3bcfd7e26a21568d20"/>
 			</diskarea>
 		</part>
 	</software>
@@ -969,7 +969,7 @@ license:CC0
 		<publisher>Commodore</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="diggers and oscar (1993)(commodore)(m4)[!][compilation][amiga-cd 31, 54]" sha1="88422ad455a8b8c7255c83812aa69132f15e1bf6"/>
+				<disk name="diggers and oscar (1993)(commodore)(m4)[compilation][amiga-cd 31, 54]" sha1="88422ad455a8b8c7255c83812aa69132f15e1bf6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1158,7 +1158,7 @@ license:CC0
 		<info name="disc_matrix" value="GULPCD32 ·   MASTERED BY NIMBUS" />
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gulp! (europe) (en,fr,de,es,it)" sha1="574eee872637153009dc1a4cc36ee1dd0e5d9a79"/>
+				<disk name="gulp (europe) (en,fr,de,es,it)" sha1="574eee872637153009dc1a4cc36ee1dd0e5d9a79"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1199,7 +1199,7 @@ license:CC0
 		<publisher>Mindscape</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="liberation - captive ii v2.02-2.00c (1994-04-08)(mindscape)[!][cdd3716]" sha1="e4270283304e913a9397888f536be1b146482af1"/>
+				<disk name="liberation - captive ii v2.02-2.00c (1994-04-08)(mindscape)[cdd3716]" sha1="e4270283304e913a9397888f536be1b146482af1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1255,7 +1255,7 @@ license:CC0
 		<publisher>Millennium</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="morph (1993)(millennium)[!]" sha1="3a8909d88d48b17b7e02284866f57085fbe62e2e"/>
+				<disk name="morph (1993)(millennium)" sha1="3a8909d88d48b17b7e02284866f57085fbe62e2e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1341,7 +1341,7 @@ license:CC0
 		<publisher>21st Century Entertainment</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pinball fantasies (1993)(21st century entertainment)[!]" sha1="01b589f79dc0c6e9ebc3ed898aa021c6e59daa70"/>
+				<disk name="pinball fantasies (1993)(21st century entertainment)" sha1="01b589f79dc0c6e9ebc3ed898aa021c6e59daa70"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1353,7 +1353,7 @@ license:CC0
 		<publisher>21st Century Entertainment</publisher>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pinball illusions (1995)(21st century entertainment)[!]" sha1="1b657df40d086d9ce8f498e32033993361f3452b"/>
+				<disk name="pinball illusions (1995)(21st century entertainment)" sha1="1b657df40d086d9ce8f498e32033993361f3452b"/>
 			</diskarea>
 		</part>
 	</software>

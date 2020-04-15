@@ -250,7 +250,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="cogito! (19xx)(reader's digest software)(4am crack)" size="143360" crc="dab73665" sha1="fac81f70393ce06a08830913560c2e3f6e694ed0" />
+				<rom name="cogito (19xx)(reader's digest software)(4am crack)" size="143360" crc="dab73665" sha1="fac81f70393ce06a08830913560c2e3f6e694ed0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21479,7 +21479,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! cause and effect level two (4am crack).dsk" size="143360" crc="65e41cfc" sha1="dc53ff28e0dcdcfc5d0e44ccc922dd49b643a66d" />
+				<rom name="good thinking cause and effect level two (4am crack).dsk" size="143360" crc="65e41cfc" sha1="dc53ff28e0dcdcfc5d0e44ccc922dd49b643a66d" />
 			</dataarea>
 		</part>
 	</software>
@@ -21492,7 +21492,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! details level one (4am crack).dsk" size="143360" crc="b14fa5d9" sha1="b224195b188dbff6aa377a3a81fe3f47ddffb740" />
+				<rom name="good thinking details level one (4am crack).dsk" size="143360" crc="b14fa5d9" sha1="b224195b188dbff6aa377a3a81fe3f47ddffb740" />
 			</dataarea>
 		</part>
 	</software>
@@ -21505,7 +21505,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! details level two (4am crack).dsk" size="143360" crc="83bdefa5" sha1="ae30b39c407557186fde3e27cab4d087b7a83f52" />
+				<rom name="good thinking details level two (4am crack).dsk" size="143360" crc="83bdefa5" sha1="ae30b39c407557186fde3e27cab4d087b7a83f52" />
 			</dataarea>
 		</part>
 	</software>
@@ -21519,7 +21519,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! drawing conclusions level two (4am crack).dsk" size="143360" crc="31194564" sha1="b9abab309834d1f902c49723767302d21b34004f" />
+				<rom name="good thinking drawing conclusions level two (4am crack).dsk" size="143360" crc="31194564" sha1="b9abab309834d1f902c49723767302d21b34004f" />
 			</dataarea>
 		</part>
 	</software>
@@ -21532,7 +21532,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! fact and opinion level two (4am crack).dsk" size="143360" crc="58bba79f" sha1="68e5df6cb7ef32a137ea52364d5618c73bbbe538" />
+				<rom name="good thinking fact and opinion level two (4am crack).dsk" size="143360" crc="58bba79f" sha1="68e5df6cb7ef32a137ea52364d5618c73bbbe538" />
 			</dataarea>
 		</part>
 	</software>
@@ -21545,7 +21545,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! main idea level two (4am crack).dsk" size="143360" crc="816c199f" sha1="3bcea5b02a2817820f7afad8e23d086cb5173264" />
+				<rom name="good thinking main idea level two (4am crack).dsk" size="143360" crc="816c199f" sha1="3bcea5b02a2817820f7afad8e23d086cb5173264" />
 			</dataarea>
 		</part>
 	</software>
@@ -21558,7 +21558,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! predicting outcomes level one (4am crack).dsk" size="143360" crc="7e9e6f5a" sha1="870a372c555c12d4eac06a50221404e29ac69b9a" />
+				<rom name="good thinking predicting outcomes level one (4am crack).dsk" size="143360" crc="7e9e6f5a" sha1="870a372c555c12d4eac06a50221404e29ac69b9a" />
 			</dataarea>
 		</part>
 	</software>
@@ -21571,7 +21571,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="good thinking! sequencing events level two (4am crack).dsk" size="143360" crc="8cc6ba5b" sha1="bcce9148832200dfb205879b25cc0fb867a6c9f4" />
+				<rom name="good thinking sequencing events level two (4am crack).dsk" size="143360" crc="8cc6ba5b" sha1="bcce9148832200dfb205879b25cc0fb867a6c9f4" />
 			</dataarea>
 		</part>
 	</software>

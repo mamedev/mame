@@ -844,7 +844,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="alt_title" value="シーソー"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c_so! (japan).bin" size="32768" crc="be7ed0eb" sha1="d45a230b3cbf2d2dcfe7b94691fc7f1a5d747625" offset="000000" />
+				<rom name="c_so (japan).bin" size="32768" crc="be7ed0eb" sha1="d45a230b3cbf2d2dcfe7b94691fc7f1a5d747625" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="alt_title" value="頑皮鬼 ~ Wánpí guǐ"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c_so! (tw).bin" size="32768" crc="82c4e3e5" sha1="7101c42289815d7e0d04b523f8f0e833f2f089b3" offset="000000" />
+				<rom name="c_so (tw).bin" size="32768" crc="82c4e3e5" sha1="7101c42289815d7e0d04b523f8f0e833f2f089b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

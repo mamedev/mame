@@ -117,7 +117,7 @@ license:CC0
 			<feature name="pcb_rev" value="REV:00"/>
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11282 UBL - Vroom! Vroom! - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" />
+				<rom name="500-11282 UBL - Vroom Vroom - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" />
 			</dataarea>
 		</part>
 	</software>
