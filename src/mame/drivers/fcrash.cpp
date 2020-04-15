@@ -679,9 +679,9 @@ void fcrash_state::wofabl_map(address_map &map)
 	map(0x880006, 0x880007).w(FUNC(fcrash_state::cps1_soundlatch_w));
 	map(0x880008, 0x88000f).r(FUNC(fcrash_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x880e78, 0x880e79).r(FUNC(fcrash_state::cps1_in2_r));            /* Player 3 controls (later games) */
-	//map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
+	map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
 	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
-	//map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }

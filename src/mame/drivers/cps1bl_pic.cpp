@@ -10,7 +10,7 @@
     Cadillacs and Dinosaurs         930201 ETC
     The Punisher                    930422 ETC
     Saturday Night Slam Masters     930713 ETC
-	Warriors of Fate                921002 ETC
+    Warriors of Fate                921002 ETC
 
     (Note, these are all CPS1.5/Q sound games)
 
