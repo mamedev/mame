@@ -16,6 +16,9 @@
 #define MCallingConvention
 #endif
 
+#define ERR     (-1)
+#define OK      (0)
+
 typedef void WINDOW;
 
 MExternC WINDOW* MCallingConvention initscr(void);
