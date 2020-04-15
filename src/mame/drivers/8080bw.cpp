@@ -117,7 +117,7 @@
          TV0H, TV02, TV03, TV04 - sitv (rev 2 with bug fixes)
          CV03, CV04, CV05, CV06 w/proms - undumped (but may be the same as one of the sisv sets with the roms combined to 2716 size)
          CV17, CV18, CV19, CV20 w/proms - sicv
-         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
+         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - invadpt2a - (same as PVxx set just split differently)
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
          Note: SV0H and TV0H are called in taito documentation "SV01-1" and "TV01-1" most likely due to someone along the line mistaking the '1-1' for an H or vice versa when writing the documentation or creating the labels.
 
@@ -4382,6 +4382,24 @@ ROM_START( invadpt2 )
 	ROM_LOAD( "pv07.2",   0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
 ROM_END
 
+ROM_START( invadpt2a ) // Comes from original TAITO PCBs. Same as invadpt2 but with half sized ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "uv01.36",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
+	ROM_LOAD( "uv02.35",     0x0400, 0x0400, CRC(c867f5b4) SHA1(686318fda6edde297aecaf33f480bfa075fa6eca) )
+	ROM_LOAD( "uv03.34",     0x0800, 0x0400, CRC(cb23ccc1) SHA1(86be2d14d52b3404e1a25c573bd25b97729d82a1) )
+	ROM_LOAD( "uv04.33",     0x0c00, 0x0400, CRC(9a11abe2) SHA1(f5337183c7f279d75ddeeab24f4f132aa2ee103b) )
+	ROM_LOAD( "uv05.32",     0x1000, 0x0400, CRC(787821dd) SHA1(ae6e7297fccf8ae9aced8cb8b58fda1a616fa43b) )
+	ROM_LOAD( "uv06.31",     0x1400, 0x0400, CRC(f5e8114f) SHA1(dd5f5b00ee662ac2c7234f1e278441879fc7d394) )
+	ROM_LOAD( "uv07.42",     0x1800, 0x0400, CRC(07839f04) SHA1(989f77219b578b1b14a18e0fd6bf9079e3b1e155) )
+	ROM_LOAD( "uv08.41",     0x1c00, 0x0400, CRC(a7e1c6ef) SHA1(2b96617a1631d74068f51e911c74fe554a448776) )
+	ROM_LOAD( "uv09.40",     0x4000, 0x0400, CRC(261a39ae) SHA1(6554b33d9a44632a5856eb45aaafbdeed8244ce4) )
+	ROM_LOAD( "uv10.39",     0x4400, 0x0400, CRC(b2cbcc8b) SHA1(f11961445e81efeeb636bc430e372f79c10efd8c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        // color maps player 1/player 2
+	ROM_LOAD( "pv06",        0x0000, 0x0400, CRC(a732810b) SHA1(a5fabffa73ca740909e23b9530936f9274dff356) )
+	ROM_LOAD( "pv07",        0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
+ROM_END
+
 ROM_START( invadpt2br )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pv01",        0x0000, 0x0800, CRC(7288a511) SHA1(ff617872784c28ed03591aefa9f0519e5651701f) )
@@ -4467,7 +4485,6 @@ ROM_START( moonbasea )
 	ROM_LOAD( "cv02.h7",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 	ROM_LOAD( "cv01.g7",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
-
 
 ROM_START( invrvnge ) // Space Invaders hw + sound daughterboard
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5658,7 +5675,8 @@ GAME( 1978, darthvdr,    invaders, darthvdr,  darthvdr,  _8080bw_state,  empty_i
 GAMEL(19??, tst_invd,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT0,   "<unknown>", "Space Invaders Test ROM", MACHINE_SUPPORTS_SAVE, layout_invaders )
 
 // other Taito
-GAME( 1979, invadpt2,    0,        invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, invadpt2,    0,        invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito, bigger ROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, invadpt2a,   invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito", "Space Invaders Part II (Taito, smaller ROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, invadpt2br,  invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito do Brasil", "Space Invaders Part II (Brazil)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, invaddlx,    invadpt2, invaders,  invadpt2,  mw8080bw_state, empty_init,    ROT270, "Taito (Midway license)", "Space Invaders Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, moonbase,    invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu", "Moon Base Zeta (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - to display it, press P1 Right+P1 Fire+2P Start then P1 Left+P1 Fire+P1 Start at the attract gameplay sequence
