@@ -10778,7 +10778,7 @@ license:CC0
 		</part>
 	</software>
 
-		<!-- Metal Slug 5 bootleg -->
+		<!-- Metal Slug 5 bootlegs -->
 
 	<software name="ms5plus" cloneof="mslug5">
 		<description>Metal Slug 5 Plus (bootleg)</description>
@@ -10816,6 +10816,43 @@ license:CC0
 				<rom loadflag="load16_byte" name="268-c6c.c6" offset="0x2000001" size="0x800000" crc="010a831b" sha1="aec140661e3ae35d264df416478ba15188544d91" />  <!-- mask rom TC5364205 -->
 				<rom loadflag="load16_byte" name="268-c7c.c7" offset="0x3000000" size="0x800000" crc="6d72a969" sha1="968dd9a4d1209b770b9b85ea6532fa24d262a262" />  <!-- mask rom TC5364205 -->
 				<rom loadflag="load16_byte" name="268-c8c.c8" offset="0x3000001" size="0x800000" crc="551d720e" sha1="ebf69e334fcaba0fda6fd432fd0970283a365d12" />  <!-- mask rom TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mslug5b" cloneof="mslug5">
+		<description>Metal Slug 5 (bootleg)</description>
+		<year>2003</year>
+		<publisher>bootleg</publisher>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS" />
+		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="boot_mslug5b" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="ms5b-p1.bin" offset="0x000000" size="0x100000" crc="1376f43c" sha1="7ca4a8b11c7effda2603d04e793cf664e7aa39bf" />
+				<rom loadflag="load16_word_swap" name="ms5b-p2.bin" offset="0x100000" size="0x400000" crc="4becfba0" sha1="fd3708f6c8fa26133b29b4b033148dff54dc1e7d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x40000">
+				<rom name="ms5b-s1.bin" offset="0x00000" size="0x20000" crc="3a427c9f" sha1="6c6050640adb7148d42d35e3017cc171e53ae957" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x20000">
+				<rom name="ms5b-m1.bin" offset="0x00000" size="0x20000" crc="bf1601bc" sha1="5e285c98c65acefd77e893247482af0d09f3e1e4" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x1000000">
+				<rom name="ms5b-v1.bin" offset="0x000000" size="0x400000" crc="e3f9fd75" sha1="8772d0936c45623763b92c55816d0e56dd8d2ef2" />
+				<rom name="ms5b-v2.bin" offset="0x400000" size="0x400000" crc="a53618f6" sha1="002e37f3d45aa6153593c7939902e1a022de14c7" />
+				<rom name="ms5b-v3.bin" offset="0x800000" size="0x400000" crc="14f000ee" sha1="b30df60964cc8480b78a4bc2d323cad59e44a0ae" />
+				<rom name="ms5b-v4.bin" offset="0xc00000" size="0x400000" crc="0ccee813" sha1="4bc034f7f37da956b4116a2dea8a856b96e43c18" />
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<rom loadflag="load16_byte" name="ms5b-c1.bin" offset="0x0000000" size="0x800000" crc="4b0e5998" sha1="458486d579db118ec4ba4f9fce9d62fedfef949b" />
+				<rom loadflag="load16_byte" name="ms5b-c2.bin" offset="0x0000001" size="0x800000" crc="022fc30b" sha1="7178900acbb377c3de95338c8fae56e308327cab" />
+				<rom loadflag="load16_byte" name="ms5b-c3.bin" offset="0x1000000" size="0x800000" crc="ead86d28" sha1="e1db4f839972748f49dddfe3bd4b0cf2e0ddf074" />
+				<rom loadflag="load16_byte" name="ms5b-c4.bin" offset="0x1000001" size="0x800000" crc="0be6be35" sha1="34e20e55423cefd2b98c15061f86198b64727173" />
+				<rom loadflag="load16_byte" name="ms5b-c5.bin" offset="0x2000000" size="0x800000" crc="2a23e569" sha1="576370a24a8ef5ca0f8e7afa4ccdb0cb3ad9bdaa" />
+				<rom loadflag="load16_byte" name="ms5b-c6.bin" offset="0x2000001" size="0x800000" crc="6eb6bc9e" sha1="4e54d904b0ce34cca429b3c86ab8bf972c66336e" />
+				<rom loadflag="load16_byte" name="ms5b-c7.bin" offset="0x3000000" size="0x800000" crc="57f4e53f" sha1="813d98175288045c0750d45afe03c74973d70cee" />
+				<rom loadflag="load16_byte" name="ms5b-c8.bin" offset="0x3000001" size="0x800000" crc="9d59ff7c" sha1="ff90dc79598de0880df17624c76df81c92f267ce" />
 			</dataarea>
 		</part>
 	</software>
