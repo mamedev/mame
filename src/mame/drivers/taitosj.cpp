@@ -2293,38 +2293,64 @@ ROM_START( wwestern1 )
 ROM_END
 
 ROM_START( frontlin )
+	ROM_REGION( 0x12000, "maincpu", 0 )  // on PBC J000004A / K1000103A
+	ROM_LOAD( "aa1_05.ic1", 0x00000, 0x2000, CRC(4b7c0d81) SHA1(2261421b01a56c8ec3e27e97f9202682ffc472aa) )  // 2764
+	ROM_LOAD( "aa1_06.ic2", 0x02000, 0x2000, CRC(caacdc02) SHA1(7dd46e79e403c3a45dafe5d8844818cffbc0ef89) )  // 2764
+	ROM_LOAD( "aa1_07.ic3", 0x04000, 0x2000, CRC(df2b2691) SHA1(79a99687c4c9931f247810732523a2ecf840dcad) )  // 2764
+	ROM_LOAD( "aa1_08.ic6", 0x06000, 0x2000, CRC(f9bc3374) SHA1(20939b1eebc990ed20cf386d091a496dd1449ba7) )  // 2764
+	ROM_LOAD( "aa1_10.ic8", 0x0e000, 0x1000, CRC(2704aa4c) SHA1(d8dbad5deeef2c7b032b741ab3014a8402c334eb) )  // 2732
+	ROM_LOAD( "aa1_09.ic7", 0x10000, 0x2000, CRC(e24d1f05) SHA1(06f973673729bc82a5cd43fcec50d721fed6dc72) )  // 2764
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )  // on PCB J10000001A / K1000100A / M4200331A
+	ROM_LOAD( "aa1_11.ic70", 0x0000, 0x1000, CRC(15f4ed8c) SHA1(ec096234e4e594100180eb99c8c57eb97b9f57e2) )  // 2732
+	ROM_LOAD( "aa1_12.ic71", 0x1000, 0x1000, CRC(c3eb38e7) SHA1(427e5deb6a6e22d8c34923209a818f79d50e59d4) )  // 2732
+	
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 2k for the microcontroller on PCB J1000003A / K1000102A
+	ROM_LOAD( "aa1_13.ic24", 0x0000, 0x0800, CRC(7e78bdd3) SHA1(9eeb0e969fd013b9db074a15b0463216453e9364) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )  // graphic ROMs used at runtime on PBC J000004A / K1000103A
+	ROM_LOAD( "aa1_01.ic4",  0x0000, 0x2000, CRC(724fd755) SHA1(fd4d903edc6fccf7f350788e10bdbf3e1005790d) )  // 2764
+	ROM_LOAD( "aa1_02.ic5",  0x2000, 0x2000, CRC(b2d35070) SHA1(f9476207a930509bf02c8af6fc76b471578746a7) )  // 2764
+	ROM_LOAD( "aa1_03.ic9",  0x4000, 0x2000, CRC(d0723026) SHA1(a4ddfe198453304c50ce0eac5055357e24fd14c9) )  // 2764
+	ROM_LOAD( "aa1_04.ic10", 0x6000, 0x2000, CRC(bdc0a4f0) SHA1(a2fa59ec1d4e7bd4f6d2b0743bcbb0ff3750420c) )  // 2764
+
+	ROM_REGION( 0x0100, "proms", 0 )  // layer PROM - on PCB J1000002A / K1000101A
+	ROM_LOAD( "eb16.ic22", 0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+ROM_END
+
+ROM_START( frontlina )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "fl69.u69",     0x00000, 0x1000, CRC(93b64599) SHA1(1d4e135d5105d5e2949dbd791eb87c30e8505f1d) )
-	ROM_LOAD( "fl68.u68",     0x01000, 0x1000, CRC(82dccdfb) SHA1(0c88feff88b61dc0ae5487aa0a83f665a308658f) )
-	ROM_LOAD( "fl67.u67",     0x02000, 0x1000, CRC(3fa1ba12) SHA1(06eaccc75a4a950ed509c0dd203eeb7120849e74) )
-	ROM_LOAD( "fl66.u66",     0x03000, 0x1000, CRC(4a3db285) SHA1(0b486523d4ae302962dcb4ca042754fd96208259) )
-	ROM_LOAD( "fl65.u65",     0x04000, 0x1000, CRC(da00ec70) SHA1(652eb07c1e98ed04042a334ad8e27fd3da8dd6a2) )
-	ROM_LOAD( "fl64.u64",     0x05000, 0x1000, CRC(9fc90a20) SHA1(2d1bc248ed68dbb1993c360a9f2e2dbe26c216fb) )
-	ROM_LOAD( "fl55.u55",     0x06000, 0x1000, CRC(359242c2) SHA1(63bd845b2d881946a7904e4df1db3d78a60b57ad) )
-	ROM_LOAD( "fl54.u54",     0x07000, 0x1000, CRC(d234c60f) SHA1(b45bf432a64b7aaf3762d72a762b5eca198d5b3d) )
-	ROM_LOAD( "aa1_10.8",     0x0e000, 0x1000, CRC(2704aa4c) SHA1(d8dbad5deeef2c7b032b741ab3014a8402c334eb) )
-	ROM_LOAD( "fl53.u53",     0x10000, 0x1000, CRC(67429975) SHA1(b84254b2d04b034c2602f95587523a77dfdbae71) ) /* banked at 6000 */
-	ROM_LOAD( "fl52.u52",     0x11000, 0x1000, CRC(cb223d34) SHA1(a1a4530ed25064c6cabe34c52bb239e3656e4ced) ) /* banked at 7000 */
+	ROM_LOAD( "fl69.u69",     0x00000, 0x1000, CRC(93b64599) SHA1(1d4e135d5105d5e2949dbd791eb87c30e8505f1d) ) // == aa1_05.ic1 1/2
+	ROM_LOAD( "fl68.u68",     0x01000, 0x1000, CRC(82dccdfb) SHA1(0c88feff88b61dc0ae5487aa0a83f665a308658f) ) // == aa1_05.ic1 2/2
+	ROM_LOAD( "fl67.u67",     0x02000, 0x1000, CRC(3fa1ba12) SHA1(06eaccc75a4a950ed509c0dd203eeb7120849e74) ) // == aa1_06.ic2 1/2
+	ROM_LOAD( "fl66.u66",     0x03000, 0x1000, CRC(4a3db285) SHA1(0b486523d4ae302962dcb4ca042754fd96208259) ) // == aa1_06.ic2 2/2
+	ROM_LOAD( "fl65.u65",     0x04000, 0x1000, CRC(da00ec70) SHA1(652eb07c1e98ed04042a334ad8e27fd3da8dd6a2) ) // == aa1_07.ic3 1/2
+	ROM_LOAD( "fl64.u64",     0x05000, 0x1000, CRC(9fc90a20) SHA1(2d1bc248ed68dbb1993c360a9f2e2dbe26c216fb) ) // == aa1_07.ic3 2/2
+	ROM_LOAD( "fl55.u55",     0x06000, 0x1000, CRC(359242c2) SHA1(63bd845b2d881946a7904e4df1db3d78a60b57ad) ) // == aa1_08.ic6 1/2
+	ROM_LOAD( "fl54.u54",     0x07000, 0x1000, CRC(d234c60f) SHA1(b45bf432a64b7aaf3762d72a762b5eca198d5b3d) ) // == aa1_08.ic6 2/2
+	ROM_LOAD( "aa1_10.ic8",   0x0e000, 0x1000, CRC(2704aa4c) SHA1(d8dbad5deeef2c7b032b741ab3014a8402c334eb) )
+	ROM_LOAD( "fl53.u53",     0x10000, 0x1000, CRC(67429975) SHA1(b84254b2d04b034c2602f95587523a77dfdbae71) ) // == aa1_09.ic7 1/2 - banked at 6000
+	ROM_LOAD( "fl52.u52",     0x11000, 0x1000, CRC(cb223d34) SHA1(a1a4530ed25064c6cabe34c52bb239e3656e4ced) ) // == aa1_09.ic7 2/2 - banked at 7000
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "fl70.u70",     0x0000, 0x1000, CRC(15f4ed8c) SHA1(ec096234e4e594100180eb99c8c57eb97b9f57e2) )
-	ROM_LOAD( "fl71.u71",     0x1000, 0x1000, CRC(c3eb38e7) SHA1(427e5deb6a6e22d8c34923209a818f79d50e59d4) )
+	ROM_LOAD( "fl70.u70",     0x0000, 0x1000, CRC(15f4ed8c) SHA1(ec096234e4e594100180eb99c8c57eb97b9f57e2) ) // aa1_11.ic70
+	ROM_LOAD( "fl71.u71",     0x1000, 0x1000, CRC(c3eb38e7) SHA1(427e5deb6a6e22d8c34923209a818f79d50e59d4) ) // aa1_12.ic71
+	
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 2k for the microcontroller
+	ROM_LOAD( "aa1_13.ic24",  0x0000, 0x0800, CRC(7e78bdd3) SHA1(9eeb0e969fd013b9db074a15b0463216453e9364) )
 
-	ROM_REGION( 0x0800, "bmcu:mcu", 0 )       /* 2k for the microcontroller */
-	ROM_LOAD( "aa1.13",       0x0000, 0x0800, CRC(7e78bdd3) SHA1(9eeb0e969fd013b9db074a15b0463216453e9364) )
+	ROM_REGION( 0x8000, "gfx1", 0 )  // graphic ROMs used at runtime
+	ROM_LOAD( "fl1.u1",       0x0000, 0x1000, CRC(e82c9f46) SHA1(eaab468bb5e46e9c714e6f84e65f954331fdbc56) ) // == aa1_01.ic4 1/2
+	ROM_LOAD( "fl2.u2",       0x1000, 0x1000, CRC(123055d3) SHA1(6aaddd8ebb418c7c8584eb74ad13cd5accd5a196) ) // == aa1_01.ic4 2/2
+	ROM_LOAD( "fl3.u3",       0x2000, 0x1000, CRC(7ea46347) SHA1(b924a614abe01f7ca6a31463864d6cc55a47946e) ) // == aa1_02.ic5 1/2
+	ROM_LOAD( "fl4.u4",       0x3000, 0x1000, CRC(9e2cff10) SHA1(0932c15eacccab5a3a931dd40c1a35b5a4ca1cd5) ) // == aa1_02.ic5 2/2
+	ROM_LOAD( "fl5.u5",       0x4000, 0x1000, CRC(630b4be1) SHA1(780f75fdea68917a08f5f00da3831eaa26fd4405) ) // == aa1_03.ic9 1/2
+	ROM_LOAD( "fl6.u6",       0x5000, 0x1000, CRC(9e092d58) SHA1(8388870bb40c7a2e3b4ede74c37c71c3a3d1a607) ) // == aa1_03.ic9 2/2
+	ROM_LOAD( "fl7.u7",       0x6000, 0x1000, CRC(613682a3) SHA1(b681f3a4e70f207ce140adfac1388900d5013317) ) // == aa1_04.ic10 1/2
+	ROM_LOAD( "fl8.u8",       0x7000, 0x1000, CRC(f73b0d5e) SHA1(3f4ae070e39fac3c64c6c438168d131bffc580e2) ) // == aa1_04.ic10 2/2
 
-	ROM_REGION( 0x8000, "gfx1", 0 )       /* graphic ROMs used at runtime */
-	ROM_LOAD( "fl1.u1",       0x0000, 0x1000, CRC(e82c9f46) SHA1(eaab468bb5e46e9c714e6f84e65f954331fdbc56) )
-	ROM_LOAD( "fl2.u2",       0x1000, 0x1000, CRC(123055d3) SHA1(6aaddd8ebb418c7c8584eb74ad13cd5accd5a196) )
-	ROM_LOAD( "fl3.u3",       0x2000, 0x1000, CRC(7ea46347) SHA1(b924a614abe01f7ca6a31463864d6cc55a47946e) )
-	ROM_LOAD( "fl4.u4",       0x3000, 0x1000, CRC(9e2cff10) SHA1(0932c15eacccab5a3a931dd40c1a35b5a4ca1cd5) )
-	ROM_LOAD( "fl5.u5",       0x4000, 0x1000, CRC(630b4be1) SHA1(780f75fdea68917a08f5f00da3831eaa26fd4405) )
-	ROM_LOAD( "fl6.u6",       0x5000, 0x1000, CRC(9e092d58) SHA1(8388870bb40c7a2e3b4ede74c37c71c3a3d1a607) )
-	ROM_LOAD( "fl7.u7",       0x6000, 0x1000, CRC(613682a3) SHA1(b681f3a4e70f207ce140adfac1388900d5013317) )
-	ROM_LOAD( "fl8.u8",       0x7000, 0x1000, CRC(f73b0d5e) SHA1(3f4ae070e39fac3c64c6c438168d131bffc580e2) )
-
-	ROM_REGION( 0x0100, "proms", 0 )      /* layer PROM */
-	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+	ROM_REGION( 0x0100, "proms", 0 )  // layer PROM
+	ROM_LOAD( "eb16.ic22",    0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
 
@@ -2864,28 +2890,29 @@ void taitosj_state::init_junglhbr()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
 }
 
-GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spacecr,  0,        nomcu,    spacecr,  taitosj_state, init_spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglek,  0,        nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekas,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekj2,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleh,  junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junglehbr,junglek,  nomcu,    junglek,  taitosj_state, init_junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleby, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpine,   0,        nomcu,    alpine,   taitosj_state, init_alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar,  0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hwrace,   0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation", "High Way Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spaceskr,  0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Space Seeker", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spacecr,   0,        nomcu,    spacecr,  taitosj_state, init_spacecr, ROT90,  "Taito Corporation",         "Space Cruiser", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglek,   0,        nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekas, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekj2, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation",         "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleh,   junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junglehbr, junglek,  nomcu,    junglek,  taitosj_state, init_junglhbr,ROT180, "Taito do Brasil",           "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratpet,  junglek,  nomcu,    piratpet, taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleby,  junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "bootleg",                   "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpine,    0,        nomcu,    alpine,   taitosj_state, init_alpine,  ROT270, "Taito Corporation",         "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpinea,   alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea, ROT270, "Taito Corporation",         "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timetunl,  0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Time Tunnel", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern,  0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern1, wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlin,  0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlina, frontlin, mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator,  0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg",                   "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator4, elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar2,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hwrace,    0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "High Way Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kikstart,  0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
