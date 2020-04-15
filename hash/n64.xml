@@ -296,8 +296,14 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="64大相撲"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NOSJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="64 oozumou (japan).bin" size="16777216" crc="a6dbf8ae" sha1="da4c60c6054c374a251a7e5e718f199a37946423" />
+				<rom name="nus-nosj-0.u1" size="16777216" crc="a6dbf8ae" sha1="da4c60c6054c374a251a7e5e718f199a37946423" />
 			</dataarea>
 		</part>
 	</software>
@@ -401,8 +407,14 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="エアロゲイジ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NAGJ-1]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="aerogauge (japan) (rev a).bin" size="8388608" crc="1a5f6c19" sha1="dfb171caa0091bd36526641d252839c0e72b616c" />
+				<rom name="nus-nagj-1.u1" size="8388608" crc="1a5f6c19" sha1="dfb171caa0091bd36526641d252839c0e72b616c" />
 			</dataarea>
 		</part>
 	</software>
@@ -8438,8 +8450,14 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="release" value="20000421"/>
 		<info name="alt_title" value="忍たま乱太郎64 ゲームギャラリー"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NHBJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="nintama rantarou 64 game gallery (japan).bin" size="8388608" crc="2d96c091" sha1="0c2ee2266c67b5afa507f5b8ece88ab565fed63a" />
+				<rom name="nus-nhbj-0.u1" size="8388608" crc="2d96c091" sha1="0c2ee2266c67b5afa507f5b8ece88ab565fed63a" />
 			</dataarea>
 		</part>
 	</software>
