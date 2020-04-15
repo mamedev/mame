@@ -518,7 +518,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			if (!part.romdata().empty())
 			{
 				std::map<std::string, u32> data_area_map;
-				char const *last_region_name = "???";
+				//char const *last_region_name = "???";
 				char const *last_name = "???";
 				u32 current_length = 0;
 				int items_since_region = 1;
@@ -528,7 +528,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 					{
 						// reset our region tracking states
 						items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
-						last_region_name = romp->name().c_str();
+						//last_region_name = romp->name().c_str();
 
 						// check for a valid tag
 						if (romp->name().size() < MIN_TAG_LENGTH)
