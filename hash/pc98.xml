@@ -12767,7 +12767,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ダムバスターズ" />
 		<info name="release" value="198601xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1086448">
+			<dataarea name="flop" size="3765072">
 				<rom name="dam busters [nfd r1].nfd" size="3765072" crc="2bd54d4e" sha1="3a1df219c32478405f7ae2797d46f1ec7262eb5f" offset="0" />
 			</dataarea>
 		</part>

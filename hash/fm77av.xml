@@ -357,7 +357,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="レイドック"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
+			<dataarea name="flop" size="416048">
 				<rom name="laydocka1.d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132"/>
 			</dataarea>
 		</part>
@@ -379,7 +379,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<!--rom name="laydock (1986)(t&amp;e)(jp).d77" size="538592" crc="60fc8306" sha1="65f73297d0ee4f07ec5f513eef54dfbc1d3a5094" offset="0"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
+			<dataarea name="flop" size="416048">
 				<rom name="laydock (disk 1).d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132"/>
 			</dataarea>
 		</part>

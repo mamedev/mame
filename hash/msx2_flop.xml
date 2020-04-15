@@ -246,7 +246,7 @@ The following floppies came with the machines.
 		<year>1985</year>
 		<publisher>Sony</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="73720">
+			<dataarea name="flop" size="737280">
 				<rom name="700sdsk1.dsk" size="737280" crc="cc7c0972" sha1="b9cbe7decaf796b8cde9a70de50d634b5e2b2a2b"/>
 			</dataarea>
 		</part>

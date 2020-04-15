@@ -4775,7 +4775,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
-			<dataarea name="flop" size="1261568">
+			<dataarea name="flop" size="1281968">
 				<rom name="opeurope.d88" size="1281968" crc="32174842" sha1="12fd4e6558e0bf7e47a9a27fa5c33db9c3a60cfd" offset="000000" />
 			</dataarea>
 		</part>
@@ -6724,7 +6724,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
-			<dataarea name="flop" size="1261568">
+			<dataarea name="flop" size="1281968">
 				<rom name="inindo.d88" size="1281968" crc="8228d430" sha1="074d1fb23eb31b6d388deeeded545c4202cd5dee" offset="000000" />
 			</dataarea>
 		</part>
@@ -9737,7 +9737,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
-			<dataarea name="flop" size="1261568">
+			<dataarea name="flop" size="1281968">
 				<rom name="nobubus.d88" size="1281968" crc="6ac325e5" sha1="c12389c6a34ed87155ab4db4831479f608e47d59" offset="000000" />
 			</dataarea>
 		</part>
@@ -11813,7 +11813,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Master Disk" />
-			<dataarea name="flop" size="1261568">
+			<dataarea name="flop" size="3583660">
 				<rom name="shinjuku labyrinth (master disk).mfm" size="3583660" crc="78b7c26c" sha1="778befacd1534dc22edffccaebb2957823e488e7" offset="000000" />
 			</dataarea>
 		</part>

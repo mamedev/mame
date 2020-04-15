@@ -421,14 +421,15 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 
 void software_list_device::internal_validity_check(validity_checker &valid)
 {
-	enum { NAME_LEN_PARENT = 16, NAME_LEN_CLONE = 16 };
+	enum { NAME_LEN_PARENT = 16, NAME_LEN_CLONE = 16, NAME_LEN_PART = 16  };
+	auto const valid_name_char = [] (char ch) { return ((ch >= '0') && (ch <= '9')) || ((ch >= 'a') && (ch <= 'z')) || (ch == '_'); };
+	auto const valid_tag_char = [] (char ch) { return ((ch >= '0') && (ch <= '9')) || ((ch >= 'a') && (ch <= 'z')) || strchr("$.:_", u8(ch)); };
+	auto const valid_year_char = [] (char ch) { return isdigit(u8(ch)) || (ch == '?') || (ch == '+'); };
 
 	softlist_map names;
 	softlist_map descriptions;
 	for (const software_info &swinfo : get_info())
 	{
-		std::string const &shortname(swinfo.shortname());
-
 		// first parse and output core errors if any
 		if (m_errors.length() > 0)
 		{
@@ -437,48 +438,32 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		}
 
 		// Now check if the xml data is valid:
+		std::string const &shortname(swinfo.shortname());
 
-		// Did we lost any description?
 		if (swinfo.longname().empty())
-		{
 			osd_printf_error("%s: %s has no description\n", filename(), shortname);
-			break;
-		}
 
-		// Did we lost any year?
 		if (swinfo.year().empty())
-		{
 			osd_printf_error("%s: %s has no year\n", filename(), shortname);
-			break;
-		}
 
-		// Did we lost any publisher?
 		if (swinfo.publisher().empty())
-		{
 			osd_printf_error("%s: %s has no publisher\n", filename(), shortname);
-			break;
-		}
 
 		// Did we lost the software parts?
 		if (swinfo.parts().empty())
-		{
-			osd_printf_error("%s: %s has no part\n", filename(), shortname);
-			break;
-		}
+			osd_printf_error("%s: %s has no parts\n", filename(), shortname);
 
 		// Second, since the xml is fine, run additional checks:
 
 		// check for duplicate names
-		if (!names.insert(std::make_pair(shortname, &swinfo)).second)
-		{
-			const software_info *match = names.find(shortname)->second;
-			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), shortname, match->shortname());
-		}
+		auto const dupname(names.emplace(shortname, &swinfo));
+		if (!dupname.second)
+			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), shortname, dupname.first->second->shortname());
 
 		// check for duplicate descriptions
-		std::string longname(swinfo.longname());
-		if (!descriptions.insert(std::make_pair(strmakelower(longname), &swinfo)).second)
-			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo.longname(), shortname);
+		auto const dupdesc(descriptions.emplace(swinfo.longname(), &swinfo));
+		if (!dupdesc.second)
+			osd_printf_error("%s: %s has duplicate description '%s' (%s)\n", filename(), shortname, swinfo.longname(), dupdesc.first->second->shortname());
 
 		bool const is_clone(!swinfo.parentname().empty());
 		if (is_clone)
@@ -486,16 +471,15 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			if (swinfo.parentname() == shortname)
 			{
 				osd_printf_error("%s: %s is set as a clone of itself\n", filename(), shortname);
-				break;
 			}
-
-			// make sure the parent exists
-			const software_info *swinfo2 = find(swinfo.parentname());
-
-			if (swinfo2 == nullptr)
-				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname(), shortname);
-			else if (!swinfo2->parentname().empty())
-				osd_printf_error("%s: %s is a clone of a clone\n", filename(), shortname);
+			else
+			{
+				software_info const *const parent = find(swinfo.parentname());
+				if (!parent)
+					osd_printf_error("%s: %s is a clone of non-existent parent %s\n", filename(), shortname, swinfo.parentname());
+				else if (!parent->parentname().empty())
+					osd_printf_error("%s: %s is a clone %s which is a clone of %s\n", filename(), shortname, swinfo.parentname(), parent->parentname());
+			}
 		}
 
 		// make sure the driver name isn't too long
@@ -504,32 +488,80 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 					is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 
 		// make sure the driver name doesn't contain invalid characters
-		for (char ch : shortname)
-			if (((ch < '0') || (ch > '9')) && ((ch < 'a') || (ch > 'z')) && (ch != '_'))
-			{
-				osd_printf_error("%s: %s contains invalid characters\n", filename(), shortname);
-				break;
-			}
+		if (std::find_if_not(shortname.begin(), shortname.end(), valid_name_char) != shortname.end())
+			osd_printf_error("%s: %s contains invalid characters\n", filename(), shortname);
 
 		// make sure the year is only digits, '?' or '+'
-		for (char ch : swinfo.year())
-			if (!isdigit(u8(ch)) && (ch != '?') && (ch != '+'))
-			{
-				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), shortname, swinfo.year());
-				break;
-			}
+		if (std::find_if_not(swinfo.year().begin(), swinfo.year().end(), valid_year_char) != swinfo.year().end())
+			osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), shortname, swinfo.year());
 
-		softlist_map part_names;
-		for (const software_part &part : swinfo.parts())
+		std::set<std::string> part_names;
+		for (software_part const &part : swinfo.parts())
 		{
 			if (part.interface().empty())
-				osd_printf_error("%s: %s has a part (%s) without interface\n", filename(), shortname, part.name());
+				osd_printf_error("%s: %s part %s has no interface\n", filename(), shortname, part.name());
 
 			if (part.romdata().empty())
-				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), shortname, part.name());
+				osd_printf_error("%s: %s part %s has no data areas\n", filename(), shortname, part.name());
 
-			if (!part_names.insert(std::make_pair(part.name(), &swinfo)).second)
-				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), shortname, part.name());
+			if (!part_names.emplace(part.name()).second)
+				osd_printf_error("%s: %s part %s has duplicate name\n", filename(), shortname, part.name());
+
+			if (part.name().length() > NAME_LEN_PART)
+				osd_printf_error("%s: %s part %s name must be %d characters or less\n", filename(), shortname, part.name(), NAME_LEN_PART);
+
+			if (std::find_if_not(part.name().begin(), part.name().end(), valid_name_char) != part.name().end())
+				osd_printf_error("%s: %s part %s contains invalid characters\n", filename(), shortname, part.name());
+
+			// validate data areas
+			// based on ROM validation code from validity.cpp but adapted to work with rom_entry and ignore unavailable features like BIOS
+			if (!part.romdata().empty())
+			{
+				std::map<std::string, u32> data_area_map;
+				char const *last_region_name = "???";
+				char const *last_name = "???";
+				u32 current_length = 0;
+				int items_since_region = 1;
+				for (rom_entry const *romp = &part.romdata().front(); romp && !ROMENTRY_ISEND(romp); ++romp)
+				{
+					if (ROMENTRY_ISREGION(romp)) // if this is a region, make sure it's valid, and record the length
+					{
+						// reset our region tracking states
+						items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
+						last_region_name = romp->name().c_str();
+
+						// check for a valid tag
+						if (romp->name().size() < MIN_TAG_LENGTH)
+							osd_printf_error("%s: %s part %s data area name '%s' is too short (mut be at least %d characters)\n", filename(), shortname, part.name(), romp->name(), MIN_TAG_LENGTH);
+
+						if (std::find_if_not(romp->name().begin(), romp->name().end(), valid_tag_char) != romp->name().end())
+							osd_printf_error("%s: %s part %s data area name '%s' contains invalid characters\n", filename(), shortname, part.name(), romp->name());
+
+						// attempt to add it to the map, reporting duplicates as errors
+						current_length = ROMREGION_GETLENGTH(romp);
+						if (!data_area_map.emplace(romp->name(), current_length).second)
+							osd_printf_error("%s: %s part %s data area has duplicate name '%s'\n", filename(), shortname, part.name(), romp->name());
+					}
+					else if (ROMENTRY_ISFILE(romp)) // if this is a file, make sure it is properly formatted
+					{
+						// track the last filename we found
+						last_name = romp->name().c_str();
+
+						// make sure the hash is valid
+						util::hash_collection hashes;
+						if (!hashes.from_internal_string(romp->hashdata().c_str()))
+							osd_printf_error("%s: %s part %s ROM '%s' has invalid hash string '%s'\n", filename(), shortname, part.name(), romp->name(), romp->hashdata());
+					}
+
+					// for any non-region ending entries, make sure they don't extend past the end
+					if (!ROMENTRY_ISREGIONEND(romp) && current_length > 0)
+					{
+						items_since_region++;
+						if (!ROMENTRY_ISIGNORE(romp) && (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length))
+							osd_printf_error("%s: %s part %s ROM '%s' extends past the defined data area\n", filename(), shortname, part.name(), last_name);
+					}
+				}
+			}
 		}
 	}
 

@@ -8797,12 +8797,12 @@ has been replaced with an all-zero block. -->
 		<publisher>Sega</publisher>
 		<info name="developer" value="Sega" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [1 of 2].img" size="368640" crc="9d919d85" sha1="9203ecedd274d2436b6c39aa166fabd0e5d089d4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [2 of 2].img" size="368640" crc="8684a3dd" sha1="3200f3a97d5912812dc4b53b8b733a371c2bf140"/>
 			</dataarea>
 		</part>

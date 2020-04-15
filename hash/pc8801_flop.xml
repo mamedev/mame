@@ -575,13 +575,13 @@ INVESTIGATE
 		<!--rom name="saito yuki demo.d88" size="697984" crc="e879576f" sha1="4f7344ce305d86c9492f0527c4120d5ac0ced37a" offset="0"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424"> <!-- Data CRC16: 2590 -->
+			<dataarea name="flop" size="349136"> <!-- Data CRC16: 2590 -->
 				<rom name="saito yuki demo (disk 1).d88" size="349136" crc="596501d6" sha1="b698d49dcdf16dbe97151d368a5f7f139a5b4dd6" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="31424"> <!-- Data CRC16: 15660 -->
+			<dataarea name="flop" size="348848"> <!-- Data CRC16: 15660 -->
 				<rom name="saito yuki demo (disk 2).d88" size="348848" crc="0b6f69cb" sha1="f90808d7368a2c3d09a67570754b8e27f3ec4b98" offset="0"/>
 			</dataarea>
 		</part>
@@ -11129,7 +11129,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<year>1989?</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="415824">    <!-- Data CRC16: 21332 -->
+			<dataarea name="flop" size="415840">    <!-- Data CRC16: 21332 -->
 				<rom name="emerald dragon music disk (19xx)(basho house).d88" size="415840" crc="6f1a87d3" sha1="c6c6ec5af97f3c1c0c1b9687d4cd7ac368051181"/>
 			</dataarea>
 		</part>

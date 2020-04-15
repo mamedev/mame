@@ -447,7 +447,7 @@ license:CC0
 			<dataarea name="rom" size="2097152">
 				<rom name="was ist das von richard scarry.u1" size="2097152" crc="744cd1f4" sha1="797b9856ef6f96c92978303c6604c2f1ae2e9278" />
 			</dataarea>
-			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="47060702" crc="b6a82c67" sha1="ee6dd6a64b8c876298d4d987ec0944b94601a36d" offset="0"/>
 				<rom name="0 - 0002.png" size="25273650" crc="951c77cf" sha1="901996b902f3954442d76924c3f33930e98cc21c" offset="0"/>
 				<rom name="0 - 0003.png" size="21119566" crc="85eacf2a" sha1="1bc18385434c23e247024ad950b4cadb87339dba" offset="0"/>

@@ -6637,7 +6637,7 @@ license:CC0
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
-			<dataarea name="rom" size="0x800">
+			<dataarea name="rom" size="0x8000">
 				<rom name="turbomst.bin" size="0x8000" status="nodump"/>
 			</dataarea>
 		</part>

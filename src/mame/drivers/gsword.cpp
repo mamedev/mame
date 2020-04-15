@@ -230,7 +230,7 @@ clock is supplied to both communication MCUs on T0.  Outputs are set
 after detecting a rising edge on T0, and inputs are read after detecting
 a falling edge on T0.
 
-A frame consists to five bytes send LSB first.  Each byte is followed by
+A frame consists to five bytes sent LSB first.  Each byte is followed by
 an odd parity bit.  Useful addresses for debugging communication:
 * $12A: Function for sending a frame from $21..$25
 * $159: Function for receiving a frame to $29..$2D

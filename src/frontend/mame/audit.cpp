@@ -187,33 +187,7 @@ media_auditor::summary media_auditor::audit_software(software_list_device &swlis
 				if (ROMREGION_ISROMDATA(region))
 				{
 					if (searchpath.empty())
-					{
-						std::vector<software_info const *> parents;
-
-						// search <rompath>/<list>/<software> following parents
-						searchpath.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), swinfo.shortname()));
-						for (software_info const *i = &swinfo; i && !i->parentname().empty(); i = swlist.find(i->parentname()))
-						{
-							if (std::find(parents.begin(), parents.end(), i) != parents.end())
-							{
-								osd_printf_warning("WARNING: software parent/clone relationships form a loop (%s:%s)\n", swlist.list_name(), swinfo.shortname());
-								break;
-							}
-							parents.emplace_back(i);
-							searchpath.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), i->parentname()));
-						}
-
-						// search <rompath>/<software> following parents
-						searchpath.emplace_back(swinfo.shortname());
-						parents.clear();
-						for (software_info const *i = &swinfo; i && !i->parentname().empty(); i = swlist.find(i->parentname()))
-						{
-							if (std::find(parents.begin(), parents.end(), i) != parents.end())
-								break;
-							parents.emplace_back(i);
-							searchpath.emplace_back(i->parentname());
-						}
-					}
+						searchpath = rom_load_manager::get_software_searchpath(swlist, swinfo);
 					return &audit_one_rom(searchpath, rom);
 				}
 				else if (ROMREGION_ISDISKDATA(region))

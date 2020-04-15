@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Paul Priest,Aaron Giles
+// copyright-holders:Nicola Salmoria,Paul Priest,Aaron Giles,Vas Crabb
 /*********************************************************************
 
     romload.cpp
@@ -30,27 +30,72 @@
 #define TEMPBUFFER_MAX_SIZE     (1024 * 1024 * 1024)
 
 /***************************************************************************
-    HELPERS (also used by diimage.cpp)
+    HELPERS
  ***************************************************************************/
 
 namespace {
 
-rom_entry const *next_parent_system(game_driver const *&system, std::vector<rom_entry> &rom_entries)
+auto next_parent_system(game_driver const &system)
 {
-	if (!system)
-		return nullptr;
-	int const parent(driver_list::find(system->parent));
-	if (0 > parent)
+	return
+			[sys = &system, roms = std::vector<rom_entry>()] () mutable -> rom_entry const *
+			{
+				if (!sys)
+					return nullptr;
+				int const parent(driver_list::find(sys->parent));
+				if (0 > parent)
+				{
+					sys = nullptr;
+					return nullptr;
+				}
+				else
+				{
+					sys = &driver_list::driver(parent);
+					roms = rom_build_entries(sys->rom);
+					return &roms[0];
+				}
+			};
+}
+
+
+auto next_parent_software(std::vector<software_info const *> const &parents)
+{
+	auto part(parents.front()->parts().end());
+	return
+			[&parents, current = parents.cbegin(), part, end = part] () mutable -> const rom_entry *
+			{
+				if (part == end)
+				{
+					if (parents.end() == current)
+						return nullptr;
+					part = (*current)->parts().cbegin();
+					end = (*current)->parts().cend();
+					do { ++current; } while ((parents.cend() != current) && (*current)->parts().empty());
+				}
+				return &(*part++).romdata()[0];
+			};
+}
+
+
+std::vector<std::string> make_software_searchpath(software_list_device &swlist, software_info const &swinfo, std::vector<software_info const *> &parents)
+{
+	std::vector<std::string> result;
+
+	// search <rompath>/<list>/<software> following parents
+	for (software_info const *i = &swinfo; i; )
 	{
-		system = nullptr;
-		return nullptr;
+		if (std::find(parents.begin(), parents.end(), i) != parents.end())
+			break;
+		parents.emplace_back(i);
+		result.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), i->shortname()));
+		i = i->parentname().empty() ? nullptr : swlist.find(i->parentname());
 	}
-	else
-	{
-		system = &driver_list::driver(parent);
-		rom_entries = rom_build_entries(system->rom);
-		return &rom_entries[0];
-	}
+
+	// search <rompath>/<software> following parents
+	for (software_info const *i : parents)
+		result.emplace_back(i->shortname());
+
+	return result;
 }
 
 
@@ -1068,6 +1113,23 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 }
 
 
+/*-------------------------------------------------
+    get_software_searchpath - get search path
+    for a software list item
+-------------------------------------------------*/
+
+std::vector<std::string> rom_load_manager::get_software_searchpath(software_list_device &swlist, const software_info &swinfo)
+{
+	std::vector<software_info const *> parents;
+	return make_software_searchpath(swlist, swinfo, parents);
+}
+
+
+/*-------------------------------------------------
+    open_disk_image - open a disk image for a
+    device
+-------------------------------------------------*/
+
 chd_error rom_load_manager::open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd)
 {
 	const std::vector<std::string> searchpath(device.searchpath());
@@ -1075,47 +1137,24 @@ chd_error rom_load_manager::open_disk_image(const emu_options &options, const de
 	driver_device const *const driver(dynamic_cast<driver_device const *>(&device));
 	std::function<const rom_entry * ()> next_parent;
 	if (driver)
-		next_parent = [sys = &driver->system(), roms = std::vector<rom_entry>()] () mutable { return next_parent_system(sys, roms); };
+		next_parent = next_parent_system(driver->system());
 	else
 		next_parent = [] () { return nullptr; };
 	return do_open_disk(options, { searchpath }, romp, image_chd, std::move(next_parent));
 }
 
 
+/*-------------------------------------------------
+    open_disk_image - open a disk image for a
+    software item
+-------------------------------------------------*/
+
 chd_error rom_load_manager::open_disk_image(const emu_options &options, software_list_device &swlist, const software_info &swinfo, const rom_entry *romp, chd_file &image_chd)
 {
 	std::vector<software_info const *> parents;
-	std::vector<std::string> listsearch, freesearch, disksearch;
-	disksearch.emplace_back(swlist.list_name());
-
-	for (software_info const *i = &swinfo; i; )
-	{
-		if (std::find(parents.begin(), parents.end(), i) != parents.end())
-			break;
-		parents.emplace_back(i);
-		listsearch.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), i->shortname()));
-		freesearch.emplace_back(i->shortname());
-		i = i->parentname().empty() ? nullptr : swlist.find(i->parentname());
-	}
-
-	auto part(parents.front()->parts().end());
-	return do_open_disk(
-			options,
-			{ listsearch, freesearch, disksearch },
-			romp,
-			image_chd,
-			[&parents, current = parents.cbegin(), part, end = part] () mutable -> const rom_entry *
-			{
-				if (part == end)
-				{
-					if (parents.end() == current)
-						return nullptr;
-					part = (*current)->parts().cbegin();
-					end = (*current)->parts().cend();
-					do { ++current; } while ((parents.cend() != current) && (*current)->parts().empty());
-				}
-				return &(*part++).romdata()[0];
-			});
+	std::vector<std::string> searchpath = make_software_searchpath(swlist, swinfo, parents);
+	searchpath.emplace_back(swlist.list_name()); // look for loose disk images in software list directory
+	return do_open_disk(options, { searchpath }, romp, image_chd, next_parent_software(parents));
 }
 
 
@@ -1175,10 +1214,8 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	m_romsloadedsize = 0;
 
 	std::vector<const software_info *> parents;
-	std::vector<std::string> listsearch, freesearch, disksearch, devsearch;
-	listsearch.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), swname));
-	freesearch.emplace_back(swname);
-	const software_info *swinfo = swlist.find(swname);
+	std::vector<std::string> swsearch, disksearch, devsearch;
+	const software_info *const swinfo = swlist.find(swname);
 	if (swinfo)
 	{
 		// dispay a warning for unsupported software
@@ -1196,21 +1233,12 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		}
 
 		// walk the chain of parents and add them to the search path
-		parents.emplace_back(swinfo);
-		swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname()) : nullptr;
-		while (swinfo)
-		{
-			if (std::find(parents.begin(), parents.end(), swinfo) != parents.end())
-			{
-				m_errorstring.append(util::string_format("WARNING: parent/clone relationships form a loop for software %s (in list %s)\n", swname, swlist.list_name()));
-				m_softwarningstring.append(util::string_format("Parent/clone relationships from a loop for software %s (in list %s)\n", swname, swlist.list_name()));
-				break;
-			}
-			parents.emplace_back(swinfo);
-			listsearch.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), swinfo->shortname()));
-			freesearch.emplace_back(swinfo->shortname());
-			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname()) : nullptr;
-		}
+		swsearch = make_software_searchpath(swlist, *swinfo, parents);
+	}
+	else
+	{
+		swsearch.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), swname));
+		swsearch.emplace_back(swname);
 	}
 
 	// this is convenient for CD-only lists so you don't need an extra level of directories containing one file each
@@ -1269,40 +1297,23 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		if (ROMREGION_ISROMDATA(region))
 		{
 			if (devsearch.empty())
-				process_rom_entries({ listsearch, freesearch }, 0U, region, region + 1, true);
+				process_rom_entries({ swsearch }, 0U, region, region + 1, true);
 			else
-				process_rom_entries({ listsearch, freesearch, devsearch }, 0U, region, region + 1, true);
+				process_rom_entries({ swsearch, devsearch }, 0U, region, region + 1, true);
 		}
 		else if (ROMREGION_ISDISKDATA(region))
 		{
 			if (!next_parent)
 			{
 				if (!parents.empty())
-				{
-					auto part(parents.front()->parts().end());
-					next_parent =
-							[&parents, current = parents.cbegin(), part, end = part] () mutable -> const rom_entry *
-							{
-								if (part == end)
-								{
-									if (parents.end() == current)
-										return nullptr;
-									part = (*current)->parts().cbegin();
-									end = (*current)->parts().cend();
-									do { ++current; } while ((parents.cend() != current) && (*current)->parts().empty());
-								}
-								return &(*part++).romdata()[0];
-							};
-				}
+					next_parent = next_parent_software(parents);
 				else
-				{
 					next_parent = [] () { return nullptr; };
-				}
 			}
 			if (devsearch.empty())
-				process_disk_entries({ listsearch, freesearch, disksearch }, regiontag.c_str(), region + 1, next_parent);
+				process_disk_entries({ swsearch, disksearch }, regiontag.c_str(), region + 1, next_parent);
 			else
-				process_disk_entries({ listsearch, freesearch, disksearch, devsearch }, regiontag.c_str(), region + 1, next_parent);
+				process_disk_entries({ swsearch, disksearch, devsearch }, regiontag.c_str(), region + 1, next_parent);
 		}
 	}
 
@@ -1373,7 +1384,7 @@ void rom_load_manager::process_region_list()
 				{
 					driver_device const *const driver(dynamic_cast<driver_device const *>(&device));
 					if (driver)
-						next_parent = [sys = &driver->system(), roms = std::vector<rom_entry>()] () mutable { return next_parent_system(sys, roms); };
+						next_parent = next_parent_system(driver->system());
 					else
 						next_parent = [] () { return nullptr; };
 				}

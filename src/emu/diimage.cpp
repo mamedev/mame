@@ -906,31 +906,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				u32 crc = 0;
 				const bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 				std::vector<const software_info *> parents;
-				std::vector<std::string> searchpath;
-
-				// search <rompath>/<list>/<software> following parents
-				searchpath.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), swname));
-				for (const software_info *i = swinfo; i && !i->parentname().empty(); i = swlist.find(i->parentname()))
-				{
-					if (std::find(parents.begin(), parents.end(), i) != parents.end())
-					{
-						osd_printf_warning("WARNING: parent/clone relationships form a loop for software %s (in list %s)\n", swname, swlist.list_name());
-						break;
-					}
-					parents.emplace_back(i);
-					searchpath.emplace_back(util::string_format("%s" PATH_SEPARATOR "%s", swlist.list_name(), i->parentname()));
-				}
-
-				// search <rompath>/<software> following parents
-				searchpath.emplace_back(swname);
-				parents.clear();
-				for (software_info const *i = swinfo; i && !i->parentname().empty(); i = swlist.find(i->parentname()))
-				{
-					if (std::find(parents.begin(), parents.end(), i) != parents.end())
-						break;
-					parents.emplace_back(i);
-					searchpath.emplace_back(i->parentname());
-				}
+				std::vector<std::string> searchpath = rom_load_manager::get_software_searchpath(swlist, *swinfo);
 
 				// for historical reasons, add the search path for the software list device's owner
 				const device_t *const listowner = swlist.owner();

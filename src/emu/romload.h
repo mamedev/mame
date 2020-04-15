@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Aaron Giles
+// copyright-holders:Nicola Salmoria,Aaron Giles,Vas Crabb
 /*********************************************************************
 
     romload.h
@@ -422,6 +422,9 @@ public:
 	int set_disk_handle(const char *region, const char *fullpath);
 
 	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
+
+	/* get search path for a software item */
+	static std::vector<std::string> get_software_searchpath(software_list_device &swlist, const software_info &swinfo);
 
 	/* open a disk image, searching up the parent and loading by checksum */
 	static chd_error open_disk_image(const emu_options &options, const device_t &device, const rom_entry *romp, chd_file &image_chd);

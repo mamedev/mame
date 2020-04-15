@@ -1086,7 +1086,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="12e901e">
+			<dataarea name="flop" size="126717">
 				<rom name="3530 - sim city (europe).ipf" size="126717" crc="12e901ee" sha1="7fd665f19a290994dfbf8ba02da19ac1905581be" offset="0" />
 			</dataarea>
 		</part>
@@ -1122,7 +1122,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>The Edge</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195328">
+			<dataarea name="flop" size="236460">
 				<rom name="3531 - snoopy - the cool computer game (europe).ipf" size="236460" crc="acdfe6d4" sha1="4ab0bd91d893964d957bf8c7ab3fa79d534220dc" offset="0" />
 			</dataarea>
 		</part>

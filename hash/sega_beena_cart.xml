@@ -185,7 +185,7 @@ license:CC0
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase! Meiro de Daibouken!.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7" />
 			</dataarea>
-			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x0204f417" crc="088c3d4c" sha1="d66a27f30374568998cff2ed89e494ac7f449687" />
 				<rom name="0 - 0002.png" size="0x020d5ff7" crc="3f992374" sha1="b5dd1f438afc18ac6ca78aa2757129bb1f53b54e" />
 				<rom name="0 - 0003.png" size="0x020912fe" crc="b064c6ea" sha1="a4107dbcdc40713a651da52653b9e639b2d9addc" />
@@ -210,7 +210,7 @@ license:CC0
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes! PreCure 5 Asonde Oboeyou Hiragana!.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813" />
 			</dataarea>
-			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+			<dataarea name="pages" size="0x4000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x01fd2372" crc="9290ac04" sha1="d106071e01ee790d85d46a2378ce5f638331b67a"  />
 				<rom name="0 - 0002.png" size="0x0200a259" crc="d919d19b" sha1="20444680d29b6a66471cbdb77537ba054753b9d6"  />
 				<rom name="0 - 0003.png" size="0x01fd80c8" crc="97c2ba5e" sha1="128b226187bfc53e4b1abf7be04c068a61c88240"  />
