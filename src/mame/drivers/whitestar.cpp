@@ -112,9 +112,9 @@ WRITE8_MEMBER(whitestar_state::bank_w)
 // Whitestar automatically pulses the DMD IRQ line?  DE hardware doesn't do that...
 WRITE8_MEMBER(whitestar_state::dmddata_w)
 {
-	m_decodmd->data_w(space,offset,data);
-	m_decodmd->ctrl_w(space,0,1);
-	m_decodmd->ctrl_w(space,0,0);
+	m_decodmd->data_w(data);
+	m_decodmd->ctrl_w(1);
+	m_decodmd->ctrl_w(0);
 }
 void whitestar_state::machine_start()
 {
