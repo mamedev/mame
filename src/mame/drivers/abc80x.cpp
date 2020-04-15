@@ -193,7 +193,7 @@ READ8_MEMBER( abc800_state::read )
 {
 	uint8_t data = 0xff;
 	
-	if (offset < 0x4000 && !m_keydtr)
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
 		data = m_video_ram[offset];
 	}
@@ -219,7 +219,7 @@ READ8_MEMBER( abc800_state::read )
 
 WRITE8_MEMBER( abc800_state::write )
 {
-	if (offset < 0x4000 && !m_keydtr)
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
 		m_video_ram[offset] = data;
 	}
@@ -1121,7 +1121,7 @@ void abc800c_state::abc800c(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 
@@ -1150,7 +1150,7 @@ void abc800m_state::abc800m(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 

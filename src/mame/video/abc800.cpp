@@ -12,10 +12,9 @@
 
 
 
-// these are needed because the MC6845 emulation does
+// this is needed because the MC6845 emulation does
 // not position the active display area correctly
 #define HORIZONTAL_PORCH_HACK   115
-#define VERTICAL_PORCH_HACK     29
 
 
 
@@ -188,7 +187,7 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	const pen_t *pen = m_palette->pens();
 
-	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
+	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 240); y++)
 	{
 		int x = HORIZONTAL_PORCH_HACK;
 
