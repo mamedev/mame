@@ -37,7 +37,6 @@ public:
 	void init_kodb();
 	void init_mtwinsb();
 	void init_sf2m1();
-	void init_wofabl();
 
 protected:
 	DECLARE_MACHINE_START(fcrash);
@@ -68,7 +67,7 @@ protected:
 	virtual void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	void fcrash_build_palette();
+	virtual void fcrash_build_palette();
 
 	void fcrash_map(address_map &map);
 	void mtwinsb_map(address_map &map);
@@ -105,6 +104,17 @@ protected:
 	optional_device<msm5205_device> m_msm_2;
 
 	optional_memory_bank m_okibank;
+};
+
+class cps1bl_no_brgt : public fcrash_state
+{
+public:
+	cps1bl_no_brgt(const machine_config &mconfig, device_type type, const char *tag)
+		: fcrash_state(mconfig, type, tag)
+	{ }
+
+private:
+	void fcrash_build_palette() override;
 };
 
 #endif // MAME_INCLUDES_FCRASH_H

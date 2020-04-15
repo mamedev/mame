@@ -4,7 +4,7 @@
 
 
 /*
-    A note reguarding other bootlegs:
+    A note regarding other bootlegs:
     In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
     derived classes and source files.
 
@@ -81,8 +81,13 @@ Status of each game:
 cawingb2, cawingbl: OK.
 fcrash, kodb:       Old sprites show on next screen. Patch used.
 sf2m1:              Crowd is missing. Plane's tail comes off a bit. Patch used.
-sgyxz, wofabl:      Garbage left behind. A priority problem can be seen in 3rd demo where
-                    the fighters walk through the crowd instead of behind.
+wofabl:             Old sprites left behind - doesn't seem to write end-of-table marker when sprite table is empty.
+                    Priority problems - doesn't seem to write the layer mask values anywhere.
+sgyxz:              Same as wofabl, plus sprite alignment issues and missing foreground layer.
+
+brightness circuity present on pcb?
+	wofabl		no
+	others		tbc...   assume yes for now
 */
 
 #include "emu.h"
@@ -855,6 +860,7 @@ MACHINE_START_MEMBER(fcrash_state,sgyxz)
 MACHINE_START_MEMBER(fcrash_state, wofabl)
 {
 	MACHINE_START_CALL_MEMBER(sgyxz);
+	m_layer_mask_reg[2] = 0x26;  // uses 0x2a for palette control reg
 	m_sprite_list_end_marker = 0x8000;
 }
 
@@ -896,23 +902,6 @@ void fcrash_state::init_sf2m1()
 	mem16[0x64E/2] = 0x6046; // fix priorities
 
 	init_mtwinsb();
-}
-
-void fcrash_state::init_wofabl()
-{
-	uint32_t gfx_size = memregion( "gfx" )->bytes();
-	uint8_t *rom = memregion( "gfx" )->base();
-	for (int i = 0; i < gfx_size; i += 8)
-	{
-		uint8_t tmp = rom[i + 1];
-		rom[i + 1] = rom[i + 4];
-		rom[i + 4] = tmp;
-		tmp = rom[i + 3];
-		rom[i + 3] = rom[i + 6];
-		rom[i + 6] = tmp;
-	}
-
-	init_cps1();
 }
 
 MACHINE_START_MEMBER(fcrash_state,ffightblb)
@@ -1434,6 +1423,31 @@ void fcrash_state::fcrash_build_palette()
 	}
 }
 
+void cps1bl_no_brgt::fcrash_build_palette()
+{
+	// some bootlegs don't have the brightness hardware, the 2x 74ls07 and 2x extra resistor arrays
+	// are either unpopulated or simply don't exist in the bootleg design.
+	// this is a problem as some games (wofabl, jurassic99) use erroneous brightness values
+	// which have no effect on the bootleg pcb, but cause issues in mame (as they would on genuine hardware).	
+	
+	int offset;
+
+	// all the bootlegs seem to write the palette offset as usual
+	int palettebase = (m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
+
+	for (offset = 0; offset < 32 * 6 * 16; offset++)
+	{
+		int palette = m_gfxram[palettebase / 2 + offset];
+		int r, g, b;
+
+		r = ((palette >> 8) & 0x0f) * 0x11;
+		g = ((palette >> 4) & 0x0f) * 0x11;
+		b = ((palette >> 0) & 0x0f) * 0x11;
+
+		m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	}
+}
+
 uint32_t fcrash_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layercontrol, l0, l1, l2, l3;
@@ -1617,7 +1631,7 @@ ROM_END
 
 // the following bootleg is very peculiar: the program ROMs are identical to those of ffightbl but is uses smaller ROMs for patching
 // there is a full set of GFX ROMs matching ffightbl, additional ROMs matching 0x100000-0x1fffff of ffightbla and some smaller ROMs for overlaying
-// for now the loading is the full set, overlayed by the 0x100000-0x1fffff, overlayed by the smalle ROMs. Should be checked though
+// for now the loading is the full set, overlayed by the 0x100000-0x1fffff, overlayed by the smaller ROMs. Should be checked though
 // the sound system comprises a Z80 with bare bones sound code and a single OKI-M6295
 ROM_START( ffightblb )
 	ROM_REGION( 0x10000, "patch", 0 )
@@ -1855,15 +1869,15 @@ ROM_START( wofabl )
 	ROM_LOAD16_BYTE( "6.prg.010", 0x100000, 0x20000, CRC(93eeb161) SHA1(0b8efb7ace59791ffb8a3f7826f0ea74620d7a0f) ) // x111111xxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "4.prg.010", 0x100001, 0x20000, CRC(a0751944) SHA1(84f092992f0f94acffbbb43168fbcee2c45da789) ) // x111111xxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x400000, "gfx", 0 ) /* rearranged in init */
-	ROM_LOAD64_WORD( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) )
-	ROM_LOAD64_WORD( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) )
-	ROM_LOAD64_WORD( "gfx14.040",  0x000004, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) )
-	ROM_LOAD64_WORD( "gfx16.040",  0x000006, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) )
-	ROM_LOAD64_WORD( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
-	ROM_LOAD64_WORD( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
-	ROM_LOAD64_WORD( "gfx10.040",  0x200004, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
-	ROM_LOAD64_WORD( "gfx12.040",  0x200006, 0x80000, CRC(c29f7b70) SHA1(95d22dcd9e2a48ddea7573d0be75225e0aae798f) )
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD32_BYTE( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) )
+	ROM_LOAD32_BYTE( "gfx14.040",  0x000001, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) )
+	ROM_LOAD32_BYTE( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) )
+	ROM_LOAD32_BYTE( "gfx16.040",  0x000003, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) )
+	ROM_LOAD32_BYTE( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
+	ROM_LOAD32_BYTE( "gfx10.040",  0x200001, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
+	ROM_LOAD32_BYTE( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
+	ROM_LOAD32_BYTE( "gfx12.040",  0x200003, 0x80000, CRC(808cc8f0) SHA1(55731139ba6d7d222fa17236e3e91b2e69a44046) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "sound.512", 0x00000, 0x10000,  CRC(210c376f) SHA1(0d937c86078d0a106f5636b7daf5fc0266c2c2ec) ) // identical to sgyxz
@@ -1990,22 +2004,22 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1990, cawingbl,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
-GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
+GAME( 1990, cawingbl,   cawing,  cawingbl,  cawingbl,  fcrash_state,   init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
+GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,   init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 
-GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
-GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Soon Hwa)",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority glitches
+GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg (Soon Hwa)",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority glitches
 
-GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,  init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
+GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,   init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
-GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,  init_mtwinsb,   ROT0,    "David Inc. (bootleg)",  "Twins (Mega Twins bootleg)",  MACHINE_SUPPORTS_SAVE ) // based on World version
+GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,   init_mtwinsb,   ROT0,    "David Inc. (bootleg)",  "Twins (Mega Twins bootleg)",  MACHINE_SUPPORTS_SAVE ) // based on World version
 
-GAME( 1992, sf2m1,      sf2ce,   sf2m1,     sf2,       fcrash_state,  init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M1, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
-GAME( 1992, sf2m9,      sf2ce,   sf2m1,     sf2,       fcrash_state,  init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
+GAME( 1992, sf2m1,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M1, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
+GAME( 1992, sf2m9,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
-GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     fcrash_state,  init_cps1,      ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
-GAME( 1999, wofabl,     wof,     wofabl,    wofabl,    fcrash_state,  init_wofabl,    ROT0,    "bootleg",  "Sangokushi II (bootleg)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
+GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     fcrash_state,   init_cps1,      ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1999, wofabl,     wof,     wofabl,    wofabl,    cps1bl_no_brgt, init_cps1,      ROT0,    "bootleg",  "Sangokushi II (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 
-GAME( 1992, varthb,     varth,   varthb,    varth,     fcrash_state,  init_mtwinsb,   ROT270,  "bootleg",  "Varth: Operation Thunderstorm (bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, varthb,     varth,   varthb,    varth,     fcrash_state,   init_mtwinsb,   ROT270,  "bootleg",  "Varth: Operation Thunderstorm (bootleg)",  MACHINE_SUPPORTS_SAVE )
