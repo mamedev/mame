@@ -54,22 +54,23 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
-	void scratchpad_map(address_map &map);
-
 	// internal helpers
 	u8 mux_out();
+	bool data_in();
 	bool sep_data();
 	bool missing_clk();
 	bool drv_sel_trk0();
+	bool sec_buf_in();
 	bool test_condition();
+	void set_bar(u16 bar);
 	void shift_crc(bool data);
 	void set_flag(bool j, bool k);
 
 	// address spaces
 	address_space_config m_inst_config;
-	address_space_config m_sp_config;
+	address_space_config m_data_config;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_inst_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_sp_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_data_cache;
 
 	// internal state
 	u16 m_pc;
@@ -81,6 +82,7 @@ private:
 	u8 m_cntr;
 	u8 m_sr;
 	u8 m_spar;
+	u8 m_sp[16];
 	u16 m_bar;
 	u16 m_crc;
 	u16 m_flags;
