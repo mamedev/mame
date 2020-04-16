@@ -31,7 +31,7 @@
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
- @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
+ @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
@@ -57,7 +57,7 @@
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
  *MP1296   TMS1100?  1982, Entex Black Knight
- @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
@@ -131,7 +131,7 @@
   inconsistent:
 
  @TMS1007  TMS1000   1976, TSI Speech+ (S14002-A)
- @CD7282SL TMS1100   1981, Tandy Radio Shack Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100   1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -2882,7 +2882,7 @@ ROM_END
 
   known releases:
   - Hong Kong: Electronic Football II, Conic
-  - USA: Electronic Football II, Tandy Radio Shack
+  - USA: Electronic Football II, Tandy
 
 ***************************************************************************/
 
@@ -5497,14 +5497,14 @@ ROM_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was published later in the USA by Tandy Radio Shack,
+  for more information. It was published later in the USA by Tandy(Radio Shack),
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
   known releases:
   - Japan: FX-Micom R-165
-  - USA: Science Fair Microcomputer Trainer, published by Tandy Radio Shack.
-    Of note is the complete redesign of the case, adding more adjustable wiring
+  - USA: Science Fair Microcomputer Trainer, published by Tandy. Of note is
+    the complete redesign of the case, adding more adjustable wiring
 
 ***************************************************************************/
 
@@ -8875,7 +8875,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Championship Football (model 60-2150)
+  Tandy Championship Football (model 60-2150)
   * PCB label CYG-316
   * TMS1100NLL MP1193 (die label 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
@@ -8998,7 +8998,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Championship Football (model 60-2151)
+  Tandy Championship Football (model 60-2151)
   * TMS1100NLL MP1183 (no decap)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
@@ -9064,7 +9064,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
+  Tandy Computerized Arcade (1981, 1982, 1995)
   * TMS1100 MCU, label CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
@@ -9241,7 +9241,7 @@ ROM_END
 
 /***************************************************************************
 
-  (Tandy) Radio Shack Monkey See (1982 version)
+  Tandy(Radio Shack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
@@ -12479,10 +12479,10 @@ CONS( 1982, lostreas,   0,         0, lostreas,  lostreas,  lostreas_state,  emp
 
 CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie - The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
-CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Corporation", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
