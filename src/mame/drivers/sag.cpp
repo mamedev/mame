@@ -18,7 +18,7 @@ Games released, MCU: (*denotes undumped)
 - Football 4       - TMS1670
 - *Pac-Man 2       - HD38800?
 - Pinball          - HD38800
-- *Space Invader 2 - HD38800 - is dumped, but need redump
+- Space Invader 2  - HD38800
 
 Battleship and Turtles were announced but unreleased.
 A 2nd version of the console was also announced, called Table Top Game Machine,

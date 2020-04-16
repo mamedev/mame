@@ -52,13 +52,13 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 		</part>
 	</software>
 
-	<software name="sinv2" supported="no"> <!-- bad dump -->
+	<software name="sinv2">
 		<description>Space Invader 2</description>
 		<year>1981</year>
 		<publisher>Entex</publisher>
 		<part name="cart" interface="sag_cart">
 			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
-				<rom name="inv2_hd38800a31" offset="0x0000" size="0x1000" crc="29c8c100" sha1="41cd413065659c6d7d5b2408de2ca6d51c49629a" status="baddump" />
+				<rom name="inv2_hd38800a31" offset="0x0000" size="0x1000" crc="10e39521" sha1="41d86696e518ea071e75ed37d5dc63c0408c262e" />
 				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
 		</part>
