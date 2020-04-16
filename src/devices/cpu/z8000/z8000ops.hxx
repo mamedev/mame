@@ -4674,7 +4674,7 @@ void z8002_device::Z79_ssN0_0000_addr()
 void z8002_device::Z7A_0000_0000()
 {
 	CHECK_PRIVILEGED_INSTR();
-	m_irq_req |= Z8000_HALT;
+	m_halt = true;
 	if (m_icount > 0) m_icount = 0;
 }
 

@@ -30,7 +30,7 @@ protected:
 	static constexpr uint16_t Z8000_NVI     = 0x0800;  /* non vectored interrupt */
 	static constexpr uint16_t Z8000_VI      = 0x0400;  /* vectored interrupt (LSB is vector)  */
 	static constexpr uint16_t Z8000_SYSCALL = 0x0200;  /* system call (lsb is vector) */
-	static constexpr uint16_t Z8000_HALT    = 0x0100;  /* halted flag  */
+	static constexpr uint16_t Z8000_RESET   = 0x0100;  /* reset flag  */
 
 public:
 	enum
@@ -111,6 +111,7 @@ protected:
 	int m_nmi_state;      /* NMI line state */
 	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
 	int m_mi;
+	bool m_halt;
 	address_space *m_program;
 	address_space *m_data;
 	address_space *m_stack;
@@ -119,7 +120,7 @@ protected:
 	address_space *m_io;
 	address_space *m_sio;
 	int m_icount;
-	int m_vector_mult;
+	const int m_vector_mult;
 
 	void clear_internal_state();
 	void register_debug_state();
@@ -231,6 +232,7 @@ protected:
 	inline uint32_t SRLL(uint32_t dest, uint8_t count);
 	inline void Interrupt();
 	virtual uint32_t GET_PC(uint32_t VEC);
+	virtual uint32_t get_reset_pc();
 	virtual uint16_t GET_FCW(uint32_t VEC);
 	virtual uint32_t F_SEG_Z8001();
 	virtual uint32_t PSA_ADDR();
@@ -674,9 +676,7 @@ public:
 	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_reset() override;
-
+	// z8002_device overrides
 	virtual bool get_segmented_mode() const override;
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr) override;
@@ -684,6 +684,7 @@ protected:
 	virtual void PUSH_PC() override;
 	virtual void CHANGE_FCW(uint16_t fcw) override;
 	virtual uint32_t GET_PC(uint32_t VEC) override;
+	virtual uint32_t get_reset_pc() override;
 	virtual uint16_t GET_FCW(uint32_t VEC) override;
 	virtual uint32_t F_SEG_Z8001() override;
 	virtual uint32_t PSA_ADDR() override;

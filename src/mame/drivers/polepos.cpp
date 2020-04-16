@@ -419,7 +419,7 @@ void polepos_state::machine_reset()
 
 void polepos_state::z80_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom();
+	map(0x0000, 0x2fff).rom().region("maincpu", 0);
 	map(0x3000, 0x37ff).mirror(0x0800).ram().share("nvram");                 /* Battery Backup */
 	map(0x4000, 0x47ff).rw(FUNC(polepos_state::sprite_r), FUNC(polepos_state::sprite_w));           /* Motion Object */
 	map(0x4800, 0x4bff).rw(FUNC(polepos_state::road_r), FUNC(polepos_state::road_w));               /* Road Memory */
@@ -448,7 +448,6 @@ void polepos_state::z80_io(address_map &map)
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 void polepos_state::z8002_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram().share(m_sprite16_memory);   /* Motion Object */
 	map(0x9000, 0x97ff).ram().share(m_road16_memory);     /* Road Memory */
 	map(0x9800, 0x9fff).ram().w(FUNC(polepos_state::alpha16_w)).share(m_alpha16_memory);  /* Alphanumeric (char ram) */
@@ -460,12 +459,14 @@ void polepos_state::z8002_map(address_map &map)
 void polepos_state::z8002_map_1(address_map &map)
 {
 	z8002_map(map);
+	map(0x0000, 0x7fff).rom().region("sub", 0);
 	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 void polepos_state::z8002_map_2(address_map &map)
 {
 	z8002_map(map);
+	map(0x0000, 0x7fff).rom().region("sub2", 0);
 	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
@@ -969,7 +970,7 @@ void polepos_state::topracern_io(address_map &map)
 
 void polepos_state::sound_z80_bootleg_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x1fff).rom().region("soundz80bl", 0);
 	map(0x2700, 0x27ff).ram();
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_r));

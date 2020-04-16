@@ -768,7 +768,6 @@ void m20_state::machine_reset()
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
-	m_maincpu->reset();   // FIXME: rewrite Z8000 core to not read the vector at this time
 	m_kbdi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
