@@ -62,7 +62,6 @@ license:CC0
 	Guardian [Alt 2]
 	Guinness Disc Of Records - Second Edition
 	Gunship 2000
-	Heimdall 2: Into The Hall Of Worlds
 	HeroQuest II: Legacy Of Sorasil
 	Humans 1 & 2, The
 	Humans 3: Evolution - Lost In Time...
@@ -1159,6 +1158,19 @@ license:CC0
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gulp (europe) (en,fr,de,es,it)" sha1="574eee872637153009dc1a4cc36ee1dd0e5d9a79"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Heavy GFX glitches -->
+	<software name="heimdall2" supported="no">
+		<description>Heimdall 2 - Into The Hall Of Worlds</description>
+		<year>1994</year>
+		<publisher>Core</publisher>
+		<info name="disc_matrix" value="CDD3924 HEIMDALL 2 CD32 :   MASTERED BY NIMBUS"/>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="heimdall 2 - into the hall of worlds" sha1="5de73081c4278135362eb079a1f73053a50f86dc"/>
 			</diskarea>
 		</part>
 	</software>
