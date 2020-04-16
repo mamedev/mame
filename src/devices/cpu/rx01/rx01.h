@@ -16,7 +16,7 @@ public:
 		RX01_R8, RX01_R9, RX01_R10, RX01_R11, RX01_R12, RX01_R13, RX01_R14, RX01_R15,
 		RX01_BAR,
 		RX01_CRC,
-		RX01_UNIT, RX01_LDHD
+		RX01_UNIT, RX01_LDHD, RX01_INDEX
 	};
 
 	enum : u16 {
@@ -58,6 +58,7 @@ private:
 	u8 mux_out();
 	bool data_in();
 	bool sep_data();
+	bool sep_clk();
 	bool missing_clk();
 	bool drv_sel_trk0();
 	bool sec_buf_in();
@@ -88,6 +89,7 @@ private:
 	u16 m_flags;
 	bool m_unit;
 	bool m_load_head;
+	bool m_syn_index;
 	s32 m_icount;
 };
 

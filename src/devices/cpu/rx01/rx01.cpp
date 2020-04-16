@@ -55,6 +55,7 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_flags(0)
 	, m_unit(false)
 	, m_load_head(false)
+	, m_syn_index(false)
 	, m_icount(0)
 {
 	std::fill(std::begin(m_sp), std::end(m_sp), 0);
@@ -95,6 +96,7 @@ void rx01_cpu_device::device_start()
 	state_add(RX01_CRC, "CRC", m_crc).formatstr("%06O");
 	state_add(RX01_UNIT, "UNIT", m_unit);
 	state_add(RX01_LDHD, "LDHD", m_load_head);
+	state_add(RX01_INDEX, "INDEX", m_syn_index);
 
 	// Save state registration
 	save_item(NAME(m_pc));
@@ -111,6 +113,7 @@ void rx01_cpu_device::device_start()
 	save_item(NAME(m_flags));
 	save_item(NAME(m_unit));
 	save_item(NAME(m_load_head));
+	save_item(NAME(m_syn_index));
 }
 
 void rx01_cpu_device::device_reset()
@@ -144,6 +147,12 @@ bool rx01_cpu_device::data_in()
 }
 
 bool rx01_cpu_device::sep_data()
+{
+	// TODO
+	return false;
+}
+
+bool rx01_cpu_device::sep_clk()
 {
 	// TODO
 	return false;
@@ -185,6 +194,10 @@ bool rx01_cpu_device::test_condition()
 		// Serial data from interface
 		return data_in();
 
+	case 014:
+		// Drive index latch
+		return m_syn_index;
+
 	case 020:
 		// MSB of shift register
 		return BIT(m_sr, 7);
@@ -200,6 +213,18 @@ bool rx01_cpu_device::test_condition()
 	case 034:
 		// Track zero of selected drive on head
 		return (m_flags & FF_IOB0) && (m_flags & FF_IOB3) && drv_sel_trk0();
+
+	case 040:
+		// Drive write protect (TODO)
+		return false;
+
+	case 044:
+		// Separated clock
+		return sep_clk();
+
+	case 050:
+		// 12-bit interface mode selected (TODO)
+		return false;
 
 	case 054:
 		// Separated data equals shift register MSB
@@ -225,7 +250,8 @@ bool rx01_cpu_device::test_condition()
 		return (m_flags & FF_FLAG) != 0;
 
 	default:
-		LOG("%04o: Unhandled branch condition %d\n", m_ppc, (m_mb & 074) >> 2);
+		// Shouldn't happen
+		logerror("%04o: Unhandled branch condition %d\n", m_ppc, (m_mb & 074) >> 2);
 		return true;
 	}
 }
@@ -357,6 +383,7 @@ void rx01_cpu_device::execute_run()
 
 			case 040:
 				m_load_head = BIT(m_mb, 1);
+				m_syn_index = false;
 				break;
 
 			case 044:
