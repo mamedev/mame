@@ -116,20 +116,16 @@ MExternC int MCallingConvention mvaddstr(int row, int col, const char* text)
 {
 #if defined(_MSC_VER)
 	COORD Coord;
-	DWORD dwCharsWritten;
 
 	Coord.X = col;
 	Coord.Y = row;
 
-	if (!WriteConsoleOutputCharacter(l_ConsoleData.hStdOut, text, lstrlen(text), Coord, &dwCharsWritten))
+	SetConsoleCursorPosition(l_ConsoleData.hStdOut, Coord);
+
+	if (!WriteConsole(l_ConsoleData.hStdOut, text, lstrlen(text), NULL, NULL))
 	{
 		return ERR;
 	}
-
-	Coord.X = 0;
-	Coord.Y = row + 1;
-
-	SetConsoleCursorPosition(l_ConsoleData.hStdOut, Coord);
 
 	return OK;
 #else
