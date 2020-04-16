@@ -311,6 +311,13 @@ void spg2xx_game_state::mem_map_1m(address_map &map)
 	map(0x000000, 0x0fffff).mirror(0x300000).bankr("cartbank");
 }
 
+void spg2xx_game_gssytts_state::mem_map_upperbank(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr("cartbank");
+	map(0x200000, 0x3fffff).bankr("upperbank");
+}
+
+
 static INPUT_PORTS_START( rad_skat )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Full Left")
@@ -852,6 +859,25 @@ static INPUT_PORTS_START( ablkickb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lxspidaj )
+	PORT_START("P1") // base controller has dpad, 2 regular buttons, 2 turbo buttons, start button, reset button.  IR connected JetSki pad has the same inputs but in handlebar form.
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) // is this a button or comms with the controller on the Jetski, check code (possibly just 'start' tho)
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( comil )
 	PORT_START("EXTRA0")
 	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("50:50")
@@ -923,7 +949,7 @@ static INPUT_PORTS_START( guitarss )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("B4: Red")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("B5: Green")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Strum / Select")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // unused? no Strum down?
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED ) // unused, strum is single direction here
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Whammy")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Start / Select") // pause
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
@@ -1395,6 +1421,71 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
+WRITE16_MEMBER(spg2xx_game_gssytts_state::portc_w)
+{
+	int bank = 0;
+
+	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if (mem_mask & 1)
+		if (data & 1)
+			bank |= 1;
+
+	if (mem_mask & 2)
+		if (data & 2)
+			bank |= 2;
+
+	m_upperbank->set_entry(bank);
+	m_maincpu->invalidate_cache();
+}
+
+void spg2xx_game_gssytts_state::machine_start()
+{
+	m_upperbank->configure_entries(0, 4, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->set_entry(1);
+
+	spg2xx_game_state::machine_start();
+}
+
+void spg2xx_game_gssytts_state::machine_reset()
+{
+	m_upperbank->set_entry(1);
+
+	spg2xx_game_state::machine_reset();
+}
+
+
+void spg2xx_game_gssytts_state::gssytts(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_gssytts_state::mem_map_upperbank);
+
+	spg2xx_base(config);
+
+//	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::porta_w));
+//	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::portb_w));
+//	m_maincpu->portc_out().set(FUNC(spg2xx_game_state::portc_w));
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
 
 
 void spg2xx_game_state::rad_skatp(machine_config &config)
@@ -1458,6 +1549,12 @@ ROM_START( ablkickb )
 	ROM_LOAD16_WORD_SWAP( "fm25q16a.bin", 0x800000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
+ROM_START( lxspidaj )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx29lv320ct.u2", 0x000000, 0x400000, CRC(e7e03c62) SHA1(ab13452f0436efb767f01dff54dd48a528538e3f) )
+ROM_END
+
+
 ROM_START( fordrace )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "fordracing_29lv320ct_00c222a7.bin", 0x000000, 0x400000, CRC(998cad17) SHA1(98a65e9e0ec17e3366e0ac6ddc2d852a7efb360e) )
@@ -1493,6 +1590,16 @@ ROM_START( guitarss )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "guitar_superstar_stratocaster.bin", 0x000000, 0x800000, CRC(63950016) SHA1(28b9613571f47c49995aa35c4d4a2d6f68389813) )
 ROM_END
+
+ROM_START( gssytts )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "guitarssytts.bin", 0x000000, 0x800000, CRC(ec3de9e1) SHA1(690efe2676c664c2be52cda00d6dcb9d60a26e9a) ) // no data
+	ROM_CONTINUE(0x000000, 0x800000) // 1st 8mb
+	ROM_CONTINUE(0x800000, 0x800000) // no data
+	ROM_CONTINUE(0x800000, 0x800000) // 2nd 8mb
+ROM_END
+
+
 
 
 ROM_START( jjstrip )
@@ -1594,6 +1701,9 @@ CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_ga
 
 CONS( 2006, ablkickb,    0,     0,        ablkickb,       ablkickb,    spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
+CONS( 2007, lxspidaj,    0,     0,        abltenni,       lxspidaj,    spg2xx_game_albkickb_state, init_ablkickb, "Lexibook", "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+
 CONS( 2006, fordrace,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "Excalibur Electronics", "Ford Racing", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
@@ -1608,6 +1718,8 @@ CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_ga
 
 // Another version of this has a red "Gibson Flying V" style controller.  The difference is reflected on the title screen, songs are the same.
 CONS( 200?, guitarss,    0,     0,        abltenni,       guitarss,    spg2xx_game_state, empty_init, "Senario", "Guitar Super Star (Fender Stratocaster style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2009, gssytts,     0,     0,        gssytts,        guitarss,    spg2xx_game_gssytts_state, empty_init, "Senario", "Guitar Super Star: You Take The Stage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, vtechtvs,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "VTech", "TV Station (VTech, Spain)", MACHINE_NOT_WORKING )
 
