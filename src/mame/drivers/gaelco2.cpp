@@ -8,22 +8,23 @@
 
     Known games that run on this hardware:
     ======================================
-    Game               | Year | Chip      | Ref      |Protected
-    -------------------+------+-----------+----------+--------------------------------------------------
-    Alligator Hunt     | 1994 | GAE1 449  | 940411   | DS5002FP (unprotected version available)
-    World Rally 2      | 1995 | GAE1 449  | 950510   | DS5002FP
-    World Rally 2      | 1995 | GAE1 506  | 950510-1 | DS5002FP
-    Touch & Go         | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
-    Touch & Go         | 1995 | GAE1 501  | 950510-1 | DS5002FP
-    Maniac Square      | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
-    Maniac Square      | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
-    Snow Board         | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
-    Cardioline Cycle   | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
-    Cardioline Stepper | 1997 | CG-1V 288 | 970410   | IO board MCU (not really protection)
-    Bang!              | 1998 | CG-1V 388 | 980921/1 | No
-    Super Roller       | 1998 | CG-1V-218 |          | DS5002FP (by Nova Desitec)
-    Play 2000          | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
-    -------------------+------+-----------+----------+--------------------------------------------------
+    Game                   | Year | Chip        | Ref      |Protected
+    -----------------------+------+-------------+----------+--------------------------------------------------
+    Alligator Hunt         | 1994 | GAE1 449    | 940411   | DS5002FP (unprotected version available)
+    Alligator Hunt (proto) | 1994 | GAE1 CS438  |          | DS5002FP
+    World Rally 2          | 1995 | GAE1 449    | 950510   | DS5002FP
+    World Rally 2          | 1995 | GAE1 506    | 950510-1 | DS5002FP
+    Touch & Go             | 1995 | GAE1 501    | 950906   | DS5002FP (unprotected version available)
+    Touch & Go             | 1995 | GAE1 501    | 950510-1 | DS5002FP
+    Maniac Square          | 1996 | GAE1 501    | 940411   | DS5002FP (unprotected version available)
+    Maniac Square          | 1996 | CG-1V 427   | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
+    Snow Board             | 1996 | CG-1V 366   | 960419/1 | Lattice IspLSI 1016-80LJ
+    Cardioline Cycle       | 1997 | GAE1 501    | 970410   | IO board ST62T15C6 MCU (not really protection)
+    Cardioline Stepper     | 1997 | CG-1V 288   | 970410   | IO board ST62T15B6 MCU (not really protection)
+    Bang!                  | 1998 | CG-1V 388   | 980921/1 | No
+    Super Roller           | 1998 | CG-1V-218   |          | DS5002FP (by Nova Desitec)
+    Play 2000              | 1999 | CG-1V-149   | 990315   | DS5002FP (by Nova Desitec)
+    -----------------------+------+-------------+----------+--------------------------------------------------
 
     Notes:
     touchgo:
@@ -1462,6 +1463,8 @@ ROM_START( aligator )
 	ROM_LOAD( "u49",        0x0c00000, 0x0400000, CRC(70a4ee0b) SHA1(07b09916f0366d0c6eed94a905ec0b9d6ac9e7e1) )    /* GFX + Sound */
 ROM_END
 
+/* PCB without Gaelco logos. Gfx and sound on a subboard with 32 EPROMs connected to the main PCB mask ROMs sockets.
+   Checksum = B975CB0B */
 ROM_START( aligatorp )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "all_27-10_notext.u45",  0x000000, 0x080000, CRC(da2798df) SHA1(528ef26aca57b8cfaa6f82bbf74e6368741d01ea) )
