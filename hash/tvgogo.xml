@@ -7,19 +7,24 @@ license:CC0
 
 Dumped|Name       |Notes
 ______|___________|______
- XXX  |4 in 1     |No controller
- XXX  |Whac-A-Mole|Hammer-shaped IR motion controller
- XXX  |Tennis     |Racquet-shaped IR motion controller
+  Y   |4 in 1     |No controller
+  Y   |Whac-A-Mole|Hammer-shaped IR motion controller
+  Y   |Tennis     |Racquet-shaped IR motion controller
       |Paintball  |Gun controller
       |Skateboard |Skateboard-shaped motion controller
-      |Basketball |Ball-shaped motion controller
-      |Dodgeball  |Motion controller
-      |Baseball   |Baseball Bat shaped motion controller
+  -   |Basketball |Ball-shaped motion controller
+  Y   |Dodgeball  |Motion controller
+  -   |Baseball   |Baseball Bat shaped motion controller
+
+
+	The US carts do not appear to have a language selection screen
+  while the EU ones do.
+  
 -->
 
 <softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">
 	<software name="4in1" supported="no">
-		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze)</description>
+		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (EU)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -30,7 +35,7 @@ ______|___________|______
 	</software>
 
 	<software name="tennis" supported="no">
-		<description>Tennis</description>
+		<description>Tennis (EU)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -41,7 +46,7 @@ ______|___________|______
 	</software>
 
 	<software name="whacmole" supported="no">
-		<description>Whac-A-Mole</description>
+		<description>Whac-A-Mole (EU)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
@@ -50,5 +55,17 @@ ______|___________|______
 			</dataarea>
 		</part>
 	</software>
+
+  <software name="dodgebal" supported="no">
+    <description>Dodgeball (US)</description>
+    <year>2005</year>
+    <publisher>Toyquest</publisher>
+    <part name="cart" interface="tvgogo_cart">
+      <dataarea name="rom" size="0x400000">
+        <rom name="tvgogododgeball_m5m29gt320_001c0020.bin" size="0x400000" crc="785f4305" sha1="0c96d6330acd2771adb4dbdcb6b9ccaa73ffc513"/>
+      </dataarea>
+    </part>
+  </software>
+
 
 </softwarelist>
