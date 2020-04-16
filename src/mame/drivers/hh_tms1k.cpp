@@ -68,7 +68,7 @@
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
- *MP3200   TMS1000   1978, Parker Brothers Electronic Mastermind
+ @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
@@ -115,6 +115,7 @@
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
+ *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable, pinout seems to match TMS1670)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -223,6 +224,7 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "pbmastm.lh"
 #include "phpball.lh"
 #include "qfire.lh" // clickable
 #include "quizwizc.lh"
@@ -8197,6 +8199,122 @@ ROM_END
 
 /***************************************************************************
 
+  Parker Brothers Electronic Master Mind
+  * TMS1000NLL MP3200 (die label 1000E, MP3200)
+  * 5 red leds, 5 green leds
+
+  This is a board game, it came with 4 plug boards and a lot of colored pegs.
+  It's not related to the equally named Electronic Master Mind by Invicta,
+  that one is on a Rockwell MM75.
+
+***************************************************************************/
+
+class pbmastm_state : public hh_tms1k_state
+{
+public:
+	pbmastm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void pbmastm(machine_config &config);
+};
+
+// handlers
+
+WRITE16_MEMBER(pbmastm_state::write_r)
+{
+	// R1-R10: leds (direct)
+	m_display->matrix(1, data >> 1);
+}
+
+WRITE16_MEMBER(pbmastm_state::write_o)
+{
+	// O0-O5: input mux
+	m_inp_mux = data & 0x3f;
+}
+
+READ8_MEMBER(pbmastm_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( pbmastm )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("D")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Red")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Blue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Brown")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Black")
+
+	PORT_START("IN.3") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Yellow")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("White")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Pink")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Gray")
+
+	PORT_START("IN.4") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Green")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Orange")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("Blank")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Delete")
+
+	PORT_START("IN.5") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Battery Test")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Code")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Check")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void pbmastm_state::pbmastm(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
+	m_maincpu->k().set(FUNC(pbmastm_state::read_k));
+	m_maincpu->r().set(FUNC(pbmastm_state::write_r));
+	m_maincpu->o().set(FUNC(pbmastm_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 10);
+	config.set_default_layout(layout_pbmastm);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( pbmastm )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3200", 0x0000, 0x0400, CRC(059dbb88) SHA1(20e3f6aeecce167371bda914f263daf53c50c839) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_pbmastm_output.pla", 0, 365, CRC(b355c4d9) SHA1(43cc971a4feacfddfe810c8983c65d9eef3ed57b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die label 0980B-01A)
   * 3-digit 7seg LED display, 6-level sound
@@ -12470,6 +12588,7 @@ CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  emp
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )

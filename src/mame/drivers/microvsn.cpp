@@ -19,7 +19,8 @@ artwork is recommended. It's also advised to disable screen filtering,
 eg. with -prescale or -nofilter.
 
 TODO:
-- dump/add remaining 8021 cartridges
+- dump/add remaining 8021 cartridges, which games have 8021 versions? An online
+  FAQ mentions at least Block Buster, Connect 4, Bowling.
 
 ******************************************************************************/
 

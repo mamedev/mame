@@ -13432,10 +13432,10 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 feleg                           //
 
 @source:fidel_card.cpp
-bridgec3                        //
-bridgeca                        //
-gincribc                        //
-vbrc                            //
+bridgec3
+bridgeca
+gincribc
+vbrc
 
 @source:fidel_cc1.cpp
 cc1                             //
@@ -15759,8 +15759,8 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-sfxchas                         // Tandy Radio Shack
-tbaskb                          // Tandy Radio Shack
+sfxchas                         // Tandy Corporation
+tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
@@ -15950,7 +15950,8 @@ mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
 mmerlin                         // Parker Bros
-monkeysee                       // Tandy Radio Shack
+monkeysee                       // Tandy Corporation
+pbmastm                         // Parker Bros
 phpball                         // Tomy
 qfire                           // Electroplay
 quizwizc                        // Coleco
@@ -15965,11 +15966,11 @@ starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
-tandy12                         // Tandy Radio Shack
+tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
-tcfball                         // Tandy Radio Shack
-tcfballa                        // Tandy Radio Shack
+tcfball                         // Tandy Corporation
+tcfballa                        // Tandy Corporation
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
 ti125076                        // Texas Instruments
