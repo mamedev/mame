@@ -100,10 +100,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(m20_i8259_r);
-	DECLARE_WRITE16_MEMBER(m20_i8259_w);
-	DECLARE_READ16_MEMBER(port21_r);
-	DECLARE_WRITE16_MEMBER(port21_w);
+	uint16_t i8259_r(offs_t offset);
+	void i8259_w(offs_t offset, uint16_t data);
+	uint16_t port21_r();
+	void port21_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
@@ -119,7 +119,7 @@ private:
 	void install_memory();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	IRQ_CALLBACK_MEMBER(m20_irq_callback);
+	uint16_t viack_r();
 };
 
 
@@ -169,15 +169,15 @@ port21      =   0x21        !TTL latch
 !   B7  See B3 input                0 => colour card present
 */
 
-READ16_MEMBER(m20_state::port21_r)
+uint16_t m20_state::port21_r()
 {
-	//printf("port21 read: offset 0x%x\n", offset);
+	//printf("port21 read\n");
 	return m_port21;
 }
 
-WRITE16_MEMBER(m20_state::port21_w)
+void m20_state::port21_w(uint16_t data)
 {
-	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
+	//printf("port21 write: data 0x%x\n", data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
 
 	// floppy drive select
@@ -202,12 +202,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 	m_fd1797->dden_w(data & 8);
 }
 
-READ16_MEMBER(m20_state::m20_i8259_r)
+uint16_t m20_state::i8259_r(offs_t offset)
 {
 	return m_i8259->read(offset)<<1;
 }
 
-WRITE16_MEMBER(m20_state::m20_i8259_w)
+void m20_state::i8259_w(offs_t offset, uint16_t data)
 {
 	m_i8259->write(offset, (data>>1));
 }
@@ -727,17 +727,14 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
+	map(0x140, 0x143).rw(FUNC(m20_state::i8259_r), FUNC(m20_state::i8259_w));
 
 	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
 }
 
-IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
+uint16_t m20_state::viack_r()
 {
-	if (! irqline)
-		return 0xff; // NVI, value ignored
-	else
-		return m_i8259->acknowledge();
+	return m_i8259->acknowledge()<<1;
 }
 
 WRITE_LINE_MEMBER(m20_state::int_w)
@@ -796,7 +793,7 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
 	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
 	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(m20_state::m20_irq_callback));
+	m_maincpu->viack().set(FUNC(m20_state::viack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 

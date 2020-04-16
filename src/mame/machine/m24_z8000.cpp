@@ -74,7 +74,8 @@ void m24_z8000_device::device_add_mconfig(machine_config &config)
 	m_z8000->set_addrmap(AS_PROGRAM, &m24_z8000_device::z8000_prog);
 	m_z8000->set_addrmap(AS_DATA, &m24_z8000_device::z8000_data);
 	m_z8000->set_addrmap(AS_IO, &m24_z8000_device::z8000_io);
-	m_z8000->set_irq_acknowledge_callback(FUNC(m24_z8000_device::int_cb));
+	m_z8000->nviack().set(FUNC(m24_z8000_device::nviack_r));
+	m_z8000->viack().set(FUNC(m24_z8000_device::viack_r));
 	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
@@ -183,15 +184,15 @@ WRITE8_MEMBER(m24_z8000_device::serctl_w)
 	m_z8000_mem = (data & 0x20) ? true : false;
 }
 
-IRQ_CALLBACK_MEMBER(m24_z8000_device::int_cb)
+uint16_t m24_z8000_device::nviack_r()
 {
-	if (!irqline)
-	{
-		m_z8000->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
-		return 0xff; // NVI, value ignored
-	}
-	else
-		return m_pic->acknowledge();
+	m_z8000->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
+	return 0xffff;
+}
+
+uint16_t m24_z8000_device::viack_r()
+{
+	return m_pic->acknowledge() << 1;
 }
 
 READ8_MEMBER(m24_z8000_device::handshake_r)

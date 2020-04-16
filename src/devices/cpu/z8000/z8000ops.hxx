@@ -266,10 +266,10 @@ uint32_t z8002_device::POPL(uint8_t src)
 #define CHK_SUBL_V if (((~value & dest & ~result) | (value & ~dest & result)) & S32) SET_V
 
 /* check for privileged instruction and trap if executed */
-#define CHECK_PRIVILEGED_INSTR() if (!(m_fcw & F_S_N)) { m_irq_req = Z8000_TRAP; return; }
+#define CHECK_PRIVILEGED_INSTR() if (!(m_fcw & F_S_N)) { m_irq_req |= Z8000_TRAP; return; }
 
 /* if no EPU is present (it isn't), raise an extended intstuction trap */
-#define CHECK_EXT_INSTR()  if (!(m_fcw & F_EPU)) { m_irq_req = Z8000_EPU; return; }
+#define CHECK_EXT_INSTR()  if (!(m_fcw & F_EPU)) { m_irq_req |= Z8000_EPU; return; }
 
 
 /******************************************
@@ -2474,7 +2474,7 @@ void z8002_device::Z35_ssN0_dddd_imm16()
 void z8002_device::Z36_0000_0000()
 {
 	/* execute break point trap m_irq_req */
-	m_irq_req = Z8000_TRAP;
+	m_irq_req |= Z8000_TRAP;
 }
 
 /******************************************
@@ -4872,8 +4872,8 @@ void z8002_device::Z7F_imm8()
 {
 	GET_IMM8(0);
 	/* execute system call via IRQ */
-	m_irq_req = Z8000_SYSCALL | imm8;
-
+	m_irq_req |= Z8000_SYSCALL;
+	(void)imm8;
 }
 
 /******************************************

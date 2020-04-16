@@ -40,6 +40,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_opcodes_config("first word", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_stack_config("stack", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_sio_config("special I/O", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_iack_in(*this)
 	, m_mo_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
 	, m_vector_mult(vecmult)
@@ -333,41 +334,6 @@ void z8002_device::cycles(int cycles)
 #include "z8000ops.hxx"
 #include "z8000tbl.hxx"
 
-void z8002_device::set_irq(int type)
-{
-	switch ((type >> 8) & 255)
-	{
-		case Z8000_EPU >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_TRAP >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_NMI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_SEGTRAP >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_NVI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_VI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_SYSCALL >> 8:
-			LOG("Z8K SYSCALL $%02x\n", type & 0xff);
-			m_irq_req = type;
-			break;
-		default:
-			logerror("Z8000 invalid Cause_Interrupt %04x\n", type);
-			return;
-	}
-	/* set interrupt request flag, reset HALT flag */
-	m_irq_req = type;
-	m_halt = false;
-}
-
 void z8002_device::PUSH_PC()
 {
 	PUSHW(SP, m_pc);        /* save current pc */
@@ -447,7 +413,7 @@ void z8002_device::Interrupt()
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(GET_FCW(EPU));
 		m_pc = GET_PC(EPU);
@@ -459,7 +425,7 @@ void z8002_device::Interrupt()
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(GET_FCW(TRAP));
 		m_pc = GET_PC(TRAP);
@@ -471,19 +437,22 @@ void z8002_device::Interrupt()
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(GET_FCW(SYSCALL));
 		m_pc = GET_PC(SYSCALL);
-		LOG("Z8K syscall $%04x\n", m_pc);
+		LOG("Z8K syscall [$%02x/$%04x]\n", m_op[0] & 0xff, m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
 	{
+		//standard_irq_callback(SEGT_LINE);
+		m_irq_vec = m_iack_in[0](m_pc);
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(GET_FCW(SEGTRAP));
 		m_pc = GET_PC(SEGTRAP);
@@ -492,10 +461,14 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_NMI)
 	{
+		standard_irq_callback(NMI_LINE);
+		m_irq_vec = m_iack_in[1](m_pc);
+		m_halt = false;
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = RDMEM_W(*m_program, NMI);
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
@@ -505,13 +478,14 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
 	{
-		int type = standard_irq_callback(NVI_LINE);
-		set_irq(type | Z8000_NVI);
+		standard_irq_callback(VI_LINE);
+		m_irq_vec = m_iack_in[2](m_pc);
+		m_halt = false;
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
@@ -520,29 +494,30 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
 	{
-		int type = standard_irq_callback(VI_LINE);
-		set_irq(type | Z8000_VI);
+		standard_irq_callback(VI_LINE);
+		m_irq_vec = m_iack_in[3](m_pc);
+		m_halt = false;
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
-		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc);
+		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + 2 * (m_irq_vec & 0xff), m_fcw, m_pc);
 	}
 }
 
 uint32_t z8002_device::read_irq_vector()
 {
-	return RDMEM_W(*m_program, VEC00 + 2 * (m_irq_req & 0xff));
+	return RDMEM_W(*m_program, VEC00 + 2 * (m_irq_vec & 0xff));
 }
 
 
 uint32_t z8001_device::read_irq_vector()
 {
-	return segmented_addr(RDMEM_L(*m_program, VEC00 + 4 * (m_irq_req & 0xff)));
+	return segmented_addr(RDMEM_L(*m_program, VEC00 + 2 * (m_irq_vec & 0xff)));
 }
 
 
@@ -574,7 +549,6 @@ void z8002_device::register_debug_state()
 	state_add( Z8000_PSAPOFF, "PSAPOFF", m_psapoff ).formatstr("%04X");
 	state_add( Z8000_PSAPSEG, "PSAPSEG", m_psapseg ).formatstr("%04X");
 	state_add( Z8000_REFRESH, "REFR",    m_refresh ).formatstr("%04X");
-	state_add( Z8000_IRQ_REQ, "IRQR",    m_irq_req ).formatstr("%04X");
 	state_add( Z8000_IRQ_VEC, "IRQV",    m_irq_vec ).formatstr("%04X");
 	state_add( Z8000_R0,      "R0",      RW(0)     ).formatstr("%04X");
 	state_add( Z8000_R1,      "R1",      RW(1)     ).formatstr("%04X");
@@ -701,6 +675,7 @@ void z8002_device::device_start()
 	register_save_state();
 
 	set_icountptr(m_icount);
+	m_iack_in.resolve_all_safe(0xffff);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
@@ -757,7 +732,6 @@ void z8002_device::execute_set_input(int irqline, int state)
 		if (state != CLEAR_LINE)
 		{
 			m_irq_req = Z8000_NMI;
-			m_irq_vec = NMI;
 		}
 	}
 	else if (irqline < 2)
