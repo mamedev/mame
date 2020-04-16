@@ -1,6 +1,7 @@
 
 // MAME Reference driver for Grant Searle's Simple Z80 Computer
-// Frank Palazzolo - frank@avoidspikes.com
+// http://searle.x10host.com/z80/SimpleZ80.html
+// Written by Frank Palazzolo - frank@avoidspikes.com
 
 // All the common emulator stuff is here
 #include "emu.h"
