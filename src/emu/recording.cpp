@@ -235,6 +235,7 @@ bool avi_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 
 mng_movie_recording::mng_movie_recording(screen_device *screen, std::map<std::string, std::string> &&info_fields)
 	: movie_recording(screen)
+	, m_mng_frame(0)
 	, m_info_fields(std::move(info_fields))
 {
 }
