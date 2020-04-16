@@ -23,6 +23,7 @@ public:
 	template <news_hid_device Device> auto irq_out() { return m_irq_out_cb[Device].bind(); }
 
 	void map(address_map &map);
+	void map_68k(address_map &map);
 
 protected:
 	// device_t overrides
@@ -44,6 +45,9 @@ private:
 	template <news_hid_device Device> u8 data_r();
 	template <news_hid_device Device> void reset_w(u8 data);
 	template <news_hid_device Device> void init_w(u8 data);
+	template <news_hid_device Device> void ien_w(u8 data);
+
+	u8 status_68k_r();
 
 	required_ioport m_mouse_x_axis;
 	required_ioport m_mouse_y_axis;
@@ -52,13 +56,13 @@ private:
 	devcb_write_line::array<2> m_irq_out_cb;
 
 	util::fifo<u8, 8> m_fifo[2];
+	bool m_irq_enabled[2];
 	bool m_irq_out_state[2];
 
 	// mouse state
 	s16 m_mouse_x;
 	s16 m_mouse_y;
 	u8 m_mouse_b;
-	bool m_mouse_enable;
 };
 
 DECLARE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device)
