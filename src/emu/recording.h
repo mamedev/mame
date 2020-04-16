@@ -71,10 +71,14 @@ protected:
 	// virtuals
 	virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) = 0;
 
+	// accessors
+	int current_frame() const { return m_frame; }
+
 private:
 	screen_device *	m_screen;				// screen associated with this movie (can be nullptr)
 	attotime		m_frame_period;			// time of frame period
 	attotime		m_next_frame_time;      // time of next frame
+	int				m_frame;				// current movie frame number
 };
 
 

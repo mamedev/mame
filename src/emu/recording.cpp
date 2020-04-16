@@ -32,7 +32,6 @@ namespace
 
 	private:
 		avi_file::ptr       m_avi_file;                 // handle to the open movie file
-		u32                 m_avi_frame;                // current movie frame number
 	};
 
 
@@ -50,7 +49,6 @@ namespace
 
 	private:
 		std::unique_ptr<emu_file>			m_mng_file;           // handle to the open movie file
-		u32									m_mng_frame;          // current movie frame number
 		std::map<std::string, std::string>	m_info_fields;
 	};
 };
@@ -66,6 +64,7 @@ namespace
 
 movie_recording::movie_recording(screen_device *screen)
     : m_screen(screen)
+	, m_frame(0)
 {
     m_frame_period = m_screen ? m_screen->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
 }
@@ -97,6 +96,7 @@ bool movie_recording::append_video_frame(bitmap_rgb32 &bitmap, attotime curtime)
 		// append this bitmap as a single frame
 		if (!append_single_video_frame(bitmap, palette, palette_entries))
 			return false;
+		m_frame++;
 
 		// advance time
 		set_next_frame_time(next_frame_time() + frame_period());
@@ -171,9 +171,6 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	std::string fullpath = file->fullpath();
 	file.reset();
 
-	// reset the state
-	m_avi_frame = 0;
-
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
@@ -235,7 +232,6 @@ bool avi_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 
 mng_movie_recording::mng_movie_recording(screen_device *screen, std::map<std::string, std::string> &&info_fields)
 	: movie_recording(screen)
-	, m_mng_frame(0)
 	, m_info_fields(std::move(info_fields))
 {
 }
@@ -274,14 +270,13 @@ bool mng_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 {
 	// set up the text fields in the movie info
 	png_info pnginfo;
-	if (m_mng_frame == 0)
+	if (current_frame() == 0)
 	{
 		for (auto &ent : m_info_fields)
 			pnginfo.add_text(ent.first.c_str(), ent.second.c_str());
 	}
 
 	png_error error = mng_capture_frame(*m_mng_file, pnginfo, bitmap, palette_entries, palette);
-	m_mng_frame++;
 	return error == png_error::PNGERR_NONE;
 }
 
