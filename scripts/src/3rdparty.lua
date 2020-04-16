@@ -2211,7 +2211,7 @@ project "wdlfft"
 -- vccurses library objects
 --------------------------------------------------
 
-if string.find(_ACTION, "vs+") or string.find(_ACTION, "osx-clang+") then
+if string.find(_ACTION, "vs+") or string.find(_ACTION, "xcode+") then
 project "portcurses"
 	uuid "b3f9cf9c-4bd6-4ccb-8d64-ecb752509625"
 	kind "StaticLib"
