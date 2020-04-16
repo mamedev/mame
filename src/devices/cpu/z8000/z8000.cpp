@@ -478,7 +478,7 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
 	{
-		standard_irq_callback(VI_LINE);
+		standard_irq_callback(NVI_LINE);
 		m_irq_vec = m_iack_in[2](m_pc);
 		m_halt = false;
 
