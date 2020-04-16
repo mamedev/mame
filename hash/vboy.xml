@@ -72,8 +72,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="2097152" width="32">
 				<rom name="golf (usa).bin" size="2097152" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
+			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
@@ -287,8 +286,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="1048576" width="32">
 				<rom name="teleroboxer (japan, usa).bin" size="1048576" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
+			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
@@ -336,8 +334,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="1048576" width="32">
 				<rom name="vue-vvfj-0.u1" size="1048576" crc="526cc969" sha1="583b409b7215159219d08e789db46140062095f2" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
+			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
@@ -380,8 +377,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="2097152" width="32">
 				<rom name="t&amp;e virtual golf (japan).bin" size="2097152" crc="6ba07915" sha1="c595285d42c69f14b2b418c1edfbe4a7f9a624b6" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
+			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
@@ -454,8 +450,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="2097152" width="32">
 				<rom name="virtual boy wario land (japan, usa).bin" size="2097152" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
+			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
