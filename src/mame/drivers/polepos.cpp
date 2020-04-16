@@ -88,7 +88,7 @@ Address          Dir Data             Name      Description
 ---------------- --- ---------------- --------- -----------------------
 00xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4L/3L program ROM
 01xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4K/3K program ROM
-011-------------   W ---------------x NMIACKB   Z8002 #2 NMI enable/acknowledge [1]
+011-------------   W ---------------x NMIACKB   Z8002 #2 NVI enable/acknowledge [1]
 the rest of the memory map is common to the other Z8002
 
 
@@ -98,11 +98,14 @@ Address          Dir Data             Name      Description
 ---------------- --- ---------------- --------- -----------------------
 00xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4E/3E program ROM
 01xxxxxxxxxxxxx- R   xxxxxxxxxxxxxxxx ROM 4D/3D program ROM
-011-------------   W ---------------x NMIACKA   Z8002 #1 NMI enable/acknowledge [1]
+011-------------   W ---------------x NMIACKA   Z8002 #1 NVI enable/acknowledge [1]
 the rest of the memory map is common to the other Z8002
 
 [1] One Z8002 writes at $6000 and the other at $6002, but they did it only for clarity
     because the low address bits are ignored and the location is not shared.
+
+    NMIACK is not used to handle the NMI or NVI acknowledge cycles (whose codes are
+    ignored).
 
 
 Z8002 (common):
@@ -460,14 +463,14 @@ void polepos_state::z8002_map_1(address_map &map)
 {
 	z8002_map(map);
 	map(0x0000, 0x7fff).rom().region("sub", 0);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x6000, 0x6001).mirror(0x1ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<true>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 void polepos_state::z8002_map_2(address_map &map)
 {
 	z8002_map(map);
 	map(0x0000, 0x7fff).rom().region("sub2", 0);
-	map(0x6000, 0x6001).mirror(0x0ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
+	map(0x6000, 0x6001).mirror(0x1ffe).w(FUNC(polepos_state::z8002_nvi_enable_w<false>)); /* NVI enable - *NOT* shared by the two CPUs */
 }
 
 
