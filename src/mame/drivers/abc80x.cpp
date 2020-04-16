@@ -141,7 +141,6 @@ Notes:
 
     TODO:
 
-    - abc850 is broken
     - abc806 30K banking
     - cassette
 	- abc800 video card bus 
