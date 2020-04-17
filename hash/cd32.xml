@@ -73,7 +73,6 @@ license:CC0
 	James Pond 2: Codename RoboCod [Kixx]
 	James Pond 3: Operation Starfi5h
 	James Pond 3: Operation Starfi5h [Kixx]
-	Jetstrike
 	John Barnes European Football
 	Jungle Strike
 	Kang Fu
@@ -92,7 +91,6 @@ license:CC0
 	Magic Island
 	Manchester United: Premier League Champions
 	Mathematik
-	Microcosm
 	Microcosm [Demo]
 	More! Lemmings
 	Morph [Kixx]
@@ -137,7 +135,6 @@ license:CC0
 	Thomas The Tank Engine's Pinball
 	Top Gear 2
 	UFO: Enemy Unknown [Limited Edition]
-	Universe
 	VanCity Direct TV
 	Video Creator
 	Vital Light [CD 32 VITA LIFE   MADE IN THE U.K. BY CD-SYSTEMS   01087]
@@ -595,9 +592,10 @@ license:CC0
 		<description>ATR: All Terrain Racing</description>
 		<year>1995</year>
 		<publisher>Team 17</publisher>
+		<info name="disc_matrix" value="CDD6125 ATR CD32 :   MASTERED BY NIMBUS"/>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="atr - all terrain racing (1995)(team 17)" sha1="79a835dda3cc84bf82e4f65e5a99a072c22bcc5c" status="baddump"/>
+				<disk name="atr - all terrain racing (1995)(team 17)" sha1="edefcd613796faea7e279b3729fd876243623171"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1170,7 +1168,7 @@ license:CC0
 		<info name="disc_matrix" value="CDD3924 HEIMDALL 2 CD32 :   MASTERED BY NIMBUS"/>
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
-				<disk name="heimdall 2 - into the hall of worlds" sha1="5de73081c4278135362eb079a1f73053a50f86dc"/>
+				<disk name="heimdall 2 - into the hall of worlds (1994)(core)" sha1="5de73081c4278135362eb079a1f73053a50f86dc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1186,6 +1184,19 @@ license:CC0
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="international karate plus (europe)" sha1="6f69a642e1f4104bbe7d1f66353473752c14e64c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Cut off airplane selection graphics -->
+	<software name="jetstrike" supported="no">
+		<description>Jetstrike</description>
+		<year>1994</year>
+		<publisher>Rasputin</publisher>
+		<info name="disc_matrix" value="BR00400-01 Made by KAO Ireland" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jetstrike (1994)(rasputin)" sha1="54876d6371e67338e902986adf58452d97724d01"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1242,6 +1253,19 @@ license:CC0
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mean arenas (europe)" sha1="0a48eceb7d86ab776b91657c3e9a1af1b7a06a13"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Heavy GFX glitches -->
+	<software name="microcosm" supported="no">
+		<description>Microcosm</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="disc_matrix" value="DADC AUSTRIA   MCD32-1  11     A2" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="microcosm (1994)(psygnosis)" sha1="4151e7109a476bb3bdebedb5989fdf7fc2030038"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1407,6 +1431,19 @@ license:CC0
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="prey - an alien encounter (europe)" sha1="a63ee5d54f70fe53a966ddcd0c2a7085d7c7426a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Heavy GFX glitches in Project-X, DSKDAT W 0000 in F17 Challenge-->
+	<software name="projxf17" supported="no">
+		<description>Project-X and F17 Challenge</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="disc_matrix" value="CDD3499 PX VERSION 2 :   MASTERED BY NIMBUS" />
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="project-x and f17 challenge (1994)(team 17)" sha1="9c0010cc8b648b8d929dadb266d1f6464b1ef14d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1840,6 +1877,19 @@ license:CC0
 		<part name="cdrom" interface="cd32_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultimate body blows (europe)" sha1="737f46a3d4ed22f8d69ebff24e66e6bdc170ad81"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Doesn't boot -->
+	<software name="universe" supported="no">
+		<description>Universe</description>
+		<year>1994</year>
+		<publisher>Core</publisher>
+		<info name="disc_matrix" value="CDD4533 UNIVERSE :   MASTERED BY NIMBUS"/>
+		<part name="cdrom" interface="cd32_cdrom">
+			<diskarea name="cdrom">
+				<disk name="universe (1994)(core)" sha1="bf6dbeab33ea5bb977649a4ce0a9bf3718ca4417"/>
 			</diskarea>
 		</part>
 	</software>
