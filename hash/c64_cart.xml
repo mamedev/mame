@@ -477,7 +477,7 @@ license:CC0
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="btx" />
+			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -494,7 +494,7 @@ license:CC0
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="btx" />
+			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -511,7 +511,7 @@ license:CC0
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="btx" />
+			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -526,7 +526,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>J. Ranheim</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="capture2" />
+			<feature name="slot_unsupported" value="capture2" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -541,7 +541,7 @@ license:CC0
 		<year>1987</year>
 		<publisher>J. Ranheim</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="capture2" />
+			<feature name="slot_unsupported" value="capture2" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -556,7 +556,7 @@ license:CC0
 		<year>198?</year>
 		<publisher>Trilogic</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="expert" />
+			<feature name="slot_unsupported" value="expert" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
@@ -632,7 +632,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>KCS Dordrecht</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="speedsaver_c000" />
+			<feature name="slot_unsupported" value="speedsaver_c000" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -647,7 +647,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>KCS Dordrecht</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="speedsaver_combi" />
+			<feature name="slot_unsupported" value="speedsaver_combi" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -692,7 +692,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>The Soft Group</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="video_mate" />
+			<feature name="slot_unsupported" value="video_mate" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -733,7 +733,7 @@ license:CC0
 		<year>1986</year>
 		<publisher>Robtek</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="game_killer" />
+			<feature name="slot_unsupported" value="game_killer" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
@@ -857,7 +857,7 @@ license:CC0
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="bi80" />
+			<feature name="slot_unsupported" value="bi80" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -873,7 +873,7 @@ license:CC0
 		<publisher>Creative Micro Designs</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ramlink" />
+			<feature name="slot_unsupported" value="ramlink" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -902,7 +902,7 @@ license:CC0
 		<publisher>Creative Micro Designs</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ramlink" />
+			<feature name="slot_unsupported" value="ramlink" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -930,7 +930,7 @@ license:CC0
 		<publisher>Creative Micro Designs</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ramlink" />
+			<feature name="slot_unsupported" value="ramlink" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -980,7 +980,7 @@ license:CC0
 		<publisher>Orange Micro</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="grappler" />
+			<feature name="slot_unsupported" value="grappler" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -1073,7 +1073,7 @@ license:CC0
 		<info name="serial" value="REX 9600" />
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="goliath" />
+			<feature name="slot_unsupported" value="goliath" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 
@@ -1089,7 +1089,7 @@ license:CC0
 		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9603" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="quickbyte2" />
+			<feature name="slot_unsupported" value="quickbyte2" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -1104,7 +1104,7 @@ license:CC0
 		<publisher>Jann Datentechnik</publisher>
 		<info name="serial" value="REX 9603" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="quickbyte2" />
+			<feature name="slot_unsupported" value="quickbyte2" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -1133,7 +1133,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>Elektronik-Technik-Peters</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="flash8" />
+			<feature name="slot_unsupported" value="flash8" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="rom" size="0x8000">
@@ -1147,7 +1147,7 @@ license:CC0
 		<year>19??</year>
 		<publisher>Pixstik</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="computapix_ieee488" />
+			<feature name="slot_unsupported" value="computapix_ieee488" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1162,7 +1162,7 @@ license:CC0
 		<year>19??</year>
 		<publisher>Micro Systems Development</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="msd_ieee488" />
+			<feature name="slot_unsupported" value="msd_ieee488" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x400">
@@ -1181,7 +1181,7 @@ license:CC0
 		<year>19??</year>
 		<publisher>Stack</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="stack_ieee488" />
+			<feature name="slot_unsupported" value="stack_ieee488" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1209,7 +1209,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Technofor</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="technofor_ieee488" />
+			<feature name="slot_unsupported" value="technofor_ieee488" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1223,7 +1223,7 @@ license:CC0
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="hobbi_elektronika" />
+			<feature name="slot_unsupported" value="hobbi_elektronika" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -1251,7 +1251,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Richvale Telecommunications</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c64link" />
+			<feature name="slot_unsupported" value="c64link" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
@@ -1265,7 +1265,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Richvale Telecommunications</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c64link2" />
+			<feature name="slot_unsupported" value="c64link2" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
@@ -1399,7 +1399,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="chameleon" />
+			<feature name="slot_unsupported" value="chameleon" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -1463,7 +1463,7 @@ license:CC0
 		<publisher>Roßmöller</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="samson" />
+			<feature name="slot_unsupported" value="samson" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -1527,7 +1527,7 @@ license:CC0
 		<year>2008</year>
 		<publisher>Protovision</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="mmc_replay" />
+			<feature name="slot_unsupported" value="mmc_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
@@ -1541,7 +1541,7 @@ license:CC0
 		<year>2007</year>
 		<publisher>Protovision</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="mmc64" />
+			<feature name="slot_unsupported" value="mmc64" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
@@ -1556,7 +1556,7 @@ license:CC0
 		<publisher>CyberpunX</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="retro_replay" />
+			<feature name="slot_unsupported" value="retro_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
@@ -5259,7 +5259,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>KCS Dordecht</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="kcs_power_cartridge" />
+			<feature name="slot_unsupported" value="kcs_power_cartridge" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
@@ -5477,7 +5477,7 @@ license:CC0
 		<year>19??</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot_unsupported" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5492,7 +5492,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar2" />
+			<feature name="slot_unsupported" value="ar2" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5507,7 +5507,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar2" />
+			<feature name="slot_unsupported" value="ar2" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5522,7 +5522,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar2" />
+			<feature name="slot_unsupported" value="ar2" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5537,7 +5537,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar3" />
+			<feature name="slot_unsupported" value="ar3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5552,7 +5552,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar3" />
+			<feature name="slot_unsupported" value="ar3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5567,7 +5567,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar3" />
+			<feature name="slot_unsupported" value="ar3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -5582,7 +5582,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4" />
+			<feature name="slot_unsupported" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5597,7 +5597,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4" />
+			<feature name="slot_unsupported" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5612,7 +5612,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4" />
+			<feature name="slot_unsupported" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5627,7 +5627,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5642,7 +5642,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5657,7 +5657,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5672,7 +5672,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5687,7 +5687,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5702,7 +5702,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5717,7 +5717,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5732,7 +5732,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5747,7 +5747,7 @@ license:CC0
 		<publisher>Atrax</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5762,7 +5762,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5777,7 +5777,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5792,7 +5792,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5807,7 +5807,7 @@ license:CC0
 		<publisher>Derko</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5822,7 +5822,7 @@ license:CC0
 		<publisher>Triumwyrat</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5837,7 +5837,7 @@ license:CC0
 		<publisher>Triumwyrat</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5852,7 +5852,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5867,7 +5867,7 @@ license:CC0
 		<publisher>Fairlight</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5882,7 +5882,7 @@ license:CC0
 		<publisher>Triad</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5897,7 +5897,7 @@ license:CC0
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ar4x" />
+			<feature name="slot_unsupported" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -5913,7 +5913,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_frame" />
+			<feature name="slot_unsupported" value="freeze_frame" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -5930,7 +5930,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_frame" />
+			<feature name="slot_unsupported" value="freeze_frame" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -5947,7 +5947,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_frame4" />
+			<feature name="slot_unsupported" value="freeze_frame4" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -5964,7 +5964,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_machine" />
+			<feature name="slot_unsupported" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -5981,7 +5981,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_machine" />
+			<feature name="slot_unsupported" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -5998,7 +5998,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="freeze_machine" />
+			<feature name="slot_unsupported" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -6055,7 +6055,7 @@ license:CC0
 		<year>198?</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_proto" />
+			<feature name="slot_unsupported" value="final_proto" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="rom" size="0x6000">
@@ -6140,7 +6140,7 @@ license:CC0
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_plus" />
+			<feature name="slot_unsupported" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -6154,7 +6154,7 @@ license:CC0
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_plus" />
+			<feature name="slot_unsupported" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -6168,7 +6168,7 @@ license:CC0
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_plus" />
+			<feature name="slot_unsupported" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -6331,7 +6331,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>Gameworks</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="atomic_power" />
+			<feature name="slot_unsupported" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -6345,7 +6345,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>Frank &amp; Joe</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="atomic_power" />
+			<feature name="slot_unsupported" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -6359,7 +6359,7 @@ license:CC0
 		<year>1989</year>
 		<publisher>D&amp;E, Venlo</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="atomic_power" />
+			<feature name="slot_unsupported" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -6374,7 +6374,7 @@ license:CC0
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="codebuster" />
+			<feature name="slot_unsupported" value="codebuster" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6390,7 +6390,7 @@ license:CC0
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="snapshot" />
+			<feature name="slot_unsupported" value="snapshot" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6412,7 +6412,7 @@ license:CC0
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="snapshot" />
+			<feature name="slot_unsupported" value="snapshot" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6434,7 +6434,7 @@ license:CC0
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="snapshot" />
+			<feature name="slot_unsupported" value="snapshot" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6451,7 +6451,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap3" />
+			<feature name="slot_unsupported" value="supersnap3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6468,7 +6468,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap4" />
+			<feature name="slot_unsupported" value="supersnap4" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6485,7 +6485,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap4" />
+			<feature name="slot_unsupported" value="supersnap4" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6501,7 +6501,7 @@ license:CC0
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap5" />
+			<feature name="slot_unsupported" value="supersnap5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6518,7 +6518,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap5" />
+			<feature name="slot_unsupported" value="supersnap5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6547,7 +6547,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap5" />
+			<feature name="slot_unsupported" value="supersnap5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6576,7 +6576,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap5" />
+			<feature name="slot_unsupported" value="supersnap5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6605,7 +6605,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supersnap5" />
+			<feature name="slot_unsupported" value="supersnap5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 
@@ -6633,7 +6633,7 @@ license:CC0
 		<publisher>Schnedler Systems</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="turbo_master" />
+			<feature name="slot_unsupported" value="turbo_master" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
@@ -6789,7 +6789,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="moogsp" />
+			<feature name="slot_unsupported" value="moogsp" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 
@@ -6829,7 +6829,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ltkernal" />
+			<feature name="slot_unsupported" value="ltkernal" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -7060,7 +7060,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>MicroDoctor</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="mw203" />
+			<feature name="slot_unsupported" value="mw203" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
