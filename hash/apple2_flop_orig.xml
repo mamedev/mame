@@ -12202,10 +12202,12 @@ license:CC0
 		<info name="release" value="2020-04-11"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 13-sector drive and a 48K Apple II+ or later. -->
+		<!-- This image wes updated on 04/17/2020 to fix incorrectly
+		set sector type (it was incorrectly set to 15-sector) -->
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="234776">
-				<rom name="abm.woz" size="234776" crc="c6e64a66" sha1="b2145b3c5e7aec31cdb667ef33e67b6046ebf109"/>
+				<rom name="abm.woz" size="234776" crc="e1f6c358" sha1="bddc3e453fc5c397b5666227de7b6ae17c1f9454" />
 			</dataarea>
 		</part>
 	</software>
