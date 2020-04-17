@@ -42140,3 +42140,5 @@ simpr8210                       // Pioneer PR-8210
 @source:gsz80.cpp
 gsz80
 
+@source:gscpm.cpp
+gscpm
