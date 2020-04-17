@@ -489,6 +489,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
 mbc200.cpp

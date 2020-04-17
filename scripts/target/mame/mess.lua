@@ -3971,6 +3971,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bbl380.cpp",
 	MAME_DIR .. "src/mame/drivers/actions_atj2279b.cpp",
 	MAME_DIR .. "src/mame/drivers/pubint_storyreader.cpp",
+	MAME_DIR .. "src/mame/drivers/magiceyes_pollux_vr3520f.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")

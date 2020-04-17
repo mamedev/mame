@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj Cartridges">
+	<!-- NAND ROMs, dumps not yet verified as good, although they do contain a filesystem -->
+	
+	<software name="nickandi" supported="no">
+		<description>Nicktoon Android Invasion (US, 500-13290-B)</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13290-B - Nicktoons Android Invasion (US).bin" size="0x4200000" crc="1bdd1865" sha1="a500858c6e701617c5f6e1d0b23b058956a834ee" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
