@@ -225,7 +225,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 	if (offset == 7)
 		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_k007121_1->ctrl_w(space, offset, data);
+	m_k007121_1->ctrl_w(offset, data);
 }
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
@@ -247,7 +247,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 7)
 		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_k007121_2->ctrl_w(space, offset, data);
+	m_k007121_2->ctrl_w(offset, data);
 }
 
 

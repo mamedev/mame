@@ -34,7 +34,7 @@ public:
 	auto read_callback() { return m_read_cb.bind(); }
 	auto write_callback() { return m_write_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
+	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
 	uint16_t *get_color_lookup() { return m_color_lookup; }

@@ -36,7 +36,7 @@ ladybug_video_device::ladybug_video_device(machine_config const &mconfig, char c
 {
 }
 
-WRITE8_MEMBER(ladybug_video_device::bg_w)
+void ladybug_video_device::bg_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset & 0x07ff] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x03ff);

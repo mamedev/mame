@@ -315,7 +315,7 @@ void gtia_device::button_interrupt(int button_count, uint8_t button_port)
  *
  **************************************************************/
 
-READ8_MEMBER( gtia_device::read )
+uint8_t gtia_device::read(offs_t offset)
 {
 	switch (offset & 31)
 	{

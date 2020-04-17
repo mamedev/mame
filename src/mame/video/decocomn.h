@@ -27,11 +27,11 @@ public:
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_WRITE16_MEMBER( buffered_palette_w );
-	DECLARE_WRITE16_MEMBER( palette_dma_w );
-	DECLARE_WRITE16_MEMBER( priority_w );
+	void buffered_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void palette_dma_w(uint16_t data);
+	void priority_w(uint16_t data);
 	uint16_t priority_r();
-	DECLARE_READ16_MEMBER( d_71_r );
+	uint16_t d_71_r();
 
 protected:
 	// device-level overrides
