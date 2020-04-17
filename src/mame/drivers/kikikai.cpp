@@ -24,13 +24,17 @@ Notes:
   To set it up, just enable the single board 4p mode and keep the master/slave
   mode to off and the board ID to master.
 
-- kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
-  PS4 is the MC6801U4 mcu.
+- kicknrun the MC6801U4 mcu has been decapped and it's internal ROM has beed dumped.
+  Currently it's not hooked up properly, initial hook up is based the code from
+  Bubble Bobble - see bublbobl.ccp
 
-- Kiki Kaikai suffers from random lock-ups. It happens when the sound
-  CPU misses CTS from YM2203. The processor will loop infinitely and the main
-  CPU will in turn wait forever. It's difficult to meet the required level
-  of synchronization. This is kludged by filtering the 2203's busy signal.
+- mexico86 does a PS4 STOP ERROR shortly after boot, but works afterwards. PS4 is
+  the MC6801U4 mcu, the bootleggers replaced it with a custom programmed 68705 MCU.
+
+- Kiki Kaikai suffers from random lock-ups. It happens when the sound CPU misses
+  CTS from YM2203. The processor will loop infinitely and the main CPU will in
+  turn wait forever. It's difficult to meet the required level of synchronization.
+  This is kludged by filtering the 2203's busy signal.
 
 - KiKi KaiKai uses a custom MC6801U4 MCU which isn't dumped. The bootleg Knight Boy
   replaces it with a 68705. The bootleg is NOT 100% equivalent to the original
@@ -596,7 +600,7 @@ ROM_START( kicknrun )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A78-01,  JPH1021P, 185, PS4 */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -627,7 +631,7 @@ ROM_START( kicknrunu )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
-	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A78-01,  JPH1021P, 185, PS4 */
+	ROM_LOAD( "a87-01_jph1021p.h8", 0xf000, 0x1000, CRC(9451e880) SHA1(e9a505296108645f99449d391d0ebe9ac1b9984e) ) /* MCU labeled TAITO A87-01,  JPH1021P, 185, PS4 */
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* 64k for the cpu on the sub board */
 	ROM_LOAD( "a87-09-1",  0x0000, 0x4000, CRC(6a2ad32f) SHA1(42d4b97b25d219902ad215793f1d2c006ffe94dc) )
@@ -730,8 +734,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  kikikai_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  kikikai_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  kikikai_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kicknrun, 0,        kicknrun,       mexico86, kikikai_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_NOT_WORKING )
 GAME( 1986, kicknrunu,kicknrun, kicknrun,       mexico86, kikikai_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_NOT_WORKING )
 GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, kikikai_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
