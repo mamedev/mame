@@ -452,7 +452,7 @@ void m24_state::m24_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x0020, 0x0021).mirror(0xe).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0021).mirror(0xc).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).mirror(0xc).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0060).rw(FUNC(m24_state::keyboard_data_r), FUNC(m24_state::keyboard_data_w));
 	map(0x0061, 0x0061).rw(FUNC(m24_state::ctrlport_a_r), FUNC(m24_state::ctrlport_a_w));
