@@ -1718,7 +1718,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="shangrlia2_specialdisk_b.hdm" size="1261568" crc="9c8bc65bº" sha1="ccf291f71dfa6a31b9d6e06aee706775c5e5fb3f"/>
+				<rom name="shangrlia2_specialdisk_b.hdm" size="1261568" crc="9c8bc65b" sha1="ccf291f71dfa6a31b9d6e06aee706775c5e5fb3f"/>
 			</dataarea>
 		</part>
 	</software>
