@@ -1204,10 +1204,10 @@ Screen-Printer (standalone)
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="Udo Gronostay" />
 		<info name="author" value="Klaus Kunze" />
-		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14691">
-				<rom name="glueckspilz.cas" size="14691" crc="c562cb8d" sha1="446c48dc44b7c755e03c225b3e313bf568050fed" />
+			<dataarea name="cass" size="14635">
+				<rom name="glueckspilz.cas" size="14635" crc="83338074" sha1="01534f2031033b303f01fcde171576b511a2deb5" />
 			</dataarea>
 		</part>
 	</software>
