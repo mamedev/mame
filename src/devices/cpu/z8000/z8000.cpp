@@ -402,7 +402,7 @@ void z8002_device::Interrupt()
 
 	if (m_irq_req & Z8000_RESET)
 	{
-		m_irq_req &= ~(Z8000_RESET | Z8000_NMI);
+		m_irq_req &= Z8000_NVI | Z8000_VI;
 		CHANGE_FCW(RDMEM_W(*m_program, 2)); /* get reset m_fcw */
 		m_pc = get_reset_pc(); /* get reset m_pc  */
 	}
@@ -731,7 +731,7 @@ void z8002_device::execute_set_input(int irqline, int state)
 
 		if (state != CLEAR_LINE)
 		{
-			m_irq_req = Z8000_NMI;
+			m_irq_req |= Z8000_NMI;
 		}
 	}
 	else if (irqline < 2)
