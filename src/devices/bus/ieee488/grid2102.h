@@ -16,19 +16,18 @@
 #include <vector>
 #include <queue>
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> grid2102_device
-class grid2102_device :  public device_t,
+// ======================> grid210x_device
+class grid210x_device :  public device_t,
 						public device_ieee488_interface,
 						public device_image_interface
 {
 public:
 	// construction/destruction
-	grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, uint8_t *identify_response, attotime read_delay = attotime::from_msec(5));
 
 protected:
 	// device-level overrides
@@ -69,12 +68,47 @@ private:
 	bool has_srq;
 	uint8_t serial_poll_byte;
 	uint32_t floppy_sector_number;
+	int bus_addr;
+	uint8_t *identify_response_ptr;
 	std::vector<uint8_t> m_data_buffer;
 	std::queue<uint8_t> m_output_data_buffer;
+	uint16_t io_size;
 	emu_timer *m_delay_timer;
+protected:
+	attotime read_delay;
+};
+
+class grid2102_device : public grid210x_device {
+public:
+	// construction/destruction
+	grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+private:
+	static uint8_t identify_response[];
+};
+
+class grid2101_floppy_device : public grid210x_device {
+public:
+	// construction/destruction
+	grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+private:
+	static uint8_t identify_response[];
+};
+
+class grid2101_hdd_device : public grid210x_device {
+public:
+	// construction/destruction
+	grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
+
+private:
+	static uint8_t identify_response[];
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(GRID2102, grid2102_device)
+DECLARE_DEVICE_TYPE(GRID2101_FLOPPY, grid2101_floppy_device)
+DECLARE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device)
 
 #endif // MAME_BUS_IEEE488_GRID2102_H

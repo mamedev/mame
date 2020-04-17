@@ -462,4 +462,6 @@ void remote488_devices(device_slot_interface &device)
 void grid_ieee488_devices(device_slot_interface &device)
 {
 	device.option_add("grid2102", GRID2102).clock(XTAL(4'000'000));
+	device.option_add("grid2101_floppy", GRID2101_FLOPPY).clock(XTAL(4'000'000));
+	device.option_add("grid2101_hdd", GRID2101_HDD).clock(XTAL(4'000'000));
 }

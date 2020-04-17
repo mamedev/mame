@@ -86,7 +86,7 @@
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-// #define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -248,12 +248,13 @@ WRITE16_MEMBER(gridcomp_state::grid_gpib_w)
 WRITE8_MEMBER(gridcomp_state::grid_dma_w)
 {
 	m_tms9914->write(7, data);
+	LOG("DMA %02x <- %02x\n", offset, data);
 }
 
 READ8_MEMBER(gridcomp_state::grid_dma_r)
 {
 	int ret = m_tms9914->read(7);
-	// LOG("DMA %02x == %02x\n", offset, ret);
+	LOG("DMA %02x == %02x\n", offset, ret);
 	return ret;
 }
 
@@ -337,6 +338,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
 	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
 	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
+	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xdfe00, 0xdfe1f).unmaprw(); // .rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
 	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
@@ -422,6 +424,9 @@ void gridcomp_state::grid1101(machine_config &config)
 	ieee.atn_callback().set("hpib", FUNC(tms9914_device::atn_w));
 	ieee.ren_callback().set("hpib", FUNC(tms9914_device::ren_w));
 	IEEE488_SLOT(config, "ieee_grid", 0, grid_ieee488_devices, nullptr);
+	IEEE488_SLOT(config, "ieee_grid2", 0, grid_ieee488_devices, nullptr);
+	IEEE488_SLOT(config, "ieee_grid3", 0, grid_ieee488_devices, nullptr);
+	IEEE488_SLOT(config, "ieee_grid4", 0, grid_ieee488_devices, nullptr);
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274(config, m_uart8274, XTAL(4'032'000));
@@ -440,7 +445,7 @@ void gridcomp_state::grid1109(machine_config &config)
 void gridcomp_state::grid1121(machine_config &config)
 {
 	grid1101(config);
-	m_maincpu->set_clock(XTAL(24'000'000) / 3); // XXX
+	// m_maincpu->set_clock(XTAL(24'000'000) / 3); // XXX
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1121_map);
 }
 
@@ -489,7 +494,7 @@ ROM_END
 
 ROM_START( grid1129 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
-	ROM_DEFAULT_BIOS("patched")
+	ROM_DEFAULT_BIOS("ccos")
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
 	ROMX_LOAD("1129even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
