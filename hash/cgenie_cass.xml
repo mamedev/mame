@@ -914,10 +914,10 @@ Screen-Printer (standalone)
 		<year>198?</year>
 		<publisher>Kansas Software</publisher>
 		<info name="author" value="Wal Mansell" />
-		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="9811">
-				<rom name="cosmic_attack.cas" size="9811" crc="cb712ef1" sha1="0aedf205194e625d0a782c334111e0c60b09e23a" />
+			<dataarea name="cass" size="9755">
+				<rom name="cosmic_attack.cas" size="9755" crc="3266bd94" sha1="f92f79d630e32287b227e3c9f7c902f9c4d6ba64" />
 			</dataarea>
 		</part>
 	</software>
