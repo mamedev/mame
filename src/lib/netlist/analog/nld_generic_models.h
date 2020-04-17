@@ -14,7 +14,9 @@
 //
 // Set to 0 to use a linearized diode model in the range exceeding
 // maximum dissipation. The intention is to have a faster
-// convergence but this yet not really is observable
+// convergence. On selected circuits (LM3900 trapezoidal) this is
+// observable and has a 10% impact.
+// FIXME: More research needed
 //
 
 #define USE_TEXTBOOK_DIODE  (1)
