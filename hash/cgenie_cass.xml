@@ -1491,8 +1491,8 @@ Screen-Printer (standalone)
 		<info name="author" value="Klaus Weber" />
 		<info name="usage" value="Type SYSTEM and load with MAMPF2, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="17091">
-				<rom name="mampfman2.cas" size="17091" crc="f2be825b" sha1="ddae6342f05506d8c33f5148f04191988867d36a" />
+			<dataarea name="cass" size="17035">
+				<rom name="mampfman2.cas" size="17035" crc="11e61c65" sha1="4a3b59f427f632b5e2d889330b6ddd0ffbccbf5b" />
 			</dataarea>
 		</part>
 	</software>
