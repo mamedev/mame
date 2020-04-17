@@ -1237,6 +1237,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ne",
 		"nec",
 		"netronic",
+		"news_68k",
 		"news_r3k",
 		"next",
 		"nintendo",
@@ -2946,6 +2947,15 @@ files {
 	MAME_DIR .. "src/mame/includes/elf.h",
 	MAME_DIR .. "src/mame/drivers/exp85.cpp",
 	MAME_DIR .. "src/mame/includes/exp85.h",
+}
+
+createMESSProjects(_target, _subtarget, "news_68k")
+files {
+	MAME_DIR .. "src/mame/drivers/news_68k.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0266.h",
+	MAME_DIR .. "src/mame/machine/news_hid.cpp",
+	MAME_DIR .. "src/mame/machine/news_hid.h",
 }
 
 createMESSProjects(_target, _subtarget, "news_r3k")
