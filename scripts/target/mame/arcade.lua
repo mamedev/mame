@@ -4964,6 +4964,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sshot.cpp",
 	MAME_DIR .. "src/mame/drivers/ssingles.cpp",
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",
+	MAME_DIR .. "src/mame/drivers/startouch.cpp",
 	MAME_DIR .. "src/mame/drivers/statriv2.cpp",
 	MAME_DIR .. "src/mame/drivers/strkzn.cpp",
 	MAME_DIR .. "src/mame/drivers/stuntair.cpp",

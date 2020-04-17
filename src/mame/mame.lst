@@ -37697,6 +37697,9 @@ starridr                        //
 starshp1                        // 007513-007531    1977/07 [6502]
 starshpp                        // 007513-007531    1977/07 [6502]
 
+@source:startouch.cpp
+europl01                        //
+
 @source:starwars.cpp
 esb                             // 136031           (c) 1985
 starwars                        // 136021           (c) 1983
