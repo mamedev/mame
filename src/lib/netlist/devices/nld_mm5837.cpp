@@ -74,7 +74,7 @@ namespace netlist
 			log().warning(MW_FREQUENCY_OUTSIDE_OF_SPECS_1(m_FREQ()));
 
 		m_shift = 0x1ffff;
-		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
+		m_is_timestep = (m_RV.m_P.net().solver()->timestep_device_count() > 0);
 	}
 
 	NETLIB_UPDATE_PARAM(MM5837_dip)

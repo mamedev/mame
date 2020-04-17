@@ -17,6 +17,7 @@
 
 #include <cmath>
 
+constexpr int vgmviz_device::SCREEN_HEIGHT;
 
 constexpr float lerp(float a, float b, float f)
 {
@@ -32,6 +33,16 @@ constexpr float lerp(float a, float b, float f)
 DEFINE_DEVICE_TYPE(VGMVIZ, vgmviz_device, "vgmviz", "VGM Visualizer")
 
 
+
+/*static*/ const bool vgmviz_device::NEEDS_FFT[VIZ_COUNT] =
+{
+	false,	// VIZ_WAVEFORM
+	true,	// VIZ_WATERFALL
+	true,	// VIZ_RAWSPEC
+	true,	// VIZ_BARSPEC4
+	true,	// VIZ_BARSPEC8
+	true	// VIZ_BARSPEC16
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -67,6 +78,7 @@ void vgmviz_device::device_start()
 {
 	WDL_fft_init();
 	fill_window();
+	m_bitmap.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 
@@ -147,23 +159,17 @@ void vgmviz_device::apply_fft()
 void vgmviz_device::apply_waterfall()
 {
 	int total_bars = FFT_LENGTH / 2;
-	int bar_step = total_bars / 256;
 	WDL_FFT_COMPLEX* bins[2] = { (WDL_FFT_COMPLEX*)m_fft_buf[0], (WDL_FFT_COMPLEX*)m_fft_buf[1] };
-	int bar_index = 0;
-	for (int bar = 0; bar < 256; bar++, bar_index += bar_step)
+	for (int bar = 0; bar < std::min<int>(total_bars, SCREEN_HEIGHT); bar++)
 	{
-		if (bar_index < 2)
+		if (bar < 2)
 		{
 			continue;
 		}
-		float val = 0.0f;
-		for (int i = 0; i < bar_step; i++)
-		{
-			int permuted = WDL_fft_permute(FFT_LENGTH / 2, (bar * bar_step) + i);
-			val = std::max<WDL_FFT_REAL>(bins[0][permuted].re + bins[1][permuted].re, val);
-		}
-		int level = int(logf(val * 32768.0f) * 31.0f);
-		m_waterfall_buf[m_waterfall_length % (FFT_LENGTH / 2 + 16)][255 - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
+		int permuted = WDL_fft_permute(FFT_LENGTH / 2, bar);
+		float val = std::max<float>(bins[0][permuted].re, bins[1][permuted].re);
+		int level = int(log10f(val * 32768.0f) * 95.0f);
+		m_waterfall_buf[m_waterfall_length % SCREEN_WIDTH][total_bars - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
 	}
 	m_waterfall_length++;
 }
@@ -242,10 +248,33 @@ void vgmviz_device::device_reset()
 	memset(m_curr_peaks, 0, sizeof(float) * 2);
 
 	m_waterfall_length = 0;
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < SCREEN_WIDTH; i++)
 	{
 		memset(m_waterfall_buf[i], 0, sizeof(int) * 256);
 	}
+
+	m_viz_mode = VIZ_WAVEFORM;
+	m_clear_pending = true;
+	m_bitmap.fill(0);
+
+	m_history_length = 0;
+}
+
+
+//-------------------------------------------------
+//  cycle_spectrogram - cycle the visualization
+//  mode among the valid modes.
+//-------------------------------------------------
+
+void vgmviz_device::cycle_viz_mode()
+{
+	m_viz_mode = (viz_mode)((int)m_viz_mode + 1);
+	if (m_viz_mode == VIZ_COUNT)
+	{
+		m_viz_mode = VIZ_WAVEFORM;
+	}
+	m_bitmap.fill(0);
+	m_clear_pending = true;
 }
 
 
@@ -275,26 +304,74 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (int i = 0; i < m_outputs; i++)
 		{
-			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = (outputs[i][pos] + 32768.0f) / 65336.0f;
+			const float sample = (float)(int16_t)outputs[i][pos] / 65336.0f;
+			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = sample + 0.5f;
 		}
 
-		m_audio_count[m_audio_fill_index]++;
-		if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+		switch (m_viz_mode)
 		{
-			apply_window(m_audio_fill_index);
-			apply_fft();
-			apply_waterfall();
-
-			m_audio_fill_index = 1 - m_audio_fill_index;
-			if (m_audio_frames_available < 2)
-			{
-				m_audio_frames_available++;
-			}
-			m_audio_count[m_audio_fill_index] = 0;
+		default:
+			update_waveform(outputs);
+			break;
+		case VIZ_WATERFALL:
+		case VIZ_RAW_SPEC:
+		case VIZ_BAR_SPEC4:
+		case VIZ_BAR_SPEC8:
+		case VIZ_BAR_SPEC16:
+		case VIZ_PILLAR_SPEC4:
+		case VIZ_PILLAR_SPEC8:
+		case VIZ_PILLAR_SPEC16:
+		case VIZ_TOP_SPEC:
+		case VIZ_TOP_SPEC4:
+		case VIZ_TOP_SPEC8:
+		case VIZ_TOP_SPEC16:
+			update_fft(outputs);
+			break;
 		}
 	}
 }
 
+
+//-------------------------------------------------
+//  update_waveform - perform a wave-style update
+//-------------------------------------------------
+
+void vgmviz_device::update_waveform(stream_sample_t **outputs)
+{
+	m_history_length++;
+	m_audio_count[m_audio_fill_index]++;
+	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+	{
+		m_audio_fill_index = 1 - m_audio_fill_index;
+		if (m_audio_frames_available < 2)
+		{
+			m_audio_frames_available++;
+		}
+		m_audio_count[m_audio_fill_index] = 0;
+	}
+}
+
+//-------------------------------------------------
+//  update_fft - keep the FFT up-to-date
+//-------------------------------------------------
+
+void vgmviz_device::update_fft(stream_sample_t **outputs)
+{
+	m_audio_count[m_audio_fill_index]++;
+	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+	{
+		apply_window(m_audio_fill_index);
+		apply_fft();
+		apply_waterfall();
+
+		m_audio_fill_index = 1 - m_audio_fill_index;
+		if (m_audio_frames_available < 2)
+		{
+			m_audio_frames_available++;
+		}
+		m_audio_count[m_audio_fill_index] = 0;
+	}
+}
 
 //-------------------------------------------------
 //  init_palette - initialize the palette
@@ -406,8 +483,8 @@ void vgmviz_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(FFT_LENGTH / 2 + 16, 768);
-	m_screen->set_visarea(0, FFT_LENGTH / 2 + 15, 0, 767);
+	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_screen->set_visarea(0, SCREEN_WIDTH-1, 0, SCREEN_HEIGHT-1);
 	m_screen->set_screen_update(FUNC(vgmviz_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(vgmviz_device::init_palette), 512 + FFT_LENGTH / 2 + 1);
@@ -418,68 +495,283 @@ void vgmviz_device::device_add_mconfig(machine_config &config)
 //  screen_update - update vu meters
 //-------------------------------------------------
 
+template void vgmviz_device::draw_spectrogram<1, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<4, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<8, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<16, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<4, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<8, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<16, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<3, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<6, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<12, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+
 uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	find_levels();
+	switch (m_viz_mode)
+	{
+	default:
+		bitmap.fill(0, cliprect);
+		draw_waveform(bitmap);
+		break;
+	case VIZ_WATERFALL:
+		bitmap.fill(0, cliprect);
+		draw_waterfall(bitmap);
+		break;
+	case VIZ_RAW_SPEC:
+		draw_spectrogram<1, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC:
+		draw_spectrogram<1, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC4:
+		draw_spectrogram<4, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC4:
+		draw_spectrogram<3, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC4:
+		draw_spectrogram<4, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC8:
+		draw_spectrogram<8, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC8:
+		draw_spectrogram<6, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC8:
+		draw_spectrogram<8, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC16:
+		draw_spectrogram<16, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC16:
+		draw_spectrogram<12, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC16:
+		draw_spectrogram<16, SPEC_VIZ_TOP>(bitmap);
+		break;
+	}
+	return 0;
+}
+
+template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap_rgb32 &bitmap)
+{
+	const int black_index = 512 + FFT_LENGTH / 2;
+
+	if (m_clear_pending || SpecMode == SPEC_VIZ_BAR)
+	{
+		bitmap.fill(0);
+		m_clear_pending = false;
+	}
 
 	const pen_t *pal = m_palette->pens();
-	int chan_x = 0;
-	const int black_idx = (512 + FFT_LENGTH / 2);
-	for (int chan = 0; chan < 2; chan++)
+
+	int width = SCREEN_WIDTH;
+	switch (SpecMode)
 	{
-		int level = int(m_curr_levels[chan] * 255.0f);
-		int peak = int(m_curr_peaks[chan] * 255.0f);
-		for (int y = 0; y < 512; y++)
+	case SPEC_VIZ_PILLAR:
+		for (int y = 2; y < SCREEN_HEIGHT; y++)
 		{
-			int bar_y = 255 - (y >> 1);
-			for (int x = 0; x < 7; x++)
+			uint32_t *src = &m_bitmap.pix32(y);
+			uint32_t *dst = &bitmap.pix32(y - 2);
+			for (int x = SCREEN_WIDTH - 1; x >= 1; x--)
 			{
-				uint32_t *line = &bitmap.pix32(y + 256);
-				bool lit = bar_y <= level || bar_y == peak;
-				line[chan_x + x] = pal[lit ? bar_y : black_idx];
+				dst[x] = src[x - 1];
 			}
 		}
-		chan_x += 8;
-		m_curr_peaks[chan] *= 0.99f;
+		width = (int)(SCREEN_WIDTH * 0.75f);
+		break;
+	case SPEC_VIZ_TOP:
+		for (int y = 1; y < SCREEN_HEIGHT; y++)
+		{
+			uint32_t *src = &m_bitmap.pix32(y);
+			uint32_t *dst = &bitmap.pix32(y - 1);
+			for (int x = 0; x < SCREEN_WIDTH; x++)
+			{
+				dst[x] = src[x];
+			}
+		}
+		break;
+	default:
+		break;
 	}
 
 	int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX *bins[2] = { (WDL_FFT_COMPLEX *)m_fft_buf[0], (WDL_FFT_COMPLEX *)m_fft_buf[1] };
-	for (int bar = 0; bar < total_bars; bar++)
+
+	for (int bar = 2; bar < total_bars && bar < width; bar += BarSize)
 	{
-		if (bar < 2)
+		float max_val = 0.0f;
+		for (int sub_bar = 0; sub_bar < BarSize && (bar + sub_bar) < total_bars; sub_bar++)
 		{
-			continue;
+			int permuted = WDL_fft_permute(FFT_LENGTH/2, bar + sub_bar);
+			const float max_channel = std::max<float>(bins[0][permuted].re, bins[1][permuted].re);
+			max_val = std::max<float>(max_channel, max_val);
 		}
-		int permuted = WDL_fft_permute(FFT_LENGTH/2, bar);
-		float val = (bins[0][permuted].re + bins[1][permuted].re) * 0.5f;
-		int level = int(logf(val * 32768.0f) * 63.0f);
-		for (int y = 0; y < 512; y++)
+
+		float raw_level = logf(max_val * 32768.0f);
+
+		int level = 0;
+		int pal_index = 0;
+		switch (SpecMode)
 		{
-			int bar_y = 511 - y;
-			uint32_t *line = &bitmap.pix32(y + 256);
-			bool lit = bar_y <= level;
-			line[bar + 16] = pal[lit ? (256 + bar) : black_idx];
+		case SPEC_VIZ_BAR:
+			level = int(raw_level * 95.0f);
+			if (level <= 767)
+			{
+				pal_index = 255 - level / 3;
+			}
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+			{
+				int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *line = &bitmap.pix32(y);
+				for (int x = 0; x < BarSize; x++)
+				{
+					line[(bar - 2) + x] = bar_y <= level ? pal[256 + pal_index] : pal[black_index];
+				}
+			}
+			break;
+		case SPEC_VIZ_PILLAR:
+			level = int(raw_level * 59.0f);
+			if (level < 383)
+			{
+				pal_index = 255 - (int)(level * 0.75f);
+			}
+
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+			{
+				int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *line = &bitmap.pix32(y);
+				line[0] = 0;
+				if (bar_y > level)
+				{
+					continue;
+				}
+				const uint32_t entry = pal[256 + pal_index];
+				for (int x = (bar_y < level) ? 0 : 1; x < (BarSize - 1); x++)
+				{
+					if (bar_y < (level - 1))
+					{
+						const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.75f);
+						const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.75f);
+						const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.75f);
+						line[(bar - 2) + x] = 0xff000000 | (r << 16) | (g << 8) | b;
+					}
+					else
+					{
+						line[(bar - 2) + x] = pal[256 + pal_index];
+					}
+				}
+				const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.5f);
+				const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.5f);
+				const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.5f);
+				line[(bar - 2) + (BarSize - 1)] = 0xff000000 | (r << 16) | (g << 8) | b;
+				if (bar_y < level)
+				{
+					line[(bar - 2) + (BarSize - 2)] = 0xff000000 | (r << 16) | (g << 8) | b;
+				}
+			}
+			for (int x = 0; x < SCREEN_WIDTH; x++)
+			{
+				bitmap.pix32(SCREEN_HEIGHT - 1, x) = 0;
+				bitmap.pix32(SCREEN_HEIGHT - 2, x) = 0;
+			}
+			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			break;
+		case SPEC_VIZ_TOP:
+			level = int(raw_level * 63.0f);
+			if (level < 255)
+			{
+				pal_index = 255 - level;
+			}
+
+			for (int x = 0; x < BarSize; x++)
+			{
+				bitmap.pix32(SCREEN_HEIGHT - 1, (bar - 2) + x) = level > 0 ? pal[256 + pal_index] : pal[black_index];
+			}
+
+			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			break;
 		}
 	}
+}
 
-	const int width = FFT_LENGTH / 2 + 16;
-	for (int y = 0; y < 256; y++)
+void vgmviz_device::draw_waterfall(bitmap_rgb32 &bitmap)
+{
+	const pen_t *pal = m_palette->pens();
+	float tex_height = ((float)FFT_LENGTH / 2) - 1.0f;
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
+		const float v0 = (float)y / SCREEN_HEIGHT;
+		const float v1 = (float)(y + 1) / SCREEN_HEIGHT;
+		const float v0h = v0 * tex_height;
+		const float v1h = v1 * tex_height;
+		const int v0_index = (int)v0h;
+		const int v1_index = (int)v1h;
+		const float interp = v0h - (float)v0_index;
 		uint32_t* line = &bitmap.pix32(y);
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
-			if (m_waterfall_length < width)
+			if (m_waterfall_length < SCREEN_WIDTH)
 			{
-				const int sample = m_waterfall_buf[x][y];
+				const float s0 = m_waterfall_buf[x][v0_index];
+				const float s1 = m_waterfall_buf[x][v1_index];
+				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}
 			else
 			{
-				const int sample = m_waterfall_buf[((m_waterfall_length - width) + x) % width][y];
+				const int x_index = ((m_waterfall_length - SCREEN_WIDTH) + x) % SCREEN_WIDTH;
+				const float s0 = m_waterfall_buf[x_index][v0_index];
+				const float s1 = m_waterfall_buf[x_index][v1_index];
+				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}
 		}
 	}
-	return 0;
+}
+
+void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
+{
+	static const uint32_t MED_GRAY = 0xff7f7f7f;
+	static const uint32_t WHITE = 0xffffffff;
+	static const uint32_t LEFT_COLOR = 0xffbf0000;
+	static const uint32_t RIGHT_COLOR = 0xff00bf00;
+	static const int CHANNEL_HEIGHT = (SCREEN_HEIGHT / 2) - 1;
+	static const int CHANNEL_CENTER = CHANNEL_HEIGHT / 2;
+
+	if (m_audio_frames_available == 0)
+		return;
+
+	for (int x = 0; x < SCREEN_WIDTH; x++)
+	{
+		bitmap.pix32(CHANNEL_CENTER, x) = MED_GRAY;
+		bitmap.pix32(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
+
+		const float raw_l = m_audio_buf[1 - m_audio_fill_index][0][((int)m_history_length + 1 + x) % FFT_LENGTH];
+		const int sample_l = (int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int dy_l = (sample_l == 0) ? 0 : ((sample_l < 0) ? -1 : 1);
+		const int endy_l = CHANNEL_CENTER;
+		int y = endy_l - sample_l;
+		do
+		{
+			bitmap.pix32(y, x) = LEFT_COLOR;
+			y += dy_l;
+		} while(y != endy_l);
+
+		const float raw_r = m_audio_buf[1 - m_audio_fill_index][1][((int)m_history_length + 1 + x) % FFT_LENGTH];
+		const int sample_r = (int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int dy_r = (sample_r == 0) ? 0 : ((sample_r < 0) ? -1 : 1);
+		const int endy_r = CHANNEL_HEIGHT + 1 + CHANNEL_CENTER;
+		y = endy_r - sample_r;
+		do
+		{
+			bitmap.pix32(y, x) = RIGHT_COLOR;
+			y += dy_r;
+		} while(y != endy_r);
+
+		bitmap.pix32(CHANNEL_HEIGHT, x) = WHITE;
+		bitmap.pix32(CHANNEL_HEIGHT + 1, x) = WHITE;
+	}
 }

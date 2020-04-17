@@ -192,7 +192,7 @@ public:
 
 	void write(const pstring &s)
 	{
-		const auto sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
+		const auto *const sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
 		const auto sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
 		write(sl);
 		m_strm.write(sm, sl);

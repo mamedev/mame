@@ -386,7 +386,7 @@ Xtal Systems (Xtal Research)
 		<year>19??</year>
 		<publisher>Konami</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="215296">
+			<dataarea name="flop" size="225536">
 				<rom name="4game.dsk" size="225536" crc="19cc28fa" sha1="fed6c4972fc72ac51952f3b800c43f1b1240643b"/>
 			</dataarea>
 		</part>
@@ -740,7 +740,7 @@ Xtal Systems (Xtal Research)
 		<year>1985</year>
 		<publisher>Orion Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="215296">
+			<dataarea name="flop" size="1722368">
 				<rom name="highway.dsk" size="1722368" crc="6a0b9186" sha1="dc88e7aa2cdf9d066fece5dc10092a41de077075"/>
 			</dataarea>
 		</part>

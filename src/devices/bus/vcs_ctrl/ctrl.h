@@ -79,11 +79,8 @@ public:
 	// bit 6 - pin 9 -
 	//
 	uint8_t read_joy() { return exists() ? m_device->vcs_joy_r() : 0xff; }
-	DECLARE_READ8_MEMBER( joy_r ) { return read_joy(); }
 	uint8_t read_pot_x() { return exists() ? m_device->vcs_pot_x_r() : 0xff; }
-	DECLARE_READ8_MEMBER( pot_x_r ) { return read_pot_x(); }
 	uint8_t read_pot_y() { return exists() ? m_device->vcs_pot_y_r() : 0xff; }
-	DECLARE_READ8_MEMBER( pot_y_r ) { return read_pot_y(); }
 
 	void joy_w(uint8_t data) { if (exists()) m_device->vcs_joy_w(data); }
 

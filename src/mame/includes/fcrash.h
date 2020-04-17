@@ -20,10 +20,12 @@ public:
 		: cps_state(mconfig, type, tag, 1)
 		, m_msm_1(*this, "msm1")
 		, m_msm_2(*this, "msm2")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void fcrash(machine_config &config);
 	void cawingbl(machine_config &config);
+	void ffightblb(machine_config &config);
 	void kodb(machine_config &config);
 	void mtwinsb(machine_config &config);
 	void sf2m1(machine_config &config);
@@ -35,16 +37,17 @@ public:
 	void init_kodb();
 	void init_mtwinsb();
 	void init_sf2m1();
-	void init_wofabl();
 
 protected:
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_MACHINE_START(ffightblb);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
+	DECLARE_MACHINE_START(wofabl);
 
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
@@ -64,7 +67,7 @@ protected:
 	virtual void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	void fcrash_build_palette();
+	virtual void fcrash_build_palette();
 
 	void fcrash_map(address_map &map);
 	void mtwinsb_map(address_map &map);
@@ -74,6 +77,8 @@ protected:
 	void varthb_map(address_map &map);
 
 	void fcrash_sound_map(address_map &map);
+	void ffightblb_sound_map(address_map &map);
+	void ffightblb_oki_map(address_map &map);
 	void kodb_sound_map(address_map &map);
 	void sgyxz_sound_map(address_map &map);
 
@@ -97,6 +102,19 @@ protected:
 
 	optional_device<msm5205_device> m_msm_1;
 	optional_device<msm5205_device> m_msm_2;
+
+	optional_memory_bank m_okibank;
+};
+
+class cps1bl_no_brgt : public fcrash_state
+{
+public:
+	cps1bl_no_brgt(const machine_config &mconfig, device_type type, const char *tag)
+		: fcrash_state(mconfig, type, tag)
+	{ }
+
+private:
+	void fcrash_build_palette() override;
 };
 
 #endif // MAME_INCLUDES_FCRASH_H

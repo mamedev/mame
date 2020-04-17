@@ -23,7 +23,6 @@ A4 Map Construction + A4 Power-up Kit                         Artdink           
 ADPCM Kaihatsu Shien Library V1.1                             Fujitsu                           1991/7     FD
 ADPCM Kaihatsu Shien Library V2.1                             Fujitsu                           1992/6     FD
 AgentNet V1.0 (V1.1)                                          CSK Research Institute (CRI)      1990/12    FD
-Ai Shimai                                                     Silky's                           1994/9     FD×04
 ASM-386 Tool Kit V2.2                                         Fujitsu                           1995/3     FD
 Cannon Sight                                                  Nikkonren Kikaku                  1993/?     FD×02
 CB Trainer Jikkou System V1.1                                 Fujitsu                           1993/5     FD
@@ -201,7 +200,6 @@ Spell Master Kakitaoshi                                       Nikkonren Kikaku  
 Super Daisenryaku                                             System Soft                       1990/3     FD×02
 Super Itekomashi Perfect                                      Nikkonren Kikaku                  1994/12    FD
 Super Paso-rika Keisuke                                       Fujitsu Ooita Software Laboratory 1993/7     FD×02
-Super Ultra Mucchin Puripuri Cyborg Marilyn DX                JAST                              1994/4     FD×03
 Symmetry 17                                                   Jouhou Suuri Kenkyuusho           1992/2     FD
 Tablet Keyboard Driver V1.1                                   Fujitsu                           1993/7     FD
 Tenshi-tachi no Gogo Collection                               JAST                              1995/3     FD×04
@@ -378,74 +376,45 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Images taken from the Fresh series Master CD, they should match the original disks -->
 	<software name="msdos62">
 		<description>MS-DOS 6.2 L10</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Boot Disk" />
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (boot disk).hdm" size="1261568" crc="16a72ad3" sha1="995b709506811697eceddcbd1812ca809d7230e8"/>
+				<rom name="dos6fd1.hdm" size="1261568" crc="8eb094ae" sha1="3a260440520ac79453c9f50068588c5bed4fd1dd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 1" />
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3"/>
+				<rom name="dos6fd2.hdm" size="1261568" crc="c95a73fc" sha1="89d80f89b1578a79c18eb29bece5a832bb99c4ee"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 2" />
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06"/>
+				<rom name="dos6fd3.hdm" size="1261568" crc="6a4997ac" sha1="70a6c58ce5a35750a1dbf3d41e7881e628c8a094"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 3" />
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055"/>
+				<rom name="dos6fd4.hdm" size="1261568" crc="0472b599" sha1="6175f95fa6842bd4c4f968185d9db4c9c09b2598"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 4" />
+			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38"/>
+				<rom name="dos6fd5.hdm" size="1261568" crc="15e78c7d" sha1="26e92fadc2d971d0bb54818ffd15a1cb2754fde3"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="msdos62a" cloneof="msdos62">
-		<description>MS-DOS 6.2 L10 (Bad Disk 1?)</description>
-		<year>1994</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="System" />
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (startup) [bad - missing data].hdm" size="1261568" crc="e7eec864" sha1="22a98bcb36566487a0253657de1a00e44e459b6a" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 1" />
-			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 1).hdm" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 2" />
-			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 2).hdm" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 3" />
-			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 3).hdm" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Utility 4" />
-			<dataarea name="flop" size="1261568">
-				<rom name="[os] ms-dos 6.2 l10 (utility 4).hdm" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38"/>
+				<rom name="dos6fd6.hdm" size="1261568" crc="3c7912c4" sha1="569cdb1d750e8b50d285ad97f17c56ae8fbb8ef1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,6 +450,39 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="aishimai">
+		<description>Ai Shimai - Futari no Kajitsu</description>
+		<year>1994</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="愛姉妹　～二人の果実～" />
+		<info name="release" value="199409xx" />
+		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="aishimai_diska.hdm" size="1261568" crc="5566b303" sha1="7849a6811202fa6a4fe171370063b2d0d43fdee7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="aishimai_diskb.hdm" size="1261568" crc="d2cafc88" sha1="b80b129f8909d3f211558b1b514ef9ef3708eb03"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="aishimai_diskc.hdm" size="1261568" crc="1e1a3b38" sha1="2043789e96a386a24c932a39f14ddc6a2743a3c3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="aishimai_diskd.hdm" size="1261568" crc="48c70c9e" sha1="daeb6f0f1024bf6a715d9d67814e31d2b368bde3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Some graphics issues -->
 	<software name="asuka120" supported="partial">
 		<description>Asuka 120% Burning Fest.</description>
@@ -491,19 +493,19 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899"/>
+				<rom name="asuka 120 burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb"/>
+				<rom name="asuka 120 burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="asuka 120% burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
+				<rom name="asuka 120 burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,6 +572,32 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="daisenryaku iii '90 map collection vol. 1.hdm" size="1261568" crc="2828cff9" sha1="d62df199fbac964580aaffd392ff51ce00279395"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokyuse2sp">
+		<description>Doukyuusei 2 Special Disk</description>
+		<year>1995</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="同級生２　スペシャルディスク" />
+		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Doukyuusei 2 CD, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dks2_specialdisk_a.hdm" size="1261568" crc="b36cb5bc" sha1="269feb107864f8d1ff594558304688713efae01c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dks2_specialdisk_b.hdm" size="1261568" crc="38ae3d7a" sha1="eb02a5e96fa110b479df36a7f55ff7288976f178"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dks2_specialdisk_c.hdm" size="1261568" crc="6dd7f10c" sha1="48da99807160b2ce8608b8fa0533ba96b73169dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -861,13 +889,13 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop! (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6"/>
+				<rom name="dr. stop (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop! (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626"/>
+				<rom name="dr. stop (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1421,6 +1449,34 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="maririndx">
+		<description>Super Ultra Mucchin Puripuri Cyborg Maririn DX</description>
+		<year>1994</year>
+		<publisher>ジャスト (JAST)</publisher>
+		<info name="alt_title" value="スーパーウルトラむっちんぷりぷりサイボーグマリリンＤＸ" />
+		<info name="release" value="199404xx" />
+		<info name="usage" value="Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
+		<!-- Copy protected disk, invalid sector headers on track 3 -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3594134">
+				<rom name="maririndx_diska.mfm" size="3594134" crc="61706c9d" sha1="c6ae5412211d03e604bfc58b8d40107a4f3912fe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="maririndx_diskb.hdm" size="1261568" crc="3a3180cb" sha1="5650bd10276d7f4661e7973d295a9ba4c31f3231"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="maririndx_diskc.hdm" size="1261568" crc="d4f2fc7d" sha1="2efc64d48f990691420eb51fb284ab585b5cf419"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjfantt">
 		<description>Mahjong Gensoukyoku / Mahjong Fantasia Taikenban</description>
 		<year>1992</year>
@@ -1433,11 +1489,23 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="musicpro" supported="no">
-		<description>Music Pro-Towns</description>
+	<software name="musicpro">
+		<description>Music Pro-Towns (1990-05-23)</description>
 		<year>1989</year>
 		<publisher>Musical Plan</publisher>
+		<info name="usage" value="This is a master disk that can be turned into a System, Data or Demo disk. Make a copy of this disk, boot TownsOS V1.1, run the icon for the type of disk you want, and wait until it returns to the TownsOS GUI." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="musicpro.hdm" size="1261568" crc="0616885e" sha1="775c2db605458b29d3aa89c65c9e0b7b6c75b8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicproo" cloneof="musicpro">
+		<description>Music Pro-Towns (1989-08-28)</description>
+		<year>1989</year>
+		<publisher>Musical Plan</publisher>
+		<info name="usage" value="This is a master disk that can be turned into a System, Data or Demo disk. Make a copy of this disk, boot TownsOS V1.1, run the icon for the type of disk you want, and wait until it returns to the TownsOS GUI." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="music pro-towns (1989)(musical plan)(jp).hdm" size="1261568" crc="f5f61d98" sha1="2abb5e9042d8aae0480b551568ac2f8053126209"/>
@@ -1631,6 +1699,26 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
 				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shangrl2sp">
+		<description>Shangrlia 2 Special Disk</description>
+		<year>1993</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="シャングリラ２　スペシャルディスク" />
+		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Shangrlia 2 CD, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia2_specialdisk_a.hdm" size="1261568" crc="18ba3026" sha1="05d90c7b540fe3cbe0714d914f4da879a46a679c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shangrlia2_specialdisk_b.hdm" size="1261568" crc="9c8bc65b" sha1="ccf291f71dfa6a31b9d6e06aee706775c5e5fb3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2435,6 +2523,18 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="rumuder.bin" size="1474560" crc="6030e5cd" sha1="4f07f291b9e18e063ca7717af4905fd5b4f6686d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sa2">
+		<description>S. A. 2</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="田中ブラザーズ (Tanaka Brothers)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sa2.hdm" size="1261568" crc="3e3eb153" sha1="71278cfd2f11a879cfe00c267a7de8a4a75f0100"/>
 			</dataarea>
 		</part>
 	</software>

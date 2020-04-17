@@ -257,7 +257,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="163840">
-				<rom name="sega logo v1.0e (sf-7000) [!].sf7" size="163840" crc="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092"/>
+				<rom name="sega logo v1.0e (sf-7000).sf7" size="163840" crc="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092"/>
 			</dataarea>
 		</part>
 	</software>

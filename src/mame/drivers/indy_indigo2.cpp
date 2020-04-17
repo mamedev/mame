@@ -500,7 +500,7 @@ void ip22_state::indigo2_4415(machine_config &config)
  * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
  * 0e <- 01 Mics: BRG enable
  * 03 <- c1 Receiver: as above + Receiver enable
- * 05 <- ea Transmitter: as above + Transmitetr enable
+ * 05 <- ea Transmitter: as above + Transmitter enable
  * 00 <- 10 Reset External/status IE
 */
 

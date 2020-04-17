@@ -63,7 +63,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -81,14 +80,11 @@ private:
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
-	required_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -124,18 +120,6 @@ INPUT_CHANGED_MEMBER(intel02_state::reset_button)
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(intel02_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
 
 // I8255 PPI
 
@@ -254,10 +238,7 @@ void intel02_state::intel02(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "intellect02", "bin");
-	m_cart->set_device_load(FUNC(intel02_state::cart_load));
-	m_cart->set_must_be_loaded(true);
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "intellect02").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("intellect02");
 }
 

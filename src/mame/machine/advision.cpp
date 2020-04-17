@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Dan Boris
 /***************************************************************************
-
-  advision.c
 
   Machine file to handle emulation of the AdventureVision.
 

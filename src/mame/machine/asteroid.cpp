@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
 /***************************************************************************
 
-  machine.c
+  machine/asteroid.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -106,7 +106,7 @@ READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 	m_dsw_sel->i0a_w(BIT(val, 6));
 	m_dsw_sel->i0b_w(BIT(val, 7));
 
-	m_dsw_sel->s_w(space, 0, offset & 0x03);
+	m_dsw_sel->s_w(offset & 0x03);
 
 	return 0xfc | (m_dsw_sel->zb_r() << 1) | m_dsw_sel->za_r();
 }
@@ -133,7 +133,7 @@ void asteroid_state::machine_reset()
 {
 	m_dvg->reset_w();
 	if (m_earom.found())
-		earom_control_w(machine().dummy_space(), 0, 0);
+		earom_control_w(0);
 
 	/* reset RAM banks if present */
 	if (m_ram1.target() != nullptr)

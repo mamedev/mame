@@ -22,6 +22,7 @@
   1997: R-Zone DataZone: PDA with a built-in SuperScreen.
 
   TODO:
+  - softwarelist? it's impossible right now due to SVG initialization
   - support for SuperScreen. SVG colors will need to be inverted, or maybe
     with artwork or HLSL?
   - add DataZone, will get its own driver
@@ -69,7 +70,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(t1_write_r);
 	DECLARE_WRITE8_MEMBER(t1_write_s);
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	virtual u8 input_r() override;
 
 	void t2_update_audio();
 	DECLARE_WRITE8_MEMBER(t2_write_r);
@@ -173,7 +174,7 @@ WRITE8_MEMBER(rzone_state::t1_write_s)
 	sclock_w(data >> 1 & 1);
 }
 
-READ8_MEMBER(rzone_state::input_r)
+u8 rzone_state::input_r()
 {
 	// K1: SDATA
 	return sdata_r();

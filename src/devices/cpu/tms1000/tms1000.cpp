@@ -151,7 +151,7 @@ void tms1000_cpu_device::device_reset()
 
 	// decode microinstructions
 	for (int op = 0; op < 0x100; op++)
-		m_micro_decode[op] = decode_micro(op);
+		m_micro_decode[op] = m_decode_micro.isnull() ? decode_micro(op) : m_decode_micro(op);
 
 	// the fixed instruction set is not programmable
 	m_fixed_decode[0x00] = F_COMX;

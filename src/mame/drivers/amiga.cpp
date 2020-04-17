@@ -629,12 +629,12 @@ WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
 
 READ8_MEMBER( cdtv_state::dmac_io_read )
 {
-	return m_cdrom->read(space, 0);
+	return m_cdrom->read();
 }
 
 WRITE8_MEMBER( cdtv_state::dmac_io_write )
 {
-	m_cdrom->write(space, 0, data);
+	m_cdrom->write(data);
 }
 
 WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )

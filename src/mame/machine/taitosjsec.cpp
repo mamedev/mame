@@ -24,6 +24,7 @@ taito_sj_security_mcu_device::taito_sj_security_mcu_device(
 	, m_read_data(0U)
 	, m_zaccept(false)
 	, m_zready(false)
+	, m_pa_val(0U)
 	, m_pb_val(0U)
 	, m_busak(false)
 	, m_reset(false)

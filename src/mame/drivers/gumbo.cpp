@@ -356,7 +356,7 @@ ROM_START( mspuzzlea ) /* sticker on PCB stated:  MISS PUZZLE  V ..8 */
 	ROM_LOAD( "u210.bin", 0x00000, 0x40000, CRC(0a223a38) SHA1(e5aefbdbb09c18cc230bc852df3ea1defb1a21a8) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "u421.u421", 0x000000, 0x80000, CRC(52b67ee5) SHA1(209fdf845c5ef2e65fbc0de8aeb26562b6d033ab) ) /* several more explicit pictures have been relaced compared to the set below */
+	ROM_LOAD( "u421.u421", 0x000000, 0x80000, CRC(52b67ee5) SHA1(209fdf845c5ef2e65fbc0de8aeb26562b6d033ab) ) /* several more explicit pictures have been replaced compared to the set below */
 	ROM_LOAD( "u420.u420", 0x100000, 0x80000, CRC(3565696e) SHA1(5234dc25f73e6245b199071fa3a9c0d2367cae9f) ) /* Starting with 204 & 205, as well as many in 300 range */
 	ROM_LOAD( "u425.u425", 0x080000, 0x80000, CRC(933544e3) SHA1(d77b1050c4b56d0fd3be703bec961863d5188484) )
 	ROM_LOAD( "u426.u426", 0x180000, 0x80000, CRC(e458eb9d) SHA1(bead05ec57d97c86ed727b2c4b95f8ffdbd7ef4c) )

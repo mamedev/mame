@@ -603,7 +603,7 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //  internal I/O
 //-------------------------------------------------
 
-READ8_MEMBER(e0c6s46_device::io_r)
+u8 e0c6s46_device::io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -697,7 +697,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(e0c6s46_device::io_w)
+void e0c6s46_device::io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

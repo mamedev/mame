@@ -690,13 +690,13 @@ void exidy_sh8253_sound_device::device_reset()
 
 WRITE8_MEMBER(venture_sound_device::pa_w)
 {
-	m_pia->write_porta(data);
+	m_pia->porta_w(data);
 }
 
 
 WRITE8_MEMBER(venture_sound_device::pb_w)
 {
-	m_pia->write_portb(data);
+	m_pia->portb_w(data);
 }
 
 
@@ -885,7 +885,7 @@ READ8_MEMBER(victory_sound_device::status_r)
 
 TIMER_CALLBACK_MEMBER(victory_sound_device::delayed_command_w)
 {
-	m_pia->write_porta(param);
+	m_pia->porta_w(param);
 	m_pia_ca1 = 0;
 	m_pia->ca1_w(m_pia_ca1);
 }
@@ -960,7 +960,7 @@ void victory_sound_device::device_reset()
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
 	   as the sound CPU checks port A before the main CPU ever writes to it */
-	m_pia->write_porta(0);
+	m_pia->porta_w(0);
 	m_pia_ca1 = 1;
 	m_pia->ca1_w(m_pia_ca1);
 }

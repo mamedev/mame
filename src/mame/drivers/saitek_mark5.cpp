@@ -99,7 +99,7 @@ private:
 	required_device_array<hlcd0538_device, 3> m_lcd;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<u8> m_nvram;
-	required_ioport_array<7+1> m_inputs;
+	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;
 
 	// address maps
@@ -112,7 +112,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(reset_irq_w);
+	void reset_irq_w(u8 data);
 	DECLARE_READ8_MEMBER(reset_irq_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(cb_rom_r);
@@ -152,7 +152,7 @@ void mark5_state::machine_start()
 
 void mark5_state::machine_reset()
 {
-	reset_irq_w(machine().dummy_space(), 0, 0);
+	reset_irq_w(0);
 }
 
 
@@ -210,7 +210,7 @@ TIMER_CALLBACK_MEMBER(mark5_state::interrupt)
 	write_lcd(m_lcd_lcd ^ 1);
 }
 
-WRITE8_MEMBER(mark5_state::reset_irq_w)
+void mark5_state::reset_irq_w(u8 data)
 {
 	// MC14020 R
 	m_irqtimer->adjust(attotime::from_hz((19.6608_MHz_XTAL / 10 / 0x1000) * 2));
@@ -220,7 +220,7 @@ WRITE8_MEMBER(mark5_state::reset_irq_w)
 READ8_MEMBER(mark5_state::reset_irq_r)
 {
 	if (!machine().side_effects_disabled())
-		reset_irq_w(space, offset, 0);
+		reset_irq_w(0);
 
 	return 0xff;
 }
@@ -364,11 +364,11 @@ static INPUT_PORTS_START( mark5 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Start Clock")
 
-	PORT_START("IN.5") // square 'd-pad' (8-way, so define joystick)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_START("IN.5") // d-pad reads here
+	PORT_BIT(0x01, 0x01, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x31, NOTEQUALS, 0x00)
+	PORT_BIT(0x02, 0x02, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xc2, NOTEQUALS, 0x00)
+	PORT_BIT(0x04, 0x04, IPT_CUSTOM) PORT_CONDITION("IN.8", 0xa4, NOTEQUALS, 0x00)
+	PORT_BIT(0x08, 0x08, IPT_CUSTOM) PORT_CONDITION("IN.8", 0x58, NOTEQUALS, 0x00)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -389,6 +389,16 @@ static INPUT_PORTS_START( mark5 )
 	PORT_CONFNAME( 0x02, 0x02, "LCD Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("IN.8") // square 'd-pad' (8-way, so define joystick)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_CODE(KEYCODE_UP) PORT_NAME("Cursor Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Cursor Down")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Cursor Right")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Cursor Left")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) // ul
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) // ur
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) // dl
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) // dr
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mark6 )

@@ -82,6 +82,19 @@ Acorn BBC Micro - 6502 2nd Processor Discs
 		</part>
 	</software>
 
+	<software name="coprosup">
+		<description>65C102 Co-Processor Support Disc</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="DFS" />
+		<info name="usage" value="Requires 65C102 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="65C102SupportDisc.ssd" size="102400" crc="f6378bb4" sha1="03bfe9e860ecc6117f2e78771c4e301751269055"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hisheet">
 		<description>Hi-InterSheet</description>
 		<year>1986</year>
@@ -133,7 +146,7 @@ Acorn BBC Micro - 6502 2nd Processor Discs
 	</software>
 
 	<software name="psystem">
-		<description>P-System</description>
+		<description>p-System</description>
 		<year>1984</year>
 		<publisher>Acornsoft/TDI</publisher>
 		<info name="release" value="SNB26" />
@@ -141,7 +154,7 @@ Acorn BBC Micro - 6502 2nd Processor Discs
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="P-System (1)"/>
 			<dataarea name="flop" size="204800">
-				<rom name="Acornsoft P-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536"/>
+				<rom name="Acornsoft p-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536"/>
 			</dataarea>
 		</part>
 	</software>

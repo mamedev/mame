@@ -577,7 +577,7 @@ void ks0164_cpu_device::execute_run()
 				m_r[R_PC] += 2;
 
 				m_r[r] --;
-				if(m_r[r] != 0xffff)
+				if(m_r[r] != 0)
 					m_r[R_PC] = a;
 				break;
 			}

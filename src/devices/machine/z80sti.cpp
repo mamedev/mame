@@ -362,7 +362,7 @@ void z80sti_device::take_interrupt(int level)
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( z80sti_device::read )
+uint8_t z80sti_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -407,7 +407,7 @@ READ8_MEMBER( z80sti_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80sti_device::write )
+void z80sti_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{

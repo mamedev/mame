@@ -427,6 +427,70 @@ ROM_START( gijoeu )
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh
 ROM_END
 
+ROM_START( gijoeua ) // this uses a standard GX069 main PCB, but the GFX ROMs are moved to the 'ROM BOARD MAX352M PWB 352673'
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "069uaa03.14e", 0x000000,  0x40000, CRC(cfb1af44) SHA1(b4e68dbead19a5211778345330739cfcb37011ab) )
+	ROM_LOAD16_BYTE( "069uaa02.18e", 0x000001,  0x40000, CRC(3e6a56cd) SHA1(df719197dc001e80be8d04ced68f8937a9d6d1fe) )
+	ROM_LOAD16_BYTE( "069a12.13e",   0x080000,  0x40000, CRC(75a7585c) SHA1(443d6dee99edbe81ab1b7289e6cad403fe01cc0d) )
+	ROM_LOAD16_BYTE( "069a11.16e",   0x080001,  0x40000, CRC(3153e788) SHA1(fde4543eac707ef24b431e64011cf0f923d4d3ac) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
+
+	// the GFX ROMs are smaller and believed to have the same content as the other sets, in fact the game runs fine. Still better to have them dumped
+	// only 4 GFX ROMs were dumped from this PCB because the others are soldered ant the dumper didn't want to risk damage
+	ROM_REGION( 0x200000, "k056832", 0 )
+	ROM_LOAD32_BYTE( "069a10al.d7", 0x000000, 0x40000, NO_DUMP )
+	ROM_LOAD32_BYTE( "069a10ah.d9", 0x000001, 0x40000, NO_DUMP )
+	ROM_LOAD32_BYTE( "069a09al.d3", 0x000002, 0x40000, NO_DUMP )
+	ROM_LOAD32_BYTE( "069a09ah.d5", 0x000003, 0x40000, NO_DUMP )
+	ROM_LOAD32_BYTE( "069a10bl.j7", 0x100000, 0x40000, CRC(087d8e25) SHA1(b26eca0f96c91c18143b5e7a77aaf3831e935d5e) )
+	ROM_LOAD32_BYTE( "069a10bh.j9", 0x100001, 0x40000, CRC(fc7ad198) SHA1(ef9b834af04b78aa1c205e1c63da0fdec07783bb) )
+	ROM_LOAD32_BYTE( "069a09bl.j3", 0x100002, 0x40000, CRC(385217cc) SHA1(3b1fa53fde8e500e5e06a16a2ae71457c23a73a4) )
+	ROM_LOAD32_BYTE( "069a09bh.j5", 0x100003, 0x40000, CRC(c6d43c8a) SHA1(5bbb6c8d160e32097f2327ae3708037a9b9543f3) )
+	// overlay standard ROMs for now
+	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, BAD_DUMP CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, BAD_DUMP CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+
+	ROM_REGION( 0x400000, "k053246", 0 )
+	ROM_LOAD64_BYTE( "069a08al.k3", 0x000000, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a08ah.n3", 0x000001, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a05al.k5", 0x000002, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a05ah.n5", 0x000003, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a07al.k7", 0x000004, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a07ah.n7", 0x000005, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a06al.k9", 0x000006, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a06ah.n9", 0x000007, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a08bl.l3", 0x200000, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a08bh.p3", 0x200001, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a05bl.l5", 0x200002, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a05bh.p5", 0x200003, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a07bl.l7", 0x200004, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a07bh.p7", 0x200005, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a06bl.l9", 0x200006, 0x40000, NO_DUMP )
+	ROM_LOAD64_BYTE( "069a06bh.p9", 0x200007, 0x40000, NO_DUMP )
+	// overlay standard ROMs for now
+	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, BAD_DUMP CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, BAD_DUMP CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, BAD_DUMP CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD64_WORD( "069a06.2h", 0x000006, 0x100000, BAD_DUMP CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	ROM_LOAD( "069a04a.g2", 0x000000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04b.j2", 0x040000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04c.k2", 0x080000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04d.l2", 0x0c0000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04e.n2", 0x100000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04f.p2", 0x140000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04g.r2", 0x180000, 0x40000, NO_DUMP )
+	ROM_LOAD( "069a04h.s2", 0x1c0000, 0x40000, NO_DUMP )
+	// overlay standard ROM for now
+	ROM_LOAD( "069a04a.1e", 0x000000, 0x200000, BAD_DUMP CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(33b07813) SHA1(aa4df1b4265e24cb79d1405dfdf5998689f6561e) ) // sldh
+ROM_END
+
 ROM_START( gijoej )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "069jaa03.14e", 0x000000,  0x40000, CRC(4b398901) SHA1(98fcc6ae9cc69c67d82eb1a7ab0bb71e61aee623) )
@@ -485,5 +549,6 @@ ROM_END
 GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeua, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )

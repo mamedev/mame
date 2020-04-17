@@ -3,8 +3,8 @@
 
 // Samsung KS0164 wavetable chip
 
-#ifndef DEVICES_SOUND_KS0164_H
-#define DEVICES_SOUND_KS0164_H
+#ifndef MAME_SOUND_KS0164_H
+#define MAME_SOUND_KS0164_H
 
 #pragma once
 
@@ -87,6 +87,8 @@ private:
 	void mpu401_w(u8 data);
 	u8 mpu401_istatus_r();
 	void mpu401_istatus_w(u8 data);
+
+	static inline u16 uncomp_8_16(u8 value);
 };
 
 DECLARE_DEVICE_TYPE(KS0164, ks0164_device)

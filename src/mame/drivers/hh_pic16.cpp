@@ -20,7 +20,8 @@
  @053     1655A   1979, Atari Touch Me
  @0??     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (custom label)
  @061     1655A   1980, Lakeside Le Boom
- *081     1655A   19??, Ramtex Space Invaders/Block Buster
+ @078     1655A   1980, Radio Shack Sound Effects Chassis
+ *081     1655A   1981, Ramtex Space Invaders/Block Buster
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *123     1655A?  1980, Kingsford Match Me/Mini Match Me
@@ -43,6 +44,7 @@
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg of the
     other? Or are they both made by the same subcontractor? I presume Toytronic.
+  - is sfxchas an import of an existing toy meant for US-market? if so, which?
   - uspbball and pabball internal artwork
 
 ***************************************************************************/
@@ -61,6 +63,7 @@
 #include "melodym.lh" // clickable
 #include "matchme.lh" // clickable
 #include "rockpin.lh"
+#include "sfxchas.lh" // clickable
 #include "tbaskb.lh"
 #include "touchme.lh" // clickable
 #include "ttfball.lh"
@@ -1077,6 +1080,160 @@ ROM_END
 
 /***************************************************************************
 
+  Tandy(Radio Shack division) Sound Effects Chassis
+  * PCB label 25-600321, REV C, TCI-A3H / 94HB
+  * PIC 1655A-078
+  * 2 7seg LEDs + 8 other LEDs, 1-bit sound with volume decay
+
+  This could be purchased as a bare PCB from Radio Shack under the Archer
+  brand, catalog number 277-1013. It was named "Sound Effects Chassis" but
+  clearly it's nothing like that. More likely, it's a canceled tabletop game,
+  either custom made for Tandy, or an (as of yet) unknown import.
+
+  The bottom-left button selects game type and the bottom-right button selects
+  number of players. Press the bottom button(IPT_BUTTON5) to start. In games
+  4 and 5 it's easy to lock up the program by pressing the buttons repeatedly
+  and causing a score overflow.
+
+  The instruction leaflet says to attach a speaker and a 9V power source.
+  It actually takes 5V, 9V would break it. The only thing it has to say about
+  the game itself is "Your module will produce blinking lights and several
+  different sounds."
+
+***************************************************************************/
+
+class sfxchas_state : public hh_pic16_state
+{
+public:
+	sfxchas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_READ8_MEMBER(read_c);
+	DECLARE_WRITE8_MEMBER(write_c);
+
+	void speaker_decay_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
+	void sfxchas(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+};
+
+void sfxchas_state::machine_start()
+{
+	hh_pic16_state::machine_start();
+
+	// zerofill/init
+	m_speaker_volume = 0;
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+void sfxchas_state::speaker_decay_reset()
+{
+	if (~m_b & 0x40)
+		m_speaker_volume = 20.0;
+
+	// it takes a bit before it actually starts fading
+	double vol = (m_speaker_volume > 1.0) ? 1.0 : m_speaker_volume;
+	m_speaker->set_output_gain(0, vol);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(sfxchas_state::speaker_decay_sim)
+{
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_decay_reset();
+	m_speaker_volume /= 1.15;
+}
+
+void sfxchas_state::update_display()
+{
+	m_display->matrix(~m_b >> 4 & 3, (~m_c >> 1 & 0x7f) | (~m_b << 7 & 0x780));
+}
+
+WRITE8_MEMBER(sfxchas_state::write_b)
+{
+	// B0-B3: led data
+	// B4,B5: led select
+	m_b = data;
+	update_display();
+
+	// B6: speaker on
+	// B7: speaker out
+	speaker_decay_reset();
+	m_speaker->level_w(data >> 7 & 1);
+}
+
+READ8_MEMBER(sfxchas_state::read_c)
+{
+	// C1-C7: buttons
+	return (m_c & 1) ? 0xff : m_inputs[1]->read();
+}
+
+WRITE8_MEMBER(sfxchas_state::write_c)
+{
+	// C0: enable buttons
+	// C1-C7: digit segments
+	m_c = data;
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( sfxchas )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // top button, increment clockwise
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
+INPUT_PORTS_END
+
+void sfxchas_state::sfxchas(machine_config &config)
+{
+	/* basic machine hardware */
+	PIC1655(config, m_maincpu, 1050000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->write_b().set(FUNC(sfxchas_state::write_b));
+	m_maincpu->read_c().set(FUNC(sfxchas_state::read_c));
+	m_maincpu->write_c().set(FUNC(sfxchas_state::write_c));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 7+4);
+	m_display->set_segmask(3, 0x7f);
+	config.set_default_layout(layout_sfxchas);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(sfxchas_state::speaker_decay_sim), attotime::from_msec(25));
+}
+
+// roms
+
+ROM_START( sfxchas )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-078", 0x0000, 0x0400, CRC(bf780733) SHA1(57ac4620d87492280ab8cf69c148f98e38ecedc4) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Rocket Pinball (model 7-460)
   * PIC 1650A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
@@ -1760,7 +1917,8 @@ CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_
 
 CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Corporation", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, sfxchas,   0,       0, sfxchas,   sfxchas,   sfxchas_state,   empty_init, "Tandy Corporation", "Sound Effects Chassis", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )

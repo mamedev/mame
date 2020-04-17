@@ -670,7 +670,7 @@ All images in this list were created from original discs, most contain copy prot
 		<publisher>Audiogenic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104936">
-				<rom name="084 blast!.fsd" size="104936" crc="25e91719" sha1="42203574fa4ad32b8464d326a11fb81cd56ada4d" />
+				<rom name="084 blast.fsd" size="104936" crc="25e91719" sha1="42203574fa4ad32b8464d326a11fb81cd56ada4d" />
 			</dataarea>
 		</part>
 	</software>

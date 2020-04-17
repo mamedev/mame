@@ -471,7 +471,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		}
 
 		case KART:  // keyboard read
-			return m_kart->read(space,0);
+			return m_kart->read();
 
 		case IRQ_STATUS_A:
 			return (m_ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
@@ -552,7 +552,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			break;
 
 		case KART:
-			m_kart->write(space,0,data);
+			m_kart->write(data);
 			break;
 
 		case IRQ_MASK_A:
@@ -811,10 +811,10 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 							case 0x18: // latch B
 								/*
 								---- x--- floppy controller reset
+								---x ---- printer strobe
 								*/
 								m_fdc->dden_w(BIT(data, 1));
-								if (!(data & 8))
-									m_fdc->soft_reset();
+								m_fdc->mr_w(BIT(data, 3));
 								if(data & ~0xa)
 									printf("%02x Latch B\n",data);
 								return;

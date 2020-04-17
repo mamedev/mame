@@ -43,7 +43,6 @@ class wicat_state : public driver_device
 public:
 	wicat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
 		m_via(*this, "via"),
@@ -74,16 +73,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bdir_w);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(video_dma_r);
-	DECLARE_WRITE8_MEMBER(video_dma_w);
-	DECLARE_READ8_MEMBER(video_uart0_r);
-	DECLARE_WRITE8_MEMBER(video_uart0_w);
-	DECLARE_READ8_MEMBER(video_uart1_r);
-	DECLARE_WRITE8_MEMBER(video_uart1_w);
-	DECLARE_READ8_MEMBER(videosram_r);
-	DECLARE_WRITE8_MEMBER(videosram_w);
 	DECLARE_WRITE8_MEMBER(videosram_store_w);
 	DECLARE_WRITE8_MEMBER(videosram_recall_w);
 	DECLARE_READ8_MEMBER(video_timer_r);
@@ -102,7 +91,6 @@ private:
 	DECLARE_WRITE16_MEMBER(via_w);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
-	required_shared_ptr<uint8_t> m_vram;
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<via6522_device> m_via;
@@ -185,20 +173,20 @@ void wicat_state::video_mem(address_map &map)
 void wicat_state::video_io(address_map &map)
 {
 	// these are largely wild guesses...
-	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
-	map(0x0100, 0x0107).rw(FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
-	map(0x0200, 0x0207).rw(FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
+	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w)).umask16(0xff00);  // some sort of timer?
+	map(0x0100, 0x0107).rw(m_videouart0, FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(m_videouart1, FUNC(scn2651_device::read), FUNC(scn2651_device::write)).umask16(0xff00);  // INS2651 UART #2
 	map(0x0304, 0x0304).r(FUNC(wicat_state::video_status_r));
-	map(0x0400, 0x047f).rw(FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
+	map(0x0400, 0x047f).rw(m_videosram, FUNC(x2210_device::read), FUNC(x2210_device::write)).umask16(0xff00);  // XD2210  4-bit NOVRAM
 	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
 	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
 	map(0x0800, 0x0807).w("videoctrl", FUNC(ls259_device::write_d0)).umask16(0xffff);
-	map(0x0a00, 0x0a1f).rw(FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
-	map(0x0b00, 0x0b03).rw(FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
+	map(0x0a00, 0x0a1f).rw(m_videodma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00); // AM9517A DMA
+	map(0x0b00, 0x0b03).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0xff00);  // i8275 CRTC
 	map(0x0e00, 0x0eff).ram();
-	map(0x4000, 0x5fff).ram().share("vram"); // video RAM?
-	map(0x8000, 0x8fff).rom().region("g2char", 0x0000);
-	map(0x9000, 0x9fff).rom().region("g2char", 0x0000);
+	map(0x4000, 0x5fff).ram(); // video RAM?
+	map(0x8000, 0x8fff).lr8(NAME([this] (offs_t offset) { return m_chargen->as_u8(offset); }));
+	map(0x9000, 0x9fff).lr8(NAME([this] (offs_t offset) { return m_chargen->as_u8(offset); }));
 }
 
 void wicat_state::wd1000_mem(address_map &map)
@@ -547,32 +535,6 @@ WRITE16_MEMBER(wicat_state::via_w)
 		m_via->write(offset,data>>8);
 }
 
-READ8_MEMBER(wicat_state::video_r)
-{
-	switch(offset)
-	{
-	case 0x00:
-		return m_crtc->read(0);
-	case 0x02:
-		return m_crtc->read(1);
-	default:
-		return 0xff;
-	}
-}
-
-WRITE8_MEMBER(wicat_state::video_w)
-{
-	switch(offset)
-	{
-	case 0x00:
-		m_crtc->write(0,data);
-		break;
-	case 0x02:
-		m_crtc->write(1,data);
-		break;
-	}
-}
-
 READ8_MEMBER( wicat_state::vram_r )
 {
 	return m_videocpu->space(AS_IO).read_byte(offset*2);
@@ -581,56 +543,6 @@ READ8_MEMBER( wicat_state::vram_r )
 WRITE8_MEMBER( wicat_state::vram_w )
 {
 	m_videocpu->space(AS_IO).write_byte(offset*2,data);
-}
-
-READ8_MEMBER(wicat_state::video_dma_r)
-{
-	return m_videodma->read(offset/2);
-}
-
-WRITE8_MEMBER(wicat_state::video_dma_w)
-{
-	if(!(offset & 0x01))
-		m_videodma->write(offset/2,data);
-}
-
-READ8_MEMBER(wicat_state::video_uart0_r)
-{
-	uint16_t noff = offset >> 1;
-	return m_videouart0->read(noff);
-}
-
-WRITE8_MEMBER(wicat_state::video_uart0_w)
-{
-	uint16_t noff = offset >> 1;
-	m_videouart0->write(noff,data);
-}
-
-READ8_MEMBER(wicat_state::video_uart1_r)
-{
-	uint16_t noff = offset >> 1;
-	return m_videouart1->read(noff);
-}
-
-WRITE8_MEMBER(wicat_state::video_uart1_w)
-{
-	uint16_t noff = offset >> 1;
-	m_videouart1->write(noff,data);
-}
-
-// XD2210 64 x 4bit NOVRAM
-READ8_MEMBER(wicat_state::videosram_r)
-{
-	if(offset & 0x01)
-		return 0xff;
-	else
-		return m_videosram->read(space,offset/2);
-}
-
-WRITE8_MEMBER(wicat_state::videosram_w)
-{
-	if(!(offset & 0x01))
-		m_videosram->write(space,offset/2,data);
 }
 
 WRITE8_MEMBER(wicat_state::videosram_store_w)
@@ -659,14 +571,14 @@ READ8_MEMBER(wicat_state::video_timer_r)
 
 	if(offset == 0x00)
 		return (m_videouart->dr_r() << 4) | (m_videouart->tbre_r() && m_videoctrl->q6_r() ? 0x08 : 0x00);
-	if(offset == 0x02)
+	if(offset == 0x01)
 	{
 		if (!machine().side_effects_disabled())
 		{
 			m_videouart->drr_w(1);
 			m_videouart->drr_w(0);
 		}
-		return m_videouart->read(space,0);
+		return m_videouart->read();
 	}
 	return ret;
 }
@@ -674,8 +586,8 @@ READ8_MEMBER(wicat_state::video_timer_r)
 WRITE8_MEMBER(wicat_state::video_timer_w)
 {
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
-	if(offset == 0x02)
-		m_videouart->write(space,0,data);
+	if(offset == 0x01)
+		m_videouart->write(data);
 }
 
 READ8_MEMBER(wicat_state::video_status_r)

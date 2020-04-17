@@ -1053,7 +1053,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	*/
 
 	// FDC master reset
-	if (!BIT(data, 0)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 0));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 1));

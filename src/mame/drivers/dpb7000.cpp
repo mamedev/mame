@@ -87,6 +87,8 @@ private:
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	template <int StoreNum> uint32_t store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	static constexpr device_timer_id TIMER_DISKSEQ = 0;
 	static constexpr device_timer_id TIMER_FIELD_IN = 1;
 	static constexpr device_timer_id TIMER_FIELD_OUT = 2;
@@ -112,6 +114,9 @@ private:
 	DECLARE_READ8_MEMBER(fddcpu_p2_r);
 	DECLARE_WRITE8_MEMBER(fddcpu_p2_w);
 	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
+
+	void handle_brush_function(uint16_t data);
+	void store_address_w(uint8_t card, uint16_t data);
 
 	enum : uint16_t
 	{
@@ -160,6 +165,14 @@ private:
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;
+
+	uint16_t m_rhscr[2];
+	uint16_t m_rvscr[2];
+	uint16_t m_rzoom[2];
+	uint16_t m_fld_sel[2];
+	uint16_t m_window_enable[2];
+	uint16_t m_cxpos[2];
+	uint16_t m_cypos[2];
 
 	required_device<tdc1008_device> m_filter_cd;
 	required_device<tdc1008_device> m_filter_ce;
@@ -247,10 +260,16 @@ private:
 	uint8_t m_bif;
 	uint8_t m_bixos;
 	uint8_t m_biyos;
-	uint8_t m_bxlen;
-	uint8_t m_bylen;
+	uint16_t m_bxlen;
+	uint16_t m_bylen;
 	uint8_t m_plum;
 	uint8_t m_pchr;
+	std::unique_ptr<uint8_t[]> m_framestore_chr[2];
+	std::unique_ptr<uint8_t[]> m_framestore_lum[2];
+	std::unique_ptr<uint8_t[]> m_framestore_ext[2];
+	std::unique_ptr<uint8_t[]> m_brushstore_chr[2];
+	std::unique_ptr<uint8_t[]> m_brushstore_lum[2];
+	std::unique_ptr<uint8_t[]> m_brushstore_ext[2];
 };
 
 void dpb7000_state::main_map(address_map &map)
@@ -456,6 +475,31 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_bylen));
 	save_item(NAME(m_plum));
 	save_item(NAME(m_pchr));
+
+	// Frame Store Cards, 640x1024
+	for (int i = 0; i < 2; i++)
+	{
+		m_framestore_chr[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+		m_framestore_lum[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+		m_framestore_ext[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+	}
+
+	// Brush Store Cards
+	for (int i = 0; i < 2; i++)
+	{
+		m_brushstore_chr[i] = std::make_unique<uint8_t[]>(0x10000);
+		m_brushstore_lum[i] = std::make_unique<uint8_t[]>(0x10000);
+		m_brushstore_ext[i] = std::make_unique<uint8_t[]>(0x10000);
+	}
+
+	// Store Address Cards
+	memset(m_rhscr, 0, sizeof(uint16_t) * 2);
+	memset(m_rvscr, 0, sizeof(uint16_t) * 2);
+	memset(m_rzoom, 0, sizeof(uint16_t) * 2);
+	memset(m_fld_sel, 0, sizeof(uint16_t) * 2);
+	memset(m_window_enable, 0, sizeof(uint16_t) * 2);
+	memset(m_cxpos, 0, sizeof(uint16_t) * 2);
+	memset(m_cypos, 0, sizeof(uint16_t) * 2);
 }
 
 void dpb7000_state::machine_reset()
@@ -514,6 +558,22 @@ void dpb7000_state::machine_reset()
 	m_bylen = 0;
 	m_plum = 0;
 	m_pchr = 0;
+
+	// Frame Store Cards, 640x1024
+	for (int i = 0; i < 2; i++)
+	{
+		memset(&m_framestore_chr[i][0], 0, 10 * 0x10000);
+		memset(&m_framestore_lum[i][0], 0, 10 * 0x10000);
+		memset(&m_framestore_ext[i][0], 0, 10 * 0x10000);
+	}
+
+	// Brush Store Cards
+	for (int i = 0; i < 2; i++)
+	{
+		memset(&m_brushstore_chr[i][0], 0, 0x10000);
+		memset(&m_brushstore_lum[i][0], 0, 0x10000);
+		memset(&m_brushstore_ext[i][0], 0, 0x10000);
+	}
 }
 
 void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -795,6 +855,95 @@ READ16_MEMBER(dpb7000_state::cpu_ctrlbus_r)
 	return ret;
 }
 
+void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
+{
+	switch ((data >> 12) & 7)
+	{
+	case 0:
+		LOG("%s: Store Address Card %d, set RHSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rhscr[card] = data & 0xfff;
+		break;
+	case 1:
+		LOG("%s: Store Address Card %d, set RVSCR: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rvscr[card] = data & 0xfff;
+		break;
+	case 2:
+		LOG("%s: Store Address Card %d, set R ZOOM: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_rzoom[card] = data & 0xf;
+		break;
+	case 3:
+		LOG("%s: Store Address Card %d, set FLDSEL: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_fld_sel[card] = data & 0xf;
+		m_window_enable[card] = BIT(m_fld_sel[card], 2);
+		break;
+	case 4:
+		LOG("%s: Store Address Card %d, set CXPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_cxpos[card] = data & 0xfff;
+		break;
+	case 5:
+		LOG("%s: Store Address Card %d, set CYPOS: %03x\n", machine().describe_context(), card + 1, data & 0xfff);
+		m_cypos[card] = data & 0xfff;
+		break;
+	default:
+		LOG("%s: Store Address Card %d, unknown register: %04x\n", machine().describe_context(), card + 1, data);
+		break;
+	}
+}
+
+void dpb7000_state::handle_brush_function(uint16_t data)
+{
+	//printf("handle_brush_function %d, cxpos %d, cypos %d\n", (data >> 1) & 0xf, m_cxpos[1], m_cypos[1]);
+	switch ((data >> 1) & 0xf)
+	{
+	case 0: // Live Video
+		break;
+	case 1: // Brush Store Read
+		break;
+	case 2: // Brush Store Write
+		break;
+	case 3: // Framestore Read
+		break;
+	case 4: // Framestore Write
+		break;
+	case 5: // Fast Wipe Video
+		break;
+	case 6: // Fast Wipe Brush Store
+		break;
+	case 7: // Fast Wipe Framestore
+		if (!BIT(data, 5) && m_cxpos[0] < 800 && m_cypos[0] < 768)
+		{
+			//printf("Plotting store 1 at %d, %d\n", m_cxpos[0], m_cypos[0]);
+			m_framestore_lum[0][m_cypos[0] * 800 + m_cxpos[0]] = 0xff;
+			m_framestore_chr[0][m_cypos[0] * 800 + (m_cxpos[0] & ~1)] = 0x80;
+			m_framestore_chr[0][m_cypos[0] * 800 + (m_cxpos[0] |  1)] = 0x80;
+		}
+		if (!BIT(data, 6) && m_cxpos[1] < 800 && m_cypos[1] < 768)
+		{
+			//printf("Plotting store 2 at %d, %d\n", m_cxpos[1], m_cypos[1]);
+			m_framestore_lum[1][m_cypos[1] * 800 + m_cxpos[1]] = 0xff;
+			m_framestore_chr[1][m_cypos[1] * 800 + (m_cxpos[1] & ~1)] = 0x80;
+			m_framestore_chr[1][m_cypos[1] * 800 + (m_cxpos[1] |  1)] = 0x80;
+		}
+		break;
+	case 8: // Draw
+		break;
+	case 9: // Draw with Stencil I
+		break;
+	case 10: // Draw with Stencil II
+		break;
+	case 11: // Copy to Framestore
+		break;
+	case 12: // Copy to Brush Store
+		break;
+	case 13: // Paste with Stencil I
+		break;
+	case 14: // Paste with Stencil II
+		break;
+	case 15: // Copy to same Framestore (Invert)
+		break;
+	}
+}
+
 WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 {
 	switch (m_csr)
@@ -810,17 +959,21 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 		};
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Function Select: %04x\n", machine().describe_context(), data);
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Function:           %s\n", s_func_names[(data >> 1) & 0xf]);
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Store I:           %d\n", BIT(data, 5));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Store II:          %d\n", BIT(data, 6));
+		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Store I:            %d\n", BIT(data, 5));
+		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Store II:           %d\n", BIT(data, 6));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Luma Enable:        %d\n", BIT(data, 7));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Chroma Enable:      %d\n", BIT(data, 8));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Brush Select:       %d\n", BIT(data, 9));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Disc Enable:        %d\n", BIT(data, 10));
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                /Brush Invert:      %d\n", BIT(data, 11));
+		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Brush Invert:       %d\n", BIT(data, 11));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Brush Zero:         %d\n", BIT(data, 12));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Fixed Color Select: %d\n", BIT(data, 13));
 		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "                Go:                 %d\n", BIT(data, 0));
 		m_brush_addr_func = data & ~1;
+		if (BIT(data, 0))
+		{
+			handle_brush_function(data);
+		}
 		break;
 	}
 
@@ -847,13 +1000,17 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 	}
 
 	case 2: // Store Address Card
-		m_store_addr[1]->reg_w(data);
+		store_address_w(1, data);
 		if (BIT(data, 15))
-			m_store_addr[0]->reg_w(data);
+			store_address_w(0, data);
+
+		//m_store_addr[1]->reg_w(data);
+		//if (BIT(data, 15))
+		//	m_store_addr[0]->reg_w(data);
 		break;
 
 	case 8: // Brush Address Card, "Select 8" signal to PAL 16L8, BE
-		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Select 8\n", machine().describe_context());
+		LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Select 8: %04x\n", machine().describe_context(), data);
 		break;
 
 	case 9: // Brush Address Card, register write/select
@@ -872,12 +1029,12 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 			m_biyos = data & 0x7;
 			break;
 		case 4:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BXLEN = %02x\n", machine().describe_context(), data & 0x3f);
-			m_bxlen = data & 0x3f;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BXLEN = %03x\n", machine().describe_context(), data & 0xfff);
+			m_bxlen = data & 0xfff;
 			break;
 		case 5:
-			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BYLEN = %02x\n", machine().describe_context(), data & 0x3f);
-			m_bylen = data & 0x3f;
+			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: BYLEN = %03x\n", machine().describe_context(), data & 0xfff);
+			m_bylen = data & 0xfff;
 			break;
 		case 6:
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR, "%s: Brush Address Card, Register Write: PLUM = %03x(?)\n", machine().describe_context(), data & 0xff);
@@ -1070,6 +1227,31 @@ WRITE_LINE_MEMBER(dpb7000_state::fddcpu_debug_rx)
 	}
 }
 
+template <int StoreNum>
+uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 768; y++)
+	{
+		uint8_t *src_lum = &m_framestore_lum[StoreNum][y * 800];
+		uint8_t *src_chr = &m_framestore_chr[StoreNum][y * 800];
+		uint32_t *dst = &bitmap.pix32(y);
+		for (int x = 0; x < 800; x++)
+		{
+			uint8_t y = src_lum[x];
+			uint8_t u = src_chr[x & ~1];
+			uint8_t v = src_chr[x |  1];
+			float fr = y + 1.4075f * (v - 128);
+			float fg = y - 0.3455f * (u - 128) - (0.7169f * (v - 128));
+			float fb = y + 1.7790f * (u - 128);
+			uint8_t r = (fr < 0.0f) ? 0 : (fr > 255.0f ? 255 : (uint8_t)fr);
+			uint8_t g = (fg < 0.0f) ? 0 : (fg > 255.0f ? 255 : (uint8_t)fg);
+			uint8_t b = (fb < 0.0f) ? 0 : (fb > 255.0f ? 255 : (uint8_t)fb);
+			dst[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+		}
+	}
+	return 0;
+}
+
 void dpb7000_state::dpb7000(machine_config &config)
 {
 	// Computer Card 1 & 2
@@ -1107,6 +1289,18 @@ void dpb7000_state::dpb7000(machine_config &config)
 	screen.set_size(696, 276);
 	screen.set_visarea(56, 695, 36, 275);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
+	store_screen1.set_refresh_hz(60);
+	store_screen1.set_size(800, 768);
+	store_screen1.set_visarea(0, 799, 0, 767);
+	store_screen1.set_screen_update(FUNC(dpb7000_state::store_screen_update<0>));
+
+	screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
+	store_screen2.set_refresh_hz(60);
+	store_screen2.set_size(800, 768);
+	store_screen2.set_visarea(0, 799, 0, 767);
+	store_screen2.set_screen_update(FUNC(dpb7000_state::store_screen_update<1>));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

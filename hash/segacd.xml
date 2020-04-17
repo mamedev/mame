@@ -1542,7 +1542,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="CDAC-075900 3"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jeopardy! (usa)" sha1="6f159f64d3ea62bb8eff70e9a2f84d02bfb54688"/>
+				<disk name="jeopardy (usa)" sha1="6f159f64d3ea62bb8eff70e9a2f84d02bfb54688"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4532,7 +4532,7 @@ See: http://rawdump.net/
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mighty mighty missile! (usa)" sha1="561a66d7ed2df029ad07b49c4f0bca11f8ae0eb4"/>
+				<disk name="mighty mighty missile (usa)" sha1="561a66d7ed2df029ad07b49c4f0bca11f8ae0eb4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4986,7 +4986,7 @@ See: http://rawdump.net/
 		<info name="serial" value="T-87015"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the san diego zoo presents... the animals! (usa)" sha1="88f7be68f35e5dd7776b3ff580ae40ce7087151b"/>
+				<disk name="the san diego zoo presents... the animals (usa)" sha1="88f7be68f35e5dd7776b3ff580ae40ce7087151b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5648,7 +5648,7 @@ See: http://rawdump.net/
 		<info name="release" value="199406xx" />
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="panic! (usa)" sha1="44216917d5e42f131c0854cd8fb5066f5e39c87f"/>
+				<disk name="panic (usa)" sha1="44216917d5e42f131c0854cd8fb5066f5e39c87f"/>
 			</diskarea>
 		</part>
 	</software>

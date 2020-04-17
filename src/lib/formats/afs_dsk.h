@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
 /***************************************************************************
 
@@ -9,8 +9,6 @@
 ***************************************************************************/
 #ifndef MAME_FORMATS_AFS_DSK_H
 #define MAME_FORMATS_AFS_DSK_H
-
-#pragma once
 
 #pragma once
 

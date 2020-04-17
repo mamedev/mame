@@ -15,6 +15,7 @@
 #include "video/saa5050.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class malzak_state : public driver_device
 {
@@ -48,13 +49,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_mainbank;
-	/* misc */
-//  int playfield_x[256];
-//  int playfield_y[256];
-	int m_playfield_code[256];
-	int m_malzak_x;
-	int m_malzak_y;
-	int m_collision_counter;
 
 	DECLARE_READ8_MEMBER(fake_VRLE_r);
 	DECLARE_READ8_MEMBER(s2636_portA_r);
@@ -63,16 +57,27 @@ private:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
+	DECLARE_WRITE8_MEMBER(playfield_w);
 	DECLARE_READ8_MEMBER(videoram_r);
 
-	void malzak_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void video_start() override;
 
 	void malzak2_map(address_map &map);
 	void malzak_data_map(address_map &map);
 	void malzak_io_map(address_map &map);
 	void malzak_map(address_map &map);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	std::unique_ptr<bitmap_rgb32> m_trom_bitmap;
+	std::unique_ptr<bitmap_rgb32> m_playfield_bitmap;
+	tilemap_t *m_playfield_tilemap;
+	int m_playfield_code[256];
+	int m_scrollx;
+	int m_scrolly;
+	int m_collision_counter;
+	u8  m_playfield_bank;
 };
 
 #endif // MAME_INCLUDES_MALZAK_H

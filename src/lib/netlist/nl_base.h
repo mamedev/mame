@@ -28,9 +28,9 @@
 #include "nl_errstr.h"
 #include "nltypes.h"
 
+#include <initializer_list>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>
 
 //============================================================
 //  MACROS / New Syntax
@@ -187,6 +187,8 @@ namespace netlist
 	/// \brief Delegate type for device notification.
 	///
 	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	// -----------------------------------------------------------------------------
 	// forward definitions
@@ -428,18 +430,18 @@ namespace netlist
 				store().insert({obj, aname});
 			}
 
-			static const T &get(const C *obj) noexcept
+			static const T *get(const C *obj) noexcept
 			{
 				try
 				{
 					auto ret(store().find(obj));
 					nl_assert(ret != store().end());
-					return ret->second;
+					return &ret->second;
 				}
 				catch (...)
 				{
 					nl_assert_always(true, "exception in property_store_t.get()");
-					return *static_cast<T *>(nullptr);
+					return static_cast<T *>(nullptr);
 				}
 			}
 
@@ -488,7 +490,7 @@ namespace netlist
 
 			const pstring &name() const noexcept
 			{
-				return props::get(this);
+				return *props::get(this);
 			}
 
 		protected:
@@ -637,7 +639,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -825,11 +827,11 @@ namespace netlist
 		void set_go_gt_I(nl_fptype GO, nl_fptype GT, nl_fptype I) const noexcept
 		{
 			// Check for rail nets ...
-			if (m_go1 != nullptr)
+			if (m_go != nullptr)
 			{
-				*m_Idr1 = I;
-				*m_go1 = GO;
-				*m_gt1 = GT;
+				*m_Idr = I;
+				*m_go = GO;
+				*m_gt = GT;
 			}
 		}
 
@@ -837,11 +839,11 @@ namespace netlist
 		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
-	private:
 
-		nl_fptype *m_Idr1; // drive current
-		nl_fptype *m_go1;  // conductance for Voltage from other term
-		nl_fptype *m_gt1;  // conductance for total conductance
+	private:
+		nl_fptype *m_Idr; // drive current
+		nl_fptype *m_go;  // conductance for Voltage from other term
+		nl_fptype *m_gt;  // conductance for total conductance
 
 	};
 
@@ -1414,9 +1416,9 @@ namespace netlist
 		inline std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
-			for (auto &d : m_devices)
+			for (const auto &d : m_devices)
 			{
-				auto dev = dynamic_cast<C *>(d.second.get());
+				auto * const dev = dynamic_cast<C *>(d.second.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1430,7 +1432,7 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib &lib() const noexcept { return *m_lib; }
+		plib::dynlib_base &lib() const noexcept { return *m_lib; }
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -1464,7 +1466,7 @@ namespace netlist
 
 		core_device_t *find_device(const pstring &name) const
 		{
-			for (auto & d : m_devices)
+			for (const auto & d : m_devices)
 				if (d.first == name)
 					return d.second.get();
 			return nullptr;
@@ -1576,7 +1578,7 @@ namespace netlist
 
 		pstring                             m_name;
 		unique_pool_ptr<netlist_t>          m_netlist;
-		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
+		plib::unique_ptr<plib::dynlib_base> m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
@@ -1738,7 +1740,7 @@ namespace netlist
 		{
 			passert_always_msg(names.size() == N, "initializer_list size mismatch");
 			std::size_t i = 0;
-			for (auto &n : names)
+			for (const auto &n : names)
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
@@ -1951,9 +1953,9 @@ namespace netlist
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
 
-		m_gt1 = gt;
-		m_go1 = go;
-		m_Idr1 = Idr;
+		m_gt = gt;
+		m_go = go;
+		m_Idr = Idr;
 	}
 
 	inline logic_net_t & logic_t::net() noexcept
@@ -2129,7 +2131,7 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				const auto obj(top->object());
+				auto *const obj(top->object());
 				m_queue.pop();
 				if (obj != nullptr)
 					obj->template update_devs<KEEP_STATS>();

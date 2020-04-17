@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "necdasm.h"
 
 #define NEC_INPUT_LINE_INTP0 10
 #define NEC_INPUT_LINE_INTP1 11
@@ -21,7 +22,7 @@ enum
 	V25_PENDING
 };
 
-class v25_common_device : public cpu_device
+class v25_common_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// configuration helpers
@@ -68,6 +69,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; };
 
 private:
 	address_space_config m_program_config;

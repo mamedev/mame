@@ -12767,7 +12767,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ダムバスターズ" />
 		<info name="release" value="198601xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1086448">
+			<dataarea name="flop" size="3765072">
 				<rom name="dam busters [nfd r1].nfd" size="3765072" crc="2bd54d4e" sha1="3a1df219c32478405f7ae2797d46f1ec7262eb5f" offset="0" />
 			</dataarea>
 		</part>
@@ -15473,7 +15473,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ドッキン美奈子先生" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="659456">
-				<rom name="dokkin minako sensei! (1988)(tect house).fdi" size="659456" crc="6fd988d4" sha1="f3b307a9b2a95b9f5a42cd25cb733f26e4e994a7" offset="0" />
+				<rom name="dokkin minako sensei (1988)(tect house).fdi" size="659456" crc="6fd988d4" sha1="f3b307a9b2a95b9f5a42cd25cb733f26e4e994a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -23206,25 +23206,25 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="ippatsu jang! (j) a.fdi" size="1265664" crc="d289b58f" sha1="b2238af1d44623a6fb885856c5147f7395c3a818" offset="0" />
+				<rom name="ippatsu jang (j) a.fdi" size="1265664" crc="d289b58f" sha1="b2238af1d44623a6fb885856c5147f7395c3a818" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="ippatsu jang! (j) b.fdi" size="1265664" crc="0ddd60f8" sha1="a9d91cb8e397981b2e4d5a52f97a7c53db881ce8" offset="0" />
+				<rom name="ippatsu jang (j) b.fdi" size="1265664" crc="0ddd60f8" sha1="a9d91cb8e397981b2e4d5a52f97a7c53db881ce8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="ippatsu jang! (j) c.fdi" size="1265664" crc="a412dae9" sha1="ca4dc1d74297902fbd8fd6be54baf34206601f59" offset="0" />
+				<rom name="ippatsu jang (j) c.fdi" size="1265664" crc="a412dae9" sha1="ca4dc1d74297902fbd8fd6be54baf34206601f59" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="ippatsu jang! (j) d.fdi" size="1265664" crc="fe90d36b" sha1="e30ac11d8e31be010467d9bdd38d1122e07e6cac" offset="0" />
+				<rom name="ippatsu jang (j) d.fdi" size="1265664" crc="fe90d36b" sha1="e30ac11d8e31be010467d9bdd38d1122e07e6cac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27846,7 +27846,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="release" value="198812xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="kumiko (system house oh!).fdi" size="1265664" crc="054140c9" sha1="1f114fb56b9fe40b72bb42f6875b0cdfe99a8e6b" offset="0" />
+				<rom name="kumiko (system house oh).fdi" size="1265664" crc="054140c9" sha1="1f114fb56b9fe40b72bb42f6875b0cdfe99a8e6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -30673,25 +30673,25 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="my eyes !_a.fdi" size="1265664" crc="57441b86" sha1="b5031e344c61d78d02e1f36292b42a8522129ec9" offset="0" />
+				<rom name="my eyes _a.fdi" size="1265664" crc="57441b86" sha1="b5031e344c61d78d02e1f36292b42a8522129ec9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="my eyes !_b.fdi" size="1265664" crc="4dde0cd1" sha1="0af6e48163f8133b5035880bc1214782138b712d" offset="0" />
+				<rom name="my eyes _b.fdi" size="1265664" crc="4dde0cd1" sha1="0af6e48163f8133b5035880bc1214782138b712d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="my eyes !_c.fdi" size="1265664" crc="1d4c6ee4" sha1="f2b6c4a31be2c2d5053f496f45adb54b70a464f6" offset="0" />
+				<rom name="my eyes _c.fdi" size="1265664" crc="1d4c6ee4" sha1="f2b6c4a31be2c2d5053f496f45adb54b70a464f6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="my eyes !_d.fdi" size="1265664" crc="3fceb0e4" sha1="ab6b448005845ef51259a4e782a3117b8e376719" offset="0" />
+				<rom name="my eyes _d.fdi" size="1265664" crc="3fceb0e4" sha1="ab6b448005845ef51259a4e782a3117b8e376719" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32048,31 +32048,31 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="oh! pai_a.fdi" size="1265664" crc="7e7ed96e" sha1="aa141e20e6fc8c0002846ee0b0acd23d5fd88cf6" offset="0" />
+				<rom name="oh pai_a.fdi" size="1265664" crc="7e7ed96e" sha1="aa141e20e6fc8c0002846ee0b0acd23d5fd88cf6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="oh! pai_b.fdi" size="1265664" crc="f627b6ba" sha1="d8af8963378bd1442a01454e595f7fe91411a138" offset="0" />
+				<rom name="oh pai_b.fdi" size="1265664" crc="f627b6ba" sha1="d8af8963378bd1442a01454e595f7fe91411a138" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="oh! pai_c.fdi" size="1265664" crc="c8926407" sha1="8b06c4437e460a848779c97e7af3ae1cd0bea67f" offset="0" />
+				<rom name="oh pai_c.fdi" size="1265664" crc="c8926407" sha1="8b06c4437e460a848779c97e7af3ae1cd0bea67f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="oh! pai_d.fdi" size="1265664" crc="4ab5eedc" sha1="7292754fd47d42113380c9faf850238e1b1502c8" offset="0" />
+				<rom name="oh pai_d.fdi" size="1265664" crc="4ab5eedc" sha1="7292754fd47d42113380c9faf850238e1b1502c8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="oh! pai_e.fdi" size="1265664" crc="78d3d6d2" sha1="0fe991087aa1bbc0f0b78eef905daaab0f4a6708" offset="0" />
+				<rom name="oh pai_e.fdi" size="1265664" crc="78d3d6d2" sha1="0fe991087aa1bbc0f0b78eef905daaab0f4a6708" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52429,13 +52429,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1342992">
-				<rom name="pirates!_1.nfd" size="1342992" crc="6cf0838a" sha1="786d592645e9bd23d315ee19ab5c4ccf8c1fb1aa" offset="0" />
+				<rom name="pirates_1.nfd" size="1342992" crc="6cf0838a" sha1="786d592645e9bd23d315ee19ab5c4ccf8c1fb1aa" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1250832">
-				<rom name="pirates!_2.nfd" size="1250832" crc="887be368" sha1="42fcf64c11b97eaf69cc2dcec6bc619cd9774a21" offset="0" />
+				<rom name="pirates_2.nfd" size="1250832" crc="887be368" sha1="42fcf64c11b97eaf69cc2dcec6bc619cd9774a21" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -55021,37 +55021,37 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1310716">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 1 of 6)(disk a)[req install].fdd" size="1310716" crc="3df0e078" sha1="95f7e2cfd892e8882d813a5fffd1979035350ecf" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 1 of 6)(disk a)[req install].fdd" size="1310716" crc="3df0e078" sha1="95f7e2cfd892e8882d813a5fffd1979035350ecf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1308668">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 2 of 6)(disk b)[req install].fdd" size="1308668" crc="37a49731" sha1="c8947d759acde8324995b30f068dca7faea7fe82" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 2 of 6)(disk b)[req install].fdd" size="1308668" crc="37a49731" sha1="c8947d759acde8324995b30f068dca7faea7fe82" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1308668">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 3 of 6)(disk c)[req install].fdd" size="1308668" crc="bbbd099d" sha1="844a1b02f8315c08ffe00c8bd456c07e7348271f" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 3 of 6)(disk c)[req install].fdd" size="1308668" crc="bbbd099d" sha1="844a1b02f8315c08ffe00c8bd456c07e7348271f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1201148">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 4 of 6)(disk d)[req install].fdd" size="1201148" crc="278684b8" sha1="edd1b5f5badc41758d3f87a83de136d5d8261f5d" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 4 of 6)(disk d)[req install].fdd" size="1201148" crc="278684b8" sha1="edd1b5f5badc41758d3f87a83de136d5d8261f5d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1225724">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 5 of 6)(disk e)[req install].fdd" size="1225724" crc="9da04133" sha1="4a76f8c7c61275d5935733b14121a94c404bb0bf" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 5 of 6)(disk e)[req install].fdd" size="1225724" crc="9da04133" sha1="4a76f8c7c61275d5935733b14121a94c404bb0bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1151996">
-				<rom name="ami to yobanaide! (1995)(c's ware)(disk 6 of 6)(disk f)[req install].fdd" size="1151996" crc="dd1ec4a3" sha1="a25a2dbb21a5b897b6759c506d81fd16820eec3e" offset="0" />
+				<rom name="ami to yobanaide (1995)(c's ware)(disk 6 of 6)(disk f)[req install].fdd" size="1151996" crc="dd1ec4a3" sha1="a25a2dbb21a5b897b6759c506d81fd16820eec3e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57275,37 +57275,37 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1117180">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 1 of 6)(disk a)[req install].fdd" size="1117180" crc="2a1cd58a" sha1="4bbe9b81b9220a23f02eb6d4caf069fcd12ff9da" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 1 of 6)(disk a)[req install].fdd" size="1117180" crc="2a1cd58a" sha1="4bbe9b81b9220a23f02eb6d4caf069fcd12ff9da" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1200124">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 2 of 6)(disk b)[req install].fdd" size="1200124" crc="634df488" sha1="7d0aa12deb15bb916ef31c87f4d777d39446cc74" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 2 of 6)(disk b)[req install].fdd" size="1200124" crc="634df488" sha1="7d0aa12deb15bb916ef31c87f4d777d39446cc74" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1199100">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 3 of 6)(disk c)[req install].fdd" size="1199100" crc="ac5db2ed" sha1="92ebe7fd8d44f1d68a2fdf53e48295ccd6db7829" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 3 of 6)(disk c)[req install].fdd" size="1199100" crc="ac5db2ed" sha1="92ebe7fd8d44f1d68a2fdf53e48295ccd6db7829" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1311740">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 4 of 6)(disk d)[req install].fdd" size="1311740" crc="85970cb1" sha1="d2df620acc40a4b47962d8258e6dbf28b7c97c27" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 4 of 6)(disk d)[req install].fdd" size="1311740" crc="85970cb1" sha1="d2df620acc40a4b47962d8258e6dbf28b7c97c27" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1311740">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 5 of 6)(disk e)[req install].fdd" size="1311740" crc="9330926a" sha1="1d246804d39b3ef67c52d3dbac387bfa9ed85db9" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 5 of 6)(disk e)[req install].fdd" size="1311740" crc="9330926a" sha1="1d246804d39b3ef67c52d3dbac387bfa9ed85db9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1301500">
-				<rom name="gaogao! 1st radical sequence (1994)(4x9)(disk 6 of 6)(disk f)[req install].fdd" size="1301500" crc="3c4caf99" sha1="786ddd14b6ea3a9b6a026b7bfe2cac0a0343ca52" offset="0" />
+				<rom name="gaogao 1st radical sequence (1994)(4x9)(disk 6 of 6)(disk f)[req install].fdd" size="1301500" crc="3c4caf99" sha1="786ddd14b6ea3a9b6a026b7bfe2cac0a0343ca52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57319,43 +57319,43 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="1153020">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 1 of 7)(boot disk).fdd" size="1153020" crc="1ccb05e1" sha1="fa1b5613ddea7a948a196c7ebb6009a0e24a0ad6" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 1 of 7)(boot disk).fdd" size="1153020" crc="1ccb05e1" sha1="fa1b5613ddea7a948a196c7ebb6009a0e24a0ad6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1273852">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 2 of 7)(disk a).fdd" size="1273852" crc="4445de98" sha1="2abab215f285f566088091cdf340375c59b52e17" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 2 of 7)(disk a).fdd" size="1273852" crc="4445de98" sha1="2abab215f285f566088091cdf340375c59b52e17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1301500">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 3 of 7)(disk b).fdd" size="1301500" crc="27c02170" sha1="4a34cd9dfed6f76abe5681da6fc89efd95b22b94" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 3 of 7)(disk b).fdd" size="1301500" crc="27c02170" sha1="4a34cd9dfed6f76abe5681da6fc89efd95b22b94" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1306620">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 4 of 7)(disk c).fdd" size="1306620" crc="cccf0fd3" sha1="52e2f70c765df9361d39ce52bbe455b6d9b24b3b" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 4 of 7)(disk c).fdd" size="1306620" crc="cccf0fd3" sha1="52e2f70c765df9361d39ce52bbe455b6d9b24b3b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1156092">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 5 of 7)(disk d).fdd" size="1156092" crc="6a0ee408" sha1="f8e07d2114ab1b9d7c5ad88457caed2c5e9c8850" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 5 of 7)(disk d).fdd" size="1156092" crc="6a0ee408" sha1="f8e07d2114ab1b9d7c5ad88457caed2c5e9c8850" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1311740">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 6 of 7)(disk e).fdd" size="1311740" crc="e1d63822" sha1="bfa00e9b67bc0c0a8802fa413e9f29bfbf81627d" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 6 of 7)(disk e).fdd" size="1311740" crc="e1d63822" sha1="bfa00e9b67bc0c0a8802fa413e9f29bfbf81627d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1311740">
-				<rom name="gaogao! 2nd pandora wood (1994)(4x9)(disk 7 of 7)(disk f).fdd" size="1311740" crc="dcb1709c" sha1="333dc503f96bc17ca7aa290a284fa191284c4074" offset="0" />
+				<rom name="gaogao 2nd pandora wood (1994)(4x9)(disk 7 of 7)(disk f).fdd" size="1311740" crc="dcb1709c" sha1="333dc503f96bc17ca7aa290a284fa191284c4074" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57424,37 +57424,37 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1260540">
-				<rom name="get! (1996)(black package)(disk 1 of 6)(disk a)[req install].fdd" size="1260540" crc="68c4cadb" sha1="347e13be8f9111ac6ee12dba76a32eac7cc48a37" offset="0" />
+				<rom name="get (1996)(black package)(disk 1 of 6)(disk a)[req install].fdd" size="1260540" crc="68c4cadb" sha1="347e13be8f9111ac6ee12dba76a32eac7cc48a37" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1310716">
-				<rom name="get! (1996)(black package)(disk 2 of 6)(disk b)[req install].fdd" size="1310716" crc="0bbb194a" sha1="fb3665732b990c9f2351437d0badc1247941820f" offset="0" />
+				<rom name="get (1996)(black package)(disk 2 of 6)(disk b)[req install].fdd" size="1310716" crc="0bbb194a" sha1="fb3665732b990c9f2351437d0badc1247941820f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1307644">
-				<rom name="get! (1996)(black package)(disk 3 of 6)(disk c)[req install].fdd" size="1307644" crc="f6aafdce" sha1="17a3dc0a9c59bf693bba0a52b34293efae0013b5" offset="0" />
+				<rom name="get (1996)(black package)(disk 3 of 6)(disk c)[req install].fdd" size="1307644" crc="f6aafdce" sha1="17a3dc0a9c59bf693bba0a52b34293efae0013b5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1299452">
-				<rom name="get! (1996)(black package)(disk 4 of 6)(disk d)[req install].fdd" size="1299452" crc="4e8dd90c" sha1="23a6dabdf84dffd8ea81d2f92fe3de6d9141ea33" offset="0" />
+				<rom name="get (1996)(black package)(disk 4 of 6)(disk d)[req install].fdd" size="1299452" crc="4e8dd90c" sha1="23a6dabdf84dffd8ea81d2f92fe3de6d9141ea33" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1311740">
-				<rom name="get! (1996)(black package)(disk 5 of 6)(disk e)[req install].fdd" size="1311740" crc="39b67e8c" sha1="af4c21fa7049a08e53d51b0ea6bbb7f1f47a55bc" offset="0" />
+				<rom name="get (1996)(black package)(disk 5 of 6)(disk e)[req install].fdd" size="1311740" crc="39b67e8c" sha1="af4c21fa7049a08e53d51b0ea6bbb7f1f47a55bc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1310716">
-				<rom name="get! (1996)(black package)(disk 6 of 6)(disk f)[req install].fdd" size="1310716" crc="d1d16202" sha1="71ad79651c47764675cceda060f3672ad0282820" offset="0" />
+				<rom name="get (1996)(black package)(disk 6 of 6)(disk f)[req install].fdd" size="1310716" crc="d1d16202" sha1="71ad79651c47764675cceda060f3672ad0282820" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -60215,31 +60215,31 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1298428">
-				<rom name="oh! kitsunesama (1995)(curott)(disk 1 of 5)(disk a)[req install].fdd" size="1298428" crc="d3a2947f" sha1="e4d3114fe233483939248841bc9453924bc1b1fe" offset="0" />
+				<rom name="oh kitsunesama (1995)(curott)(disk 1 of 5)(disk a)[req install].fdd" size="1298428" crc="d3a2947f" sha1="e4d3114fe233483939248841bc9453924bc1b1fe" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1306620">
-				<rom name="oh! kitsunesama (1995)(curott)(disk 2 of 5)(disk b)[req install].fdd" size="1306620" crc="135c5cd2" sha1="30cc364c84da135ae7ea91d5b1cdb595b9ef481b" offset="0" />
+				<rom name="oh kitsunesama (1995)(curott)(disk 2 of 5)(disk b)[req install].fdd" size="1306620" crc="135c5cd2" sha1="30cc364c84da135ae7ea91d5b1cdb595b9ef481b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1306620">
-				<rom name="oh! kitsunesama (1995)(curott)(disk 3 of 5)(disk c)[req install].fdd" size="1306620" crc="fa93efcb" sha1="6fd7129047dc5adeb0afda3367b9fe237be4f87b" offset="0" />
+				<rom name="oh kitsunesama (1995)(curott)(disk 3 of 5)(disk c)[req install].fdd" size="1306620" crc="fa93efcb" sha1="6fd7129047dc5adeb0afda3367b9fe237be4f87b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1302524">
-				<rom name="oh! kitsunesama (1995)(curott)(disk 4 of 5)(disk d)[req install].fdd" size="1302524" crc="0a47c62d" sha1="97045d2badf882a13d2d1d2169ad734091beab93" offset="0" />
+				<rom name="oh kitsunesama (1995)(curott)(disk 4 of 5)(disk d)[req install].fdd" size="1302524" crc="0a47c62d" sha1="97045d2badf882a13d2d1d2169ad734091beab93" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1306620">
-				<rom name="oh! kitsunesama (1995)(curott)(disk 5 of 5)(disk e)[req install].fdd" size="1306620" crc="510aa045" sha1="ae04b021d33e294af2614730b65714b458e46dfc" offset="0" />
+				<rom name="oh kitsunesama (1995)(curott)(disk 5 of 5)(disk e)[req install].fdd" size="1306620" crc="510aa045" sha1="ae04b021d33e294af2614730b65714b458e46dfc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -60353,43 +60353,43 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1297404">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 1 of 7)(disk a)[req install].fdd" size="1297404" crc="b89d1a4a" sha1="a847e6314fef03e0faed3f13f1bf7fe308ec1433" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 1 of 7)(disk a)[req install].fdd" size="1297404" crc="b89d1a4a" sha1="a847e6314fef03e0faed3f13f1bf7fe308ec1433" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1296380">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 2 of 7)(disk b)[req install].fdd" size="1296380" crc="06b4f8a1" sha1="caf12b27934e3927f03e3be049ab31b33fb2f88c" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 2 of 7)(disk b)[req install].fdd" size="1296380" crc="06b4f8a1" sha1="caf12b27934e3927f03e3be049ab31b33fb2f88c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1292284">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 3 of 7)(disk c)[req install].fdd" size="1292284" crc="db9f24b6" sha1="4ed1b2652a977dd92ee54b59c0b9a8839139de98" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 3 of 7)(disk c)[req install].fdd" size="1292284" crc="db9f24b6" sha1="4ed1b2652a977dd92ee54b59c0b9a8839139de98" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1302524">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 4 of 7)(disk d)[req install].fdd" size="1302524" crc="6982bccb" sha1="1be1b2bce30267d7e5651e1d6e0716eccae1cee2" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 4 of 7)(disk d)[req install].fdd" size="1302524" crc="6982bccb" sha1="1be1b2bce30267d7e5651e1d6e0716eccae1cee2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1301500">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 5 of 7)(disk e)[req install].fdd" size="1301500" crc="e0be4e0f" sha1="90bd1920162aca2fe52f3f1b236e8e4fe70bc99d" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 5 of 7)(disk e)[req install].fdd" size="1301500" crc="e0be4e0f" sha1="90bd1920162aca2fe52f3f1b236e8e4fe70bc99d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1286140">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 6 of 7)(disk f)[req install].fdd" size="1286140" crc="160f6a66" sha1="2dfca229deff8ca3c2fab8599b326df2aeb183b3" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 6 of 7)(disk f)[req install].fdd" size="1286140" crc="160f6a66" sha1="2dfca229deff8ca3c2fab8599b326df2aeb183b3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk G"/>
 			<dataarea name="flop" size="1272828">
-				<rom name="pia carrot he youkoso!! - we've been waiting for you (1996)(cocktail)(disk 7 of 7)(disk g)[req install].fdd" size="1272828" crc="49a75e87" sha1="dfd7c404961c60bb93c28ecad185ccc08e2acd45" offset="0" />
+				<rom name="pia carrot he youkoso - we've been waiting for you (1996)(cocktail)(disk 7 of 7)(disk g)[req install].fdd" size="1272828" crc="49a75e87" sha1="dfd7c404961c60bb93c28ecad185ccc08e2acd45" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -62146,37 +62146,37 @@ SPACE EMPIRE
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1113084">
-				<rom name="yes! hg (1995)(himeya)(disk 1 of 6).fdd" size="1113084" crc="2a5f63ff" sha1="8d01d56efc885bfc5bf5d8c4acea7f84b53babd6" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 1 of 6).fdd" size="1113084" crc="2a5f63ff" sha1="8d01d56efc885bfc5bf5d8c4acea7f84b53babd6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1149948">
-				<rom name="yes! hg (1995)(himeya)(disk 2 of 6).fdd" size="1149948" crc="976bb9b0" sha1="a9f6bd4970fe42d29d10036bb11a329f4f092f26" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 2 of 6).fdd" size="1149948" crc="976bb9b0" sha1="a9f6bd4970fe42d29d10036bb11a329f4f092f26" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1288188">
-				<rom name="yes! hg (1995)(himeya)(disk 3 of 6).fdd" size="1288188" crc="ff0d4bc8" sha1="430ca17d8bd310136377ee8b32c76c24e32866af" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 3 of 6).fdd" size="1288188" crc="ff0d4bc8" sha1="430ca17d8bd310136377ee8b32c76c24e32866af" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1083388">
-				<rom name="yes! hg (1995)(himeya)(disk 4 of 6).fdd" size="1083388" crc="42d6fa80" sha1="3a0177f3dbabf24eed4f867a3e399fe0c13962cd" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 4 of 6).fdd" size="1083388" crc="42d6fa80" sha1="3a0177f3dbabf24eed4f867a3e399fe0c13962cd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1293308">
-				<rom name="yes! hg (1995)(himeya)(disk 5 of 6).fdd" size="1293308" crc="e50040c0" sha1="3435229232e52a5d39c6f8eda85646d577ca0b10" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 5 of 6).fdd" size="1293308" crc="e50040c0" sha1="3435229232e52a5d39c6f8eda85646d577ca0b10" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1278972">
-				<rom name="yes! hg (1995)(himeya)(disk 6 of 6).fdd" size="1278972" crc="f454a63f" sha1="04b231ff944d66aacc3a9baa41e00db58204784e" offset="0" />
+				<rom name="yes hg (1995)(himeya)(disk 6 of 6).fdd" size="1278972" crc="f454a63f" sha1="04b231ff944d66aacc3a9baa41e00db58204784e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -63964,7 +63964,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="bk turb (bio 100%).fdi" size="1478656" crc="d9a66884" sha1="284d4c05fc8fe5df48c09de57bf092717b699d1f" offset="0" />
+				<rom name="bk turb (bio 100).fdi" size="1478656" crc="d9a66884" sha1="284d4c05fc8fe5df48c09de57bf092717b699d1f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -63975,7 +63975,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="camel-zoo (19xx)(bio 100 %).fdi" size="1265664" crc="4be9d4d7" sha1="70fc9b81f4a6a62ccd48c9c6cd293f271a11838d" offset="0" />
+				<rom name="camel-zoo (19xx)(bio 100).fdi" size="1265664" crc="4be9d4d7" sha1="70fc9b81f4a6a62ccd48c9c6cd293f271a11838d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -63987,7 +63987,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="car 2 grand prix (bio 100%).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
+				<rom name="car 2 grand prix (bio 100).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -63999,7 +63999,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="carax'92 (bio100%).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
+				<rom name="carax'92 (bio100).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64011,7 +64011,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1478656">
-				<rom name="cray shoot (bio 100%).fdi" size="1478656" crc="e37e85d7" sha1="0deb3e1eaa4e917c4110c9901a35a17f12919603" offset="0" />
+				<rom name="cray shoot (bio 100).fdi" size="1478656" crc="e37e85d7" sha1="0deb3e1eaa4e917c4110c9901a35a17f12919603" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64034,7 +64034,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1478656">
-				<rom name="f1 grandprix (1992)(bio 100%).fdi" size="1478656" crc="8fa46fda" sha1="146ee288486174095297be074feb3d1007ec0de4" offset="0" />
+				<rom name="f1 grandprix (1992)(bio 100).fdi" size="1478656" crc="8fa46fda" sha1="146ee288486174095297be074feb3d1007ec0de4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64045,7 +64045,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="superdepth 2 finalty (bio 100%).fdi" size="1265664" crc="299724f1" sha1="21849d8a9f2bc71a59d5f9d32fcff6bde22369ee" offset="0" />
+				<rom name="superdepth 2 finalty (bio 100).fdi" size="1265664" crc="299724f1" sha1="21849d8a9f2bc71a59d5f9d32fcff6bde22369ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64067,7 +64067,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="gemini snake (1990)(bio 100%).fdi" size="1478656" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
+				<rom name="gemini snake (1990)(bio 100).fdi" size="1478656" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64089,7 +64089,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
-				<rom name="goggle ii (bio 100%).fdi" size="1265664" crc="2a73a48f" sha1="d6ab101cabdf327bc7bdb372a095a16a996d5b29" offset="0" />
+				<rom name="goggle ii (bio 100).fdi" size="1265664" crc="2a73a48f" sha1="d6ab101cabdf327bc7bdb372a095a16a996d5b29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64100,7 +64100,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="goggle-3 (1995) (bio 100%).fdi" size="1478656" crc="6bc5ded1" sha1="3d73e29ee3ddf58700724dc4f6bfda93bff21dd9" offset="0" />
+				<rom name="goggle-3 (1995) (bio 100).fdi" size="1478656" crc="6bc5ded1" sha1="3d73e29ee3ddf58700724dc4f6bfda93bff21dd9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64111,7 +64111,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="goggle-3 (1995)(bio 100%)(a).fdi" size="1478656" crc="17a385da" sha1="f03b960d9eebd8f34a05b9d160ca6c5661390e3b" offset="0" />
+				<rom name="goggle-3 (1995)(bio 100)(a).fdi" size="1478656" crc="17a385da" sha1="f03b960d9eebd8f34a05b9d160ca6c5661390e3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64122,7 +64122,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="marka i (1989)(bio 100%).fdi" size="1265664" crc="421d2806" sha1="3085215f87b36ef67ad659fc36d0675d19a66219" offset="0" />
+				<rom name="marka i (1989)(bio 100).fdi" size="1265664" crc="421d2806" sha1="3085215f87b36ef67ad659fc36d0675d19a66219" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64133,7 +64133,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="markadia (1993)(bio 100%).fdi" size="1261568" crc="00747693" sha1="43c659b4b6e798554ae2356223873831b919da17" offset="0" />
+				<rom name="markadia (1993)(bio 100).fdi" size="1261568" crc="00747693" sha1="43c659b4b6e798554ae2356223873831b919da17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64144,7 +64144,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="markadia (1993)(bio 100%) [a].fdi" size="1261568" crc="19eed65c" sha1="a0c454be33961f80e0710e8b4b3ec17f44815b11" offset="0" />
+				<rom name="markadia (1993)(bio 100) [a].fdi" size="1261568" crc="19eed65c" sha1="a0c454be33961f80e0710e8b4b3ec17f44815b11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64155,7 +64155,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="met's snow wars (bio 100%).fdi" size="1265664" crc="3638519f" sha1="2e31e4cd1c67bf84befc4778affb10239a66c5f2" offset="0" />
+				<rom name="met's snow wars (bio 100).fdi" size="1265664" crc="3638519f" sha1="2e31e4cd1c67bf84befc4778affb10239a66c5f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64177,7 +64177,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="roliroli rolling (bio 100%).fdi" size="1265664" crc="3ee95428" sha1="6f98461901f8e497ff3cee2499f4349f3eb1e595" offset="0" />
+				<rom name="roliroli rolling (bio 100).fdi" size="1265664" crc="3ee95428" sha1="6f98461901f8e497ff3cee2499f4349f3eb1e595" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64188,7 +64188,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="seena 2 (bio 100%).fdi" size="1478656" crc="7ae621e9" sha1="9ab9ffe76e256df5e9a9cc03ba7e9680e8e0277f" offset="0" />
+				<rom name="seena 2 (bio 100).fdi" size="1478656" crc="7ae621e9" sha1="9ab9ffe76e256df5e9a9cc03ba7e9680e8e0277f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64199,7 +64199,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="sengoku turb (bio 100%).fdi" size="1265664" crc="63f4e59a" sha1="58f1d0102d2a97893ab6292279b22669ca00ff85" offset="0" />
+				<rom name="sengoku turb (bio 100).fdi" size="1265664" crc="63f4e59a" sha1="58f1d0102d2a97893ab6292279b22669ca00ff85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64210,7 +64210,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="stardust chaser (1992)(bio 100%).fdi" size="1478656" crc="9f4abc3c" sha1="f93da7c68144891b77f430714eadc247c9c05972" offset="0" />
+				<rom name="stardust chaser (1992)(bio 100).fdi" size="1478656" crc="9f4abc3c" sha1="f93da7c68144891b77f430714eadc247c9c05972" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64221,7 +64221,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="super depth (bio 100%).fdi" size="1265664" crc="4720c776" sha1="1a8df1a172a30b2fd9de95185fa0a7e89ae1ff6f" offset="0" />
+				<rom name="super depth (bio 100).fdi" size="1265664" crc="4720c776" sha1="1a8df1a172a30b2fd9de95185fa0a7e89ae1ff6f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64936,7 +64936,7 @@ doujin?!?
 		<info name="author" value="Udukisya" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="5x5 go! go! (udukisya).fdi" size="1478656" crc="2a6aa7cd" sha1="88685ee0245a15b32d2c9636ccb2a3d7802e22c9" offset="0" />
+				<rom name="5x5 go go (udukisya).fdi" size="1478656" crc="2a6aa7cd" sha1="88685ee0245a15b32d2c9636ccb2a3d7802e22c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -66523,7 +66523,7 @@ doujin?!?
 		<info name="alt_title" value="Malice Club" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="oshioki!! salor moon (j).fdi" size="1265664" crc="795c85f0" sha1="4fd53fb2a6f54857f405cd733361984b8351994e" offset="0" />
+				<rom name="oshioki salor moon (j).fdi" size="1265664" crc="795c85f0" sha1="4fd53fb2a6f54857f405cd733361984b8351994e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -67896,7 +67896,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<info name="alt_title" value="うさ雀ファイト!Aちーむ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="a chimu - usa suzume faito! (j).fdi" size="1265664" crc="f9cfb75e" sha1="c54b4f9e8f5c71b28c854eaf32a186b8c82d128d" offset="0" />
+				<rom name="a chimu - usa suzume faito (j).fdi" size="1265664" crc="f9cfb75e" sha1="c54b4f9e8f5c71b28c854eaf32a186b8c82d128d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

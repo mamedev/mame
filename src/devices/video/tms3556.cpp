@@ -183,33 +183,40 @@ uint32_t tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 uint8_t tms3556_device::vram_r()
 {
 	uint8_t ret;
-	if (m_bamp_written) {
-		m_bamp_written=false;
-		m_vdp_acmpxy_mode=dma_write;
-		if (m_init_read)
-			m_vdp_acmp=VDP_BAMP;
-		else
-			m_vdp_acmp=(VDP_BAMP-1)&0xFFFF;
+	if (!machine().side_effects_disabled()) {
+		if (m_bamp_written) {
+			m_bamp_written=false;
+			m_vdp_acmpxy_mode=dma_write;
+			if (m_init_read)
+				m_vdp_acmp=VDP_BAMP;
+			else
+				m_vdp_acmp=(VDP_BAMP-1)&0xFFFF;
+		}
+
+		if (m_row_col_written) {
+			m_row_col_written=0;
+			m_vdp_acmpxy_mode=dma_read;
+			if (m_init_read)
+				m_vdp_acmpxy=m_colrow;
+			else
+				m_vdp_acmpxy=(m_colrow-1)&0xFFFF;
+		}
+
+		m_init_read=false;
 	}
 
-	if (m_row_col_written) {
-		m_row_col_written=0;
-		m_vdp_acmpxy_mode=dma_read;
-		if (m_init_read)
-			m_vdp_acmpxy=m_colrow;
-		else
-			m_vdp_acmpxy=(m_colrow-1)&0xFFFF;
-	}
-
-	m_init_read=false;
 	if (m_vdp_acmpxy_mode==dma_read) {
 		ret=readbyte(m_vdp_acmpxy);
-		m_vdp_acmpxy++;
-		if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+		if (!machine().side_effects_disabled()) {
+			m_vdp_acmpxy++;
+			if (m_vdp_acmpxy==VDP_BAMTF) m_vdp_acmpxy=VDP_BAMP;
+		}
 	} else {
 		ret=readbyte(m_vdp_acmp);
-		m_vdp_acmp++;
-		if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+		if (!machine().side_effects_disabled()) {
+			m_vdp_acmp++;
+			if (m_vdp_acmp==VDP_BAMTF) m_vdp_acmp=VDP_BAMP;
+		}
 	}
 	return ret;
 }
@@ -254,7 +261,8 @@ uint8_t tms3556_device::reg_r(offs_t offset)
 	LOG("TMS3556 Reg Read: %06x\n", offset);
 
 	int reply = 0; // FIXME : will send internal status (VBL, HBL...)
-	m_reg_access_phase = 0;
+	if (!machine().side_effects_disabled())
+		m_reg_access_phase = 0;
 	return reply;
 }
 

@@ -112,7 +112,8 @@ def generate():
                          7*4,               # start of key index
                          7*4+len(keys)*8,   # start of value index
                          0, 0)              # size and offset of hash table
-    output += array.array("i", offsets).tostring()
+    offsdata = array.array("i", offsets)
+    output += offsdata.tobytes() if hasattr(offsdata, "tobytes") else offsdata.tostring()
     output += ids
     output += strs
     return output

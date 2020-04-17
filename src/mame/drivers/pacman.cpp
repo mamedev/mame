@@ -390,7 +390,7 @@ MACHINE_RESET_MEMBER(pacman_state,mschamp)
 
 MACHINE_RESET_MEMBER(pacman_state,superabc)
 {
-	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	superabc_bank_w(0);
 }
 
 MACHINE_RESET_MEMBER(pacman_state,maketrax)
@@ -727,7 +727,7 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
 WRITE_LINE_MEMBER(pacman_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
@@ -844,7 +844,7 @@ READ8_MEMBER(pacman_state::rocktrv2_question_r)
   The two PROMs on the main board at 7F and 4A are also replaced with PROMs from the kit
 */
 
-WRITE8_MEMBER(pacman_state::superabc_bank_w)
+void pacman_state::superabc_bank_w(uint8_t data)
 {
 	// d4-d6: bank
 	int bank = data >> 4 & 7;
@@ -3773,6 +3773,7 @@ void pacman_state::s2650games(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &pacman_state::s2650games_map);
 	maincpu.set_addrmap(AS_DATA, &pacman_state::s2650games_dataport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)).invert();
+	maincpu.intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	m_mainlatch->q_out_cb<0>().set_nop();
 	m_mainlatch->q_out_cb<1>().set_nop();
@@ -7616,7 +7617,7 @@ GAME( 1981, abscam,   puckman,  piranha,  mspacman, pacman_state,  init_eyes,   
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, pacman_state,  empty_init,    ROT90,  "hack", "Piranha (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, titanpac, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "hack", "Titan (Pac-Man hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacmanfm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (FAMARE S.A.)", "Pac Man (FAMARE S.A. bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pacmanug, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (U.G.)", "Pac Man (U.G. bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacmanug, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (U.Games)", "Pac Man (U.Games bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  init_pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 

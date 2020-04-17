@@ -45,8 +45,8 @@ public:
 
 	uint8_t m_pit_out2;
 
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void pc_page_w(offs_t offset, uint8_t data);
+	void nmi_enable_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
@@ -107,21 +107,21 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
-	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	uint8_t pc_ppi_porta_r();
+	uint8_t pc_ppi_portc_r();
+	void pc_ppi_portb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( pc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( pc_dma_write_byte );
-	DECLARE_READ8_MEMBER( pc_dma8237_1_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_2_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_3_dack_r );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_1_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_2_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_3_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_0_dack_w );
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_0_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
@@ -156,9 +156,9 @@ protected:
 private:
 	required_device<cassette_image_device>  m_cassette;
 
-	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	uint8_t pc_ppi_porta_r();
+	uint8_t pc_ppi_portc_r();
+	void pc_ppi_portb_w(uint8_t data);
 };
 
 
@@ -181,8 +181,8 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	uint8_t pc_ppi_portc_r();
+	void pc_ppi_portb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
@@ -203,8 +203,8 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	uint8_t pc_ppi_portc_r();
+	void pc_ppi_portb_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device)

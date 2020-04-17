@@ -92,7 +92,7 @@ void agat7video_device::device_reset()
 }
 
 
-READ8_MEMBER(agat7video_device::read)
+uint8_t agat7video_device::read(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 		do_io(offset);
@@ -100,7 +100,7 @@ READ8_MEMBER(agat7video_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(agat7video_device::write)
+void agat7video_device::write(offs_t offset, uint8_t data)
 {
 	do_io(offset);
 }

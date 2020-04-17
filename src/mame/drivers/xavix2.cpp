@@ -313,12 +313,12 @@ void xavix2_state::gpu1_trigger_w(u8 data)
 
 void xavix2_state::gpu_update(u16 count, u16 adr)
 {
-	int *list = new int[count];
+	std::unique_ptr<int []> list(new int[count]);
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*i);
 		list[i] = (command & 0x1fe00000) | i;
 	}
-	std::sort(list, list + count, std::greater<int>());
+	std::sort(list.get(), list.get() + count, std::greater<int>());
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*(list[i] & 0xffff));
 		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x s=%02x w=%02x h=%02x c=%04x %s\n",
@@ -370,7 +370,6 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 			}
 		}
 	}
-	delete[] list;
 }
 
 void xavix2_state::gpu_descsize_w(u16 data)
@@ -594,10 +593,10 @@ void xavix2_state::mem(address_map &map)
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-  if(machine().input().code_pressed_once(KEYCODE_8))
-	irq_raise(8);
-  if(machine().input().code_pressed_once(KEYCODE_0))
-	irq_raise(10);
+	if(machine().input().code_pressed_once(KEYCODE_8))
+		irq_raise(8);
+	if(machine().input().code_pressed_once(KEYCODE_0))
+		irq_raise(10);
 
 	constexpr int dx = 0x400 - 320;
 	constexpr int dy = 0x200 - 200;

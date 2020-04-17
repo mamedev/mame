@@ -33,8 +33,8 @@ public:
 	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	virtual uint8_t read(uint8_t offset) override;
-	virtual void write(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

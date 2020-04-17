@@ -26,7 +26,7 @@ public:
 
 	void set_auto_ack(int state);
 
-	void set_fifo_callbacks(read16_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
+	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
 	uint16_t data_r();
@@ -75,7 +75,7 @@ public:
 	DECLARE_READ16_MEMBER( input_latch_r );
 	DECLARE_READ32_MEMBER( input_latch32_r );
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
-	DECLARE_WRITE16_MEMBER( output_latch_w );
+	void output_latch_w(uint16_t data);
 	DECLARE_WRITE32_MEMBER( output_latch32_w );
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
@@ -217,7 +217,7 @@ protected:
 	write_line_delegate m_output_full_cb;
 	write_line_delegate m_input_empty_cb;
 
-	read16_delegate m_fifo_data_r;
+	read16smo_delegate m_fifo_data_r;
 	read16_delegate m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 

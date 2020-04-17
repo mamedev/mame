@@ -70,7 +70,7 @@ WRITE8_MEMBER(taito68705_mcu_device_base::data_w)
 		m_host_flag = true;
 	m_host_latch = data;
 	if (m_latch_driven)
-		m_mcu->pa_w(space, 0, data);
+		m_mcu->pa_w(data);
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_host_flag ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -147,7 +147,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 	if (BIT(data, host_bit))
 	{
 		m_latch_driven = false;
-		m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, 0xff);
+		m_mcu->pa_w(0xff);
 		if (!BIT(value, host_bit))
 		{
 			m_host_flag = false;
@@ -157,7 +157,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 	else
 	{
 		m_latch_driven = true;
-		m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, m_host_latch);
+		m_mcu->pa_w(m_host_latch);
 	}
 
 	// PB2 sets the MCU semaphore when low

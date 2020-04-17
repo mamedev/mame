@@ -583,7 +583,7 @@ license:CC0
 		<publisher>Arcadia</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps511)aaargh!.ipf" size="1049180" crc="aea5ec3e" sha1="05ba3c9eeec1bd920b442dcbc3b709c59d55b8a3"/>
+				<rom name="(sps511)aaargh.ipf" size="1049180" crc="aea5ec3e" sha1="05ba3c9eeec1bd920b442dcbc3b709c59d55b8a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5349,73 +5349,73 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette1.ipf" size="1049612" crc="0070104e" sha1="df92c7e0691c306bbf12deddb9e69fbe00606067"/>
+				<rom name="(sps463)biing_diskette1.ipf" size="1049612" crc="0070104e" sha1="df92c7e0691c306bbf12deddb9e69fbe00606067"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette2.ipf" size="1049612" crc="14be3671" sha1="a939f3c3a663329b175e59cef107890951fd179d"/>
+				<rom name="(sps463)biing_diskette2.ipf" size="1049612" crc="14be3671" sha1="a939f3c3a663329b175e59cef107890951fd179d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette3.ipf" size="1049612" crc="d7a01fc9" sha1="026889f8061f8c7ebb50284aec7ee8d0fe58585e"/>
+				<rom name="(sps463)biing_diskette3.ipf" size="1049612" crc="d7a01fc9" sha1="026889f8061f8c7ebb50284aec7ee8d0fe58585e"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette4.ipf" size="1049612" crc="45f7e3dc" sha1="1024e4ed07eb0ca6d326d0a4a33bce369acc198b"/>
+				<rom name="(sps463)biing_diskette4.ipf" size="1049612" crc="45f7e3dc" sha1="1024e4ed07eb0ca6d326d0a4a33bce369acc198b"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 5" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette5.ipf" size="1049612" crc="2ad72638" sha1="fd7282e63efd4620bd0a29203b3e33cba67c5194"/>
+				<rom name="(sps463)biing_diskette5.ipf" size="1049612" crc="2ad72638" sha1="fd7282e63efd4620bd0a29203b3e33cba67c5194"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 6" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette6.ipf" size="1049612" crc="72f64146" sha1="9ad9cf40bda3ce63e97dbfa8725d69043a7e2466"/>
+				<rom name="(sps463)biing_diskette6.ipf" size="1049612" crc="72f64146" sha1="9ad9cf40bda3ce63e97dbfa8725d69043a7e2466"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 7" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette7.ipf" size="1049612" crc="da5342e7" sha1="05e3e0b9a6c812756f72e266f7e4c150339b0a8d"/>
+				<rom name="(sps463)biing_diskette7.ipf" size="1049612" crc="da5342e7" sha1="05e3e0b9a6c812756f72e266f7e4c150339b0a8d"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 8" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette8.ipf" size="1049612" crc="35e84651" sha1="54d95e6e124772f8613978b18f89daed58e3cbfa"/>
+				<rom name="(sps463)biing_diskette8.ipf" size="1049612" crc="35e84651" sha1="54d95e6e124772f8613978b18f89daed58e3cbfa"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 9" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette9.ipf" size="1049612" crc="ac8dd462" sha1="edd5443315763b298e16c85092dec3ee0984398c"/>
+				<rom name="(sps463)biing_diskette9.ipf" size="1049612" crc="ac8dd462" sha1="edd5443315763b298e16c85092dec3ee0984398c"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 10" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette10.ipf" size="1049612" crc="6497a68e" sha1="f3cad972ee668c1eb070cc7d99ee530b1f43a615"/>
+				<rom name="(sps463)biing_diskette10.ipf" size="1049612" crc="6497a68e" sha1="f3cad972ee668c1eb070cc7d99ee530b1f43a615"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 11" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette11.ipf" size="1049612" crc="58048183" sha1="dc1c9bcf65b9e7734e88302c3a9c456cfce2bdb8"/>
+				<rom name="(sps463)biing_diskette11.ipf" size="1049612" crc="58048183" sha1="dc1c9bcf65b9e7734e88302c3a9c456cfce2bdb8"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette 12" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps463)biing!_diskette12.ipf" size="1049612" crc="7af9856b" sha1="d88f816d55518306e36bc98ebb64c3cb311a5073"/>
+				<rom name="(sps463)biing_diskette12.ipf" size="1049612" crc="7af9856b" sha1="d88f816d55518306e36bc98ebb64c3cb311a5073"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12434,19 +12434,19 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1139672">
-				<rom name="(sps647)donk!_disk1.ipf" size="1139672" crc="b353bab1" sha1="40ce8994eac765d8fecb6b228830605b31a96d64"/>
+				<rom name="(sps647)donk_disk1.ipf" size="1139672" crc="b353bab1" sha1="40ce8994eac765d8fecb6b228830605b31a96d64"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1140812">
-				<rom name="(sps647)donk!_disk2.ipf" size="1140812" crc="b4e2b4d9" sha1="5b8b54d53d2c89a991368b14d466b02cf36e2361"/>
+				<rom name="(sps647)donk_disk2.ipf" size="1140812" crc="b4e2b4d9" sha1="5b8b54d53d2c89a991368b14d466b02cf36e2361"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1140812">
-				<rom name="(sps647)donk!_disk3.ipf" size="1140812" crc="f5665e98" sha1="ad88ea3e7de891bbe90c97062a9480fd92ba0fd3"/>
+				<rom name="(sps647)donk_disk3.ipf" size="1140812" crc="f5665e98" sha1="ad88ea3e7de891bbe90c97062a9480fd92ba0fd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14062,7 +14062,7 @@ license:CC0
 		<publisher>Impulze</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
-				<rom name="(sps650)eddtheduck!.ipf" size="1049304" crc="a2780686" sha1="d940e4dd630c804e01b741c42bfb82432cd4c02a"/>
+				<rom name="(sps650)eddtheduck.ipf" size="1049304" crc="a2780686" sha1="d940e4dd630c804e01b741c42bfb82432cd4c02a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16492,7 +16492,7 @@ license:CC0
 		<publisher>Rainbird</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps484)fish!.ipf" size="1049612" crc="ca4f1379" sha1="f56deda69f1670018ef6b90ebf34a816fc6c3c05"/>
+				<rom name="(sps484)fish.ipf" size="1049612" crc="ca4f1379" sha1="f56deda69f1670018ef6b90ebf34a816fc6c3c05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18417,13 +18417,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps487)goal!_disk1of2.ipf" size="1049612" crc="58f4c914" sha1="40dfca06d4d342edbcc10a1994f7cc35153f3f1c"/>
+				<rom name="(sps487)goal_disk1of2.ipf" size="1049612" crc="58f4c914" sha1="40dfca06d4d342edbcc10a1994f7cc35153f3f1c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049304">
-				<rom name="(sps487)goal!_disk2of2.ipf" size="1049304" crc="119039bd" sha1="b57c116f44da2cfb1e7e4583a757a04ad1434dd5"/>
+				<rom name="(sps487)goal_disk2of2.ipf" size="1049304" crc="119039bd" sha1="b57c116f44da2cfb1e7e4583a757a04ad1434dd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18771,13 +18771,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2909)goldrush!_disk1of2.ipf" size="1049612" crc="02235179" sha1="566e4e8cf9db17d1eab4dd6de50bb06ddfc855a3"/>
+				<rom name="(sps2909)goldrush_disk1of2.ipf" size="1049612" crc="02235179" sha1="566e4e8cf9db17d1eab4dd6de50bb06ddfc855a3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2909)goldrush!_disk2of2.ipf" size="1049612" crc="469eb700" sha1="08852073cf1e26ccd28188c63afe229a0082ec9d"/>
+				<rom name="(sps2909)goldrush_disk2of2.ipf" size="1049612" crc="469eb700" sha1="08852073cf1e26ccd28188c63afe229a0082ec9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21249,7 +21249,7 @@ license:CC0
 		<publisher>Black Legend</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps0260)hyperion!.ipf" size="1049180" crc="419320b4" sha1="9005ad0940cf4542ae71d28d29459d0fb0c452a3"/>
+				<rom name="(sps0260)hyperion.ipf" size="1049180" crc="419320b4" sha1="9005ad0940cf4542ae71d28d29459d0fb0c452a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30570,7 +30570,7 @@ license:CC0
 		<publisher>Psygnosis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1004614">
-				<rom name="(sps697)ohno!morelemmings.ipf" size="1004614" crc="d988798b" sha1="3c55ad16a1a197651de278e705a9f4ad3641fed8"/>
+				<rom name="(sps697)ohnomorelemmings.ipf" size="1004614" crc="d988798b" sha1="3c55ad16a1a197651de278e705a9f4ad3641fed8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32464,13 +32464,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps552)pirates!_diska.ipf" size="1049612" crc="69b63505" sha1="c047adc033ea5738cfdfcbed14694363bc756f02"/>
+				<rom name="(sps552)pirates_diska.ipf" size="1049612" crc="69b63505" sha1="c047adc033ea5738cfdfcbed14694363bc756f02"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps552)pirates!_diskb.ipf" size="1049612" crc="43650229" sha1="36342cf5a83c13a095912e6acd4ee50082d60037"/>
+				<rom name="(sps552)pirates_diskb.ipf" size="1049612" crc="43650229" sha1="36342cf5a83c13a095912e6acd4ee50082d60037"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32485,13 +32485,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps551)pirates!_disca.ipf" size="1049612" crc="f29c8afa" sha1="1fbf79372639b8033b5688f40508310ab52a17a2"/>
+				<rom name="(sps551)pirates_disca.ipf" size="1049612" crc="f29c8afa" sha1="1fbf79372639b8033b5688f40508310ab52a17a2"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps551)pirates!_discb.ipf" size="1049612" crc="ebc2d4ab" sha1="51e83967998cffa26c94685860c18e76ceb46c82"/>
+				<rom name="(sps551)pirates_discb.ipf" size="1049612" crc="ebc2d4ab" sha1="51e83967998cffa26c94685860c18e76ceb46c82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35412,7 +35412,7 @@ license:CC0
 		<publisher>GameTek</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps250)riskant!.ipf" size="1049180" crc="c28656ea" sha1="b3c7139729c5591d6d2a25ab070727e93fe0cb2a"/>
+				<rom name="(sps250)riskant.ipf" size="1049180" crc="c28656ea" sha1="b3c7139729c5591d6d2a25ab070727e93fe0cb2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45314,7 +45314,7 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<publisher>Soundware</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps396)ugh!.ipf" size="1049612" crc="2700fd88" sha1="b807e9450a040eaecfd7f333a5f86d10fb5347ef"/>
+				<rom name="(sps396)ugh.ipf" size="1049612" crc="2700fd88" sha1="b807e9450a040eaecfd7f333a5f86d10fb5347ef"/>
 			</dataarea>
 		</part>
 	</software>

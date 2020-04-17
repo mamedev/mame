@@ -2599,7 +2599,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<info name="release" value="199102xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="caroll (1990)(system house oh!).dim" size="1261824" crc="f7b58871" sha1="f106562ba33d086e9bf2dbca42b0b0b70fa45a83" offset="000000" />
+				<rom name="caroll (1990)(system house oh).dim" size="1261824" crc="f7b58871" sha1="f106562ba33d086e9bf2dbca42b0b0b70fa45a83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2744,13 +2744,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="choubangai seifuku zukan + (1989)(system house oh!)(disk 1 of 2)(disk a).dim" size="1261824" crc="d1de0419" sha1="4a0e1c127b654d670c512faf85386b9eb367cfb9" offset="000000" />
+				<rom name="choubangai seifuku zukan + (1989)(system house oh)(disk 1 of 2)(disk a).dim" size="1261824" crc="d1de0419" sha1="4a0e1c127b654d670c512faf85386b9eb367cfb9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="choubangai seifuku zukan + (1989)(system house oh!)(disk 2 of 2)(disk b).dim" size="1261824" crc="71877552" sha1="bfd51dc67aca666eeb805937d5b3f7e4e0717982" offset="000000" />
+				<rom name="choubangai seifuku zukan + (1989)(system house oh)(disk 2 of 2)(disk b).dim" size="1261824" crc="71877552" sha1="bfd51dc67aca666eeb805937d5b3f7e4e0717982" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3462,7 +3462,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="堕天使KYOUKO" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="datenshi kyouko part i (19xx)(system house oh!).dim" size="1261824" crc="586a9186" sha1="5b69d23298e50b7d4e4f84753578e1bbec30e5ef" offset="000000" />
+				<rom name="datenshi kyouko part i (19xx)(system house oh).dim" size="1261824" crc="586a9186" sha1="5b69d23298e50b7d4e4f84753578e1bbec30e5ef" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3652,13 +3652,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="533a8631" sha1="707473abd5433f8ef70481b46dee29f255f8bf0c" offset="000000" />
+				<rom name="detana twin bee (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="533a8631" sha1="707473abd5433f8ef70481b46dee29f255f8bf0c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (1991)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="3ddc210b" sha1="7237a1ef5b7df7cbccc410e3ff0747345679acdf" offset="000000" />
+				<rom name="detana twin bee (1991)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="3ddc210b" sha1="7237a1ef5b7df7cbccc410e3ff0747345679acdf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3669,7 +3669,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<publisher>コナミ (Konami)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="detana! twin bee (demo) (1991)(konami).dim" size="1261824" crc="0f1ae0e4" sha1="c255bc812369e2943d7ac228fe9c15d6c197cafc" offset="000000" />
+				<rom name="detana twin bee (demo) (1991)(konami).dim" size="1261824" crc="0f1ae0e4" sha1="c255bc812369e2943d7ac228fe9c15d6c197cafc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4708,13 +4708,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="emerald densetsu (1990)(system house oh!)(disk 1 of 2)(opening).dim" size="1261824" crc="4cf97f18" sha1="3965cee399717daa13f5016e796ce24c61a2b43a" offset="0" />
+				<rom name="emerald densetsu (1990)(system house oh)(disk 1 of 2)(opening).dim" size="1261824" crc="4cf97f18" sha1="3965cee399717daa13f5016e796ce24c61a2b43a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Game Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="emerald densetsu (1990)(system house oh!)(disk 2 of 2)(game1).dim" size="1261824" crc="27ef0197" sha1="b5c7c857a098cd97fbaeab8f9928fd296af6994a" offset="0" />
+				<rom name="emerald densetsu (1990)(system house oh)(disk 2 of 2)(game1).dim" size="1261824" crc="27ef0197" sha1="b5c7c857a098cd97fbaeab8f9928fd296af6994a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5191,13 +5191,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="fushigi no kabe (1988)(system house oh!)(disk 1 of 2).dim" size="1261824" crc="6c6073f5" sha1="6b1982c0d51fe2097370d47888907264cd9982e5" offset="000000" />
+				<rom name="fushigi no kabe (1988)(system house oh)(disk 1 of 2).dim" size="1261824" crc="6c6073f5" sha1="6b1982c0d51fe2097370d47888907264cd9982e5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="fushigi no kabe (1988)(system house oh!)(disk 2 of 2).dim" size="1261824" crc="8cdf8d9b" sha1="9f2472f9832554c3d347e9405d3cdf61e1e8ea20" offset="000000" />
+				<rom name="fushigi no kabe (1988)(system house oh)(disk 2 of 2).dim" size="1261824" crc="8cdf8d9b" sha1="9f2472f9832554c3d347e9405d3cdf61e1e8ea20" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5898,13 +5898,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="giza! xix (1991)(fairytale)(disk 1 of 2)(disk a).dim" size="1261824" crc="d86f814c" sha1="0f42850e0a1d41695bbdc79ec688696cda1583bf" offset="000000" />
+				<rom name="giza xix (1991)(fairytale)(disk 1 of 2)(disk a).dim" size="1261824" crc="d86f814c" sha1="0f42850e0a1d41695bbdc79ec688696cda1583bf" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="giza! xix (1991)(fairytale)(disk 2 of 2)(disk b).dim" size="1261824" crc="23902ddd" sha1="930c9deb8596261ea6be5c9c636c19463f6f2556" offset="000000" />
+				<rom name="giza xix (1991)(fairytale)(disk 2 of 2)(disk b).dim" size="1261824" crc="23902ddd" sha1="930c9deb8596261ea6be5c9c636c19463f6f2556" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7036,7 +7036,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19910214" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="jane (1990)(system house oh!).dim" size="1261824" crc="11665467" sha1="c89731c50d9905d44cad5c0056ac3cfd6f380b6f" offset="000000" />
+				<rom name="jane (1990)(system house oh).dim" size="1261824" crc="11665467" sha1="c89731c50d9905d44cad5c0056ac3cfd6f380b6f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7743,7 +7743,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="alt_title" value="媚少女NORIKO" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="bishoujo noriko (19xx)(system house oh!).dim" size="1261824" crc="6694c68b" sha1="fd7af7ffeb894beaadb68462e55577ec619bfd9d" offset="000000" />
+				<rom name="bishoujo noriko (19xx)(system house oh).dim" size="1261824" crc="6694c68b" sha1="fd7af7ffeb894beaadb68462e55577ec619bfd9d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8894,7 +8894,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19890120" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="makenshi kumiko (19xx)(system house oh!).dim" size="1261824" crc="0c1bd9b7" sha1="d8e4f33302a6550a8fa97d9ab8ae25a24463ebe0" offset="000000" />
+				<rom name="makenshi kumiko (19xx)(system house oh).dim" size="1261824" crc="0c1bd9b7" sha1="d8e4f33302a6550a8fa97d9ab8ae25a24463ebe0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9307,19 +9307,19 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 1 of 3).dim" size="1261824" crc="6100fefb" sha1="f2fa67d3f88e0b16a8532ac778cfa11ad6514bb9" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="6100fefb" sha1="f2fa67d3f88e0b16a8532ac778cfa11ad6514bb9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 2 of 3).dim" size="1261824" crc="e04c8ce2" sha1="172146769e4956166f011610ea2ec748cc0ca4de" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="e04c8ce2" sha1="172146769e4956166f011610ea2ec748cc0ca4de" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="milk time (1991)(system house oh!)(disk 3 of 3).dim" size="1261824" crc="653d9b5e" sha1="fde894b58312a82c0dd258b95f69e802348f5401" offset="000000" />
+				<rom name="milk time (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="653d9b5e" sha1="fde894b58312a82c0dd258b95f69e802348f5401" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9597,7 +9597,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19940702" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="mr. do! &amp; mr. do! vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
+				<rom name="mr. do &amp; mr. do vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9987,7 +9987,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="199011xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="nicoll (1990)(system house oh!).dim" size="1261824" crc="8400f85c" sha1="1e14aef379b6d10e5b4308b12b43b6cd4edc5037" offset="000000" />
+				<rom name="nicoll (1990)(system house oh).dim" size="1261824" crc="8400f85c" sha1="1e14aef379b6d10e5b4308b12b43b6cd4edc5037" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10188,31 +10188,31 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 1 of 5)(disk a).dim" size="1261824" crc="bbd60b0d" sha1="7795f5300a88161ef2236b30873b775e8e4e7ef5" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 1 of 5)(disk a).dim" size="1261824" crc="bbd60b0d" sha1="7795f5300a88161ef2236b30873b775e8e4e7ef5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 2 of 5)(disk b).dim" size="1261824" crc="d87dac91" sha1="56436555503461c6356e9c734de3153c3c24975c" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 2 of 5)(disk b).dim" size="1261824" crc="d87dac91" sha1="56436555503461c6356e9c734de3153c3c24975c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 3 of 5)(disk c).dim" size="1261824" crc="1c2562a9" sha1="c08dc8e9ec56a5cc7eb182677a269ac3e94fa031" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 3 of 5)(disk c).dim" size="1261824" crc="1c2562a9" sha1="c08dc8e9ec56a5cc7eb182677a269ac3e94fa031" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 4 of 5)(disk d).dim" size="1261824" crc="196d5221" sha1="5f5e3c792a5312afe806d737d6a8c6c7bb803584" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 4 of 5)(disk d).dim" size="1261824" crc="196d5221" sha1="5f5e3c792a5312afe806d737d6a8c6c7bb803584" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! pai (199x)(silky's)(disk 5 of 5)(disk e).dim" size="1261824" crc="97297914" sha1="2d6c3089ea34fd0f65a0a8fee1cef1e257db79b3" offset="000000" />
+				<rom name="oh pai (199x)(silky's)(disk 5 of 5)(disk e).dim" size="1261824" crc="97297914" sha1="2d6c3089ea34fd0f65a0a8fee1cef1e257db79b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10284,7 +10284,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19890929" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="orange iro no biyaku (1989)(system house oh!).dim" size="1261824" crc="15d4324d" sha1="d8c3ac5cd97dffc615ac5ae6c1264813b1ed3390" offset="000000" />
+				<rom name="orange iro no biyaku (1989)(system house oh).dim" size="1261824" crc="15d4324d" sha1="d8c3ac5cd97dffc615ac5ae6c1264813b1ed3390" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10423,13 +10423,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (1991)(konami)(disk 1 of 2).dim" size="1261824" crc="534d190b" sha1="47d81801ef4531f7ea7af14b2f6b206341d178be" offset="000000" />
+				<rom name="parodius da (1991)(konami)(disk 1 of 2).dim" size="1261824" crc="534d190b" sha1="47d81801ef4531f7ea7af14b2f6b206341d178be" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (1991)(konami)(disk 2 of 2).dim" size="1261824" crc="c060b794" sha1="30e84ccfac606ab7a7958b3f23864fb759ee11f1" offset="000000" />
+				<rom name="parodius da (1991)(konami)(disk 2 of 2).dim" size="1261824" crc="c060b794" sha1="30e84ccfac606ab7a7958b3f23864fb759ee11f1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10441,7 +10441,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="alt_title" value="パロディウスだ! (デモディスク)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="parodius da! (demo) (1991)(konami).dim" size="1261824" crc="5fc8522c" sha1="ce978ee718d09d63df796ca27404d29d7aaefee3" offset="000000" />
+				<rom name="parodius da (demo) (1991)(konami).dim" size="1261824" crc="5fc8522c" sha1="ce978ee718d09d63df796ca27404d29d7aaefee3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10674,25 +10674,25 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 1 of 4).dim" size="1261824" crc="cb0c19e5" sha1="4403b126bba00d75159401724df661299bf4f96d" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 1 of 4).dim" size="1261824" crc="cb0c19e5" sha1="4403b126bba00d75159401724df661299bf4f96d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 2 of 4).dim" size="1261824" crc="56f5d5d2" sha1="64ff546ac307f8008b45308458f71a0d082c9ca6" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 2 of 4).dim" size="1261824" crc="56f5d5d2" sha1="64ff546ac307f8008b45308458f71a0d082c9ca6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 3 of 4).dim" size="1261824" crc="4e10fba9" sha1="a43f4c6d535ef351536957bc897640d529715892" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 3 of 4).dim" size="1261824" crc="4e10fba9" sha1="a43f4c6d535ef351536957bc897640d529715892" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pinky 1 (1990)(system house oh!)(disk 4 of 4).dim" size="1261824" crc="03e7b75f" sha1="b35fe9fba58f738aaa082d479d278999eaf0ade7" offset="000000" />
+				<rom name="pinky 1 (1990)(system house oh)(disk 4 of 4).dim" size="1261824" crc="03e7b75f" sha1="b35fe9fba58f738aaa082d479d278999eaf0ade7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11023,19 +11023,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 1 of 3).dim" size="1261824" crc="65d34713" sha1="c6e78274231f19225632a1e6657eee8cd4120542" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 2 of 3).dim" size="1261824" crc="0624a794" sha1="2d08d95804530874798aeafc0698353fd78a388f" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="pretty doll (1991)(system house oh!)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" offset="000000" />
+				<rom name="pretty doll (1991)(system house oh)(disk 3 of 3).dim" size="1261824" crc="f53d16f2" sha1="124fe85889282d5a663b6fde9bd332e930eae9ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12084,13 +12084,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="sekai de ichiban kimi ga suki! (1990)(cocktail soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="7ba671be" sha1="4400735d1a89d33ed8ea653c0277bb3a653394c7" offset="000000" />
+				<rom name="sekai de ichiban kimi ga suki (1990)(cocktail soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="7ba671be" sha1="4400735d1a89d33ed8ea653c0277bb3a653394c7" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="sekai de ichiban kimi ga suki! (1990)(cocktail soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="ffc4ebea" sha1="d67d7ebbf99f064e065cbec5196ba6465e6f8acc" offset="000000" />
+				<rom name="sekai de ichiban kimi ga suki (1990)(cocktail soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="ffc4ebea" sha1="d67d7ebbf99f064e065cbec5196ba6465e6f8acc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12316,7 +12316,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="alt_title" value="少女伝説 PART-II ~ Shoujo Densetsu Part 2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="shoujo densetsu (1989)(system house oh!).dim" size="1261824" crc="5139d6ae" sha1="9f8a2a9564085134b379f22a792bd10b075aea52" offset="0" />
+				<rom name="shoujo densetsu (1989)(system house oh).dim" size="1261824" crc="5139d6ae" sha1="9f8a2a9564085134b379f22a792bd10b075aea52" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13956,19 +13956,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13981,19 +13981,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14007,13 +14007,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street (1993)(jast)(disk 1 of 2)(disk a).dim" size="1261824" crc="036683ad" sha1="1d4f88969568b1747d1c7fb79bf0efd06f0cafad" offset="000000" />
+				<rom name="totsugeki bakkon street (1993)(jast)(disk 1 of 2)(disk a).dim" size="1261824" crc="036683ad" sha1="1d4f88969568b1747d1c7fb79bf0efd06f0cafad" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street (1993)(jast)(disk 2 of 2)(disk b).dim" size="1261824" crc="6e64c6fe" sha1="654e6bb50c65ec31b23751740ba57d33b5d7b52c" offset="000000" />
+				<rom name="totsugeki bakkon street (1993)(jast)(disk 2 of 2)(disk b).dim" size="1261824" crc="6e64c6fe" sha1="654e6bb50c65ec31b23751740ba57d33b5d7b52c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14026,19 +14026,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 1 of 3)(disk a).dim" size="1261824" crc="92c5074f" sha1="b2215512044ba8a3451e74c1a96ec8793fdcc072" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 1 of 3)(disk a).dim" size="1261824" crc="92c5074f" sha1="b2215512044ba8a3451e74c1a96ec8793fdcc072" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 2 of 3)(disk b).dim" size="1261824" crc="3b28f392" sha1="17c428b7a217944cf8c8730b1f3b14dd15a5675e" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 2 of 3)(disk b).dim" size="1261824" crc="3b28f392" sha1="17c428b7a217944cf8c8730b1f3b14dd15a5675e" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="totsugeki! bakkon street ii hunting roulette (199x)(jast)(disk 3 of 3)(disk c).dim" size="1261824" crc="b45c1d56" sha1="a214e872a4716e5694d1eba1f179ec18d183635d" offset="000000" />
+				<rom name="totsugeki bakkon street ii hunting roulette (199x)(jast)(disk 3 of 3)(disk c).dim" size="1261824" crc="b45c1d56" sha1="a214e872a4716e5694d1eba1f179ec18d183635d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15211,7 +15211,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<info name="release" value="19901015" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yesterday (1990)(system house oh!).dim" size="1261824" crc="b1724d5c" sha1="afef8ba07b1e670c8aa18570fe4ed78e645c64f7" offset="000000" />
+				<rom name="yesterday (1990)(system house oh).dim" size="1261824" crc="b1724d5c" sha1="afef8ba07b1e670c8aa18570fe4ed78e645c64f7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16795,13 +16795,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="g68k easy graphic tool (1988)(oh! business)(disk 1 of 2)(disk a).dim" size="1261824" crc="aac299c4" sha1="4a26c51c74905f447eaa986574adebc3da20e594" offset="000000" />
+				<rom name="g68k easy graphic tool (1988)(oh business)(disk 1 of 2)(disk a).dim" size="1261824" crc="aac299c4" sha1="4a26c51c74905f447eaa986574adebc3da20e594" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="g68k easy graphic tool (1988)(oh! business)(disk 2 of 2)(disk b).dim" size="1261824" crc="74b45277" sha1="9fabf2dabb5d08b6fd9ed79f8c740aaf7681f0fe" offset="000000" />
+				<rom name="g68k easy graphic tool (1988)(oh business)(disk 2 of 2)(disk b).dim" size="1261824" crc="74b45277" sha1="9fabf2dabb5d08b6fd9ed79f8c740aaf7681f0fe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17393,7 +17393,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Oh! Business</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="sprite editor e68k (1988)(oh! business).dim" size="1261824" crc="705f545f" sha1="03b53a8db0212186d3b6da49ded030bdd12066d1" offset="000000" />
+				<rom name="sprite editor e68k (1988)(oh business).dim" size="1261824" crc="705f545f" sha1="03b53a8db0212186d3b6da49ded030bdd12066d1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20659,7 +20659,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Elrin Da!</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="elrin da! magazine vol. 1 uchuu tai sakusen (1993)(elrin da!).dim" size="1261824" crc="957ab735" sha1="0227dd52e8837e3ea24595eae99c178025dc3476" offset="000000" />
+				<rom name="elrin da magazine vol. 1 uchuu tai sakusen (1993)(elrin da).dim" size="1261824" crc="957ab735" sha1="0227dd52e8837e3ea24595eae99c178025dc3476" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20729,19 +20729,19 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 1 of 3).dim" size="1261824" crc="055826b4" sha1="07849b314d705587b4a0315ea1ae313469eefe84" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 1 of 3).dim" size="1261824" crc="055826b4" sha1="07849b314d705587b4a0315ea1ae313469eefe84" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 2 of 3).dim" size="1261824" crc="8d932780" sha1="8a5289a5294818efe3cffb3a700601ca67e1f13f" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 2 of 3).dim" size="1261824" crc="8d932780" sha1="8a5289a5294818efe3cffb3a700601ca67e1f13f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 01 z-music v1.0 (1991)(oh! x)(disk 3 of 3).dim" size="1261824" crc="c944dabc" sha1="a245988cc7de00f8cecf7e7b11fc0d220e17e9d8" offset="0" />
+				<rom name="bessatsu oh x music system 01 z-music v1.0 (1991)(oh x)(disk 3 of 3).dim" size="1261824" crc="c944dabc" sha1="a245988cc7de00f8cecf7e7b11fc0d220e17e9d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20796,37 +20796,37 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 1 of 6)(system).dim" size="1261824" crc="150886a2" sha1="20acf7af0803516525ad6199b9106a20e21753fe" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 1 of 6)(system).dim" size="1261824" crc="150886a2" sha1="20acf7af0803516525ad6199b9106a20e21753fe" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 2 of 6)(disk 1).dim" size="1261824" crc="9ef2f798" sha1="7653dc0003870dec5a488e3430caba0d6b4a702a" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 2 of 6)(disk 1).dim" size="1261824" crc="9ef2f798" sha1="7653dc0003870dec5a488e3430caba0d6b4a702a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 3 of 6)(disk 2).dim" size="1261824" crc="cd10a708" sha1="a5598cb54c58839a21203314e13b1fb6b891d47d" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 3 of 6)(disk 2).dim" size="1261824" crc="cd10a708" sha1="a5598cb54c58839a21203314e13b1fb6b891d47d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 4 of 6)(disk 3).dim" size="1261824" crc="53c562c0" sha1="0fd961213fdbc9cd8715f7dbd58926245d079534" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 4 of 6)(disk 3).dim" size="1261824" crc="53c562c0" sha1="0fd961213fdbc9cd8715f7dbd58926245d079534" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 5 of 6)(disk 4).dim" size="1261824" crc="15dc2a7a" sha1="f1608fa679caaba46ca91eafe1695c6786d1c22c" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 5 of 6)(disk 4).dim" size="1261824" crc="15dc2a7a" sha1="f1608fa679caaba46ca91eafe1695c6786d1c22c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1261824">
-				<rom name="bessatsu oh! x music system 02 z-music v2.0 (1991)(oh! x)(disk 6 of 6)(disk 5).dim" size="1261824" crc="f9e721a4" sha1="85f7d4c8c4b97847c5ebe1c899b6c8d3d5b44d34" offset="0" />
+				<rom name="bessatsu oh x music system 02 z-music v2.0 (1991)(oh x)(disk 6 of 6)(disk 5).dim" size="1261824" crc="f9e721a4" sha1="85f7d4c8c4b97847c5ebe1c899b6c8d3d5b44d34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20837,7 +20837,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" offset="0" />
+				<rom name="oh x soukan 10 shuunen kinen pro-68k sono 4 sion 2 (1992)(soft bank).dim" size="1261824" crc="76bbf14e" sha1="35aa2a42a85af361e397d1a40b90b5a86f2fc098" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20860,7 +20860,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" offset="0" />
+				<rom name="oh x 1990.06 soukan 8 shuunen kinen pro-68k (1990)(soft bank).dim" size="1261824" crc="f74a44c8" sha1="06096e3fcfd1f1e33a255b28c2beaef1cea419f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20883,7 +20883,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" offset="0" />
+				<rom name="oh x 1991.05 ougou shuukan pro-68k (1991)(soft bank).dim" size="1261824" crc="8cb03c87" sha1="dce2135fedbfb751368bae0fcb6ea7ac81792d15" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20919,7 +20919,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" offset="0" />
+				<rom name="oh x 1992.06 soukan x shuunen kinen pro-68k (1992)(soft bank).dim" size="1261824" crc="52a80f0a" sha1="49bb89e5c9e531f710ac542c7f91b0f81d9fac69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20930,7 +20930,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
-				<rom name="oh! x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" offset="0" />
+				<rom name="oh x 1992.07 doga cga system v2.50 (1992)(soft bank).dim" size="1474816" crc="f47374da" sha1="803bdbb9fa3c7f1106993df33a6726fa53879162" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20941,7 +20941,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
-				<rom name="oh! x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" offset="0" />
+				<rom name="oh x 1993.10 aki matsuri pro-68k (1993)(soft bank).dim" size="1474816" crc="49bb290a" sha1="c4d7d4615b382024aa07a138a015f36ca82b53c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20952,7 +20952,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" offset="0" />
+				<rom name="oh x 1994.03 hinamatsuri pro-68k (1994)(soft bank).dim" size="1261824" crc="df0a437b" sha1="e1f8c758cf1d03360b10f1c8b36b0d12a93a8d9a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20963,7 +20963,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" offset="0" />
+				<rom name="oh x 1994.05 koi no bori pro-68k (1994)(soft bank).dim" size="1261824" crc="b2f80d35" sha1="d0b2b62c80b33f4b0213b2e6b47408f8db1626e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20974,7 +20974,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" offset="0" />
+				<rom name="oh x 1994.07 cga nyuumon kit genie (1994)(soft bank).dim" size="1261824" crc="e7196476" sha1="2ef826740ce9d5257bdd6a8064ccc10cb185b7c2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20997,7 +20997,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" offset="0" />
+				<rom name="oh x 1994.10 momiji gari pro-68k (1994)(soft bank).dim" size="1261824" crc="e0b3575f" sha1="0b012396a08f21e49dfbb828de3838ab7b4a3c4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21020,7 +21020,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" offset="0" />
+				<rom name="oh x 1994.12 xl image + alpha (1994)(soft bank).dim" size="1261824" crc="e95647b8" sha1="8e11cfa23ee9686c6469f2a44fadb9d3f6bb0c31" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21031,7 +21031,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.05 oh! dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" offset="0" />
+				<rom name="oh x 1995.05 oh dennou club (1995)(soft bank).dim" size="1261824" crc="9867e7d4" sha1="7faadd752dbfe791436bff00e9d6999f9f04d300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21042,7 +21042,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" offset="0" />
+				<rom name="oh x 1995.08 shochuu mimai pro-68k (1995)(soft bank).dim" size="1261824" crc="0ef7e907" sha1="6ff2746efb769b150c15d37fe6d7be4e088a806b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21054,13 +21054,13 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 1 of 2).dim" size="1261824" crc="96da918c" sha1="41f7c4e13698269622444903f061b824731a9251" offset="0" />
+				<rom name="oh x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 1 of 2).dim" size="1261824" crc="96da918c" sha1="41f7c4e13698269622444903f061b824731a9251" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 2 of 2).dim" size="1261824" crc="dce4043c" sha1="895fb111e0f5bd716a7df8e1ece9286a5eae6252" offset="0" />
+				<rom name="oh x 1995.12 merry x'mas pro-68k (1995)(soft bank)(disk 2 of 2).dim" size="1261824" crc="dce4043c" sha1="895fb111e0f5bd716a7df8e1ece9286a5eae6252" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21892,7 +21892,7 @@ sold through Takeru vending machines -->
 		<info name="release" value="19930820" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah! ohimesama!.dim" size="1261824" crc="235f83ca" sha1="a40470d9fab4c7d13184b5300eb16aa52db2d39e" offset="000000" />
+				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah ohimesama.dim" size="1261824" crc="235f83ca" sha1="a40470d9fab4c7d13184b5300eb16aa52db2d39e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21932,7 +21932,7 @@ sold through Takeru vending machines -->
 		<info name="release" value="19940720" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="the world of x68000 ii (disk 3 of 4) - rush! &amp; useful.dim" size="1261824" crc="f60f3b1b" sha1="a4ff175494a9438ed4444e533816bac8303a6e4c" offset="000000" />
+				<rom name="the world of x68000 ii (disk 3 of 4) - rush &amp; useful.dim" size="1261824" crc="f60f3b1b" sha1="a4ff175494a9438ed4444e533816bac8303a6e4c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21972,7 +21972,7 @@ sold through Takeru vending machines -->
 		<info name="release" value="19940720" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="aa! o-hime-sama!.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
+				<rom name="aa o-hime-sama.dim" size="1261824" crc="6605a6b5" sha1="05e30f93a6688a57c34fae9779d7b1cec142fd4c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22269,7 +22269,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Pussy Cat" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="anzu fly! (1991)(pussy cat).dim" size="1261824" crc="1bea6961" sha1="3bef9fa8168ae3e5cb6acc9862c1cd8ab4707796" offset="000000" />
+				<rom name="anzu fly (1991)(pussy cat).dim" size="1261824" crc="1bea6961" sha1="3bef9fa8168ae3e5cb6acc9862c1cd8ab4707796" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23390,13 +23390,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="chotto local rule na mine sweeper hun de oshimai!! (199x)(mpu)(disk 1 of 2)(disk a).dim" size="1261824" crc="7f2c5df7" sha1="6f246f68dd42a35d470157e8ea85810852cce5b5" offset="000000" />
+				<rom name="chotto local rule na mine sweeper hun de oshimai (199x)(mpu)(disk 1 of 2)(disk a).dim" size="1261824" crc="7f2c5df7" sha1="6f246f68dd42a35d470157e8ea85810852cce5b5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="chotto local rule na mine sweeper hun de oshimai!! (199x)(mpu)(disk 2 of 2)(disk b).dim" size="1261824" crc="57858b38" sha1="26ba37e916f06f3fce3ccd2407593c8f41380f32" offset="000000" />
+				<rom name="chotto local rule na mine sweeper hun de oshimai (199x)(mpu)(disk 2 of 2)(disk b).dim" size="1261824" crc="57858b38" sha1="26ba37e916f06f3fce3ccd2407593c8f41380f32" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23857,7 +23857,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="M' Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="dastard!! ankoku no hakai kami (19xx)(m' soft).dim" size="1261824" crc="0cdd992a" sha1="2749e327ee2ce9dd726f857a31d8bd9a2db7848a" offset="000000" />
+				<rom name="dastard ankoku no hakai kami (19xx)(m' soft).dim" size="1261824" crc="0cdd992a" sha1="2749e327ee2ce9dd726f857a31d8bd9a2db7848a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24283,7 +24283,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Biwahosi Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="dog fight! (1992)(biwahosi software).dim" size="1261824" crc="00eb4b74" sha1="b6fd0ffff8a3e089542a5c4a05aee791a16cace6" offset="000000" />
+				<rom name="dog fight (1992)(biwahosi software).dim" size="1261824" crc="00eb4b74" sha1="b6fd0ffff8a3e089542a5c4a05aee791a16cace6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24584,7 +24584,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Elrin Da!" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="elrin da! magazine vol. 2 quiz uchuu tai sakusen (1993)(elrin da!).dim" size="1261824" crc="95cad303" sha1="4ba703175767ee404dd7571926c5bf0b51aca6bb" offset="000000" />
+				<rom name="elrin da magazine vol. 2 quiz uchuu tai sakusen (1993)(elrin da).dim" size="1261824" crc="95cad303" sha1="4ba703175767ee404dd7571926c5bf0b51aca6bb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25213,7 +25213,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Daba" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ganbare! paichan (1994)(daba).dim" size="1261824" crc="8cfbcf3a" sha1="096506173c25332b722357c70b7e7b30aa69e386" offset="000000" />
+				<rom name="ganbare paichan (1994)(daba).dim" size="1261824" crc="8cfbcf3a" sha1="096506173c25332b722357c70b7e7b30aa69e386" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25261,7 +25261,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="To$hi" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ga-war games (19xx)(to$hi).dim" size="1261824" crc="e98d5245" sha1="f7bce4cc75d49f9e1ce552b7cf3520334396223f" offset="000000" />
+				<rom name="ga-war games (19xx)(toshi).dim" size="1261824" crc="e98d5245" sha1="f7bce4cc75d49f9e1ce552b7cf3520334396223f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25722,7 +25722,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Taka-P" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="hey! say! education committee v0.12 (1993)(taka-p).dim" size="1261824" crc="0ec31ba9" sha1="725b07e0f60c770869cf9dc4a550f4fd5386cc76" offset="000000" />
+				<rom name="hey say education committee v0.12 (1993)(taka-p).dim" size="1261824" crc="0ec31ba9" sha1="725b07e0f60c770869cf9dc4a550f4fd5386cc76" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25734,7 +25734,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Taka-P" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="hey! say! education committee v0.10 (1993)(taka-p).dim" size="1261824" crc="4b414e14" sha1="ae45bc7175787009a698ec9639b46d6142ad3527" offset="000000" />
+				<rom name="hey say education committee v0.10 (1993)(taka-p).dim" size="1261824" crc="4b414e14" sha1="ae45bc7175787009a698ec9639b46d6142ad3527" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26264,7 +26264,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Project Team Interrupt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="kaisen game daa! (1990)(project team interrupt).dim" size="1261824" crc="fab410a6" sha1="de0717dce11c1b2ab1975b50d404a574f97e634f" offset="000000" />
+				<rom name="kaisen game daa (1990)(project team interrupt).dim" size="1261824" crc="fab410a6" sha1="de0717dce11c1b2ab1975b50d404a574f97e634f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26577,7 +26577,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="T&amp;H Project" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="korette deesure jong! (19xx)(t&amp;h project).dim" size="1261824" crc="42a93d62" sha1="f58e9a0808b18c160ea89bd5cf3a7895da6100b2" offset="000000" />
+				<rom name="korette deesure jong (19xx)(t&amp;h project).dim" size="1261824" crc="42a93d62" sha1="f58e9a0808b18c160ea89bd5cf3a7895da6100b2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27305,13 +27305,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="masayochan peeping shot! vol. 1 (19xx)(onoe network)(disk 1 of 2).dim" size="1261824" crc="ec5b755b" sha1="ef247c721cc335ebcb166bde7449a191916bc7f5" offset="000000" />
+				<rom name="masayochan peeping shot vol. 1 (19xx)(onoe network)(disk 1 of 2).dim" size="1261824" crc="ec5b755b" sha1="ef247c721cc335ebcb166bde7449a191916bc7f5" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="masayochan peeping shot! vol. 1 (19xx)(onoe network)(disk 2 of 2).dim" size="1261824" crc="ffa65d77" sha1="f3b20e54c5bd9b80ff7aff2294c44d524977c064" offset="000000" />
+				<rom name="masayochan peeping shot vol. 1 (19xx)(onoe network)(disk 2 of 2).dim" size="1261824" crc="ffa65d77" sha1="f3b20e54c5bd9b80ff7aff2294c44d524977c064" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27432,7 +27432,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Brace" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="mikkun fly! (1991)(brace).dim" size="1261824" crc="b8948ca4" sha1="50b68c4e84cc470e2aa8e5cd18bf8ffae460e369" offset="000000" />
+				<rom name="mikkun fly (1991)(brace).dim" size="1261824" crc="b8948ca4" sha1="50b68c4e84cc470e2aa8e5cd18bf8ffae460e369" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27608,13 +27608,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="momotarou gaiden momokochan fight! (1991)(todo2)(disk 1 of 2)(disk a).dim" size="1261824" crc="fd0b0e00" sha1="088f5ea8c953196b0d0e8541681be15d95888080" offset="000000" />
+				<rom name="momotarou gaiden momokochan fight (1991)(todo2)(disk 1 of 2)(disk a).dim" size="1261824" crc="fd0b0e00" sha1="088f5ea8c953196b0d0e8541681be15d95888080" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="momotarou gaiden momokochan fight! (1991)(todo2)(disk 2 of 2)(disk b).dim" size="1261824" crc="5b0c6874" sha1="ff03f200e3133f324cdc8c1ab2866e5760023df2" offset="000000" />
+				<rom name="momotarou gaiden momokochan fight (1991)(todo2)(disk 2 of 2)(disk b).dim" size="1261824" crc="5b0c6874" sha1="ff03f200e3133f324cdc8c1ab2866e5760023df2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27777,7 +27777,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series bangaihen nouten chokudake! 2 (1990)(iron gear).dim" size="1261824" crc="a29a05ce" sha1="35ff987bc2f46b55401c40c28eec4b26e6bcf2a9" offset="000000" />
+				<rom name="naniwa do konjou series bangaihen nouten chokudake 2 (1990)(iron gear).dim" size="1261824" crc="a29a05ce" sha1="35ff987bc2f46b55401c40c28eec4b26e6bcf2a9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27789,7 +27789,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series nouten chokudake! (1990)(iron gear).dim" size="1261824" crc="d6cab31a" sha1="439f9963785c2e0e1c3607caff3f0b7bfdc05795" offset="000000" />
+				<rom name="naniwa do konjou series nouten chokudake (1990)(iron gear).dim" size="1261824" crc="d6cab31a" sha1="439f9963785c2e0e1c3607caff3f0b7bfdc05795" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27801,7 +27801,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="naniwa do konjou series nouten chokudake! 3 (1991)(iron gear).dim" size="1261824" crc="00a3fad5" sha1="a54b548807931a3d4ad00fcbfc6ffe982c119056" offset="000000" />
+				<rom name="naniwa do konjou series nouten chokudake 3 (1991)(iron gear).dim" size="1261824" crc="00a3fad5" sha1="a54b548807931a3d4ad00fcbfc6ffe982c119056" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27826,7 +27826,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Yamaco" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="nasake muyou fire 2! (1994)(yamaco).dim" size="1261824" crc="44546ade" sha1="14d3b3119afd5f2de675e96b4de92ce72fba9b3e" offset="000000" />
+				<rom name="nasake muyou fire 2 (1994)(yamaco).dim" size="1261824" crc="44546ade" sha1="14d3b3119afd5f2de675e96b4de92ce72fba9b3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28007,7 +28007,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Maru" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="oh! hajiki! (19xx)(maru).dim" size="1261824" crc="e80fc5ca" sha1="0c261e400bf21ed5b285c25e07845769c288c859" offset="000000" />
+				<rom name="oh hajiki (19xx)(maru).dim" size="1261824" crc="e80fc5ca" sha1="0c261e400bf21ed5b285c25e07845769c288c859" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28092,7 +28092,7 @@ sold through Takeru vending machines -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ossan no dotsuki!! game special.dim" size="1261824" crc="da0937bf" sha1="16a1f2fcd66f8e9ad069f7259cea6b6ad1f18713" offset="000000" />
+				<rom name="ossan no dotsuki game special.dim" size="1261824" crc="da0937bf" sha1="16a1f2fcd66f8e9ad069f7259cea6b6ad1f18713" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28278,7 +28278,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="68 Bank" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="patariro! game (19xx)(68 bank).dim" size="1261824" crc="b60c6c8f" sha1="a88ca5e9365dda1975e9eb46c8bcc9dfd19a9f01" offset="000000" />
+				<rom name="patariro game (19xx)(68 bank).dim" size="1261824" crc="b60c6c8f" sha1="a88ca5e9365dda1975e9eb46c8bcc9dfd19a9f01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28792,7 +28792,7 @@ sold through Takeru vending machines -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="push bon! (1994)(-).dim" size="1261824" crc="eed59df0" sha1="4523eb111b155fb47af53c2c2bf69cab84c38b05" offset="000000" />
+				<rom name="push bon (1994)(-).dim" size="1261824" crc="eed59df0" sha1="4523eb111b155fb47af53c2c2bf69cab84c38b05" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28963,7 +28963,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Todo2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="quiz jan! (1990)(todo2).dim" size="1261824" crc="583bc086" sha1="3c8baf368c512fed6ef9c0dac8e04cd40131adfa" offset="000000" />
+				<rom name="quiz jan (1990)(todo2).dim" size="1261824" crc="583bc086" sha1="3c8baf368c512fed6ef9c0dac8e04cd40131adfa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29229,7 +29229,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Iron Gear" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="refresh! (1990)(iron gear).dim" size="1261824" crc="98774bbe" sha1="b1386dc4f257a8bdeb22a0df8bade2b6b2e50d5f" offset="000000" />
+				<rom name="refresh (1990)(iron gear).dim" size="1261824" crc="98774bbe" sha1="b1386dc4f257a8bdeb22a0df8bade2b6b2e50d5f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29435,7 +29435,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="Mugen Unagi Team" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="sakeru no da! (19xx)(mugen unagi team).dim" size="1261824" crc="3ea3f15b" sha1="66b0cd5f04a1de70d1c9ad382a497c7bb6249a6b" offset="000000" />
+				<rom name="sakeru no da (19xx)(mugen unagi team).dim" size="1261824" crc="3ea3f15b" sha1="66b0cd5f04a1de70d1c9ad382a497c7bb6249a6b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30033,7 +30033,7 @@ sold through Takeru vending machines -->
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="snow na kibun! (1991)(-).dim" size="1261824" crc="b1dc4083" sha1="fbfe0698eeefe573aeaa6e2ddd084ccdd76ceeee" offset="000000" />
+				<rom name="snow na kibun (1991)(-).dim" size="1261824" crc="b1dc4083" sha1="fbfe0698eeefe573aeaa6e2ddd084ccdd76ceeee" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30342,7 +30342,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="To$hi" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="star trek (19xx)(to$hi).dim" size="1261824" crc="ce9e9c86" sha1="e627a8a1bbf3d5e4bdfa66a23d20f2574c83cb97" offset="000000" />
+				<rom name="star trek (19xx)(toshi).dim" size="1261824" crc="ce9e9c86" sha1="e627a8a1bbf3d5e4bdfa66a23d20f2574c83cb97" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31080,7 +31080,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="PYN" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! dai 8 kikou shidan (1991)(pyn).dim" size="1261824" crc="7b6a19cb" sha1="94d2aa76ec1a57984a87ccf6b47a2d7c9e5034ec" offset="000000" />
+				<rom name="tatakae dai 8 kikou shidan (1991)(pyn).dim" size="1261824" crc="7b6a19cb" sha1="94d2aa76ec1a57984a87ccf6b47a2d7c9e5034ec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31093,13 +31093,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 46 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="4391ae06" sha1="96a502f4adc5aab9d5732a08c65463d0c5496f7c" offset="000000" />
+				<rom name="tatakae konyanko comike 46 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="4391ae06" sha1="96a502f4adc5aab9d5732a08c65463d0c5496f7c" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 46 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="3a71e0b1" sha1="66c5bcc635d5f55ee0bb482790ba214407104991" offset="000000" />
+				<rom name="tatakae konyanko comike 46 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="3a71e0b1" sha1="66c5bcc635d5f55ee0bb482790ba214407104991" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31112,13 +31112,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 47 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="fbdf78b1" sha1="bf1d23369dbae6de2602df9b5bcc7ed2ab64fa13" offset="000000" />
+				<rom name="tatakae konyanko comike 47 (1994)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1261824" crc="fbdf78b1" sha1="bf1d23369dbae6de2602df9b5bcc7ed2ab64fa13" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tatakae! konyanko comike 47 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="b0f4fdbe" sha1="2d00b74c437fbbd2ff7e5317e21027cea91ecddf" offset="000000" />
+				<rom name="tatakae konyanko comike 47 (1994)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1261824" crc="b0f4fdbe" sha1="2d00b74c437fbbd2ff7e5317e21027cea91ecddf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31131,13 +31131,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1474816">
-				<rom name="tatakae! konyanko ex (199x)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1474816" crc="9776a32e" sha1="ad2d3c6195c0d78b3b1e9f336407dc1ea40ccf21" offset="000000" />
+				<rom name="tatakae konyanko ex (199x)(nankoku byouyou)(disk 1 of 2)(disk a).dim" size="1474816" crc="9776a32e" sha1="ad2d3c6195c0d78b3b1e9f336407dc1ea40ccf21" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1474816">
-				<rom name="tatakae! konyanko ex (199x)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1474816" crc="a8595966" sha1="69adca6e3bf95914db3184cf7203e22f64f79469" offset="000000" />
+				<rom name="tatakae konyanko ex (199x)(nankoku byouyou)(disk 2 of 2)(disk b).dim" size="1474816" crc="a8595966" sha1="69adca6e3bf95914db3184cf7203e22f64f79469" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31509,13 +31509,13 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 0" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tokkou! kamikaze fighter (1996)(haiteidoradorazu)(disk 1 of 2)(disk 0).dim" size="1261824" crc="fcd6554d" sha1="f7b27942c9a3fbb3c5cc2fbec28e2744a8a5591b" offset="000000" />
+				<rom name="tokkou kamikaze fighter (1996)(haiteidoradorazu)(disk 1 of 2)(disk 0).dim" size="1261824" crc="fcd6554d" sha1="f7b27942c9a3fbb3c5cc2fbec28e2744a8a5591b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="tokkou! kamikaze fighter (1996)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="00af0887" sha1="c7bed328c574a0be09446585afde17dc9bc39c3f" offset="000000" />
+				<rom name="tokkou kamikaze fighter (1996)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="00af0887" sha1="c7bed328c574a0be09446585afde17dc9bc39c3f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31652,7 +31652,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="TAU Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="ueshita hanten!! upside down v1.02a (1995)(tau software).dim" size="1261824" crc="bf03e503" sha1="856f41394425b890eea1765aefeaaa5e588dee55" offset="0" />
+				<rom name="ueshita hanten upside down v1.02a (1995)(tau software).dim" size="1261824" crc="bf03e503" sha1="856f41394425b890eea1765aefeaaa5e588dee55" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32159,7 +32159,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="P Shoukai Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yuugai chase aa!! namida no shimensoka (199x)(p shoukai software).dim" size="1261824" crc="cefba359" sha1="b4d5c9735fae5e6e7215fcb023241d2688dd41d8" offset="000000" />
+				<rom name="yuugai chase aa namida no shimensoka (199x)(p shoukai software).dim" size="1261824" crc="cefba359" sha1="b4d5c9735fae5e6e7215fcb023241d2688dd41d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32207,7 +32207,7 @@ sold through Takeru vending machines -->
 		<info name="developer" value="P Shoukai Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="yuugai wars mamore! akai daichi (199x)(p shoukai software).dim" size="1261824" crc="e10b9f36" sha1="e7ea0e491d52e14fc209fabc41396ec95955ec86" offset="000000" />
+				<rom name="yuugai wars mamore akai daichi (199x)(p shoukai software).dim" size="1261824" crc="e10b9f36" sha1="e7ea0e491d52e14fc209fabc41396ec95955ec86" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

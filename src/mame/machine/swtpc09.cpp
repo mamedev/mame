@@ -967,7 +967,7 @@ void swtpc09_state::machine_reset()
 	m_brg->rsa_w(baud_rate_high);
 	m_brg->rsb_w(1);
 
-	m_pia->write_portb(0);
+	m_pia->portb_w(0);
 	m_pia->cb1_w(0);
 	m_pia->ca2_w(0);
 	m_pia->cb2_w(0);

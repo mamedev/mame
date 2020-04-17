@@ -315,17 +315,18 @@ public:
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "williams2_tile"),
-		m_gain({0.8f, 0.73f, 0.81f}),
-		m_offset({-0.27f, 0.0f, -0.22f})
+		m_gain({ 0.8f, 0.73f, 0.81f }),
+		m_offset({ -0.27f, 0.0f, -0.22f })
 	{ }
 
 	void williams2_base(machine_config &config);
+
 	INPUT_CHANGED_MEMBER(rgb_gain)
 	{
 		if (param < 3)
-			m_gain[param] = (float) newval / 100.0f;
+			m_gain[param] = float(newval) / 100.0f;
 		else
-			m_offset[param-3] = (float) newval / 100.0f - 1.0f;
+			m_offset[param - 3] = (float(newval) / 100.0f) - 1.0f;
 		rebuild_palette();
 	}
 

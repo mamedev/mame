@@ -69,7 +69,7 @@ READ8_MEMBER(mcb216_state::tms5501_status_r)
 {
 	// D7  D6  D5  D4  D3  D2  D1  D0
 	// TBE RDA IPG TBE RDA SRV ORE FME
-	return bitswap<8>(m_tms5501->sta_r(space, 0), 4, 3, 5, 4, 3, 2, 1, 0);
+	return bitswap<8>(m_tms5501->sta_r(), 4, 3, 5, 4, 3, 2, 1, 0);
 }
 
 void mcb216_state::mcb216_mem(address_map &map)

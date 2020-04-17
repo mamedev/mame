@@ -514,8 +514,8 @@ void vegas_state::machine_start()
 
 void vegas_state::machine_reset()
 {
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	// Clear CPU IO registers
 	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
@@ -786,10 +786,8 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
 			/* bit 0 is used to reset the IOASIC */
 			if (!(data & (1 << 0)))
-			{
 				m_ioasic->ioasic_reset();
-				m_dcs->reset_w(data & 0x01);
-			}
+			m_dcs->reset_w(data & 0x01);
 			if ((data & (1 << 2)) && !(m_sio_reset_ctrl & (1 << 2))) {
 				logerror("sio_w: Ethernet reset\n");
 				m_ethernet->reset();

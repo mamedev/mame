@@ -209,17 +209,15 @@ inline int s2650_device::check_irq_line()
 	{
 		if( (m_psu & II) == 0 )
 		{
-			int vector;
 			if (m_halt)
 			{
 				m_halt = 0;
 				m_iar = (m_iar + 1) & PMSK;
 			}
-			vector = standard_irq_callback(0) & 0xff;
+			standard_irq_callback(0);
 
 			/* Say hi */
-			m_intack_handler(true);
-
+			int vector = m_intack_handler();
 			/* build effective address within first 8K page */
 			m_ea = S2650_relative[vector] & PMSK;
 			if (vector & 0x80)      /* indirect bit set ? */
@@ -824,7 +822,7 @@ void s2650_device::device_start()
 {
 	m_sense_handler.resolve();
 	m_flag_handler.resolve_safe();
-	m_intack_handler.resolve_safe();
+	m_intack_handler.resolve_safe(0x00);
 
 	m_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_BIG>();
 

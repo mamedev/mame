@@ -30,9 +30,9 @@ public:
 	// construction/destruction
 	corvus_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t read();
+	void write(uint8_t data);
+	uint8_t status_r();
 
 protected:
 	// device-level overrides

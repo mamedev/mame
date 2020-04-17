@@ -445,17 +445,17 @@ void epc_state::epc_io(address_map &map)
 	map(0x03f4, 0x03f5).m(m_fdc, FUNC(i8272a_device::map));
 
 	map(0x03bc, 0x03be).lrw8(
-		[this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		[this](offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
-			uint8_t data = m_lpt->read(space, offset);
+			uint8_t data = m_lpt->read(offset);
 			LOGLPT("LPT read offset %02x: %02x\n", offset, data);
 			return data;
 		},
 		"lpt_r",
-		[this](address_space &space, offs_t offset, uint8_t data)
+		[this](offs_t offset, uint8_t data)
 		{
 			LOGLPT("LPT write offset %02x: %02x\n", offset, data);
-			m_lpt->write(space, offset, data);
+			m_lpt->write(offset, data);
 		},
 		"lpt_w"
 	);

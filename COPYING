@@ -82,8 +82,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-Berkeley SoftFloat - software implementation of binary floating-point that conforms to the IEEE Standard for Floating-Point Arithmetic
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 The Regents of the University of California
+Berkeley SoftFloat - software implementation of binary floating-point that
+conforms to the IEEE Standard for Floating-Point Arithmetic
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 The Regents of
+the University of California
 
 FLAC - Free Lossless Audio Codec
 Copyright (c) 2001,2002,2003,2004,2005,2006,2007 Josh Coalson 
@@ -152,7 +154,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Expat
-Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper
+Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd
+and Clark Cooper
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Expat maintainers
 
 Lua - a powerful, fast, lightweight, embeddable scripting language
@@ -193,7 +196,8 @@ tap-windows.h
 Copyright (C) 2002-2014 OpenVPN Technologies, Inc.
 
 utf8proc
-Copyright (c) 2014-2015 Steven G. Johnson, Jiahao Chen, Tony Kelman, Jonas Fonseca, and other contributors
+Copyright (c) 2014-2015 Steven G. Johnson, Jiahao Chen, Tony Kelman,
+Jonas Fonseca, and other contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

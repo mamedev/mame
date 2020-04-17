@@ -176,13 +176,13 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 
 READ8_MEMBER(mephisto_milano_state::milano_input_r)
 {
-	return m_board->input_r(space, offset) ^ 0xff;
+	return m_board->input_r() ^ 0xff;
 }
 
 WRITE8_MEMBER(mephisto_milano_state::milano_led_w)
 {
 	m_led_latch = data;
-	m_board->mux_w(space, offset, data);
+	m_board->mux_w(data);
 }
 
 WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
@@ -199,7 +199,7 @@ WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
 			m_leds[i] = 0;
 	}
 
-	m_display->io_w(space, offset, data & 0x0f);
+	m_display->io_w(data & 0x0f);
 }
 
 void mephisto_milano_state::milano_mem(address_map &map)
@@ -241,10 +241,10 @@ WRITE8_MEMBER(mephisto_academy_state::academy_led_w)
 READ8_MEMBER(mephisto_academy_state::academy_input_r)
 {
 	uint8_t data;
-	if (m_board->mux_r(space, offset) == 0xff)
+	if (m_board->mux_r() == 0xff)
 		data = m_keys->read();
 	else
-		data = m_board->input_r(space, offset);
+		data = m_board->input_r();
 
 	return data ^ 0xff;
 }

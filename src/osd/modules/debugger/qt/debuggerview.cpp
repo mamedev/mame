@@ -10,6 +10,9 @@
 
 #include "modules/lib/osdobj_common.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+#define horizontalAdvance width
+#endif
 
 DebuggerView::DebuggerView(const debug_view_type& type,
 							running_machine* machine,
@@ -49,7 +52,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 {
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
-	const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
+	const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
 	const int fontHeight = std::max(1, actualFont.lineSpacing());
 	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
@@ -240,7 +243,7 @@ void DebuggerView::mousePressEvent(QMouseEvent* event)
 	if (event->button() == Qt::LeftButton)
 	{
 		QFontMetrics actualFont = fontMetrics();
-		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
+		const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
 		const int fontHeight = std::max(1, actualFont.lineSpacing());
 
 		debug_view_xy topLeft = m_view->visible_position();

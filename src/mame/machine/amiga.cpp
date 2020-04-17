@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 
 void amiga_state::set_interrupt(int interrupt)
 {
-	custom_chip_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, interrupt, 0xffff);
+	custom_chip_w(REG_INTREQ, interrupt);
 }
 
 bool amiga_state::int2_pending()
@@ -1256,7 +1256,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( amiga_state::custom_chip_w )
+void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 {
 	uint16_t temp;
 	offset &= 0xff;
@@ -1265,7 +1265,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 		logerror("%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
 
 	// paula will handle some of those registers
-	m_paula->reg_w(space, offset, data, mem_mask);
+	m_paula->reg_w(offset, data);
 
 	switch (offset)
 	{

@@ -743,6 +743,7 @@ merit.cpp
 merit3xx.cpp
 meritm.cpp
 merits.cpp
+meritsdx.cpp
 mermaid.cpp
 metalmx.cpp
 metlclsh.cpp
@@ -1015,6 +1016,7 @@ redclash.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
+rfslots8085.cpp
 rgum.cpp
 rltennis.cpp
 rmhaihai.cpp
@@ -1199,6 +1201,7 @@ starfire.cpp
 stargame.cpp
 starrider.cpp
 starshp1.cpp
+startouch.cpp
 starwars.cpp
 statriv2.cpp
 stellafr.cpp

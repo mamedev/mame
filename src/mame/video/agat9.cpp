@@ -147,7 +147,7 @@ void agat9video_device::device_reset()
 }
 
 
-READ8_MEMBER(agat9video_device::read)
+uint8_t agat9video_device::read(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 		do_io(offset);
@@ -155,12 +155,12 @@ READ8_MEMBER(agat9video_device::read)
 	return m_mode;
 }
 
-WRITE8_MEMBER(agat9video_device::write)
+void agat9video_device::write(offs_t offset, uint8_t data)
 {
 	do_io(offset);
 }
 
-READ8_MEMBER(agat9video_device::apple_read)
+uint8_t agat9video_device::apple_read(offs_t offset)
 {
 	logerror("%s: %04x read (%s)\n", machine().describe_context(), 0xc050 + offset, offset<8?"apple":"palette");
 
@@ -170,7 +170,7 @@ READ8_MEMBER(agat9video_device::apple_read)
 	return m_mode;
 }
 
-WRITE8_MEMBER(agat9video_device::apple_write)
+void agat9video_device::apple_write(offs_t offset, uint8_t data)
 {
 	logerror("%s: %04x write (%s)\n", machine().describe_context(), 0xc050 + offset, offset<8?"apple":"palette");
 

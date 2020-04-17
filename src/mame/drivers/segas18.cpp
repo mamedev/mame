@@ -582,7 +582,7 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 READ16_MEMBER( segas18_state::wwally_custom_io_r )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
+		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(offset & 0x0006/2);
 
 	return m_mapper->open_bus_r();
 }
@@ -591,7 +591,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r(space, 0);
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r();
 }
 
 

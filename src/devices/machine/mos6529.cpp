@@ -54,7 +54,7 @@ void mos6529_device::device_start()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6529_device::read )
+uint8_t mos6529_device::read()
 {
 	return m_input;
 }
@@ -64,7 +64,7 @@ READ8_MEMBER( mos6529_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6529_device::write )
+void mos6529_device::write(uint8_t data)
 {
 	for (int bit = 0; bit < 8; bit++)
 		m_p_handler[bit](BIT(data, bit));

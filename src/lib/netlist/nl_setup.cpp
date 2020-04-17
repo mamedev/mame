@@ -62,7 +62,7 @@ namespace netlist
 		std::initializer_list<const char *> params_and_connections)
 	{
 		std::vector<pstring> params;
-		auto i(params_and_connections.begin());
+		const auto *i(params_and_connections.begin());
 		pstring name(*i);
 		++i;
 		for (; i != params_and_connections.end(); ++i)
@@ -138,7 +138,7 @@ namespace netlist
 
 	void nlparse_t::register_dev(const pstring &classname, const pstring &name)
 	{
-		auto f = m_factory.factory_by_name(classname);
+		auto *f = m_factory.factory_by_name(classname);
 		if (f == nullptr)
 		{
 			log().fatal(MF_CLASS_1_NOT_FOUND(classname));
@@ -305,7 +305,7 @@ namespace netlist
 
 	bool nlparse_t::device_exists(const pstring &name) const
 	{
-		for (auto &d : m_device_factory)
+		for (const auto &d : m_device_factory)
 			if (d.first == name)
 				return true;
 		return false;
@@ -436,7 +436,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 	do {
 		ret = temp;
 		temp = "";
-		for (auto &e : m_alias)
+		for (const auto &e : m_alias)
 		{
 			// FIXME: this will resolve first one found
 			if (e.second == ret)
@@ -454,7 +454,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname) const
 {
 	std::vector<pstring> terms;
-	for (auto & t : m_terminals)
+	for (const auto & t : m_terminals)
 	{
 		if (plib::startsWith(t.second->name(), devname))
 		{
@@ -464,7 +464,7 @@ std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devna
 		}
 	}
 
-	for (auto & t : m_alias)
+	for (const auto & t : m_alias)
 	{
 		if (plib::startsWith(t.first, devname))
 		{
@@ -596,7 +596,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 	out.net().add_terminal(new_proxy->in());
 
-	auto proxy(new_proxy.get());
+	auto *proxy(new_proxy.get());
 	if (!m_proxies.insert({&out, proxy}).second)
 		throw nl_exception(MF_DUPLICATE_PROXY_1(out.name()));
 
@@ -621,7 +621,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 	auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate, x, &incast);
 	//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 
-	auto ret(new_proxy.get());
+	auto *ret(new_proxy.get());
 
 	if (!m_proxies.insert({&inp, ret}).second)
 		throw nl_exception(MF_DUPLICATE_PROXY_1(inp.name()));
@@ -695,7 +695,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 {
 	if (out.is_analog() && in.is_logic())
 	{
-		auto proxy = get_a_d_proxy(in);
+		auto *proxy = get_a_d_proxy(in);
 
 		out.net().add_terminal(proxy->proxy_term());
 	}
@@ -726,7 +726,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	{
 		log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(),
 				inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?", term.name());
-		auto proxy = get_a_d_proxy(inp);
+		auto *proxy = get_a_d_proxy(inp);
 
 		//out.net().register_con(proxy->proxy_term());
 		connect_terminals(term, proxy->proxy_term());
@@ -786,7 +786,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = nlstate().pool().make_owned<analog_net_t>(m_nlstate,"net." + t1.name());
-		auto anetp = anet.get();
+		auto *anetp = anet.get();
 		m_nlstate.register_net(std::move(anet));
 		t1.set_net(anetp);
 		anetp->add_terminal(t2);
@@ -973,7 +973,7 @@ void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 	for (const pstring &ll : loglist)
 	{
 		pstring name = "log_" + ll;
-		auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
+		auto nc = factory().factory_by_name("LOG")->make_device(m_nlstate.pool(), m_nlstate, name);
 		register_link(name + ".I", ll);
 		log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		m_nlstate.register_device(nc->name(), std::move(nc));
@@ -1055,7 +1055,7 @@ pstring models_t::model_string(const model_map_t &map)
 {
 	// operator [] has no const implementation
 	pstring ret = map.at("COREMODEL") + "(";
-	for (auto & i : map)
+	for (const auto & i : map)
 		ret += (i.first + '=' + i.second + ' ');
 
 	return ret + ")";
@@ -1154,7 +1154,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	ret->m_R_low = m_models.value(model, "ORL");
 	ret->m_R_high = m_models.value(model, "ORH");
 
-	auto retp = ret.get();
+	auto *retp = ret.get();
 
 	m_nlstate.m_family_cache.emplace(model, std::move(ret));
 
@@ -1217,13 +1217,13 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_nlstate.register_device(e.first, e.second->Create(nlstate().pool(), m_nlstate, e.first));
+			m_nlstate.register_device(e.first, e.second->make_device(nlstate().pool(), m_nlstate, e.first));
 		}
 	}
 
 	log().debug("Searching for solver and parameters ...\n");
 
-	auto solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
+	auto *solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_netlist_params = m_nlstate.get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	// set default model parameters
@@ -1239,7 +1239,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = e.second->Create(m_nlstate.pool(), m_nlstate, e.first);
+			auto dev = e.second->make_device(m_nlstate.pool(), m_nlstate, e.first);
 			m_nlstate.register_device(dev->name(), std::move(dev));
 		}
 	}

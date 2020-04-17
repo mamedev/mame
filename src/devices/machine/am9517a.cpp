@@ -397,8 +397,7 @@ void am9517a_device::end_of_process()
 		m_mask |= 1 << m_current_channel;
 	}
 
-	// signal end of process
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 	set_hreq(0);
 
 	m_current_channel = -1;
@@ -506,6 +505,8 @@ void am9517a_device::device_start()
 
 	m_address_mask = 0xffff;
 
+	// force clear upon initial reset
+	m_eop = ASSERT_LINE;
 }
 
 
@@ -525,10 +526,9 @@ void am9517a_device::device_reset()
 	m_current_channel = -1;
 	m_last_channel = 3;
 	m_hreq = -1;
-	m_eop = 0;
 
 	set_hreq(0);
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 
 	set_dack();
 }
@@ -545,8 +545,6 @@ void am9517a_device::execute_run()
 		switch (m_state)
 		{
 		case STATE_SI:
-			set_eop(CLEAR_LINE);
-
 			if (!COMMAND_DISABLE)
 			{
 				int priority[] = { 0, 1, 2, 3 };
@@ -622,10 +620,23 @@ void am9517a_device::execute_run()
 
 		case STATE_S2:
 			set_dack();
-			m_state = COMMAND_COMPRESSED_TIMING ? STATE_S4 : STATE_S3;
+			if (COMMAND_COMPRESSED_TIMING)
+			{
+				// signal end of process during last cycle
+				if (m_channel[m_current_channel].m_count == 0)
+					set_eop(ASSERT_LINE);
+
+				m_state = STATE_S4;
+			}
+			else
+				m_state = STATE_S3;
 			break;
 
 		case STATE_S3:
+			// signal end of process during last cycle
+			if (m_channel[m_current_channel].m_count == 0)
+				set_eop(ASSERT_LINE);
+
 			dma_read();
 
 			if (COMMAND_EXTENDED_WRITE)
@@ -685,6 +696,10 @@ void am9517a_device::execute_run()
 			break;
 
 		case STATE_S23:
+			// signal end of process during last cycle
+			if (m_channel[m_current_channel].m_count == 0)
+				set_eop(ASSERT_LINE);
+
 			m_state = STATE_S24;
 			break;
 
@@ -1260,10 +1275,9 @@ void pcxport_dmac_device::device_reset()
 	m_current_channel = -1;
 	m_last_channel = 3;
 	m_hreq = -1;
-	m_eop = 0;
 
 	set_hreq(0);
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 
 	set_dack();
 }
@@ -1292,8 +1306,7 @@ void pcxport_dmac_device::end_of_process()
 	}
 	// don't mask out channel if not autoinitialize
 
-	// signal end of process
-	set_eop(ASSERT_LINE);
+	set_eop(CLEAR_LINE);
 	set_hreq(0);
 
 	m_current_channel = -1;

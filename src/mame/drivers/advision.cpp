@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Dan Boris
 /*************************************************************************
-
-    drivers/advision.c
 
     Driver for the Entex Adventure Vision
 

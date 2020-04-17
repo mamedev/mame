@@ -12,6 +12,8 @@
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 class korgz3_state : public driver_device
 {
@@ -94,7 +96,7 @@ void korgz3_state::synth_map(address_map &map)
 	map(0x0000, 0x0027).m(m_synthcpu, FUNC(hd6301y_cpu_device::hd6301y_io));
 	map(0x0040, 0x013f).ram();
 	map(0x2000, 0x2000).nopr();
-	//map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
+	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x4000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).rom().region("hd6303_program", 0);
 }
@@ -125,7 +127,12 @@ void korgz3_state::korgz3(machine_config &config)
 
 	M58990(config, m_adc, 1'000'000); // M58990P-1
 
-	//YM2414(config, "ymsnd", ?'???'???); // YM2414B
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	ym2414_device &ymsnd(YM2414(config, "ymsnd", 3'579'545)); // YM2414B
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 }
 
 ROM_START(korgz3)

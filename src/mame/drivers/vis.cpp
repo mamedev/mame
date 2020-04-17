@@ -446,14 +446,14 @@ READ8_MEMBER(vis_vga_device::visvgamem_r)
 	if(!(vga.sequencer.data[0x25] & 0x40))
 		return mem_r(space, offset, mem_mask);
 	u16 win = (vga.sequencer.data[0x1e] & 0x0f) == 3 ? m_wina : m_winb; // this doesn't seem quite right
-	return mem_linear_r(space, (offset + (win * 64)) & 0x3ffff, mem_mask);
+	return mem_linear_r((offset + (win * 64)) & 0x3ffff);
 }
 
 WRITE8_MEMBER(vis_vga_device::visvgamem_w)
 {
 	if(!(vga.sequencer.data[0x25] & 0x40))
 		return mem_w(space, offset, data, mem_mask);
-	return mem_linear_w(space, (offset + (m_wina * 64)) & 0x3ffff, data, mem_mask);
+	return mem_linear_w((offset + (m_wina * 64)) & 0x3ffff, data);
 }
 
 READ8_MEMBER(vis_vga_device::vga_r)

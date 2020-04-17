@@ -121,7 +121,7 @@ READ8_MEMBER( micral_state::unk_r )
 READ8_MEMBER( micral_state::keyin_r )
 {
 	m_uart->write_rdav(0);
-	u8 result = m_uart->get_received_data();
+	u8 result = m_uart->receive();
 	m_uart->write_rdav(1);
 	return result;
 }

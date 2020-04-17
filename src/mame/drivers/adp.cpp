@@ -299,8 +299,7 @@ WRITE16_MEMBER(adp_state::input_w)
 void adp_state::skattv_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -311,8 +310,7 @@ void adp_state::skattva_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800100, 0x800101).portr("IN0");
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -323,8 +321,7 @@ void adp_state::quickjac_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w)); // bad
-	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w)); // bad
+	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16)); // bad
 	map(0x800100, 0x800101).portr("IN0");
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -335,8 +332,7 @@ void adp_state::funland_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800089, 0x800089).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x80008b, 0x80008b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x80008d, 0x80008d).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -349,8 +345,7 @@ void adp_state::funland_mem(address_map &map)
 void adp_state::fstation_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x800080, 0x800081).rw(m_acrtc, FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x800082, 0x800083).rw(m_acrtc, FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x800100, 0x800101).rw(FUNC(adp_state::input_r), FUNC(adp_state::input_w));
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);

@@ -205,7 +205,7 @@ WRITE32_MEMBER(namcofl_state::sysreg_w)
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
 WRITE8_MEMBER(namcofl_state::c116_w)
 {
-	m_c116->write(space, offset, data);
+	m_c116->write(offset, data);
 
 	if ((offset & 0x180e) == 0x180a)
 	{

@@ -366,7 +366,7 @@ namespace analog
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
 			nl_fptype capval, nl_fptype V,
 			nl_fptype &g11, nl_fptype &g12, nl_fptype &g21, nl_fptype &g22,
-			nl_fptype &I1, nl_fptype &I2)
+			nl_fptype &I1, nl_fptype &I2) const
 		{
 			const nl_fptype I = cap.Ieq(capval, V) * m_polarity;
 			const nl_fptype G = cap.G(capval);
@@ -376,7 +376,7 @@ namespace analog
 		}
 
 		void calculate_caps(nl_fptype Vgs, nl_fptype Vgd, nl_fptype Vth,
-			nl_fptype &Cgs, nl_fptype &Cgd, nl_fptype &Cgb)
+			nl_fptype &Cgs, nl_fptype &Cgd, nl_fptype &Cgb) const
 		{
 			nl_fptype Vctrl = Vgs - Vth * m_polarity;
 			// Cut off - now further differentiated into 3 different formulas

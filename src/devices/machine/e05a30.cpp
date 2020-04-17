@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
     IMPLEMENTATION
 ***************************************************************************/
 
-WRITE8_MEMBER( e05a30_device::write )
+void e05a30_device::write(offs_t offset, uint8_t data)
 {
 	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER( e05a30_device::write )
 	}
 }
 
-READ8_MEMBER( e05a30_device::read )
+uint8_t e05a30_device::read(offs_t offset)
 {
 	uint8_t result = 0;
 

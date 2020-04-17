@@ -463,7 +463,7 @@ void scc8530_legacy_device::set_reg_b(int reg, uint8_t data)
 //  getter
 //-------------------------------------------------
 
-READ8_MEMBER(scc8530_legacy_device::reg_r)
+uint8_t scc8530_legacy_device::reg_r(offs_t offset)
 {
 	return read_reg(offset & 3);
 }
@@ -507,7 +507,7 @@ uint8_t scc8530_legacy_device::read_reg(int offset)
 //  setter
 //-------------------------------------------------
 
-WRITE8_MEMBER( scc8530_legacy_device::reg_w )
+void scc8530_legacy_device::reg_w(offs_t offset, uint8_t data)
 {
 	write_reg(offset & 3, data);
 }

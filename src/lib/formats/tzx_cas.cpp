@@ -27,11 +27,12 @@ TODO:
 
 */
 
-#include <cassert>
-
 #include "tzx_cas.h"
-#include "formats/imageutl.h"
-#include "emu.h"
+#include "imageutl.h"
+
+#include <cassert>
+#include <cmath>
+
 
 #define TZX_WAV_FREQUENCY   44100
 #define WAVE_LOW        -0x5a9e
@@ -435,7 +436,7 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 		const uint8_t *symtable = bytes;
 		const uint8_t *table2 = bytes + (2 * npd + 1)*asd;
 
-		int NB = ceil(compute_log2(asd)); // number of bits needed to represent each symbol
+		int NB = std::ceil(compute_log2(asd)); // number of bits needed to represent each symbol
 
 		uint8_t stream_bit = 0;
 		uint32_t stream_byte = 0;

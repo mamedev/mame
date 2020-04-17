@@ -30,10 +30,10 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include "ibmxdf_dsk.h"
 
-#include "emu.h" // emu_fatalerror
-#include "formats/ibmxdf_dsk.h"
+#include "emucore.h" // emu_fatalerror
+
 
 ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
 {

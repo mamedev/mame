@@ -21,9 +21,9 @@ protected:
 private:
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( status_r);
-	DECLARE_WRITE8_MEMBER(access_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	uint8_t status_r(offs_t offset);
+	void access_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(LPC_PIT, lpc_pit_device)

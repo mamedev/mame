@@ -118,7 +118,7 @@ void tmpz84c015_device::device_start()
 
 void tmpz84c015_device::device_reset()
 {
-	irq_priority_w(*m_io, 0, 0);
+	irq_priority_w(0);
 	z80_device::device_reset();
 }
 
@@ -132,12 +132,12 @@ void tmpz84c015_device::device_post_load()
 	// reinit irq priority
 	uint8_t prio = m_irq_priority;
 	m_irq_priority = -1;
-	irq_priority_w(*m_io, 0, prio);
+	irq_priority_w(prio);
 }
 
 
 /* CPU interface */
-WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
+void tmpz84c015_device::irq_priority_w(uint8_t data)
 {
 	data &= 7;
 

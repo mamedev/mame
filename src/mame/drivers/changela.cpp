@@ -33,7 +33,7 @@ WRITE8_MEMBER(changela_state::mcu_w)
 {
 	m_mcu_in = data;
 	if (!BIT(m_port_c_out, 2))
-		m_mcu->pa_w(space, 0, data);
+		m_mcu->pa_w(data);
 }
 
 
@@ -54,7 +54,7 @@ WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
 
 	/* PC2 is connected to the /OE input of the LS374 */
 	if (BIT(data, 2))
-		m_mcu->pa_w(space, 0, BIT(data, 2) ? 0xff : m_mcu_in);
+		m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
 
 	m_port_c_out = data;
 }
@@ -135,7 +135,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 
 WRITE_LINE_MEMBER(changela_state::mcu_pc_0_w)
 {
-	m_mcu->pc_w(machine().dummy_space(), 0, 0xfe | state);
+	m_mcu->pc_w(0xfe | state);
 }
 
 WRITE_LINE_MEMBER(changela_state::collision_reset_0_w)
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN0") /* 0xDx2C */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE /* Gear shift */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE /* Gear shift */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x20)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x20)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* FWD - negated bit 7 */

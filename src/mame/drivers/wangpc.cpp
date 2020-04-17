@@ -569,7 +569,7 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 	check_level2_interrupts();
 
-	uint8_t data = m_uart->read(space, 0);
+	uint8_t data = m_uart->read();
 
 	if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
 
@@ -608,7 +608,7 @@ WRITE8_MEMBER( wangpc_state::uart_w  )
 	m_uart_tbre = 0;
 	check_level2_interrupts();
 
-	m_uart->write(space, 0, data);
+	m_uart->write(data);
 }
 
 

@@ -199,13 +199,13 @@ namespace plib {
 		ret = split_paragraphs(description, width, 0, 0) + "\n";
 		ret += "Usage:\t" + usage + "\n\nOptions:\n\n";
 
-		for (auto & optbase : m_opts )
+		for (const auto & optbase : m_opts )
 		{
 			// Skip anonymous inputs which are collected in option_args
 			if (dynamic_cast<option_args *>(optbase) != nullptr)
 				continue;
 
-			if (auto opt = dynamic_cast<option *>(optbase))
+			if (auto * const opt = dynamic_cast<option *>(optbase))
 			{
 				pstring line = "";
 				if (opt->short_opt() != "")
@@ -223,7 +223,7 @@ namespace plib {
 						auto *ol = dynamic_cast<option_str_limit_base *>(opt);
 						if (ol)
 						{
-							for (auto &v : ol->limit())
+							for (const auto &v : ol->limit())
 							{
 								line += v + "|";
 							}
@@ -243,7 +243,7 @@ namespace plib {
 				else
 					ret += split_paragraphs(line + opt->help(), width, indent, 0);
 			}
-			else if (auto grp = dynamic_cast<option_group *>(optbase))
+			else if (auto *grp = dynamic_cast<option_group *>(optbase))
 			{
 				ret += "\n" + grp->group() + ":\n";
 				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n";
@@ -251,9 +251,9 @@ namespace plib {
 		}
 		// FIXME: other help ...
 		pstring ex("");
-		for (auto & optbase : m_opts )
+		for (const auto & optbase : m_opts )
 		{
-			if (auto example = dynamic_cast<option_example *>(optbase))
+			if (auto *example = dynamic_cast<option_example *>(optbase))
 			{
 				ex += "> " + example->example()+"\n\n";
 				ex += split_paragraphs(example->help(), width, 4, 4) + "\n";
@@ -268,9 +268,9 @@ namespace plib {
 
 	option *options::getopt_short(const pstring &arg) const
 	{
-		for (auto & optbase : m_opts)
+		for (const auto & optbase : m_opts)
 		{
-			auto opt = dynamic_cast<option *>(optbase);
+			auto *opt = dynamic_cast<option *>(optbase);
 			if (opt && arg != "" && opt->short_opt() == arg)
 				return opt;
 		}
@@ -278,9 +278,9 @@ namespace plib {
 	}
 	option *options::getopt_long(const pstring &arg) const
 	{
-		for (auto & optbase : m_opts)
+		for (const auto & optbase : m_opts)
 		{
-			auto opt = dynamic_cast<option *>(optbase);
+			auto *opt = dynamic_cast<option *>(optbase);
 			if (opt && arg !="" && opt->long_opt() == arg)
 				return opt;
 		}

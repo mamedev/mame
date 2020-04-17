@@ -243,7 +243,7 @@ public:
 
 	// ctor/dtor
 	option_resolution(const option_guide &guide);
-	~option_resolution() = default;
+	~option_resolution();
 
 	// sets a specification
 	void set_specification(const std::string &specification);

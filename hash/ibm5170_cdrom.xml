@@ -107,7 +107,7 @@ license:CC0
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-10 cuba! (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
+				<disk name="a-10 cuba (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
 			</diskarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@ license:CC0
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-10 cuba! (1997)(megamedia)[compilation megapak 7]" sha1="5fc89dde64013ab6d070572ac2b9a8829bbde084" />
+				<disk name="a-10 cuba (1997)(megamedia)[compilation megapak 7]" sha1="5fc89dde64013ab6d070572ac2b9a8829bbde084" />
 			</diskarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@ license:CC0
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bioforge vf1.01 (1995)(origin)(m3)[!]" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
+				<disk name="bioforge vf1.01 (1995)(origin)(m3)" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
 			</diskarea>
 		</part>
 	</software>
@@ -880,22 +880,22 @@ license:CC0
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 1 of 4)[!]" sha1="449b907d4b85e67d3b7fe5832ea7ad4f555b31db" />
+				<disk name="blade runner (1997)(virgin)(disc 1 of 4)" sha1="449b907d4b85e67d3b7fe5832ea7ad4f555b31db" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 2 of 4)[!]" sha1="f1de28b44c7960d43451c1287e6fabfdb6018da5" />
+				<disk name="blade runner (1997)(virgin)(disc 2 of 4)" sha1="f1de28b44c7960d43451c1287e6fabfdb6018da5" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 3 of 4)[!]" sha1="aca716550f43468d4e786083d29c07610273d8e1" />
+				<disk name="blade runner (1997)(virgin)(disc 3 of 4)" sha1="aca716550f43468d4e786083d29c07610273d8e1" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 4 of 4)[!]" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
+				<disk name="blade runner (1997)(virgin)(disc 4 of 4)" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
 			</diskarea>
 		</part>
 	</software>
@@ -1188,7 +1188,7 @@ license:CC0
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="caesar ii (1997)(sierra)[!][budget][50011269]" sha1="1a3e489a3845963b4f833f613c89c8fffadeefbf" />
+				<disk name="caesar ii (1997)(sierra)[budget][50011269]" sha1="1a3e489a3845963b4f833f613c89c8fffadeefbf" />
 			</diskarea>
 		</part>
 	</software>
@@ -2462,7 +2462,7 @@ license:CC0
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 1 of 2)[!]" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
+				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 1 of 2)" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">

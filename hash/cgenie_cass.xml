@@ -914,10 +914,10 @@ Screen-Printer (standalone)
 		<year>198?</year>
 		<publisher>Kansas Software</publisher>
 		<info name="author" value="Wal Mansell" />
-		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="9811">
-				<rom name="cosmic_attack.cas" size="9811" crc="cb712ef1" sha1="0aedf205194e625d0a782c334111e0c60b09e23a" />
+			<dataarea name="cass" size="9755">
+				<rom name="cosmic_attack.cas" size="9755" crc="3266bd94" sha1="f92f79d630e32287b227e3c9f7c902f9c4d6ba64" />
 			</dataarea>
 		</part>
 	</software>
@@ -1204,10 +1204,10 @@ Screen-Printer (standalone)
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="Udo Gronostay" />
 		<info name="author" value="Klaus Kunze" />
-		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14691">
-				<rom name="glueckspilz.cas" size="14691" crc="c562cb8d" sha1="446c48dc44b7c755e03c225b3e313bf568050fed" />
+			<dataarea name="cass" size="14635">
+				<rom name="glueckspilz.cas" size="14635" crc="83338074" sha1="01534f2031033b303f01fcde171576b511a2deb5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1491,8 +1491,8 @@ Screen-Printer (standalone)
 		<info name="author" value="Klaus Weber" />
 		<info name="usage" value="Type SYSTEM and load with MAMPF2, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="17091">
-				<rom name="mampfman2.cas" size="17091" crc="f2be825b" sha1="ddae6342f05506d8c33f5148f04191988867d36a" />
+			<dataarea name="cass" size="17035">
+				<rom name="mampfman2.cas" size="17035" crc="11e61c65" sha1="4a3b59f427f632b5e2d889330b6ddd0ffbccbf5b" />
 			</dataarea>
 		</part>
 	</software>

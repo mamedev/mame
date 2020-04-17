@@ -1833,12 +1833,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates! (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
+				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates! (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089"/>
+				<rom name="pirates (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7294,7 +7294,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Capcom</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Arcade Blockbusters! (USA).img" size="737280" crc="73e7a7bd" sha1="00bd672d6284b08782777c7005be13b3b8d3c1cc"/>
+				<rom name="Arcade Blockbusters (USA).img" size="737280" crc="73e7a7bd" sha1="00bd672d6284b08782777c7005be13b3b8d3c1cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8142,6 +8142,44 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cnflcteu">
+		<description>Conflict Europe</description>
+		<year>1989</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conflict europe.img" size="737280" crc="12c1aa37" sha1="5be457fd17739b64d6ab6d7892ebfe302ee835e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camelot">
+		<description>Conquest of Camelot - The Search for the Grail</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.001.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 1.img" size="737280" crc="dac688c5" sha1="8ea08590af7a8f1db5c9c14aaf6191f141410311"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 2.img" size="737280" crc="88b65db5" sha1="c32bfd802776df4986ae7335ab7182af899de969"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 3.img" size="737280" crc="1b3a6edb" sha1="1ca7bae05d0c4eb602f64cc4c76939561f56c2be"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 4.img" size="737280" crc="0425a6aa" sha1="6a5b771e52508035a869bfde3076ee70d15a1899"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crimewav">
 		<description>Crime Wave</description>
 		<year>1990</year>
@@ -8759,12 +8797,12 @@ has been replaced with an all-zero block. -->
 		<publisher>Sega</publisher>
 		<info name="developer" value="Sega" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [1 of 2].img" size="368640" crc="9d919d85" sha1="9203ecedd274d2436b6c39aa166fabd0e5d089d4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [2 of 2].img" size="368640" crc="8684a3dd" sha1="3200f3a97d5912812dc4b53b8b733a371c2bf140"/>
 			</dataarea>
 		</part>
@@ -8862,6 +8900,38 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="harpoon">
+		<description>Harpoon</description>
+		<year>1989</year>
+		<publisher>Three-Sixty</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 1.img" size="737280" crc="ca8f8d95" sha1="4c1637d7e10ce85ecc9f67a8540acecbe8a4db2d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 2.img" size="737280" crc="9770fd0e" sha1="1dc0cc6d859eefd664c237969774e9949fd48705"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harpoonbs2">
+		<description>Harpoon Battleset 2 - North Atlantic Convoys</description>
+		<year>1989</year>
+		<publisher>Three-Sixty</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon battleset 2 - north atlantic convoys disk 1.img" size="737280" crc="e090779c" sha1="372e03722c4651c8c480fad1ebb3f4146773201a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon battleset 2 - north atlantic convoys disk 2.img" size="737280" crc="5c0d3f87" sha1="302824289f15df9f6d329768d560d4ad1912daea"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="herolanc">
 		<description>Heroes of the Lance</description>
 		<year>1991</year>
@@ -8931,12 +9001,29 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped via Kryoflux -->
 		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
 		<year>1989</year>
-		<publisher>U.S. Gold</publisher>
+		<publisher>Lucasfilm - U.S. Gold</publisher>
 		<info name="developer" value="LucasFilm Games" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2157701">
 				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="indycrus_525" cloneof="indycrus">
+		<description>Indiana Jones and the Last Crusade - The Action Game (5.25")</description>
+		<year>1989</year>
+		<publisher>Lucasfilm - U.S. Gold</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game [US Gold] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="249fb996" sha1="e1f79bad887c9567b515d00c7e7be62cda088eab"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game [US Gold] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="f235cc28" sha1="0b372361c7ea4a20f9159d4f42dc791440ce0b3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9380,6 +9467,27 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Leather Goddesses of Phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl2">
+		<description>Leisure Suit Larry Goes Looking for Love (In Several Wrong Places)</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 1).img" size="737280" crc="d852af42" sha1="1feab542687a6984072faabd228976d6953238c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 2).img" size="737280" crc="09153a59" sha1="a57ef10d7b5c6ffa393b0b296a7907c51728652a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 3).img" size="737280" crc="0a3b07f8" sha1="2a3732988e2265d3f352fa5f25330fb6602ab59d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10037,13 +10145,13 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1 - Program"/>
 			<dataarea name="flop" size = "163840">
-				<rom name="Math Blaster! (USA) (Side 1 - Program).img" size="163840" crc="b73a1e48" sha1="01cedf6b1b079b2403e88803d26fb89818bda895"/>
+				<rom name="Math Blaster (USA) (Side 1 - Program).img" size="163840" crc="b73a1e48" sha1="01cedf6b1b079b2403e88803d26fb89818bda895"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 2 - Data"/>
 			<dataarea name="flop" size = "163840">
-				<rom name="Math Blaster! (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28"/>
+				<rom name="Math Blaster (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11547,6 +11655,38 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="tswtwgp3" supported="partial">
+		<description>The Software Toolworks Game Pack 3</description>
+		<year>1993</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="version" value="3.0.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 1.img" size="737280" crc="a1476386" sha1="77f22c2b2ab60f738c6ff5858f57192b14ef68ff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 2.img" size="737280" crc="b0df3792" sha1="f9e13f0bd983837951fb4d76af609ea71e03767d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 3.img" size="737280" crc="64c72675" sha1="47c1df916942faff008f2dc318868dbb14e03181"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 4.img" size="737280" crc="47a52e1e" sha1="cc2f84d861161918720f980a7e5af2a52ea7c515"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 5.img" size="737280" crc="f4b8294b" sha1="5585df51c001e0c0181ab5d92e09b4130cd3fbef"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sq2">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Space Quest II - Vohaul's Revenge (5.25")</description>
@@ -12030,12 +12170,12 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="278eea7d" sha1="57441bd093713932e67b0b2c598b6aff3df7ad09"/>
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="278eea7d" sha1="57441bd093713932e67b0b2c598b6aff3df7ad09"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
 			</dataarea>
 		</part>
 	</software>

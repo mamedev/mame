@@ -423,7 +423,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 //  yb_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64h156_device::yb_r )
+uint8_t c64h156_device::yb_r()
 {
 	if (checkpoint_live.accl) {
 		return checkpoint_live.accl_yb;
@@ -437,7 +437,7 @@ READ8_MEMBER( c64h156_device::yb_r )
 //  yb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64h156_device::yb_w )
+void c64h156_device::yb_w(uint8_t data)
 {
 	if (m_yb != data)
 	{

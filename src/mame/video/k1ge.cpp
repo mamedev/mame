@@ -40,7 +40,7 @@ void k2ge_device::k2ge_palette(palette_device &palette) const
 }
 
 
-READ8_MEMBER( k1ge_device::read )
+uint8_t k1ge_device::read(offs_t offset)
 {
 	assert(offset < 0x4000);
 
@@ -59,7 +59,7 @@ READ8_MEMBER( k1ge_device::read )
 }
 
 
-WRITE8_MEMBER( k1ge_device::write )
+void k1ge_device::write(offs_t offset, uint8_t data)
 {
 	assert(offset < 0x4000);
 

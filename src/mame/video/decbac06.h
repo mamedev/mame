@@ -9,6 +9,8 @@
 #include "tilemap.h"
 #include <memory>
 
+typedef device_delegate<void (tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags)> decbac06_tile_cb_delegate;
+
 class deco_bac06_device : public device_t
 {
 public:
@@ -26,28 +28,12 @@ public:
 	void disable_8x8() { m_supports_8x8 = false; }
 	void disable_16x16() { m_supports_16x16 = false; }
 	void disable_rc_scroll() { m_supports_rc_scroll = false; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
 
-	std::unique_ptr<u16[]> m_pf_data;
-	std::unique_ptr<u16[]> m_pf_rowscroll;
-	std::unique_ptr<u16[]> m_pf_colscroll;
+	void set_transmask(int group, u32 fgmask, u32 bgmask);
 
-	tilemap_t* m_pf8x8_tilemap[3];
-	tilemap_t* m_pf16x16_tilemap[3];
-	int    m_tile_region_8;
-	int    m_tile_region_16;
-
-	// some bootlegs (eg midresb / midresbj) don't appear to actually support the alt modes, they set them and end up with broken gfx on later levels.
-	bool    m_supports_8x8;
-	bool    m_supports_16x16;
-	bool    m_supports_rc_scroll;
-
-	void create_tilemaps(int region8x8,int region16x16);
-	u16 m_pf_control_0[8];
-	u16 m_pf_control_1[8];
-
-	void deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition, u8 pri = 0, u8 primask = 0xff);
-	void deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type, u8 pri = 0, u8 primask = 0xff);
-
+	void deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,u32 flags, u8 pri = 0, u8 primask = 0xff);
+	void deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,u32 flags, int mode, int type, u8 pri = 0, u8 primask = 0xff);
 
 	/* I wonder if pf_control_0 is really registers, or a selection of pins.
 
@@ -63,12 +49,7 @@ public:
 	*/
 	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; };
 
-	void set_colmask(int data) { m_gfxcolmask = data; }
 	void set_flip_screen(bool flip);
-
-	u8 m_gfxcolmask;
-	int m_rambank; // external connection?
-	bool m_flip_screen;
 
 	/* 16-bit accessors */
 
@@ -106,6 +87,28 @@ public:
 	u8 pf_colscroll_8bit_swap_r(offs_t offset);
 	void pf_colscroll_8bit_swap_w(offs_t offset, u8 data);
 
+// TODO: privatize values
+	std::unique_ptr<u16[]> m_pf_data;
+	std::unique_ptr<u16[]> m_pf_rowscroll;
+	std::unique_ptr<u16[]> m_pf_colscroll;
+
+	tilemap_t* m_pf8x8_tilemap[3];
+	tilemap_t* m_pf16x16_tilemap[3];
+	int    m_tile_region_8;
+	int    m_tile_region_16;
+
+	// some bootlegs (eg midresb / midresbj) don't appear to actually support the alt modes, they set them and end up with broken gfx on later levels.
+	bool    m_supports_8x8;
+	bool    m_supports_16x16;
+	bool    m_supports_rc_scroll;
+
+	void create_tilemaps(int region8x8,int region16x16);
+	u16 m_pf_control_0[8];
+	u16 m_pf_control_1[8];
+
+	int m_rambank; // external connection?
+	bool m_flip_screen;
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -113,12 +116,6 @@ protected:
 	u8 m_gfxregion8x8;
 	u8 m_gfxregion16x16;
 	int m_wide;
-
-	u8 m_bppmult_8x8;
-	u8 m_bppmask_8x8;
-
-	u8 m_bppmult_16x16;
-	u8 m_bppmask_16x16;
 
 	void custom_tilemap_draw(bitmap_ind16 &bitmap,
 							bitmap_ind8 &primap,
@@ -128,9 +125,7 @@ protected:
 							const u16 *colscroll_ptr,
 							const u16 *control0,
 							const u16 *control1,
-							int flags,
-							u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition,
-							u8 bppmult, u8 bppmask,
+							u32 flags,
 							u8 pri = 0, u8 pmask = 0xff);
 
 private:
@@ -144,6 +139,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	decbac06_tile_cb_delegate m_tile_cb;
 	bool m_thedeep_kludge;
 };
 

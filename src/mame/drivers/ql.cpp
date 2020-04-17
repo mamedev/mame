@@ -246,7 +246,7 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
-		data = m_zx8301->data_r(space, offset & 0x1ffff);
+		data = m_zx8301->data_r(offset & 0x1ffff);
 	}
 	if (offset >= 0xc0000)
 	{
@@ -301,11 +301,11 @@ WRITE8_MEMBER( ql_state::write )
 	}
 	if (offset == 0x18063)
 	{
-		m_zx8301->control_w(space, 0, data);
+		m_zx8301->control_w(data);
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
-			m_zx8301->data_w(space, offset & 0x1ffff, data);
+			m_zx8301->data_w(offset & 0x1ffff, data);
 	}
 	if (m_qimi_enabled)
 	{

@@ -101,7 +101,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *************************************/
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 2) // divided by 2 internally in the Z180 core
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 

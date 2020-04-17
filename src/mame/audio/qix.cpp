@@ -104,7 +104,7 @@ WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
 
 TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 {
-	m_sndpia1->write_porta(param);
+	m_sndpia1->porta_w(param);
 }
 
 

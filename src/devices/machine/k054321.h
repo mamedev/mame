@@ -41,12 +41,12 @@ private:
 
 	void propagate_volume();
 
-	DECLARE_WRITE8_MEMBER(volume_reset_w);
-	DECLARE_WRITE8_MEMBER(volume_up_w);
-	DECLARE_WRITE8_MEMBER(active_w);
+	void volume_reset_w(u8 data);
+	void volume_up_w(u8 data);
+	void active_w(u8 data);
 
-	DECLARE_READ8_MEMBER(busy_r);
-	DECLARE_WRITE8_MEMBER(dummy_w);
+	u8 busy_r();
+	void dummy_w(u8 data);
 };
 
 DECLARE_DEVICE_TYPE(K054321, k054321_device)

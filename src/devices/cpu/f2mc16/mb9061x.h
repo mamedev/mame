@@ -48,20 +48,20 @@ protected:
 private:
 	// TBC
 	TIMER_CALLBACK_MEMBER(tbtc_tick);
-	READ8_MEMBER(tbtc_r);
-	WRITE8_MEMBER(tbtc_w);
+	u8 tbtc_r();
+	void tbtc_w(u8 data);
 
 	// INTC
-	READ8_MEMBER(intc_r);
-	WRITE8_MEMBER(intc_w);
+	u8 intc_r(offs_t offset);
+	void intc_w(offs_t offset, u8 data);
 	void intc_trigger_irq(int icr, int vector);
 	void intc_clear_irq(int icr, int vector);
 
 	// TIMERS
 	TIMER_CALLBACK_MEMBER(timer0_tick);
 	TIMER_CALLBACK_MEMBER(timer1_tick);
-	READ8_MEMBER(timer_r);
-	WRITE8_MEMBER(timer_w);
+	u8 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u8 data);
 	void recalc_timer(int tnum);
 	void tin_common(int timer, int base, int state);
 

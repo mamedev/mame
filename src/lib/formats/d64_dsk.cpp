@@ -10,8 +10,10 @@
 
 *********************************************************************/
 
-#include "emu.h" // emu_fatalerror, fatalerror
 #include "formats/d64_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 d64_format::d64_format()
 {

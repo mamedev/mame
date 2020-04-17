@@ -104,7 +104,6 @@ void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4
 
 void captaven_state::video_start()
 {
-	m_deco_tilegen[1]->set_pf1_8bpp_mode(1);
 	deco32_state::allocate_spriteram(0);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::video_start();
@@ -134,7 +133,6 @@ void nslasher_state::video_start()
 
 void dragngun_state::video_start()
 {
-	//m_deco_tilegen[0]->set_pf1_8bpp_mode(1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::allocate_buffered_palette();
@@ -423,7 +421,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1, 1);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
@@ -625,7 +623,7 @@ u32 nslasher_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &b
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1, 1);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else

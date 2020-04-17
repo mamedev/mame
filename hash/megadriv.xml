@@ -7764,7 +7764,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sor">
-		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tetsuken (Jpn, Rev. A)</description>
+		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tekken (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7782,7 +7782,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sora" cloneof="sor">
-		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tetsuken (Jpn)</description>
+		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tekken (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7800,7 +7800,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="sor2">
-		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
+		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Requiem (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4091 (JPN)"/>
@@ -9983,7 +9983,7 @@ but dumps still have to be confirmed.
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="aaahh!!! real monsters (usa).bin" size="2097152" crc="fdc80bfc" sha1="fa579a7e47ee4a1bdb080bbdec1eef480a85293e"/>
+				<rom name="aaahh real monsters (usa).bin" size="2097152" crc="fdc80bfc" sha1="fa579a7e47ee4a1bdb080bbdec1eef480a85293e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11188,7 +11188,7 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="barkley shut up and jam! 2 (usa).bin" size="2097152" crc="321bb6bd" sha1="b13f13ccc1a21dacd295f30c66695bf97bbeff8d"/>
+				<rom name="barkley shut up and jam 2 (usa).bin" size="2097152" crc="321bb6bd" sha1="b13f13ccc1a21dacd295f30c66695bf97bbeff8d"/>
 			</dataarea>
 			<!-- Correct? size taken from the header -->
 			<dataarea name="sram" size="4096">
@@ -11202,7 +11202,7 @@ but dumps still have to be confirmed.
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="barkley shut up and jam! 2 (usa) (beta).bin" size="2097152" crc="de27357b" sha1="a9f9fa95106d2e1d00800386ba3d56e1483c83db"/>
+				<rom name="barkley shut up and jam 2 (usa) (beta).bin" size="2097152" crc="de27357b" sha1="a9f9fa95106d2e1d00800386ba3d56e1483c83db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13093,7 +13093,7 @@ but dumps still have to be confirmed.
 		<info name="alt_title" value="コラムスIII 対決!コラムスワールド"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="columns iii - taiketsu! columns world (jpn, kor).bin" size="524288" crc="cd07462f" sha1="2e850c2b737098b9926ac0fc9b8b2116fc5aa48a"/>
+				<rom name="columns iii - taiketsu columns world (jpn, kor).bin" size="524288" crc="cd07462f" sha1="2e850c2b737098b9926ac0fc9b8b2116fc5aa48a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14134,7 +14134,7 @@ but dumps still have to be confirmed.
 		<info name="alt_title" value="ダイヤルQをまわせ ~ Dial Q o Mawase! / 究極麻雀 ~ Jiuji Maque (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="dial q o mawase! (jpn) (unl).bin" size="1048576" crc="c632e5af" sha1="08967e04d992264f193ecdfd0e0457baaf25f4f2"/>
+				<rom name="dial q o mawase (jpn) (unl).bin" size="1048576" crc="c632e5af" sha1="08967e04d992264f193ecdfd0e0457baaf25f4f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14145,7 +14145,7 @@ but dumps still have to be confirmed.
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="dick vitale's 'awesome, baby!' college hoops (usa).bin" size="2097152" crc="1312cf22" sha1="2aac7a1cf92e51a14fd3e12a830e135fee255044"/>
+				<rom name="dick vitale's 'awesome, baby' college hoops (usa).bin" size="2097152" crc="1312cf22" sha1="2aac7a1cf92e51a14fd3e12a830e135fee255044"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14247,7 +14247,7 @@ but dumps still have to be confirmed.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="ikazuse! koi no doki doki penguin land md (jpn) (sn).bin" size="262144" crc="0053bfd6" sha1="37bc8429a6259582b840e219a2cf412cea5fc873"/>
+				<rom name="ikazuse koi no doki doki penguin land md (jpn) (sn).bin" size="262144" crc="0053bfd6" sha1="37bc8429a6259582b840e219a2cf412cea5fc873"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14258,7 +14258,7 @@ but dumps still have to be confirmed.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="ikazuse! koi no doki doki penguin land md (jpn) (gnk).bin" size="262144" crc="22736650" sha1="e64e4c127158db366e95e8c3cc6b4d5906ad78ec"/>
+				<rom name="ikazuse koi no doki doki penguin land md (jpn) (gnk).bin" size="262144" crc="22736650" sha1="e64e4c127158db366e95e8c3cc6b4d5906ad78ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15833,7 +15833,7 @@ but dumps still have to be confirmed.
 		<publisher>Toaplan</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="same! same! same! (jul 30, 1990 prototype).bin" size="524288" crc="6fd46dc2" sha1="798646ff94c867077ebd7188a3c87dbad1a23844" />
+				<rom name="same same same (jul 30, 1990 prototype).bin" size="524288" crc="6fd46dc2" sha1="798646ff94c867077ebd7188a3c87dbad1a23844" />
 			</dataarea>
 		</part>
 	</software>
@@ -16852,7 +16852,7 @@ but dumps still have to be confirmed.
 		<info name="alt_title" value="ひょっこりひょうたん島 大統領をめざせ!"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="hyokkori hyoutanjima - daitouryou o mezase! (jpn).bin" size="524288" crc="72253bdb" sha1="32a73559f84dbab5460bfd1e266acfc8f4391ae4"/>
+				<rom name="hyokkori hyoutanjima - daitouryou o mezase (jpn).bin" size="524288" crc="72253bdb" sha1="32a73559f84dbab5460bfd1e266acfc8f4391ae4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17301,7 +17301,7 @@ but dumps still have to be confirmed.
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="jeopardy! (usa).bin" size="524288" crc="56cff3f1" sha1="2a5c5ec5648b1d29768c808ab3c21118dc77fa27"/>
+				<rom name="jeopardy (usa).bin" size="524288" crc="56cff3f1" sha1="2a5c5ec5648b1d29768c808ab3c21118dc77fa27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17312,7 +17312,7 @@ but dumps still have to be confirmed.
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="jeopardy! deluxe (usa).bin" size="524288" crc="25e2f9d2" sha1="1817433ac701c407eb748e87f01a0bc8639e3ac2"/>
+				<rom name="jeopardy deluxe (usa).bin" size="524288" crc="25e2f9d2" sha1="1817433ac701c407eb748e87f01a0bc8639e3ac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17323,7 +17323,7 @@ but dumps still have to be confirmed.
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="jeopardy! sports edition (usa).bin" size="524288" crc="13f924d2" sha1="bc20e31c387ed091fe0288e86ea9b421063953bb"/>
+				<rom name="jeopardy sports edition (usa).bin" size="524288" crc="13f924d2" sha1="bc20e31c387ed091fe0288e86ea9b421063953bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17738,7 +17738,7 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="kidou keisatsu patlabor - 98-shiki kidou seyo! (jpn).bin" size="524288" crc="21a0e749" sha1="5595422530e6891042a4a005d11b79af7f09fe9b"/>
+				<rom name="kidou keisatsu patlabor - 98-shiki kidou seyo (jpn).bin" size="524288" crc="21a0e749" sha1="5595422530e6891042a4a005d11b79af7f09fe9b"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -18587,7 +18587,7 @@ but dumps still have to be confirmed.
 		<info name="alt_title" value="まじかるハットのぶっとびターボ!大冒険"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="magical hat no buttobi turbo! daibouken (jpn).bin" size="524288" crc="e43e853d" sha1="1a741125a80ba9207c74a32e5b21dbb347c3c34a"/>
+				<rom name="magical hat no buttobi turbo daibouken (jpn).bin" size="524288" crc="e43e853d" sha1="1a741125a80ba9207c74a32e5b21dbb347c3c34a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21716,7 +21716,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pele! (euro, usa).bin" size="1048576" crc="5a8abe51" sha1="c0a91e2d10b98174faa647fb732c335d7438abf7"/>
+				<rom name="pele (euro, usa).bin" size="1048576" crc="5a8abe51" sha1="c0a91e2d10b98174faa647fb732c335d7438abf7"/>
 			</dataarea>
 			<!-- Correct? size taken from the header -->
 			<dataarea name="sram" size="4096">
@@ -22226,7 +22226,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Microprose</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pirates! gold (usa) (beta).bin" size="1048576" crc="0a525641" sha1="6449aea7af69e6b91c91b654c9ea952a72f0dd7c"/>
+				<rom name="pirates gold (usa) (beta).bin" size="1048576" crc="0a525641" sha1="6449aea7af69e6b91c91b654c9ea952a72f0dd7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23611,7 +23611,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="ゾウ!ゾウ!ゾウ! レスキュー大作戦"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="zou! zou! zou! rescue daisakusen (jpn).bin" size="524288" crc="1a761e67" sha1="0cf2e2a7f00fb3d7a1a6424152693138ece586f1"/>
+				<rom name="zou zou zou rescue daisakusen (jpn).bin" size="524288" crc="1a761e67" sha1="0cf2e2a7f00fb3d7a1a6424152693138ece586f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24299,7 +24299,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Dreamworks</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
-				<rom name="shove it! ...the warehouse game (usa).bin" size="131072" crc="c51f40cb" sha1="e4094c5a575f8d7325e7ec7425ecf022a6bf434e"/>
+				<rom name="shove it ...the warehouse game (usa).bin" size="131072" crc="c51f40cb" sha1="e4094c5a575f8d7325e7ec7425ecf022a6bf434e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24423,7 +24423,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="テレビアニメ・スラムダンク強豪真っ向対決!"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="from tv animation slam dunk - kyougou makkou taiketsu! (jpn).bin" size="2097152" crc="cdf5678f" sha1="7161a12c2a477cff8e29fa51403eea12c03180c7"/>
+				<rom name="from tv animation slam dunk - kyougou makkou taiketsu (jpn).bin" size="2097152" crc="cdf5678f" sha1="7161a12c2a477cff8e29fa51403eea12c03180c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27862,7 +27862,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Dreamworks</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="trampoline terror! (usa).bin" size="262144" crc="aabb349f" sha1="d0dc2acdc17a1e1da25828f7d07d4ba9e3c9bd78"/>
+				<rom name="trampoline terror (usa).bin" size="262144" crc="aabb349f" sha1="d0dc2acdc17a1e1da25828f7d07d4ba9e3c9bd78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31692,7 +31692,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>TecToy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
-				<rom name="bomber [!].bin" size="131072" crc="6389a658" sha1="fe6415e4cd3754316606cae0f0d85856d8ee00e0"/>
+				<rom name="bomber.bin" size="131072" crc="6389a658" sha1="fe6415e4cd3754316606cae0f0d85856d8ee00e0"/>
 			</dataarea>
 		</part>
 	</software>

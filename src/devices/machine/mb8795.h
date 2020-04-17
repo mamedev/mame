@@ -84,22 +84,22 @@ private:
 	bool recv_is_multicast();
 	bool recv_is_local_multicast();
 
-	DECLARE_READ8_MEMBER(txstat_r);
-	DECLARE_WRITE8_MEMBER(txstat_w);
-	DECLARE_READ8_MEMBER(txmask_r);
-	DECLARE_WRITE8_MEMBER(txmask_w);
-	DECLARE_READ8_MEMBER(rxstat_r);
-	DECLARE_WRITE8_MEMBER(rxstat_w);
-	DECLARE_READ8_MEMBER(rxmask_r);
-	DECLARE_WRITE8_MEMBER(rxmask_w);
-	DECLARE_READ8_MEMBER(txmode_r);
-	DECLARE_WRITE8_MEMBER(txmode_w);
-	DECLARE_READ8_MEMBER(rxmode_r);
-	DECLARE_WRITE8_MEMBER(rxmode_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_READ8_MEMBER(tdc_lsb_r);
-	DECLARE_READ8_MEMBER(mac_r);
-	DECLARE_WRITE8_MEMBER(mac_w);
+	uint8_t txstat_r();
+	void txstat_w(uint8_t data);
+	uint8_t txmask_r();
+	void txmask_w(uint8_t data);
+	uint8_t rxstat_r();
+	void rxstat_w(uint8_t data);
+	uint8_t rxmask_r();
+	void rxmask_w(uint8_t data);
+	uint8_t txmode_r();
+	void txmode_w(uint8_t data);
+	uint8_t rxmode_r();
+	void rxmode_w(uint8_t data);
+	void reset_w(uint8_t data);
+	uint8_t tdc_lsb_r();
+	uint8_t mac_r(offs_t offset);
+	void mac_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(MB8795, mb8795_device)

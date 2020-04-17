@@ -20,8 +20,8 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
-#define LOG_DMA       (1U << 1)
-#define LOG_PPU       (1U << 0)
+#define LOG_DMA       (1U << 2)
+#define LOG_PPU       (1U << 1)
 
 //#define VERBOSE             (LOG_PPU)
 #define VERBOSE             (0)
@@ -92,6 +92,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(timing_setting_control_w);
 	DECLARE_WRITE8_MEMBER(initial_startup_w);
+	DECLARE_READ8_MEMBER(irq_status_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(timer_config_w);
 	DECLARE_WRITE8_MEMBER(timer_value_w);
@@ -327,6 +328,12 @@ WRITE8_MEMBER(nes_sh6578_state::initial_startup_w)
 	}
 }
 
+READ8_MEMBER(nes_sh6578_state::irq_status_r)
+{
+	logerror("%s: nes_sh6578_state::irq_status_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 WRITE8_MEMBER(nes_sh6578_state::irq_mask_w)
 {
 	m_irqmask = data;
@@ -450,7 +457,7 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 
 	map(0x4031, 0x4031).w(FUNC(nes_sh6578_state::initial_startup_w));
 	map(0x4032, 0x4032).w(FUNC(nes_sh6578_state::irq_mask_w));
-
+	map(0x4033, 0x4033).r(FUNC(nes_sh6578_state::irq_status_r));
 	map(0x4034, 0x4034).w(FUNC(nes_sh6578_state::timer_config_w));
 	map(0x4035, 0x4035).w(FUNC(nes_sh6578_state::timer_value_w));
 
@@ -612,6 +619,13 @@ ROM_START( bandgpad )
 	ROM_LOAD( "gamepad.bin", 0x00000, 0x100000, CRC(e2fbb532) SHA1(e9170a7739a8355acbf263fe2b1d291951dc07f0) )
 ROM_END
 
+ROM_START( bandggcn )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "gogoconniechan.bin", 0x00000, 0x100000, CRC(715d66ae) SHA1(9326c227bad86eea85194a90f746c60dc032a323) )
+ROM_END
+
+
+
 ROM_START( ts_handy11 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
@@ -629,6 +643,7 @@ ROM_END
 
 
 CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
+CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
 // possibly newer than 2001
 CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )

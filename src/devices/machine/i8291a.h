@@ -31,39 +31,39 @@ public:
 	auto dio_read() { return m_dio_read_func.bind(); }
 
 	// Signal inputs
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_WRITE_LINE_MEMBER(dack_w);
+	void reset_w(int state);
+	void dack_w(int state);
 
 	// GPIB port
-	DECLARE_WRITE_LINE_MEMBER(eoi_w);
-	DECLARE_WRITE_LINE_MEMBER(dav_w);
-	DECLARE_WRITE_LINE_MEMBER(nrfd_w);
-	DECLARE_WRITE_LINE_MEMBER(ndac_w);
-	DECLARE_WRITE_LINE_MEMBER(ifc_w);
-	DECLARE_WRITE_LINE_MEMBER(srq_w);
-	DECLARE_WRITE_LINE_MEMBER(atn_w);
-	DECLARE_WRITE_LINE_MEMBER(ren_w);
-	DECLARE_WRITE8_MEMBER(dio_w);
+	void eoi_w(int state);
+	void dav_w(int state);
+	void nrfd_w(int state);
+	void ndac_w(int state);
+	void ifc_w(int state);
+	void srq_w(int state);
+	void atn_w(int state);
+	void ren_w(int state);
+	void dio_w(uint8_t data); // declared but not defined?
 
 	// register r/w functions
 
-	DECLARE_WRITE8_MEMBER(dout_w);
-	DECLARE_WRITE8_MEMBER(ie1_w);
-	DECLARE_WRITE8_MEMBER(ie2_w);
-	DECLARE_WRITE8_MEMBER(spoll_mode_w);
-	DECLARE_WRITE8_MEMBER(addr_mode_w);
-	DECLARE_WRITE8_MEMBER(aux_mode_w);
-	DECLARE_WRITE8_MEMBER(addr01_w);
-	DECLARE_WRITE8_MEMBER(eos_w);
+	void dout_w(uint8_t data);
+	void ie1_w(uint8_t data);
+	void ie2_w(uint8_t data);
+	void spoll_mode_w(uint8_t data);
+	void addr_mode_w(uint8_t data);
+	void aux_mode_w(uint8_t data);
+	void addr01_w(uint8_t data);
+	void eos_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(din_r);
-	DECLARE_READ8_MEMBER(ints1_r);
-	DECLARE_READ8_MEMBER(ints2_r);
-	DECLARE_READ8_MEMBER(spoll_stat_r);
-	DECLARE_READ8_MEMBER(addr_stat_r);
-	DECLARE_READ8_MEMBER(cpt_r);
-	DECLARE_READ8_MEMBER(addr0_r);
-	DECLARE_READ8_MEMBER(addr1_r);
+	uint8_t din_r();
+	uint8_t ints1_r();
+	uint8_t ints2_r();
+	uint8_t spoll_stat_r();
+	uint8_t addr_stat_r();
+	uint8_t cpt_r();
+	uint8_t addr0_r();
+	uint8_t addr1_r();
 	void map(address_map &map);
 
 private:

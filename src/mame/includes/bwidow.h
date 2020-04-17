@@ -41,7 +41,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void earom_control_w(uint8_t data);
 
 	void bwidow_map(address_map &map);
 	void bwidowp_map(address_map &map);
