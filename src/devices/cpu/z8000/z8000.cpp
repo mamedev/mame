@@ -27,19 +27,19 @@ DEFINE_DEVICE_TYPE(Z8002, z8002_device, "z8002", "Zilog Z8002")
 
 
 z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 8, 1)
+	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 1)
 {
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_io_config("I/O", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_io_config("I/O", ENDIANNESS_BIG, 16, 16, 0)
 	, m_opcodes_config("first word", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_stack_config("stack", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_sio_config("special I/O", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_sio_config("special I/O", ENDIANNESS_BIG, 16, 16, 0)
 	, m_iack_in(*this)
 	, m_mo_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
@@ -49,7 +49,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 
 
 z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 16, 2)
+	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 2)
 {
 }
 
@@ -261,21 +261,6 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
-		// FIXME: this should perform a 16-bit big-endian word read
-		return m_io->read_byte((uint16_t)(addr)) +
-			(m_io->read_byte((uint16_t)(addr+1)) << 8);
-	}
-	else
-	{
-		/* how to handle MMU reads? */
-		return m_sio->read_word_unaligned((uint16_t)addr);
-	}
-}
-
-uint16_t z8001_device::RDPORT_W(int mode, uint16_t addr)
-{
-	if(mode == 0)
-	{
 		return m_io->read_word_unaligned((uint16_t)addr);
 	}
 	else
@@ -299,21 +284,6 @@ void z8002_device::WRPORT_B(int mode, uint16_t addr, uint8_t value)
 }
 
 void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
-{
-	if(mode == 0)
-	{
-		// FIXME: this should perform a 16-bit big-endian word write
-		m_io->write_byte((uint16_t)(addr),value & 0xff);
-		m_io->write_byte((uint16_t)(addr+1),(value >> 8) & 0xff);
-	}
-	else
-	{
-		/* how to handle MMU writes? */
-		m_sio->write_word_unaligned((uint16_t)addr, value);
-	}
-}
-
-void z8001_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	if(mode == 0)
 	{

@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
-	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult);
+	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -145,9 +145,9 @@ protected:
 	inline void WRMEM_W(address_space &space, uint32_t addr, uint16_t value);
 	inline void WRMEM_L(address_space &space, uint32_t addr, uint32_t value);
 	inline uint8_t RDPORT_B(int mode, uint16_t addr);
-	virtual uint16_t RDPORT_W(int mode, uint16_t addr);
+	inline uint16_t RDPORT_W(int mode, uint16_t addr);
 	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);
-	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value);
+	inline void WRPORT_W(int mode, uint16_t addr, uint16_t value);
 	inline void cycles(int cycles);
 	virtual void PUSH_PC();
 	virtual void CHANGE_FCW(uint16_t fcw);
@@ -683,8 +683,6 @@ protected:
 	// z8002_device overrides
 	virtual bool get_segmented_mode() const override;
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;
-	virtual uint16_t RDPORT_W(int mode, uint16_t addr) override;
-	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value) override;
 	virtual void PUSH_PC() override;
 	virtual void CHANGE_FCW(uint16_t fcw) override;
 	virtual uint32_t GET_PC(uint32_t VEC) override;
