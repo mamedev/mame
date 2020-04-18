@@ -18574,6 +18574,14 @@ actionhw                        // (c) 1995
 kickgoal                        // (c) 1995
 kickgoala                       //
 
+@source:kikikai.cpp
+kicknrun                        // A87 (c) 1986 Taito Corporation
+kicknrunu                       // A87 (c) 1986 Taito Corporation
+kikikai                         // A85 (c) 1986 Taito Corporation
+knightb                         // bootleg
+mexico86                        // bootleg (Micro Research)
+mexico86a                       // bootleg
+
 @source:kim1.cpp
 kim1                            // Commodore (MOS) KIM-1 1975
 
@@ -22361,14 +22369,6 @@ toride2gk                       // (c) 1994
 toride2j                        // (c) 1994
 vmetal                          // (c) 1995 Excellent System?
 vmetaln                         // (c) 1995 Excellent System?
-
-@source:mexico86.cpp
-kicknrun                        // A87 (c) 1986 Taito Corporation
-kicknrunu                       // A87 (c) 1986 Taito Corporation
-kikikai                         // A85 (c) 1986 Taito Corporation
-knightb                         // bootleg
-mexico86                        // bootleg (Micro Research)
-mexico86a                       // bootleg
 
 @source:meyc8080.cpp
 casbjack                        // (c) 1983 Meyco Games
