@@ -53,7 +53,7 @@
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
-		setup.register_param(# name, # val);
+		setup.register_param(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_param(# name ".HINT_" # val, "1");

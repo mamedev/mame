@@ -60,6 +60,11 @@ namespace netlist
 
 		/// \brief provide library with static solver implementations.
 		///
+		/// By default no static solvers are provided since these are
+		/// determined by the specific use case. It is up to the implementor
+		/// of a callbacks_t implementation to optionally provide such a collection
+		/// of symbols.
+		///
 		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
