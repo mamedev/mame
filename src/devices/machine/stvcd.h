@@ -192,6 +192,65 @@ private:
 	required_device<timer_device> m_sector_timer;
 	required_device<timer_device> m_sh1_timer;
 	required_device<cdda_device> m_cdda;
+	
+	// 0x00
+	void cmd_get_status();
+	void cmd_get_hw_info();
+	void cmd_get_toc();
+	void cmd_get_session_info();
+	void cmd_init_cdsystem();
+	void cmd_end_data_transfer();
+	// 0x10
+	void cmd_play_disc();
+	void cmd_seek_disc();
+	void cmd_ffwd_rew_disc();
+	// 0x20
+	void cmd_get_subcode_q_rw_channel();
+	// 0x30
+	void cmd_set_cddevice_connection();
+	void cmd_get_cddevice_connection();
+	void cmd_last_buffer_destination();
+	// 0x40
+	void cmd_set_filter_range();
+	void cmd_get_filter_range();
+	void cmd_set_filter_subheader_conditions();
+	void cmd_get_filter_subheader_conditions();
+	void cmd_set_filter_mode();
+	void cmd_get_filter_mode();
+	void cmd_set_filter_connection();
+	void cmd_reset_selector();
+	// 0x50
+	void cmd_get_buffer_size();
+	void cmd_get_buffer_partition_sector_number();
+	void cmd_calculate_actual_data_size();
+	void cmd_get_actual_data_size();
+	void cmd_get_sector_information();
+	// 0x60
+	void cmd_set_sector_length();
+	void cmd_get_sector_data();
+	void cmd_delete_sector_data();
+	void cmd_get_and_delete_sector_data();
+	void cmd_put_sector_data();
+	void cmd_move_sector_data();
+	void cmd_copy_sector_data();
+	void cmd_get_sector_data_copy_or_move_error();
+	// 0x70
+	void cmd_change_directory();
+	void cmd_read_directory();
+	void cmd_get_file_scope();
+	void cmd_get_target_file_info();
+	void cmd_read_file();
+	void cmd_abort_file();
+	// 0x90
+	void cmd_mpeg_get_status();
+	void cmd_mpeg_get_irq();
+	void cmd_mpeg_set_irq_mask();
+	void cmd_mpeg_init();
+	void cmd_mpeg_set_mode();
+	// 0xe0
+	void cmd_check_copy_protection();
+	void cmd_get_disc_region();
+	void cmd_get_mpeg_card_boot_rom();
 };
 
 // device type definition
