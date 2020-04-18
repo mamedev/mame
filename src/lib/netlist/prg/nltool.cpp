@@ -97,7 +97,7 @@ public:
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_prepro;
-	plib::option_args	opt_files;
+	plib::option_args   opt_files;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
 
@@ -199,7 +199,7 @@ public:
 			return stream_ptr(nullptr);
 
 		strm->imbue(std::locale::classic());
-		return std::move(strm);
+		return std::move(strm); // FIXME: for c++11 clang builds;
 	}
 
 private:
@@ -219,17 +219,13 @@ public:
 	{
 		if (m_app.opt_boostlib() == "builtin")
 			return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
-		else if (m_app.opt_boostlib() == "generic")
+		if (m_app.opt_boostlib() == "generic")
 			return plib::make_unique<plib::dynlib_static>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
-		{
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
-		}
-		else
-		{
-			//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-			return plib::make_unique<plib::dynlib>(m_app.opt_boostlib());
-		}
+
+		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
+		return plib::make_unique<plib::dynlib>(m_app.opt_boostlib());
 	}
 
 private:
@@ -629,7 +625,7 @@ void tool_app_t::static_compile()
 	{
 		std::map<pstring, pstring> map;
 
-		for (auto &f : opt_files())
+		for (const auto &f : opt_files())
 		{
 			std::vector<pstring> names;
 			if (opt_name.was_specified())
@@ -1079,7 +1075,7 @@ void tool_app_t::convert()
 	if (opt_files().size() > 1)
 		throw netlist::nl_exception("nltool: convert needs exactly one file");
 
-	if (opt_files().size() == 0 || opt_files()[0] == "-")
+	if (opt_files().empty() || opt_files()[0] == "-")
 	{
 		plib::copystream(ostrm, std::cin);
 	}

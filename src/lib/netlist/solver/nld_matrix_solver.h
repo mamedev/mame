@@ -208,6 +208,7 @@ namespace solver
 
 		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
 		{
+			plib::unused_var(target);
 			return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
 		}
 

@@ -299,7 +299,7 @@ namespace plib {
 		{
 			if (m_source_location.size() == 1)
 				trail = trail_first;
-			s = trail + plib::pfmt("{1}:{2}:0\n")(m_source_location.back().file_name(), m_source_location.back().line()) + s;
+			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_source_location.back().file_name(), m_source_location.back().line(), s);
 			m_source_location.pop_back();
 		}
 		verror("\n" + s + e + " " + currentline_str() + "\n");

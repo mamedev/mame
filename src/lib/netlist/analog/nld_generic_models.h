@@ -134,6 +134,7 @@ namespace analog
 		generic_capacitor_const(device_t &dev, const pstring &name)
 		: m_gmin(nlconst::zero())
 		{
+			plib::unused_var(dev, name);
 		}
 
 		// Returns { G, Ieq }

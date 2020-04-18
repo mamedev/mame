@@ -123,10 +123,10 @@ namespace netlist
 			const auto dfdz = 25.0/(R*sup) * m_R.deltaV();
 			const auto Ieq = dfdz * in;
 			m_R.set_mat( G, -G, 0.0,
-				        -G,  G, 0.0);
-			             //VIN  VR1
+						-G,  G, 0.0);
+						 //VIN  VR1
 			m_DUM1.set_mat( 0.0,   0.0,  0.0,   // IIN
-				            dfdz,  0.0,  Ieq);  // IR1
+							dfdz,  0.0,  Ieq);  // IR1
 			m_DUM2.set_mat( 0.0,   0.0,  0.0,   // IIN
 						   -dfdz,  0.0, -Ieq);  // IR2
 		}
@@ -134,9 +134,9 @@ namespace netlist
 
 	private:
 		nld_power_pins             m_supply;
-		analog::nld_twoterm		   m_R;
-		analog::nld_twoterm		   m_DUM1;
-		analog::nld_twoterm		   m_DUM2;
+		analog::nld_twoterm        m_R;
+		analog::nld_twoterm        m_DUM1;
+		analog::nld_twoterm        m_DUM2;
 		param_fp_t                 m_base_r;
 		state_var<bool>            m_last;
 	};

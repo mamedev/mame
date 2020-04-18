@@ -549,8 +549,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					pstring lastnet = tt[1];
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
-						pstring devname = tt[0] + plib::pfmt("{}")(i);
-						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						pstring devname = plib::pfmt("{}{}")(tt[0], i);
+						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? plib::pfmt("{}a{}")(tt[1], i) : tt[2];
 						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
 						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(lastnet, devname, 0);
@@ -584,7 +584,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					}
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
-						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						pstring devname = plib::pfmt("{}{}")(tt[0], i);
 						add_device("CCCS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(tt[1], devname, 0);
 						add_term(tt[2], devname, 1);

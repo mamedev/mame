@@ -158,7 +158,7 @@ namespace solver
 			strm("\t{1};\n", terms);
 
 			//for (std::size_t i = 0; i < railstart; i++)
-			//	*tcr_r[i]       += static_cast<FT>(go[i]);
+			//  *tcr_r[i]       += static_cast<FT>(go[i]);
 
 			for (std::size_t i = 0; i < net.railstart(); i++)
 			{
@@ -172,7 +172,7 @@ namespace solver
 			for (std::size_t i=1; i < net.count(); i++)
 				terms += plib::pfmt(" + Idr[{1}]")(this->m_Idrn.didx(k,i));
 			//for (std::size_t i = railstart; i < term_count; i++)
-			//	RHS_t +=  (- go[i]) * *cnV[i];
+			//  RHS_t +=  (- go[i]) * *cnV[i];
 
 			for (std::size_t i = net.railstart(); i < net.count(); i++)
 				terms += plib::pfmt(" - go[{1}] * *cnV[{1}]")(this->m_gonn.didx(k,i), this->m_connected_net_Vn.didx(k,i));

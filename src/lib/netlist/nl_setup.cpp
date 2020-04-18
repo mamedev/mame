@@ -1341,7 +1341,7 @@ source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str));
 	ret->imbue(std::locale::classic());
-	return std::move(ret);
+	return std::move(ret); // FIXME: for c++11 clang builds
 }
 
 source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
@@ -1349,7 +1349,7 @@ source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str, std::ios_base::binary));
 	ret->imbue(std::locale::classic());
-	return std::move(ret);
+	return std::move(ret); // FIXME: for c++11 clang builds
 }
 
 source_file_t::stream_ptr source_file_t::stream(const pstring &name)

@@ -134,9 +134,9 @@ namespace solver
 			}
 		}
 		for (auto &d : step_devices)
-			m_step_funcs.push_back(nldelegate_ts(&core_device_t::timestep, d));
+			m_step_funcs.emplace_back(nldelegate_ts(&core_device_t::timestep, d));
 		for (auto &d : dynamic_devices)
-			m_dynamic_funcs.push_back(nldelegate_dyn(&core_device_t::update_terminals, d));
+			m_dynamic_funcs.emplace_back(nldelegate_dyn(&core_device_t::update_terminals, d));
 	}
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)

@@ -25,7 +25,7 @@
 namespace netlist
 {
 
-	plib::unique_ptr<plib::dynlib_base>	callbacks_t:: static_solver_lib() const
+	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
 		return plib::make_unique<plib::dynlib_static>(nullptr);
 	}
