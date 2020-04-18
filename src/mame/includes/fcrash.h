@@ -21,6 +21,7 @@ public:
 		, m_msm_1(*this, "msm1")
 		, m_msm_2(*this, "msm2")
 		, m_okibank(*this, "okibank")
+		, m_sgyxz_dsw(*this, { "DSWA", "DSWB", "DSWC" })
 	{ }
 
 	void fcrash(machine_config &config);
@@ -47,7 +48,7 @@ protected:
 	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
-	DECLARE_MACHINE_START(wofabl);
+	DECLARE_MACHINE_RESET(sgyxz);
 
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
@@ -61,6 +62,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer2_w);
+	DECLARE_READ16_MEMBER(sgyxz_dsw_r);
 
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
@@ -104,6 +106,8 @@ protected:
 	optional_device<msm5205_device> m_msm_2;
 
 	optional_memory_bank m_okibank;
+	
+	optional_ioport_array<3> m_sgyxz_dsw;
 };
 
 class cps1bl_no_brgt : public fcrash_state

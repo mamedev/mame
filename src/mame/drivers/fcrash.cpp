@@ -83,9 +83,13 @@ fcrash, kodb:       Old sprites show on next screen. Patch used.
 sf2m1:              Crowd is missing. Plane's tail comes off a bit. Patch used.
 wofabl:             Old sprites left behind - doesn't seem to write end-of-table marker when sprite table is empty.
                     Priority problems - doesn't seem to write the layer mask values anywhere.
-sgyxz:              Same as wofabl, plus sprite alignment issues and missing foreground layer.
+                    Incorrect layer ordering during attract - writes invalid layer order values to layer control reg (bits 6-13).
+                    Glitched level 1 trees - bad data in gfx rom 12 but dump is confirmed correct.  https://youtu.be/RWKhBzwH0Gk
+sgyxz:              Priority problems - doesn't seem to write the layer mask values anywhere. Patch used.
+                    Missing foreground trees on level 1.
 
 brightness circuity present on pcb?
+	sgyxz		no
 	wofabl		no
 	others		tbc...   assume yes for now
 */
@@ -294,6 +298,12 @@ WRITE16_MEMBER(fcrash_state::varthb_layer2_w)
 {
 	if (data > 0x9000)
 		m_cps_a_regs[0x06 / 2] = data;
+}
+
+READ16_MEMBER(fcrash_state::sgyxz_dsw_r)
+{
+	int in = m_sgyxz_dsw[offset]->read();
+	return (in << 8) | 0xff;
 }
 
 
@@ -526,6 +536,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, sgyxz)
+	MCFG_MACHINE_RESET_OVERRIDE(fcrash_state, sgyxz)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -538,8 +549,6 @@ void fcrash_state::sgyxz(machine_config &config)
 	m_screen->set_palette(m_palette);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
-
-	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -559,10 +568,7 @@ void fcrash_state::sgyxz(machine_config &config)
 void fcrash_state::wofabl(machine_config &config)
 {
 	sgyxz(config);
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::wofabl_map);
-
-	MCFG_MACHINE_START_OVERRIDE(fcrash_state, wofabl)
 }
 
 void fcrash_state::varthb(machine_config &config)
@@ -659,13 +665,14 @@ void fcrash_state::sgyxz_map(address_map &map)
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
 	map(0x880000, 0x880001).portr("IN1");            /* Player input ports */
-	map(0x880006, 0x88000d).r(FUNC(fcrash_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x880006, 0x880007).portr("IN0");                                   /* System input ports + Player 3 controls */
+	map(0x880008, 0x88000d).r(FUNC(fcrash_state::sgyxz_dsw_r));            /* Dip Switches */
 	map(0x88000e, 0x88000f).w(FUNC(fcrash_state::cps1_soundlatch_w));
-	map(0x880e78, 0x880e79).r(FUNC(fcrash_state::cps1_in2_r));            /* Player 3 controls (later games) */
+	map(0x880e78, 0x880e79).nopr();  // reads just once at start, bug?
 	map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
 	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
-	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
+	map(0xf1c006, 0xf1c007).noprw();  // doesn't have an eeprom
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -677,12 +684,12 @@ void fcrash_state::wofabl_map(address_map &map)
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
 	map(0x880000, 0x880001).portr("IN1");            /* Player input ports */
 	map(0x880006, 0x880007).w(FUNC(fcrash_state::cps1_soundlatch_w));
-	map(0x880008, 0x88000f).r(FUNC(fcrash_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x880e78, 0x880e79).r(FUNC(fcrash_state::cps1_in2_r));            /* Player 3 controls (later games) */
+	map(0x880008, 0x880009).portr("IN0");                                   /* System input ports + Player 3 controls */
+	map(0x88000a, 0x88000f).r(FUNC(fcrash_state::sgyxz_dsw_r));            /* Dip Switches */
 	map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
 	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
-	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
+	map(0xf1c006, 0xf1c007).noprw();  // doesn't have an eeprom
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -752,7 +759,8 @@ void fcrash_state::ffightblb_oki_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
-MACHINE_START_MEMBER(fcrash_state,fcrash)
+
+MACHINE_START_MEMBER(fcrash_state, fcrash)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -776,7 +784,7 @@ MACHINE_START_MEMBER(fcrash_state,fcrash)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_RESET_MEMBER(fcrash_state,fcrash)
+MACHINE_RESET_MEMBER(fcrash_state, fcrash)
 {
 	m_sample_buffer1 = 0;
 	m_sample_buffer2 = 0;
@@ -799,7 +807,7 @@ MACHINE_START_MEMBER(fcrash_state, cawingbl)
 	m_sprite_base = 0x1000;
 }
 
-MACHINE_START_MEMBER(fcrash_state,kodb)
+MACHINE_START_MEMBER(fcrash_state, kodb)
 {
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -848,21 +856,54 @@ MACHINE_START_MEMBER(fcrash_state, sf2m1)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(fcrash_state,sgyxz)
+MACHINE_START_MEMBER(fcrash_state, sgyxz)
 {
-	MACHINE_START_CALL_MEMBER(kodb);
+	m_layer_enable_reg = 0x20;
+	// palette_control  = 0x2a
+	
+	// layer priority masks:
+	// clears 0x28, 0x2c, 0x2e at boot, then never writes any layer mask values anywhere outside main ram.
+	// (bootleggers have nop'd the original code)
+	// assume the bootleg h/w just uses some fixed values (set in machine_reset), just use any locations the game doesn't overwrite:
+	m_layer_mask_reg[0] = 0x38;
+	m_layer_mask_reg[1] = 0x3a;
+	m_layer_mask_reg[2] = 0x3c;
+	m_layer_mask_reg[3] = 0x3e;
+	
 	m_layer_scroll1x_offset = 0x40;
 	m_layer_scroll2x_offset = 0x40;
 	m_layer_scroll3x_offset = 0x40;
+	m_sprite_base = 0x1000;
+	m_sprite_list_end_marker = 0x8000;
+	m_sprite_x_offset = 0;
+	
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(fcrash_state, wofabl)
+MACHINE_RESET_MEMBER(fcrash_state, sgyxz)
 {
-	MACHINE_START_CALL_MEMBER(sgyxz);
-	m_layer_mask_reg[2] = 0x26;  // uses 0x2a for palette control reg
-	m_sprite_list_end_marker = 0x8000;
+	// assume some fixed values for layer masks (game never writes any outside main ram)
+	m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0x1ff;
+	m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x1ff;
 }
+
+MACHINE_START_MEMBER(fcrash_state, ffightblb)
+{
+	m_layer_enable_reg = 0x20;
+	m_layer_mask_reg[0] = 0x26;
+	m_layer_mask_reg[1] = 0x30;
+	m_layer_mask_reg[2] = 0x28;
+	m_layer_mask_reg[3] = 0x32;
+	m_layer_scroll1x_offset = 0x00;
+	m_layer_scroll2x_offset = 0x08;
+	m_layer_scroll3x_offset = 0x04;
+	m_sprite_base = 0x5008; // check this
+	m_sprite_list_end_marker = 0x8000;
+	m_sprite_x_offset = -0x38;
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
+}
+
 
 void fcrash_state::init_cawingbl()
 {
@@ -904,22 +945,6 @@ void fcrash_state::init_sf2m1()
 	init_mtwinsb();
 }
 
-MACHINE_START_MEMBER(fcrash_state,ffightblb)
-{
-	m_layer_enable_reg = 0x20;
-	m_layer_mask_reg[0] = 0x26;
-	m_layer_mask_reg[1] = 0x30;
-	m_layer_mask_reg[2] = 0x28;
-	m_layer_mask_reg[3] = 0x32;
-	m_layer_scroll1x_offset = 0x00;
-	m_layer_scroll2x_offset = 0x08;
-	m_layer_scroll3x_offset = 0x04;
-	m_sprite_base = 0x5008; // check this
-	m_sprite_list_end_marker = 0x8000;
-	m_sprite_x_offset = -0x38;
-
-	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
-}
 
 #define CPS1_COINAGE_1 \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) \
@@ -983,19 +1008,19 @@ static INPUT_PORTS_START( fcrash )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level 1" )
-	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )      // "01"
-	PORT_DIPSETTING(    0x06, DEF_STR( Easier ) )       // "02"
-	PORT_DIPSETTING(    0x05, DEF_STR( Easy ) )     // "03"
-	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )       // "04"
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )       // "05"
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )     // "06"
-	PORT_DIPSETTING(    0x01, DEF_STR( Harder ) )       // "07"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "08"
+	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )   // "01"
+	PORT_DIPSETTING(    0x06, DEF_STR( Easier ) )    // "02"
+	PORT_DIPSETTING(    0x05, DEF_STR( Easy ) )      // "03"
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )    // "04"
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )    // "05"
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )      // "06"
+	PORT_DIPSETTING(    0x01, DEF_STR( Harder ) )    // "07"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )   // "08"
 	PORT_DIPNAME( 0x18, 0x10, "Difficulty Level 2" )
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )     // "01"
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       // "02"
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )     // "03"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "04"
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )      // "01"
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )    // "02"
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )      // "03"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )   // "04"
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x60, "100k" )
 	PORT_DIPSETTING(    0x40, "200k" )
@@ -1079,12 +1104,12 @@ static INPUT_PORTS_START( cawingbl )
 	PORT_START("DSWA")
 	CPS1_COINAGE_1
 	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )                          // Overrides all other coinage settings
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                           // according to manual
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       // This switch is not documented
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )  // Overrides all other coinage settings
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // according to manual
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )       // This switch is not documented
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level (Enemy's Strength)" )   PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level (Enemy's Strength)" ) PORT_DIPLOCATION("SW(B):1,2,3")
 	PORT_DIPSETTING(    0x07, "1 (Easiest)" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "3" )
@@ -1093,34 +1118,34 @@ static INPUT_PORTS_START( cawingbl )
 	PORT_DIPSETTING(    0x02, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
-	PORT_DIPNAME( 0x18, 0x18, "Difficulty Level (Player's Strength)" )  PORT_DIPLOCATION("SW(B):4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Difficulty Level (Player's Strength)" ) PORT_DIPLOCATION("SW(B):4,5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(B):6" )                      // This switch is not documented
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW(B):7" )                      // This switch is not documented
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(B):8" )                      // This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(B):6" )  // This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW(B):7" )  // This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(B):8" )  // This switch is not documented
 
 	PORT_START("DSWC")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )                      // This switch is not documented
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )                      // This switch is not documented
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )                    PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )  // This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )  // This switch is not documented
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW(C):3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                                PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" ) PORT_DIPLOCATION("SW(C):4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )                  PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW(C):5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )                  PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW(C):6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )               PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW(C):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                              PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode") PORT_DIPLOCATION("SW(C):8")
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
@@ -1138,21 +1163,21 @@ static INPUT_PORTS_START( kodb )
 
 	PORT_START("DSWA")
 	CPS1_COINAGE_2( "SW(A)" )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Slots" )                        PORT_DIPLOCATION("SW(A):4")
+	PORT_DIPNAME( 0x08, 0x08, "Coin Slots" ) PORT_DIPLOCATION("SW(A):4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPNAME( 0x10, 0x10, "Play Mode" )                         PORT_DIPLOCATION("SW(A):5")
+	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW(A):5")
 	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPSETTING(    0x10, "3 Players" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(A):6" )
-	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" ) PORT_DIPLOCATION("SW(A):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )
 
 	PORT_START("DSWB")
 	CPS1_DIFFICULTY_1( "SW(B)" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Lives ) )                    PORT_DIPLOCATION("SW(B):4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW(B):4,5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x38, "2" )
 	PORT_DIPSETTING(    0x28, "3" )
@@ -1161,7 +1186,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x08, "7" )
 	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )               PORT_DIPLOCATION("SW(B):7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW(B):7,8")
 	PORT_DIPSETTING(    0x80, "80k and every 400k" )
 	PORT_DIPSETTING(    0xc0, "100k and every 450k" )
 	PORT_DIPSETTING(    0x40, "160k and every 450k" )
@@ -1170,22 +1195,22 @@ static INPUT_PORTS_START( kodb )
 	PORT_START("DSWC")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )                PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW(C):3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                            PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" ) PORT_DIPLOCATION("SW(C):4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )              PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW(C):5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW(C):6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )           PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW(C):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                          PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode") PORT_DIPLOCATION("SW(C):8")
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 
@@ -1220,32 +1245,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgyxz )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START ("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, "Play Mode" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x03, "Tournament" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START ("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START ("DSWC")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )  // test mode doesn't work
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	// No COIN3, must use SERVICE1 to credit 3P in "3 Players, 3 Chutes" mode
+	// STARTx changes character during gameplay
+	
 	PORT_START ("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1253,7 +1272,7 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)  // special move added by bootlegger
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1261,34 +1280,15 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)  // special move added by bootlegger
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START ("IN2")      /* Player 3 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
-
-	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( wofabl )
-	PORT_INCLUDE(sgyxz)
-
-	PORT_MODIFY("DSWA")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(A):1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(A):2" )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x02, "Cabinet" ) PORT_DIPLOCATION("SW(A):1,2")
+	PORT_DIPSETTING( 0x03, "3 Players, 3 Chutes" )
+	PORT_DIPSETTING( 0x02, "3 Players, 1 Chute" )
+	PORT_DIPSETTING( 0x01, "2 Players, 1 Chute" )
+	//PORT_DIPSETTING( 0x00, "2 Players, 1 Chute" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(A):3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(A):4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(A):5" )
@@ -1296,15 +1296,130 @@ static INPUT_PORTS_START( wofabl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(A):7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )
 
-	PORT_MODIFY("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(B):1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(B):2" )
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(B):1,2")
+	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( 1C_4C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(B):3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(B):4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(B):5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Number of Special Moves" ) PORT_DIPLOCATION("SW(B):7,8")
+	PORT_DIPSETTING( 0xc0, "3" )
+	PORT_DIPSETTING( 0x80, "2" )
+	PORT_DIPSETTING( 0x40, "1" )
+	PORT_DIPSETTING( 0x00, "0" )
+	
+	PORT_START("DSWC")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(C):1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(C):2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(C):4" )
+	PORT_DIPNAME( 0x70, 0x60, "Number of Players" ) PORT_DIPLOCATION("SW(C):5,6,7")
+	PORT_DIPSETTING( 0x70, "Start 1, Continue 1" )
+	PORT_DIPSETTING( 0x60, "Start 2, Continue 2" )
+	PORT_DIPSETTING( 0x50, "Start 3, Continue 3" )
+	PORT_DIPSETTING( 0x40, "Start 4, Continue 4" )
+	PORT_DIPSETTING( 0x30, "Start 1, Continue 2" )
+	PORT_DIPSETTING( 0x20, "Start 2, Continue 3" )
+	PORT_DIPSETTING( 0x10, "Start 3, Continue 4" )
+	PORT_DIPSETTING( 0x00, "Start 4, Continue 5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(C):8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wofabl )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START ("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(A):1,2,3,4")
+	PORT_DIPSETTING( 0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING( 0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING( 0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING( 0x0b, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING( 0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING( 0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING( 0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING( 0x07, "2 Coins Start, 1 Coin Continue" )
+	PORT_DIPSETTING( 0x06, DEF_STR( Free_Play ) )
+	/* setting any of these crashes the test mode config menu */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(A):5" )  // free play?
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(A):6" )  // 1c 8c?
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(A):7" )  // 2 coins start?
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )  // 1c 7c?
+	
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, "Game Difficulty" ) PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING( 0x07, "0 (Extra Easy)" )
+	PORT_DIPSETTING( 0x06, "1 (Very Easy)" )
+	PORT_DIPSETTING( 0x05, "2 (Easy)" )
+	PORT_DIPSETTING( 0x04, "3 (Normal)" )
+	PORT_DIPSETTING( 0x03, "4 (Hard)" )
+	PORT_DIPSETTING( 0x02, "5 (Very Hard)" )
+	PORT_DIPSETTING( 0x01, "6 (Extra Hard)" )
+	PORT_DIPSETTING( 0x00, "7 (Hardest)" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(B):4" )
+	PORT_DIPNAME( 0x70, 0x60, "Number of Players" ) PORT_DIPLOCATION("SW(B):5,6,7")
+	PORT_DIPSETTING( 0x70, "Start 1, Continue 1" )
+	PORT_DIPSETTING( 0x60, "Start 2, Continue 2" )
+	PORT_DIPSETTING( 0x50, "Start 3, Continue 3" )
+	PORT_DIPSETTING( 0x40, "Start 4, Continue 4" )
+	PORT_DIPSETTING( 0x30, "Start 1, Continue 2" )
+	PORT_DIPSETTING( 0x20, "Start 2, Continue 3" )
+	PORT_DIPSETTING( 0x10, "Start 3, Continue 4" )
+	PORT_DIPSETTING( 0x00, "Start 4, Continue 5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+	
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, "Cabinet" ) PORT_DIPLOCATION("SW(C):1,2")
+	PORT_DIPSETTING( 0x03, "3 Players, 3 Chutes" )
+	PORT_DIPSETTING( 0x02, "3 Players, 1 Chute" )
+	PORT_DIPSETTING( 0x01, "2 Players, 1 Chute" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(C):4" )
+	PORT_DIPNAME( 0x30, 0x10, "Extend" ) PORT_DIPLOCATION("SW(C):5,6")
+	PORT_DIPSETTING( 0x30, "No Extend" )
+	PORT_DIPSETTING( 0x20, "100000 pts." )
+	PORT_DIPSETTING( 0x10, "300000 pts." )
+	PORT_DIPSETTING( 0x00, "100000, 300000, 500000, 1000000 pts." )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(C):7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(C):8" )  // crashes the test mode config menu if set
 INPUT_PORTS_END
 
 
@@ -1825,6 +1940,13 @@ ROM_END
     24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
     sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
     3x8 dsws
+	
+	bootlegger hacks:
+	2 extra playable characters (7 total)
+	can swap character during gameplay (press start to cycle)
+	new special move (button 3)
+	level order is changed
+	attract sequence shortened
 */
 ROM_START( sgyxz )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */
@@ -1877,7 +1999,7 @@ ROM_START( wofabl )
 	ROM_LOAD32_BYTE( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
 	ROM_LOAD32_BYTE( "gfx10.040",  0x200001, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
 	ROM_LOAD32_BYTE( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
-	ROM_LOAD32_BYTE( "gfx12.040",  0x200003, 0x80000, CRC(808cc8f0) SHA1(55731139ba6d7d222fa17236e3e91b2e69a44046) )
+	ROM_LOAD32_BYTE( "gfx12.040",  0x200003, 0x80000, CRC(c29f7b70) SHA1(95d22dcd9e2a48ddea7573d0be75225e0aae798f) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "sound.512", 0x00000, 0x10000,  CRC(210c376f) SHA1(0d937c86078d0a106f5636b7daf5fc0266c2c2ec) ) // identical to sgyxz
@@ -2019,7 +2141,7 @@ GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,   init_mtwi
 GAME( 1992, sf2m1,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M1, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2m9,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
-GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     fcrash_state,   init_cps1,      ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     cps1bl_no_brgt, init_cps1,      ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1999, wofabl,     wof,     wofabl,    wofabl,    cps1bl_no_brgt, init_cps1,      ROT0,    "bootleg",  "Sangokushi II (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 
 GAME( 1992, varthb,     varth,   varthb,    varth,     fcrash_state,   init_mtwinsb,   ROT270,  "bootleg",  "Varth: Operation Thunderstorm (bootleg)",  MACHINE_SUPPORTS_SAVE )
