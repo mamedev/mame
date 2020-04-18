@@ -937,13 +937,13 @@ license:CC0
 		<part name="cass1" interface="timex_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="64513">
-				<rom name="programa de a presentaçao - side a (1983)(tmx portugal ltda).tzx" size="64513" crc="473f0089" sha1="3cfcc1e405f6dfcdd9f99be11651f5a680904fcc"/>
+				<rom name="programa de a presentacao - side a (1983)(tmx portugal ltda).tzx" size="64513" crc="473f0089" sha1="3cfcc1e405f6dfcdd9f99be11651f5a680904fcc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="timex_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="87645">
-				<rom name="programa de a presentaçao - side b (1983)(tmx portugal ltda).tzx" size="87645" crc="988ad0de" sha1="c4322b5a4f7560377c118746413c798f37aa6cc9"/>
+				<rom name="programa de a presentacao - side b (1983)(tmx portugal ltda).tzx" size="87645" crc="988ad0de" sha1="c4322b5a4f7560377c118746413c798f37aa6cc9"/>
 			</dataarea>
 		</part>
 	</software>
