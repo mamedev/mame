@@ -1260,8 +1260,8 @@ Screen-Printer (standalone)
 		<info name="author" value="Jürgen Buchmüller" />
 		<info name="usage" value="Type SYSTEM and load with HEKTIK, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14704">
-				<rom name="hektik.cas" size="14704" crc="c63aa90e" sha1="fe62fabc207d16d51b1f6f4c69b06083d1a756ad" />
+			<dataarea name="cass" size="14627">
+				<rom name="hektik.cas" size="14627" crc="933a5a34" sha1="2dd597be32687bc305b7d4fd0e5f073b5f603898" />
 			</dataarea>
 		</part>
 	</software>
