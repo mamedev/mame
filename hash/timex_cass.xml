@@ -972,7 +972,7 @@ license:CC0
 
 	<software name="sroulett">
 		<description>Simple Roulette</description>
-		<year>xx??</year>
+		<year>????</year>
 		<publisher>Jay Simpson</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="18208">
@@ -1106,15 +1106,15 @@ license:CC0
 		<description>TC 2048 Demonstraçao</description>
 		<year>1984</year>
 		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="timex_cass">
+		<part name="cass1" interface="timex_cass">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="59350">
+			<dataarea name="cass1" size="59350">
 				<rom name="tc 2048 demonstraçao - side a (1984)(tmx portugal ltda).tzx" size="59350" crc="0c11b3b0" sha1="7775039bc3c5522fb60a4e929953064f436b14b7"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="timex_cass">
+		<part name="cass2" interface="timex_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="50119">
+			<dataarea name="cass2" size="50119">
 				<rom name="tc 2048 demonstraçao - side b (1984)(tmx portugal ltda).tzx" size="50119" crc="3a3cc13c" sha1="e3134203f65c16964a79b57896f342f5e70235e5"/>
 			</dataarea>
 		</part>
