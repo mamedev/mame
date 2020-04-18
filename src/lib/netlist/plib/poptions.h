@@ -234,7 +234,7 @@ namespace plib {
 
 	private:
 		static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-				unsigned firstline_indent);
+				unsigned firstline_indent, const pstring &line_end = "\n");
 
 		void check_consistency() noexcept(false);
 
