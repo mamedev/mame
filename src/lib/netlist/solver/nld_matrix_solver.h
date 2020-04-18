@@ -22,6 +22,13 @@ namespace netlist
 {
 namespace solver
 {
+
+	enum static_compile_target
+	{
+		CXX_EXTERNAL_C,
+		CXX_STATIC
+	};
+
 	P_ENUM(matrix_sort_type_e,
 		NOSORT,
 		ASCENDING,
@@ -46,6 +53,8 @@ namespace solver
 		, LONGDOUBLE
 		, FLOAT128
 	)
+
+	using static_compile_container = std::vector<std::pair<pstring, pstring>>;
 
 	struct solver_parameters_t
 	{
@@ -197,7 +206,7 @@ namespace solver
 
 		virtual void log_stats();
 
-		virtual std::pair<pstring, pstring> create_solver_code()
+		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
 		{
 			return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
 		}

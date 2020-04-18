@@ -112,7 +112,7 @@ namespace solver
 
 		unsigned vsolve_non_dynamic(bool newton_raphson) override;
 
-		std::pair<pstring, pstring> create_solver_code() override;
+		std::pair<pstring, pstring> create_solver_code(static_compile_target target) override;
 
 	private:
 
@@ -247,7 +247,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code()
+	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code(static_compile_target target)
 	{
 		std::stringstream t;
 		t.imbue(std::locale::classic());
@@ -255,9 +255,14 @@ namespace solver
 		pstring name = static_compile_name();
 		pstring fptype(fp_constants<FT>::name());
 
-		strm.writeline(plib::pfmt("extern \"C\" void {1}({2} * __restrict V, "
-			"{2} * __restrict go, {2} * __restrict gt, "
-			"{2} * __restrict Idr, {2} ** __restrict cnV)\n")(name, fptype));
+		pstring extqual;
+		if (target == CXX_EXTERNAL_C)
+			extqual = "extern \"C\"";
+		else if (target == CXX_STATIC)
+			extqual = "static";
+		strm.writeline(plib::pfmt("{1} void {2}({3} * __restrict V, "
+			"{3} * __restrict go, {3} * __restrict gt, "
+			"{3} * __restrict Idr, {3} ** __restrict cnV)\n")(extqual, name, fptype));
 		strm.writeline("{\n");
 		generate_code(strm);
 		strm.writeline("}\n");

@@ -410,13 +410,16 @@ namespace devices
 		}
 	}
 
-	void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
+	solver::static_compile_container NETLIB_NAME(solver)::create_solver_code(solver::static_compile_target target)
 	{
+		solver::static_compile_container mp;
 		for (auto & s : m_mat_solvers)
 		{
-			auto r = s->create_solver_code();
-			mp[r.first] = r.second; // automatically overwrites identical names
+			auto r = s->create_solver_code(target);
+			if (r.first != "") // ignore solvers not supporting static compile
+				mp.push_back(r);
 		}
+		return mp;
 	}
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
