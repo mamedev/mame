@@ -545,7 +545,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="herói">
+	<software name="heroi">
 	<!--	Portuguese adaptation of H.E.R.O.	-->
 		<description>Herói</description>
 		<year>198?</year>
@@ -591,7 +591,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="horacego">
+	<software name="horacski">
 		<description>Horace Goes Skiing</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -602,7 +602,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hotzdisa">
+	<software name="hotzd143" cloneof="hotzd195">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Hot Z Disassembler v1.43</description>
 		<year>1984</year>
@@ -614,7 +614,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hotzdisa">
+	<software name="hotzd184" cloneof="hotzd195">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Hot Z Disassembler v1.84</description>
 		<year>1984</year>
@@ -626,7 +626,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hotzdisa">
+	<software name="hotzd195">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Hot Z Disassembler v1.95</description>
 		<year>1984</year>
@@ -638,7 +638,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hungryho">
+	<software name="hungrhrc">
 		<description>Hungry Horace</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -713,7 +713,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="keywordv">
+	<software name="keyword1" cloneof="keyword5">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Keyword v1</description>
 		<year>1984</year>
@@ -725,7 +725,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="keywordv">
+	<software name="keyword5">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Keyword v5.0</description>
 		<year>198?</year>
@@ -838,7 +838,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="omnicalc">
+	<software name="omnical2">
 		<description>Omnicalc 2</description>
 		<year>1984</year>
 		<publisher>Microsphere</publisher>
@@ -849,7 +849,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="orcamen">
+	<software name="orcament">
 		<description>Orçamento Doméstico</description>
 		<year>198?</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -871,7 +871,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="perigosn">
+	<software name="perigosns">
 	<!--	Portuguese adaptation of Jungle Trouble	-->
 		<description>Perigos Na Selva</description>
 		<year>1983</year>
@@ -883,7 +883,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="personal">
+	<software name="pershofi">
 		<description>Personal Home Finance</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -894,7 +894,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="personal">
+	<software name="perspoma">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Personal Portfolio Manager</description>
 		<year>1983</year>
@@ -918,7 +918,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="profile2">
+	<software name="prof2068">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Pro-File 2068</description>
 		<year>19??</year>
@@ -930,7 +930,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="presenta">
+	<software name="prpresen">
 		<description>Programa de a presentaçao</description>
 		<year>1983</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -970,7 +970,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="simplero">
+	<software name="sroulett">
 		<description>Simple Roulette</description>
 		<year>xx??</year>
 		<publisher>Jay Simpson</publisher>
@@ -981,7 +981,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="smartter">
+	<software name="smarttr1">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Smart Terminal 1</description>
 		<year>1983</year>
@@ -1044,7 +1044,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="statesca">
+	<software name="statcapi">
 		<description>States &amp; Capitals</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1066,7 +1066,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="superhot">
+	<software name="suprhzd251">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Super Hot Z Disassembler v2.51</description>
 		<year>19??</year>
@@ -1090,7 +1090,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="taswordt">
+	<software name="tasword2">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Tasword Two</description>
 		<year>1983</year>
@@ -1102,7 +1102,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tc2048de">
+	<software name="tc2048dm">
 		<description>TC 2048 Demonstraçao</description>
 		<year>1984</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -1120,7 +1120,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tc2048hi">
+	<software name="tc2048hrc">
 		<description>TC2048 Hi-Res Colour Demo</description>
 		<year>20??</year>
 		<publisher>Andrew Owen</publisher>
@@ -1142,7 +1142,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="thetrade">
+	<software name="tradertr">
 		<description>The Trader Trilogy</description>
 		<year>1984</year>
 		<publisher>Knighted Computers</publisher>
@@ -1177,7 +1177,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timeteac">
+	<software name="timetch1">
 		<description>Time Teacher I</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1206,7 +1206,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timextc2">
+	<software name="tc2048hc">
 		<description>Timex TC2048 Hi-Colour Demo</description>
 		<year>2002</year>
 		<publisher>Grok Developments Ltd</publisher>
@@ -1229,7 +1229,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="travelwi">
+	<software name="travtrsh">
 		<description>Travel with Trashman</description>
 		<year>1984</year>
 		<publisher>New Generation Software</publisher>
@@ -1240,7 +1240,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ts2068de">
+	<software name="ts2068dm">
 		<description>TS-2068 DEMO</description>
 		<year>2010</year>
 		<publisher>Mister Beep</publisher>
@@ -1251,7 +1251,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="upload20">
+	<software name="upload2k">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Upload-2000</description>
 		<year>1983</year>
@@ -1299,7 +1299,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="warinthe">
+	<software name="wareast">
 		<description>War in the East</description>
 		<year>1985</year>
 		<publisher>Sharps Inc</publisher>
@@ -1310,7 +1310,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="windowpr">
+	<software name="windowp32">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Window Print 32</description>
 		<year>1987</year>
@@ -1322,7 +1322,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="windowpr">
+	<software name="windowp64">
 	<!--	Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.	-->
 		<description>Window Print 64</description>
 		<year>1987</year>
@@ -1334,7 +1334,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wordplay">
+	<software name="wordply1">
 		<description>Word Play I</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1345,7 +1345,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wordplay">
+	<software name="wordply2">
 		<description>Word Play II</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
