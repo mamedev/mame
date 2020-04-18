@@ -39,6 +39,7 @@ WRITE8_MEMBER(pcktgal_state::bank_w)
 WRITE8_MEMBER(pcktgal_state::sound_bank_w)
 {
 	membank("bank3")->set_entry((data >> 2) & 1);
+	m_msm->reset_w((data & 2) >> 1);
 }
 
 WRITE8_MEMBER(pcktgal_state::sound_w)
@@ -63,9 +64,10 @@ WRITE8_MEMBER(pcktgal_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(pcktgal_state::adpcm_reset_r)
+READ8_MEMBER(pcktgal_state::sound_unk_r)
 {
-	m_msm->reset_w(0);
+	// POST only? Unknown purpose
+//	m_msm->reset_w(0);
 	return 0;
 }
 
@@ -98,7 +100,7 @@ void pcktgal_state::pcktgal_sound_map(address_map &map)
 	map(0x1800, 0x1800).w(FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
 	map(0x2000, 0x2000).w(FUNC(pcktgal_state::sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(pcktgal_state::sound_unk_r));
 	map(0x4000, 0x7fff).bankr("bank3");
 	map(0x8000, 0xffff).rom();
 }
