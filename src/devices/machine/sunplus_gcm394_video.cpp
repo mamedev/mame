@@ -8,6 +8,46 @@
 
 **********************************************************************/
 
+/* lots of games, including wrlshunt are not copying tilemap data properly
+   the analysis below is for wrlshunt, although gormiti could prove to be an easier case to look at
+   while jak_ths and jak_swc might be more difficult (the latter uses line/bitmap mode, but still
+   fails to copy the line data)
+   
+
+   --
+
+   wrlshunt BG Tilemap location note
+
+   background tilemap appears to be at 24ad30 - 24af87 (byte address) in RAM  == 125698 - 1257c3 (word address)
+   there are pointers to this
+   (2879-287a) = 98 56 12 00 (00125698) (main background tilemap data is at this address)
+   (287b-287c) = 30 5e 12 00 (00125e30) (address for other layer tilemap)
+   where do we get these copied to registers or used as a source to copy from?
+
+   if you return rand() on 707f reads sometimes you see
+   [:maincpu] pc:053775: r4 = r4 lsr r3  (5698 0009) : [:maincpu] result 002b  (possible unrelated)
+
+   (bg tile addressing is also done by tile #, like the sprites, not fixed step like smartfp)
+   
+   -- callled from here
+   058F79: call 054e56 (with values above)
+   and
+   058FB1: call 054e56 (for some other purpose)
+   (both of these are at the start of the function at 058F46, which we loop in at the moment, possible main loop for the menu?)
+
+   there are other calls in the code, but those are the ones before sprites are uploaded for the menu
+
+   --
+	054E91: r4 = [bp+27] (contains lower part of address)
+	054E92: ds:[r1++] = r4    -- write 5698  to 2879
+	054E93: r4 = [bp+28] (contains upper part of address)
+	054E94: ds:[r1] = r4   -- write 0012  to 287a
+
+	(this is a huge function that ends at 55968, also has lots of calls in it)
+
+*/
+
+
 #include "emu.h"
 #include "sunplus_gcm394_video.h"
 
@@ -1279,21 +1319,6 @@ READ16_MEMBER(gcm394_base_video_device::video_707c_r)
    is this because wrlshunt uses more layers?
 */
 
-/*  wrlshunt BG Tilemap location note
-
-   background tilemap appears to be at 24ad30 - 24af87 (byte address) in RAM  == 125698 - 1257c3 (word address)
-   there are pointers to this
-   (2879-287a) = 98 56 12 00 (00125698) (main background tilemap data is at this address)
-   (287b-287c) = 30 5e 12 00 (00125e30) (address for other layer tilemap)
-   where do we get these copied to registers or used as a source to copy from?
-   does it depend on 707f behavior?
-
-   if you return rand() on 707f reads sometimes you see
-   [:maincpu] pc:053775: r4 = r4 lsr r3  (5698 0009) : [:maincpu] result 002b
-
-   (bg tile addressing is also done by tile #, like the sprites, not fixed step like smartfp)
-
-*/
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
