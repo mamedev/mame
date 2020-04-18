@@ -8,7 +8,6 @@ They were the German distributor of the Colour Genie EG2000 computers.
 
 Known missing software titles:
 
-Bäng-Bäng, 1983 TCS
 Break Out
 Colour-Assembler
 Colour-Monitor I
@@ -49,6 +48,19 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="10894">
 				<rom name="adressdatei2.cas" size="10894" crc="3fe7d06a" sha1="398c8fb13df611b3fea49d8a9b3ed02139e12b35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baeng">
+		<description>BängBäng - 2 player gun fight</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with BAENG, enter / to start (req. 32k memory and joysticks)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="8943">
+				<rom name="baeng.cas" size="8943" crc="0e1badf1" sha1="0a6dd2a49555ea0e0049eb02f19f60c9de382ab8" />
 			</dataarea>
 		</part>
 	</software>
