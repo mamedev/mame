@@ -230,7 +230,7 @@ namespace plib
 
 	namespace util
 	{
-		pstring basename(const pstring &filename);
+		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
