@@ -40,6 +40,10 @@ namespace plib {
 		virtual ~app() = default;
 
 		virtual pstring usage() = 0;
+
+		/* short version of usage, defaults to usage */
+		virtual pstring usage_short() { return usage(); }
+
 		virtual int execute() = 0;
 
 		plib::putf8_fmt_writer pout;
