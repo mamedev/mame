@@ -6129,7 +6129,7 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 		{9,  29, 28},
 		{10, 33, 32},
 		{11, 37, 36},
-		{14, 39, 40},
+		{14, 39, 38},
 		{15, 35, 34},
 		{16, 31, 30},
 		{17, 27, 26},
@@ -6183,9 +6183,9 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 		{23, 7,  6}};
 	static uint16_t input_pins_registered[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 	static uint16_t input_pins_combinatorialcomplex[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 20, 21, 23};
-	static uint16_t input_pins_combinatorialsimple[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	uint16_t input_pins_combinatorialsimple[22];
 	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	uint16_t index, output_pin_count;
+	uint16_t index, input_pin_count, output_pin_count;
 
 	output_pin_count = 0;
 
@@ -6240,7 +6240,21 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 		{
 			/* Simple Mode */
 
-			set_input_pins(input_pins_combinatorialsimple, ARRAY_LENGTH(input_pins_combinatorialsimple));
+			input_pin_count = 0;
+
+			for (index = 1; index < 12; ++index)
+			{
+				input_pins_combinatorialsimple[input_pin_count] = index;
+
+				++input_pin_count;
+			}
+
+			for (index = 13; index < 15; ++index)
+			{
+				input_pins_combinatorialsimple[input_pin_count] = index;
+
+				++input_pin_count;
+			}
 
 			memcpy(gal20v8pinfuserows, pinfuserows_registered, sizeof(pinfuserows_registered));
 			memcpy(gal20v8pinfusecolumns, pinfusecolumns_combinatorialsimple, sizeof(pinfusecolumns_combinatorialsimple));
@@ -6250,6 +6264,10 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 				if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
 				{
 					/* Pin is for input only */
+
+					input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
+
+					++input_pin_count;
 
 					if (macrocells[index].pin == 18 || macrocells[index].pin == 19)
 					{
@@ -6271,19 +6289,17 @@ static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
 						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
 					}
 
-					if (output_pins[output_pin_count].pin != 18 &&
-						output_pins[output_pin_count].pin != 19)
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_OUTPUT;
-					}
-					else
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
-					}
+					output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
 
 					++output_pin_count;
 				}
 			}
+
+			input_pins_combinatorialsimple[input_pin_count] = 23;
+
+			++input_pin_count;
+
+			set_input_pins(input_pins_combinatorialsimple, input_pin_count);
 		}
 	}
 	else
