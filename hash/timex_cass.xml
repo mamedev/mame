@@ -9,9 +9,9 @@ license:CC0
 
 	
 	Notes on cassette dumps:
-		MAME would prefer a proper separate representation of each cassette side, rather than having both in a single TZX.
+		It's preferable to have a proper representation of each cassette side, rather than having both in a single TZX.
 		While the contents in both sides of each cassette are usually identical, it's preferable to have dumps of both to be completely sure.
-		Certain alternate editions might share the same data but have very different pauses between blocks, which makes them technically different.
+		Certain alternate editions might share the same data but have very different pauses between blocks, which makes them separate clones.
 		Beware of any "fake" TZX files with 1000ms pauses! Those are better added as TAP while the real TZXs are created.
 
 	
