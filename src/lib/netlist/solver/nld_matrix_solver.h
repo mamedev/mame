@@ -222,8 +222,10 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
-		virtual unsigned vsolve_non_dynamic(bool newton_raphson) = 0;
+		virtual void vsolve_non_dynamic() = 0;
 		virtual netlist_time compute_next_timestep(nl_fptype cur_ts) = 0;
+		virtual bool check_err() = 0;
+		virtual void store() = 0;
 
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
@@ -399,14 +401,14 @@ namespace solver
 			return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim;
 		}
 
-		void store()
+		void store() override
 		{
 			const std::size_t iN = size();
 			for (std::size_t i = 0; i < iN; i++)
 				this->m_terms[i].setV(m_new_V[i]);
 		}
 
-		bool check_err()
+		bool check_err() override
 		{
 			// NOTE: Ideally we should also include currents (RHS) here. This would
 			// need a reevaluation of the right hand side after voltages have been updated

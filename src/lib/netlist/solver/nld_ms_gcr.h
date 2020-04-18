@@ -110,7 +110,7 @@ namespace solver
 			}
 		}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 		std::pair<pstring, pstring> create_solver_code(static_compile_target target) override;
 
@@ -271,7 +271,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		if (m_proc.resolved())
 		{
@@ -294,12 +294,6 @@ namespace solver
 			// backward substitution
 			mat.gaussian_back_substitution(this->m_new_V, this->m_RHS);
 		}
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver
