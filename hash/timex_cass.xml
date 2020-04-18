@@ -63,7 +63,7 @@ license:CC0
 		<publisher>Paolo Ferraris</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="5444">
-				<rom name="4k race refueled+ (2005)(paolo ferraris).tap" size="5444" crc="ad98748e" sha1="f436b5e3264de6c7594f921e486c887f571c8f4f"/>
+				<rom name="4k race refueled plus (2005)(paolo ferraris).tap" size="5444" crc="ad98748e" sha1="f436b5e3264de6c7594f921e486c887f571c8f4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@ license:CC0
 		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="29328">
-				<rom name="cozinheiro (198x)(tmx portugal ltda).tzx" size="29328" crc="76887baf" sha1="caa7ee66802c903ee73ad83387706675bd16b27e"/>
+				<rom name="cozinheiro (198x)(tmx portugal ltda).tzx" status="baddump" size="29328" crc="76887baf" sha1="caa7ee66802c903ee73ad83387706675bd16b27e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -409,13 +409,13 @@ license:CC0
 		<part name="cass1" interface="spectrum_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="95250">
-				<rom name="demonstração tc 2048 - side a (198x)(tmx portugal ltda).tzx" size="95250" crc="7eb56a5a" sha1="46db89e9951b0e8d0359f94228cb9fb07edeba82"/>
+				<rom name="demonstracao tc 2048 - side a (198x)(tmx portugal ltda).tzx" size="95250" crc="7eb56a5a" sha1="46db89e9951b0e8d0359f94228cb9fb07edeba82"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spectrum_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="86582">
-				<rom name="demonstração tc 2048 - side b (198x)(tmx portugal ltda).tzx" size="86582" crc="e9daede5" sha1="f20b44323ee9e73a71065b8fb6272b57136d8cc3"/>
+				<rom name="demonstracao tc 2048 - side b (198x)(tmx portugal ltda).tzx" size="86582" crc="e9daede5" sha1="f20b44323ee9e73a71065b8fb6272b57136d8cc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@ license:CC0
 		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="6382">
-				<rom name="fórmula 1 (198x)(tmx portugal ltda).tzx" size="6382" crc="92908e9d" sha1="8dc0c80e86b763b76138ae2f2e7fc536fc943334"/>
+				<rom name="formula 1 (198x)(tmx portugal ltda).tzx" status="baddump" size="6382" crc="92908e9d" sha1="8dc0c80e86b763b76138ae2f2e7fc536fc943334"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@ license:CC0
 		<publisher>Games to Learn By Inc</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="38953">
-				<rom name="frogger (1983)(games to learn by inc).tzx" size="38953" crc="573c64eb" sha1="a45646004b374fa088849f1839bea3513e5c2ca2"/>
+				<rom name="frogger (1983)(games to learn by inc).tzx" status="baddump" size="38953" crc="573c64eb" sha1="a45646004b374fa088849f1839bea3513e5c2ca2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -552,7 +552,7 @@ license:CC0
 		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="32897">
-				<rom name="herói (198x)(tmx portugal ltda).tzx" size="32897" crc="3a616c4a" sha1="764c232faf927161a9a5bf292e1c43f3c67be79c"/>
+				<rom name="heroi (198x)(tmx portugal ltda).tzx" size="32897" crc="3a616c4a" sha1="764c232faf927161a9a5bf292e1c43f3c67be79c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -575,7 +575,7 @@ license:CC0
 		<publisher>Timex Computer Corporation</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="16072">
-				<rom name="horace &amp; the spiders (1983)(timex computer corporation).tap" size="16072" crc="658cfd25" sha1="235b3f1d87383a3e312add99fcc4aa6eba7a56da"/>
+				<rom name="horace and the spiders (1983)(timex computer corporation).tap" size="16072" crc="658cfd25" sha1="235b3f1d87383a3e312add99fcc4aa6eba7a56da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -586,7 +586,7 @@ license:CC0
 		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="9031">
-				<rom name="horácio e as aranhas (198x)(tmx portugal ltda).tzx" size="9031" crc="ce7b76b1" sha1="bdd2f2a5034bb39ea4a6fc83301350f947d0db52"/>
+				<rom name="horacio e as aranhas (198x)(tmx portugal ltda).tzx" size="9031" crc="ce7b76b1" sha1="bdd2f2a5034bb39ea4a6fc83301350f947d0db52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -811,7 +811,7 @@ license:CC0
 		<publisher>Zebra Systems Inc</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="20491">
-				<rom name="mscript rerelease (1983)(zebra systems inc).tzx" size="20491" crc="3721abe9" sha1="1f248a6700a911056129eb3dc18e8cdb98d0f541"/>
+				<rom name="mscript rerelease (1983)(zebra systems inc).tzx" status="baddump" size="20491" crc="3721abe9" sha1="1f248a6700a911056129eb3dc18e8cdb98d0f541"/>
 			</dataarea>
 		</part>
 	</software>
@@ -855,7 +855,7 @@ license:CC0
 		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="10137">
-				<rom name="orçamento doméstico (198x)(tmx portugal ltda).tzx" size="10137" crc="99b3d99a" sha1="8a3cc2e76779e4dd4dc674e3df7c80d3c8453008"/>
+				<rom name="orcamento domestico (198x)(tmx portugal ltda).tzx" size="10137" crc="99b3d99a" sha1="8a3cc2e76779e4dd4dc674e3df7c80d3c8453008"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1050,7 +1050,7 @@ license:CC0
 		<publisher>Timex Computer Corporation</publisher>
 		<part name="cass" interface="timex_cass">
 			<dataarea name="cass" size="14891">
-				<rom name="states &amp; capitals (1983)(timex computer corporation).tzx" size="14891" crc="ba095325" sha1="928e4239695a47f8dbddf0f73e59cc8119e0e24d"/>
+				<rom name="states and capitals (1983)(timex computer corporation).tzx" size="14891" crc="ba095325" sha1="928e4239695a47f8dbddf0f73e59cc8119e0e24d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1109,13 +1109,13 @@ license:CC0
 		<part name="cass1" interface="timex_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass1" size="59350">
-				<rom name="tc 2048 demonstraçao - side a (1984)(tmx portugal ltda).tzx" size="59350" crc="0c11b3b0" sha1="7775039bc3c5522fb60a4e929953064f436b14b7"/>
+				<rom name="tc 2048 demonstracao - side a (1984)(tmx portugal ltda).tzx" size="59350" crc="0c11b3b0" sha1="7775039bc3c5522fb60a4e929953064f436b14b7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="timex_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass2" size="50119">
-				<rom name="tc 2048 demonstraçao - side b (1984)(tmx portugal ltda).tzx" size="50119" crc="3a3cc13c" sha1="e3134203f65c16964a79b57896f342f5e70235e5"/>
+				<rom name="tc 2048 demonstracao - side b (1984)(tmx portugal ltda).tzx" size="50119" crc="3a3cc13c" sha1="e3134203f65c16964a79b57896f342f5e70235e5"/>
 			</dataarea>
 		</part>
 	</software>
