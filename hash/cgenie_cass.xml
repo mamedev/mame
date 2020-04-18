@@ -24,7 +24,6 @@ Mampf (Mampfman?), TCS 1983
 Mathematik-Lernprogramm
 Mausi, TCS 1983
 Memory
-NE555
 Opamp (Operationsverstärker Applikationen), Uwe Gerber
 Optik (Grundeigenschaften des Lichts)
 Orgel, TCS 1982
@@ -343,6 +342,19 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="6725">
 				<rom name="nato_morsing.cas" size="6725" crc="82256162" sha1="7fb1841bcf577a2b1fee3eefe4314bd893ad1ecf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ne555">
+		<description>NE555 timer chip information and calculator</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Udo Gerber" />
+		<info name="usage" value="Type SYSTEM and load with NE555 (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="15266">
+				<rom name="ne555.cas" size="15266" crc="25a880ad" sha1="84768dc4aa55b3f904a3db49c001f8555740f34f" />
 			</dataarea>
 		</part>
 	</software>
