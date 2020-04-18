@@ -617,6 +617,7 @@ void m24_state::olivetti(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "m24_disk_list").set_original("m24");
 }
 
 ROM_START( m21 )
