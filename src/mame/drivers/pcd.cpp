@@ -554,6 +554,8 @@ void pcd_state::pcd(machine_config &config)
 
 	INPUT_BUFFER(config, "scsi_data_in", 0);
 	m_scsi->set_slot_device(1, "harddisk", OMTI5100, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("pcd_flop");
 }
 
 void pcd_state::pcx(machine_config &config)
@@ -568,6 +570,7 @@ void pcd_state::pcx(machine_config &config)
 
 	m_usart[1]->txd_handler().set_nop();
 
+	config.device_remove("flop_list");
 	SOFTWARE_LIST(config, "flop_ls").set_original("pcx_flop");
 }
 

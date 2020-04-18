@@ -1833,12 +1833,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates! (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
+				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="pirates! (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089"/>
+				<rom name="pirates (disk 2 of 2).img" size="368640" crc="964cb6c9" sha1="215ffc08ea7fa144952ba5d8ed7eb0d49820a089"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7294,7 +7294,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Capcom</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Arcade Blockbusters! (USA).img" size="737280" crc="73e7a7bd" sha1="00bd672d6284b08782777c7005be13b3b8d3c1cc"/>
+				<rom name="Arcade Blockbusters (USA).img" size="737280" crc="73e7a7bd" sha1="00bd672d6284b08782777c7005be13b3b8d3c1cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8797,12 +8797,12 @@ has been replaced with an all-zero block. -->
 		<publisher>Sega</publisher>
 		<info name="developer" value="Sega" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [1 of 2].img" size="368640" crc="9d919d85" sha1="9203ecedd274d2436b6c39aa166fabd0e5d089d4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
+			<dataarea name="flop" size = "368640">
 				<rom name="Golden Axe [Sega] [1990] [5.25] [2 of 2].img" size="368640" crc="8684a3dd" sha1="3200f3a97d5912812dc4b53b8b733a371c2bf140"/>
 			</dataarea>
 		</part>
@@ -10145,13 +10145,13 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1 - Program"/>
 			<dataarea name="flop" size = "163840">
-				<rom name="Math Blaster! (USA) (Side 1 - Program).img" size="163840" crc="b73a1e48" sha1="01cedf6b1b079b2403e88803d26fb89818bda895"/>
+				<rom name="Math Blaster (USA) (Side 1 - Program).img" size="163840" crc="b73a1e48" sha1="01cedf6b1b079b2403e88803d26fb89818bda895"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 2 - Data"/>
 			<dataarea name="flop" size = "163840">
-				<rom name="Math Blaster! (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28"/>
+				<rom name="Math Blaster (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11582,6 +11582,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="simlife">
+		<description>SimLife</description>
+		<year>1992</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="2565bba0" sha1="121122ec26a856272259cecf37322118911fc9b6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (USA) [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="7f61828f" sha1="459a4b9d0dc9bdd100d056c45e49f648777668a8"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bartvssm">
 		<description>The Simpsons - Bart vs. the Space Mutants</description>
 		<year>1991</year>
@@ -12170,12 +12188,12 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="278eea7d" sha1="57441bd093713932e67b0b2c598b6aff3df7ad09"/>
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="278eea7d" sha1="57441bd093713932e67b0b2c598b6aff3df7ad09"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
 			</dataarea>
 		</part>
 	</software>

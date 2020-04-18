@@ -575,13 +575,13 @@ INVESTIGATE
 		<!--rom name="saito yuki demo.d88" size="697984" crc="e879576f" sha1="4f7344ce305d86c9492f0527c4120d5ac0ced37a" offset="0"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424"> <!-- Data CRC16: 2590 -->
+			<dataarea name="flop" size="349136"> <!-- Data CRC16: 2590 -->
 				<rom name="saito yuki demo (disk 1).d88" size="349136" crc="596501d6" sha1="b698d49dcdf16dbe97151d368a5f7f139a5b4dd6" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="31424"> <!-- Data CRC16: 15660 -->
+			<dataarea name="flop" size="348848"> <!-- Data CRC16: 15660 -->
 				<rom name="saito yuki demo (disk 2).d88" size="348848" crc="0b6f69cb" sha1="f90808d7368a2c3d09a67570754b8e27f3ec4b98" offset="0"/>
 			</dataarea>
 		</part>
@@ -2216,21 +2216,21 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk " />
 			<dataarea name="flop" size="401392">    <!-- Data CRC16: 7 -->
-				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh!)(system disk).d88" size="401392" crc="ac2376a4" sha1="910fcc708d60e69d4080af7352d64e976482374f"/>
+				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh)(system disk).d88" size="401392" crc="ac2376a4" sha1="910fcc708d60e69d4080af7352d64e976482374f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="380592">    <!-- Data CRC16: 21463 -->
-				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh!)(disk 1).d88" size="380592" crc="23649e3e" sha1="a8f358926a3bb5802b62b94f8be02d1a07130245"/>
+				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh)(disk 1).d88" size="380592" crc="23649e3e" sha1="a8f358926a3bb5802b62b94f8be02d1a07130245"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="401392">    <!-- Data CRC16: 51566 -->
-				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh!)(disk 2).d88" size="401392" crc="550fb206" sha1="cb6f97c49516c7ec9ab0aec79ca4a1120781b420"/>
+				<rom name="alice tachi no gogo vol.1 (1989)(systemhouse oh)(disk 2).d88" size="401392" crc="550fb206" sha1="cb6f97c49516c7ec9ab0aec79ca4a1120781b420"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11129,7 +11129,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<year>1989?</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="415824">    <!-- Data CRC16: 21332 -->
+			<dataarea name="flop" size="415840">    <!-- Data CRC16: 21332 -->
 				<rom name="emerald dragon music disk (19xx)(basho house).d88" size="415840" crc="6f1a87d3" sha1="c6c6ec5af97f3c1c0c1b9687d4cd7ac368051181"/>
 			</dataarea>
 		</part>
@@ -13122,7 +13122,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<info name="alt_title" value="がんばれ!美樹ちゃん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="ganbare! miki-chan.d88" size="348848" crc="b71a357a" sha1="b02f2f06ffb71a7c16b56d525b054df37289a018"/>
+				<rom name="ganbare miki-chan.d88" size="348848" crc="b71a357a" sha1="b02f2f06ffb71a7c16b56d525b054df37289a018"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14972,7 +14972,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349104">
-				<rom name="hashire! skyline sr.d88" size="349104" crc="ee7eb00f" sha1="4f5a47e3e4950f3fb572feac98e786380b815d2f"/>
+				<rom name="hashire skyline sr.d88" size="349104" crc="ee7eb00f" sha1="4f5a47e3e4950f3fb572feac98e786380b815d2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17910,28 +17910,28 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk a).d88" size="348848" crc="0e5419be" sha1="960728eb2cad18c4d26f522c90c08d5c6c3e96f5"/>
+				<rom name="kibun wa pastel touch (disk a).d88" size="348848" crc="0e5419be" sha1="960728eb2cad18c4d26f522c90c08d5c6c3e96f5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
+				<rom name="kibun wa pastel touch (disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
+				<rom name="kibun wa pastel touch (disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
+				<rom name="kibun wa pastel touch (disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17957,21 +17957,21 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
+				<rom name="kibun wa pastel touch (disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
+				<rom name="kibun wa pastel touch (disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch! (disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
+				<rom name="kibun wa pastel touch (disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25684,28 +25684,28 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="473776">
-				<rom name="pirates! (disk 1).d88" size="473776" crc="f454e71d" sha1="211a1ca4ca269e80b6bffaeb822ceddda12995f7"/>
+				<rom name="pirates (disk 1).d88" size="473776" crc="f454e71d" sha1="211a1ca4ca269e80b6bffaeb822ceddda12995f7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="473776">
-				<rom name="pirates! (disk 2).d88" size="473776" crc="85385c55" sha1="913a5233474a2d2605005dab4e9f194bca644191"/>
+				<rom name="pirates (disk 2).d88" size="473776" crc="85385c55" sha1="913a5233474a2d2605005dab4e9f194bca644191"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="473776">
-				<rom name="pirates! (disk 3).d88" size="473776" crc="cfc77981" sha1="c5b69c036c5ce4bbd69b594a95f0022564f3b409"/>
+				<rom name="pirates (disk 3).d88" size="473776" crc="cfc77981" sha1="c5b69c036c5ce4bbd69b594a95f0022564f3b409"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Save" />
 			<dataarea name="flop" size="473776">
-				<rom name="pirates! (disk 4).d88" size="473776" crc="34961250" sha1="ffb66d24d3182f46288bd8b50f101f8fd0e60519"/>
+				<rom name="pirates (disk 4).d88" size="473776" crc="34961250" sha1="ffb66d24d3182f46288bd8b50f101f8fd0e60519"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29328,35 +29328,35 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="442352">
-				<rom name="sekai de ichiban kimi ga suki! (disk a).d88" size="442352" crc="569f36c5" sha1="e7fd7bc1c4477d27c0d5cab996dc7b9fc9cc9439"/>
+				<rom name="sekai de ichiban kimi ga suki (disk a).d88" size="442352" crc="569f36c5" sha1="e7fd7bc1c4477d27c0d5cab996dc7b9fc9cc9439"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki! (disk b).d88" size="443264" crc="50b16026" sha1="21f33e3e83938f40d585d4bbf2e01d91a995cafe"/>
+				<rom name="sekai de ichiban kimi ga suki (disk b).d88" size="443264" crc="50b16026" sha1="21f33e3e83938f40d585d4bbf2e01d91a995cafe"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki! (disk c).d88" size="443264" crc="b9994ad1" sha1="57721446be623ec6eb1df75c0bffa474d169688c"/>
+				<rom name="sekai de ichiban kimi ga suki (disk c).d88" size="443264" crc="b9994ad1" sha1="57721446be623ec6eb1df75c0bffa474d169688c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki! (disk d).d88" size="443264" crc="082f31f9" sha1="5d4c5ea38a40c030768bfcec4b7befed8dec4bf7"/>
+				<rom name="sekai de ichiban kimi ga suki (disk d).d88" size="443264" crc="082f31f9" sha1="5d4c5ea38a40c030768bfcec4b7befed8dec4bf7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki! (disk e).d88" size="443264" crc="8e601ffd" sha1="f77e522eb73b5d4a71712c4878904296f29364ce"/>
+				<rom name="sekai de ichiban kimi ga suki (disk e).d88" size="443264" crc="8e601ffd" sha1="f77e522eb73b5d4a71712c4878904296f29364ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29374,35 +29374,35 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="442352">
-				<rom name="sekai de ichiban kimi ga suki!(a) (disk 1).d88" size="442352" crc="47cd3e0a" sha1="4ca3448cf14a863125600032536c922e5a693ade"/>
+				<rom name="sekai de ichiban kimi ga suki(a) (disk 1).d88" size="442352" crc="47cd3e0a" sha1="4ca3448cf14a863125600032536c922e5a693ade"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki!(a) (disk b).d88" size="443264" crc="50b16026" sha1="21f33e3e83938f40d585d4bbf2e01d91a995cafe"/>
+				<rom name="sekai de ichiban kimi ga suki(a) (disk b).d88" size="443264" crc="50b16026" sha1="21f33e3e83938f40d585d4bbf2e01d91a995cafe"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki!(a) (disk c).d88" size="443264" crc="b9994ad1" sha1="57721446be623ec6eb1df75c0bffa474d169688c"/>
+				<rom name="sekai de ichiban kimi ga suki(a) (disk c).d88" size="443264" crc="b9994ad1" sha1="57721446be623ec6eb1df75c0bffa474d169688c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki!(a) (disk d).d88" size="443264" crc="082f31f9" sha1="5d4c5ea38a40c030768bfcec4b7befed8dec4bf7"/>
+				<rom name="sekai de ichiban kimi ga suki(a) (disk d).d88" size="443264" crc="082f31f9" sha1="5d4c5ea38a40c030768bfcec4b7befed8dec4bf7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="443264">
-				<rom name="sekai de ichiban kimi ga suki!(a) (disk e).d88" size="443264" crc="8e601ffd" sha1="f77e522eb73b5d4a71712c4878904296f29364ce"/>
+				<rom name="sekai de ichiban kimi ga suki(a) (disk e).d88" size="443264" crc="8e601ffd" sha1="f77e522eb73b5d4a71712c4878904296f29364ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40549,19 +40549,19 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="C.N. Productions" />
 		<!--combined image-->
-		<!--rom name="captain-neo music disk 3 - fredy! fredy! (1991)(c.n. productions).d88" size="844320" crc="2fbfb421" sha1="64b67f7267913c448c72856b317d782fbca4ba7a"/-->
+		<!--rom name="captain-neo music disk 3 - fredy fredy (1991)(c.n. productions).d88" size="844320" crc="2fbfb421" sha1="64b67f7267913c448c72856b317d782fbca4ba7a"/-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="422160">
-				<rom name="captain-neo_music_disk_3_-_fredy!_fredy!_01.d88" size="422160" crc="47f7135a" sha1="4d14b966633f7ee5fdef53f3b01fb3d907c7ee03"/>
+				<rom name="captain-neo_music_disk_3_-_fredy_fredy_01.d88" size="422160" crc="47f7135a" sha1="4d14b966633f7ee5fdef53f3b01fb3d907c7ee03"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="PCM" />
 			<dataarea name="flop" size="422160">
-				<rom name="captain-neo_music_disk_3_-_fredy!_fredy!_02.d88" size="422160" crc="c297af77" sha1="31278a420faf856e1d440e47f7f5023cf8a29bb3"/>
+				<rom name="captain-neo_music_disk_3_-_fredy_fredy_02.d88" size="422160" crc="c297af77" sha1="31278a420faf856e1d440e47f7f5023cf8a29bb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42503,7 +42503,7 @@ Also found as separate images (but equal CRC)
 		<info name="alt_title" value="がんばれ!アドル君!!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="ganbare! adol-kun!.d88" size="348848" crc="5510af0f" sha1="1464fdbb2b616f140d596806cfa80179acbe3d60"/>
+				<rom name="ganbare adol-kun.d88" size="348848" crc="5510af0f" sha1="1464fdbb2b616f140d596806cfa80179acbe3d60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42887,14 +42887,14 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="369632">
-				<rom name="hunter card!! (disk a).d88" size="369632" crc="eddf4057" sha1="197d8f0820f40a0e4f69abdf579fca7943c218c1"/>
+				<rom name="hunter card (disk a).d88" size="369632" crc="eddf4057" sha1="197d8f0820f40a0e4f69abdf579fca7943c218c1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="369632">
-				<rom name="hunter card!! (disk b).d88" size="369632" crc="419e1598" sha1="adb7126e15c8d910e1512bf2b7b2e741df685267"/>
+				<rom name="hunter card (disk b).d88" size="369632" crc="419e1598" sha1="adb7126e15c8d910e1512bf2b7b2e741df685267"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43732,7 +43732,7 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		<info name="alt_title" value="脳天直撃! 外伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="361904">
-				<rom name="noten chokugeki! gaiden.d88" size="361904" crc="ebf37d16" sha1="2047d41ac297fd6014253cbd3af5b6623b6b6bf2"/>
+				<rom name="noten chokugeki gaiden.d88" size="361904" crc="ebf37d16" sha1="2047d41ac297fd6014253cbd3af5b6623b6b6bf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46975,14 +46975,14 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="411728">    <!-- Data CRC16: 51769 -->
-				<rom name="acchimuite hoi! (disk a).d88" size="411728" crc="6d1d4413" sha1="9dfc5f61560be8322372a5355f061478a14f2875"/>
+				<rom name="acchimuite hoi (disk a).d88" size="411728" crc="6d1d4413" sha1="9dfc5f61560be8322372a5355f061478a14f2875"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="369968">    <!-- Data CRC16: 37874 -->
-				<rom name="acchimuite hoi! (disk b).d88" size="369968" crc="272f5aba" sha1="2654351a7fcaf0a72cfeed9c026ed553cf99973b"/>
+				<rom name="acchimuite hoi (disk b).d88" size="369968" crc="272f5aba" sha1="2654351a7fcaf0a72cfeed9c026ed553cf99973b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46996,14 +46996,14 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="411728">    <!-- Data CRC16: 25051 -->
-				<rom name="acchi muite hoi! (19xx)(-)(disk a).d88" size="411728" crc="20a250a2" sha1="5f775cf1f5b54bb7a05f1725d4d5539f34393877"/>
+				<rom name="acchi muite hoi (19xx)(-)(disk a).d88" size="411728" crc="20a250a2" sha1="5f775cf1f5b54bb7a05f1725d4d5539f34393877"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="369968">    <!-- Data CRC16: 6156 -->
-				<rom name="acchi muite hoi! (19xx)(-)(disk b).d88" size="369968" crc="33836120" sha1="5db84ee19bbeb78f41622515fa6953d2630f5b4f"/>
+				<rom name="acchi muite hoi (19xx)(-)(disk b).d88" size="369968" crc="33836120" sha1="5db84ee19bbeb78f41622515fa6953d2630f5b4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47019,14 +47019,14 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="390608">    <!-- Data CRC16: 2510 -->
-				<rom name="acchi muite hoi! (a2)(disk a).d88" size="390608" crc="768363a0" sha1="5cd0582fac212baa9379a323cc2508341243375b"/>
+				<rom name="acchi muite hoi (a2)(disk a).d88" size="390608" crc="768363a0" sha1="5cd0582fac212baa9379a323cc2508341243375b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 19585 -->
-				<rom name="acchi muite hoi! (a2)(disk b).d88" size="348848" crc="a460a808" sha1="3a036ab8350419a0cdbd0e5eb89dcddd506932f1"/>
+				<rom name="acchi muite hoi (a2)(disk b).d88" size="348848" crc="a460a808" sha1="3a036ab8350419a0cdbd0e5eb89dcddd506932f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47314,7 +47314,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
-				<rom name="chikyu sos!.d88" size="348832" crc="bb349e36" sha1="dc2c7758659632723e43687fc9796af8fbd8d613"/>
+				<rom name="chikyu sos.d88" size="348832" crc="bb349e36" sha1="dc2c7758659632723e43687fc9796af8fbd8d613"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48046,7 +48046,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="kishu! okehazama.d88" size="348848" crc="d40e8f90" sha1="b1e350d236c4c8411ca032c67aa67eaa4a6cc74e"/>
+				<rom name="kishu okehazama.d88" size="348848" crc="d40e8f90" sha1="b1e350d236c4c8411ca032c67aa67eaa4a6cc74e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48433,7 +48433,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mikisan jump! easy.d88" size="348848" crc="e66fbd6e" sha1="ea126172c50b14da4df5db8f70baf66b4c82cb33"/>
+				<rom name="mikisan jump easy.d88" size="348848" crc="e66fbd6e" sha1="ea126172c50b14da4df5db8f70baf66b4c82cb33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50697,7 +50697,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<info name="alt_title" value="大ハッスル!SFハレハレ三銃士"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="dai hussle! sf harehare sanjushi.d88" size="348848" crc="ba6af099" sha1="014f0dbc723f0c1fd41576d23a651dd5f59e9deb"/>
+				<rom name="dai hussle sf harehare sanjushi.d88" size="348848" crc="ba6af099" sha1="014f0dbc723f0c1fd41576d23a651dd5f59e9deb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51471,7 +51471,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="kaiketsu! oyabun-man 2.d88" size="348848" crc="886996ea" sha1="bcabedd6d88d811ee5cc86de86faf3e93d16c81e"/>
+				<rom name="kaiketsu oyabun-man 2.d88" size="348848" crc="886996ea" sha1="bcabedd6d88d811ee5cc86de86faf3e93d16c81e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51925,17 +51925,17 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
-		<!--rom name="nihon jodan! black jack!.d88" size="697696" crc="16dc996d" sha1="e259bdd55a33f198dda5b13952184b30d10c536c"/-->
+		<!--rom name="nihon jodan black jack!.d88" size="697696" crc="16dc996d" sha1="e259bdd55a33f198dda5b13952184b30d10c536c"/-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="nihon jodan! black jack! (disk 1).d88" size="348848" crc="f976a21f" sha1="0afcc5abf7b39c8634387c4dc797bf0d9718665e"/>
+				<rom name="nihon jodan black jack (disk 1).d88" size="348848" crc="f976a21f" sha1="0afcc5abf7b39c8634387c4dc797bf0d9718665e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="nihon jodan! black jack! (disk 2).d88" size="348848" crc="e9fb8e16" sha1="4b84be4c16ad5ed2e4091c1f0ae30ccb30db3cac"/>
+				<rom name="nihon jodan black jack (disk 2).d88" size="348848" crc="e9fb8e16" sha1="4b84be4c16ad5ed2e4091c1f0ae30ccb30db3cac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51957,7 +51957,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="nyanpi!.d88" size="348848" crc="1c34469f" sha1="22380ba54cba8bfbbb178d482e0a8326d5919b04"/>
+				<rom name="nyanpi.d88" size="348848" crc="1c34469f" sha1="22380ba54cba8bfbbb178d482e0a8326d5919b04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52763,13 +52763,13 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sweet emotion! (disk 1).d88" size="415840" crc="a7dd24cd" sha1="20b14dd0b2d5736f7b9569553aa379fc83113e73"/>
+				<rom name="sweet emotion (disk 1).d88" size="415840" crc="a7dd24cd" sha1="20b14dd0b2d5736f7b9569553aa379fc83113e73"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sweet emotion! (disk 2).d88" size="415840" crc="23f5d5db" sha1="cd00306eb002d19ee1f6b187b0fa6b6e1091c6e4"/>
+				<rom name="sweet emotion (disk 2).d88" size="415840" crc="23f5d5db" sha1="cd00306eb002d19ee1f6b187b0fa6b6e1091c6e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52827,13 +52827,13 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="temp monster! (disk 1).d88" size="348848" crc="11bb295f" sha1="635d987d76b0bf17f29a9bc43086250973041773"/>
+				<rom name="temp monster (disk 1).d88" size="348848" crc="11bb295f" sha1="635d987d76b0bf17f29a9bc43086250973041773"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="temp monster! (disk 2).d88" size="348848" crc="69f64a66" sha1="6205b957eb9543ec65c46a726681a64c8512890d"/>
+				<rom name="temp monster (disk 2).d88" size="348848" crc="69f64a66" sha1="6205b957eb9543ec65c46a726681a64c8512890d"/>
 			</dataarea>
 		</part>
 	</software>

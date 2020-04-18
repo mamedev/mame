@@ -10,6 +10,7 @@
     Cadillacs and Dinosaurs         930201 ETC
     The Punisher                    930422 ETC
     Saturday Night Slam Masters     930713 ETC
+    Warriors of Fate                921002 ETC
 
     (Note, these are all CPS1.5/Q sound games)
 
@@ -25,11 +26,20 @@ Status of each game:
 dinopic:           No sound.
 dinopic2:          No sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
 dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
+jurassic99:        No sound.
 punipic, punipic2: No sound. Problems in Central Park. Patches used.
 punipic3:          Same as punipic, and doors are missing.
 slampic:           No sound. Some minor gfx issues (sprites on character select screen).
 slampic2:          No sound. All gfx issues confirmed present on real board.
+wofpic:            No sound. Some minor gfx issues. Missing boat start of level 7.
 
+all dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
+
+brightness circuity present on pcb?
+	slampic2	yes
+	dinopic3	no
+	jurassic99	no
+	others		tbc...   assume no for now
 */
 
 #include "emu.h"
@@ -46,55 +56,87 @@ slampic2:          No sound. All gfx issues confirmed present on real board.
 #define CODE_SIZE            0x400000
 
 
-class cps1bl_pic_state : public fcrash_state
+class cps1bl_pic_state : public cps1bl_no_brgt
 {
 public:
 	cps1bl_pic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fcrash_state(mconfig, type, tag)
+		: cps1bl_no_brgt(mconfig, type, tag)
 	{ }
 
-	void dinopic(machine_config &config);
 	void punipic(machine_config &config);
 	void slampic(machine_config &config);
-	void slampic2(machine_config &config);
 
 	void init_dinopic();
 	void init_punipic();
 	void init_punipic3();
 	void init_slampic();
-	void init_slampic2();
-	void init_wofpic();
+
+protected:
+	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
 
 private:
-	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(slampic);
-	DECLARE_MACHINE_START(slampic2);
 
-	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
-	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
-	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
-	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
-	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
 
-	void dinopic_map(address_map &map);
 	void punipic_map(address_map &map);
 	void slampic_map(address_map &map);
-	void slampic2_map(address_map &map);
 };
 
-class slampic2_state : public cps1bl_pic_state
+class slampic2_state : public fcrash_state
 {
 public:
 	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps1bl_pic_state(mconfig, type, tag)
+		: fcrash_state(mconfig, type, tag)
 	{ }
+	
+	void slampic2(machine_config &config);
+	void init_slampic2();
 
 private:
+	DECLARE_MACHINE_START(slampic2);
+	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
+	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
+	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
+	void slampic2_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
+
+class dinopic_state : public cps1bl_pic_state
+{
+public:
+	dinopic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cps1bl_pic_state(mconfig, type, tag)
+	{ }
+	
+	void dinopic(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
+	DECLARE_MACHINE_START(dinopic);
+	void dinopic_map(address_map &map);
+	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
+
+class wofpic_state : public dinopic_state
+{
+public:
+	wofpic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dinopic_state(mconfig, type, tag)
+	{ }
+	
+	void wofpic(machine_config &config);
+	void init_wofpic();
+
+private:
+	DECLARE_WRITE16_MEMBER(wofpic_layer_w);
+	DECLARE_WRITE16_MEMBER(wofpic_layer2_w);
+	DECLARE_WRITE16_MEMBER(wofpic_spr_base_w);
+	DECLARE_MACHINE_START(wofpic);
+	void wofpic_map(address_map &map);
 };
 
 
@@ -126,7 +168,7 @@ WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer2_w)
+WRITE16_MEMBER(dinopic_state::dinopic_layer2_w)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
@@ -214,7 +256,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer2_w)
 	}
 }
 
-READ16_MEMBER(cps1bl_pic_state::slampic2_cps_a_r)
+READ16_MEMBER(slampic2_state::slampic2_cps_a_r)
 {
 	// checks bit 0 of 800132
 	// no sound codes are sent unless this returns true, ready signal from the sound PIC?
@@ -225,28 +267,133 @@ READ16_MEMBER(cps1bl_pic_state::slampic2_cps_a_r)
 	return 0;
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic2_sound_w)
+WRITE16_MEMBER(slampic2_state::slampic2_sound_w)
 {
 	//logerror("Sound command: %04x\n", data);
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic2_sound2_w)
+WRITE16_MEMBER(slampic2_state::slampic2_sound2_w)
 {
 	//logerror("Sound2 command: %04x\n", data);
 }
 
+WRITE16_MEMBER(wofpic_state::wofpic_layer_w)
+{
+	switch (offset)
+	{
+	case 0x00:
+		m_cps_a_regs[0x0e / 2] = data;
+		break;
+	case 0x01:
+		m_cps_a_regs[0x0c / 2] = data;
+		break;
+	case 0x02:
+		m_cps_a_regs[0x12 / 2] = data;
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+		break;
+	case 0x03:
+		m_cps_a_regs[0x10 / 2] = data;
+		break;
+	case 0x04:
+		m_cps_a_regs[0x16 / 2] = data;
+		break;
+	case 0x05:
+		m_cps_a_regs[0x14 / 2] = data;
+		break;
+	case 0x06:
+		{
+			// see bootleggers routines starting at $101000
+			// writes values 0-f to 98000c
+			// how does this relate to layer control reg value?
+			
+			// original game values:
+			// m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x6398 / 2];
+			// m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x639a / 2];
+			// m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x639c / 2];
+			// m_cps_b_regs[m_layer_mask_reg[3] / 2] = m_mainram[0x639e / 2];
+			
+			switch (data)
+			{
+			case 0:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0x1ff;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x7fff;
+				break;
+			case 1:
+				// 12c0, 12cc, 12c2, 12c4, 12c6, 270a, 2700
+				break;
+			case 2:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0x780;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0;
+				break;
+			case 3:
+				// 1c80, 1c8e
+				break;
+			case 4:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x7fff;
+				break;
+			case 5:
+				break;
+			case 6:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0x781;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x1f;
+				break;
+			case 7:
+				break;
+			case 8:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x1f;
+				break;
+			case 9:
+				break;
+			case 10:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;
+				m_cps_b_regs[m_layer_mask_reg[2] / 2] = 0x40ff;
+				m_cps_b_regs[m_layer_mask_reg[3] / 2] = 0x7fff;
+				break;
+			case 11:
+				break;
+			case 14:
+				m_cps_b_regs[m_layer_enable_reg / 2] = 0x12ce;  // 12ce, 1b0e
+				break;
+			case 15:
+				// 2700, 270a, 2708, 2702, 1e02, 1e0e, 1b02, 1e00, 13e8
+				break;
+			}
+		}
+		break;
+	default:
+		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
+	}
+}
 
-void cps1bl_pic_state::dinopic(machine_config &config)
+WRITE16_MEMBER(wofpic_state::wofpic_layer2_w)
+{
+	m_cps_a_regs[0x06 / 2] = data;
+}
+
+WRITE16_MEMBER(wofpic_state::wofpic_spr_base_w)
+{
+	m_sprite_base = data ? 0x3000 : 0x1000;
+}
+
+
+void dinopic_state::dinopic(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::dinopic_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::dinopic_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
 
 	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); /* no valid dumps .. */
 
-	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, dinopic)
+	MCFG_MACHINE_START_OVERRIDE(dinopic_state, dinopic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
@@ -256,8 +403,8 @@ void cps1bl_pic_state::dinopic(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
-	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
-	m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->set_screen_update(FUNC(dinopic_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(dinopic_state::screen_vblank_cps1));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -339,22 +486,22 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
-void cps1bl_pic_state::slampic2(machine_config &config)
+void slampic2_state::slampic2(machine_config &config)
 {
 	M68000(config, m_maincpu, 10000000);  // measured
-	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::slampic2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &slampic2_state::slampic2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(slampic2_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &slampic2_state::cpu_space_map);
 
 	PIC16C57(config, m_audiocpu, 4000000);  // measured
 	//m_audiocpu->set_disable();
 
-	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, slampic2)
+	MCFG_MACHINE_START_OVERRIDE(slampic2_state, slampic2)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
-	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
-	//m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->set_screen_update(FUNC(slampic2_state::screen_update_fcrash));
+	//m_screen->screen_vblank().set(FUNC(slampic2_state::screen_vblank_cps1));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -364,27 +511,34 @@ void cps1bl_pic_state::slampic2(machine_config &config)
 	//GENERIC_LATCH_8(config, m_soundlatch);
 	//GENERIC_LATCH_8(config, m_soundlatch2);
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_LOW);  // measured & pin 7 verified
-	//m_oki->set_addrmap(0, &cps1bl_pic_state::slampic2_oki_map);
+	//m_oki->set_addrmap(0, &slampic2_state::slampic2_oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
+void wofpic_state::wofpic(machine_config &config)
+{
+	dinopic(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wofpic_state::wofpic_map);
+	MCFG_MACHINE_START_OVERRIDE(wofpic_state, wofpic)
+}
 
-void cps1bl_pic_state::dinopic_map(address_map &map)
+
+void dinopic_state::dinopic_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
-	map(0x800006, 0x800007).w(FUNC(cps1bl_pic_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800018, 0x80001f).r(FUNC(cps1bl_pic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(FUNC(cps1bl_pic_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps1bl_pic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps1bl_pic_state::cps1_cps_b_r), FUNC(cps1bl_pic_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800222, 0x800223).w(FUNC(cps1bl_pic_state::dinopic_layer2_w));
+	map(0x800006, 0x800007).w(FUNC(dinopic_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800018, 0x80001f).r(FUNC(dinopic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(dinopic_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(dinopic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(dinopic_state::cps1_cps_b_r), FUNC(dinopic_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800222, 0x800223).w(FUNC(dinopic_state::dinopic_layer2_w));
 	map(0x880000, 0x880001).nopw(); // always 0
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
-	map(0x980000, 0x98000b).w(FUNC(cps1bl_pic_state::dinopic_layer_w));
+	map(0x900000, 0x92ffff).ram().w(FUNC(dinopic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x980000, 0x98000b).w(FUNC(dinopic_state::dinopic_layer_w));
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
-	map(0xf1c004, 0xf1c005).w(FUNC(cps1bl_pic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(dinopic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
@@ -429,19 +583,19 @@ void cps1bl_pic_state::slampic_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
-void cps1bl_pic_state::slampic2_map(address_map &map)
+void slampic2_state::slampic2_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800001).portr("IN1");
 	map(0x800002, 0x800003).portr("IN2"); // player 3 + 4 inputs
-	map(0x800018, 0x80001f).r(FUNC(cps1bl_pic_state::cps1_dsw_r));
+	map(0x800018, 0x80001f).r(FUNC(slampic2_state::cps1_dsw_r));
 	map(0x800030, 0x800031).nopw();  // coin ctrl
-	map(0x800100, 0x80013f).ram().r(FUNC(cps1bl_pic_state::slampic2_cps_a_r)).share("cps_a_regs");
+	map(0x800100, 0x80013f).ram().r(FUNC(slampic2_state::slampic2_cps_a_r)).share("cps_a_regs");
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");
-	map(0x800180, 0x800181).w(FUNC(cps1bl_pic_state::slampic2_sound_w));   // sound
-	map(0x800188, 0x800189).w(FUNC(cps1bl_pic_state::slampic2_sound2_w));  // sound
+	map(0x800180, 0x800181).w(FUNC(slampic2_state::slampic2_sound_w));   // sound
+	map(0x800188, 0x800189).w(FUNC(slampic2_state::slampic2_sound2_w));  // sound
 	map(0x8ffff8, 0x8fffff).nopw();  // ?
-	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(slampic2_state::cps1_gfxram_w)).share("gfxram");
 	//  0x930000, 0x933fff  spriteram mirror?
 	//  0xf00000, 0xf3ffff  workram
 	//  0xfc0000, 0xfeffff  gfxram
@@ -464,8 +618,28 @@ void cps1bl_pic_state::slampic2_map(address_map &map)
 	*/
 }
 
+void wofpic_state::wofpic_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
+	map(0x800006, 0x800007).w(FUNC(wofpic_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800008, 0x800009).w(FUNC(wofpic_state::wofpic_layer2_w));
+	map(0x800018, 0x80001f).r(FUNC(wofpic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(wofpic_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(wofpic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(wofpic_state::cps1_cps_b_r), FUNC(wofpic_state::cps1_cps_b_w)).share("cps_b_regs");  /* Only writes here at boot */
+	map(0x880000, 0x880001).nopw(); // ?
+	map(0x900000, 0x92ffff).ram().w(FUNC(wofpic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x980000, 0x98000d).w(FUNC(wofpic_state::wofpic_layer_w));
+	map(0xf18000, 0xf19fff).nopw(); // few q-sound leftovers
+	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(wofpic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
+	map(0xff0000, 0xffffff).ram().share("mainram");
+}
 
-MACHINE_START_MEMBER(cps1bl_pic_state, dinopic)
+
+MACHINE_START_MEMBER(dinopic_state, dinopic)
 {
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
@@ -509,7 +683,7 @@ MACHINE_START_MEMBER(cps1bl_pic_state, slampic)
 	m_sprite_x_offset = 2;
 }
 
-MACHINE_START_MEMBER(cps1bl_pic_state, slampic2)
+MACHINE_START_MEMBER(slampic2_state, slampic2)
 {
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[1] = 0x02;
@@ -521,6 +695,21 @@ MACHINE_START_MEMBER(cps1bl_pic_state, slampic2)
 	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0xff00;
 	m_sprite_x_offset = 0;
+}
+
+MACHINE_START_MEMBER(wofpic_state, wofpic)
+{
+	m_layer_enable_reg = 0x26;
+	m_layer_mask_reg[0] = 0x28;
+	m_layer_mask_reg[1] = 0x2a;
+	m_layer_mask_reg[2] = 0x2c;
+	m_layer_mask_reg[3] = 0x2e;
+	m_layer_scroll1x_offset = 0x40;
+	m_layer_scroll2x_offset = 0x40;
+	m_layer_scroll3x_offset = 0x40;
+	m_sprite_base = 0x1000;
+	m_sprite_list_end_marker = 0x8000;
+	m_sprite_x_offset = 2;
 }
 
 
@@ -553,7 +742,7 @@ void cps1bl_pic_state::init_punipic3()
 	init_dinopic();
 }
 
-void cps1bl_pic_state::init_slampic2()
+void slampic2_state::init_slampic2()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
@@ -565,22 +754,14 @@ void cps1bl_pic_state::init_slampic2()
 	init_cps1();
 }
 
-void cps1bl_pic_state::init_wofpic()
+void wofpic_state::init_wofpic()
 {
-	uint32_t gfx_size = memregion( "gfx" )->bytes();
-	uint8_t *rom = memregion( "gfx" )->base();
-	for (int i = 0; i < gfx_size; i += 8)
-	{
-		uint8_t tmp = rom[i + 1];
-		rom[i + 1] = rom[i + 4];
-		rom[i + 4] = tmp;
-		tmp = rom[i + 3];
-		rom[i + 3] = rom[i + 6];
-		rom[i + 6] = tmp;
-	}
-
-	init_dinopic();
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16_delegate(*this, FUNC(wofpic_state::wofpic_spr_base_w)));
+	init_cps1();
 }
+
 
 static INPUT_PORTS_START( slampic )
 	PORT_INCLUDE(slammast)
@@ -833,6 +1014,44 @@ void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16
 	}
 }
 
+void dinopic_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int pos;
+	int base = m_sprite_base / 2;
+	int last_sprite_offset = 0;
+	uint16_t tileno, colour, xpos, ypos;
+	bool flipx, flipy;
+	uint16_t *sprite_ram = m_bootleg_sprite_ram.get();
+
+	// end of sprite table marker is 0x8000
+	// 1st sprite always 0x100e
+	// sprites are: [ypos][tile#][color][xpos]
+	// no block sprites
+	for (pos = base + 7; pos < base + 0x400; pos += 4)
+		if (sprite_ram[pos] == m_sprite_list_end_marker)
+		{
+			last_sprite_offset = pos - 3;
+			break;
+		}
+
+	for (pos = last_sprite_offset - base; pos >= 0; pos -= 4)
+	{
+		tileno = sprite_ram[base + pos] & 0x7fff;
+		xpos   = sprite_ram[base + pos + 2] & 0x1ff;
+		ypos   = sprite_ram[base + pos - 1] & 0x1ff;
+		flipx  = BIT(sprite_ram[base + pos + 1], 5);
+		flipy  = BIT(sprite_ram[base + pos + 1], 6);
+		colour = sprite_ram[base + pos + 1] & 0x1f;
+		ypos   = 256 - ypos - 16;
+		xpos   = xpos + m_sprite_x_offset + 49;
+
+		if (flip_screen())
+			m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, !flipx, !flipy, 512-16-xpos, 256-16-ypos, screen.priority(), 2, 15);
+		else
+			m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 2, 15);
+	}
+}
+
 
 // ************************************************************************* DINOPIC, DINOPIC2, DINOPIC3
 
@@ -1006,6 +1225,82 @@ ROM_START( dinopic3 )
 	ROM_LOAD( "4_palce16v8.bin", 0x800, 0x117, CRC(97a67c6d) SHA1(822411f878f1efe462a7a8e93960a1fc5140422e) )
 	ROM_LOAD( "5_palce16v8.bin", 0xa00, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )  // dinopic2
 	ROM_LOAD( "6_palce16v8.bin", 0xc00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // dinopic2
+ROM_END
+
+/*
+	Jurassic 99 (Cadillacs and Dinosaurs bootleg)
+	pcb marking: H11F6
+	uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
+	
+	Confirmed clocks (measured):
+     xtals: 30MHz, 24MHz
+     68k  = 12MHz
+     em78 = 3.75MHz
+     oki  = 1MHz     pin 7 high
+	
+	  __________________________________________
+	  |TDA2003(V)  U6295  ROM 30MHz   6116      |
+	  | 93C46   EM78P447AP            6116      |
+	==                                6116      |
+	==       6116                     6116      |
+	==       6116       P2                      |
+	==                       P3       A1020A    |
+	==         (T)                        P8    |
+	==       62256               P6     6116    |
+	==       62256                      6116    |
+	==       ROM1            P4  P8             |
+	==       ROM2            P5  P8   GFXROM1   |
+	==                    62256  P8             |
+	  # 68K  P1   24MHz   62256  P8	  GFXROM2   |
+	  |_________________________________________|
+	
+	V = volume pot
+	# = player 3 connector	
+	T = test mode button
+	U6295 = oki M6295 clone
+	68K = MC68HC000FN16 PLCC68
+*/
+ROM_START( jurassic99 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "210204_rom2.bin",  0x000000, 0x100000, CRC(3f713043) SHA1(90e81c651772e895a56146c986c64ff8c35826ac) )
+	ROM_LOAD16_WORD_SWAP( "210105a_rom1.bin", 0x100000, 0x100000, CRC(e6294edf) SHA1(4f9515e2e060dad165f6cb513baee2568c82c1be) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD64_WORD("210101a_cda2.bin", 0x000000, 0x80000, CRC(3f167412) SHA1(2636065b37998d5c3008edc1c13d073305132f4f) )
+	ROM_CONTINUE( 0x000004, 0x80000 )
+	ROM_CONTINUE( 0x200000, 0x80000 )
+	ROM_CONTINUE( 0x200004, 0x80000 )
+	ROM_LOAD64_WORD("210102_cdb2.bin",  0x000002, 0x80000, CRC(8a6920d8) SHA1(099bfc37b524f60c82332c83c3f1af411b14e35a) )
+	ROM_CONTINUE( 0x000006, 0x80000 )
+	ROM_CONTINUE( 0x200002, 0x80000 )
+	ROM_CONTINUE( 0x200006, 0x80000 )
+
+	// EMC EM78P447AP, secured
+	//ROM_REGION( 0x3000, "audiocpu", 0 )
+	//ROM_LOAD( "u28.bin", 0x0000, 0x2020, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
+
+	/* pld devices:
+	U25    ATF20V8B-15PC  1?
+	U66    ATF16V8B-15PC  2
+	U100   ATF16V8B-15PC  3
+	U118   ATF20V8B-15PC  4?  socketed, secured
+	U146   ATF20V8B-15PC  5
+	U160   ATF16V8B-15PC  6
+	U97G   ATF16V8B-15PC  8
+	U96G   ATF16V8B-15PC  8
+	U98G   ATF16V8B-15PC  8
+	U99G   ATF16V8B-15PC  8
+	U134G  ATF16V8B-15PC  8?
+	U124   Actel A1020A   84-pin PLCC
+	
+	3rd column numbers are what's hand-written on each chip
+	? = hard to read or rubbed off
+	seems to be no #7 ?
+	the #8's have alternative 16-pin dip footprints underneath, picture of a very similar pcb shows some ttl chips fitted instead of the pals, can't read what they are unfortunately!
+	*/
 ROM_END
 
 
@@ -1350,15 +1645,15 @@ ROM_START( wofpic )
 	ROM_LOAD16_BYTE( "3.1m", 0x100001, 0x20000, CRC(739379be) SHA1(897f61527213902fda04bc28339f1f4278bf5ae9) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "4.1m", 0x100000, 0x20000, CRC(fe5eee87) SHA1(be1230f64c1e59ae3ff3e58593070613966ac79d) ) // 11xxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x400000, "gfx", 0 ) // rearranged in init
-	ROM_LOAD64_WORD( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) )
-	ROM_LOAD64_WORD( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) )
-	ROM_LOAD64_WORD( "gfx14.040",  0x000004, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) )
-	ROM_LOAD64_WORD( "gfx16.040",  0x000006, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) )
-	ROM_LOAD64_WORD( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
-	ROM_LOAD64_WORD( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
-	ROM_LOAD64_WORD( "gfx10.040",  0x200004, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
-	ROM_LOAD64_WORD( "gfx12.040",  0x200006, 0x80000, CRC(c29f7b70) SHA1(95d22dcd9e2a48ddea7573d0be75225e0aae798f) )
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD32_BYTE( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) )
+	ROM_LOAD32_BYTE( "gfx14.040",  0x000001, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) )
+	ROM_LOAD32_BYTE( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) )
+	ROM_LOAD32_BYTE( "gfx16.040",  0x000003, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) )
+	ROM_LOAD32_BYTE( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
+	ROM_LOAD32_BYTE( "gfx10.040",  0x200001, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
+	ROM_LOAD32_BYTE( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
+	ROM_LOAD32_BYTE( "gfx12.040",  0x200003, 0x80000, CRC(808cc8f0) SHA1(55731139ba6d7d222fa17236e3e91b2e69a44046) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
 	ROM_LOAD( "pic.bin", 0x0000, 0x1007, NO_DUMP )
@@ -1370,15 +1665,16 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1993,  dinopic,   dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
-GAME( 1993,  dinopic3,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic,    dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
 
-GAME( 1993,  punipic,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic2,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic3,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 
-GAME( 1993,  slampic,   slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
-GAME( 1993,  slampic2,  slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic2,   slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
 
-GAME( 1992,  wofpic,    wof,       dinopic,   wof,       cps1bl_pic_state,  init_wofpic,    ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 021002 ETC, needs correct layers enable, etc. Currently only sprites show.
+GAME( 1992,  wofpic,     wof,       wofpic,    wof,       wofpic_state,      init_wofpic,    ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 921002 ETC

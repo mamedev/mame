@@ -52,10 +52,11 @@ DEFINE_DEVICE_TYPE(NETLIST_LOGIC_OUTPUT,  netlist_mame_logic_output_device,  "nl
 DEFINE_DEVICE_TYPE(NETLIST_ANALOG_OUTPUT, netlist_mame_analog_output_device, "nl_analog_out", "Netlist Analog Output")
 DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl_stream_out", "Netlist Stream Output")
 
-
 // ----------------------------------------------------------------------------------------
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
+
+extern plib::dynlib_static_sym nl_static_solver_syms[];
 
 class netlist_mame_device::netlist_mame_callbacks_t : public netlist::callbacks_t
 {
@@ -88,10 +89,15 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 			m_parent.logerror("netlist FATAL: %s\n", ls.c_str());
 			break;
 		}
+	}
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	{
+		//return plib::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:
@@ -128,8 +134,12 @@ protected:
 		case plib::plog_level::FATAL:
 			osd_printf_error("netlist FATAL: %s\n", ls);
 			break;
-			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
+	}
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	{
+		return plib::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 private:

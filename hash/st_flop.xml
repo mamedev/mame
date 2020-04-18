@@ -1272,14 +1272,14 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="468337">
-				<rom name="deja vu - a nightmare comes true! (europe) (disk 1).ipf" size="468337" crc="5ff6e90a" sha1="2c759e4d137490eec8670b01f4b117e7546594d5" offset="0" />
+				<rom name="deja vu - a nightmare comes true (europe) (disk 1).ipf" size="468337" crc="5ff6e90a" sha1="2c759e4d137490eec8670b01f4b117e7546594d5" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="468252">
-				<rom name="deja vu - a nightmare comes true! (europe) (disk 2).ipf" size="468252" crc="9bc3f029" sha1="6db0c129ced88b76dcba6dee7184e03ee04a7b82" offset="0" />
+				<rom name="deja vu - a nightmare comes true (europe) (disk 2).ipf" size="468252" crc="9bc3f029" sha1="6db0c129ced88b76dcba6dee7184e03ee04a7b82" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2133,7 +2133,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="469240">
-				<rom name="hardball! (europe) (compilation - accolade all time favourites).ipf" size="469240" crc="9d654a14" sha1="d3b6c7dc9f90b0c47851d752e78168fdb8cb60a1" offset="0" />
+				<rom name="hardball (europe) (compilation - accolade all time favourites).ipf" size="469240" crc="9d654a14" sha1="d3b6c7dc9f90b0c47851d752e78168fdb8cb60a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

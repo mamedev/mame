@@ -44,10 +44,11 @@
 
 *********************************************************************/
 
-#include "emu.h"
-#include "formats/os9_dsk.h"
+#include "os9_dsk.h"
+#include "imageutl.h"
 
-#include "formats/imageutl.h"
+#include "coretmpl.h" // BIT
+
 
 os9_format::os9_format() : wd177x_format(formats)
 {
@@ -85,7 +86,7 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
 	io_generic_read(io, os9_header, 0, sizeof(os9_header));
 
 	int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
-	int os9_heads = BIT(os9_header[0x10], 0) ? 2 : 1;
+	int os9_heads = util::BIT(os9_header[0x10], 0) ? 2 : 1;
 	int os9_sectors = pick_integer_be(os9_header, 0x11, 2);
 
 	if (os9_total_sectors <= 0 || os9_heads <= 0 || os9_sectors <= 0)
@@ -103,19 +104,19 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor)
 	int opt_track0_sectors = pick_integer_be(os9_header, 0x3f + 11, 2);
 	int opt_interleave = os9_header[0x3f + 13];
 
-	int opt_mfm = BIT(opt_density, 0);
+	int opt_mfm = util::BIT(opt_density, 0);
 
 	// The NitrOS9 rb1773 driver uses bit 1 of opt_type to distinguish
 	// between a sector base ID of zero or one, so recognise that here.
-	int opt_sector_base_id = BIT(opt_type, 1) ? 0 : 1;
-	int opt_sector_size = BIT(opt_type, 2) ? 512 : 256;
-	int opt_coco = BIT(opt_type, 5);
+	int opt_sector_base_id = util::BIT(opt_type, 1) ? 0 : 1;
+	int opt_sector_size = util::BIT(opt_type, 2) ? 512 : 256;
+	int opt_coco = util::BIT(opt_type, 5);
 
 	// Some OS9 versions appear to use bit 7 of the opt_density rather
 	// than bit 5 of opt_type to signify a COCO format disk. E.g. Gimix
 	// OS9 is documented to use this bit and had a floppy driver that
 	// could read both non-COCO and COCO format disks.
-	if (BIT(opt_density, 7))
+	if (util::BIT(opt_density, 7))
 		opt_coco = 1;
 
 	// COCO format disks are expected for have an opt_dtype of 1.

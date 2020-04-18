@@ -244,7 +244,7 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 }
 
 // Also used by Rainbow-100 ************
-WRITE8_MEMBER(vt100_video_device::dc012_w)
+void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 {
 	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
@@ -337,7 +337,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 }
 
 // Writing to DC011 resets internal counters (& disturbs display) on real hardware.
-WRITE8_MEMBER(vt100_video_device::dc011_w)
+void vt100_video_device::dc011_w(uint8_t data)
 {
 	if (!BIT(data, 5))
 	{
@@ -358,7 +358,7 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 	recompute_parameters();
 }
 
-WRITE8_MEMBER(vt100_video_device::brightness_w)
+void vt100_video_device::brightness_w(uint8_t data)
 {
 	//m_palette->set_pen_color(1, data, data, data);
 }

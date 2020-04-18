@@ -319,6 +319,7 @@ VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
 VIDEOS["HD63484"] = true
 --VIDEOS["HD66421"] = true
+--VIDEOS["HLCD0488"] = true
 --VIDEOS["HLCD0515"] = true
 --VIDEOS["HLCD0538"] = true
 VIDEOS["HUC6202"] = true
@@ -3950,10 +3951,10 @@ files {
 	MAME_DIR .. "src/mame/machine/lsasquad.cpp",
 	MAME_DIR .. "src/mame/video/lsasquad.cpp",
 	MAME_DIR .. "src/mame/drivers/marinedt.cpp",
-	MAME_DIR .. "src/mame/drivers/mexico86.cpp",
-	MAME_DIR .. "src/mame/includes/mexico86.h",
-	MAME_DIR .. "src/mame/machine/mexico86.cpp",
-	MAME_DIR .. "src/mame/video/mexico86.cpp",
+	MAME_DIR .. "src/mame/drivers/kikikai.cpp",
+	MAME_DIR .. "src/mame/includes/kikikai.h",
+	MAME_DIR .. "src/mame/machine/kikikai.cpp",
+	MAME_DIR .. "src/mame/video/kikikai.cpp",
 	MAME_DIR .. "src/mame/drivers/minivadr.cpp",
 	MAME_DIR .. "src/mame/drivers/missb2.cpp",
 	MAME_DIR .. "src/mame/drivers/mlanding.cpp",
@@ -4963,6 +4964,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sshot.cpp",
 	MAME_DIR .. "src/mame/drivers/ssingles.cpp",
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",
+	MAME_DIR .. "src/mame/drivers/startouch.cpp",
 	MAME_DIR .. "src/mame/drivers/statriv2.cpp",
 	MAME_DIR .. "src/mame/drivers/strkzn.cpp",
 	MAME_DIR .. "src/mame/drivers/stuntair.cpp",

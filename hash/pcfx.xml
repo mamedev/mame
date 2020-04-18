@@ -53,7 +53,7 @@ license:CC0
 		<publisher>Cocktail Soft</publisher>
 		<part name="cdrom" interface="pcfx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="pia carrot e youkoso!! weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
+				<disk name="pia carrot e youkoso weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
 			</diskarea>
 		</part>
 	</software>

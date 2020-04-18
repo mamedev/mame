@@ -106,6 +106,7 @@ protected:
 	u8 sp_stat_r();
 	void ioc0_w(u8 data);
 	u8 ios0_r();
+	void ios0_w(u8 data);
 	void ioc1_w(u8 data);
 	u8 ios1_r();
 	void pwm_control_w(u8 data);
@@ -123,7 +124,6 @@ private:
 	};
 
 	struct hso_cam_entry {
-		bool active;
 		u8 command;
 		u16 time;
 	};
@@ -144,7 +144,7 @@ private:
 	hso_cam_entry hso_cam_hold;
 
 	u64 base_timer2, ad_done;
-	u8 hsi_mode, hsi_status, hso_command, ad_command;
+	u8 hsi_mode, hsi_status, hso_command, ad_command, hso_active;
 	u16 hso_time, ad_result;
 	u8 pwm_control;
 	u8 port1, port2;

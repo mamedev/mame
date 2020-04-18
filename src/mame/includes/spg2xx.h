@@ -202,6 +202,28 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_gssytts_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_gssytts_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_upperbank(*this, "upperbank")
+	{ }
+
+	void gssytts(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+
+private:
+	required_memory_bank m_upperbank;
+
+	void mem_map_upperbank(address_map& map);
+};
+
 
 
 #endif // MAME_INCLUDES_SPG2XX_H

@@ -75,8 +75,7 @@ namespace solver
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
-		unsigned solve_non_dynamic(bool newton_raphson);
+		void vsolve_non_dynamic() override;
 
 		void LE_invert();
 
@@ -101,6 +100,8 @@ namespace solver
 
 
 	private:
+		void solve_non_dynamic();
+
 		template <typename T, std::size_t N, std::size_t M>
 		using array2D = std::array<std::array<T, M>, N>;
 		static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
@@ -208,7 +209,7 @@ namespace solver
 
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(bool newton_raphson)
+	void matrix_solver_w_t<FT, SIZE>::solve_non_dynamic()
 	{
 		const auto iN = this->size();
 
@@ -342,21 +343,15 @@ namespace solver
 				if (plib::abs(tmp-RHS(i)) > static_cast<float_type>(1e-6))
 					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, plib::abs(tmp-RHS(i)), RHS(i));
 			}
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		this->clear_square_mat(this->m_A);
 		this->fill_matrix_and_rhs();
 
-		return this->solve_non_dynamic(newton_raphson);
+		this->solve_non_dynamic();
 	}
 
 } // namespace solver

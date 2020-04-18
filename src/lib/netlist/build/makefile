@@ -23,7 +23,8 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements
+TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
+TIDY_FLAGSX += -readability-named-parameter,-readability-function-size
 
 space := 
 space += 
@@ -73,6 +74,7 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/macro \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
+			$(OBJ)/generated \
 
 
 OBJS = $(POBJS) $(NLOBJS)
@@ -163,6 +165,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
+	$(NLOBJ)/generated/static_solvers.o \
 	
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \

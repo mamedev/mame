@@ -165,7 +165,7 @@ void rpunch_state::scrollreg_w(offs_t offset, u16 data, u16 mem_mask)
 
 WRITE8_MEMBER(rpunch_state::gga_w)
 {
-	m_gga->write(space, offset >> 5, data & 0xff);
+	m_gga->write(offset >> 5, data & 0xff);
 }
 
 

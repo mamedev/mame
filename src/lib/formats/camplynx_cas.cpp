@@ -23,9 +23,8 @@ Each byte is 8 bits (MSB first) with no start or stop bits.
 
 ********************************************************************/
 
-#include "emu.h"   // for popmessage and <string>
-
 #include "camplynx_cas.h"
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767

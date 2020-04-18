@@ -603,7 +603,7 @@ private:
 	void tarzan_decrypt_tiles();
 	void tarzan_decrypt_program_rom();
 	void tarzana_decrypt_program_rom();
-	void starzan_decrypt(u8 *ROM, int size, bool isOpcode);
+	void starzan_decrypt_program_rom();
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
 	void lhzb2_decrypt_sprites();
@@ -946,7 +946,7 @@ void igs017_state::tarzana_decrypt_program_rom()
 		m_decrypted_opcodes[i] = x;
 	}
 
-	for (int i = 0; i < 0x40000; i++) // by iq132
+	for (int i = 0; i < 0x40000; i++) // by iq_132
 	{
 		u8 x = rom[i];
 
@@ -963,49 +963,34 @@ void igs017_state::tarzana_decrypt_program_rom()
 void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
-//  tarzana_decrypt_tiles();    // to do
+//  tarzana_decrypt_tiles();    // to do when dumped
 }
 
 
 // starzan
 
-// decryption is incomplete: data decryption is correct but opcodes are encrypted differently.
-
-void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
+void igs017_state::starzan_decrypt_program_rom()
 {
-	for(int i=0; i<size; i++)
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
 	{
-#if 1
-		u8 x = ROM[i];
+		u8 x = rom[i];
 
-		// this seems ok for opcodes too
-		if ((i & 0x10) && (i & 0x01))
-		{
-			if (!(!(i & 0x2000) && !(i & 0x100) && !(i & 0x80)))
-				x ^= 0x01;
-		}
-		else
-		{
-			if (!(i & 0x2000) && !(i & 0x100) && !(i & 0x80))
-				x ^= 0x01;
-		}
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00020) != 0x00020) x ^= 0x20;
+		if ((i & 0x002a0) == 0x00220) x ^= 0x20;
+		if ((i & 0x00220) != 0x00200) x ^= 0x40;
+		if ((i & 0x001c0) != 0x00040) x ^= 0x80;
 
-		// 2x no xor (opcode)
-		// 3x no xor (opcode)
-		// 60-66 no xor (opcode)
-		if (!(i & 0x100) || (i & 0x80) || (i & 0x20))
-			x ^= 0x20;
+		m_decrypted_opcodes[i] = x;
+	}
 
-		// 2x needs xor (opcode)
-		// 3x needs xor (opcode)
-		if ((i & 0x200) || (i & 0x40) || !(i & 0x20))
-			x ^= 0x40;
+	for (int i = 0; i < 0x40000; i++) // by iq_132
+	{
+		u8 x = rom[i];
 
-		if ((!(i & 0x100) && (i & 0x80)) || (i & 0x20))
-			x ^= 0x80;
-
-#else
-		// by iq_132
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
 		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
@@ -1014,23 +999,16 @@ void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
 		if ((i & 0x00260) == 0x00220) x ^= 0x40;
 		if ((i & 0x00020) == 0x00020) x ^= 0x80;
 		if ((i & 0x001a0) == 0x00080) x ^= 0x80;
-#endif
-		ROM[i] = x;
+
+		rom[i] = x;
 	}
 }
 
 void igs017_state::init_starzan()
 {
-	int size = 0x040000;
-
-	u8 *data = memregion("maincpu")->base();
-	u8 *code = m_decrypted_opcodes;
-	memcpy(code, data, size);
-
-	starzan_decrypt(data, size, false); // data
-	starzan_decrypt(code, size, true);  // opcodes
-
-	mgcs_flip_sprites();
+	starzan_decrypt_program_rom();
+	//  starzan_decrypt_tiles();    // to do when dumped
+	mgcs_flip_sprites(); // ?
 }
 
 

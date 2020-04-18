@@ -48,17 +48,29 @@ void news_hid_hle_device::map(address_map &map)
 	map(0x7, 0x7).w(FUNC(news_hid_hle_device::init_w<MOUSE>));
 }
 
+void news_hid_hle_device::map_68k(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
+	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_68k_r));
+	map(0x2, 0x2).w(FUNC(news_hid_hle_device::ien_w<KEYBOARD>));
+	map(0x3, 0x3).w(FUNC(news_hid_hle_device::reset_w<KEYBOARD>));
+	// TODO: keyboard buzzer
+	map(0x5, 0x5).r(FUNC(news_hid_hle_device::data_r<MOUSE>));
+	map(0x6, 0x6).w(FUNC(news_hid_hle_device::ien_w<MOUSE>));
+	map(0x7, 0x7).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
+}
+
 void news_hid_hle_device::device_start()
 {
 	m_irq_out_cb.resolve_all_safe();
 
 	//save_item(NAME(m_fifo));
+	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_out_state));
 
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
 	save_item(NAME(m_mouse_b));
-	save_item(NAME(m_mouse_enable));
 }
 
 void news_hid_hle_device::device_reset()
@@ -66,10 +78,10 @@ void news_hid_hle_device::device_reset()
 	m_fifo[KEYBOARD].clear();
 	m_fifo[MOUSE].clear();
 
+	m_irq_enabled[KEYBOARD] = false;
+	m_irq_enabled[MOUSE] = false;
 	out_irq<KEYBOARD>(false);
 	out_irq<MOUSE>(false);
-
-	m_mouse_enable = false;
 
 	reset_key_state();
 	start_processing(attotime::from_hz(1'200));
@@ -99,9 +111,6 @@ void news_hid_hle_device::push_key(u8 code)
 // HACK: abuse the keyboard row scanner to sample the mouse too
 void news_hid_hle_device::scan_complete()
 {
-	if (!m_mouse_enable)
-		return;
-
 	// read mouse state
 	s16 const x = m_mouse_x_axis->read();
 	s16 const y = m_mouse_y_axis->read();
@@ -140,7 +149,7 @@ template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device:
 	if (m_irq_out_state[Device] != state)
 	{
 		m_irq_out_state[Device] = state;
-		m_irq_out_cb[Device](state);
+		m_irq_out_cb[Device](state && m_irq_enabled[Device]);
 	}
 }
 
@@ -174,9 +183,31 @@ template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device:
 {
 	LOG("init_w<%d> 0x%02x\n", Device, data);
 
-	// HACK: prevent unexpected mouse activity from crashing NEWS-OS
-	if (Device == MOUSE)
-		m_mouse_enable = bool(data);
+	ien_w<Device>(data);
+}
+
+template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device::ien_w(u8 data)
+{
+	LOG("ien_w<%d> 0x%02x\n", Device, data);
+
+	m_irq_enabled[Device] = bool(data);
+}
+
+u8 news_hid_hle_device::status_68k_r()
+{
+	u8 const data =
+		(!m_fifo[KEYBOARD].empty() ? 0x80 : 0) |
+		(!m_fifo[MOUSE].empty()    ? 0x40 : 0) |
+		(m_fifo[KEYBOARD].full()   ? 0x20 : 0) |
+		(m_fifo[MOUSE].full()      ? 0x10 : 0) |
+		(m_irq_out_state[KEYBOARD] ? 0x08 : 0) |
+		(m_irq_out_state[MOUSE]    ? 0x08 : 0) |
+		(m_irq_enabled[KEYBOARD]   ? 0x02 : 0) |
+		(m_irq_enabled[MOUSE]      ? 0x01 : 0);
+
+	LOG("status_r 0x%02x\n", data);
+
+	return data;
 }
 
 INPUT_PORTS_START(news_hid_hle_device)

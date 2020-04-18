@@ -11,7 +11,7 @@ license:CC0
 		<publisher>Silicon Beach</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "409600">
-				<rom name="Airborne!.image" size="409600" crc="5d3729c2" sha1="2519b4afa8f803d0d7098d1b33f1c39abe0a50fa" offset="0"/>
+				<rom name="Airborne.image" size="409600" crc="5d3729c2" sha1="2519b4afa8f803d0d7098d1b33f1c39abe0a50fa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

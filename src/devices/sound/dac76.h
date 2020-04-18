@@ -1,5 +1,5 @@
-// license: GPL-2.0+
-// copyright-holders: Dirk Best
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     PMI DAC-76 COMDAC

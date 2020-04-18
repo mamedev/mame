@@ -322,7 +322,7 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x25"/>
 			<dataarea name="rom" size="393216">
-				<rom name="gokuraku! chuuka taisen (japan).pce" size="393216" crc="e749a22c" sha1="b58e94e3e0c778e678c5d08c708ac4e37bedbbe3" />
+				<rom name="gokuraku chuuka taisen (japan).pce" size="393216" crc="e749a22c" sha1="b58e94e3e0c778e678c5d08c708ac4e37bedbbe3" />
 			</dataarea>
 		</part>
 	</software>
@@ -478,7 +478,7 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x62"/>
 			<dataarea name="rom" size="524288">
-				<rom name="dragon egg! (japan).pce" size="524288" crc="442405d5" sha1="56c69f24b542fea72cc753ddf0e4bb23974adbdf" />
+				<rom name="dragon egg (japan).pce" size="524288" crc="442405d5" sha1="56c69f24b542fea72cc753ddf0e4bb23974adbdf" />
 			</dataarea>
 		</part>
 	</software>
@@ -635,7 +635,7 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x43"/>
 			<dataarea name="rom" size="262144">
-				<rom name="ganbare! golf boys (japan).pce" size="262144" crc="27a4d11a" sha1="69794e5af0d2ec1a5bf6122c64fd5bc43092ae04" />
+				<rom name="ganbare golf boys (japan).pce" size="262144" crc="27a4d11a" sha1="69794e5af0d2ec1a5bf6122c64fd5bc43092ae04" />
 			</dataarea>
 		</part>
 	</software>
@@ -690,7 +690,7 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x06"/>
 			<dataarea name="rom" size="524288">
-				<rom name="hana taaka daka! (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" />
+				<rom name="hana taaka daka (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" />
 			</dataarea>
 		</part>
 	</software>

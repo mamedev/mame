@@ -71,6 +71,7 @@ Merit Riviera Notes - There are several known versions:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/mm58274c.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -106,6 +107,7 @@ public:
 	void dtrvwz5(machine_config &config);
 	void casino5(machine_config &config);
 	void dodge(machine_config &config);
+	void mosdraw(machine_config &config);
 	void tictac(machine_config &config);
 	void trvwhiz(machine_config &config);
 	void trvwhziv(machine_config &config);
@@ -124,18 +126,18 @@ public:
 
 private:
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(low_offset_w);
-	DECLARE_WRITE8_MEMBER(med_offset_w);
-	DECLARE_WRITE8_MEMBER(high_offset_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(casino5_bank_w);
+	uint8_t questions_r();
+	void low_offset_w(offs_t offset, uint8_t data);
+	void med_offset_w(offs_t offset, uint8_t data);
+	void high_offset_w(offs_t offset, uint8_t data);
+	uint8_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint8_t data);
+	void casino5_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE8_MEMBER(led1_w);
-	DECLARE_WRITE8_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(misc_couple_w);
+	void led1_w(uint8_t data);
+	void led2_w(uint8_t data);
+	void misc_w(uint8_t data);
+	void misc_couple_w(uint8_t data);
 
 	DECLARE_MACHINE_START(casino5);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
@@ -187,7 +189,7 @@ void merit_state::machine_start()
 }
 
 
-READ8_MEMBER(merit_state::questions_r)
+uint8_t merit_state::questions_r()
 {
 	uint8_t *questions = memregion("user1")->base();
 	int address;
@@ -239,43 +241,39 @@ READ8_MEMBER(merit_state::questions_r)
 	return questions[address];
 }
 
-WRITE8_MEMBER(merit_state::low_offset_w)
+void merit_state::low_offset_w(offs_t offset, uint8_t data)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xffff00) | offset;
 }
 
-WRITE8_MEMBER(merit_state::med_offset_w)
+void merit_state::med_offset_w(offs_t offset, uint8_t data)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xff00ff) | (offset << 8);
 }
 
-WRITE8_MEMBER(merit_state::high_offset_w)
+void merit_state::high_offset_w(offs_t offset, uint8_t data)
 {
 	offset = bitswap<8>(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0x00ffff) | (offset << 16);
 }
 
-READ8_MEMBER(merit_state::palette_r)
+uint8_t merit_state::palette_r(offs_t offset)
 {
-	int co;
-
-	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	int co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
 	return m_ram_palette[co];
 }
 
-WRITE8_MEMBER(merit_state::palette_w)
+void merit_state::palette_w(offs_t offset, uint8_t data)
 {
-	int co;
-
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	data &= 0x0f;
 
-	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	int co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
 	m_ram_palette[co] = data;
 
 }
@@ -349,7 +347,7 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE8_MEMBER(merit_state::led1_w)
+void merit_state::led1_w(uint8_t data)
 {
 	/* 5 button lamps player 1 */
 	m_leds[0] = BIT(~data, 0);
@@ -359,7 +357,7 @@ WRITE8_MEMBER(merit_state::led1_w)
 	m_leds[4] = BIT(~data, 4);
 }
 
-WRITE8_MEMBER(merit_state::led2_w)
+void merit_state::led2_w(uint8_t data)
 {
 	/* 5 button lamps player 2 */
 	m_leds[5] = BIT(~data, 0);
@@ -372,7 +370,7 @@ WRITE8_MEMBER(merit_state::led2_w)
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 7));
 }
 
-WRITE8_MEMBER(merit_state::misc_w)
+void merit_state::misc_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x10);
 	m_extra_video_bank_bit = (data & 2) << 8;
@@ -381,7 +379,7 @@ WRITE8_MEMBER(merit_state::misc_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(merit_state::misc_couple_w)
+void merit_state::misc_couple_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x10);
 	m_extra_video_bank_bit = (data & 2) << 8;
@@ -393,7 +391,7 @@ WRITE8_MEMBER(merit_state::misc_couple_w)
 	m_backup_ram[0x1011] = 0xc9; //ret
 }
 
-WRITE8_MEMBER(merit_state::casino5_bank_w)
+void merit_state::casino5_bank_w(uint8_t data)
 {
 	if ( data == 0 )
 	{
@@ -772,6 +770,13 @@ static INPUT_PORTS_START( rivierab )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mosdraw )
+	PORT_INCLUDE( riviera )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // to bypass printer check TODO: proper emulation
+INPUT_PORTS_END
+	
 static INPUT_PORTS_START( iowapp )
 	PORT_INCLUDE( meritpoker )
 
@@ -1487,6 +1492,14 @@ void merit_state::dodge(machine_config &config)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(merit_state::dodge_nvram_init));
 }
 
+void merit_state::mosdraw(machine_config &config)
+{
+	dodge(config);
+
+	// TODO: hook up RTC and printer
+	MM58274C(config, "rtc", 0);  // actually an MM58174AN, but should be compatible according to other drivers
+}
+
 void merit_state::tictac(machine_config &config)
 {
 	pitboss(config);
@@ -1777,6 +1790,22 @@ ROM_START( rivierab ) /* PAL16L8ANC labeled DEC-003 at U13 */
 	ROM_LOAD( "hisc_u40.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 ROM_END
 
+// Sub board CRT-203 includes 2 P8255A, parallel printer connection & MM58174AN RTC that plugs in through the CRT-200's P8255 socket.
+// There is a battery that connects to the PCB to keep the CRT-200's Mosel MS6264L-10PC RAM active and also runs to the CRT-203 for the RTC (guess)
+// Currently the game starts with an error, press F2 to configure RTC then press Deal (2)
+ROM_START( mosdraw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4436-05_u5-0.u5", 0x0000, 0x8000, CRC(d0194059) SHA1(4e106c7e38fd92e005f5e1899b6fbca4ab62ce6d) ) /* 4436-05 U5-0  041790 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "tana_u39.u39", 0x00000, 0x2000, CRC(e17c977d) SHA1(cb622fdb2ec001b9a77b17c11c4576c1b4efb248) )
+	ROM_LOAD( "tana_u38.u38", 0x02000, 0x2000, CRC(b3e4e24a) SHA1(2711ad68937c71f8d2e5c8efe83928e03134917b) )
+	ROM_LOAD( "tana_u37.u37", 0x04000, 0x2000, CRC(013c5eab) SHA1(363b8128e0ab3f00c26b0cd3cc8636b10b5fbd73) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "tana_u40.u40", 0x00000, 0x2000, CRC(a45cae66) SHA1(499759badc006fa09706d349e252284949d20a2d) )
+ROM_END
+
 ROM_START( bigappg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-13_u5-0.u5", 0x0000, 0x8000, CRC(47bad6fd) SHA1(87f6c603b52e184f82179869d7b58453cbd34814) ) /* 2131-13 U5-0 111786 */
@@ -1812,7 +1841,7 @@ ROM_START( iowapp )
 	ROM_LOAD( "2131-21_u5-1.u5", 0x0000, 0x8000, CRC(29ce9656) SHA1(24054176f63957883ad9c022644de28684b95623) ) /* 2131-21 U5-1 981221 2131-21B - label shows copyright 1990 */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "iowa_u39.u39", 0x0000, 0x2000, CRC(8d003bbe) SHA1(06711632f4dea6b794b112525b0e26db698b334b) ) /* lables show copyright 1989 */
+	ROM_LOAD( "iowa_u39.u39", 0x0000, 0x2000, CRC(8d003bbe) SHA1(06711632f4dea6b794b112525b0e26db698b334b) ) /* labels show copyright 1989 */
 	ROM_LOAD( "iowa_u38.u38", 0x2000, 0x2000, CRC(2f2152a8) SHA1(c0a6dd92ef5eb60363ac3855d62fcea07006368e) )
 	ROM_LOAD( "iowa_u37.u37", 0x4000, 0x2000, CRC(393c78fe) SHA1(d913d081a7205c19dff6a7c6d604716695de2e98) )
 
@@ -2544,9 +2573,10 @@ GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state, empty_init, R
 GAME( 1984, chkndraw,   0,        pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state, empty_init, ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,    0,        dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa,   riviera,  dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab,   riviera,  dodge,   rivierab,  merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, riviera,    0,        dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa,   riviera,  dodge,   riviera,   merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab,   riviera,  dodge,   rivierab,  merit_state, empty_init, ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state, empty_init, ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
 GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state, empty_init, ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )

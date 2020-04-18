@@ -310,37 +310,37 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="188415">
-				<rom name="les a 100% d'or (uk) (face 1a) (1989) (1. operation wolf) [original] [tape] [compilation].cdt" size="188415" crc="56b081e8" sha1="19c9b043e6ec086776a6aba6d63ee89147f5e3e0"/>
+				<rom name="les a 100 d'or (uk) (face 1a) (1989) (1. operation wolf) [original] [tape] [compilation].cdt" size="188415" crc="56b081e8" sha1="19c9b043e6ec086776a6aba6d63ee89147f5e3e0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="68408">
-				<rom name="les a 100% d'or (uk) (face 2a) (1989) (2. r-type program) [original] [tape] [compilation].cdt" size="68408" crc="a2d14a78" sha1="2739af983c82775199cac29f1103ef5111f99dff"/>
+				<rom name="les a 100 d'or (uk) (face 2a) (1989) (2. r-type program) [original] [tape] [compilation].cdt" size="68408" crc="a2d14a78" sha1="2739af983c82775199cac29f1103ef5111f99dff"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="cpc_cass">
 			<dataarea name="cass" size="106461">
-				<rom name="les a 100% d'or (uk) (face 2b) (1989) (2. r-type levels) [original] [tape] [compilation].cdt" size="106461" crc="c576aa9d" sha1="ed02deccfe9517b188a88a516be61b7925323b3c"/>
+				<rom name="les a 100 d'or (uk) (face 2b) (1989) (2. r-type levels) [original] [tape] [compilation].cdt" size="106461" crc="c576aa9d" sha1="ed02deccfe9517b188a88a516be61b7925323b3c"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="cpc_cass">
 			<dataarea name="cass" size="93529">
-				<rom name="les a 100% d'or (uk) (face 3a) (1989) (3. after burner program) [original] [tape] [compilation].cdt" size="93529" crc="a1e37556" sha1="b1bc43003c75c8845594e1eb2ceea8c0d63c9d01"/>
+				<rom name="les a 100 d'or (uk) (face 3a) (1989) (3. after burner program) [original] [tape] [compilation].cdt" size="93529" crc="a1e37556" sha1="b1bc43003c75c8845594e1eb2ceea8c0d63c9d01"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="cpc_cass">
 			<dataarea name="cass" size="57014">
-				<rom name="les a 100% d'or (uk) (face 3b) (1989) (3. after burner levels) [original] [tape] [compilation].cdt" size="57014" crc="da144c9b" sha1="7f5bf743181f23d318836c858344640610c6c341"/>
+				<rom name="les a 100 d'or (uk) (face 3b) (1989) (3. after burner levels) [original] [tape] [compilation].cdt" size="57014" crc="da144c9b" sha1="7f5bf743181f23d318836c858344640610c6c341"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="cpc_cass">
 			<dataarea name="cass" size="88350">
-				<rom name="les a 100% d'or (uk) (face 4a) (1989) (4. titan 16 niveaux) [original] [tape] [compilation].cdt" size="88350" crc="2edbd4a9" sha1="d153694485bbd43d66187f9dc5f4193f1365ba6e"/>
+				<rom name="les a 100 d'or (uk) (face 4a) (1989) (4. titan 16 niveaux) [original] [tape] [compilation].cdt" size="88350" crc="2edbd4a9" sha1="d153694485bbd43d66187f9dc5f4193f1365ba6e"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="cpc_cass">
 			<dataarea name="cass" size="7179">
-				<rom name="les a 100% d'or (uk) (face 4b) (1989) (5. amcharge) [original] [tape] [compilation].cdt" size="7179" crc="efc1570d" sha1="87d38f33105f9c3d357b5fa55346cbeccaccae4a"/>
+				<rom name="les a 100 d'or (uk) (face 4b) (1989) (5. amcharge) [original] [tape] [compilation].cdt" size="7179" crc="efc1570d" sha1="87d38f33105f9c3d357b5fa55346cbeccaccae4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -979,7 +979,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="167611">
-				<rom name="aaargh! (s) (1988) [original] [tape].cdt" size="167611" crc="2a3006f9" sha1="354ec471d814109a2cbd6828148f76837bad52ba"/>
+				<rom name="aaargh (s) (1988) [original] [tape].cdt" size="167611" crc="2a3006f9" sha1="354ec471d814109a2cbd6828148f76837bad52ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5044,7 +5044,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="16909">
-				<rom name="blitz! (uk) (1994) [amstrad action] [original] [tape].cdt" size="16909" crc="ab19ed90" sha1="49e1e162196f01ecbeeba34b4a31bee9accc1327"/>
+				<rom name="blitz (uk) (1994) [amstrad action] [original] [tape].cdt" size="16909" crc="ab19ed90" sha1="49e1e162196f01ecbeeba34b4a31bee9accc1327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5331,7 +5331,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63535">
-				<rom name="boinggg! (uk) (1988) [original] [tape].cdt" size="63535" crc="d6d61cfd" sha1="3c7d6ea5ddb6c6fc5c7e256f9c869381967d0736"/>
+				<rom name="boinggg (uk) (1988) [original] [tape].cdt" size="63535" crc="d6d61cfd" sha1="3c7d6ea5ddb6c6fc5c7e256f9c869381967d0736"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5444,7 +5444,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then CHAIN&quot;&quot;,10" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="36127">
-				<rom name="boom! (uk) (1989) [original] [tape].cdt" size="36127" crc="bc3b449c" sha1="e9808a42698c11652960a8c79a69bf56231f0d96"/>
+				<rom name="boom (uk) (1989) [original] [tape].cdt" size="36127" crc="bc3b449c" sha1="e9808a42698c11652960a8c79a69bf56231f0d96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7177,22 +7177,22 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="165728">
-				<rom name="cheat mode ii the revenge! (uk) (face 1a) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="165728" crc="50b42b67" sha1="55fdfde5f9388750a9fcaaccc00413452285d092"/>
+				<rom name="cheat mode ii the revenge (uk) (face 1a) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="165728" crc="50b42b67" sha1="55fdfde5f9388750a9fcaaccc00413452285d092"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="194047">
-				<rom name="cheat mode ii the revenge! (uk) (face 1b) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="194047" crc="5fb5f29c" sha1="2ed5a85101d2b74b943a02397ae342a6b608750f"/>
+				<rom name="cheat mode ii the revenge (uk) (face 1b) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="194047" crc="5fb5f29c" sha1="2ed5a85101d2b74b943a02397ae342a6b608750f"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="cpc_cass">
 			<dataarea name="cass" size="68300">
-				<rom name="cheat mode ii the revenge! (uk) (face 2a) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="68300" crc="f81e5001" sha1="42c7c74fc7f13ff000924e061d0805a69306fcc4"/>
+				<rom name="cheat mode ii the revenge (uk) (face 2a) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="68300" crc="f81e5001" sha1="42c7c74fc7f13ff000924e061d0805a69306fcc4"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="cpc_cass">
 			<dataarea name="cass" size="59949">
-				<rom name="cheat mode ii the revenge! (uk) (face 2b) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="59949" crc="634a809f" sha1="ebf2403b18dd7492d51296634e443993ec6ad290"/>
+				<rom name="cheat mode ii the revenge (uk) (face 2b) (1990) [amstrad action] [original] [tape] [compilation].cdt" size="59949" crc="634a809f" sha1="ebf2403b18dd7492d51296634e443993ec6ad290"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11499,13 +11499,13 @@ Please stick to using the floppy versions for the time being...
 		<part name="cass1" interface="cpc_cass">
 			<feature name="part_id" value="Side 1 - Nova!" />
 			<dataarea name="cass" size="68331">
-				<rom name="double gold - nova ! + haunted house (uk) (face a) (1987) [original] [tape] [compilation].cdt" size="68331" crc="a781fdd6" sha1="337677451103ae34fe0a0bff51c495eff81086c7"/>
+				<rom name="double gold - nova + haunted house (uk) (face a) (1987) [original] [tape] [compilation].cdt" size="68331" crc="a781fdd6" sha1="337677451103ae34fe0a0bff51c495eff81086c7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<feature name="part_id" value="Side 2 - Haunted House" />
 			<dataarea name="cass" size="47977">
-				<rom name="double gold - nova ! + haunted house (uk) (face b) (1987) [original] [tape] [compilation].cdt" size="47977" crc="2acbe814" sha1="9f7eac326da0be7efb27c1475f2c7d652f76b53f"/>
+				<rom name="double gold - nova + haunted house (uk) (face b) (1987) [original] [tape] [compilation].cdt" size="47977" crc="2acbe814" sha1="9f7eac326da0be7efb27c1475f2c7d652f76b53f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11570,7 +11570,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="378790">
-				<rom name="dr. doom's revenge! (uk,f,g,s) (1989) [original] [tape].cdt" size="378790" crc="d37b7047" sha1="432fbbdf1d27f063cef99beaea8c655162bc1cb2"/>
+				<rom name="dr. doom's revenge (uk,f,g,s) (1989) [original] [tape].cdt" size="378790" crc="d37b7047" sha1="432fbbdf1d27f063cef99beaea8c655162bc1cb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11583,12 +11583,12 @@ Please stick to using the floppy versions for the time being...
 		<info name="alt_title" value="El Asombroso Spider-man y Capitan America en La Venganza del Dr. Muerte! (Box)" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="193482">
-				<rom name="la venganza del dr. muerte! (uk,f,g,s) (face a) (1989) (spain retail version) [original] [tape].cdt" size="193482" crc="d80d31b5" sha1="c49e7b139999bd81d1de21058f83404c1562843a"/>
+				<rom name="la venganza del dr. muerte (uk,f,g,s) (face a) (1989) (spain retail version) [original] [tape].cdt" size="193482" crc="d80d31b5" sha1="c49e7b139999bd81d1de21058f83404c1562843a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="185317">
-				<rom name="la venganza del dr. muerte! (uk,f,g,s) (face b) (1989) (spain retail version) [original] [tape].cdt" size="185317" crc="1f7e173f" sha1="cf75fe8baff310094636b3adb676190e3d788136"/>
+				<rom name="la venganza del dr. muerte (uk,f,g,s) (face b) (1989) (spain retail version) [original] [tape].cdt" size="185317" crc="1f7e173f" sha1="cf75fe8baff310094636b3adb676190e3d788136"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13224,7 +13224,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51468">
-				<rom name="execution ! (uk) (1985) [original] [tape].cdt" size="51468" crc="8f74a3f4" sha1="c802920fe01b4c1dd45e569513e34dff24400a76"/>
+				<rom name="execution (uk) (1985) [original] [tape].cdt" size="51468" crc="8f74a3f4" sha1="c802920fe01b4c1dd45e569513e34dff24400a76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15636,7 +15636,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass3" interface="cpc_cass">
 			<dataarea name="cass" size="52375">
-				<rom name="les geants de l'arcade (uk) (face 2a) (1988) (rygar - let's fight !!!) [original] [tape] [compilation].cdt" size="52375" crc="c27a1782" sha1="63b532bba1b04ed3ad1e432a15caea5c50012399"/>
+				<rom name="les geants de l'arcade (uk) (face 2a) (1988) (rygar - let's fight) [original] [tape] [compilation].cdt" size="52375" crc="c27a1782" sha1="63b532bba1b04ed3ad1e432a15caea5c50012399"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="cpc_cass">
@@ -20883,7 +20883,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="60275">
-				<rom name="kwah! (uk) (1986) [original] [tape].cdt" size="60275" crc="8c60c7c2" sha1="2dc29e9db74d21526cdbe86360a8ac0c7d06c002"/>
+				<rom name="kwah (uk) (1986) [original] [tape].cdt" size="60275" crc="8c60c7c2" sha1="2dc29e9db74d21526cdbe86360a8ac0c7d06c002"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26064,7 +26064,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="80422">
-				<rom name="oinks! (uk) (1987) [original] [tape].cdt" size="80422" crc="ce4986f1" sha1="1f6ddddd6cbf41e19626b78acb43ce29a6a25453"/>
+				<rom name="oinks (uk) (1987) [original] [tape].cdt" size="80422" crc="ce4986f1" sha1="1f6ddddd6cbf41e19626b78acb43ce29a6a25453"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26407,7 +26407,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18763">
-				<rom name="osprey! (uk) (1984) [original] [tape].cdt" size="18763" crc="bf382356" sha1="bf5d1e2952c72b10a75be2f0069bf82a5839364f"/>
+				<rom name="osprey (uk) (1984) [original] [tape].cdt" size="18763" crc="bf382356" sha1="bf5d1e2952c72b10a75be2f0069bf82a5839364f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29035,7 +29035,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63746">
-				<rom name="raid !!! (uk) (1985) [u.s. gold] [original] [tape].cdt" size="63746" crc="886c15f9" sha1="0a5f3161d22115b57336557f20611c197017303d"/>
+				<rom name="raid (uk) (1985) [u.s. gold] [original] [tape].cdt" size="63746" crc="886c15f9" sha1="0a5f3161d22115b57336557f20611c197017303d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29415,7 +29415,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="35011">
-				<rom name="realm ! (uk) (1987) [original] [tape].cdt" size="35011" crc="d02bd4c4" sha1="a56e506c1321889ca8ac7a21af2687dc84418e3d"/>
+				<rom name="realm (uk) (1987) [original] [tape].cdt" size="35011" crc="d02bd4c4" sha1="a56e506c1321889ca8ac7a21af2687dc84418e3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30367,7 +30367,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24557">
-				<rom name="roland ahoy! (uk) (1984) [original] [tape].cdt" size="24557" crc="e118f0c5" sha1="37249c303d0b20450056790ce893c995dc344a60"/>
+				<rom name="roland ahoy (uk) (1984) [original] [tape].cdt" size="24557" crc="e118f0c5" sha1="37249c303d0b20450056790ce893c995dc344a60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30654,7 +30654,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="52374">
-				<rom name="rygar - let's fight !!! (uk) (1987) [original] [tape].cdt" size="52374" crc="ec89a9fd" sha1="1d2d6a77bd8c856ac59cefe72bbd9ec2ab2217f0"/>
+				<rom name="rygar - let's fight (uk) (1987) [original] [tape].cdt" size="52374" crc="ec89a9fd" sha1="1d2d6a77bd8c856ac59cefe72bbd9ec2ab2217f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32489,7 +32489,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="36433">
-				<rom name="snoball in hell! (uk) (1989) [original] [tape].cdt" size="36433" crc="6489ed24" sha1="4b8417acb1012d3e4c72bd3a2ef757b68cac7440"/>
+				<rom name="snoball in hell (uk) (1989) [original] [tape].cdt" size="36433" crc="6489ed24" sha1="4b8417acb1012d3e4c72bd3a2ef757b68cac7440"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35133,7 +35133,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="67039">
-				<rom name="super seymour saves the planet!! (uk) (1991) [original] [tape].cdt" size="67039" crc="4cdefb9e" sha1="c6e16748bd361eb83449dcd18e378cb4c4762f18"/>
+				<rom name="super seymour saves the planet (uk) (1991) [original] [tape].cdt" size="67039" crc="4cdefb9e" sha1="c6e16748bd361eb83449dcd18e378cb4c4762f18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35613,7 +35613,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30355">
-				<rom name="system 8 - the pools predictor! (uk) (1988) [original] [tape] [utilitaire].cdt" size="30355" crc="b39f1225" sha1="c27ae71946d958e3b1a45bf910003b69a6d49674"/>
+				<rom name="system 8 - the pools predictor (uk) (1988) [original] [tape] [utilitaire].cdt" size="30355" crc="b39f1225" sha1="c27ae71946d958e3b1a45bf910003b69a6d49674"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36688,7 +36688,7 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66031">
-				<rom name="think! (uk) (1987) [original] [tape].cdt" size="66031" crc="d313513f" sha1="0f9cacb64c80b328423f91526f977ce28a15a4a9"/>
+				<rom name="think (uk) (1987) [original] [tape].cdt" size="66031" crc="d313513f" sha1="0f9cacb64c80b328423f91526f977ce28a15a4a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43894,7 +43894,7 @@ Covertapes
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="71317">
-				<rom name="betiled! (uk) (2009) [original] [tape].cdt" size="71317" crc="a475e3ab" sha1="b2281d84a42cf1bbbbd8c11646d2e691ee6f447e"/>
+				<rom name="betiled (uk) (2009) [original] [tape].cdt" size="71317" crc="a475e3ab" sha1="b2281d84a42cf1bbbbd8c11646d2e691ee6f447e"/>
 			</dataarea>
 		</part>
 	</software>

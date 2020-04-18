@@ -141,10 +141,9 @@ Notes:
 
     TODO:
 
-    - abc802 video is all black
-    - abc850 is broken
     - abc806 30K banking
     - cassette
+	- abc800 video card bus 
 
 */
 
@@ -189,40 +188,103 @@ READ8_MEMBER( abc800_state::pling_r )
 //  MEMORY BANKING
 //**************************************************************************
 
-//-------------------------------------------------
-//  bankswitch
-//-------------------------------------------------
-
-void abc800_state::bankswitch()
+READ8_MEMBER( abc800_state::read )
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (m_fetch_charram)
+	uint8_t data = 0xff;
+	
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
-		// HR video RAM selected
-		program.install_ram(0x0000, 0x3fff, m_video_ram);
+		data = m_video_ram[offset];
+	}
+	else if (offset < 0x7800)
+	{
+		data = m_rom->base()[offset];
+	}
+	else if (offset < 0x8000 && m_fetch_charram)
+	{
+		data = m_rom->base()[offset];
+	}
+	else if (offset < 0x8000)
+	{
+		data = m_char_ram[offset & (m_char_ram_size - 1)];
 	}
 	else
 	{
-		// BASIC ROM selected
-		program.install_rom(0x0000, 0x3fff, m_rom->base());
+		data = m_ram->pointer()[offset & m_ram->mask()];
+	}
+	
+	return data;
+}
+
+WRITE8_MEMBER( abc800_state::write )
+{
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
+	{
+		m_video_ram[offset] = data;
+	}
+	else if (offset >= 0x7800 && offset < 0x8000)
+	{
+ 		m_char_ram[offset & (m_char_ram_size - 1)] = data;
+	}
+	else if (offset >= 0x8000)
+	{
+		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 }
 
-void abc802_state::bankswitch()
+READ8_MEMBER( abc802_state::read )
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	uint8_t data = 0xff;
 
-	if (m_lrs)
+	if (offset < 0x8000)
 	{
-		// ROM and video RAM selected
-		program.install_rom(0x0000, 0x77ff, m_rom->base());
-		program.install_ram(0x7800, 0x7fff, m_char_ram);
+		if (!m_lrs)
+		{
+			data = m_ram->pointer()[offset];
+		}
+		else
+		{
+			if (offset < 0x7800)
+			{
+				data = m_rom->base()[offset];
+			}
+			else 
+			{
+				if (m_fetch_charram) 
+				{
+					data = m_rom->base()[offset];
+				}
+				else
+				{
+					data = m_char_ram[offset & (m_char_ram_size - 1)];
+				}
+			}
+		}
 	}
 	else
 	{
-		// low RAM selected
-		program.install_ram(0x0000, 0x7fff, m_ram->pointer());
+		data = m_ram->pointer()[offset];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( abc802_state::write )
+{
+	if (offset < 0x8000)
+	{
+		if (!m_lrs)
+		{
+			m_ram->pointer()[offset] = data;
+		}
+		else if (offset >= 0x7800)
+		{
+			m_char_ram[offset & (m_char_ram_size - 1)] = data;
+		}
+	}
+	else
+	{
+		m_ram->pointer()[offset] = data;
 	}
 }
 
@@ -375,55 +437,12 @@ READ8_MEMBER( abc800_state::m1_r )
 {
 	if (offset >= 0x7800 && offset < 0x8000)
 	{
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = true;
-			bankswitch();
-		}
+		m_fetch_charram = true;
 
 		return m_rom->base()[offset];
 	}
 
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = false;
-		bankswitch();
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-READ8_MEMBER( abc800c_state::m1_r )
-{
-	if (offset >= 0x7c00 && offset < 0x8000)
-	{
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = true;
-			bankswitch();
-		}
-
-		return m_rom->base()[offset];
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = false;
-		bankswitch();
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-READ8_MEMBER( abc802_state::m1_r )
-{
-	if (m_lrs)
-	{
-		if (offset >= 0x7800 && offset < 0x8000)
-		{
-			return m_rom->base()[offset];
-		}
-	}
+	m_fetch_charram = false;
 
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
@@ -486,16 +505,12 @@ void abc800_state::abc800_m1(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc800c_mem )
+//  ADDRESS_MAP( abc800_mem )
 //-------------------------------------------------
 
-void abc800c_state::abc800c_mem(address_map &map)
+void abc800_state::abc800_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("video_ram");
-	map(0x4000, 0x7bff).rom();
-	map(0x7c00, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(abc800_state::read), FUNC(abc800_state::write));
 }
 
 
@@ -534,20 +549,6 @@ void abc800_state::abc800c_io(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc800m_mem )
-//-------------------------------------------------
-
-void abc800_state::abc800m_mem(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("video_ram");
-	map(0x4000, 0x77ff).rom();
-	map(0x7800, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
@@ -567,10 +568,7 @@ void abc800_state::abc800m_io(address_map &map)
 
 void abc802_state::abc802_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x77ff).rom();
-	map(0x7800, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(abc802_state::read), FUNC(abc802_state::write));
 }
 
 
@@ -800,31 +798,33 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 
 
 //-------------------------------------------------
+//  Z80DART abc800
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc800_state::keydtr_w )
+{
+	if (LOG) logerror("%s KEYDTR %u\n",machine().describe_context(),state);
+
+	m_keydtr = state;
+}
+
+
+//-------------------------------------------------
 //  Z80DART abc802
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abc802_state::lrs_w )
 {
-	m_lrs = state;
+	if (LOG) logerror("%s LRS %u\n",machine().describe_context(),state);
 
-	bankswitch();
+	m_lrs = state;
 }
 
 WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
 {
+	if (LOG) logerror("%s 80/40 MUX %u\n",machine().describe_context(),state);
+
 	m_80_40_mux = state;
-}
-
-
-//-------------------------------------------------
-//  Z80DART abc806
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc806_state::keydtr_w )
-{
-	if (LOG) logerror("%s KEYDTR %u\n",machine().describe_context(),state);
-
-	m_keydtr = state;
 }
 
 
@@ -862,16 +862,11 @@ void abc800_state::machine_start()
 	save_item(NAME(m_dfd_out));
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_fgctl));
 }
 
 void abc800_state::machine_reset()
 {
 	m_sb = m_io_sb->read();
-
-	m_fetch_charram = false;
-	bankswitch();
 
 	m_dart->ria_w(1);
 
@@ -898,9 +893,6 @@ void abc802_state::machine_start()
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
 	save_item(NAME(m_lrs));
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_80_40_mux));
 }
 
 void abc802_state::machine_reset()
@@ -910,7 +902,6 @@ void abc802_state::machine_reset()
 
 	// memory banking
 	m_lrs = 1;
-	bankswitch();
 
 	// clear screen time out (S1)
 	m_sio->dcdb_w(BIT(config, 0));
@@ -934,10 +925,6 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
-	// allocate video RAM
-	uint32_t videoram_size = m_ram->size() - 0x8000;
-	m_video_ram.allocate(videoram_size);
-
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_sb));
@@ -951,19 +938,6 @@ void abc806_state::machine_start()
 	save_item(NAME(m_keydtr));
 	save_item(NAME(m_eme));
 	save_item(NAME(m_map));
-	save_item(NAME(m_txoff));
-	save_item(NAME(m_40));
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_attr_data));
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_hrc));
-	save_item(NAME(m_sync));
-	save_item(NAME(m_v50_addr));
-	save_item(NAME(m_hru2_a8));
-	save_item(NAME(m_vsync_shift));
-	save_item(NAME(m_vsync));
-	save_item(NAME(m_d_vsync));
 }
 
 void abc806_state::machine_reset()
@@ -1130,13 +1104,15 @@ void abc800c_state::abc800c(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800c_state::abc800c_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800_state::abc800_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc800c_state::abc800c_io);
 
 	// video hardware
 	abc800c_video(config);
 
 	// peripheral hardware
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
+
 	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
 	kb.set_default_option("abc800");
 	kb.set_fixed(true);
@@ -1144,7 +1120,7 @@ void abc800c_state::abc800c(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 
@@ -1157,13 +1133,15 @@ void abc800m_state::abc800m(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800m_state::abc800m_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800_state::abc800_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc800m_state::abc800m_io);
 
 	// video hardware
 	abc800m_video(config);
 
 	// peripheral hardware
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
+
 	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
 	kb.set_default_option("abc800");
 	kb.set_fixed(true);
@@ -1171,7 +1149,7 @@ void abc800m_state::abc800m(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 
@@ -1219,9 +1197,9 @@ void abc806_state::abc806(machine_config &config)
 	abc806_video(config);
 
 	// peripheral hardware
-	E0516(config, E0516_TAG, ABC806_X02);
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
+	E0516(config, E0516_TAG, ABC806_X02);
 
 	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc77");
 
@@ -1510,5 +1488,5 @@ ROM_END
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY             FULLNAME        FLAGS
 COMP( 1981, abc800c, 0,       0,      abc800c, abc800, abc800c_state, empty_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, abc800m, abc800c, 0,      abc800m, abc800, abc800m_state, empty_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,  0,       0,      abc802,  abc802, abc802_state,  empty_init, "Luxor Datorer AB", "ABC 802",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,  0,       0,      abc802,  abc802, abc802_state,  empty_init, "Luxor Datorer AB", "ABC 802",      MACHINE_SUPPORTS_SAVE )
 COMP( 1983, abc806,  0,       0,      abc806,  abc806, abc806_state,  empty_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )

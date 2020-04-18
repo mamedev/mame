@@ -178,7 +178,7 @@ void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //  control_w - display control register
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8301_device::control_w )
+void zx8301_device::control_w(uint8_t data)
 {
 	/*
 
@@ -212,7 +212,7 @@ WRITE8_MEMBER( zx8301_device::control_w )
 //  data_r - RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( zx8301_device::data_r )
+uint8_t zx8301_device::data_r(offs_t offset)
 {
 	if (LOG) logerror("ZX8301 RAM Read: %06x\n", offset);
 
@@ -229,7 +229,7 @@ READ8_MEMBER( zx8301_device::data_r )
 //  data_w - RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8301_device::data_w )
+void zx8301_device::data_w(offs_t offset, uint8_t data)
 {
 	if (LOG) logerror("ZX8301 RAM Write: %06x = %02x\n", offset, data);
 

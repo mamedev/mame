@@ -6918,7 +6918,7 @@ license:CC0
 		<publisher>Superior Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Speech!-1.03.rom" size="8192" crc="38884b27" sha1="5183c89461d1edcd4e08d7afb0290d047d20dee2"/>
+				<rom name="Speech-1.03.rom" size="8192" crc="38884b27" sha1="5183c89461d1edcd4e08d7afb0290d047d20dee2"/>
 			</dataarea>
 		</part>
 	</software>

@@ -14,8 +14,10 @@
 
 *********************************************************************/
 
-#include "emu.h"
 #include "img_dsk.h"
+
+#include "coretmpl.h" // BIT
+
 
 // Debugging
 #define VERBOSE 0
@@ -159,7 +161,7 @@ void img_format::write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , 
 	bit_w(buffer , clock_bit , CELL_SIZE);
 	bit_w(buffer , data_bit , CELL_SIZE);
 
-	if (BIT(m_crc , 15) ^ data_bit) {
+	if (util::BIT(m_crc , 15) ^ data_bit) {
 		m_crc = (m_crc << 1) ^ CRC_POLY;
 	} else {
 		m_crc <<= 1;
@@ -169,7 +171,7 @@ void img_format::write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , 
 void img_format::write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint8_t clock)
 {
 	for (int i = 7; i >= 0; i--) {
-		write_mmfm_bit(buffer , BIT(data , i) , BIT(clock , i));
+		write_mmfm_bit(buffer , util::BIT(data , i) , util::BIT(clock , i));
 	}
 }
 
@@ -182,7 +184,7 @@ void img_format::write_crc(std::vector<uint32_t> &buffer , uint16_t crc)
 {
 	// Note that CRC is stored with MSB (x^15) first
 	for (unsigned i = 0; i < 16; i++) {
-		write_mmfm_bit(buffer , BIT(crc , 15 - i) , 0);
+		write_mmfm_bit(buffer , util::BIT(crc , 15 - i) , 0);
 	}
 }
 
@@ -268,10 +270,10 @@ std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , 
 	do {
 		unsigned cnt_trans = 0;
 		while (pos < bitstream_size && cnt_trans < 34) {
-			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			bool bit = util::BIT(bitstream[ pos >> 3 ] , ~pos & 7);
 			pos++;
 			if (cnt_trans < 32) {
-				if (!(BIT(cnt_trans , 0) ^ bit)) {
+				if (!(util::BIT(cnt_trans , 0) ^ bit)) {
 					cnt_trans++;
 				} else {
 					cnt_trans = 0;
@@ -298,10 +300,10 @@ std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , 
 		// Get AM
 		data_sr = clock_sr = 0;
 		for (unsigned i = 0; i < 7; ++i) {
-			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			bool bit = util::BIT(bitstream[ pos >> 3 ] , ~pos & 7);
 			pos++;
 			clock_sr = (clock_sr << 1) | bit;
-			bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			bit = util::BIT(bitstream[ pos >> 3 ] , ~pos & 7);
 			pos++;
 			data_sr = (data_sr << 1) | bit;
 		}
@@ -327,7 +329,7 @@ std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , 
 		data_sr = 0;
 		unsigned j;
 		for (j = 0; j < 8 && pos < bitstream_size; j++) {
-			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			bool bit = util::BIT(bitstream[ pos >> 3 ] , ~pos & 7);
 			pos += 2;
 			data_sr = (data_sr << 1) | bit;
 		}

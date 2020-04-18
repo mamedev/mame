@@ -3312,6 +3312,7 @@ void cp1610_cpu_device::execute_run()
 			{
 				/* PSHR R7 */
 				standard_irq_callback(CP1610_INT_INTR);
+				m_write_intak(m_r[6]);
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;
 				m_icount -= 9;
@@ -3322,6 +3323,7 @@ void cp1610_cpu_device::execute_run()
 			{
 				/* PSHR R7 */
 				standard_irq_callback(CP1610_INT_INTRM);
+				m_write_intak(m_r[6]);
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;
 				m_icount -= 9;
@@ -3338,6 +3340,7 @@ void cp1610_cpu_device::device_start()
 {
 	m_read_bext.resolve_safe(0);
 	m_read_iab.resolve_safe(0);
+	m_write_intak.resolve_safe();
 	m_intr_enabled = false;
 	m_reset_pending = false;
 	m_intr_pending = false;
@@ -3403,6 +3406,7 @@ cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *
 	, m_intrm_state(0)
 	, m_read_bext(*this)
 	, m_read_iab(*this)
+	, m_write_intak(*this)
 {
 }
 

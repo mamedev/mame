@@ -161,6 +161,7 @@ private:
 
 DECLARE_DEVICE_TYPE(NEOGEO_MSLUG3B6_CART, neogeo_mslug3b6_cart_device)
 
+
 /*************************************************
  ms5plus
  **************************************************/
@@ -184,6 +185,21 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_MS5PLUS_CART, neogeo_ms5plus_cart_device)
+
+
+/*************************************************
+ mslug5b
+ **************************************************/
+
+class neogeo_mslug5b_cart_device : public neogeo_bootleg_cart_device
+{
+public:
+	neogeo_mslug5b_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type() override { return 0; }
+};
+
+DECLARE_DEVICE_TYPE(NEOGEO_MSLUG5B_CART, neogeo_mslug5b_cart_device)
 
 
 /*************************************************

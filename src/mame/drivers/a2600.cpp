@@ -53,7 +53,7 @@ READ8_MEMBER(a2600_state::cart_over_all_r)
 
 	if (masked_offset < 0x80)
 	{
-		ret = m_tia->read(space, masked_offset&0x7f);
+		ret = m_tia->read(masked_offset&0x7f);
 	}
 	else if (masked_offset < 0x100)
 	{
@@ -62,7 +62,7 @@ READ8_MEMBER(a2600_state::cart_over_all_r)
 	/* 0x100 - 0x1ff already masked out */
 	else if (masked_offset < 0x280)
 	{
-		ret = m_tia->read(space, masked_offset&0x7f);
+		ret = m_tia->read(masked_offset&0x7f);
 	}
 	else if (masked_offset < 0x2a0)
 	{
@@ -89,7 +89,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 
 	if (masked_offset < 0x80)
 	{
-		m_tia->write(space, masked_offset & 0x7f, data);
+		m_tia->write(masked_offset & 0x7f, data);
 	}
 	else if (masked_offset < 0x100)
 	{
@@ -98,7 +98,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	/* 0x100 - 0x1ff already masked out */
 	else if (masked_offset < 0x280)
 	{
-		m_tia->write(space, masked_offset & 0x7f, data);
+		m_tia->write(masked_offset & 0x7f, data);
 	}
 	else if (masked_offset < 0x2a0)
 	{
@@ -283,7 +283,7 @@ WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 {
 	// Both Cart & TIA see these addresses
 	m_cart->write_bank(space, offset, data);
-	m_tia->write(space, offset, data);
+	m_tia->write(offset, data);
 }
 
 void a2600_base_state::machine_start()

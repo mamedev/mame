@@ -17,8 +17,8 @@ class pcdx_video_device : public device_t, public device_gfx_interface
 {
 public:
 	virtual void map(address_map &map) = 0;
-	DECLARE_READ8_MEMBER(detect_r);
-	DECLARE_WRITE8_MEMBER(detect_w);
+	uint8_t detect_r();
+	void detect_w(uint8_t data);
 
 protected:
 	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -36,9 +36,9 @@ public:
 	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	DECLARE_WRITE8_MEMBER(vram_sw_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	void vram_sw_w(uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 
 protected:
 	void device_start() override;
@@ -70,9 +70,9 @@ private:
 		int yb;
 	} m_mouse;
 
-	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t t1_r();
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -86,12 +86,12 @@ public:
 	auto txd_handler() { return m_txd_handler.bind(); }
 
 	virtual void map(address_map &map) override;
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_WRITE8_MEMBER(term_w);
-	DECLARE_READ8_MEMBER(term_mcu_r);
-	DECLARE_WRITE8_MEMBER(term_mcu_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
+	uint8_t term_r(offs_t offset);
+	void term_w(offs_t offset, uint8_t data);
+	uint8_t term_mcu_r(offs_t offset);
+	void term_mcu_w(offs_t offset, uint8_t data);
+	uint8_t unk_r();
+	void p1_w(uint8_t data);
 
 	void pcx_vid_io(address_map &map);
 	void pcx_vid_map(address_map &map);
@@ -113,8 +113,8 @@ private:
 	devcb_write_line m_txd_handler;
 	uint8_t m_term_key, m_term_char, m_term_stat, m_p1;
 
-	DECLARE_READ8_MEMBER(rx_callback);
-	DECLARE_WRITE8_MEMBER(tx_callback);
+	uint8_t rx_callback();
+	void tx_callback(uint8_t data);
 
 	SCN2672_DRAW_CHARACTER_MEMBER(display_pixels);
 };

@@ -1307,7 +1307,7 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 
 std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 {
-	return std::make_unique<nec_disassembler>();
+	return std::make_unique<nec_disassembler>(this);
 }
 
 

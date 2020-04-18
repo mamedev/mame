@@ -18,8 +18,17 @@
 
 #include <limits>
 
+// ----------------------------------------------------------------------------------------
+// Statically compiled solvers for mame netlist
+// ----------------------------------------------------------------------------------------
+
 namespace netlist
 {
+
+	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
+	{
+		return plib::make_unique<plib::dynlib_static>(nullptr);
+	}
 
 	// ----------------------------------------------------------------------------------------
 	// logic_family_ttl_t
@@ -201,8 +210,8 @@ namespace netlist
 	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
-		pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		m_lib = plib::make_unique<plib::dynlib>(libpath);
+
+		m_lib = m_callbacks->static_solver_lib();
 
 		m_setup = plib::make_unique<setup_t>(*this);
 		// create the run interface
@@ -795,9 +804,9 @@ namespace netlist
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm)
 	: analog_t(dev, aname, STATE_BIDIR)
-	, m_Idr1(nullptr)
-	, m_go1(nullptr)
-	, m_gt1(nullptr)
+	, m_Idr(nullptr)
+	, m_go(nullptr)
+	, m_gt(nullptr)
 	{
 		state().setup().register_term(*this, *otherterm);
 	}

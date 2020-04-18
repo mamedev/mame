@@ -8,7 +8,6 @@ They were the German distributor of the Colour Genie EG2000 computers.
 
 Known missing software titles:
 
-Bäng-Bäng, 1983 TCS
 Break Out
 Colour-Assembler
 Colour-Monitor I
@@ -24,7 +23,6 @@ Mampf (Mampfman?), TCS 1983
 Mathematik-Lernprogramm
 Mausi, TCS 1983
 Memory
-NE555
 Opamp (Operationsverstärker Applikationen), Uwe Gerber
 Optik (Grundeigenschaften des Lichts)
 Orgel, TCS 1982
@@ -50,6 +48,19 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="10894">
 				<rom name="adressdatei2.cas" size="10894" crc="3fe7d06a" sha1="398c8fb13df611b3fea49d8a9b3ed02139e12b35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baeng">
+		<description>BängBäng - 2 player gun fight</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with BAENG, enter / to start (req. 32k memory and joysticks)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="8943">
+				<rom name="baeng.cas" size="8943" crc="0e1badf1" sha1="0a6dd2a49555ea0e0049eb02f19f60c9de382ab8" />
 			</dataarea>
 		</part>
 	</software>
@@ -343,6 +354,19 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="6725">
 				<rom name="nato_morsing.cas" size="6725" crc="82256162" sha1="7fb1841bcf577a2b1fee3eefe4314bd893ad1ecf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ne555">
+		<description>NE555 timer chip information and calculator</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Udo Gerber" />
+		<info name="usage" value="Type SYSTEM and load with NE555 (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="15266">
+				<rom name="ne555.cas" size="15266" crc="25a880ad" sha1="84768dc4aa55b3f904a3db49c001f8555740f34f" />
 			</dataarea>
 		</part>
 	</software>
@@ -914,10 +938,10 @@ Screen-Printer (standalone)
 		<year>198?</year>
 		<publisher>Kansas Software</publisher>
 		<info name="author" value="Wal Mansell" />
-		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="9811">
-				<rom name="cosmic_attack.cas" size="9811" crc="cb712ef1" sha1="0aedf205194e625d0a782c334111e0c60b09e23a" />
+			<dataarea name="cass" size="9755">
+				<rom name="cosmic_attack.cas" size="9755" crc="3266bd94" sha1="f92f79d630e32287b227e3c9f7c902f9c4d6ba64" />
 			</dataarea>
 		</part>
 	</software>
@@ -1204,10 +1228,10 @@ Screen-Printer (standalone)
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="Udo Gronostay" />
 		<info name="author" value="Klaus Kunze" />
-		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start (req. 32k memory)" />
+		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14691">
-				<rom name="glueckspilz.cas" size="14691" crc="c562cb8d" sha1="446c48dc44b7c755e03c225b3e313bf568050fed" />
+			<dataarea name="cass" size="14635">
+				<rom name="glueckspilz.cas" size="14635" crc="83338074" sha1="01534f2031033b303f01fcde171576b511a2deb5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1260,8 +1284,8 @@ Screen-Printer (standalone)
 		<info name="author" value="Jürgen Buchmüller" />
 		<info name="usage" value="Type SYSTEM and load with HEKTIK, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14704">
-				<rom name="hektik.cas" size="14704" crc="c63aa90e" sha1="fe62fabc207d16d51b1f6f4c69b06083d1a756ad" />
+			<dataarea name="cass" size="14627">
+				<rom name="hektik.cas" size="14627" crc="933a5a34" sha1="2dd597be32687bc305b7d4fd0e5f073b5f603898" />
 			</dataarea>
 		</part>
 	</software>
@@ -1491,8 +1515,8 @@ Screen-Printer (standalone)
 		<info name="author" value="Klaus Weber" />
 		<info name="usage" value="Type SYSTEM and load with MAMPF2, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="17091">
-				<rom name="mampfman2.cas" size="17091" crc="f2be825b" sha1="ddae6342f05506d8c33f5148f04191988867d36a" />
+			<dataarea name="cass" size="17035">
+				<rom name="mampfman2.cas" size="17035" crc="11e61c65" sha1="4a3b59f427f632b5e2d889330b6ddd0ffbccbf5b" />
 			</dataarea>
 		</part>
 	</software>

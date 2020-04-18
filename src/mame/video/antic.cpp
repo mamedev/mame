@@ -1131,7 +1131,7 @@ void antic_device::cclk_init()
  * Read ANTIC hardware registers
  *
  **************************************************************/
-READ8_MEMBER ( antic_device::read )
+uint8_t antic_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1197,7 +1197,7 @@ READ8_MEMBER ( antic_device::read )
  *
  **************************************************************/
 
-WRITE8_MEMBER ( antic_device::write )
+void antic_device::write(offs_t offset, uint8_t data)
 {
 	int temp;
 

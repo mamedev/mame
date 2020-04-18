@@ -18,6 +18,7 @@
 #pragma once
 
 #include "cdrom.h"
+#include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 
 
@@ -82,15 +83,14 @@ private:
 	uint8_t m_cdrom_cmd_end;
 	uint8_t m_cdrom_cmd_resp;
 
-	cdda_device *m_cdda;
+	required_device<cdda_device> m_cdda;
+	optional_device<cdrom_image_device> m_cddevice;
 	cdrom_file *m_cdrom;
 
 	std::unique_ptr<uint8_t[]> m_cdrom_toc;
 
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;
-
-	int m_cdrom_is_device;
 
 	void nvram_write(uint32_t data);
 	uint32_t nvram_read();

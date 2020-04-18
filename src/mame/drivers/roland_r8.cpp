@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/upd78k/upd78k2.h"
+#include "machine/nvram.h"
 #include "sound/rolandpcm.h"
 #include "speaker.h"
 
@@ -22,19 +23,31 @@ public:
 	}
 
 	void r8(machine_config &config);
+	void r8m(machine_config &config);
 	void r8mk2(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mk1_map(address_map &map);
+	void mk2_map(address_map &map);
 
 	required_device<upd78k2_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
 };
 
 
-void roland_r8_state::mem_map(address_map &map)
+void roland_r8_state::mk1_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom().region("maincpu", 0);
+	map(0x20000, 0x27fff).ram().share("nvram");
+	map(0x70000, 0x7001f).rw(m_pcm, FUNC(mb87419_mb87420_device::read), FUNC(mb87419_mb87420_device::write));
+}
+
+void roland_r8_state::mk2_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("maincpu", 0);
+	map(0x20000, 0x27fff).ram().share("nvram1");
+	map(0x28000, 0x2ffff).ram().share("nvram2");
+	map(0x70000, 0x7001f).rw(m_pcm, FUNC(mb87419_mb87420_device::read), FUNC(mb87419_mb87420_device::write));
 }
 
 
@@ -45,7 +58,12 @@ INPUT_PORTS_END
 void roland_r8_state::r8(machine_config &config)
 {
 	UPD78210(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mk1_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // SRM20256LC-12 + battery
+
+	//bu3904s_device &fsk(BU3904S(config, "fsk", 12_MHz_XTAL));
+	//fsk.xint_callback().set_inputline(m_maincpu, upd78k2_device::INTP0_LINE);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -57,10 +75,24 @@ void roland_r8_state::r8(machine_config &config)
 	m_pcm->add_route(1, "rspeaker", 1.0);
 }
 
+void roland_r8_state::r8m(machine_config &config)
+{
+	r8(config);
+
+	UPD78213(config.replace(), m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mk1_map);
+}
+
 void roland_r8_state::r8mk2(machine_config &config)
 {
 	UPD78213(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mk2_map);
+
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // SRM20256LC-10 + battery
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // SRM20256LC-10 + battery
+
+	//bu3904s_device &fsk(BU3904S(config, "fsk", 12_MHz_XTAL));
+	//fsk.xint_callback().set_inputline(m_maincpu, upd78k2_device::INTP0_LINE);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -103,5 +135,5 @@ ROM_END
 
 
 SYST(1989, r8,    0,  0, r8,    r8, roland_r8_state, empty_init, "Roland", "R-8 Human Rhythm Composer (v2.02)", MACHINE_IS_SKELETON)
-SYST(1990, r8m,   r8, 0, r8,    r8, roland_r8_state, empty_init, "Roland", "R-8M Total Percussion Sound Module (v1.04)", MACHINE_IS_SKELETON)
+SYST(1990, r8m,   r8, 0, r8m,   r8, roland_r8_state, empty_init, "Roland", "R-8M Total Percussion Sound Module (v1.04)", MACHINE_IS_SKELETON)
 SYST(1992, r8mk2, 0,  0, r8mk2, r8, roland_r8_state, empty_init, "Roland", "R-8 Mk II Human Rhythm Composer (v1.0.3)", MACHINE_IS_SKELETON)

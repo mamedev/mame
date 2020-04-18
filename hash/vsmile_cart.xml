@@ -3002,7 +3002,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo! - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" />
+				<rom name="Scooby-Doo - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" />
 			</dataarea>
 		</part>
 	</software>
@@ -3033,7 +3033,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo! - Funland Frenzy (Europe).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
+				<rom name="Scooby-Doo - Funland Frenzy (Europe).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
 			</dataarea>
 		</part>
 	</software>
@@ -3047,7 +3047,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo! - Funland Frenzy (Europe) (Rev 1).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
+				<rom name="Scooby-Doo - Funland Frenzy (Europe) (Rev 1).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
 			</dataarea>
 		</part>
 	</software>
@@ -3971,7 +3971,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Toy Story 2 - Operation-Rescue Woody! (Europe).bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
+				<rom name="Toy Story 2 - Operation-Rescue Woody (Europe).bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4615,7 +4615,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3"/>
 			<feature name="cart_type" value="red" />
 			<dataarea name="rom" size="8388608">
-				<rom name="80-089060 - Scooby-Doo! - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
+				<rom name="80-089060 - Scooby-Doo - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
 			</dataarea>
 		</part>
 	</software>

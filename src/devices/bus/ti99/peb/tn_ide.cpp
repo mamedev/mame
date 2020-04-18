@@ -14,7 +14,12 @@
     The card includes a clock chip to timestamp files, and a SRAM for the DSR.
 
     SRAM: 512 KiB (may be battery-backed)
-    Clock chip: RTC-65271 (alternatives: BQ4847, BQ4842, BQ4852, not implemented)
+
+    Four variants of the clock chip (since the 2004 revision):
+    - RTC-65271 (external SRAM, unbuffered)
+    - BQ4847 (external SRAM, buffered)
+    - BQ4842 (internal SRAM, 128K)
+    - BQ4847 (internal SRAM, 512K)
 
     The card does not contain any ROM. The firmware must be loaded into the
     card or saved on the IDE drive. It is part of the IDEAL software package [2]
@@ -47,12 +52,12 @@
     Suggested configuration procedure:
     (The IDELOAD program is part of the IDEAL package.)
 
-    1) Battery-backed SRAM
+    1) Clock chips BQ4847, BQ4842, BQ4852
     The IDELOAD program must be used to load the firmware into the SRAM.
-    Bootstrap code in the clock is not required, since the SRAM will be mapped
-    into the 4000 memory space on power-up.
+    Bootstrap code cannot be stored in the RTC. In order to activate the DSR
+    on next system startup, set the DIP switch to boot from SRAM.
 
-    2) Normal SRAM
+    2) Clock chip RTC65271
     The IDELOAD program must be used to load the firmware into the SRAM and
     to install the bootstrap code in the clock memory. The bootstrap code
     must be inactive until the IDEAL files have been copied on the hard disk.
@@ -81,6 +86,7 @@
 #define LOG_XRAM       (1U<<4)
 #define LOG_SRAM       (1U<<5)
 #define LOG_ATA        (1U<<6)
+#define LOG_SRAMH      (1U<<7)
 
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
@@ -88,7 +94,10 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device, "ti99_ide", "Nouspikel IDE interface card")
 
-#define CLOCK_TAG "rtc65271"
+#define CLOCK65_TAG "rtc65271"
+#define CLOCK47_TAG "bq4847"
+#define CLOCK42_TAG "bq4842"
+#define CLOCK52_TAG "bq4852"
 #define ATA_TAG "ata"
 #define LATCH_TAG "crulatch"
 #define ATALATCHEV_TAG "atalatch_even"
@@ -104,10 +113,21 @@ enum
 	MODE_TI
 };
 
+enum
+{
+	RTC65 = 0,
+	RTC47,
+	RTC42,
+	RTC52
+};
+
 nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_IDE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_rtc(*this, CLOCK_TAG),
+	m_rtc65(*this, CLOCK65_TAG),
+	m_rtc47(*this, CLOCK47_TAG),
+	m_rtc42(*this, CLOCK42_TAG),
+	m_rtc52(*this, CLOCK52_TAG),
 	m_ata(*this, ATA_TAG),
 	m_sram(*this, RAM512_TAG),
 	m_crulatch(*this, LATCH_TAG),
@@ -115,7 +135,8 @@ nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconf
 	m_latch8_15(*this, ATALATCHODD_TAG),
 	m_ideint(false),
 	m_mode(MODE_OFF),
-	m_page(0)
+	m_page(0),
+	m_rtctype(0)
 {
 }
 
@@ -147,19 +168,34 @@ READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 		// However, We take the simple way and keep the address as is.
 		// This makes debugging less tedious.
 
-		if (rtcsel)
+		if (rtcsel)   // 4020-403F
 		{
-			if ((offset&0x0010)!=0)
+			if (m_rtctype==RTC65)
 			{
-				*value = m_rtc->read(0, 1);
-				LOGMASKED(LOG_RTC, "rtc read -> %02x\n", *value);
+				if ((offset&0x0010)!=0)
+				{
+					*value = m_rtc65->read(0, 1);
+					LOGMASKED(LOG_RTC, "rtc65 read -> %02x\n", *value);
+				}
+			}
+			else
+			{
+				if (m_rtctype==RTC47)
+				{
+					*value = m_rtc47->read((offset & 0x1e)>>1);
+					LOGMASKED(LOG_RTC, "rtc reg %02d -> %02x\n", (offset & 0x1e)>>1, *value);
+				}
+				// No reaction for RTC42, RTC52
 			}
 		}
 		else
 		{
-			int addr = (offset & 0x1f) | ((offset&0x80)>>2);
-			*value = m_rtc->read(1, addr);
-			LOGMASKED(LOG_XRAM, "xram %02x -> %02x\n", addr, *value);
+			if (m_rtctype==RTC65)
+			{
+				int addr = (offset & 0x1f) | ((offset&0x80)>>2);
+				*value = m_rtc65->read(1, addr);
+				LOGMASKED(LOG_XRAM, "xram %02x -> %02x\n", addr, *value);
+			}
 		}
 	}
 
@@ -171,7 +207,18 @@ READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 			page = 0;
 
 		offs_t addr = (offset & 0x1fff) | (page<<13);
-		*value = m_sram->read(addr);
+
+		if (m_rtctype==RTC65 || m_rtctype==RTC47)
+		{
+			*value = m_sram->read(addr);    // external SRAM
+		}
+		else
+		{
+			if (m_rtctype==RTC42)
+				*value = m_rtc42->read(addr);
+			else
+				*value = m_rtc52->read(addr);
+		}
 		if (m_mode==MODE_TI)
 		{
 			if ((offset & 1)==0)
@@ -260,26 +307,41 @@ void nouspikel_ide_card_device::write(offs_t offset, uint8_t data)
 
 		if (rtcsel)
 		{
-			if ((offset&0x0010)==0)
+			if (m_rtctype == RTC65)
 			{
-				m_rtc->write(0, 0, data);
-				LOGMASKED(LOG_RTC, "rtc set <- %02x\n", data);
+				if ((offset&0x0010)==0)
+				{
+					m_rtc65->write(0, 0, data);
+					LOGMASKED(LOG_RTC, "rtc set <- %02x\n", data);
+				}
+				else
+				{
+					m_rtc65->write(0, 1, data);
+					LOGMASKED(LOG_RTC, "rtc write <- %02x\n", data);
+				}
 			}
 			else
 			{
-				m_rtc->write(0, 1, data);
-				LOGMASKED(LOG_RTC, "rtc write <- %02x\n", data);
+				if (m_rtctype == RTC47)
+				{
+					LOGMASKED(LOG_RTC, "rtc reg %02d <- %02x\n", (offset & 0x1e)>>1, data);
+					m_rtc47->write((offset & 0x1e)>>1, data);
+				}
+				// No reaction for RTC42, RTC52
 			}
 		}
 		else
 		{
-			int addr = (offset & 0x1f) | ((offset&0x80)>>2);
-			m_rtc->write(1, addr, data);
+			if (m_rtctype==RTC65)
+			{
+				int addr = (offset & 0x1f) | ((offset&0x80)>>2);
+				m_rtc65->write(1, addr, data);
 
-			if (addr & 0x20)
-				LOGMASKED(LOG_XRAM, "xram set page %02x\n", data);
-			else
-				LOGMASKED(LOG_XRAM, "xram %02x <- %02x\n", addr & 0x1f, data);
+				if (addr & 0x20)
+					LOGMASKED(LOG_XRAM, "xram set page %02x\n", data);
+				else
+					LOGMASKED(LOG_XRAM, "xram %02x <- %02x\n", addr & 0x1f, data);
+			}
 		}
 	}
 
@@ -300,8 +362,24 @@ void nouspikel_ide_card_device::write(offs_t offset, uint8_t data)
 			// When addressing in 4000-4fff, and bit 3 = 0, lock page to 0
 			if (((offset & 0x3000)==0x0000) && m_crulatch->q3_r()==0)
 				page = 0;
-			m_sram->write((offset & 0x1fff) | (page<<13), data);
+
+			offs_t addr = (offset & 0x1fff) | (page<<13);
+
+			if (m_rtctype==RTC65 || m_rtctype==RTC47)
+			{
+				m_sram->write(addr, data);
+			}
+			else
+			{
+				if (m_rtctype==RTC42)
+					m_rtc42->write(addr, data);
+				else
+					m_rtc52->write(addr, data);
+			}
+
 			LOGMASKED(LOG_SRAM, "sram %04x (%02x) <- %02x\n", offset&0xffff, page, data);
+			if ((offset & 0xfff0)==0x5ff0)
+				LOGMASKED(LOG_SRAMH, "sram %04x (%02x) <- %02x\n", offset&0xffff, page, data);
 		}
 	}
 
@@ -369,7 +447,7 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 	// A0 is not checked again (subsumed in inspace)
 
 	mmap = ((offset & 0x7f00)==0x4000) && (m_crulatch->q0_r()==1)
-			&& ((m_crulatch->q1_r()!=0) == m_buffered) && inspace;
+			&& ((m_crulatch->q1_r()!=0) == m_srammap) && inspace;
 	sramsel = ((((offset & 0x6000)==0x4000) && !mmap && (m_crulatch->q4_r()==0) && (m_crulatch->q0_r()==1))
 				|| (((offset & 0x6000)==0x6000) && (m_crulatch->q4_r()==1))) && inspace;
 
@@ -380,10 +458,10 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 
 	if (mmap)
 	{
-		xramsel = ((offset & 0x60)==0x00);
-		rtcsel = ((offset & 0x60)==0x20);
-		cs1fx = ((offset & 0x60)==0x40);
-		cs3fx = ((offset & 0x60)==0x60);
+		xramsel = ((offset & 0x60)==0x00);  // 4000-401F  (only 65271)
+		rtcsel = ((offset & 0x60)==0x20);   // 4020-403F  (65271 and 4847)
+		cs1fx = ((offset & 0x60)==0x40);    // 4040-405F
+		cs3fx = ((offset & 0x60)==0x60);    // 4060-407F
 	}
 }
 
@@ -402,10 +480,23 @@ READ8Z_MEMBER( nouspikel_ide_card_device::crureadz )
 			bit = m_ideint? 1:0;
 			break;
 		case 1:
-			bit = m_buffered? 1:0;
+			bit = m_srammap? 1:0;
 			break;
 		case 2:
-			bit = (m_rtc->intrq_r()==ASSERT_LINE)? 0:1;
+			if (m_rtctype==RTC65)
+				bit = (m_rtc65->intrq_r()==ASSERT_LINE)? 0:1;
+			else
+			{
+				if (m_rtctype==RTC47)
+					bit = (m_rtc47->intrq_r()==ASSERT_LINE)? 0:1;
+				else
+				{
+					if (m_rtctype==RTC42)
+						bit = (m_rtc42->intrq_r()==ASSERT_LINE)? 0:1;
+					else
+						bit = (m_rtc52->intrq_r()==ASSERT_LINE)? 0:1;
+				}
+			}
 			break;
 		case 3:
 			bit = 1;
@@ -458,8 +549,16 @@ WRITE_LINE_MEMBER(nouspikel_ide_card_device::resetdr_callback)
 
 void nouspikel_ide_card_device::device_add_mconfig(machine_config &config)
 {
-	RTC65271(config, m_rtc, 0);
-	m_rtc->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
+	// Choice of RTC chips
+	RTC65271(config, m_rtc65, 0);
+	BQ4847(config, m_rtc47, 0);
+	BQ4842(config, m_rtc42, 0);
+	BQ4852(config, m_rtc52, 0);
+
+	m_rtc65->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
+	m_rtc47->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
+	m_rtc42->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
+	m_rtc52->interrupt_cb().set(FUNC(nouspikel_ide_card_device::clock_interrupt_callback));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 	m_ata->irq_handler().set(FUNC(nouspikel_ide_card_device::ide_interrupt_callback));
@@ -486,20 +585,38 @@ void nouspikel_ide_card_device::device_start()
 
 void nouspikel_ide_card_device::device_reset()
 {
+	int rtype[] = { RTC65, RTC47, RTC42, RTC52 };
+
 	m_page = 0;
 	m_ideint = false;
 	m_cru_base = (ioport("CRUIDE")->read() << 8) | 0x1000;
 	m_mode = ioport("MODE")->read();
-	m_buffered = (ioport("BUFFERED")->read()!=0);
-	m_sram->set_buffered(m_buffered);
+	m_srammap = (ioport("MAPMODE")->read()!=0);
+	m_rtctype = rtype[ioport("RTC")->read()];
+
+	// The 65271 option does not support buffered SRAM; only the BQ4847
+	// can drive a buffered external RAM; the other two chips have internal SRAM
+	m_sram->set_buffered(m_rtctype == RTC47);
+
+	// Only activate the selected RTC
+	m_rtc47->connect_osc(ioport("RTC")->read()==1);
+	m_rtc42->connect_osc(ioport("RTC")->read()==2);
+	m_rtc52->connect_osc(ioport("RTC")->read()==3);
 }
 
 INPUT_PORTS_START( tn_ide )
 
-	PORT_START("BUFFERED")
-	PORT_DIPNAME(0x1, 0, "SRAM type")
-		PORT_DIPSETTING(0, "unbuffered")
-		PORT_DIPSETTING(1, "buffered")
+	PORT_START("RTC")
+	PORT_CONFNAME(0x03, 0, "RTC chip")
+		PORT_CONFSETTING(0, "RTC-65271")
+		PORT_CONFSETTING(1, "BQ4847 (ext SRAM)")
+		PORT_CONFSETTING(2, "BQ4842 (128K)")
+		PORT_CONFSETTING(3, "BQ4852 (512K)")
+
+	PORT_START("MAPMODE")
+	PORT_DIPNAME(0x1, 0, "Map at boot time")
+		PORT_DIPSETTING(0, "RTC")
+		PORT_DIPSETTING(1, "SRAM")
 
 	PORT_START("MODE")
 	PORT_DIPNAME(0x3, MODE_TI, "Card mode")

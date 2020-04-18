@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton, Sean Riddle
-/***************************************************************************
+/******************************************************************************
 
 Entex Select-A-Game Machine, handheld game console.
 Technically, the main unit is the peripheral(buttons, display, speaker, power),
@@ -18,7 +18,7 @@ Games released, MCU: (*denotes undumped)
 - Football 4       - TMS1670
 - *Pac-Man 2       - HD38800?
 - Pinball          - HD38800
-- *Space Invader 2 - HD38800 - is dumped, but need redump
+- Space Invader 2  - HD38800
 
 Battleship and Turtles were announced but unreleased.
 A 2nd version of the console was also announced, called Table Top Game Machine,
@@ -32,7 +32,7 @@ are played, Space Invader 2 is an exception.
 TODO:
 - add the rest of the games
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 

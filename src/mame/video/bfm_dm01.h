@@ -21,14 +21,14 @@ public:
 
 	auto busy_callback() { return m_busy_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( control_r );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( mux_r );
-	DECLARE_WRITE8_MEMBER( mux_w );
-	DECLARE_READ8_MEMBER( comm_r );
-	DECLARE_WRITE8_MEMBER( comm_w );
-	DECLARE_READ8_MEMBER( unknown_r );
-	DECLARE_WRITE8_MEMBER( unknown_w );
+	uint8_t control_r();
+	void control_w(uint8_t data);
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
+	uint8_t comm_r();
+	void comm_w(uint8_t data);
+	uint8_t unknown_r();
+	void unknown_w(uint8_t data);
 
 	void writedata(uint8_t data);
 	int busy(void);

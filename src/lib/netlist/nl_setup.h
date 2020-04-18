@@ -53,7 +53,7 @@
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
-		setup.register_param(# name, # val);
+		setup.register_param(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_param(# name ".HINT_" # val, "1");
@@ -280,7 +280,7 @@ namespace netlist
 		template <typename S, typename... Args>
 		void register_source(Args&&... args)
 		{
-		    static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
 
 			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
 			m_sources.add_source(std::move(src));
@@ -312,7 +312,7 @@ namespace netlist
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)
 		{
-		    static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
+			static_assert(std::is_base_of<plib::psource_t, S>::value, "S must inherit from plib::psource_t");
 
 			auto src(plib::make_unique<S>(std::forward<Args>(args)...));
 			m_includes.add_source(std::move(src));

@@ -2073,7 +2073,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="131072">
-				<rom name="ganbare goemon! - karakuri douchuu (japan).rom" size="131072" crc="40e53ea3" sha1="fd71df03b0e9f3caf701ecfc6d5232060cab3b13" status="baddump" offset="0" />
+				<rom name="ganbare goemon - karakuri douchuu (japan).rom" size="131072" crc="40e53ea3" sha1="fd71df03b0e9f3caf701ecfc6d5232060cab3b13" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2149,7 +2149,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
-				<rom name="high school! kimengumi (japan).rom" size="131072" crc="1123545c" sha1="13fbb273a95481330d33c9edc4263e30ccf1774d" status="baddump" offset="0" />
+				<rom name="high school kimengumi (japan).rom" size="131072" crc="1123545c" sha1="13fbb273a95481330d33c9edc4263e30ccf1774d" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>

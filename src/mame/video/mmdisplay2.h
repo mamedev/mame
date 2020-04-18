@@ -29,8 +29,8 @@ public:
 
 	hd44780_device *get() { return m_lcdc; }
 
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void latch_w(uint8_t data);
+	void io_w(uint8_t data);
 
 protected:
 	// device-level overrides

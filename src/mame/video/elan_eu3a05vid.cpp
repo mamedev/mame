@@ -16,7 +16,8 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this)),
 	m_bytes_per_tile_entry(4),
 	m_vrambase(0x600),
-	m_spritebase(0x3e00)
+	m_spritebase(0x3e00),
+	m_use_spritepages(false)
 {
 }
 
@@ -226,7 +227,11 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
 		int page = (unk2 & 0x30) >> 4;
 		
-		base += 0x10000 * page;
+		// rad_sinv menu screen and phoenix don't agree with this, but carlecfg needs it
+		if (m_use_spritepages)
+		{
+			base += 0x10000 * page;
+		}
 
 		if (doubleX)
 			sizex = sizex * 2;

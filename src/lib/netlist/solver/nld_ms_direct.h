@@ -42,8 +42,8 @@ namespace solver
 		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
-		unsigned solve_non_dynamic(bool newton_raphson);
+		void vsolve_non_dynamic() override;
+		void solve_non_dynamic();
 
 		void LE_solve();
 
@@ -158,26 +158,20 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(bool newton_raphson)
+	void matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic()
 	{
 		this->LE_solve();
 		this->LE_back_subst(this->m_new_V);
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		// populate matrix
 		this->clear_square_mat(m_A);
 		this->fill_matrix_and_rhs();
 
-		return this->solve_non_dynamic(newton_raphson);
+		this->solve_non_dynamic();
 	}
 
 	template <typename FT, int SIZE>

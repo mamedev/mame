@@ -23,6 +23,12 @@
 #include <ios>
 #include <iostream> // scanf
 
+#ifndef NL_DISABLE_DYNAMIC_LOAD
+#define NL_DISABLE_DYNAMIC_LOAD 0
+#endif
+
+extern plib::dynlib_static_sym nl_static_solver_syms[];
+
 class tool_app_t : public plib::app
 {
 public:
@@ -30,13 +36,15 @@ public:
 		plib::app(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader"}), "run|validate|convert|listdevices|static|header|docheader"),
-		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_prepro(*this,   "",  "prepro",                  "output preprocessor output to stderr"),
+
+		opt_files(*this, "files to process"),
+
 		opt_version(*this,  "",  "version",                 "display version and exit"),
 		opt_help(*this,     "h", "help",                    "display help and exit"),
 
@@ -44,10 +52,12 @@ public:
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
 
 		opt_grp3(*this,     "Options for static command",   "These options apply to static command."),
-		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
+		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files."),
+		opt_out(*this,      "o", "output",     "",          "single output file for the generated code.\nEither --dir or --output can be specificied"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
+		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)"),
+		opt_boostlib(*this,  "",  "boost_lib", "builtin",   "generic: will use generic solvers.\nbuiltin: Use optimized solvers compiled in.\nsomelib.so: Use library with precompiled solvers."),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
@@ -66,12 +76,14 @@ public:
 		opt_tabwidth(*this, "", "tab-width", 4,          "Tab width for output."),
 		opt_linewidth(*this,"", "line-width", 72,       "Line width for output."),
 
-		opt_ex1(*this,     "nltool -c run -t 3.5 -f nl_examples/cdelay.c -n cap_delay",
+		opt_ex1(*this,     "nltool -c run -t 3.5 -n cap_delay nl_examples/cdelay.c",
 				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
 		opt_ex2(*this,     "nltool --cmd=listdevices",
 				"List all known devices."),
 		opt_ex3(*this,     "nltool --cmd=header --tab-width=8 --line-width=80",
 				"Create the header file needed for including netlists as code."),
+		opt_ex4(*this,     "nltool --cmd static --output src/lib/netlist/generated/static_solvers.cpp src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp",
+				"Create static solvers for the MAME project."),
 
 		m_warnings(0),
 		m_errors(0)
@@ -79,29 +91,36 @@ public:
 
 	plib::option_group  opt_grp1;
 	plib::option_str_limit<unsigned> opt_cmd;
-	plib::option_str    opt_file;
 	plib::option_vec    opt_includes;
 	plib::option_vec    opt_defines;
 	plib::option_vec    opt_rfolders;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_prepro;
+	plib::option_args   opt_files;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
+
 	plib::option_group  opt_grp2;
 	plib::option_str    opt_name;
+
 	plib::option_group  opt_grp3;
 	plib::option_str    opt_dir;
+	plib::option_str    opt_out;
+
 	plib::option_group  opt_grp4;
 	plib::option_num<nl_fptype> opt_ttr;
+	plib::option_str    opt_boostlib;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
 	plib::option_bool   opt_fperr;
+
 	plib::option_group  opt_grp5;
 	plib::option_str_limit<unsigned> opt_type;
+
 	plib::option_group  opt_grp6;
 	plib::option_bool   opt_extended_validation;
 	plib::option_group  opt_grp7;
@@ -110,6 +129,7 @@ public:
 	plib::option_example opt_ex1;
 	plib::option_example opt_ex2;
 	plib::option_example opt_ex3;
+	plib::option_example opt_ex4;
 
 	int execute() override;
 	pstring usage() override;
@@ -132,6 +152,10 @@ private:
 	void run();
 	void validate();
 	void convert();
+
+	void compile_one_and_add_to_map(const pstring &file,
+		const pstring &name, netlist::solver::static_compile_target target,
+		std::map<pstring, pstring> &map);
 	void static_compile();
 
 	void mac_out(const pstring &s, bool cont = true);
@@ -175,7 +199,7 @@ public:
 			return stream_ptr(nullptr);
 
 		strm->imbue(std::locale::classic());
-		return std::move(strm);
+		return std::move(strm); // FIXME: for c++11 clang builds;
 	}
 
 private:
@@ -190,6 +214,19 @@ public:
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const override
+	{
+		if (m_app.opt_boostlib() == "builtin")
+			return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
+		if (m_app.opt_boostlib() == "generic")
+			return plib::make_unique<plib::dynlib_static>(nullptr);
+		if (NL_DISABLE_DYNAMIC_LOAD)
+			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
+
+		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
+		return plib::make_unique<plib::dynlib>(m_app.opt_boostlib());
+	}
 
 private:
 	tool_app_t &m_app;
@@ -380,6 +417,10 @@ void tool_app_t::run()
 	plib::chrono::timer<plib::chrono::system_ticks> t;
 	std::vector<input_t> inps;
 	netlist::netlist_time_ext ttr;
+
+	if (opt_files().size() != 1)
+		throw netlist::nl_exception("nltool: run needs exactly one file");
+
 	netlist_tool_t nt(*this, "netlist");
 
 	{
@@ -393,7 +434,7 @@ void tool_app_t::run()
 		if (opt_quiet())
 			nt.log().info.set_enabled(false);
 
-		nt.read_netlist(opt_file(), opt_name(),
+		nt.read_netlist(opt_files()[0], opt_name(),
 				opt_logs(),
 				m_defines, opt_rfolders(), opt_includes());
 
@@ -472,6 +513,9 @@ void tool_app_t::validate()
 {
 	netlist_tool_t nt(*this, "netlist");
 
+	if (opt_files().size() != 1)
+		throw netlist::nl_exception("nltool: validate needs exactly one file");
+
 	if (!opt_verb())
 		nt.log().verbose.set_enabled(false);
 	if (opt_quiet())
@@ -484,7 +528,7 @@ void tool_app_t::validate()
 
 	try
 	{
-		nt.read_netlist(opt_file(), opt_name(),
+		nt.read_netlist(opt_files()[0], opt_name(),
 				opt_logs(),
 				m_defines, opt_rfolders(), opt_includes());
 	}
@@ -505,37 +549,133 @@ void tool_app_t::validate()
 
 }
 
+void tool_app_t::compile_one_and_add_to_map(const pstring &file,
+	const pstring &name, netlist::solver::static_compile_target target,
+	std::map<pstring, pstring> &map)
+{
+	try
+	{
+		netlist_tool_t nt(*this, "netlist");
+
+		nt.log().verbose.set_enabled(false);
+		nt.log().info.set_enabled(false);
+		nt.log().warning.set_enabled(false);
+
+		nt.read_netlist(file, name,
+				opt_logs(),
+				m_defines, opt_rfolders(), opt_includes());
+
+		// need to reset ...
+
+		nt.exec().reset();
+
+		auto mp(nt.exec().solver()->create_solver_code(target));
+
+		for (auto &e : mp)
+		{
+			auto it = map.find(e.first);
+			if (it == map.end())
+				map.insert(e);
+			else
+			{
+				if (it->second != e.second)
+				{
+					pstring msg = plib::pfmt("nltool: found hash conflict in {1}, netlist {2}")(file, name);
+					throw netlist::nl_exception(msg);
+				}
+			}
+		}
+
+		nt.exec().stop();
+	}
+	catch (netlist::nl_exception &e)
+	{
+		perr("{} : Netlist exception : {}\n", file, e.text());
+	}
+	catch (plib::pexception &e)
+	{
+		perr("{} : Netlist exception : {}\n", file, e.text());
+	}
+}
+
 void tool_app_t::static_compile()
 {
-	if (!opt_dir.was_specified())
-		throw netlist::nl_exception("--dir option needs to be specified");
 
-	netlist_tool_t nt(*this, "netlist");
+	netlist::solver::static_compile_target target = netlist::solver::CXX_STATIC;
 
-	nt.log().verbose.set_enabled(false);
-	nt.log().info.set_enabled(false);
-	nt.log().warning.set_enabled(false);
+	if (!(opt_dir.was_specified() ^ opt_out.was_specified()))
+		throw netlist::nl_exception("either --dir or --output option needed");
 
-	nt.read_netlist(opt_file(), opt_name(),
-			opt_logs(),
-			m_defines, opt_rfolders(), opt_includes());
-
-	// need to reset ...
-
-	nt.exec().reset();
-
-	std::map<pstring, pstring> mp;
-
-	nt.exec().solver()->create_solver_code(mp);
-
-	for (auto &e : mp)
+	if (opt_dir.was_specified())
 	{
-		auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
-		sout << e.second;
+		if (opt_files().size() != 1)
+			throw netlist::nl_exception("nltool: static_compile needs exactly one file");
+
+		std::map<pstring, pstring> mp;
+
+		compile_one_and_add_to_map(opt_files()[0], opt_name(), target, mp);
+
+		for (auto &e : mp)
+		{
+			auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
+			sout << e.second;
+		}
 	}
+	else
+	{
+		std::map<pstring, pstring> map;
 
-	nt.exec().stop();
+		for (const auto &f : opt_files())
+		{
+			std::vector<pstring> names;
+			if (opt_name.was_specified())
+				names.push_back(opt_name());
+			else
+			{
+				plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(f)));
+				if (r.stream().fail())
+					throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(f));
+				r.stream().imbue(std::locale::classic());
+				pstring line;
+				while (r.readline(line))
+				{
+					if (plib::startsWith(line, "//NL_CONTAINS "))
+					{
+						auto sp = plib::psplit(plib::trim(line.substr(13)), " ", true);
+						for (auto &e : sp)
+							names.push_back(e);
+					}
+				}
 
+				if (names.empty())
+				{
+					pstring name = plib::util::basename(f, ".cpp");
+					if (plib::startsWith(name, "nl_"))
+						name = name.substr(3);
+					names.push_back(name);
+				}
+
+			}
+			for (auto &name : names)
+			{
+				if (!opt_quiet())
+					pout("Processing {}({}) ... \n", name, f);
+
+				compile_one_and_add_to_map(f, name, target, map);
+			}
+		}
+		std::ofstream sout = std::ofstream(opt_out());
+
+		sout << "#include \"plib/pdynlib.h\"\n\n";
+		for (auto &e : map)
+			sout << e.second;
+		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
+		for (auto &e : map)
+			sout << "\t{\"" << e.first << "\", reinterpret_cast<void *>(&" << e.first << ")},\n";
+		sout << "{\"\", nullptr}\n";
+		sout << "};\n";
+
+	}
 }
 
 
@@ -931,15 +1071,19 @@ void tool_app_t::convert()
 	pstring contents;
 	std::stringstream ostrm;
 	ostrm.imbue(std::locale::classic());
-	if (opt_file() == "-")
+
+	if (opt_files().size() > 1)
+		throw netlist::nl_exception("nltool: convert needs exactly one file");
+
+	if (opt_files().empty() || opt_files()[0] == "-")
 	{
 		plib::copystream(ostrm, std::cin);
 	}
 	else
 	{
-		std::ifstream strm(plib::filesystem::u8path(opt_file()));
+		std::ifstream strm(plib::filesystem::u8path(opt_files()[0]));
 		if (strm.fail())
-			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_file()));
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_files()[0]));
 		strm.imbue(std::locale::classic());
 		plib::copystream(ostrm, strm);
 	}
@@ -985,8 +1129,10 @@ static const pstring pmf_verbose[] =
 pstring tool_app_t::usage()
 {
 	return help(
-			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
-			"nltool [options]");
+		"nltool serves as the Swiss Army knife to run, test and convert netlists.\n\n"
+		"Commands may accept one or more files depending on the functionality.\n"
+		"If no file is provided, standard input is used.",
+		"nltool [option]... [files]...");
 }
 
 int tool_app_t::execute()

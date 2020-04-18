@@ -50,8 +50,16 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 	m_write_xint2(*this),
 	m_write_xint3(*this),
 	m_write_xint4(*this),
-	m_write_xint5(*this), m_card(nullptr), m_irq(0), m_nmi(0), m_pren(0),
-	m_trrq(0), m_xint2(0), m_xint3(0), m_xint4(0), m_xint5(0)
+	m_write_xint5(*this),
+	m_card(nullptr),
+	m_irq(CLEAR_LINE),
+	m_nmi(CLEAR_LINE),
+	m_pren(1),
+	m_trrq(1),
+	m_xint2(CLEAR_LINE),
+	m_xint3(CLEAR_LINE),
+	m_xint4(CLEAR_LINE),
+	m_xint5(CLEAR_LINE)
 {
 }
 

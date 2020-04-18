@@ -19,6 +19,8 @@
 #include "bus/ata/ataintf.h"
 #include "bus/ti99/internal/buffram.h"
 #include "machine/rtc65271.h"
+#include "machine/bq4847.h"
+#include "machine/bq48x2.h"
 #include "machine/74259.h"
 #include "machine/74543.h"
 
@@ -39,7 +41,11 @@ private:
 	void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
-	required_device<rtc65271_device> m_rtc;
+	required_device<rtc65271_device> m_rtc65;
+	required_device<bq4847_device> m_rtc47;
+	required_device<bq4842_device> m_rtc42;
+	required_device<bq4852_device> m_rtc52;
+
 	required_device<ata_interface_device> m_ata;
 	required_device<bus::ti99::internal::buffered_ram_device> m_sram;
 	required_device<ls259_device> m_crulatch;
@@ -56,7 +62,10 @@ private:
 	int m_page;
 
 	// Is the SRAM buffered?
-	bool m_buffered;
+	bool m_srammap;
+
+	// RTC type
+	int m_rtctype;
 
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
