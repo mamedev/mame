@@ -14,13 +14,13 @@ Hardware notes:
 games had an Intel 8021 MCU at first, but Milton Bradley switched to TMS1100.
 See the softwarelist XML for details.
 
-Each game had a screen- and keypad overlay attached to it, MAME external
+Each game had a screen- and button overlay attached to it, MAME external
 artwork is recommended. It's also advised to disable screen filtering,
 eg. with -prescale or -nofilter.
 
 TODO:
 - dump/add remaining 8021 cartridges, which games have 8021 versions? An online
-  FAQ mentions at least Block Buster, Connect 4, Bowling.
+  FAQ mentions at least Block Buster, Connect Four, Bowling.
 
 ******************************************************************************/
 

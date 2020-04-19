@@ -358,7 +358,7 @@ void desmas_state::fdes2325(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump came from a post-release bugfix by Fidelity
+ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01 - this dump came from a post-release bugfix by Fidelity
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
 
@@ -397,7 +397,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP MACHINE    INPUT   STATE         INIT            COMPANY, FULLNAME, FLAGS
-CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d, fdes2100d, 0, fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

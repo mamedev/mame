@@ -276,7 +276,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, cc7o,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger 7 (model CC7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 2nd revision of model CC7?
+CONS( 1979, cc7,      0,      0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (model BCC, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7o,     cc7,    0, bcc,     bcc,   bcc_state, empty_init, "Fidelity Electronics", "Chess Challenger \"7\" (model CC7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 2nd revision of model CC7?
 
 CONS( 1979, backgamc, 0,      0, bkc,     bkc,   bcc_state, empty_init, "Fidelity Electronics", "Backgammon Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

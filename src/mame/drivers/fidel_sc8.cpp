@@ -3,7 +3,13 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory Chess Challenger 8
+Fidelity Sensory Chess Challenger "8"
+
+It is the first chesscomputer with sensors under the chessboard.
+
+The box names it Sensory Chess Challenger, Sensory Chess Challenger "8" title
+is on the 1st page of the manual. Like other Fidelity chesscomputers from
+around this time, the number indicates maximum difficulty level.
 
 Hardware notes:
 - Z80A CPU @ 3.9MHz
@@ -61,16 +67,12 @@ private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	u8 m_inp_mux;
-	u8 m_led_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void scc_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -165,7 +167,7 @@ void scc_state::scc(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -197,4 +199,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"8\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

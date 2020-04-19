@@ -16,11 +16,13 @@
  *A56     HD38750  1981, Actronics(Hanzawa) Twinvader (small brown version)
  *A58     HD38750  1981, Actronics(Hanzawa) Challenge Racer/Ludotronic(Hanzawa) Grand Prix Turbo
  *A62     HD38750  1982, Actronics(Hanzawa) Pack'n Maze
+ *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
+ *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
-  A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp
+  A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster
@@ -35,9 +37,11 @@
  @B23     HD38800  1982, Tomy Kingman (THF-01II)
  *B24     HD38800  1982, Actronics(Hanzawa) Wanted G-Man
  *B29     HD38800  1984, Tomy Portable 6000 Bombman
- *B31     HD38800  1983, Gongoll Frog Prince (ET-806)
+ *B31     HD38800  1983, Romtec Frog Prince (ET-806)
  *B35     HD38800  1983, Bandai Gundam vs Gelgoog Zaku
+ *B42     HD38800  1983, Bandai Kiteyo Parman
  @B43     HD38800  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
+ *B48     HD38800  1983, Bandai Go Go Dynaman
  @B52     HD38800  1983, Bandai Ultraman Monster Battle (PT-424)
 
  @A09     HD38820  1980, Mattel World Championship Baseball
@@ -56,6 +60,7 @@
  @A65     HD38820  1983, Bandai Burger Time (PT-389)
  @A69     HD38820  1983, Gakken Dig Dug
  @A70     HD38820  1983, Parker Brothers Q*Bert
+ *A75     HD38820  1983, Bandai Toukon Juohmaru
  @A85     HD38820  1984, Bandai Machine Man (PT-438)
  @A88     HD38820  1984, Bandai Pair Match (PT-460) (1/2)
  @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
@@ -2453,6 +2458,10 @@ ROM_END
   * PCB labels ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
+
+  known releases:
+  - USA: Galaxian 2
+  - UK: Astro Invader (Hales/Entex)
 
 ***************************************************************************/
 

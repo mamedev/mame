@@ -115,7 +115,7 @@
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable, pinout seems to match TMS1670)
+ *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
