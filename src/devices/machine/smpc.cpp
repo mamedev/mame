@@ -203,25 +203,25 @@ void smpc_hle_device::smpc_regs(address_map &map)
 //-------------------------------------------------
 
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
-	m_mini_nvram(*this, "smem"),
-	m_mshres(*this),
-	m_mshnmi(*this),
-	m_sshres(*this),
-	m_sndres(*this),
-	m_sysres(*this),
-	m_syshalt(*this),
-	m_dotsel(*this),
-	m_pdr1_read(*this),
-	m_pdr2_read(*this),
-	m_pdr1_write(*this),
-	m_pdr2_write(*this),
-	m_irq_line(*this),
-	m_ctrl1(*this, finder_base::DUMMY_TAG),
-	m_ctrl2(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, SMPC_HLE, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this))
+	, m_mini_nvram(*this, "smem")
+	, m_mshres(*this)
+	, m_mshnmi(*this)
+	, m_sshres(*this)
+	, m_sndres(*this)
+	, m_sysres(*this)
+	, m_syshalt(*this)
+	, m_dotsel(*this)
+	, m_pdr1_read(*this)
+	, m_pdr2_read(*this)
+	, m_pdr1_write(*this)
+	, m_pdr2_write(*this)
+	, m_irq_line(*this)
+	, m_ctrl1(*this, finder_base::DUMMY_TAG)
+	, m_ctrl2(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 	m_has_ctrl_ports = false;
 }

@@ -71,12 +71,15 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_LITTLE, 32, 20, 0, address_map_constructor(FUNC(stvcd_device::io_regs), this))
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
 	, m_cdda(*this, "cdda")
 {
 }
+
 
 void stvcd_device::device_add_mconfig(machine_config &config)
 {
@@ -94,6 +97,352 @@ void stvcd_device::device_start()
 {
 }
 
+device_memory_interface::space_config_vector stvcd_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+/*
+ * Block interface
+ */
+
+void stvcd_device::io_regs(address_map &map)
+{
+	map(0x18000, 0x18003).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
+	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
+	map(0x90008, 0x9000b).mirror(0x08000).rw(FUNC(stvcd_device::hirq_r), FUNC(stvcd_device::hirq_w)).umask32(0xffffffff);
+	map(0x9000c, 0x9000f).mirror(0x08000).rw(FUNC(stvcd_device::hirqmask_r), FUNC(stvcd_device::hirqmask_w)).umask32(0xffffffff);
+	map(0x90018, 0x9001b).mirror(0x08000).rw(FUNC(stvcd_device::cr1_r), FUNC(stvcd_device::cr1_w)).umask32(0xffffffff);
+	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(stvcd_device::cr2_r), FUNC(stvcd_device::cr2_w)).umask32(0xffffffff);
+	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(stvcd_device::cr3_r), FUNC(stvcd_device::cr3_w)).umask32(0xffffffff);
+	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
+}
+
+READ32_MEMBER( stvcd_device::datatrns_r )
+{
+	u32 rv;
+
+	if (mem_mask == 0xffffffff)
+	{
+		rv = dataxfer_long_r();
+	}
+	else if (mem_mask == 0xffff0000)
+	{
+		rv = dataxfer_word_r()<<16;
+	}
+	else if (mem_mask == 0x0000ffff)
+	{
+		rv = dataxfer_word_r();
+	}
+	else
+	{
+		printf("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
+		rv = 0;
+	}
+	return rv;
+}
+
+WRITE32_MEMBER( stvcd_device::datatrns_w )
+{
+	if (mem_mask == 0xffffffff)
+		dataxfer_long_w(data);
+	else
+		printf("CD: Unknown data buffer write with mask = %08x\n", mem_mask);
+}
+
+inline u32 stvcd_device::dataxfer_long_r()
+{
+	uint32_t rv = 0;
+
+	switch (xfertype32)
+	{
+		case XFERTYPE32_GETSECTOR:
+		case XFERTYPE32_GETDELETESECTOR:
+			// make sure we have sectors left
+			if (xfersect < xfersectnum)
+			{
+				// get next longword
+				rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
+
+				xferdnum += 4;
+				xferoffs += 4;
+
+				// did we run out of sector?
+				if (xferoffs >= transpart->blocks[xfersect]->size)
+				{
+					LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
+
+					xferoffs = 0;
+					xfersect++;
+				}
+			}
+			else    // sectors are done, kill 'em all if we can
+			{
+				if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
+				{
+					int32_t i;
+
+					LOG("Killing sectors in done\n");
+
+					// deallocate the blocks
+					for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+					{
+						cd_free_block(transpart->blocks[i]);
+						transpart->blocks[i] = (blockT *)nullptr;
+						transpart->bnum[i] = 0xff;
+					}
+
+					// defrag what's left
+					cd_defragblocks(transpart);
+
+					// clean up our state
+					transpart->size -= xferdnum;
+					transpart->numblks -= xfersectnum;
+
+					/* TODO: is this correct? */
+					xfertype32 = XFERTYPE32_INVALID;
+				}
+			}
+			break;
+
+		default:
+			osd_printf_error("CD: unhandled 32-bit transfer type\n");
+			break;
+	}
+		
+	return rv;
+}
+
+inline void stvcd_device::dataxfer_long_w(u32 data)
+{
+	switch (xfertype32)
+	{
+		case XFERTYPE32_PUTSECTOR:
+			// make sure we have sectors left
+			if (xfersect < xfersectnum)
+			{
+				// get next longword
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
+
+				xferdnum += 4;
+				xferoffs += 4;
+
+				// did we run out of sector?
+				if (xferoffs >= transpart->blocks[xfersectpos+xfersect]->size)
+				{
+					LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
+
+					xferoffs = 0;
+					xfersect++;
+				}
+			}
+			else    // sectors are done
+			{
+				/* Virtual On doesnt want this to be resetted. */
+				//xfertype32 = XFERTYPE32_INVALID;
+			}
+			break;
+
+		default:
+			printf("CD: unhandled 32-bit transfer type write\n");
+			break;
+	}
+}
+
+inline u16 stvcd_device::dataxfer_word_r()
+{
+	u16 rv;
+
+	rv = 0xffff;
+	switch (xfertype)
+	{
+		case XFERTYPE_TOC:
+			rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 102*4)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_FILEINFO_1:
+			rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 6*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_FILEINFO_254: // Lunar 2
+			if((xfercount % (6 * 2)) == 0)
+			{
+				uint32_t temp = 2 + (xfercount / (0x6 * 2));
+
+				// first 4 bytes = FAD
+				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
+				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
+				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
+				finfbuf[3] = (curdir[temp].firstfad&0xff);
+				// second 4 bytes = length of file
+				finfbuf[4] = (curdir[temp].length>>24)&0xff;
+				finfbuf[5] = (curdir[temp].length>>16)&0xff;
+				finfbuf[6] = (curdir[temp].length>>8)&0xff;
+				finfbuf[7] = (curdir[temp].length&0xff);
+				finfbuf[8] = curdir[temp].interleave_gap_size;
+				finfbuf[9] = curdir[temp].file_unit_size;
+				finfbuf[10] = temp;
+				finfbuf[11] = curdir[temp].flags;
+			}
+
+			rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > (254 * 6 * 2))
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_SUBQ:
+			rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 5*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+
+		case XFERTYPE_SUBRW:
+			rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 12*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		default:
+			osd_printf_error("STVCD: Unhandled xfer type %d\n", (int)xfertype);
+			rv = 0;
+			break;
+	}
+
+	return rv;
+}
+
+READ16_MEMBER( stvcd_device::hirq_r ) 
+{
+	// TODO: this member must return the register only
+	u16 rv;
+
+//  LOG("RW HIRQ: %04x\n", rv);
+
+	rv = hirqreg;
+
+	rv &= ~DCHG;    // always clear bit 6 (tray open)
+
+	if (buffull) rv |= BFUL; else rv &= ~BFUL;
+	if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
+
+	hirqreg = rv;
+
+	return rv;
+}
+
+WRITE16_MEMBER( stvcd_device::hirq_w ) { hirqreg &= data; }
+
+// TODO: these two are actually never read or written to by host?
+READ16_MEMBER( stvcd_device::hirqmask_r ) 
+{ 
+	printf("RW HIRM: %04x\n", hirqmask);
+	return hirqmask; 
+}
+
+WRITE16_MEMBER( stvcd_device::hirqmask_w ) 
+{ 
+	printf("WW HIRM: %04x => %04x\n", hirqmask, data);
+	COMBINE_DATA(&hirqmask); 
+}
+
+READ16_MEMBER( stvcd_device::cr1_r ) { return cr1; }
+READ16_MEMBER( stvcd_device::cr2_r ) { return cr2; }
+READ16_MEMBER( stvcd_device::cr3_r ) { return cr3; }
+READ16_MEMBER( stvcd_device::cr4_r ) 
+{ 
+	cmd_pending = 0;
+	cd_stat |= CD_STAT_PERI;
+	return cr4; 
+}
+
+// TODO: understand how dual-port interface really works out
+WRITE16_MEMBER( stvcd_device::cr1_w )
+{
+	cr1 = data;
+	cd_stat &= ~CD_STAT_PERI;
+	cmd_pending |= 1;
+	m_sh1_timer->adjust(attotime::never);
+}
+
+WRITE16_MEMBER( stvcd_device::cr2_w )
+{
+	cr2 = data;
+	cmd_pending |= 2;	
+}
+
+WRITE16_MEMBER( stvcd_device::cr3_w )
+{
+	cr3 = data;
+	cmd_pending |= 4;
+}
+
+WRITE16_MEMBER( stvcd_device::cr4_w )
+{
+	cr4 = data;
+	cmd_pending |= 8;
+	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));	
+}
+
+READ32_MEMBER( stvcd_device::stvcd_r )
+{
+	return this->space().read_dword(offset<<2, mem_mask);
+}
+
+WRITE32_MEMBER( stvcd_device::stvcd_w )
+{
+	this->space().write_dword(offset<<2,data, mem_mask);
+}
+
+/*
+ * CDC command helpers
+ */
 int stvcd_device::get_timing_command(void)
 {
 	/* TODO: calculate timings based off command params */
@@ -156,6 +505,10 @@ void stvcd_device::mpeg_standard_return(uint16_t cur_status)
 	cr3 = (0 << 8) | 0x10; // Picture Info | audio status
 	cr4 = 0x1000; // video status
 }
+
+/*
+ * CDC commands
+ */
 
 void stvcd_device::cmd_get_status()
 {
@@ -1792,464 +2145,6 @@ void stvcd_device::cd_defragblocks(partitionT *part)
 				part->bnum[j] = temp2;
 			}
 		}
-	}
-}
-
-uint16_t stvcd_device::cd_readWord(uint32_t addr)
-{
-	uint16_t rv;
-
-	switch (addr & 0xffff)
-	{
-		case 0x0008:    // read HIRQ register
-		case 0x000a:
-		case 0x8008:
-		case 0x800a:
-			rv = hirqreg;
-
-			rv &= ~DCHG;    // always clear bit 6 (tray open)
-
-			if (buffull) rv |= BFUL; else rv &= ~BFUL;
-			if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
-
-			hirqreg = rv;
-
-//          LOG("RW HIRQ: %04x\n", rv);
-
-			return rv;
-
-		case 0x000c:
-		case 0x000e:
-		case 0x800c:
-		case 0x800e:
-//          LOG("RW HIRM: %04x\n", hirqmask);
-			printf("RW HIRM: %04x\n", hirqmask);
-			return hirqmask;
-
-		case 0x0018:
-		case 0x001a:
-		case 0x8018:
-		case 0x801a:
-//          LOG("RW CR1: %04x\n", cr1);
-			return cr1;
-
-		case 0x001c:
-		case 0x001e:
-		case 0x801c:
-		case 0x801e:
-//          LOG("RW CR2: %04x\n", cr2);
-			return cr2;
-
-		case 0x0020:
-		case 0x0022:
-		case 0x8020:
-		case 0x8022:
-//          LOG("RW CR3: %04x\n", cr3);
-			return cr3;
-
-		case 0x0024:
-		case 0x0026:
-		case 0x8024:
-		case 0x8026:
-//          LOG("RW CR4: %04x\n", cr4);
-			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
-			cmd_pending = 0;
-			cd_stat |= CD_STAT_PERI;
-			return cr4;
-
-		case 0x8000:
-			rv = 0xffff;
-			switch (xfertype)
-			{
-				case XFERTYPE_TOC:
-					rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 102*4)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_1:
-					rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 6*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_254: // Lunar 2
-					if((xfercount % (6 * 2)) == 0)
-					{
-						uint32_t temp = 2 + (xfercount / (0x6 * 2));
-
-						// first 4 bytes = FAD
-						finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-						finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-						finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-						finfbuf[3] = (curdir[temp].firstfad&0xff);
-						// second 4 bytes = length of file
-						finfbuf[4] = (curdir[temp].length>>24)&0xff;
-						finfbuf[5] = (curdir[temp].length>>16)&0xff;
-						finfbuf[6] = (curdir[temp].length>>8)&0xff;
-						finfbuf[7] = (curdir[temp].length&0xff);
-						finfbuf[8] = curdir[temp].interleave_gap_size;
-						finfbuf[9] = curdir[temp].file_unit_size;
-						finfbuf[10] = temp;
-						finfbuf[11] = curdir[temp].flags;
-					}
-
-					rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > (254 * 6 * 2))
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_SUBQ:
-					rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 5*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-
-				case XFERTYPE_SUBRW:
-					rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 12*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				default:
-					osd_printf_error("STVCD: Unhandled xfer type %d\n", (int)xfertype);
-					rv = 0;
-					break;
-			}
-
-			return rv;
-
-		default:
-			LOG("CD: RW %08x\n", addr);
-			return 0xffff;
-	}
-
-}
-
-uint32_t stvcd_device::cd_readLong(uint32_t addr)
-{
-	uint32_t rv = 0;
-
-	switch (addr & 0xffff)
-	{
-		case 0x8000:
-			switch (xfertype32)
-			{
-				case XFERTYPE32_GETSECTOR:
-				case XFERTYPE32_GETDELETESECTOR:
-					// make sure we have sectors left
-					if (xfersect < xfersectnum)
-					{
-						// get next longword
-						rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
-
-						xferdnum += 4;
-						xferoffs += 4;
-
-						// did we run out of sector?
-						if (xferoffs >= transpart->blocks[xfersect]->size)
-						{
-							LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
-
-							xferoffs = 0;
-							xfersect++;
-						}
-					}
-					else    // sectors are done, kill 'em all if we can
-					{
-						if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
-						{
-							int32_t i;
-
-							LOG("Killing sectors in done\n");
-
-							// deallocate the blocks
-							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
-							{
-								cd_free_block(transpart->blocks[i]);
-								transpart->blocks[i] = (blockT *)nullptr;
-								transpart->bnum[i] = 0xff;
-							}
-
-							// defrag what's left
-							cd_defragblocks(transpart);
-
-							// clean up our state
-							transpart->size -= xferdnum;
-							transpart->numblks -= xfersectnum;
-
-							/* TODO: is this correct? */
-							xfertype32 = XFERTYPE32_INVALID;
-						}
-					}
-					break;
-
-				default:
-					osd_printf_error("CD: unhandled 32-bit transfer type\n");
-					break;
-			}
-
-			return rv;
-
-		default:
-			LOG("RL %08x\n", addr);
-			return 0xffff;
-	}
-}
-
-void stvcd_device::cd_writeLong(uint32_t addr, uint32_t data)
-{
-	switch (addr & 0xffff)
-	{
-		case 0x8000:
-			switch (xfertype32)
-			{
-				case XFERTYPE32_PUTSECTOR:
-					// make sure we have sectors left
-					if (xfersect < xfersectnum)
-					{
-						// get next longword
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
-
-						xferdnum += 4;
-						xferoffs += 4;
-
-						// did we run out of sector?
-						if (xferoffs >= transpart->blocks[xfersectpos+xfersect]->size)
-						{
-							LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
-
-							xferoffs = 0;
-							xfersect++;
-						}
-					}
-					else    // sectors are done
-					{
-						/* Virtual On doesnt want this to be resetted. */
-						//xfertype32 = XFERTYPE32_INVALID;
-					}
-					break;
-
-				default:
-					osd_printf_error("CD: unhandled 32-bit transfer type write\n");
-					break;
-			}
-			break;
-
-		default:
-			break;
-	}
-}
-
-void stvcd_device::cd_writeWord(uint32_t addr, uint16_t data)
-{
-	switch(addr & 0xffff)
-	{
-	case 0x0008:
-	case 0x000a:
-	case 0x8008:
-	case 0x800a:
-//      LOG("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data);
-		hirqreg &= data;
-		return;
-	case 0x000c:
-	case 0x000e:
-	case 0x800c:
-	case 0x800e:
-//      LOG("WW HIRM: %04x => %04x\n", hirqmask, data);
-		printf("WW HIRM: %04x => %04x\n", hirqmask, data);
-		hirqmask = data;
-		return;
-	case 0x0018:
-	case 0x001a:
-	case 0x8018:
-	case 0x801a:
-//      LOG("WW CR1: %04x\n", data);
-		cr1 = data;
-		cd_stat &= ~CD_STAT_PERI;
-		cmd_pending |= 1;
-		m_sh1_timer->adjust(attotime::never);
-		break;
-	case 0x001c:
-	case 0x001e:
-	case 0x801c:
-	case 0x801e:
-//      LOG("WW CR2: %04x\n", data);
-		cr2 = data;
-		cmd_pending |= 2;
-		break;
-	case 0x0020:
-	case 0x0022:
-	case 0x8020:
-	case 0x8022:
-//      LOG("WW CR3: %04x\n", data);
-		cr3 = data;
-		cmd_pending |= 4;
-		break;
-	case 0x0024:
-	case 0x0026:
-	case 0x8024:
-	case 0x8026:
-//      LOG("WW CR4: %04x\n", data);
-		cr4 = data;
-		cmd_pending |= 8;
-		m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
-		break;
-	default:
-		LOG("WW %08x %04x\n", addr, data);
-		break;
-	}
-}
-
-READ32_MEMBER( stvcd_device::stvcd_r )
-{
-	uint32_t rv = 0;
-
-	offset <<= 2;
-
-	switch (offset)
-	{
-		case 0x88008:
-		case 0x8800a:
-		case 0x8800c:
-		case 0x8800e:
-		case 0x88018:
-		case 0x8801a:
-		case 0x8801c:
-		case 0x8801e:
-		case 0x88020:
-		case 0x88022:
-		case 0x88024:
-		case 0x88026:
-		case 0x90008:
-		case 0x9000a:
-		case 0x9000c:
-		case 0x9000e:
-		case 0x90018:
-		case 0x9001a:
-		case 0x9001c:
-		case 0x9001e:
-		case 0x90020:
-		case 0x90022:
-		case 0x90024:
-		case 0x90026:
-			rv = cd_readWord(offset);
-			return rv<<16;
-
-		case 0x98000:
-		case 0x18000:
-			if (mem_mask == 0xffffffff)
-			{
-				rv = cd_readLong(offset);
-			}
-			else if (mem_mask == 0xffff0000)
-			{
-				rv = cd_readWord(offset)<<16;
-			}
-			else if (mem_mask == 0x0000ffff)
-			{
-				rv = cd_readWord(offset);
-			}
-			else
-			{
-				osd_printf_error("CD: Unknown data buffer read @ mask = %08x\n", mem_mask);
-			}
-
-			break;
-
-		default:
-			osd_printf_error("Unknown CD read %x\n", offset);
-			break;
-	}
-
-	return rv;
-}
-
-WRITE32_MEMBER( stvcd_device::stvcd_w )
-{
-	offset <<= 2;
-
-	switch (offset)
-	{
-		case 0x18000:
-			if (mem_mask == 0xffffffff)
-				cd_writeLong(offset, data);
-			else
-				osd_printf_error("CD: Unknown data buffer write @ mask = %08x\n", mem_mask);
-			break;
-
-		case 0x88008:
-		case 0x8800a:
-		case 0x8800c:
-		case 0x8800e:
-		case 0x88018:
-		case 0x8801a:
-		case 0x8801c:
-		case 0x8801e:
-		case 0x88020:
-		case 0x88022:
-		case 0x88024:
-		case 0x88026:
-		case 0x90008:
-		case 0x9000a:
-		case 0x9000c:
-		case 0x9000e:
-		case 0x90018:
-		case 0x9001a:
-		case 0x9001c:
-		case 0x9001e:
-		case 0x90020:
-		case 0x90022:
-		case 0x90024:
-		case 0x90026:
-			cd_writeWord(offset, data>>16);
-			break;
-
-		default:
-			osd_printf_error("Unknown CD write %x @ %x\n", data, offset);
-			//xferdnum = 0x8c00;
-			break;
 	}
 }
 
