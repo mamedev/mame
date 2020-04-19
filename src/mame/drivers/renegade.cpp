@@ -24,12 +24,14 @@ Known issues:
   cfr. jantotsu.cpp;
 - Verify irq sources;
 - Unemulated partial update bg scrolling, which should effectively add layer 
-  tearing at line ~12 according to the refs. Scrolling triggers at line 54 with 
-  current timings so we are quite off;
+  tearing at line ~12 according to the refs. Scrolling currently 
+  triggers at line 6 with current timings so we are quite off.
+  Additionally scrolling updates every other frame so simply using partial 
+  updates won't cope with it;
 - None of the refs has the top 8 pixels shown but 256x232 seems unlikely. 
-  Do they show garbage on real HW by any chance?
-- coin counter isn't working properly (was tied to $3807, which is actually 
-  irq ack. Most likely unconnected for this -AS)
+  Verify what it shows on real HW, should be either garbage or vblank or 
+  border color;
+- Verify if coin counter is really tied to $3807;
 
 Memory Map (Preliminary):
 
@@ -232,12 +234,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int scanline = param;
 
-	// sprite DMA
-	// TODO: what actually generates this?
-	if (scanline == 16)
+	// vblank irq?
+	if (scanline == 240)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else if(scanline == 240)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(renegade_state::nmi_ack_w)
@@ -247,7 +246,13 @@ WRITE8_MEMBER(renegade_state::nmi_ack_w)
 
 WRITE8_MEMBER(renegade_state::irq_ack_w)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	if (data != 0xff)
+	{
+		// guess: trigger a 1->0 transition on irq ack
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
+	}
+	//m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -291,6 +296,11 @@ void renegade_state::renegade_sound_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+INPUT_CHANGED_MEMBER(renegade_state::coin_inserted)
+{
+	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 
 static INPUT_PORTS_START( renegade )
 	PORT_START("IN0")   /* IN0 */
@@ -310,8 +320,8 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Left Attack")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
 
 	PORT_START("DSW2")  /* DIP2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
@@ -322,8 +332,8 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Attack")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Attack")
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(renegade_state, mcu_status_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
 
 	PORT_START("DSW1")  /* DIP1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -502,10 +512,10 @@ void renegade_state::renegade(machine_config &config)
 	TAITO68705_MCU(config, m_mcu, 12000000/4); // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12000000/2, 384, 0, 256, 272, 0, 240); // assume same as ddragon.cpp
-	screen.set_screen_update(FUNC(renegade_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12000000/2, 384, 0, 256, 272, 0, 240); // assume same as ddragon.cpp
+	m_screen->set_screen_update(FUNC(renegade_state::screen_update));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_renegade);
 	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBGR_444, 256);
