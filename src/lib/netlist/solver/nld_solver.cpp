@@ -121,20 +121,26 @@ namespace devices
 		{
 			case solver::matrix_type_e::MAT_CR:
 				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::SOR_MAT:
-				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::MAT:
 				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#if (NL_USE_ACADEMIC_SOLVERS)
+			case solver::matrix_type_e::GMRES:
+				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SOR:
+				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SOR_MAT:
+				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::SM:
 				// Sherman-Morrison Formula
 				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::W:
 				// Woodbury Formula
 				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::SOR:
-				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::GMRES:
-				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#else
+			default:
+				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(m_params.m_method().name(), "MAT_CR"));
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#endif
 		}
 		return plib::unique_ptr<solver::matrix_solver_t>();
 	}

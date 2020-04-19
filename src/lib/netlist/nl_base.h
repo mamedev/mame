@@ -714,18 +714,15 @@ namespace netlist
 			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
-	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
+
 			void update_inputs() noexcept
 			{
+#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 				for (auto & term : m_core_terms)
 					term->m_Q = m_cur_Q;
+#endif
+				// nothing needs to be done if define not set
 			}
-	#else
-			void update_inputs() const noexcept
-			{
-				// nothing needs to be done
-			}
-	#endif
 
 		protected:
 

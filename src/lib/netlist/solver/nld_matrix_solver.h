@@ -250,8 +250,8 @@ namespace solver
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;
-		std::vector<nldelegate_ts> m_step_funcs;
-		std::vector<nldelegate_dyn> m_dynamic_funcs;
+		plib::aligned_vector<nldelegate_ts> m_step_funcs;
+		plib::aligned_vector<nldelegate_dyn> m_dynamic_funcs;
 
 		logic_input_t m_fb_sync;
 		logic_output_t m_Q_sync;
