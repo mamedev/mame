@@ -90,6 +90,30 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+// according to a video uploaded by a PCB owner, ay4 clock seems not to be a
+// general crystal-generated pulse but variable and have continuous (asynchronous
+// with musical notes) LFO like EQUITES' MSM5232.
+
+// so this is one trial to implement the features above, similar to equites.cpp
+// also modded by me who know nothing about C/C++.
+// that the LFO resolution being low is the same as equites.cpp too, and in
+// addition to that, both LFO speed and depth are not at all tuned by now.
+// improvement in proper way and tuning are expected.
+
+// maybe the music tempo is too fast but I am not sure where to fix it.
+
+#define FRQ_ADJUSTER_TAG    "FRQ"
+#define LFO_DEPTH_TAG    "LFODEPTH"
+
+#define ay4_MAX_CLOCK 3865909
+#define ay4_MIN_CLOCK  900000
+
+uint8_t champbasLFOcounter = 0;
+uint8_t champbasLFOdepth;
+uint8_t ay4frq;
+
+static const int8_t champbasLFOwaveform[13] = {59, 105, 127, 120, 85, 31, -31, -85, -120, -127, -105, -59, 0}; // sine like
+
 
 
 /*************************************
@@ -114,6 +138,20 @@ WRITE_LINE_MEMBER(champbas_state::irq_enable_w)
 TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+
+	ay4frq = ioport(FRQ_ADJUSTER_TAG)->read();
+	champbasLFOdepth = ioport(LFO_DEPTH_TAG)->read();
+
+	subdevice<ay8910_device>("ay4")->set_clock(ay4_MIN_CLOCK + ay4frq * (ay4_MAX_CLOCK - ay4_MIN_CLOCK) / 100 + champbasLFOwaveform[champbasLFOcounter] * champbasLFOdepth * 6);
+
+	if (champbasLFOcounter < 12)
+	{
+		champbasLFOcounter++;
+	}
+	else
+	{
+		champbasLFOcounter = 0;
+	}
 }
 
 
@@ -337,6 +375,11 @@ static INPUT_PORTS_START( talbot )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START(FRQ_ADJUSTER_TAG)
+	PORT_ADJUSTER(30, "ay4 Clock")
+	PORT_START(LFO_DEPTH_TAG)
+	PORT_ADJUSTER(30, "ay4 LFO Depth")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( champbas )
