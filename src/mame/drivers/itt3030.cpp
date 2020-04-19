@@ -745,6 +745,8 @@ void itt3030_state::itt3030(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("itt3030");
 }
 
 
