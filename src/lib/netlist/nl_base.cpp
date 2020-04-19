@@ -673,6 +673,7 @@ namespace netlist
 		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
 		, m_railterminal(railterminal)
 	{
+		props::add(this, props::value_type());
 	}
 
 	void detail::net_t::rebuild_list()
@@ -680,7 +681,7 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : m_core_terms)
+		for (auto & term : core_terms())
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
@@ -705,7 +706,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : m_core_terms)
+		for (core_terminal_t *ct : core_terms())
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
@@ -716,7 +717,7 @@ namespace netlist
 
 	void detail::net_t::add_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
-		for (auto &t : m_core_terms)
+		for (auto &t : core_terms())
 			if (t == &terminal)
 			{
 				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
@@ -725,15 +726,15 @@ namespace netlist
 
 		terminal.set_net(this);
 
-		m_core_terms.push_back(&terminal);
+		core_terms().push_back(&terminal);
 	}
 
 	void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
-		if (plib::container::contains(m_core_terms, &terminal))
+		if (plib::container::contains(core_terms(), &terminal))
 		{
 			terminal.set_net(nullptr);
-			plib::container::remove(m_core_terms, &terminal);
+			plib::container::remove(core_terms(), &terminal);
 		}
 		else
 		{
@@ -744,9 +745,9 @@ namespace netlist
 
 	void detail::net_t::move_connections(detail::net_t &dest_net)
 	{
-		for (auto &ct : m_core_terms)
+		for (auto &ct : core_terms())
 			dest_net.add_terminal(*ct);
-		m_core_terms.clear();
+		core_terms().clear();
 	}
 
 	// ----------------------------------------------------------------------------------------

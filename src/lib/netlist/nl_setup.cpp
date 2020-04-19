@@ -672,13 +672,13 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 		return; // Nothing to do
 	}
 
-	if (thisnet.isRailNet() && othernet.isRailNet())
+	if (thisnet.is_rail_net() && othernet.is_rail_net())
 	{
 		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 		throw nl_exception(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 	}
 
-	if (othernet.isRailNet())
+	if (othernet.is_rail_net())
 	{
 		log().debug("othernet is railnet\n");
 		merge_nets(othernet, thisnet);
@@ -799,7 +799,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	bool ret = false;
 	if (t1.has_net())
 	{
-		if (t1.net().isRailNet())
+		if (t1.net().is_rail_net())
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
@@ -814,7 +814,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	}
 	if (!ret && t2.has_net())
 	{
-		if (t2.net().isRailNet())
+		if (t2.net().is_rail_net())
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
@@ -839,7 +839,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 
 	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
-		if (t2.has_net() && t2.net().isRailNet())
+		if (t2.has_net() && t2.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
@@ -848,7 +848,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
-		if (t1.has_net() && t1.net().isRailNet())
+		if (t1.has_net() && t1.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
@@ -947,7 +947,7 @@ void setup_t::resolve_inputs()
 			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
 			err = true;
 		}
-		else if (term->net().num_cons() == 0)
+		else if (!term->net().has_connections())
 		{
 			if (term->is_logic_input())
 				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(term->name()));
@@ -1183,12 +1183,12 @@ void setup_t::delete_empty_nets()
 {
 	m_nlstate.nets().erase(
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
-			[](owned_pool_ptr<detail::net_t> &x)
+			[](owned_pool_ptr<detail::net_t> &net)
 			{
-				if (x->num_cons() == 0)
+				if (!net->has_connections())
 				{
-					x->state().log().verbose("Deleting net {1} ...", x->name());
-					x->state().run_state_manager().remove_save_items(x.get());
+					net->state().log().verbose("Deleting net {1} ...", net->name());
+					net->state().run_state_manager().remove_save_items(net.get());
 					return true;
 				}
 				return false;
@@ -1293,7 +1293,7 @@ void setup_t::prepare_to_run()
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
-		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		if (t->m_N.net().is_rail_net() && t->m_P.net().is_rail_net())
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
 				t->name(), t->m_N.net().name(), t->m_P.net().name()));

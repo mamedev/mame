@@ -18,18 +18,18 @@ namespace analog
 	void NETLIB_NAME(twoterm)::solve_now()
 	{
 		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
+		if (m_P.has_net() && !m_P.net().is_rail_net())
 			m_P.solve_now();
-		else if (m_N.has_net() && !m_N.net().isRailNet())
+		else if (m_N.has_net() && !m_N.net().is_rail_net())
 			m_N.solve_now();
 	}
 
 	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay) noexcept
 	{
 		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
+		if (m_P.has_net() && !m_P.net().is_rail_net())
 			m_P.schedule_solve_after(delay);
-		else if (m_N.has_net() && !m_N.net().isRailNet())
+		else if (m_N.has_net() && !m_N.net().is_rail_net())
 			m_N.schedule_solve_after(delay);
 	}
 

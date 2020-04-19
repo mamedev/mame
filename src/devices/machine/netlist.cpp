@@ -547,7 +547,7 @@ protected:
 				if (m_channels[i].m_buffer == nullptr)
 					break; // stop, called outside of stream_update
 				const nl_fptype v = m_channels[i].m_buffer[m_pos];
-				m_channels[i].m_param->setTo(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
+				m_channels[i].m_param->set(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
 			}
 		}
 		else
@@ -652,7 +652,7 @@ void netlist_mame_analog_input_device::write(const double val)
 void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(*((double *) ptr));
+	m_param->set(*((double *) ptr));
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -672,13 +672,13 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(param);
+	m_param->set(param);
 }
 
 void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	update_to_current_time();
-	m_param->setTo(param);
+	m_param->set(param);
 }
 
 void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -87,7 +87,7 @@ namespace solver
 
 			for (auto &p : net->core_terms())
 			{
-				log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
+				log().debug("{1} {2} {3}\n", p->name(), net->name(), net->is_rail_net());
 				switch (p->type())
 				{
 					case detail::terminal_type::TERMINAL:
@@ -558,7 +558,7 @@ namespace solver
 
 	void matrix_solver_t::add_term(std::size_t net_idx, terminal_t *term)
 	{
-		if (get_connected_net(term)->isRailNet())
+		if (get_connected_net(term)->is_rail_net())
 		{
 			m_rails_temp[net_idx].add_terminal(term, -1, false);
 		}
