@@ -42,19 +42,21 @@ const tiny_rom_entry *m24_z8000_device::device_rom_region() const
 
 void m24_z8000_device::z8000_prog(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
+	map(0x000000, 0x0fffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
 
-	map(0x40000, 0x43fff).rom().region("z8000", 0);
-	map(0x50000, 0x53fff).rom().region("z8000", 0);
-	map(0x70000, 0x73fff).rom().region("z8000", 0);
+	map(0x040000, 0x043fff).rom().region("z8000", 0);
+	map(0x050000, 0x053fff).rom().region("z8000", 0);
+	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	// TODO: segments 0x10 and higher are trapped
 }
 
 void m24_z8000_device::z8000_data(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
+	map(0x000000, 0x0fffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
 
-	map(0x40000, 0x43fff).rom().region("z8000", 0);
-	map(0x70000, 0x73fff).rom().region("z8000", 0);
+	map(0x040000, 0x043fff).rom().region("z8000", 0);
+	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	// TODO: segments 0x10 and higher are trapped
 }
 
 void m24_z8000_device::z8000_io(address_map &map)
