@@ -1197,4 +1197,17 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<!-- Added 2020-04-19 -->
+	<software name="kilopede">
+		<description>Kilopede (with sound)</description>
+		<year>1982</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Matthew B. Hickey"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="9273164">
+				<rom name="kilopede.wav" size="9273164" crc="b41be460" sha1="040213a2eec80260b17bf3f93508e45db7e710f2" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
