@@ -29,26 +29,7 @@ void coco12_state::device_start()
 
 void coco12_state::configure_sam()
 {
-	uint8_t *rom = memregion(MAINCPU_TAG)->base();
-
-	m_sam->configure_bank(0, ram().pointer(), ram().size(), false); // $0000-$7FFF
-	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);           // $8000-$9FFF
-	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);           // $A000-$BFFF
-
-	// $C000-$FEFF
-	m_sam->configure_bank(3, read8_delegate(*m_cococart, FUNC(cococart_slot_device::cts_read)), write8_delegate(*m_cococart, FUNC(cococart_slot_device::cts_write)));
-
-	// $FF00-$FF1F
-	m_sam->configure_bank(4, read8_delegate(*this, FUNC(coco12_state::ff00_read)), write8_delegate(*this, FUNC(coco12_state::ff00_write)));
-
-	// $FF20-$FF3F
-	m_sam->configure_bank(5, read8_delegate(*this, FUNC(coco12_state::ff20_read)), write8_delegate(*this, FUNC(coco12_state::ff20_write)));
-
-	// $FF40-$FF5F
-	m_sam->configure_bank(6, read8_delegate(*this, FUNC(coco12_state::ff40_read)), write8_delegate(*this, FUNC(coco12_state::ff40_write)));
-
-	// $FF60-$FFBF
-	m_sam->configure_bank(7, read8_delegate(*this, FUNC(coco12_state::ff60_read)), write8_delegate(*this, FUNC(coco12_state::ff60_write)));
+	m_sam->space(0).install_ram(0, m_ram->size() - 1, 0xffff ^ m_ram->mask(), m_ram->pointer());
 }
 
 
@@ -79,9 +60,9 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 //  sam_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco12_state::sam_read )
+uint8_t coco12_state::sam_read(offs_t offset)
 {
-	uint8_t data = ram().read(offset);
+	uint8_t data = sam().display_read(offset);
 	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 	return data;
