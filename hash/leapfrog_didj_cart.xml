@@ -35,7 +35,7 @@
 	</software>
 
 	<software name="indjones" supported="no">
-		<description>Inidiana Jones (USA)</description>
+		<description>Indiana Jones (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13304-A"/>
@@ -47,7 +47,7 @@
 	</software>
 
 	<software name="spbobfifo" supported="no">
-		<description>Nickelodeon Spongebob Squarepants - Fist of Foam (USA)</description>
+		<description>Nickelodeon Spongebob Squarepants - Fists of Foam (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13291-B"/>
