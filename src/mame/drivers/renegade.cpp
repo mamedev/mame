@@ -26,8 +26,8 @@ Known issues:
 - Unemulated partial update bg scrolling, which should effectively add layer 
   tearing at line ~12 according to the refs. Scrolling triggers at line 54 with 
   current timings so we are quite off;
-- None of the refs has the top 8 pixels shown but 256x232 isn't a valid 
-  resolution. Do they show garbage on real HW by any chance?
+- None of the refs has the top 8 pixels shown but 256x232 seems unlikely. 
+  Do they show garbage on real HW by any chance?
 - coin counter isn't working properly (was tied to $3807, which is actually 
   irq ack. Most likely unconnected for this -AS)
 
