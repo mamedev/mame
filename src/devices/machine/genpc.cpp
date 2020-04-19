@@ -129,7 +129,7 @@ void ibm5160_mb_device::pc_dma8237_0_dack_w(uint8_t data)
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 {
 	m_cur_eop = state == ASSERT_LINE;
-	if(m_dma_channel != -1 && m_cur_eop)
+	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
