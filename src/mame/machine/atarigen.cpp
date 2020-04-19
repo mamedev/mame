@@ -363,7 +363,6 @@ void atarigen_state::machine_start()
 	{
 		assert(i <= ARRAY_LENGTH(m_screen_timer));
 		m_screen_timer[i].screen = &screen;
-		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)&screen);
 		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)&screen);
 		i++;
 	}
@@ -401,14 +400,6 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		case TID_SCANLINE_INTERRUPT:
-		{
-			scanline_int_write_line(1);
-			screen_device *screen = reinterpret_cast<screen_device *>(ptr);
-			timer.adjust(screen->frame_period());
-			break;
-		}
-
 		case TID_SCANLINE_TIMER:
 			scanline_timer(timer, *reinterpret_cast<screen_device *>(ptr), param);
 			break;
@@ -429,17 +420,6 @@ void atarigen_state::scanline_update(screen_device &screen, int scanline)
 /***************************************************************************
     INTERRUPT HANDLING
 ***************************************************************************/
-
-//-------------------------------------------------
-//  scanline_int_set: Sets the scanline when the next
-//  scanline interrupt should be generated.
-//-------------------------------------------------
-
-void atarigen_state::scanline_int_set(screen_device &screen, int scanline)
-{
-	get_screen_timer(screen)->scanline_interrupt_timer->adjust(screen.time_until_pos(scanline));
-}
-
 
 //-------------------------------------------------
 //  scanline_int_write_line: Standard write line

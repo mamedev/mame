@@ -122,7 +122,6 @@ private:
 struct atarigen_screen_timer
 {
 	screen_device *screen;
-	emu_timer *         scanline_interrupt_timer;
 	emu_timer *         scanline_timer;
 };
 
@@ -145,7 +144,6 @@ protected:
 	virtual void scanline_update(screen_device &screen, int scanline);
 
 	// interrupt handling
-	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
 	void scanline_int_ack_w(u16 data = 0);
 
@@ -163,7 +161,6 @@ protected:
 	void scanline_timer(emu_timer &timer, screen_device &screen, int scanline);
 
 	// video helpers
-	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
 
 	// misc helpers
@@ -172,7 +169,6 @@ protected:
 	// timer IDs
 	enum
 	{
-		TID_SCANLINE_INTERRUPT,
 		TID_SCANLINE_TIMER,
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST

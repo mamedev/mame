@@ -10,15 +10,19 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "video/atarimo.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
-class sparkz_state : public atarigen_state
+class sparkz_state : public driver_device
 {
 public:
 	sparkz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_oki(*this, "oki")
 		, m_bitmap(*this, "bitmap")
 	{ }
@@ -27,13 +31,15 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_WRITE16_MEMBER(latch_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_int_ack_w(uint16_t data);
+	void latch_w(uint8_t data);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 
-private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
 	required_shared_ptr<uint16_t> m_bitmap;
 };

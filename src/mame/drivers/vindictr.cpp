@@ -35,16 +35,20 @@
  *
  *************************************/
 
-void vindictr_state::update_interrupts()
+void vindictr_state::scanline_interrupt()
 {
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+}
+
+
+void vindictr_state::scanline_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
 void vindictr_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
 }
 
 
@@ -187,6 +191,8 @@ void vindictr_state::vindictr(machine_config &config)
 	/* basic machine hardware */
 	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vindictr_state::main_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(vindictr_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
