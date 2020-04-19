@@ -117,7 +117,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
+
+#if !defined(__APPLE__)
 #include <ncurses/ncurses.h>
+#else
+#include <ncurses.h>
+#endif
+
 #include "corestr.h"
 #include "jedparse.h"
 #include "plaparse.h"
