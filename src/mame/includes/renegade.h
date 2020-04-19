@@ -67,7 +67,8 @@ private:
 
 	DECLARE_READ8_MEMBER(mcu_reset_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
