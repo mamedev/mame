@@ -226,7 +226,8 @@ uint32_t z8002_device::RDMEM_L(address_space &space, uint32_t addr)
 void z8002_device::WRMEM_B(address_space &space, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
-	space.write_byte(addr, value);
+	uint16_t value16 = value | (value << 8);
+	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
 void z8002_device::WRMEM_W(address_space &space, uint32_t addr, uint16_t value)
@@ -246,54 +247,33 @@ void z8002_device::WRMEM_L(address_space &space, uint32_t addr, uint32_t value)
 
 uint8_t z8002_device::RDPORT_B(int mode, uint16_t addr)
 {
-	if(mode == 0)
-	{
-		return m_io->read_byte(addr);
-	}
-	else
-	{
-		/* how to handle MMU reads? for now just do it */
-		return m_sio->read_byte(addr);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	return space.read_byte(addr);
 }
 
 uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
-	if(mode == 0)
-	{
-		return m_io->read_word_unaligned((uint16_t)addr);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	if (BIT(addr, 0))
+		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
 	else
-	{
-		/* how to handle MMU reads? */
-		return m_sio->read_word_unaligned((uint16_t)addr);
-	}
+		return space.read_word(addr);
 }
 
 void z8002_device::WRPORT_B(int mode, uint16_t addr, uint8_t value)
 {
-	if(mode == 0)
-	{
-		m_io->write_byte(addr,value);
-	}
-	else
-	{
-		/* how to handle MMU writes? for now just do it */
-		m_sio->write_byte(addr,value);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	uint16_t value16 = value | (value << 8);
+	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
 void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
-	if(mode == 0)
-	{
-		m_io->write_word_unaligned((uint16_t)addr, value);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	if (BIT(addr, 0))
+		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
 	else
-	{
-		/* how to handle MMU writes? */
-		m_sio->write_word_unaligned((uint16_t)addr, value);
-	}
+		space.write_word(addr, value, 0xffff);
 }
 
 void z8002_device::cycles(int cycles)

@@ -21,7 +21,8 @@ namespace plib {
 	public:
 		explicit dynlib_base() : m_is_loaded(false) { }
 
-		virtual ~dynlib_base() { }
+		virtual ~dynlib_base() = default;
+
 		COPYASSIGNMOVE(dynlib_base, delete)
 
 		bool isLoaded() const { return m_is_loaded; }
@@ -43,7 +44,7 @@ namespace plib {
 		explicit dynlib(const pstring &libname);
 		dynlib(const pstring &path, const pstring &libname);
 
-		~dynlib();
+		~dynlib() override;
 
 	protected:
 		void *getsym_p(const pstring &name) const noexcept override;

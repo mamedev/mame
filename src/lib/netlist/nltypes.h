@@ -14,13 +14,13 @@
 
 #include "nl_config.h"
 #include "plib/pchrono.h"
+#include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
 #include "plib/pstate.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
 #include "plib/putil.h"
-#include "plib/pdynlib.h"
 
 #include <unordered_map>
 
@@ -59,6 +59,11 @@ namespace netlist
 		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
 
 		/// \brief provide library with static solver implementations.
+		///
+		/// By default no static solvers are provided since these are
+		/// determined by the specific use case. It is up to the implementor
+		/// of a callbacks_t implementation to optionally provide such a collection
+		/// of symbols.
 		///
 		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};

@@ -37,7 +37,7 @@ That's something we will cover later.
 Now, to test this, run the following:
 
 ~~~
-> nltool --cmd=run -f test1.cpp -t 0.05 -l O -l I
+> nltool --cmd=run -t 0.05 -l O -l I test1.cpp
 ~~~
 
 This will run the circuit for 50 ms and log input "I" to file log_I.log and

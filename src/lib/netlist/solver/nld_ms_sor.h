@@ -39,7 +39,7 @@ namespace solver
 			{
 			}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_lp_fact;
@@ -52,7 +52,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 		bool resched = false;
@@ -150,14 +150,9 @@ namespace solver
 		{
 			// Fallback to direct solver ...
 			this->m_iterative_fail++;
-			return matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(newton_raphson);
+			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
 		}
 
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

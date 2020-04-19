@@ -19,6 +19,10 @@
 
  SoC has onboard keyboard scanning - matrix is 10 rows by 8 columns (KO0-KO9 and KI1-KI8)
  Piano keys have N-key rollover diodes, other buttons/switches don't
+
+ So-called program ROM actually mostly contains samples, which begin at offset 0x0b00;
+ a table at 0x085c has their starting addresses. The real microcode is likely internal,
+ since MSM6283s with different suffixes show up in other Casio keyboards.
  */
 
 #include "emu.h"

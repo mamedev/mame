@@ -22,6 +22,13 @@ namespace netlist
 {
 namespace solver
 {
+
+	enum static_compile_target
+	{
+		CXX_EXTERNAL_C,
+		CXX_STATIC
+	};
+
 	P_ENUM(matrix_sort_type_e,
 		NOSORT,
 		ASCENDING,
@@ -46,6 +53,8 @@ namespace solver
 		, LONGDOUBLE
 		, FLOAT128
 	)
+
+	using static_compile_container = std::vector<std::pair<pstring, pstring>>;
 
 	struct solver_parameters_t
 	{
@@ -197,8 +206,9 @@ namespace solver
 
 		virtual void log_stats();
 
-		virtual std::pair<pstring, pstring> create_solver_code()
+		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
 		{
+			plib::unused_var(target);
 			return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
 		}
 
@@ -213,8 +223,10 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
-		virtual unsigned vsolve_non_dynamic(bool newton_raphson) = 0;
+		virtual void vsolve_non_dynamic() = 0;
 		virtual netlist_time compute_next_timestep(nl_fptype cur_ts) = 0;
+		virtual bool check_err() = 0;
+		virtual void store() = 0;
 
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
@@ -390,14 +402,14 @@ namespace solver
 			return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim;
 		}
 
-		void store()
+		void store() override
 		{
 			const std::size_t iN = size();
 			for (std::size_t i = 0; i < iN; i++)
 				this->m_terms[i].setV(m_new_V[i]);
 		}
 
-		bool check_err()
+		bool check_err() override
 		{
 			// NOTE: Ideally we should also include currents (RHS) here. This would
 			// need a reevaluation of the right hand side after voltages have been updated

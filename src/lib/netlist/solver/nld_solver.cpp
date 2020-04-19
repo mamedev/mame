@@ -120,14 +120,7 @@ namespace devices
 		switch (m_params.m_method())
 		{
 			case solver::matrix_type_e::MAT_CR:
-				if (size > 0) // GCR always outperforms MAT solver
-				{
-					return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-				}
-				else
-				{
-					return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-				}
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::SOR_MAT:
 				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::MAT:
@@ -160,7 +153,6 @@ namespace devices
 			case 2:
 				return plib::make_unique<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
 				break;
-#if 1
 			case 3:
 				return create_solver<FT, 3>(3, sname, nets);
 				break;
@@ -179,46 +171,9 @@ namespace devices
 			case 8:
 				return create_solver<FT, 8>(8, sname, nets);
 				break;
-			case 9:
-				return create_solver<FT, 9>(9, sname, nets);
-				break;
-			case 10:
-				return create_solver<FT, 10>(10, sname, nets);
-				break;
-#if 0
-			case 11:
-				return create_solver<FT, 11>(11, sname);
-				break;
-			case 12:
-				return create_solver<FT, 12>(12, sname);
-				break;
-			case 15:
-				return create_solver<FT, 15>(15, sname);
-				break;
-			case 31:
-				return create_solver<FT, 31>(31, sname);
-				break;
-			case 35:
-				return create_solver<FT, 35>(35, sname);
-				break;
-			case 43:
-				return create_solver<FT, 43>(43, sname);
-				break;
-			case 49:
-				return create_solver<FT, 49>(49, sname);
-				break;
-			case 87:
-				return create_solver<FT,86>(86, sname, nets);
-				break;
-#endif
-#endif
 			default:
 				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
-				if (net_count <= 8)
-				{
-					return create_solver<FT, -8>(net_count, sname, nets);
-				}
-				else if (net_count <= 16)
+				if (net_count <= 16)
 				{
 					return create_solver<FT, -16>(net_count, sname, nets);
 				}
@@ -410,13 +365,16 @@ namespace devices
 		}
 	}
 
-	void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
+	solver::static_compile_container NETLIB_NAME(solver)::create_solver_code(solver::static_compile_target target)
 	{
+		solver::static_compile_container mp;
 		for (auto & s : m_mat_solvers)
 		{
-			auto r = s->create_solver_code();
-			mp[r.first] = r.second; // automatically overwrites identical names
+			auto r = s->create_solver_code(target);
+			if (r.first != "") // ignore solvers not supporting static compile
+				mp.push_back(r);
 		}
+		return mp;
 	}
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")

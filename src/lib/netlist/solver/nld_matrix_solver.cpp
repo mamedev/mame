@@ -134,9 +134,9 @@ namespace solver
 			}
 		}
 		for (auto &d : step_devices)
-			m_step_funcs.push_back(nldelegate_ts(&core_device_t::timestep, d));
+			m_step_funcs.emplace_back(nldelegate_ts(&core_device_t::timestep, d));
 		for (auto &d : dynamic_devices)
-			m_dynamic_funcs.push_back(nldelegate_dyn(&core_device_t::update_terminals, d));
+			m_dynamic_funcs.emplace_back(nldelegate_dyn(&core_device_t::update_terminals, d));
 	}
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
@@ -453,29 +453,33 @@ namespace solver
 		++m_stat_vsolver_calls;
 		if (dynamic_device_count() != 0)
 		{
-			std::size_t this_resched(0);
+			bool this_resched(false);
 			std::size_t newton_loops = 0;
 			do
 			{
 				update_dynamic();
 				// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
 				this->m_stat_calculations++;
-				this_resched = this->vsolve_non_dynamic(true);
+				this->vsolve_non_dynamic();
+				this_resched = this->check_err();
+				this->store();
 				newton_loops++;
-			} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
+			} while (this_resched && newton_loops < m_params.m_nr_loops);
 
 			m_stat_newton_raphson += newton_loops;
 			// reschedule ....
-			if (this_resched > 1 && !m_Q_sync.net().is_queued())
+			if (this_resched && !m_Q_sync.net().is_queued())
 			{
 				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
+				// FIXME: may collide with compute_next_timestep
 				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
 			}
 		}
 		else
 		{
 			this->m_stat_calculations++;
-			this->vsolve_non_dynamic(false);
+			this->vsolve_non_dynamic();
+			this->store();
 		}
 
 		return compute_next_timestep(delta.as_fp<nl_fptype>());

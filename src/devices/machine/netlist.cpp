@@ -56,6 +56,8 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
+extern plib::dynlib_static_sym nl_static_solver_syms[];
+
 class netlist_mame_device::netlist_mame_callbacks_t : public netlist::callbacks_t
 {
 public:
@@ -90,6 +92,12 @@ protected:
 			m_parent.logerror("netlist FATAL: %s\n", ls.c_str());
 			break;
 		}
+	}
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	{
+		//return plib::make_unique<plib::dynlib_static>(nullptr);
+		return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:

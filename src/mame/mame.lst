@@ -14098,6 +14098,7 @@ mooncrstg                       // (c) 1980 Gremlin
 mooncrstso                      // (c) 1980 SegaSA / Sonic
 mooncrsto                       // (c) 1980 Nichibutsu
 mooncrstu                       // (c) 1980 Nichibutsu USA
+mooncrstuu                      // (c) 1980 Nichibutsu USA
 mooncrstuk                      // (c) 1980 Nichibutsu UK
 mooncrstuku                     // (c) 1980 Nichibutsu UK
 moonqsr                         // (c) 1980 Nichibutsu
@@ -18573,6 +18574,14 @@ actionhw                        // (c) 1995
 kickgoal                        // (c) 1995
 kickgoala                       //
 
+@source:kikikai.cpp
+kicknrun                        // A87 (c) 1986 Taito Corporation
+kicknrunu                       // A87 (c) 1986 Taito Corporation
+kikikai                         // A85 (c) 1986 Taito Corporation
+knightb                         // bootleg
+mexico86                        // bootleg (Micro Research)
+mexico86a                       // bootleg
+
 @source:kim1.cpp
 kim1                            // Commodore (MOS) KIM-1 1975
 
@@ -22360,14 +22369,6 @@ toride2gk                       // (c) 1994
 toride2j                        // (c) 1994
 vmetal                          // (c) 1995 Excellent System?
 vmetaln                         // (c) 1995 Excellent System?
-
-@source:mexico86.cpp
-kicknrun                        // A87 (c) 1986 Taito Corporation
-kicknrunu                       // A87 (c) 1986 Taito Corporation
-kikikai                         // A85 (c) 1986 Taito Corporation
-knightb                         // bootleg
-mexico86                        // bootleg (Micro Research)
-mexico86a                       // bootleg
 
 @source:meyc8080.cpp
 casbjack                        // (c) 1983 Meyco Games
@@ -37058,6 +37059,7 @@ satansata                       // (c) 1981 SNK
 satansatind                     // bootleg
 vanguard                        // (c) 1981 SNK
 vanguardc                       // (c) 1981 SNK + Centuri
+vanguardg                       // (c) 1981 SNK
 vanguardj                       // (c) 1981 SNK
 zarzon                          // (c) 1981 Taito, gameplay says SNK
 
