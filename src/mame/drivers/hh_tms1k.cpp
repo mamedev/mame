@@ -5333,8 +5333,8 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 226185, "screen", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+	ROM_REGION( 227224, "screen", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 227224, CRC(f220711a) SHA1(729ad85fb9d9853a77c45b5ed072f10ede7649c4) )
 ROM_END
 
 

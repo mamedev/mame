@@ -22,7 +22,7 @@
  *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
-  A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
+ @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster
@@ -2679,6 +2679,131 @@ ROM_END
 
 /***************************************************************************
 
+  Entex Super Space Invader 2 (black version)
+  * Hitachi HD38800A31 MCU
+  * cyan/red VFD display
+
+  This version has the same MCU as the Select-A-Game cartridge. Maybe from
+  surplus inventory after that console was discontinued?. It was also sold
+  as "Super Alien Invader 2".
+
+  Hold down the fire button at boot for demo mode to work.
+
+***************************************************************************/
+
+class einvader2_state : public hh_hmcs40_state
+{
+public:
+	einvader2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ16_MEMBER(input_r);
+	void einvader2(machine_config &config);
+};
+
+// handlers
+
+void einvader2_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+WRITE8_MEMBER(einvader2_state::plate_w)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+WRITE16_MEMBER(einvader2_state::grid_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D3,D5,D6: input mux
+	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 6);
+
+	// D1-D12: vfd grid
+	m_grid = data >> 1 & 0xfff;
+	update_display();
+}
+
+READ16_MEMBER(einvader2_state::input_r)
+{
+	// D13-D15: multiplexed inputs
+	return read_inputs(6) << 13;
+}
+
+// config
+
+static INPUT_PORTS_START( einvader2 )
+	PORT_START("IN.0") // D3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
+
+	PORT_START("IN.1") // D5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
+
+	PORT_START("IN.2") // D6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("FAKE") // shared D3/D5
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "Demo" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+INPUT_PORTS_END
+
+void einvader2_state::einvader2(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38800(config, m_maincpu, 450000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(einvader2_state::plate_w));
+	m_maincpu->write_d().set(FUNC(einvader2_state::grid_w));
+	m_maincpu->read_d().set(FUNC(einvader2_state::input_r));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(469, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(12, 14);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( einvader2 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, CRC(10e39521) SHA1(41d86696e518ea071e75ed37d5dc63c0408c262e) )
+	ROM_CONTINUE(                0x1e80, 0x0100 )
+
+	ROM_REGION( 217430, "screen", 0)
+	ROM_LOAD( "einvader2.svg", 0, 217430, CRC(b082d9a3) SHA1(67f7e0314c69ba146751ea12cf490805b8660489) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Turtles (manufactured in Japan)
   * PCB label 560359
   * Hitachi QFP HD38820A43 MCU
@@ -4185,6 +4310,7 @@ CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, empty_in
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, einvader2, 0,        0, einvader2,einvader2,einvader2_state,empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
