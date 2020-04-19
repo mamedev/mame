@@ -506,20 +506,21 @@ namespace netlist
 		private:
 		};
 
-		struct netlist_ref
+		class netlist_object_t : public object_t
 		{
-			explicit netlist_ref(netlist_t &nl);
+		public:
+			explicit netlist_object_t(netlist_t &nl, const pstring &name)
+			: object_t(name)
+			, m_netlist(nl)
+			{ }
 
-			COPYASSIGNMOVE(netlist_ref, delete)
+			COPYASSIGNMOVE(netlist_object_t, delete)
 
 			netlist_state_t & state() noexcept;
 			const netlist_state_t & state() const noexcept;
 
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
-
-		protected:
-			~netlist_ref() noexcept = default; // prohibit polymorphic destruction
 
 		private:
 			netlist_t & m_netlist;
@@ -657,8 +658,7 @@ namespace netlist
 		// -----------------------------------------------------------------------------
 
 		class net_t :
-				public object_t,
-				public netlist_ref
+				public netlist_object_t
 		{
 		public:
 
@@ -993,9 +993,8 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	class core_device_t :
-			public detail::object_t,
-			public logic_family_t,
-			public detail::netlist_ref
+			public detail::netlist_object_t,
+			public logic_family_t
 	{
 	public:
 		core_device_t(netlist_state_t &owner, const pstring &name);
@@ -1328,7 +1327,7 @@ namespace netlist
 		class queue_t :
 				//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
 				public timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>,
-				public netlist_ref,
+				public netlist_object_t,
 				public plib::state_manager_t::callback_t
 		{
 		public:
@@ -1761,12 +1760,12 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	inline netlist_state_t & detail::netlist_ref::state() noexcept
+	inline netlist_state_t & detail::netlist_object_t::state() noexcept
 	{
 		return m_netlist.nlstate();
 	}
 
-	inline const netlist_state_t & detail::netlist_ref::state() const noexcept
+	inline const netlist_state_t & detail::netlist_object_t::state() const noexcept
 	{
 		return m_netlist.nlstate();
 	}

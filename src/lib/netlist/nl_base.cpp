@@ -112,7 +112,7 @@ namespace netlist
 
 	detail::queue_t::queue_t(netlist_t &nl)
 		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
-		, netlist_ref(nl)
+		, netlist_object_t(nl, nl.nlstate().name() + ".queue")
 		, m_qsize(0)
 		, m_times(512)
 		, m_net_ids(512)
@@ -149,13 +149,14 @@ namespace netlist
 		}
 	}
 
+#if 0
 	// ----------------------------------------------------------------------------------------
 	// netlist_ref_t
 	// ----------------------------------------------------------------------------------------
 
 	detail::netlist_ref::netlist_ref(netlist_t &nl)
 	: m_netlist(nl) { }
-
+#endif
 	// ----------------------------------------------------------------------------------------
 	// device_object_t
 	// ----------------------------------------------------------------------------------------
@@ -552,11 +553,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
-		: object_t(name)
-		, netlist_ref(owner.exec())
+		: netlist_object_t(owner.exec(), name)
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
+		// FIXME: logic_family should always be nullptr here
 		if (logic_family() == nullptr)
 			set_logic_family(family_TTL());
 		if (exec().stats_enabled())
@@ -564,8 +565,7 @@ namespace netlist
 	}
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
-		: object_t(owner.name() + "." + name)
-		, netlist_ref(owner.state().exec())
+		: netlist_object_t(owner.state().exec(), owner.name() + "." + name)
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
@@ -666,8 +666,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal)
-		: object_t(aname)
-		, netlist_ref(nl.exec())
+		: netlist_object_t(nl.exec(), aname)
 		, m_new_Q(*this, "m_new_Q", 0)
 		, m_cur_Q (*this, "m_cur_Q", 0)
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
