@@ -28,6 +28,7 @@ project "netlist"
 
 	defines {
 		"__STDC_CONSTANT_MACROS",
+		"NL_USE_ACADEMIC_SOLVERS=0",
 	}
 
 	includedirs {

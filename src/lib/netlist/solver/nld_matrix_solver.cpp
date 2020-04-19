@@ -219,11 +219,11 @@ namespace solver
 		// rebuild
 		for (auto &term : m_terms)
 		{
-			int *other = term.m_connected_net_idx.data();
+			//int *other = term.m_connected_net_idx.data();
 			for (std::size_t i = 0; i < term.count(); i++)
 				//FIXME: this is weird
-				if (other[i] != -1)
-					other[i] = get_net_idx(get_connected_net(term.terms()[i]));
+				if (term.m_connected_net_idx[i] != -1)
+					term.m_connected_net_idx[i] = get_net_idx(get_connected_net(term.terms()[i]));
 		}
 	}
 

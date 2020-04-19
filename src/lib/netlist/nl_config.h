@@ -17,7 +17,7 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR           11
+#define NL_VERSION_MINOR           12
 /// \brief Version - Patch level.
 ///
 #define NL_VERSION_PATCHLEVEL      0
@@ -51,6 +51,21 @@
 
 #ifndef NL_USE_QUEUE_STATS
 #define NL_USE_QUEUE_STATS             (0)
+#endif
+
+/// \brief  Compile in academic solvers
+///
+/// Set to 0 to disable compiling in the following solvers:
+///
+/// Sherman-Morrison, Woodbury, SOR and GMRES
+///
+/// GMRES may be added to productive solvers in the future
+/// again. Compiling in all solvers may increase compile
+/// time significantly.
+///
+
+#ifndef NL_USE_ACADEMIC_SOLVERS
+#define NL_USE_ACADEMIC_SOLVERS (1)
 #endif
 
 /// \brief  Store input values in logic_terminal_t.
