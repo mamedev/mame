@@ -40777,7 +40777,7 @@ license:CC0
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 games in 1 - the spongebob squarepants movie + spongebob squarepants and friends in freeze frame frenzy (europe) (en,fr,de,es,it,nl+en,fr,de,es,nl).bin" size="16777216" crc="a04cebfe" sha1="0286e31772601f7c7420722e8fbf8a210d562a06"/>
+				<rom name="2 games in 1 - the spongebob squarepants movie + spongebob squarepants and friends in freeze frame frenzy (europe).bin" size="16777216" crc="a04cebfe" sha1="0286e31772601f7c7420722e8fbf8a210d562a06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41009,7 +41009,7 @@ license:CC0
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="3 games in 1 - rugrats - i gotta go party + spongebob squarepants - supersponge + tak and the power of juju (europe) (en+en+en,fr,de).bin" size="16777216" crc="6721794b" sha1="7e93942ed7264c46b7767b4ed2baa8bfc1add8f2"/>
+				<rom name="3 games in 1 - rugrats - i gotta go party + spongebob squarepants - supersponge + tak and the power of juju (europe).bin" size="16777216" crc="6721794b" sha1="7e93942ed7264c46b7767b4ed2baa8bfc1add8f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41120,7 +41120,7 @@ license:CC0
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="twin series 4 - hamu hamu monster ex - hamster monogatari rpg + fantasy puzzle - hamster monogatari - mahou no meikyuu 1.2.3 (japan).bin" size="16777216" crc="fa643377" sha1="8b9f58c8c8a596de233a97e7e104e6c2df3b9595"/>
+				<rom name="ts4 - hamu hamu monster ex - hamster monogatari rpg + fantasy puzzle - hamster monogatari - mahou no meikyuu 1.2.3 (japan).bin" size="16777216" crc="fa643377" sha1="8b9f58c8c8a596de233a97e7e104e6c2df3b9595"/>
 			</dataarea>
 		</part>
 	</software>
