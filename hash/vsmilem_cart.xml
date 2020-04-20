@@ -440,7 +440,7 @@ Language:
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" />
+				<rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +455,7 @@ Language:
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" />
+				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
@@ -532,7 +532,7 @@ Language:
 		<info name="serial" value="80-084164(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" />
+				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
@@ -544,7 +544,7 @@ Language:
 		<info name="serial" value="80-084164(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" />
+				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>

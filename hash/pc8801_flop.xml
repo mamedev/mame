@@ -17949,7 +17949,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch (disk a).d88" size="348848" crc="7051b021" sha1="5966affe8a2572390c094fa5b3d15911657ada80"/>
+				<rom name="kibun wa pastel touch (alt)(disk a).d88" size="348848" crc="7051b021" sha1="5966affe8a2572390c094fa5b3d15911657ada80"/>
 			</dataarea>
 		</part>
 		<!-- B,C,D same as parent -->
@@ -17957,21 +17957,21 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch (disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
+				<rom name="kibun wa pastel touch (alt)(disk b).d88" size="348848" crc="f19bc7e9" sha1="4c065bfb99e6b6754682856dede7d656276302e0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch (disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
+				<rom name="kibun wa pastel touch (alt)(disk c).d88" size="348848" crc="f1efd8ea" sha1="f98f25905f1f9c5f18d0c6dc28de1b4d15ec5a5f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="348848">
-				<rom name="kibun wa pastel touch (disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
+				<rom name="kibun wa pastel touch (alt)(disk d).d88" size="348848" crc="7d3a7acd" sha1="d49bc4aecbcf5ab25aab1ff9fc91a6eb218884dc"/>
 			</dataarea>
 		</part>
 	</software>
