@@ -247,85 +247,85 @@ namespace plib
 	/// FIXME: limited implementation
 	///
 	template <typename T1, typename T2>
-	static inline T1
-	pow(T1 v, T2 p) noexcept
+	static inline
+	auto pow(T1 v, T2 p) noexcept -> decltype(std::pow(v, p))
 	{
 		return std::pow(v, p);
 	}
 
 #if (PUSE_FLOAT128)
-	static inline constexpr __float128 reciprocal(__float128 v) noexcept
+	static inline constexpr FLOAT128 reciprocal(FLOAT128 v) noexcept
 	{
-		return constants<__float128>::one() / v;
+		return constants<FLOAT128>::one() / v;
 	}
 
-	static inline __float128 abs(__float128 v) noexcept
+	static inline FLOAT128 abs(FLOAT128 v) noexcept
 	{
 		return fabsq(v);
 	}
 
-	static inline __float128 sqrt(__float128 v) noexcept
+	static inline FLOAT128 sqrt(FLOAT128 v) noexcept
 	{
 		return sqrtq(v);
 	}
 
-	static inline __float128 hypot(__float128 v1, __float128 v2) noexcept
+	static inline FLOAT128 hypot(FLOAT128 v1, FLOAT128 v2) noexcept
 	{
 		return hypotq(v1, v2);
 	}
 
-	static inline __float128 exp(__float128 v) noexcept
+	static inline FLOAT128 exp(FLOAT128 v) noexcept
 	{
 		return expq(v);
 	}
 
-	static inline __float128 log(__float128 v) noexcept
+	static inline FLOAT128 log(FLOAT128 v) noexcept
 	{
 		return logq(v);
 	}
 
-	static inline __float128 tanh(__float128 v) noexcept
+	static inline FLOAT128 tanh(FLOAT128 v) noexcept
 	{
 		return tanhq(v);
 	}
 
-	static inline __float128 floor(__float128 v) noexcept
+	static inline FLOAT128 floor(FLOAT128 v) noexcept
 	{
 		return floorq(v);
 	}
 
-	static inline __float128 log1p(__float128 v) noexcept
+	static inline FLOAT128 log1p(FLOAT128 v) noexcept
 	{
 		return log1pq(v);
 	}
 
-	static inline __float128 sin(__float128 v) noexcept
+	static inline FLOAT128 sin(FLOAT128 v) noexcept
 	{
 		return sinq(v);
 	}
 
-	static inline __float128 cos(__float128 v) noexcept
+	static inline FLOAT128 cos(FLOAT128 v) noexcept
 	{
 		return cosq(v);
 	}
 
-	static inline __float128 trunc(__float128 v) noexcept
+	static inline FLOAT128 trunc(FLOAT128 v) noexcept
 	{
 		return truncq(v);
 	}
 
 	template <typename T>
-	static inline __float128 pow(__float128 v, T p) noexcept
+	static inline FLOAT128 pow(FLOAT128 v, T p) noexcept
 	{
-		return powq(v, static_cast<__float128>(p));
+		return powq(v, static_cast<FLOAT128>(p));
 	}
 
-	static inline __float128 pow(__float128 v, int p) noexcept
+	static inline FLOAT128 pow(FLOAT128 v, int p) noexcept
 	{
 		if (p==2)
 			return v*v;
 		else
-			return powq(v, static_cast<__float128>(p));
+			return powq(v, static_cast<FLOAT128>(p));
 	}
 
 #endif
@@ -351,7 +351,7 @@ namespace plib
 	///
 	template<typename T>
 	constexpr
-	typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
+	typename std::enable_if<plib::is_integral<T>::value && plib::is_signed<T>::value, T>::type
 	abs(T v) noexcept
 	{
 		return v < 0 ? -v : v;
@@ -365,7 +365,7 @@ namespace plib
 	///
 	template<typename T>
 	constexpr
-	typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type
+	typename std::enable_if<plib::is_integral<T>::value && plib::is_unsigned<T>::value, T>::type
 	abs(T v) noexcept
 	{
 		return v;
@@ -386,8 +386,8 @@ namespace plib
 	constexpr typename std::common_type<M, N>::type
 	gcd(M m, N n) noexcept
 	{
-		static_assert(std::is_integral<M>::value, "gcd: M must be an integer");
-		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
+		static_assert(plib::is_integral<M>::value, "gcd: M must be an integer");
+		static_assert(plib::is_integral<N>::value, "gcd: N must be an integer");
 
 		return m == 0 ? plib::abs(n)
 			 : n == 0 ? plib::abs(m)
@@ -409,8 +409,8 @@ namespace plib
 	constexpr typename std::common_type<M, N>::type
 	lcm(M m, N n) noexcept
 	{
-		static_assert(std::is_integral<M>::value, "lcm: M must be an integer");
-		static_assert(std::is_integral<N>::value, "lcm: N must be an integer");
+		static_assert(plib::is_integral<M>::value, "lcm: M must be an integer");
+		static_assert(plib::is_integral<N>::value, "lcm: N must be an integer");
 
 		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
 	}

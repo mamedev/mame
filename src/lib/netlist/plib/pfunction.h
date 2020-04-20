@@ -120,8 +120,9 @@ namespace plib {
 	extern template class pfunction<double>;
 	extern template class pfunction<long double>;
 #if (PUSE_FLOAT128)
-	extern template class pfunction<__float128>;
+	extern template class pfunction<FLOAT128>;
 #endif
+
 } // namespace plib
 
 #endif // PEXCEPTION_H_

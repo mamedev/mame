@@ -329,6 +329,7 @@ namespace devices
 #if (NL_USE_FLOAT_MATRIX)
 					ms = create_solvers<float>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;
@@ -339,13 +340,15 @@ namespace devices
 #if (NL_USE_LONG_DOUBLE_MATRIX)
 					ms = create_solvers<long double>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;
-				case solver::matrix_fp_type_e::FLOAT128:
+				case solver::matrix_fp_type_e::FLOATQ128:
 #if (NL_USE_FLOAT128)
-					ms = create_solvers<__float128>(sname, grp);
+					ms = create_solvers<FLOAT128>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;

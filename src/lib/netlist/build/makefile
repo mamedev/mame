@@ -239,7 +239,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9: 
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"

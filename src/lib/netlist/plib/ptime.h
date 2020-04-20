@@ -57,14 +57,14 @@ namespace plib
 		C14CONSTEXPR ptime &operator=(ptime &&rhs) noexcept  = default;
 
 		constexpr explicit ptime(const double t) = delete;
-		//: m_time((internal_type) ( t * (double) resolution)) { }
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		// FIXME: check for overflow
 		template <typename O>
 		constexpr explicit ptime(const ptime<O, RES> &rhs) noexcept
-		: m_time(rhs.m_time) { }
+		: m_time(static_cast<TYPE>(rhs.m_time))
+		{
+		}
 
 		template <typename O>
 		C14CONSTEXPR ptime &operator+=(const ptime<O, RES> &rhs) noexcept
@@ -149,20 +149,12 @@ namespace plib
 
 		constexpr internal_type as_raw() const noexcept { return m_time; }
 
-		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, FT>>
+		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, FT>>
 		constexpr FT
 		as_fp() const noexcept
 		{
 			return static_cast<FT>(m_time) * inv_res<FT>();
 		}
-
-#if PUSE_FLOAT128
-		constexpr __float128
-		as_fp() const noexcept
-		{
-			return static_cast<__float128>(m_time) * inv_res<__float128>();
-		}
-#endif
 
 		constexpr double as_double() const noexcept { return as_fp<double>(); }
 		constexpr double as_float() const noexcept { return as_fp<float>(); }
@@ -183,11 +175,7 @@ namespace plib
 		static constexpr ptime from_raw(internal_type raw) noexcept { return ptime(raw); }
 
 		template <typename FT>
-		static constexpr typename std::enable_if<std::is_floating_point<FT>::value
-#if PUSE_FLOAT128
-			|| std::is_same<FT, __float128>::value
-#endif
-		, ptime>::type
+		static constexpr typename std::enable_if<plib::is_floating_point<FT>::value, ptime>::type
 		from_fp(FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
 		static constexpr ptime from_double(double t) noexcept

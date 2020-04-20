@@ -471,8 +471,13 @@ namespace solver
 			if (this_resched && !m_Q_sync.net().is_queued())
 			{
 				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
-				// FIXME: may collide with compute_next_timestep
+				// FIXME: test and enable - this is working better, though not optimal yet
+#if 0
+				// Don't store, the result can not be used
+				return netlist_time::from_fp(m_params.m_nr_recalc_delay());
+#else
 				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
+#endif
 			}
 		}
 		else

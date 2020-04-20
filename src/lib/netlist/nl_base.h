@@ -1789,7 +1789,7 @@ namespace netlist
 			plib::pfunction<nl_fptype> func;
 			func.compile_infix(p, {});
 			auto valx = func.evaluate();
-			if (std::is_integral<T>::value)
+			if (plib::is_integral<T>::value)
 				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
 					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
 			m_param = static_cast<T>(valx);

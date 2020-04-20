@@ -236,7 +236,7 @@ namespace plib {
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<std::is_floating_point<NT>::value, NT>::type
+	static inline typename std::enable_if<plib::is_floating_point<NT>::value, NT>::type
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;
@@ -247,7 +247,7 @@ namespace plib {
 	}
 
 	template <typename NT>
-	static inline typename std::enable_if<std::is_integral<NT>::value, NT>::type
+	static inline typename std::enable_if<plib::is_integral<NT>::value, NT>::type
 	lfsr_random(std::uint16_t &lfsr) noexcept
 	{
 		std::uint16_t lsb = lfsr & 1;
@@ -304,7 +304,7 @@ namespace plib {
 	template class pfunction<double>;
 	template class pfunction<long double>;
 #if (PUSE_FLOAT128)
-	template class pfunction<__float128>;
+	template class pfunction<FLOAT128>;
 #endif
 
 } // namespace plib

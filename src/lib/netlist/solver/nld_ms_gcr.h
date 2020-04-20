@@ -123,8 +123,7 @@ namespace solver
 		pstring static_compile_name();
 
 		mat_type mat;
-
-		plib::dynproc<void, FT *, FT *, FT *, FT *, FT ** > m_proc;
+		plib::dynproc<void, FT *, nl_fptype *, nl_fptype *, nl_fptype *, nl_fptype ** > m_proc;
 
 	};
 
