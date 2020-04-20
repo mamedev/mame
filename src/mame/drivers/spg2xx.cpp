@@ -1075,6 +1075,26 @@ static INPUT_PORTS_START( dreamlss )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tmntbftc )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0180, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1596,6 +1616,12 @@ ROM_START( guitarssa )
 	ROM_LOAD16_WORD_SWAP( "guitar_superstar_flying_v.bin", 0x000000, 0x800000, CRC(af0c837c) SHA1(f04c9a4292f811d92311d19fb35dcee3f1649a14) )
 ROM_END
 
+ROM_START( tmntbftc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tmntbftc.bin", 0x000000, 0x400000, CRC(f923da5b) SHA1(79b290b75d06dabd0f579800edc4453b044c8fd4) )
+ROM_END
+
+
 ROM_START( gssytts )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "guitarssytts.bin", 0x000000, 0x800000, CRC(ec3de9e1) SHA1(690efe2676c664c2be52cda00d6dcb9d60a26e9a) ) // no data
@@ -1731,6 +1757,8 @@ CONS( 2009, gssytts,     0,     0,        gssytts,        guitarss,    spg2xx_ga
 CONS( 200?, vtechtvs,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "VTech", "TV Station (VTech, Spain)", MACHINE_NOT_WORKING )
 
 CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2005, tmntbftc,    0,        0,        abltenni,       tmntbftc,    spg2xx_game_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Battle for the City", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_tmntmutm_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
