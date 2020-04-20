@@ -246,7 +246,7 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_jsacpu, 14.318181_MHz_XTAL/8);
 	m_jsacpu->set_addrmap(AS_PROGRAM, &atari_sac_device::sac_6502_map);
-	m_jsacpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(ATARI_CLOCK_14MHz/4/4/16/16/14));
+	m_jsacpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(14.318181_MHz_XTAL/4/4/16/16/14));
 
 	M68000(config, m_daccpu, 14.318181_MHz_XTAL/2);
 	m_daccpu->set_addrmap(AS_PROGRAM, &atari_sac_device::sac_68k_map);
