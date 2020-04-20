@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/atarisy1.h"
+#include "cpu/m68000/m68000.h"
 
 
 
@@ -166,11 +167,13 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 	/* reset the statics */
 	m_mob->set_yscroll(256);
 	m_next_timer_scanline = -1;
+	m_scanline_int_state = 0;
 
 	/* save state */
 	save_item(NAME(m_playfield_tile_bank));
 	save_item(NAME(m_playfield_priority_pens));
 	save_item(NAME(m_next_timer_scanline));
+	save_item(NAME(m_scanline_int_state));
 }
 
 
@@ -354,7 +357,8 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 {
 	/* clear the state */
-	scanline_int_ack_w();
+	m_scanline_int_state = 0;
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
 
@@ -363,7 +367,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	int scanline = param;
 
 	/* update the state */
-	scanline_int_write_line(1);
+	m_scanline_int_state = 1;
+	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 
 	/* set a timer to turn it off */
 	m_int3off_timer->adjust(m_screen->scan_period());

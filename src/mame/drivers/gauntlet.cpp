@@ -140,16 +140,16 @@
  *
  *************************************/
 
-void gauntlet_state::update_interrupts()
+void gauntlet_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
-void gauntlet_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(gauntlet_state::scanline_update)
 {
 	/* sound IRQ is on 32V */
-	if (scanline & 32)
+	if (param & 32)
 		m_soundcomm->sound_irq_gen(*m_audiocpu);
 	else
 		m_soundcomm->sound_irq_ack_w();
@@ -168,7 +168,6 @@ void gauntlet_state::machine_reset()
 	m_sound_reset_val = 1;
 
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 32);
 }
 
 
@@ -497,6 +496,8 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(gauntlet_state::scanline_update), m_screen, 0, 32);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -517,7 +518,7 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(gauntlet_state::screen_update_gauntlet));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(gauntlet_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu)

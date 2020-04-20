@@ -202,15 +202,15 @@ void cyberbal_base_state::scanline_update_one(screen_device &screen, int scanlin
 	i++;
 }
 
-void cyberbal_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal_state::scanline_update)
 {
-	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield, *m_alpha);
-	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2, *m_alpha2);
+	scanline_update_one(*m_lscreen, param, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_rscreen, param, 1, *m_playfield2, *m_alpha2);
 }
 
-void cyberbal2p_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(cyberbal2p_state::scanline_update)
 {
-	scanline_update_one(*m_screen, scanline, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_screen, param, 0, *m_playfield, *m_alpha);
 }
 
 

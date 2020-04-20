@@ -119,13 +119,6 @@ private:
     TYPES & STRUCTURES
 ***************************************************************************/
 
-struct atarigen_screen_timer
-{
-	screen_device *screen;
-	emu_timer *         scanline_timer;
-};
-
-
 class atarigen_state : public driver_device
 {
 public:
@@ -139,26 +132,11 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// callbacks provided by the derived class
-	virtual void update_interrupts() = 0;
-	virtual void scanline_update(screen_device &screen, int scanline);
-
-	// interrupt handling
-	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	void scanline_int_ack_w(u16 data = 0);
-
-	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
-	void video_int_ack_w(u16 data = 0);
-
 	// slapstic helpers
 	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
 	void slapstic_update_bank(int bank);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
-
-	// scanline timing
-	void scanline_timer_reset(screen_device &screen, int frequency);
-	void scanline_timer(emu_timer &timer, screen_device &screen, int scanline);
 
 	// video helpers
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
@@ -169,13 +147,9 @@ protected:
 	// timer IDs
 	enum
 	{
-		TID_SCANLINE_TIMER,
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST
 	};
-
-	u8               m_scanline_int_state;
-	u8               m_video_int_state;
 
 	optional_shared_ptr<u16> m_xscroll;
 	optional_shared_ptr<u16> m_yscroll;
@@ -190,18 +164,12 @@ protected:
 	offs_t           m_slapstic_base;
 	offs_t           m_slapstic_mirror;
 
-	u32              m_scanlines_per_callback;
 
-
-	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
 	optional_device<atari_slapstic_device> m_slapstic_device;
-
-private:
-	static const atarigen_screen_timer *get_screen_timer(screen_device &screen);
 };
 
 

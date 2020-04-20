@@ -210,20 +210,15 @@ RoadBlasters (aka Future Vette):005*
  *
  *************************************/
 
-void atarisy1_state::update_interrupts()
+void atarisy1_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(2, m_joystick_int ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(3, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
 MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 {
 	atarigen_state::machine_start();
-
-	m_joystick_int = 0;
-	save_item(NAME(m_joystick_int));
 }
 
 
@@ -241,13 +236,6 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
  *  Joystick I/O
  *
  *************************************/
-
-WRITE_LINE_MEMBER(atarisy1_state::joystick_int)
-{
-	m_joystick_int = state;
-	update_interrupts();
-}
-
 
 template<int Input>
 READ8_MEMBER(atarisy1_state::digital_joystick_r)
@@ -721,7 +709,7 @@ void atarisy1_state::add_adc(machine_config &config)
 	// IN0 = J102 pin 5
 
 	INPUT_MERGER_ALL_HIGH(config, m_ajsint);
-	m_ajsint->output_handler().set(FUNC(atarisy1_state::joystick_int));
+	m_ajsint->output_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 }
 
 void atarisy1_state::atarisy1(machine_config &config)
@@ -769,7 +757,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarisy1_state::screen_update_atarisy1));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(atarisy1_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 

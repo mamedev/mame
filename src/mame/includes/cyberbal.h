@@ -15,6 +15,7 @@
 #include "video/atarimo.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
@@ -67,8 +68,6 @@ public:
 protected:
 	DECLARE_READ16_MEMBER(sound_state_r);
 
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -77,6 +76,11 @@ protected:
 	void cyberbal2p_map(address_map &map);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_ack_w(uint16_t data = 0);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+
 	required_device<atari_jsa_ii_device> m_jsa;
 };
 
@@ -111,8 +115,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -140,6 +142,11 @@ protected:
 	void sound_68k_map(address_map &map);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_ack_w(uint16_t data = 0);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+
 	required_device<m6502_device> m_audiocpu;
 	required_device<cpu_device> m_extracpu;
 	required_device<cpu_device> m_daccpu;

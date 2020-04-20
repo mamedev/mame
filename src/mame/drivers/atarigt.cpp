@@ -70,16 +70,34 @@
  *
  *************************************/
 
-void atarigt_state::update_interrupts()
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
 {
-	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_scanline_int_state = true;
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+WRITE_LINE_MEMBER(atarigt_state::video_int_write_line)
 {
-	scanline_int_write_line(1);
+	if (state)
+	{
+		m_video_int_state = true;
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+	}
+}
+
+
+void atarigt_state::scanline_int_ack_w(uint32_t data)
+{
+	m_scanline_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+}
+
+
+void atarigt_state::video_int_ack_w(uint32_t data)
+{
+	m_video_int_state = false;
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -89,10 +107,15 @@ INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_start()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	atarigen_state::machine_start();
+
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
 }
 
 
@@ -814,7 +837,7 @@ void atarigt_state::atarigt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(atarigt_state::scanline_int_gen), attotime::from_hz(250));
 
-	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarigt_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 

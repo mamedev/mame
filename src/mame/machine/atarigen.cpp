@@ -23,26 +23,6 @@
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-inline const atarigen_screen_timer *atarigen_state::get_screen_timer(screen_device &screen)
-{
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
-	int i;
-
-	// find the index of the timer that matches the screen
-	for (i = 0; i < ARRAY_LENGTH(state->m_screen_timer); i++)
-		if (state->m_screen_timer[i].screen == &screen)
-			return &state->m_screen_timer[i];
-
-	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag());
-	return nullptr;
-}
-
-
-
 //**************************************************************************
 //  SOUND COMMUNICATIONS DEVICE
 //**************************************************************************
@@ -336,8 +316,6 @@ void atari_sound_comm_device::delayed_6502_write(int data)
 
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
-	, m_scanline_int_state(0)
-	, m_video_int_state(0)
 	, m_xscroll(*this, "xscroll")
 	, m_yscroll(*this, "yscroll")
 	, m_slapstic_num(0)
@@ -347,7 +325,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 	, m_slapstic_last_address(0)
 	, m_slapstic_base(0)
 	, m_slapstic_mirror(0)
-	, m_scanlines_per_callback(0)
 	, m_maincpu(*this, "maincpu")
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_screen(*this, "screen")
@@ -357,33 +334,15 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 
 void atarigen_state::machine_start()
 {
-	// allocate timers for all screens
-	int i = 0;
-	for (screen_device &screen : screen_device_iterator(*this))
-	{
-		assert(i <= ARRAY_LENGTH(m_screen_timer));
-		m_screen_timer[i].screen = &screen;
-		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)&screen);
-		i++;
-	}
-
-	save_item(NAME(m_scanline_int_state));
-	save_item(NAME(m_video_int_state));
-
 	save_item(NAME(m_slapstic_num));
 	save_item(NAME(m_slapstic_bank));
 	save_item(NAME(m_slapstic_last_pc));
 	save_item(NAME(m_slapstic_last_address));
-
-	save_item(NAME(m_scanlines_per_callback));
 }
 
 
 void atarigen_state::machine_reset()
 {
-	// reset the interrupt states
-	m_video_int_state = m_scanline_int_state = 0;
-
 	// reset the slapstic
 	if (m_slapstic_num != 0)
 	{
@@ -400,77 +359,12 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		case TID_SCANLINE_TIMER:
-			scanline_timer(timer, *reinterpret_cast<screen_device *>(ptr), param);
-			break;
-
 		// unhalt the CPU that was passed as a pointer
 		case TID_UNHALT_CPU:
 			reinterpret_cast<device_t *>(ptr)->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 	}
 }
-
-
-void atarigen_state::scanline_update(screen_device &screen, int scanline)
-{
-}
-
-
-/***************************************************************************
-    INTERRUPT HANDLING
-***************************************************************************/
-
-//-------------------------------------------------
-//  scanline_int_write_line: Standard write line
-//  callback for the scanline interrupt
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(atarigen_state::scanline_int_write_line)
-{
-	m_scanline_int_state = state;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
-//  scanline_int_ack_w: Resets the state of the
-//  scanline interrupt.
-//-------------------------------------------------
-
-void atarigen_state::scanline_int_ack_w(u16 data)
-{
-	m_scanline_int_state = 0;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
-//  video_int_write_line: Standard write line
-//  callback for the video interrupt.
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(atarigen_state::video_int_write_line)
-{
-	if (state)
-	{
-		m_video_int_state = 1;
-		update_interrupts();
-	}
-}
-
-
-//-------------------------------------------------
-//  video_int_ack_w: Resets the state of the video
-//  interrupt.
-//-------------------------------------------------
-
-void atarigen_state::video_int_ack_w(u16 data)
-{
-	m_video_int_state = 0;
-	update_interrupts();
-}
-
 
 
 /***************************************************************************
@@ -573,46 +467,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	}
 	return result;
 }
-
-
-
-/***************************************************************************
-    SCANLINE TIMING
-***************************************************************************/
-
-//-------------------------------------------------
-//  scanline_timer_reset: Sets up the scanline timer.
-//-------------------------------------------------
-
-void atarigen_state::scanline_timer_reset(screen_device &screen, int frequency)
-{
-	// set the scanline callback
-	m_scanlines_per_callback = frequency;
-
-	// set a timer to go off at scanline 0
-	if (frequency != 0)
-		get_screen_timer(screen)->scanline_timer->adjust(screen.time_until_pos(0));
-}
-
-
-//-------------------------------------------------
-//  scanline_timer: Called once every n scanlines
-//  to generate the periodic callback to the main
-//  system.
-//-------------------------------------------------
-
-void atarigen_state::scanline_timer(emu_timer &timer, screen_device &screen, int scanline)
-{
-	// callback
-	scanline_update(screen, scanline);
-
-	// generate another
-	scanline += m_scanlines_per_callback;
-	if (scanline >= screen.height())
-		scanline = 0;
-	timer.adjust(screen.time_until_pos(scanline), scanline);
-}
-
 
 
 

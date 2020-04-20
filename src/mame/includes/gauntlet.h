@@ -12,6 +12,7 @@
 
 #include "machine/atarigen.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "video/atarimo.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
@@ -41,12 +42,14 @@ public:
 	void gaunt2p(machine_config &config);
 	void gauntlet2(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
+
+private:
+	void video_int_ack_w(uint16_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE_LINE_MEMBER(speech_squeak_w);

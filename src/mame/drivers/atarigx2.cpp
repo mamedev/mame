@@ -41,16 +41,9 @@
  *
  *************************************/
 
-void atarigx2_state::update_interrupts()
+void atarigx2_state::video_int_ack_w(uint32_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-void atarigx2_state::machine_reset()
-{
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -1495,6 +1488,8 @@ void atarigx2_state::atarigx2(machine_config &config)
 	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigx2_state::main_map);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarigx2_state::scanline_update), m_screen, 0, 8);
+
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
@@ -1523,7 +1518,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update_atarigx2));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(atarigx2_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

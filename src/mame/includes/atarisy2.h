@@ -7,14 +7,15 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
+#include "video/atarimo.h"
 #include "emupal.h"
 #include "slapstic.h"
 #include "tilemap.h"
@@ -55,10 +56,10 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
 
 private:
+	void update_interrupts();
+
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
 	required_device<atari_motion_objects_device> m_mob;
@@ -77,8 +78,10 @@ private:
 	required_device_array<pokey_device, 2> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
 
-	uint8_t           m_p2portwr_state;
-	uint8_t           m_p2portrd_state;
+	bool            m_scanline_int_state;
+	bool            m_video_int_state;
+	bool            m_p2portwr_state;
+	bool            m_p2portrd_state;
 
 	required_memory_bank_array<2> m_rombank;
 	required_device<atari_slapstic_device> m_slapstic;
@@ -99,9 +102,11 @@ private:
 
 	output_finder<2> m_leds;
 
-	DECLARE_WRITE16_MEMBER(int0_ack_w);
-	DECLARE_WRITE16_MEMBER(int1_ack_w);
-	DECLARE_WRITE16_MEMBER(int_enable_w);
+	void scanline_int_ack_w(uint16_t data);
+	void video_int_ack_w(uint16_t data);
+	void int0_ack_w(uint16_t data);
+	void int1_ack_w(uint8_t data);
+	void int_enable_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(bankselect_w);
 	DECLARE_READ16_MEMBER(switch_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
@@ -115,6 +120,8 @@ private:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

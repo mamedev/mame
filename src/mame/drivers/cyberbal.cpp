@@ -38,14 +38,27 @@
  *
  *************************************/
 
-void cyberbal2p_state::update_interrupts()
+WRITE_LINE_MEMBER(cyberbal2p_state::video_int_write_line)
 {
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
-void cyberbal_state::update_interrupts()
+WRITE_LINE_MEMBER(cyberbal_state::video_int_write_line)
 {
-	m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+		m_extracpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+
+void cyberbal2p_state::video_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+void cyberbal_state::video_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
@@ -66,9 +79,7 @@ void cyberbal_state::machine_start()
 
 void cyberbal_state::machine_reset()
 {
-
 	cyberbal_base_state::machine_reset();
-	scanline_timer_reset(*m_lscreen, 8);
 
 	cyberbal_sound_reset();
 
@@ -80,7 +91,6 @@ void cyberbal_state::machine_reset()
 void cyberbal2p_state::machine_reset()
 {
 	cyberbal_base_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
 }
 
 
@@ -411,6 +421,8 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(cyberbal_state::scanline_update), m_lscreen, 0, 8);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -494,6 +506,8 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal2p_state::cyberbal2p_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(cyberbal2p_state::scanline_update), m_screen, 0, 8);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

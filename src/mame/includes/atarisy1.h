@@ -54,7 +54,6 @@ public:
 
 	optional_device<adc0808_device> m_adc;
 	optional_device<input_merger_device> m_ajsint;
-	uint8_t           m_joystick_int;
 
 	/* playfield parameters */
 	required_device<tilemap_device> m_playfield_tilemap;
@@ -68,6 +67,7 @@ public:
 	int             m_next_timer_scanline;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
+	uint8_t           m_scanline_int_state;
 
 	/* speech */
 	required_device<tms5220_device> m_tms;
@@ -79,7 +79,8 @@ public:
 	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
 
 	uint8_t           m_cur[2][2];
-	virtual void update_interrupts() override;
+
+	void video_int_ack_w(uint16_t data = 0);
 	template<int Input> DECLARE_READ8_MEMBER(digital_joystick_r);
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(adc_w);
@@ -102,7 +103,6 @@ public:
 	DECLARE_MACHINE_RESET(atarisy1);
 	DECLARE_VIDEO_START(atarisy1);
 	uint32_t screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(joystick_int);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);

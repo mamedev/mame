@@ -169,6 +169,20 @@ void atarisy2_state::update_interrupts()
 }
 
 
+void atarisy2_state::scanline_int_ack_w(uint16_t data)
+{
+	m_scanline_int_state = false;
+	update_interrupts();
+}
+
+
+void atarisy2_state::video_int_ack_w(uint16_t data)
+{
+	m_video_int_state = false;
+	update_interrupts();
+}
+
+
 
 /*************************************
  *
@@ -176,14 +190,18 @@ void atarisy2_state::update_interrupts()
  *
  *************************************/
 
-void atarisy2_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy2_state::scanline_update)
 {
-	if (scanline <= screen.height())
+	int scanline = param;
+	if (scanline <= m_screen->height())
 	{
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (m_interrupt_enable & 4)
-				scanline_int_write_line(1);
+			{
+				m_scanline_int_state = true;
+				update_interrupts();
+			}
 	}
 }
 
@@ -201,7 +219,12 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 
 	m_leds.resolve();
 
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+
 	save_item(NAME(m_interrupt_enable));
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
 	save_item(NAME(m_p2portwr_state));
 	save_item(NAME(m_p2portrd_state));
 	save_item(NAME(m_sound_reset_state));
@@ -215,10 +238,9 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();
-	scanline_timer_reset(*m_screen, 64);
 
-	m_p2portwr_state = 0;
-	m_p2portrd_state = 0;
+	m_p2portwr_state = false;
+	m_p2portrd_state = false;
 }
 
 
@@ -233,23 +255,25 @@ WRITE_LINE_MEMBER(atarisy2_state::vblank_int)
 {
 	/* clock the VBLANK through */
 	if (state && BIT(m_interrupt_enable, 3))
-		video_int_write_line(1);
+	{
+		m_video_int_state = true;
+		update_interrupts();
+	}
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int0_ack_w)
+void atarisy2_state::int0_ack_w(uint16_t data)
 {
 	/* reset sound IRQ */
-	m_p2portrd_state = 0;
+	m_p2portrd_state = false;
 	update_interrupts();
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int1_ack_w)
+void atarisy2_state::int1_ack_w(uint8_t data)
 {
 	/* reset sound CPU */
-	if (ACCESSING_BITS_0_7)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -259,10 +283,9 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::delayed_int_enable_w)
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int_enable_w)
+void atarisy2_state::int_enable_w(uint8_t data)
 {
-	if (offset == 0 && ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(atarisy2_state::delayed_int_enable_w),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(atarisy2_state::delayed_int_enable_w),this), data);
 }
 
 
@@ -659,7 +682,7 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 READ16_MEMBER(atarisy2_state::sound_r)
 {
 	/* clear the p2portwr state on a p1portrd */
-	m_p2portwr_state = 0;
+	m_p2portwr_state = false;
 	update_interrupts();
 
 	/* handle it normally otherwise */
@@ -741,10 +764,10 @@ void atarisy2_state::main_map(address_map &map)
 	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
 	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x1580, 0x1581).mirror(0x001e).w(FUNC(atarisy2_state::int0_ack_w));
-	map(0x15a0, 0x15a1).mirror(0x001e).w(FUNC(atarisy2_state::int1_ack_w));
+	map(0x15a0, 0x15a0).mirror(0x001e).w(FUNC(atarisy2_state::int1_ack_w));
 	map(0x15c0, 0x15c1).mirror(0x001e).w(FUNC(atarisy2_state::scanline_int_ack_w));
 	map(0x15e0, 0x15e1).mirror(0x001e).w(FUNC(atarisy2_state::video_int_ack_w));
-	map(0x1600, 0x1601).mirror(0x007e).w(FUNC(atarisy2_state::int_enable_w));
+	map(0x1600, 0x1600).mirror(0x007e).w(FUNC(atarisy2_state::int_enable_w));
 	map(0x1680, 0x1680).mirror(0x007e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
 	map(0x1700, 0x1701).mirror(0x007e).w(FUNC(atarisy2_state::xscroll_w)).share("xscroll");
 	map(0x1780, 0x1781).mirror(0x007e).w(FUNC(atarisy2_state::yscroll_w)).share("yscroll");
@@ -1207,6 +1230,8 @@ void atarisy2_state::atarisy2(machine_config &config)
 	// IN7 = J102 pin 3 (unused)
 
 	EEPROM_2804(config, "eeprom");
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarisy2_state::scanline_update), m_screen, 0, 64);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

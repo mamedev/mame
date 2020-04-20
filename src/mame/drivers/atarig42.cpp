@@ -35,9 +35,9 @@
  *
  *************************************/
 
-void atarig42_state::update_interrupts()
+void atarig42_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -49,13 +49,6 @@ void atarig42_state::machine_start()
 	save_item(NAME(m_sloop_next_bank));
 	save_item(NAME(m_sloop_offset));
 	save_item(NAME(m_sloop_state));
-}
-
-
-void atarig42_state::machine_reset()
-{
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
 }
 
 
@@ -523,6 +516,8 @@ void atarig42_state::atarig42(machine_config &config)
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig42_state::main_map);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(atarig42_state::scanline_update), m_screen, 0, 8);
+
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -543,7 +538,7 @@ void atarig42_state::atarig42(machine_config &config)
 	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarig42_state::screen_update_atarig42));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(atarig42_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
