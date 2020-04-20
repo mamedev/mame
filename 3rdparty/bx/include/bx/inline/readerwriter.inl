@@ -239,7 +239,7 @@ namespace bx
 
 		if (0 < morecore)
 		{
-			morecore = BX_ALIGN_MASK(morecore, 0xfff);
+			morecore = alignUp(morecore, 0x1000);
 			m_data = (uint8_t*)m_memBlock->more(morecore);
 			m_size = m_memBlock->getSize();
 		}
