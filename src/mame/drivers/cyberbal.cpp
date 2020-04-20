@@ -58,7 +58,7 @@ void cyberbal2p_state::video_int_ack_w(uint16_t data)
 
 void cyberbal_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	m_extracpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
