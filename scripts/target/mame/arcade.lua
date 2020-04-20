@@ -1179,7 +1179,7 @@ files {
 	MAME_DIR .. "src/mame/video/copsnrob.cpp",
 	MAME_DIR .. "src/mame/drivers/cyberbal.cpp",
 	MAME_DIR .. "src/mame/includes/cyberbal.h",
-	MAME_DIR .. "src/mame/audio/cyberbal.cpp",
+	MAME_DIR .. "src/mame/audio/atarisac.cpp",
 	MAME_DIR .. "src/mame/video/cyberbal.cpp",
 	MAME_DIR .. "src/mame/drivers/cybstorm.cpp",
 	MAME_DIR .. "src/mame/includes/cybstorm.h",
