@@ -7,6 +7,7 @@
 #define BX_ALLOCATOR_H_HEADER_GUARD
 
 #include "bx.h"
+#include "uint32_t.h"
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0, __FILE__, __LINE__)

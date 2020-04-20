@@ -687,6 +687,72 @@ namespace bx
 		return result;
 	}
 
+	template <typename Ty>
+	inline bool isAligned(Ty _a, int32_t _align)
+	{
+		const Ty mask = _align - 1;
+		return 0 == (_a & mask);
+	}
+
+	template <typename Ty>
+	inline bool isAligned(const Ty* _ptr, int32_t _align)
+	{
+		union { const void* ptr; uintptr_t addr; } un = { _ptr };
+		return isAligned(un.addr, _align);
+	}
+
+	template <typename Ty>
+	inline bool isAligned(Ty* _ptr, int32_t _align)
+	{
+		return isAligned( (const void*)_ptr, _align);
+	}
+
+	template <typename Ty>
+	inline Ty alignDown(Ty _a, int32_t _align)
+	{
+		const Ty mask = _align - 1;
+		return Ty(_a & ~mask);
+	}
+
+	template <typename Ty>
+	inline Ty* alignDown(Ty* _ptr, int32_t _align)
+	{
+		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
+		un.addr = alignDown(un.addr, _align);
+		return un.ptr;
+	}
+
+	template <typename Ty>
+	inline const Ty* alignDown(const Ty* _ptr, int32_t _align)
+	{
+		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
+		un.addr = alignDown(un.addr, _align);
+		return un.ptr;
+	}
+
+	template <typename Ty>
+	inline Ty alignUp(Ty _a, int32_t _align)
+	{
+		const Ty mask = _align - 1;
+		return Ty( (_a + mask) & ~mask);
+	}
+
+	template <typename Ty>
+	inline Ty* alignUp(Ty* _ptr, int32_t _align)
+	{
+		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
+		un.addr = alignUp(un.addr, _align);
+		return un.ptr;
+	}
+
+	template <typename Ty>
+	inline const Ty* alignUp(const Ty* _ptr, int32_t _align)
+	{
+		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
+		un.addr = alignUp(un.addr, _align);
+		return un.ptr;
+	}
+
 	inline BX_CONST_FUNC uint16_t halfFromFloat(float _a)
 	{
 		union { uint32_t ui; float flt; } ftou;

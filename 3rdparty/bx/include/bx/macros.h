@@ -43,12 +43,6 @@
 #define BX_FILE_LINE_LITERAL "" __FILE__ "(" BX_STRINGIZE(__LINE__) "): "
 
 ///
-#define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
-#define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
-#define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
-#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
-
-///
 #define BX_ALIGNOF(_type) __alignof(_type)
 
 #if defined(__has_feature)
