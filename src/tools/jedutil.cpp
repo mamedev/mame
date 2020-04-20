@@ -118,7 +118,7 @@
 #include <cstring>
 #include <cctype>
 
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(__linux__)
 #include <ncurses/ncurses.h>
 #else
 #include <ncurses.h>
