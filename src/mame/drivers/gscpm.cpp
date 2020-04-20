@@ -4,8 +4,9 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "bus/ata/ataintf.h"
 #include "machine/z80sio.h"
-
+#include "machine/ram.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
@@ -15,30 +16,37 @@ public:
 	gscpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bank(*this, "bank")
+		, m_ram(*this, "ram")
+		, m_ide(*this, "ide")
 		, m_sio(*this, "sio")
 	{ }
 
 	void gscpm(machine_config &config);
 
 private:
-	// address maps for program memory and io memory
+	void machine_reset() override;
+	void machine_start() override;
 	void gscpm_mem(address_map &map);
 	void gscpm_io(address_map &map);
 
+	READ8_MEMBER( cflash_r );
+	WRITE8_MEMBER( cflash_w );
 	READ8_MEMBER( sio_r );
 	WRITE8_MEMBER( sio_w );
 
 	WRITE8_MEMBER( bank_switch_w );
 
-	// two member devices required here
 	required_device<z80_device> m_maincpu;
+	required_memory_bank m_bank;
+	required_device<ram_device> m_ram;
+	required_device<ata_interface_device> m_ide;
 	required_device<z80sio_device> m_sio;
 };
 
-// Trivial memory map for program memory
 void gscpm_state::gscpm_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x3fff).bankrw("bank");
 	map(0x4000, 0xffff).ram();
 }
 
@@ -47,8 +55,18 @@ void gscpm_state::gscpm_io(address_map &map)
 	map.global_mask(0xff);  // use 8-bit ports
 	map.unmap_value_high(); // unmapped addresses return 0xff
 	map(0x00, 0x07).rw(FUNC(gscpm_state::sio_r), FUNC(gscpm_state::sio_w));
-	//map(0x10, 0x17).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // TBD compact flash
+	map(0x10, 0x17).rw(FUNC(gscpm_state::cflash_r), FUNC(gscpm_state::cflash_w)); // compact flash
 	map(0x38, 0x3f).w(FUNC(gscpm_state::bank_switch_w));
+}
+
+READ8_MEMBER( gscpm_state::cflash_r )
+{
+	return m_ide->read_cs0(offset, 0xff);
+}
+
+WRITE8_MEMBER( gscpm_state::cflash_w )
+{
+	m_ide->write_cs0(offset, data, 0xff);
 }
 
 READ8_MEMBER( gscpm_state::sio_r )
@@ -92,7 +110,20 @@ WRITE8_MEMBER( gscpm_state::sio_w )
 
 WRITE8_MEMBER( gscpm_state::bank_switch_w )
 {
-	printf("Bank Switch!\n");
+	m_bank->set_entry(1); // RAM
+}
+
+void gscpm_state::machine_start()
+{
+	driver_device::machine_start();
+	m_bank->configure_entry(0, memregion("maincpu")->base());
+	m_bank->configure_entry(1, m_ram->pointer());
+}
+
+void gscpm_state::machine_reset()
+{
+	driver_device::machine_reset();
+	m_bank->set_entry(0); // ROM
 }
 
 // This is here only to configure our terminal for interactive use
@@ -118,6 +149,11 @@ void gscpm_state::gscpm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gscpm_state::gscpm_mem);
 	m_maincpu->set_addrmap(AS_IO, &gscpm_state::gscpm_io);
 	m_maincpu->set_daisy_config(gscpm_daisy_chain);
+
+	/* compact flash hard drive */
+	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", "hdd", false);
+
+	RAM(config, m_ram).set_default_size("16K"); // This shadows the ROM
 
 	Z80SIO(config, m_sio, 0);
 	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
