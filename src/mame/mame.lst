@@ -16247,6 +16247,8 @@ hpz80unk                        //
 @source:hp80.cpp
 hp85                            //
 hp86b                           //
+hp86b_001                       //
+hp86b_004                       //
 
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
