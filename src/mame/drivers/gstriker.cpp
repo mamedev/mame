@@ -747,7 +747,7 @@ ROM_START( vgoalsca )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 ROM_END
 
-/* these were bruteforced from secured pal16l8 devices found in a twcup94a set, probably the same for all sets? */
+/* these were bruteforced from secured pal16l8 devices found on a twcup94a set, probably the same for all sets? */
 #define TWCUP94_PLD_DEVICES \
 	ROM_LOAD( "s2031a.u39", 0x0000, 0x0117, CRC(66f6020f) SHA1(b44a9ad51c1987bab14fb044b3ee37d73ec96fa7) ) \
 	ROM_LOAD( "s2032a.u64", 0x0200, 0x0117, CRC(e186728e) SHA1(c6ad476566d48585944e7f7889667899f654619b) ) \
