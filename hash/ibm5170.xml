@@ -9911,40 +9911,7 @@ license:CC0
 		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #1.img" size="1474560" crc="6bb31858" sha1="746653c590e2d528249bcafe74da6c7c805187fd"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #2.img" size="1474560" crc="e1a91aa2" sha1="eedce368b970077490df421f567dd22cc974c7be"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #3.img" size="1474560" crc="3fc281a4" sha1="def3e6746e9fa4815162c45f5c1e5f6a3b430db0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #4.img" size="1474560" crc="80d22e1a" sha1="32067ea046127630fbf0b3ec6a79d9d8d53e4a81"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #5.img" size="1474560" crc="15495bde" sha1="df4365f4969fc82c97269116e3da5fa81029f8b6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doom2a" cloneof="doom2">
-		<description>DOOM II: Hell on Earth (1.7, alt)</description>
-		<year>1994</year>
-		<publisher>GT Interactive</publisher>
-		<info name="developer" value="id Software" />
-		<info name="version" value="1.7" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match the doom2 set after removing this -->
+				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match other dumps after removing this -->
 				<rom name="Doom II v1.7 (1994)(id Software) - Floppy Disk 1.img" size="1474560" crc="9ad5a439" sha1="1d2a3ee9e9578884f602ab69da12c5b2f962b456"/>
 			</dataarea>
 		</part>
