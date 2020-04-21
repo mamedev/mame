@@ -125,11 +125,16 @@
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int   selected = view->source_index(*view->source());
-	if (selected != index) {
-		view->set_source(*view->source(index));
-		if ([[self window] firstResponder] != self)
-			view->set_cursor_visible(false);
+	const int   selected = [self selectedSubviewIndex];
+	if (selected != index)
+	{
+		const debug_view_source *source = view->source(index);
+		if (source != nullptr)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
 	}
 }
 

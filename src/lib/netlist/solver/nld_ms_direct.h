@@ -67,15 +67,17 @@ namespace solver
 			for (std::size_t i = 0; i < kN; i++)
 			{
 				// FIXME: Singular matrix?
-				const FT f = plib::reciprocal(m_A[i][i]);
+				const auto &Ai = m_A[i];
+				const FT f = plib::reciprocal(Ai[i]);
 				const auto &nzrd = this->m_terms[i].m_nzrd;
 				const auto &nzbd = this->m_terms[i].m_nzbd;
 
 				for (auto &j : nzbd)
 				{
-					const FT f1 = -f * m_A[j][i];
+					auto &Aj = m_A[j];
+					const FT f1 = -f * Aj[i];
 					for (auto &k : nzrd)
-						m_A[j][k] += m_A[i][k] * f1;
+						Aj[k] += Ai[k] * f1;
 					this->m_RHS[j] += this->m_RHS[i] * f1;
 				}
 			}
@@ -95,24 +97,30 @@ namespace solver
 
 				if (maxrow != i)
 				{
+#if 0
 					// Swap the maxrow and ith row
 					for (std::size_t k = 0; k < kN; k++) {
 						std::swap(m_A[i][k], m_A[maxrow][k]);
 					}
+#else
+						std::swap(m_A[i], m_A[maxrow]);
+#endif
 					std::swap(this->m_RHS[i], this->m_RHS[maxrow]);
 				}
 				// FIXME: Singular matrix?
-				const FT f = plib::reciprocal(m_A[i][i]);
+				const auto &Ai = m_A[i];
+				const FT f = plib::reciprocal(Ai[i]);
 
 				// Eliminate column i from row j
 
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
+					auto &Aj = m_A[j];
 					const FT f1 = - m_A[j][i] * f;
 					if (f1 != plib::constants<FT>::zero())
 					{
-						const FT * pi = &(m_A[i][i+1]);
-						FT * pj = &(m_A[j][i+1]);
+						const FT * pi = &(Ai[i+1]);
+						FT * pj = &(Aj[i+1]);
 						plib::vec_add_mult_scalar_p(kN-i-1,pj,pi,f1);
 						//for (unsigned k = i+1; k < kN; k++)
 						//  pj[k] = pj[k] + pi[k] * f1;
@@ -137,22 +145,26 @@ namespace solver
 		{
 			for (std::size_t j = kN; j-- > 0; )
 			{
-				FT tmp = 0;
+				FT tmp(0);
+				const auto & Aj(m_A[j]);
+
 				for (std::size_t k = j+1; k < kN; k++)
-					tmp += m_A[j][k] * x[k];
-				x[j] = (this->m_RHS[j] - tmp) / m_A[j][j];
+					tmp += Aj[k] * x[k];
+				x[j] = (this->m_RHS[j] - tmp) / Aj[j];
 			}
 		}
 		else
 		{
 			for (std::size_t j = kN; j-- > 0; )
 			{
-				FT tmp = 0;
+				FT tmp(0);
 				const auto &nzrd = this->m_terms[j].m_nzrd;
-				const auto e = nzrd.size(); // - 1; // exclude RHS element
+				const auto & Aj(m_A[j]);
+				const auto e = nzrd.size();
+
 				for ( std::size_t k = 0; k < e; k++)
-					tmp += m_A[j][nzrd[k]] * x[nzrd[k]];
-				x[j] = (this->m_RHS[j] - tmp) / m_A[j][j];
+					tmp += Aj[nzrd[k]] * x[nzrd[k]];
+				x[j] = (this->m_RHS[j] - tmp) / Aj[j];
 			}
 		}
 	}

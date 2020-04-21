@@ -197,12 +197,12 @@ GFXDECODE_END
 void shisen_state::shisen(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);   /* 6 MHz ? */
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL );   /* Verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &shisen_state::shisen_map);
 	m_maincpu->set_addrmap(AS_IO, &shisen_state::shisen_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shisen_state::irq0_line_hold));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 3579645));
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL ));   /* Verified on PCB */
 	soundcpu.set_addrmap(AS_PROGRAM, &shisen_state::shisen_sound_map);
 	soundcpu.set_addrmap(AS_IO, &shisen_state::shisen_sound_io_map);
 	soundcpu.set_periodic_int(FUNC(shisen_state::nmi_line_pulse), attotime::from_hz(128*55));  /* clocked by V1? (Vigilante) */
@@ -234,7 +234,7 @@ void shisen_state::shisen(machine_config &config)
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL ));   /* Verified on PCB */
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(0, "lspeaker", 0.5);
 	ymsnd.add_route(1, "rspeaker", 0.5);

@@ -51,7 +51,7 @@ namespace solver
 		  FLOAT
 		, DOUBLE
 		, LONGDOUBLE
-		, FLOAT128
+		, FLOATQ128
 	)
 
 	using static_compile_container = std::vector<std::pair<pstring, pstring>>;
@@ -143,10 +143,10 @@ namespace solver
 
 		terminal_t **terms() noexcept { return m_terms.data(); }
 
-		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, void>>
+		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, void>>
 		FT getV() const noexcept { return static_cast<FT>(m_net->Q_Analog()); }
 
-		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, void>>
+		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, void>>
 		void setV(FT v) noexcept { m_net->set_Q_Analog(static_cast<nl_fptype>(v)); }
 
 		bool isNet(const analog_net_t * net) const noexcept { return net == m_net; }
@@ -299,7 +299,7 @@ namespace solver
 		, m_mat_ptr(size, this->max_railstart() + 1)
 		, m_last_V(size, nlconst::zero())
 		, m_DD_n_m_1(size, nlconst::zero())
-		, m_h_n_m_1(size, nlconst::zero())
+		, m_h_n_m_1(size, nlconst::magic(1e-6)) // we need a non zero value here
 		{
 			//
 			// save states
@@ -318,9 +318,9 @@ namespace solver
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
 		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE> m_new_V;
+		plib::parray<float_type, SIZE> m_new_V;
 		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE> m_RHS;
+		plib::parray<float_type, SIZE> m_RHS;
 
 		PALIGNAS_VECTOROPT()
 		plib::pmatrix2d<float_type *> m_mat_ptr;
@@ -416,11 +416,11 @@ namespace solver
 			// and thus belong into a different calculation. This applies to all solvers.
 
 			const std::size_t iN = size();
-			const auto reltol(static_cast<FT>(m_params.m_reltol));
-			const auto vntol(static_cast<FT>(m_params.m_vntol));
+			const auto reltol(static_cast<float_type>(m_params.m_reltol));
+			const auto vntol(static_cast<float_type>(m_params.m_vntol));
 			for (std::size_t i = 0; i < iN; i++)
 			{
-				const auto vold(this->m_terms[i].template getV<FT>());
+				const auto vold(this->m_terms[i].template getV<float_type>());
 				const auto vnew(m_new_V[i]);
 				const auto tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
 				if (plib::abs(vnew - vold) > tol)
@@ -511,6 +511,7 @@ namespace solver
 				auto &net = m_terms[k];
 				auto **tcr_r = &(m_mat_ptr[k][0]);
 
+				using source_type = typename decltype(m_gtn)::value_type;
 				const std::size_t term_count = net.count();
 				const std::size_t railstart = net.railstart();
 				const auto &go = m_gonn[k];
@@ -520,7 +521,7 @@ namespace solver
 
 				// FIXME: gonn, gtn and Idr - which float types should they have?
 
-				auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
+				auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<source_type>::zero());
 
 				// update diagonal element ...
 				*tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
@@ -528,7 +529,7 @@ namespace solver
 				for (std::size_t i = 0; i < railstart; i++)
 					*tcr_r[i]       += static_cast<FT>(go[i]);
 
-				auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<FT>::zero()));
+				auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<source_type>::zero()));
 
 				for (std::size_t i = railstart; i < term_count; i++)
 					RHS_t +=  (- go[i]) * *cnV[i];

@@ -2721,18 +2721,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<!-- Applications -->
 
-	<software name="4ptgraph">
-		<description>4-POINT Graphics</description>
-		<year>1984</year>
-		<publisher>International Microcomputer Software, Inc.</publisher>
-		<info name="version" value="1.0B" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "327680">
-				<rom name="disk1.img" size="327680" crc="5fb1596a" sha1="f95bf310b527e2914571a02853208385a6100629"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="2630fa">
 		<description>2630 Fourier Analyzer (Demo)</description>
 		<year>1987</year>
@@ -2742,6 +2730,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2795439">
 				<rom name="2630 fourier analyzer 1.70 (demo).mfm" size="2795439" crc="6b878f2a" sha1="420223b960f51ca6d475832c078e698a6cdb1424" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dfloor2">
+		<description>3-D FloorPlan Designer V2.0</description>
+		<year>1993</year>
+		<publisher>Cosmi</publisher>
+		<info name="version" value="2.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="d1e1d56f" sha1="02222acf3fffd21bbecb7e6a9ad9293715d649ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4ptgraph">
+		<description>4-POINT Graphics</description>
+		<year>1984</year>
+		<publisher>International Microcomputer Software, Inc.</publisher>
+		<info name="version" value="1.0B" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="disk1.img" size="327680" crc="5fb1596a" sha1="f95bf310b527e2914571a02853208385a6100629"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2760,6 +2772,90 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Demo Disk 2" />
 			<dataarea name="flop" size = "368640">
 				<rom name="Disk02.img" size="368640" crc="c8e12da7" sha1="428e0dd0eafee1575c847674c34cb4144ab87291"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alinsmak">
+		<description>Ad Lib Instrument Maker V1.51</description>
+		<year>1989</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.51" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="insmaker_v151.img" size="368640" crc="55dd58ee" sha1="6022e6185644734c155a2285fa9544a5956c2909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aljukbox">
+		<description>Ad Lib Juke Box V1.64</description>
+		<year>1991</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.64" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="jukebox_v164.img" size="368640" crc="cc0c6377" sha1="ddb270c50e2fb418bad7cc15739c78e9c4715211"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aljukboxa" cloneof="aljukbox">
+		<description>Ad Lib Juke Box V1.5</description>
+		<year>1989</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.5" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="jukebox_v150.img" size="368640" crc="df22bf74" sha1="e54685566ef120e7f04f15f30938c302fbc74bbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aljukboxb" cloneof="aljukbox">
+		<description>Ad Lib Juke Box V1.6</description>
+		<year>1990</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.6" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="jukebox_v160.img" size="368640" crc="66342420" sha1="bea9793bcfe44325faa96db0e0baa0476bb30fc8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="albonus">
+		<description>Ad Lib Juke Box Registration Bonus Disk V1.62</description>
+		<year>1990</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.62" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="bonus_v162.img" size="368640" crc="1dbe8588" sha1="9168010ae4b7c4b04a3b360957102debf48b73b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="albonusa" cloneof="albonus">
+		<description>Ad Lib Juke Box Registration Bonus Disk V1.51</description>
+		<year>1989</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.51" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="bonus_v151.img" size="368640" crc="17f19fc3" sha1="750b7709478e267be34d9bbc87b68cdda548201b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alviscmp">
+		<description>Ad Lib Visual Composer V1.51</description>
+		<year>1989</year>
+		<publisher>Ad Lib</publisher>
+		<info name="version" value="V1.51" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="viscomp_v151.img" size="368640" crc="223d41b9" sha1="a5697bb46018bdf631f1e0794d83f386a7f5a24b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6668,6 +6764,44 @@ has been replaced with an all-zero block. -->
 
 	<!-- Driver disks -->
 
+	<software name="amouse7">
+		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
+		<description>AMouse Mouse Driver Disk</description>
+		<year>1991</year>
+		<publisher>ULTIMA Electronics Corp.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="AMouse-driver-disk-7.0.img" size="737280" crc="e49af872" sha1="4ee28d6149cf6c4e3fc8562a8fe6f738c6b1b83d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moustest" supported="no">
+		<!-- Dumped via Kryoflux, all tracks show as good and modified -->
+		<description>Mouse Software Test/Demo</description>
+		<year>1987</year>
+		<publisher>Mouse Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk1.img" size="368640" crc="ca451d20" sha1="0b1a6be07407c3a5fd15d9d17c61ccc8d1b94c5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousetb">
+		<description>Mouse/Trackball</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="6.20 Rev. A" />
+		<info name="release" value="19921005"/>
+		<info name="serial" value="133446-002" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="133446-002.img" size="737280" crc="b8f7b556" sha1="548b551ed6e3242b8d361f803db2580a1a3995ee"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pc1hdu" supported="no">
 		<description>Olivetti Prodest PC1 HDU Install</description>
 		<year>1988</year>
@@ -6690,6 +6824,67 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Driver Mouse.dsk" size="737280" crc="c7b67dd4" sha1="80fb80702e2a673d71df588ea42566ac3bf66f43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sicmouse" supported="no">
+		<description>SICOS Mouse</description>
+		<year>1990</year>
+		<publisher>SICOS</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
+			<dataarea name="flop" size="368640">
+				<!-- files are corrupt -->
+				<rom name="sicos_mouse.img" size="368640" crc="3f927fd3" sha1="f1372c69d5d497ca6f3ce85ec144b714dfb2ab94" status="baddump"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS PAINT\nThe SICOS mouse - paint program"/>
+			<dataarea name="flop" size="368640">
+				<!-- files are corrupt -->
+				<rom name="sicos_paint.img" size="368640" crc="b93dd558" sha1="3e78a30acf4adddbabb04babdc469b5c4ff4af4a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmous">
+		<!-- Dumped via Kryoflux, all tracks show as good, 62/80 modified -->
+		<description>SYSGRATION Mouse Driver 8.00 (5.25")</description>
+		<year>1993</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="8.00"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="sysgration mouse driver 8.00 (5.25'').img" size="368640" crc="e90076f0" sha1="7859af0d7ce851e6862607dcbce2688fba0727f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmous35" cloneof="sysgmous">
+		<!-- Dumped via Kryoflux, 28 tracks show as good and modified, rest unformatted -->
+		<description>SYSGRATION Mouse Driver 8.00 (3.5")</description>
+		<year>1993</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="8.00"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="sysgration mouse driver 8.00.img" size="737280" crc="035866b5" sha1="2bb96732023e9fd11af235ae41e1d164dc7e751d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmousa" cloneof="sysgmous">
+		<!-- Dumped via Kryoflux, all tracks show as good, 27/160 modified -->
+		<description>SYSGRATION Mouse Driver 7.03 (5.25")</description>
+		<year>1992</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="7.03"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="sysgration mouse driver 7.03.img" size="737280" crc="7f3cce79" sha1="13221acdb74e5d8f24ec567ce60e1e69268010da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8998,20 +9193,6 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="indycrus">
-		<!-- Dumped via Kryoflux -->
-		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
-		<year>1989</year>
-		<publisher>Lucasfilm - U.S. Gold</publisher>
-		<info name="developer" value="LucasFilm Games" />
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Copy-protected key disk -->
-			<dataarea name="flop" size = "2157701">
-				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2"/>
-			</dataarea>
-		</part>
-	</software>
-	
-	<software name="indycrus_525" cloneof="indycrus">
 		<description>Indiana Jones and the Last Crusade - The Action Game (5.25")</description>
 		<year>1989</year>
 		<publisher>Lucasfilm - U.S. Gold</publisher>
@@ -9024,6 +9205,20 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Indiana Jones And The Last Crusade - The Action Game [US Gold] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="f235cc28" sha1="0b372361c7ea4a20f9159d4f42dc791440ce0b3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indycrus35" cloneof="indycrus">
+		<!-- Dumped via Kryoflux -->
+		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
+		<year>1989</year>
+		<publisher>Lucasfilm - U.S. Gold</publisher>
+		<info name="developer" value="LucasFilm Games" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2157701">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2"/>
 			</dataarea>
 		</part>
 	</software>
