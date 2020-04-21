@@ -328,7 +328,7 @@ ROM_START( pcktgalb )  /* bootleg - "Yada East Corporation" */
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14", 0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */
 	ROM_LOAD( "eb06.k15", 0x0200, 0x0200, CRC(1fbd4b59) SHA1(84e20329003cf09b849b49e1d83edc330d49f404) ) /* 82s131.101 */
-	
+
 	ROM_REGION( 0x0400, "plds", 0 ) // same as official sets?
 	ROM_LOAD( "pal16l8", 0x0000, 0x0104, CRC(b8d4b318) SHA1(6dd68892501c9b61714aaa7a3cfe14cc8ad1a877) )
 	ROM_LOAD( "pal16r6", 0x0200, 0x0104, CRC(43aad537) SHA1(892104f4315d7a739718ce32b910694ea9b13fae) ) /* also seen peel18CV8 used on other boards */
