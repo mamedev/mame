@@ -4816,7 +4816,7 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		ret = x;
 	}
 	if ((offset >= 0x00100000 / 4) && (offset < 0x00101000 / 4)) {
-		//machine().logerror("NV_2A: read 100000[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
+		//machine().logerror("NV_2A: read PFB[%06X] mask %08X value %08X\n",offset*4-0x00100000,mem_mask,ret);
 		if (offset == 0x100200 / 4)
 			return 3;
 	}
@@ -4936,6 +4936,10 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		if (e >= (sizeof(pmc) / sizeof(uint32_t)))
 			return;
 		COMBINE_DATA(pmc + e);
+		if (e == 0x200 / 4) // PMC.ENABLE register
+			if (data & 0x1100) // either PFIFO or PGRAPH enabled
+				for (int ch = 0; ch < 32; ch++) // zero dma_get in all the channels
+					channel[ch][0].regs[0x44 / 4] = 0;
 		//machine().logerror("NV_2A: write PMC[%06X]=%08X\n",offset*4-0x00000000,data & mem_mask);
 	}
 	else if ((offset >= 0x00800000 / 4) && (offset < 0x00900000 / 4)) {
@@ -4957,21 +4961,6 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			dmaput = &channel[chanel][0].regs[0x40 / 4];
 			dmaget = &channel[chanel][0].regs[0x44 / 4];
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
-			if (((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) || // only for outr2
-				((*dmaput == 0x045cd000) && (*dmaget == 0x07f4d000)) || // only for scg06nt
-				((*dmaput == 0x0494c000) && (*dmaget == 0x07f4d000)) || // only for wangmid
-				((*dmaput == 0x05acd000) && (*dmaget == 0x07f4d000)) || // only for ghostsqu
-				((*dmaput == 0x0574d000) && (*dmaget == 0x07f4d000)) || // only for mj2c
-				((*dmaput == 0x07ca3000) && (*dmaget == 0x07f4d000)) || // only for hotd3
-				((*dmaput == 0x063cd000) && (*dmaget == 0x07f4d000)) || // only for vcop3
-				((*dmaput == 0x07f4f000) && (*dmaget == 0x07f4d000)) || // only for ccfboxa
-				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
-			{
-				*dmaget = *dmaput;
-				puller_waiting = 0;
-				puller_timer->enable(false);
-				return;
-			}
 			if (*dmaget != *dmaput) {
 				if (puller_waiting == 0) {
 					puller_space = &space;
