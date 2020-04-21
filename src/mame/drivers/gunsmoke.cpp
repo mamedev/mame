@@ -547,9 +547,6 @@ ROM_START( gunsmokeu )
 	ROM_LOAD( "g-05.01f", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
-
-
-
 ROM_START( gunsmokeua )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // has a small extra piece of code at 0x2f00 and a jump to it at 0x297b, otherwise the same as gunsmokeub including the datecode, chip had an 'A' stamped on it, bugfix?
 	ROM_LOAD( "gsr_03a.9n",  0x00000, 0x8000, CRC(2f6e6ad7) SHA1(e9e4a367c240a35a1ba2eeaec9458996f7926f16) ) /* Code 0000-7fff */
@@ -646,6 +643,55 @@ ROM_START( gunsmokeub )
 	ROM_LOAD( "g-05.01f", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
+ROM_START( gunsmokeg )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "gsg03.09n", 0x00000, 0x8000, CRC(8ad2754e) SHA1(221309d4d76e49f9b80849630b2846fc2e3d72a1) ) // Code 0000-7fff
+	ROM_LOAD( "gs04.10n",  0x10000, 0x8000, CRC(8d4b423f) SHA1(149274c2ed1526ca1f419fdf8a24059ff138f7f2) ) // Paged code
+	ROM_LOAD( "gs05.12n",  0x18000, 0x8000, CRC(2b5667fb) SHA1(5b689bca1e76d803b4cae22feaa7744fa528e93f) ) // Paged code
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gs02.14h",  0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "gs01.11f",  0x00000, 0x4000, CRC(b61ece9b) SHA1(eb3fc62644cc5b5a2b9cbe67c393d4a0e2a59ca9) ) // Characters
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "gs13.06c",  0x00000, 0x8000, CRC(f6769fc5) SHA1(d192ec176425327ca4b7e25fc8432fc47837ba29) ) // 32x32 tiles planes 2-3
+	ROM_LOAD( "gs12.05c",  0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
+	ROM_LOAD( "gs11.04c",  0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
+	ROM_LOAD( "gsg10.02c", 0x18000, 0x8000, CRC(0674ff4d) SHA1(cceeb3dfe8cad01115d337bce703d446cfd499ad) )
+
+	ROM_LOAD( "gs09.06a",  0x20000, 0x8000, CRC(539f182d) SHA1(4190c0adbecc57b92f4d002e121acb77e8c5d8d8) ) // 32x32 tiles planes 0-1
+	ROM_LOAD( "gs08.05a",  0x28000, 0x8000, CRC(e87e526d) SHA1(d10068addf30322424a85bbc6382cb762ae3fbe2) )
+	ROM_LOAD( "gs07.04a",  0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
+	ROM_LOAD( "gsg06.02a", 0x38000, 0x8000, CRC(5cb850a7) SHA1(5b4fec3fae4d1947778c832c41f757414652f34a) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "gsg22.06n", 0x00000, 0x8000, CRC(96779c38) SHA1(83f5811b7674e39fac6d127bcf2741a5ba111ec1) ) // Sprites planes 2-3
+	ROM_LOAD( "gsg21.04n", 0x08000, 0x8000, CRC(6e8a02c7) SHA1(8db5792ded8c6360e5a07f96b7799eae7591d719) ) // Sprites planes 2-3
+	ROM_LOAD( "gsg20.03n", 0x10000, 0x8000, CRC(139bf927) SHA1(f58bf8cffbc4e9e1a48c905d341f92a22df6cf37) ) // Sprites planes 2-3
+	ROM_LOAD( "gsg19.01n", 0x18000, 0x8000, CRC(8f249573) SHA1(390103b100ec944c249759383d505df6292f5405) ) // Sprites planes 2-3
+	ROM_LOAD( "gsg18.06l", 0x20000, 0x8000, CRC(b290451c) SHA1(c31d93efd9c1b8d71d4875d7a095a5de2011d2b8) ) // Sprites planes 0-1
+	ROM_LOAD( "gsg17.04l", 0x28000, 0x8000, CRC(61c9bd10) SHA1(ca3116c657b2cc8d7d5f0ac602a294deb92a4e8c) ) // Sprites planes 0-1
+	ROM_LOAD( "gsg16.03l", 0x30000, 0x8000, CRC(6620103b) SHA1(ef1260c05c958c115f54ddaffa213d320508ff11) ) // Sprites planes 0-1
+	ROM_LOAD( "gsg15.01l", 0x38000, 0x8000, CRC(ccc1c1b6) SHA1(feb480195bc4157d7be385b055bdd47505de6bc6) ) // Sprites planes 0-1
+
+	ROM_REGION( 0x8000, "gfx4", 0 ) // Background tilemaps
+	ROM_LOAD( "gs14.11c", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
+
+	ROM_REGION( 0x0a00, "proms", 0 )
+	ROM_LOAD( "g-01.03b",  0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) ) // Red component
+	ROM_LOAD( "g-02.04b",  0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) ) // Green component
+	ROM_LOAD( "g-03.05b",  0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) ) // Blue component
+	ROM_LOAD( "g-04.09d",  0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) ) // Char lookup table
+	ROM_LOAD( "g-06.14a",  0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) ) // Tile lookup table
+	ROM_LOAD( "g-07.15a",  0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) ) // Tile palette bank
+	ROM_LOAD( "g-09.09f",  0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) ) // Sprite lookup table
+	ROM_LOAD( "g-08.08f",  0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) ) // Sprite palette bank
+	ROM_LOAD( "g-10.02j",  0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // Video timing (not used)
+	ROM_LOAD( "g-05.01f",  0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) ) // Priority? (not used)
+ROM_END
+
 /* Game Drivers */
 
 // at 0x7E50 in the first rom is 85113 (project ident code?) and the project codename 'Gunman' both stored as ASCII.
@@ -654,9 +700,10 @@ ROM_END
 
 // this information is not displayed onscreen
 
-GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)", MACHINE_SUPPORTS_SAVE ) // GSE_03
+GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)",           MACHINE_SUPPORTS_SAVE ) // GSE_03
 GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "bootleg",                  "Gun.Smoke (World, 851115) (bootleg)", MACHINE_SUPPORTS_SAVE ) // based  on above version, warning message patched out
-GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)", MACHINE_SUPPORTS_SAVE ) // GSJ_03
-GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu, gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)", MACHINE_SUPPORTS_SAVE ) // GSA_03
-GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 1)", MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
-GAME( 1986, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 2)", MACHINE_SUPPORTS_SAVE ) // GSR_03
+GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)",           MACHINE_SUPPORTS_SAVE ) // GSJ_03
+GAME( 1986, gunsmokeu,  gunsmoke, gunsmoke, gunsmokeu, gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)",              MACHINE_SUPPORTS_SAVE ) // GSA_03
+GAME( 1985, gunsmokeua, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 1)",       MACHINE_SUPPORTS_SAVE ) // GSR_03 (03A on the chip)
+GAME( 1986, gunsmokeub, gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115, set 2)",       MACHINE_SUPPORTS_SAVE ) // GSR_03
+GAME( 1985, gunsmokeg,  gunsmoke, gunsmoke, gunsmoke,  gunsmoke_state, empty_init, ROT270, "Capcom",                   "Gun.Smoke (Germany, censored)",       MACHINE_SUPPORTS_SAVE ) // Has 'World' regional warning, but game censored for German market
