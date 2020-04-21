@@ -4103,7 +4103,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- Fatal error: UNSP: illegal ALU optype 05 at 0001 -->
-	<software name="toystor3i" supported="no">
+	<software name="toystor3i" supported="no" status="baddump">
 		<description>Disney/Pixar Toy Story 3 (Italy)</description>
 		<year>2010</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
