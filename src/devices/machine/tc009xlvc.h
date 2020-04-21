@@ -81,13 +81,13 @@ protected:
 	int m_tilemap_xoffs, m_tilemap_yoffs;
 	int m_tilemap_flipped_xoffs, m_tilemap_flipped_yoffs;
 
-	u32 tilebank(u8 slot) { return m_vregs[slot & 3]; }
+	u32 tilebank(u8 slot) const { return m_vregs[slot & 3]; }
 
 	// other bits unknown
-	bool screen_enable() { return BIT(m_vregs[4], 5); }
-	bool global_flip() { return BIT(m_vregs[4], 4); }
-	bool bg0_pri() { return BIT(m_vregs[4], 3); }
-	bool bitmap_mode() { return (m_vregs[4] & 0x7) == 7; }
+	bool screen_enable() const { return BIT(m_vregs[4], 5); }
+	bool global_flip() const { return BIT(m_vregs[4], 4); }
+	bool bg0_pri() const { return BIT(m_vregs[4], 3); }
+	bool bitmap_mode() const { return (m_vregs[4] & 0x7) == 7; }
 
 	u8 m_irq_vector[3];
 	u8 m_irq_enable;
