@@ -1358,6 +1358,8 @@ files {
 	MAME_DIR .. "src/mame/machine/asic65.h",
 	MAME_DIR .. "src/mame/machine/atarigen.cpp",
 	MAME_DIR .. "src/mame/machine/atarigen.h",
+	MAME_DIR .. "src/mame/machine/atariscom.cpp",
+	MAME_DIR .. "src/mame/machine/atariscom.h",
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",
 	MAME_DIR .. "src/mame/machine/mathbox.h",
 	MAME_DIR .. "src/mame/machine/slapstic.cpp",

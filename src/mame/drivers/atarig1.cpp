@@ -388,7 +388,7 @@ static const atari_rle_objects_config modesc_pitfight =
 void atarig1_state::atarig1(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -408,7 +408,7 @@ void atarig1_state::atarig1(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarig1_state::screen_update_atarig1));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
@@ -429,7 +429,7 @@ void atarig1_state::hydrap(machine_config &config)
 {
 	atarig1(config);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");

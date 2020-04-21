@@ -24,6 +24,8 @@ public:
 		m_jsa(*this, "jsa"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
+		m_xscroll(*this, "xscroll"),
+		m_yscroll(*this, "yscroll"),
 		m_mob(*this, "mob"),
 		m_playfield_latch(-1),
 		m_scanline_int_state(0)
@@ -58,6 +60,8 @@ private:
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_shared_ptr<uint16_t> m_xscroll;
+	required_shared_ptr<uint16_t> m_yscroll;
 	required_device<atari_motion_objects_device> m_mob;
 	int m_playfield_latch;
 

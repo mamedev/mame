@@ -38,7 +38,7 @@ void atari_sac_device::sac_6502_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).mirror(0x7fe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x2800, 0x2800).mirror(0x3f9).w(m_datin, FUNC(generic_latch_8_device::write));
-	map(0x2802, 0x2802).mirror(0x3f9).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
+	map(0x2802, 0x2802).mirror(0x3f9).rw(FUNC(atari_sac_device::sound_irq_ack_r), FUNC(atari_sac_device::sound_irq_ack_w));
 	map(0x2804, 0x2804).mirror(0x3f9).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
 	map(0x2806, 0x2806).mirror(0x3f9).w(FUNC(atari_sac_device::wrio_w));
 	map(0x2c00, 0x2c00).mirror(0x3f9).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
@@ -246,7 +246,7 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_jsacpu, 14.318181_MHz_XTAL/8);
 	m_jsacpu->set_addrmap(AS_PROGRAM, &atari_sac_device::sac_6502_map);
-	m_jsacpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(14.318181_MHz_XTAL/4/4/16/16/14));
+	m_jsacpu->set_periodic_int(FUNC(atari_sac_device::sound_irq_gen), attotime::from_hz(14.318181_MHz_XTAL/4/4/16/16/14));
 
 	M68000(config, m_daccpu, 14.318181_MHz_XTAL/2);
 	m_daccpu->set_addrmap(AS_PROGRAM, &atari_sac_device::sac_68k_map);
@@ -264,7 +264,7 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 		.int_callback().set(FUNC(atari_sac_device::main_int_write_line));
 
 	YM2151(config, m_ym2151, 14.318181_MHz_XTAL/4);
-	m_ym2151->irq_handler().set(m_soundcomm, FUNC(atari_sound_comm_device::ym2151_irq_gen));
+	m_ym2151->irq_handler().set(FUNC(atari_sac_device::ym2151_irq_gen));
 	m_ym2151->port_write_handler().set(FUNC(atari_sac_device::ym2151_port_w));
 	m_ym2151->add_route(0, *this, 0.60, AUTO_ALLOC_INPUT, 0);
 	m_ym2151->add_route(1, *this, 0.60, AUTO_ALLOC_INPUT, 1);

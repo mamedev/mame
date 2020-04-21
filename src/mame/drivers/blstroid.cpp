@@ -182,7 +182,7 @@ GFXDECODE_END
 void blstroid_state::blstroid(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blstroid_state::main_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
@@ -205,7 +205,7 @@ void blstroid_state::blstroid(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 320*2, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(blstroid_state::screen_update_blstroid));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);

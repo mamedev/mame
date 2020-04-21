@@ -833,7 +833,7 @@ static const atari_rle_objects_config modesc =
 void atarigt_state::atarigt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
+	M68EC020(config, m_maincpu, 50_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(atarigt_state::scanline_int_gen), attotime::from_hz(250));
 
@@ -854,7 +854,7 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
@@ -871,7 +871,7 @@ void atarigt_state::tmek(machine_config &config)
 {
 	atarigt(config);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16); // should be 447 kHz according to schematics, but that fails the self-test
 	m_adc->in_callback<2>().set_ioport("AN4");
 	m_adc->in_callback<3>().set_ioport("AN1");
 	m_adc->in_callback<6>().set_ioport("AN2");

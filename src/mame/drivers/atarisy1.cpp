@@ -194,7 +194,6 @@ RoadBlasters (aka Future Vette):005*
 #include "includes/atarisy1.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
@@ -210,21 +209,23 @@ RoadBlasters (aka Future Vette):005*
  *
  *************************************/
 
-void atarisy1_state::video_int_ack_w(uint16_t data)
+void atarisy1_state::video_int_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
-MACHINE_START_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_start()
 {
 	atarigen_state::machine_start();
 }
 
 
-MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_reset()
 {
 	atarigen_state::machine_reset();
+
+	bankselect_w(0);
 
 	if (m_adc.found())
 		m_ajsint->in_w<0>(0);
@@ -238,13 +239,13 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
  *************************************/
 
 template<int Input>
-READ8_MEMBER(atarisy1_state::digital_joystick_r)
+uint8_t atarisy1_state::digital_joystick_r()
 {
 	return BIT(ioport("IN0")->read(), 7 - Input) ? 0xf0 : 0x00;
 }
 
 
-READ8_MEMBER(atarisy1_state::adc_r)
+uint8_t atarisy1_state::adc_r(offs_t offset)
 {
 	if (!m_adc.found())
 		return 0xff;
@@ -252,13 +253,13 @@ READ8_MEMBER(atarisy1_state::adc_r)
 	int value = m_adc->data_r();
 
 	if (!machine().side_effects_disabled())
-		adc_w(space, offset, 0);
+		adc_w(offset, 0);
 
 	return value;
 }
 
 
-WRITE8_MEMBER(atarisy1_state::adc_w)
+void atarisy1_state::adc_w(offs_t offset, uint8_t data)
 {
 	if (!m_adc.found())
 		return;
@@ -277,7 +278,7 @@ WRITE8_MEMBER(atarisy1_state::adc_w)
  *
  *************************************/
 
-READ16_MEMBER(atarisy1_state::trakball_r)
+uint16_t atarisy1_state::trakball_r(offs_t offset)
 {
 	int result = 0xff;
 
@@ -325,7 +326,7 @@ READ16_MEMBER(atarisy1_state::trakball_r)
  *
  *************************************/
 
-READ8_MEMBER(atarisy1_state::switch_6502_r)
+uint8_t atarisy1_state::switch_6502_r()
 {
 	int temp = ioport("1820")->read();
 	if (!(ioport("F60000")->read() & 0x0040)) temp ^= 0x80;
@@ -355,33 +356,21 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
  *          D5 =    LED (out)
  */
 
-WRITE8_MEMBER(atarisy1_state::via_pa_w)
+void atarisy1_state::via_pb_w(uint8_t data)
 {
-	m_tms->data_w(data);
-}
-
-
-READ8_MEMBER(atarisy1_state::via_pa_r)
-{
-	return m_tms->status_r();
-}
-
-
-WRITE8_MEMBER(atarisy1_state::via_pb_w)
-{
-	/* write strobe */
+	// write strobe
 	m_tms->wsq_w(data & 1);
 
-	/* read strobe */
+	// read strobe
 	m_tms->rsq_w((data & 2)>>1);
 
-	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
+	// bit 4 is connected to an up-counter, clocked by SYCLKB
 	data = 5 | ((data >> 3) & 2);
-	m_tms->set_unscaled_clock(ATARI_CLOCK_14MHz/2 / (16 - data));
+	m_tms->set_unscaled_clock(14.318181_MHz_XTAL/2 / (16 - data));
 }
 
 
-READ8_MEMBER(atarisy1_state::via_pb_r)
+uint8_t atarisy1_state::via_pb_r()
 {
 	return (m_tms->readyq_r() << 2) | (m_tms->intq_r() << 3);
 }
@@ -416,16 +405,16 @@ WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
 void atarisy1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x087fff).rom(); /* slapstic maps here */
+	map(0x080000, 0x087fff).rom(); // slapstic maps here
 	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::atarisy1_int3state_r));
 	map(0x400000, 0x401fff).ram();
 	map(0x800000, 0x800001).w(FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
 	map(0x820000, 0x820001).w(FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
 	map(0x840000, 0x840001).w(FUNC(atarisy1_state::atarisy1_priority_w));
-	map(0x860000, 0x860001).w(FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
-	map(0x880000, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x8a0000, 0x8a0001).w(FUNC(atarisy1_state::video_int_ack_w));
-	map(0x8c0000, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x860001, 0x860001).w(FUNC(atarisy1_state::bankselect_w));
+	map(0x880001, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x8a0001, 0x8a0001).w(FUNC(atarisy1_state::video_int_ack_w));
+	map(0x8c0001, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x900000, 0x9fffff).ram();
 	map(0xa00000, 0xa01fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
@@ -435,9 +424,9 @@ void atarisy1_state::main_map(address_map &map)
 	map(0xf20000, 0xf20007).r(FUNC(atarisy1_state::trakball_r));
 	map(0xf40000, 0xf4001f).rw(FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
 	map(0xf60000, 0xf60003).portr("F60000");
-	map(0xf80001, 0xf80001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)); /* used by roadbls2 */
-	map(0xfc0001, 0xfc0001).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
-	map(0xfe0001, 0xfe0001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
+	map(0xf80001, 0xf80001).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // used by roadbls2
+	map(0xfc0001, 0xfc0001).r(m_mainlatch, FUNC(generic_latch_8_device::read));
+	map(0xfe0001, 0xfe0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -450,13 +439,14 @@ void atarisy1_state::main_map(address_map &map)
 
 void atarisy1_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x100f).m("via6522_0", FUNC(via6522_device::map));
-	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x1810, 0x1810).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r), FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x1820, 0x1820).r(FUNC(atarisy1_state::switch_6502_r));
-	map(0x1820, 0x1827).w(m_outlatch, FUNC(ls259_device::write_d0));
-	map(0x1870, 0x187f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0000, 0x0fff).mirror(0x2000).ram();
+	map(0x1000, 0x100f).mirror(0x27f0).m(m_via, FUNC(via6522_device::map)); // SNDEXT
+	map(0x1800, 0x1801).mirror(0x278e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x1810, 0x1810).mirror(0x278f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1810, 0x1810).mirror(0x278f).w(m_mainlatch, FUNC(generic_latch_8_device::write));
+	map(0x1820, 0x1820).mirror(0x278f).r(FUNC(atarisy1_state::switch_6502_r));
+	map(0x1820, 0x1827).mirror(0x2788).w(m_outlatch, FUNC(ls259_device::write_d0));
+	map(0x1870, 0x187f).mirror(0x2780).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -469,19 +459,19 @@ void atarisy1_state::sound_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( marble )
-	PORT_START("IN0")  /* F20000 */
+	PORT_START("IN0")  // F20000
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("IN1")  /* F20002 */
+	PORT_START("IN1")  // F20002
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START("IN2")  /* F20004 */
+	PORT_START("IN2")  // F20004
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("IN3")  /* F20006 */
+	PORT_START("IN3")  // F20006
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
-	PORT_START("F60000")    /* F60000 */
+	PORT_START("F60000")    // F60000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -489,38 +479,38 @@ static INPUT_PORTS_START( marble )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")  /* 1820 (sound) */
+	PORT_START("1820")  // 1820 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( peterpak )
-	PORT_START("IN0")   /* F40000 */
+	PORT_START("IN0")   // F40000
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN1")   /* n/a */
+	PORT_START("IN1")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN2")   /* n/a */
+	PORT_START("IN2")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")   /* n/a */
+	PORT_START("IN3")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")    /* F60000 */
+	PORT_START("F60000")    // F60000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Throw/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Throw/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump")
@@ -528,54 +518,54 @@ static INPUT_PORTS_START( peterpak )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")  /* 1820 (sound) */
+	PORT_START("1820")  // 1820 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( indytemp )
-	PORT_START("IN0")   /* F40000 */
+	PORT_START("IN0")   // F40000
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN1")   /* n/a */
+	PORT_START("IN1")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN2")   /* n/a */
+	PORT_START("IN2")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")   /* n/a */
+	PORT_START("IN3")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")    /* F60000 */
+	PORT_START("F60000")    // F60000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Whip/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Whip/P2 Start")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* freeze? */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )  // freeze?
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")  /* 1820 (sound) */
+	PORT_START("1820")  // 1820 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
@@ -584,7 +574,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( indytemc )
 	PORT_INCLUDE( indytemp )
 
-	PORT_MODIFY("IN0")  /* F40000 */
+	PORT_MODIFY("IN0")  // F40000
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -594,20 +584,20 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( roadrunn )
-	PORT_START("IN0")   /* F40000 */
+	PORT_START("IN0")   // F40000
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("IN1")   /* F40002 */
+	PORT_START("IN1")   // F40002
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("IN2")   /* n/a */
+	PORT_START("IN2")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")   /* n/a */
+	PORT_START("IN3")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("F60000")    /* F60000 */
-	/* Note that "P1 Button 1' and 'P2 Start' both act as "Hop' Buttons" in game"  */
+	PORT_START("F60000")    // F60000
+	// Note that "P1 Button 1' and 'P2 Start' both act as "Hop' Buttons" in game"
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hop/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Hop/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -615,34 +605,34 @@ static INPUT_PORTS_START( roadrunn )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")  /* 1820 (sound) */
+	PORT_START("1820")  // 1820 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( roadblst )
-	PORT_START("IN0")   /* F20000 */
+	PORT_START("IN0")   // F20000
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("IN1")   /* F40000 */
+	PORT_START("IN1")   // F40000
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64)
 
-	PORT_START("IN2")   /* n/a */
+	PORT_START("IN2")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")   /* n/a */
+	PORT_START("IN3")   // n/a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")    /* F60000 */
+	PORT_START("F60000")    // F60000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Special Weapon")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Lasers")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -650,15 +640,15 @@ static INPUT_PORTS_START( roadblst )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")  /* 1820 (sound) */
+	PORT_START("1820")  // 1820 (sound)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // SNDBUF
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
@@ -697,7 +687,7 @@ GFXDECODE_END
 
 void atarisy1_state::add_adc(machine_config &config)
 {
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->eoc_callback().set(m_ajsint, FUNC(input_merger_device::in_w<1>));
 	// IN7 = J102 pin 2
 	// IN6 = J102 pin 3
@@ -714,15 +704,12 @@ void atarisy1_state::add_adc(machine_config &config)
 
 void atarisy1_state::atarisy1(machine_config &config)
 {
-	/* basic machine hardware */
-	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	// basic machine hardware
+	M68010(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map);
 
-	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
+	M6502(config, m_audiocpu, 14.318181_MHz_XTAL/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy1_state::sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
-	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -733,13 +720,13 @@ void atarisy1_state::atarisy1(machine_config &config)
 	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
 	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	TIMER(config, m_scanline_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3_callback));
-	TIMER(config, m_int3off_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3off_callback));
-	TIMER(config, m_yscroll_reset_timer).configure_generic(FUNC(atarisy1_state::atarisy1_reset_yscroll_callback));
+	TIMER(config, m_scanline_timer).configure_generic(FUNC(atarisy1_state::int3_callback));
+	TIMER(config, m_int3off_timer).configure_generic(FUNC(atarisy1_state::int3off_callback));
+	TIMER(config, m_yscroll_reset_timer).configure_generic(FUNC(atarisy1_state::reset_yscroll_callback));
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarisy1);
 
 	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 1024);
@@ -752,40 +739,41 @@ void atarisy1_state::atarisy1(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	// note: these parameters are from published specs, not derived
+	// video timing comes from an 82S163 (H) and an 82S129 (V)
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarisy1_state::screen_update_atarisy1));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
-
-	/* sound hardware */
-	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
-		.int_callback().set_inputline("maincpu", M68K_IRQ_6);
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4));
-	ymsnd.irq_handler().set(m_soundcomm, FUNC(atari_sound_comm_device::ym2151_irq_gen));
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+
+	GENERIC_LATCH_8(config, m_mainlatch);
+	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.80);
 	ymsnd.add_route(1, "rspeaker", 0.80);
 
-	pokey_device &pokey(POKEY(config, "pokey", ATARI_CLOCK_14MHz/8));
+	pokey_device &pokey(POKEY(config, "pokey", 14.318181_MHz_XTAL/8));
 	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
-	TMS5220C(config, m_tms, ATARI_CLOCK_14MHz/2/11);
+	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
 	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	/* via */
-	via6522_device &via(VIA6522(config, "via6522_0", ATARI_CLOCK_14MHz/8));
-	via.readpa_handler().set(FUNC(atarisy1_state::via_pa_r));
-	via.readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
-	via.writepa_handler().set(FUNC(atarisy1_state::via_pa_w));
-	via.writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
+	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
+	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
+	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
+	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
+	m_via->writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
 }
 
 void atarisy1_state::marble(machine_config &config)

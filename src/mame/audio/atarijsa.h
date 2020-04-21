@@ -18,7 +18,7 @@
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
-#include "machine/atarigen.h"
+#include "machine/atariscom.h"
 
 
 //**************************************************************************
@@ -78,6 +78,12 @@ public:
 	// I/O lines
 	DECLARE_WRITE_LINE_MEMBER(main_int_write_line);
 
+	// 6502 interrupt handlers
+	INTERRUPT_GEN_MEMBER(sound_irq_gen);
+	void sound_irq_ack_w(u8 data = 0);
+	u8 sound_irq_ack_r();
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,6 +91,7 @@ protected:
 
 	// internal helpers
 	virtual void update_all_volumes() = 0;
+	void update_sound_irq();
 
 	// devices
 	required_device<atari_sound_comm_device> m_soundcomm;
@@ -102,9 +109,11 @@ protected:
 	devcb_write_line   m_main_int_cb;
 
 	// internal state
+	bool                m_timed_int;
+	bool                m_ym2151_int;
 	double              m_ym2151_volume;
-	uint8_t               m_ym2151_ct1;
-	uint8_t               m_ym2151_ct2;
+	uint8_t             m_ym2151_ct1;
+	uint8_t             m_ym2151_ct2;
 };
 
 

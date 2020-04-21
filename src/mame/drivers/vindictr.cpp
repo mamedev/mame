@@ -189,7 +189,7 @@ GFXDECODE_END
 void vindictr_state::vindictr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68010(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vindictr_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(vindictr_state::scanline_update), m_screen, 0, 8);
@@ -212,7 +212,7 @@ void vindictr_state::vindictr(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vindictr_state::screen_update_vindictr));
 	m_screen->set_palette(m_palette);
 

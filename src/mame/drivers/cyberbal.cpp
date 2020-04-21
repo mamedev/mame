@@ -341,10 +341,10 @@ GFXDECODE_END
 void cyberbal_state::cyberbal_base(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::main_map);
 
-	M68000(config, m_extracpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_extracpu, 14.318181_MHz_XTAL/2);
 	m_extracpu->set_addrmap(AS_PROGRAM, &cyberbal_state::extra_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -379,7 +379,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_lscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_lscreen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_lscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_left));
 	m_lscreen->set_palette("lpalette");
 	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); /* or is it "right?" har, har! */
@@ -388,7 +388,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_rscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_rscreen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_rscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_right));
 	m_rscreen->set_palette("rpalette");
 
@@ -421,7 +421,7 @@ void cyberbal_state::cyberbalt(machine_config &config)
 void cyberbal2p_state::cyberbal2p(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal2p_state::cyberbal2p_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -446,7 +446,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL, 456*2, 0, 336*2, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(cyberbal2p_state::screen_update_cyberbal2p));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(cyberbal2p_state::video_int_write_line));

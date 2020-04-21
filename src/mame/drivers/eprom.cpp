@@ -368,17 +368,17 @@ GFXDECODE_END
 void eprom_state::eprom(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
-	M68000(config, m_extra, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_extra, 14.318181_MHz_XTAL/2);
 	m_extra->set_addrmap(AS_PROGRAM, &eprom_state::extra_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(eprom_state::scanline_update), m_screen, 0, 8);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -402,7 +402,7 @@ void eprom_state::eprom(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_eprom));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
@@ -424,7 +424,7 @@ void eprom_state::eprom(machine_config &config)
 void eprom_state::klaxp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -449,7 +449,7 @@ void eprom_state::klaxp(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_eprom));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
@@ -469,14 +469,14 @@ void eprom_state::klaxp(machine_config &config)
 void eprom_state::guts(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::guts_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(eprom_state::scanline_update), m_screen, 0, 8);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
@@ -500,7 +500,7 @@ void eprom_state::guts(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(eprom_state::screen_update_guts));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);

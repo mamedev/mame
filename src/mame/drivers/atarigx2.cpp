@@ -1485,12 +1485,12 @@ static const atari_rle_objects_config modesc_0x400 =
 void atarigx2_state::atarigx2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
+	M68EC020(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigx2_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(atarigx2_state::scanline_update), m_screen, 0, 8);
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 	m_adc->in_callback<2>().set_ioport("A2D2");
@@ -1515,7 +1515,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update_atarigx2));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
