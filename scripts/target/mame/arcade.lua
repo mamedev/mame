@@ -1041,6 +1041,8 @@ files {
 	MAME_DIR .. "src/mame/video/equites.cpp",
 	MAME_DIR .. "src/mame/drivers/meijinsn.cpp",
 	MAME_DIR .. "src/mame/drivers/shougi.cpp",
+	MAME_DIR .. "src/mame/audio/ad_sound.cpp",
+	MAME_DIR .. "src/mame/audio/ad_sound.h",
 	MAME_DIR .. "src/mame/machine/alpha8201.cpp",
 	MAME_DIR .. "src/mame/machine/alpha8201.h",
 	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
