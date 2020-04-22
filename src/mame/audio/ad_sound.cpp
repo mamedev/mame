@@ -434,7 +434,7 @@ void ad_59mc07_device::device_reset()
 
     CPU  :Z80A
     Sound:AY-3-8910A (unpopulated: another 8910 and a YM2203)
-    OSC  :6.000MHz
+    OSC  :16.000MHz
 */
 
 //**************************************************************************
@@ -484,7 +484,7 @@ ad_60mc01_device::ad_60mc01_device(const machine_config &mconfig, const char *ta
 
 void ad_60mc01_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_audiocpu, 6_MHz_XTAL / 2); // divider not verified
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // divider not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ad_60mc01_device::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &ad_60mc01_device::sound_portmap);
 
@@ -493,7 +493,7 @@ void ad_60mc01_device::device_add_mconfig(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 6_MHz_XTAL / 4)); // divider not verified
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16_MHz_XTAL / 8)); // divider not verified
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
