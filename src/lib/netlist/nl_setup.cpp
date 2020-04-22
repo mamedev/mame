@@ -893,17 +893,43 @@ void setup_t::resolve_inputs()
 	// after all other terminals were connected.
 
 	unsigned tries = m_netlist_params->m_max_link_loops();
+#if 0
+	// This code fails for some netlists when the element at position 0
+	// is deleted. It will fail somewhere deep in std::pair releasing
+	// std::string called from erase.
+	//
+	// One example is the this netlist:
+	//
+	// #include "netlist/devices/net_lib.h"
+	// NETLIST_START(charge_discharge)
+	//     SOLVER(solver, 48000) // Fixed frequency solver
+	//     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output
+	//     RES(R, RES_K(1))
+	//     CAP(C, CAP_U(1))
+	//
+	//     NET_C(I.Q, R.1)
+	//     NET_C(R.2, C.1)
+	//     NET_C(C.2, GND)
+	//
+	//     ALIAS(O, R.2) // Output O == C.1 == R.2
+	// // NETLIST_END()
+	//
+	// Just save the net list as /tmp/test1.cpp, run
+	// ./nltool --cmd=run -t 0.05 -l O -l I /tmp/test1.cpp
+	// and see it crash with this code enabled.
+	//
+	// g++-7 (Ubuntu 7.4.0-1ubuntu1~16.04~ppa1) 7.4.0
+	//
 	while (!m_links.empty() && tries >  0)
 	{
-
-		for (auto li = m_links.begin(); li != m_links.end(); )
+		auto li = m_links.begin();
+		while (li != m_links.end())
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 
-			//printf("%s %s\n", t1s.c_str(), t2s.c_str());
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
 			else
@@ -911,6 +937,23 @@ void setup_t::resolve_inputs()
 		}
 		tries--;
 	}
+#else
+	while (!m_links.empty() && tries > 0)
+	{
+		for (std::size_t i = 0; i < m_links.size(); )
+		{
+			const pstring t1s(m_links[i].first);
+			const pstring t2s(m_links[i].second);
+			detail::core_terminal_t *t1 = find_terminal(t1s);
+			detail::core_terminal_t *t2 = find_terminal(t2s);
+			if (connect(*t1, *t2))
+				m_links.erase(m_links.begin() + i);
+			else
+				i++;
+		}
+		tries--;
+	}
+#endif
 	if (tries == 0)
 	{
 		for (auto & link : m_links)
