@@ -9,7 +9,6 @@ They were the German distributor of the Colour Genie EG2000 computers.
 Known missing software titles:
 
 Break Out
-Colour-Assembler
 Colour-Monitor I
 Colour-Skat
 Colour-Text
@@ -150,6 +149,18 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="305">
 				<rom name="charset.cas" size="305" crc="80207b26" sha1="d6251291d1d8980134f13485bb2f4028b53df843" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colasm">
+		<description>Colour-Assembler</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Type SYSTEM and load with COLASM, enter / to start.&#0a;Load or type an Z80 assembler program as BASIC lines. Example:&#0a;10  ORG 4800H&#0a;20  LD  HL,4400H&#0a;30  LD  DE,4401H&#0a;40  LD  BC,3FFH&#0a;50  LD  (HL),42&#0a;60  LDIR&#0a;60  RET&#0a;70  END 4800H&#0a;Note there are two blanks after a line number. If you want to define a label, use just one blank and write e.g. '40 LABEL: LD HL,1234H'.&#0a;Finally you can use NAME /OA to output to cassette, /NS to not create the symbol table, /TM to assemble to memory." />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="6611">
+				<rom name="colasm.cas" size="6611" crc="06eecba7" sha1="1ed872352cac33b591af3923c1252a63108e7005" />
 			</dataarea>
 		</part>
 	</software>
