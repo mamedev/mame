@@ -12227,4 +12227,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="microbe">
+		<description>Microbe</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-04-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234852">
+				<rom name="microbe side a.woz" size="234852" crc="0d944e75" sha1="5a8e5a95c764d181e0410cc411b6b14be57e87a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234852">
+				<rom name="microbe side b.woz" size="234852" crc="e23a8340" sha1="1d085179f9e2905179b4eb57fbd716430da18c2c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
