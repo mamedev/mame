@@ -159,8 +159,6 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ata_interface_device> m_ata;
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void psattack_mem(address_map &map);
@@ -170,11 +168,6 @@ private:
 	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
 	DECLARE_WRITE32_MEMBER(output_w);
 };
-
-IRQ_CALLBACK_MEMBER(psattack_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 // TODO: wrong, likely PIC protected too
 READ8_MEMBER( psattack_state::cfcard_regs_r )
@@ -247,7 +240,7 @@ void psattack_state::psattack(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::psattack_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(psattack_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	// PIC16C711
 

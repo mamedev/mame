@@ -324,7 +324,7 @@ void vrender0soc_device::IntReq( int num )
 }
 
 
-int vrender0soc_device::irq_callback()
+uint8_t vrender0soc_device::irq_callback()
 {
 	for (int i = 0; i < 32; ++i)
 	{

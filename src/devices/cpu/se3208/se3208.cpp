@@ -51,14 +51,24 @@ DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_machinex_cb(*this)
+	, m_iackx_cb(*this)
 	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_cache(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
+
 device_memory_interface::space_config_vector se3208_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
+}
+
+
+void se3208_device::device_resolve_objects()
+{
+	m_machinex_cb.resolve_safe();
+	m_iackx_cb.resolve_safe(0);
 }
 
 
@@ -1428,7 +1438,9 @@ INST(SWI)
 
 INST(HALT)
 {
-//  uint32_t Imm=EXTRACT(Opcode,0,3);
+	uint32_t Imm=EXTRACT(Opcode,0,3);
+
+	m_machinex_cb(0x10 | Imm);
 
 //  DEBUGMESSAGE("HALT\t0x%x",Imm);
 }
@@ -1730,6 +1742,9 @@ void se3208_device::device_reset()
 
 void se3208_device::SE3208_NMI()
 {
+	standard_irq_callback(INPUT_LINE_NMI);
+	m_machinex_cb(0x00);
+
 	PushVal(m_PC);
 	PushVal(m_SR);
 
@@ -1743,16 +1758,18 @@ void se3208_device::SE3208_Interrupt()
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
+	standard_irq_callback(0);
+	m_machinex_cb(0x01);
+
 	PushVal(m_PC);
 	PushVal(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
-
 	if(!(TESTFLAG(FLAG_AUT)))
 		m_PC=SE3208_Read32(8);
 	else
-		m_PC=SE3208_Read32(4*standard_irq_callback(0));
+		m_PC=SE3208_Read32(4*m_iackx_cb());
 }
 
 
