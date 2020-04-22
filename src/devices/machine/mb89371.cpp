@@ -24,11 +24,29 @@ void mb89371_device::device_start()
 
 WRITE8_MEMBER(mb89371_device::write)
 {
+	switch (offset)
+	{
+	case 0: // data
+		printf("%c", data);
+		break;
+	case 1: // control (0x40 = error reset)
+	case 2: // baud (9600 = 2)
+	case 3: // mode (8251 compatible?)
+		break;
+	}
 	logerror("MB89371 unimplemented write @%X = %02X & %02X\n", offset, data, mem_mask);
 }
 
 READ8_MEMBER(mb89371_device::read)
 {
+	switch (offset)
+	{
+	case 0x00: // data
+		break;
+	case 0x01: // control
+		// bit 0 = txrdy, bit 1 = rxrdy
+		break;
+	}
 	logerror("MB89371 unimplemented read @%X & %02X\n", offset, mem_mask);
 	return 0xff;
 }
