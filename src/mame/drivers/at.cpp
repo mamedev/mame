@@ -316,7 +316,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_portb_r )
 {
-	uint8_t data = m_mb->portb_r(space, offset);
+	uint8_t data = m_mb->portb_r();
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data = (data & ~0x10) | ((machine().time().as_ticks(66291) & 1) ? 0x10 : 0);
 

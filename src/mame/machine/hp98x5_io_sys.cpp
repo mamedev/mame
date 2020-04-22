@@ -79,7 +79,7 @@ IRQ_CALLBACK_MEMBER(hp98x5_io_sys_device::irq_callback)
 	}
 }
 
-WRITE8_MEMBER(hp98x5_io_sys_device::pa_w)
+void hp98x5_io_sys_device::pa_w(uint8_t data)
 {
 	m_pa = data;
 	update_flg_sts();

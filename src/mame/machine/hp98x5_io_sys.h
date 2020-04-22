@@ -30,7 +30,7 @@ public:
 	auto dmar() { return m_dmar_handler.bind(); }
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	DECLARE_WRITE8_MEMBER(pa_w);
+	void pa_w(uint8_t data);
 
 	void set_irq(uint8_t sc , int state);
 	void set_sts(uint8_t sc , int state);

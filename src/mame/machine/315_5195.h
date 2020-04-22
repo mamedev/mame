@@ -46,10 +46,10 @@ public:
 	auto mcu_int() { return m_mcu_int_callback.bind(); }
 
 	// public interface
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( pread );
-	DECLARE_WRITE8_MEMBER( pwrite );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 pread();
+	void pwrite(u8 data);
 
 	// mapping helpers
 	void map_as_rom(u32 offset, u32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);

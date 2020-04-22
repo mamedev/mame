@@ -106,7 +106,7 @@ void cmi_music_keyboard_device::device_timer(emu_timer &timer, device_timer_id i
     CB2 = /DWS
 */
 
-WRITE8_MEMBER( cmi_music_keyboard_device::cmi10_u20_a_w )
+void cmi_music_keyboard_device::cmi10_u20_a_w(u8 data)
 {
 	// low 7 bits connected to alphanumeric display data lines
 	m_dp1->data_w(data & 0x7f);
@@ -126,7 +126,7 @@ WRITE8_MEMBER( cmi_music_keyboard_device::cmi10_u20_a_w )
 	*/
 }
 
-WRITE8_MEMBER( cmi_music_keyboard_device::cmi10_u20_b_w )
+void cmi_music_keyboard_device::cmi10_u20_b_w(u8 data)
 {
 	// connected to alphanumeric display control lines
 	u8 const addr = bitswap<2>(data, 0, 1);
@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u21_cb2_w )
 }
 
 
-READ8_MEMBER( cmi_music_keyboard_device::cmi10_u21_a_r )
+u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 {
 #if 0
 //  int thld = m_cmi10_pia_u21->ca2_output();

@@ -51,8 +51,8 @@ public:
 
 	template <unsigned N> auto in_counter_callback() { return m_cnt_cb[N].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
