@@ -128,7 +128,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	uint8_t intack_r();
 
 	DECLARE_WRITE8_MEMBER(ginten_w);
 	DECLARE_WRITE8_MEMBER(gintdis_w);
@@ -220,7 +220,7 @@ void hp80_base_state::hp80_base(machine_config &config)
 {
 	HP_CAPRICORN(config, m_cpu, CPU_CLOCK);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp80_base_state::cpu_mem_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp80_base_state::irq_callback));
+	m_cpu->intack_cb().set(FUNC(hp80_base_state::intack_r));
 	config.set_perfect_quantum(m_cpu);
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp80_base_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
@@ -356,9 +356,9 @@ static const uint8_t vector_table[] = {
 	0x00    // No IRQ
 };
 
-IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
+uint8_t hp80_base_state::intack_r()
 {
-	LOG_IRQ("IRQ ACK %u %u\n" , m_top_pending , m_top_acked);
+	LOG_IRQ("INTACK %u %u\n" , m_top_pending , m_top_acked);
 	BIT_SET(m_int_acked , m_top_pending);
 	m_top_acked = m_top_pending;
 	if (m_top_pending > IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT) {
