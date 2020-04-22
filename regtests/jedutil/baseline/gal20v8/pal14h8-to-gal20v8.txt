@@ -1,17 +1,17 @@
 Inputs:
 
-1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23
 
 Outputs:
 
-15 (Combinatorial, No output feedback, Active high)
-16 (Combinatorial, No output feedback, Active high)
-17 (Combinatorial, No output feedback, Active high)
+15 (Combinatorial, Output feedback combinatorial, Active high)
+16 (Combinatorial, Output feedback combinatorial, Active high)
+17 (Combinatorial, Output feedback combinatorial, Active high)
 18 (Combinatorial, No output feedback, Active high)
 19 (Combinatorial, No output feedback, Active high)
-20 (Combinatorial, No output feedback, Active high)
-21 (Combinatorial, No output feedback, Active high)
-22 (Combinatorial, No output feedback, Active high)
+20 (Combinatorial, Output feedback combinatorial, Active high)
+21 (Combinatorial, Output feedback combinatorial, Active high)
+22 (Combinatorial, Output feedback combinatorial, Active high)
 
 Equations:
 
