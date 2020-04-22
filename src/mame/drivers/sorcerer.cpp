@@ -562,6 +562,8 @@ void sorcerer_state::sorcerera(machine_config &config)
 	m_fdc4->drq_wr_callback().set(FUNC(sorcerer_state::intrq4_w));
 	FLOPPY_CONNECTOR(config, "fdc4:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc4:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	// internal ram
@@ -589,6 +591,8 @@ void sorcerer_state::sorcererb(machine_config &config)
 	m_fdc3->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	FLOPPY_CONNECTOR(config, "fdc3:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc3:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	config.device_remove("cartslot");
@@ -621,9 +625,17 @@ ROM_START(sorcererd)
 	ROM_LOAD("diskboot.dat", 0xbc00, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b) ) // micropolis floppy boot
 	ROM_LOAD("boot.bin",     0xbf00, 0x0100, CRC(352e36bc) SHA1(99678e3cc4f315a0cf7d52aae511e405dc314190) ) // video/disk unit floppy boot
 	ROM_LOAD("exchr-1.20d",  0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_SYSTEM_BIOS(0, "standard", "Standard")
+	ROM_SYSTEM_BIOS(0, "standard", "Standard") // To boot floppy in flop1, GO BC00
 	ROMX_LOAD("exmo1-1.1e",  0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1), ROM_BIOS(0) ) /* monitor roms */
 	ROMX_LOAD("exmo1-2.2e",  0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "sm705", "ESAG 1.3/B") // To boot floppy in flop5, press Ctrl-X
+	ROMX_LOAD("right.1e",    0xe000, 0x0800, CRC(95586fea) SHA1(9263b0c5f059b70799e0704aa18437b04487e1b0), ROM_BIOS(1) )
+	ROM_IGNORE(0x800)
+	ROMX_LOAD("left.2e",     0xe800, 0x0800, CRC(153d1628) SHA1(e9421e8eeaa5945d0e1e5135058bfe9796db8458), ROM_BIOS(1) )
+	ROM_IGNORE(0x800)
+	ROM_SYSTEM_BIOS(2, "sm658", "Standard Monitor 658 ver 1.3/C") // To boot floppy in flop5, press Ctrl-X
+	ROMX_LOAD("13c.1e",      0xe000, 0x0800, CRC(c3c56505) SHA1(6b88f9911b897825b10f8184ddf27af5d8cbdc4d), ROM_BIOS(2) )
+	ROMX_LOAD("13c.2e",      0xe800, 0x0800, CRC(e1ac92a8) SHA1(302096c500cc87f0441f000a01b5ddfa3c102662), ROM_BIOS(2) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.15b",  0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1) ) /* video prom type 6331 */
@@ -651,12 +663,9 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(4, "adsmon", "ADSMON") // This requires an unemulated 80-column card. You can type 64 to get 64-columns, but it's mostly off the side.
 	ROMX_LOAD("adsmon.1e",   0xe000, 0x0800, CRC(460f981a) SHA1(bdae1d87b9e8ae2cae11663acd349b9ed2387094), ROM_BIOS(4) )
 	ROMX_LOAD("adsmon.2e",   0xe800, 0x0800, CRC(cb3f1dda) SHA1(3fc14306e83d73b9b9afd9b543566e52ba3e008f), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS(5, "tvc", "TVI-MON-C-V1.5") // unknown disk support
+	ROM_SYSTEM_BIOS(5, "tvc", "TVI-MON-C-V1.5") // unknown disk support (BO is the floppy boot command)
 	ROMX_LOAD("tvc-1.1e",    0xe000, 0x0800, CRC(efc15a18) SHA1(3dee821270a0d83453b18baed88a024dfd0d7a6c), ROM_BIOS(5) )
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS(6, "sm658", "Standard Monitor 658 ver 1.3C")
-	ROMX_LOAD("13c.1e",      0xe000, 0x0800, CRC(c3c56505) SHA1(6b88f9911b897825b10f8184ddf27af5d8cbdc4d), ROM_BIOS(6) )
-	ROMX_LOAD("13c.2e",      0xe800, 0x0800, CRC(e1ac92a8) SHA1(302096c500cc87f0441f000a01b5ddfa3c102662), ROM_BIOS(6) )
 ROM_END
 
 ROM_START(sorcerera)
@@ -669,7 +678,7 @@ ROM_END
 ROM_START(sorcererb)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("exchr-1.20d",  0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_SYSTEM_BIOS(0, "scuamon64", "SCUAMON64")   // this bios confirmed buggy with disks
+	ROM_SYSTEM_BIOS(0, "scuamon64", "SCUAMON64")   // DI to boot floppy
 	ROMX_LOAD("scua1.1e",    0xe000, 0x0800, CRC(0fcf1de9) SHA1(db8371eabf50a9da43ec7f717279a31754351359), ROM_BIOS(0) )
 	ROM_CONTINUE(0xe000, 0x800)
 	ROMX_LOAD("scua1.2e",    0xe800, 0x0800, CRC(aa9a6ca6) SHA1(bcaa7457a1b892ed82c1a04ee21a619faa7c1a16), ROM_BIOS(0) )
@@ -679,7 +688,7 @@ ROM_START(sorcererb)
 	ROM_IGNORE(0x800)
 	ROMX_LOAD("scua1.2e",    0xe800, 0x0800, CRC(aa9a6ca6) SHA1(bcaa7457a1b892ed82c1a04ee21a619faa7c1a16), ROM_BIOS(1) )
 	ROM_IGNORE(0x800)
-	ROM_SYSTEM_BIOS(2, "scuamon64dd", "SCUAMON64DD")
+	ROM_SYSTEM_BIOS(2, "scuamon64dd", "SCUAMON64DD")   // DI to boot floppy
 	ROMX_LOAD("devinb.1e",   0xe000, 0x0800, CRC(a2ea2f93) SHA1(8f9298f1641806dfba819ead318a4838385223fe), ROM_BIOS(2) )
 	ROM_CONTINUE(0xe000, 0x800)
 	ROMX_LOAD("devinb.2e",   0xe800, 0x0800, CRC(4d9ea9a5) SHA1(1a3c8cf98d4caed6044b1b01cd79dcd9c61dc1e1), ROM_BIOS(2) )

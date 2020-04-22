@@ -62,6 +62,7 @@ public:
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
+	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
@@ -83,7 +84,6 @@ public:
 	void init_bjtwin();
 
 protected:
-	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
 	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,15 +117,13 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_sprclk;
-	int m_sprlimit;
+	emu_timer *m_dma_timer;
 	int m_tilerambank;
 	int m_sprdma_base;
 	int mask[4*2];
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
 	int m_bgbank;
-	int m_videoshift;
 	int m_bioship_background_bank;
 	tilemap_t *m_bg_tilemap[2];
 	tilemap_t *m_tx_tilemap;
@@ -175,6 +173,7 @@ protected:
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
+	DECLARE_VIDEO_START(gunnail);
 	DECLARE_VIDEO_START(bjtwin);
 	void get_colour_4bit(u32 &colour, u32 &pri_mask);
 	void get_colour_5bit(u32 &colour, u32 &pri_mask);
@@ -182,11 +181,12 @@ protected:
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src);
 	void bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
 	void tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mcu_run(u8 dsw_setting);
@@ -220,6 +220,7 @@ protected:
 	void ssmissin_map(address_map &map);
 	void ssmissin_sound_map(address_map &map);
 	void strahl_map(address_map &map);
+	void strahljbl_map(address_map &map);
 	void tdragon2_map(address_map &map);
 	void tdragon3h_map(address_map &map);
 	void tdragon_map(address_map &map);

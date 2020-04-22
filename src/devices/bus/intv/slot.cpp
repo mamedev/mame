@@ -385,7 +385,7 @@ image_init_result intv_cart_slot_device::call_load()
 		else
 		{
 			uint16_t offset[] = { 0x400, 0x2000, 0x4000, 0x4800, 0x5000, 0x6000, 0x7000, 0x8000, 0x8800, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0xf000};
-			const char* region_name[] = {"0400", "2000", "4000", "4800", "5000", "6000", "7000", "8000", "8800", "9000", "A000", "B000", "C000", "D000", "E000", "F000"};
+			const char* region_name[] = {"0400", "2000", "4000", "4800", "5000", "6000", "7000", "8000", "8800", "9000", "a000", "b000", "c000", "d000", "e000", "f000"};
 			const char *pcb_name = get_feature("slot");
 			bool extra_bank = false;
 

@@ -372,6 +372,11 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &pntnpuzl_state::mcu_map); // FIXME: this is all internal
 	mcu.ach6_cb().set_constant(0x180); // ?
 	mcu.ach7_cb().set_constant(0x180); // ?
+	mcu.hso_cb().set("mcu_eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(0);
+	mcu.hso_cb().append("mcu_eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(1);
+	mcu.hso_cb().append("mcu_eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(5);
+
+	EEPROM_93C46_16BIT(config, "mcu_eeprom").do_callback().set_inputline("mcu", i8x9x_device::HSI3_LINE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

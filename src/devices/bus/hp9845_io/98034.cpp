@@ -176,7 +176,7 @@ WRITE16_MEMBER(hp98034_io_card_device::reg_w)
 	LOG("%.06f WR R%u=%04x %s\n" , machine().time().as_double() , offset + 4 , data , machine().describe_context());
 }
 
-WRITE8_MEMBER(hp98034_io_card_device::dc_w)
+void hp98034_io_card_device::dc_w(uint8_t data)
 {
 	if (data != m_dc) {
 		LOG("%.06f DC=%02x\n" , machine().time().as_double() , data);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(hp98034_io_card_device::dc_w)
 	}
 }
 
-READ8_MEMBER(hp98034_io_card_device::dc_r)
+uint8_t hp98034_io_card_device::dc_r()
 {
 	uint8_t res;
 
@@ -281,11 +281,11 @@ READ8_MEMBER(hp98034_io_card_device::switch_r)
 	return m_sw1->read() | 0xc0;
 }
 
-IRQ_CALLBACK_MEMBER(hp98034_io_card_device::irq_callback)
+uint8_t hp98034_io_card_device::int_ack_r()
 {
 	int res = 0xff;
 
-	if (irqline == 0 && !m_ieee488->ifc_r()) {
+	if (!m_ieee488->ifc_r()) {
 		BIT_CLR(res, 1);
 	}
 
@@ -400,7 +400,7 @@ void hp98034_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &hp98034_io_card_device::np_io_map);
 	m_cpu->dc_changed().set(FUNC(hp98034_io_card_device::dc_w));
 	m_cpu->read_dc().set(FUNC(hp98034_io_card_device::dc_r));
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp98034_io_card_device::irq_callback));
+	m_cpu->int_ack().set(FUNC(hp98034_io_card_device::int_ack_r));
 
 	IEEE488_SLOT(config , "ieee_dev" , 0 , hp_ieee488_devices , nullptr);
 	IEEE488_SLOT(config , "ieee_rem" , 0 , remote488_devices , nullptr);

@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#include "emu.h" // emu_fatalerror
 #include "formats/wd177x_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 wd177x_format::wd177x_format(const format *_formats)
 {

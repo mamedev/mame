@@ -70,16 +70,16 @@ void hp98x5_io_sys_device::device_reset()
 	update_dmar();
 }
 
-IRQ_CALLBACK_MEMBER(hp98x5_io_sys_device::irq_callback)
+uint8_t hp98x5_io_sys_device::int_r()
 {
-	if (irqline == HPHYBRID_IRL) {
+	if ((m_irq_pending & 0xff00) == 0) {
 		return m_irq_pending & 0xff;
 	} else {
 		return m_irq_pending >> 8;
 	}
 }
 
-WRITE8_MEMBER(hp98x5_io_sys_device::pa_w)
+void hp98x5_io_sys_device::pa_w(uint8_t data)
 {
 	m_pa = data;
 	update_flg_sts();

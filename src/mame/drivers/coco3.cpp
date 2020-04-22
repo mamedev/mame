@@ -41,11 +41,11 @@ void coco3_state::coco3_mem(address_map &map)
 	map(0xC000, 0xDFFF).bankr("rbank6").bankw("wbank6");
 	map(0xE000, 0xFDFF).bankr("rbank7").bankw("wbank7");
 	map(0xFE00, 0xFEFF).bankr("rbank8").bankw("wbank8");
-	map(0xFF00, 0xFF1F).rw(FUNC(coco3_state::ff00_read), FUNC(coco3_state::ff00_write));
-	map(0xFF20, 0xFF3F).rw(FUNC(coco3_state::ff20_read), FUNC(coco3_state::ff20_write));
+	map(0xFF00, 0xFF1F).rw(PIA0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xFF20, 0xFF3F).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco3_state::ff20_write));
 	map(0xFF40, 0xFF5F).rw(FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
 	map(0xFF60, 0xFF8F).rw(FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
-	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::bus_r), FUNC(gime_device::bus_w));
+	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::read), FUNC(gime_device::write));
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this

@@ -41,7 +41,7 @@ namespace devices
 
 		nl_fptype gmin() const { return m_params.m_gmin(); }
 
-		void create_solver_code(std::map<pstring, pstring> &mp);
+		solver::static_compile_container create_solver_code(solver::static_compile_target target);
 
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();

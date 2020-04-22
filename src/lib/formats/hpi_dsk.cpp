@@ -45,12 +45,14 @@
 
 *********************************************************************/
 
-#include "emu.h"
 #include "hpi_dsk.h"
+
+#include "coretmpl.h" // BIT
+
 
 // Debugging
 #define VERBOSE 0
-#define LOG(...)  do { if (VERBOSE) printf(__VA_ARGS__); } while (false)
+#define LOG(...)  do { if (VERBOSE) osd_printf_info(__VA_ARGS__); } while (false)
 
 constexpr unsigned IL_OFFSET    = 0x12; // Position of interleave factor in HPI image (2 bytes, big-endian)
 constexpr unsigned DEFAULT_IL   = 7;    // Default interleaving factor
@@ -260,7 +262,7 @@ void hpi_format::write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , 
 void hpi_format::write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint8_t clock)
 {
 	for (unsigned i = 0; i < 8; i++) {
-		write_mmfm_bit(buffer , BIT(data , i) , BIT(clock , i));
+		write_mmfm_bit(buffer , util::BIT(data , i) , util::BIT(clock , i));
 	}
 }
 
@@ -281,7 +283,7 @@ void hpi_format::write_crc(std::vector<uint32_t> &buffer , uint16_t crc)
 {
 	// Note that CRC is stored with MSB (x^15) first
 	for (unsigned i = 0; i < 16; i++) {
-		write_mmfm_bit(buffer , BIT(crc , 15 - i) , 0);
+		write_mmfm_bit(buffer , util::BIT(crc , 15 - i) , 0);
 	}
 }
 
@@ -371,7 +373,7 @@ std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , 
 	uint32_t sr = 0;
 	// Look for either sync + ID AM or sync + DATA AM
 	while (pos < bitstream_size && sr != ID_CD_PATTERN && sr != DATA_CD_PATTERN) {
-		bool bit = BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+		bool bit = util::BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
 		pos++;
 		sr = (sr << 1) | bit;
 	}
@@ -396,7 +398,7 @@ std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , 
 		uint8_t byte = 0;
 		unsigned j;
 		for (j = 0; j < 8 && pos < bitstream_size; j++) {
-			bool bit = BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+			bool bit = util::BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
 			pos += 2;
 			byte >>= 1;
 			if (bit) {

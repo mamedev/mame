@@ -1333,10 +1333,10 @@ void omti8621_device::fd_moten_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppy[i].found() ? m_floppy[i]->get_device() : nullptr;
 		if (floppy != nullptr)
-			floppy->mon_w(BIT(~data, i + 4));
+			floppy->mon_w(!BIT(data, i + 4));
 
 		if (i == (data & 0x01))
-			m_fdc->set_floppy(BIT(~data, i + 4) ? floppy : nullptr);
+			m_fdc->set_floppy(BIT(data, i + 4) ? floppy : nullptr);
 	}
 }
 

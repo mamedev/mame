@@ -50,7 +50,7 @@ namespace plib
 	struct pstonum_helper;
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type>
+	struct pstonum_helper<T, typename std::enable_if<plib::is_integral<T>::value && plib::is_signed<T>::value>::type>
 	{
 		template <typename S>
 		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
@@ -61,7 +61,7 @@ namespace plib
 	};
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type>
+	struct pstonum_helper<T, typename std::enable_if<plib::is_integral<T>::value && !plib::is_signed<T>::value>::type>
 	{
 		template <typename S>
 		unsigned long long operator()(std::locale loc, const S &arg, std::size_t *idx)
@@ -83,13 +83,13 @@ namespace plib
 
 #if PUSE_FLOAT128
 	template<>
-	struct pstonum_helper<__float128>
+	struct pstonum_helper<FLOAT128>
 	{
 		// FIXME: use strtoflt128 from quadmath.h
 		template <typename S>
-		__float128 operator()(std::locale loc, const S &arg, std::size_t *idx)
+		FLOAT128 operator()(std::locale loc, const S &arg, std::size_t *idx)
 		{
-			return static_cast<__float128>(pstonum_locale<long double>(loc, arg, idx));
+			return static_cast<FLOAT128>(pstonum_locale<long double>(loc, arg, idx));
 		}
 	};
 #endif
@@ -101,9 +101,8 @@ namespace plib
 		std::size_t idx(0);
 		auto ret = pstonum_helper<T>()(loc, cstr, &idx);
 		using ret_type = decltype(ret);
-		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
-			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
-			//&& (ret == T(0) || plib::abs(ret) >= std::numeric_limits<T>::min() ))
+		if (ret >= static_cast<ret_type>(plib::numeric_limits<T>::lowest())
+			&& ret <= static_cast<ret_type>(plib::numeric_limits<T>::max()))
 		{
 			if (cstr[idx] != 0)
 				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));

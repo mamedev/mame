@@ -897,7 +897,7 @@ void it8703f_device::map_fdc_addresses()
 {
 	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
 
-	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
 }
 
 void it8703f_device::map_lpt(address_map& map)

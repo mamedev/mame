@@ -46,15 +46,15 @@ public:
 	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
-	DECLARE_READ16_MEMBER(control_read);
-	DECLARE_WRITE16_MEMBER(control_write);
+	uint16_t control_read(offs_t offset);
+	void control_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER(alpha_w);
-	DECLARE_WRITE16_MEMBER(playfield_upper_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_lsb_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_msb_w);
-	DECLARE_WRITE16_MEMBER(playfield2_latched_msb_w);
+	void alpha_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_latched_lsb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfield2_latched_msb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

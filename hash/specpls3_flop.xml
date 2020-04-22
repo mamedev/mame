@@ -375,7 +375,7 @@ license:CC0
 		<publisher>Rainbird Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
-				<rom name="3571 - fish! (europe).ipf" size="236460" crc="880592d1" sha1="7522893bfa42a8b25bf98af8b54a83568df72bd3" offset="0" />
+				<rom name="3571 - fish (europe).ipf" size="236460" crc="880592d1" sha1="7522893bfa42a8b25bf98af8b54a83568df72bd3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@ license:CC0
 		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="266892">
-				<rom name="3573 - gary lineker's hot-shot! (unknown).ipf" size="266892" crc="17963acf" sha1="22a8985076b7c1743e9431e071940c49efe217f5" offset="0" />
+				<rom name="3573 - gary lineker's hot-shot (unknown).ipf" size="266892" crc="17963acf" sha1="22a8985076b7c1743e9431e071940c49efe217f5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -894,7 +894,7 @@ license:CC0
 		<info name="games" value="Holiday in Sumaria + Call Me Psycho + Smash Out!" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
-				<rom name="3598 - pirate 3+3 - holiday in sumaria + call me psycho + smash out! (europe).ipf" size="236460" crc="95e093a6" sha1="c6bb5c0c3fd92c8d666b3493ca8fdc55a8f1d35d" offset="0" />
+				<rom name="3598 - pirate 3+3 - holiday in sumaria + call me psycho + smash out (europe).ipf" size="236460" crc="95e093a6" sha1="c6bb5c0c3fd92c8d666b3493ca8fdc55a8f1d35d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1086,7 +1086,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="12e901e">
+			<dataarea name="flop" size="126717">
 				<rom name="3530 - sim city (europe).ipf" size="126717" crc="12e901ee" sha1="7fd665f19a290994dfbf8ba02da19ac1905581be" offset="0" />
 			</dataarea>
 		</part>
@@ -1122,7 +1122,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>The Edge</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195328">
+			<dataarea name="flop" size="236460">
 				<rom name="3531 - snoopy - the cool computer game (europe).ipf" size="236460" crc="acdfe6d4" sha1="4ab0bd91d893964d957bf8c7ab3fa79d534220dc" offset="0" />
 			</dataarea>
 		</part>
@@ -2400,13 +2400,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="194816">
-				<rom name="professional adventure writer (1986)(gilsoft international)(side a)[aka paw][aka professional adventure writing system, the].dsk" size="194816" crc="fcf1e861" sha1="017a2ac8487ac8999141f6008b9e31b12c9c5197" offset="0" />
+				<rom name="professional adventure writer (1986)(gilsoft international)(side a)[aka professional adventure writing system, the].dsk" size="194816" crc="fcf1e861" sha1="017a2ac8487ac8999141f6008b9e31b12c9c5197" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="194816">
-				<rom name="professional adventure writer (1986)(gilsoft international)(side b)[aka paw][aka professional adventure writing system, the].dsk" size="194816" crc="41b52f47" sha1="1502b0027a4a3937744af410d6d773ac7c826c36" offset="0" />
+				<rom name="professional adventure writer (1986)(gilsoft international)(side b) [aka professional adventure writing system, the].dsk" size="194816" crc="41b52f47" sha1="1502b0027a4a3937744af410d6d773ac7c826c36" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3322,7 +3322,7 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Arkanoid + Nightmare Rally"/>
 			<dataarea name="flop" size="194816">
-				<rom name="40 principales vol. 3, los - arkanoid + nightmare rally (1987)(erbe)(es)(en)[aka 40 principales, los - vol. 03 - arkanoid + nightmare rally].dsk" size="194816" crc="bf661330" sha1="e209b965d3779f63185e45944b065064da40a36c" offset="0" />
+				<rom name="40 principales vol. 3, los - arkanoid + nightmare rally (1987)(erbe)(es)(en).dsk" size="194816" crc="bf661330" sha1="e209b965d3779f63185e45944b065064da40a36c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
@@ -3988,13 +3988,13 @@ license:CC0
 		<part name="flop3" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side A: Phantis + Abu Simbel Profanation + Dustin + West Bank"/>
 			<dataarea name="flop" size="214784">
-				<rom name="dinamic 5 aniversario - phantis + abu simbel profanation + dustin + west bank (1989)(dinamic)(es)(disk 2 of 4 side b)[aka pack 5 aniversario].dsk" size="214784" crc="862604dd" sha1="acfca1a0b55c23581d17cb9aafaa2064634c4715" offset="0" />
+				<rom name="dinamic 5 aniversario - phantis + abu simbel profanation + dustin + west bank(disk 2 of 4 side b).dsk" size="214784" crc="862604dd" sha1="acfca1a0b55c23581d17cb9aafaa2064634c4715" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side B: Capitan Sevilla + Rocky + Fernando Martin Basket Master + Hundra"/>
 			<dataarea name="flop" size="214784">
-				<rom name="dinamic 5 aniversario - capitan sevilla + rocky + fernando martin basket master + hundra (1989)(dinamic)(es)(disk 2 of 4 side a)[aka pack 5 aniversario].dsk" size="214784" crc="bd5513f3" sha1="179f00b1381108ec88fcdacb5119de4b9c7041ff" offset="0" />
+				<rom name="dinamic 5 aniversario - capitan sevilla + rocky + fernando martin basket master + hundra (disk 2 of 4 side a).dsk" size="214784" crc="bd5513f3" sha1="179f00b1381108ec88fcdacb5119de4b9c7041ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4019,13 +4019,13 @@ license:CC0
 		<part name="flop3" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side A: Phantis + Abu Simbel Profanation + Dustin + West Bank"/>
 			<dataarea name="flop" size="214784">
-				<rom name="dinamic 5 aniversario - phantis + abu simbel profanation + dustin + west bank (1989)(dinamic)(es)(disk 2 of 4 side b)[aka pack 5 aniversario].dsk" size="214784" crc="862604dd" sha1="acfca1a0b55c23581d17cb9aafaa2064634c4715" offset="0" />
+				<rom name="dinamic 5 aniversario - phantis + abu simbel profanation + dustin + west bank (disk 2 of 4 side b).dsk" size="214784" crc="862604dd" sha1="acfca1a0b55c23581d17cb9aafaa2064634c4715" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3">
 			<feature name="part_id" value="Disk 2, Side B: Capitan Sevilla + Rocky + Fernando Martin Basket Master + Hundra"/>
 			<dataarea name="flop" size="214784">
-				<rom name="dinamic 5 aniversario - capitan sevilla + rocky + fernando martin basket master + hundra (1989)(dinamic)(es)(disk 2 of 4 side a)[aka pack 5 aniversario].dsk" size="214784" crc="bd5513f3" sha1="179f00b1381108ec88fcdacb5119de4b9c7041ff" offset="0" />
+				<rom name="dinamic 5 aniversario - capitan sevilla + rocky + fernando martin basket master + hundra (disk 2 of 4 side a).dsk" size="214784" crc="bd5513f3" sha1="179f00b1381108ec88fcdacb5119de4b9c7041ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5180,13 +5180,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Angleball + Kikstart 2 + Knight Tyme + Stormbringer"/>
 			<dataarea name="flop" size="194816">
-				<rom name="mastertronic +3 compilation disk 4 - angleball + kikstart 2 + knight tyme + stormbringer (19xx)(mastertronic)(side a).dsk" size="194816" crc="ded9efb7" sha1="7ee82cbfc69d7f86561eba6cc1c0d705340995eb" offset="0" />
+				<rom name="mastertronic +3 compilation disk 4 - angleball + kikstart 2 + knight tyme + stormbringer (side a).dsk" size="194816" crc="ded9efb7" sha1="7ee82cbfc69d7f86561eba6cc1c0d705340995eb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Amaurote + The Curse of Sherwood + Milk Race + Speed King 2"/>
 			<dataarea name="flop" size="194816">
-				<rom name="mastertronic +3 compilation disk 4 - amaurote + the curse of sherwood + milk race + speed king 2 (19xx)(mastertronic)(side b).dsk" size="194816" crc="d5f7d3fb" sha1="862e454932feb9072a8f6dbb1f13761d3135b4d1" offset="0" />
+				<rom name="mastertronic +3 compilation disk 4 - amaurote + the curse of sherwood + milk race + speed king 2 (side b).dsk" size="194816" crc="d5f7d3fb" sha1="862e454932feb9072a8f6dbb1f13761d3135b4d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5982,13 +5982,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Missile Ground Zero + Solar Invasion"/>
 			<dataarea name="flop" size="194816">
-				<rom name="sinclair action pack - lightgun games - lightgun games - missile ground zero + solar invasion (1989)(virgin mastertronic)(side a)[lightgun].dsk" size="194816" crc="8c3be2fa" sha1="1580bfde74955b629b2c4e3cbe4ccc524fec9f80" offset="0" />
+				<rom name="sinclair action pack - lightgun games - lightgun games - missile ground zero + solar invasion (side a)[lightgun].dsk" size="194816" crc="8c3be2fa" sha1="1580bfde74955b629b2c4e3cbe4ccc524fec9f80" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Rookie + Robot Attack + Bullseye"/>
 			<dataarea name="flop" size="194816">
-				<rom name="sinclair action pack - lightgun games - lightgun games - rookie + robot attack + bullseye (1989)(virgin mastertronic)(side b)[lightgun].dsk" size="194816" crc="e706c6db" sha1="366a7b2b04a44007a3254fc0618ceb0d9df70e72" offset="0" />
+				<rom name="sinclair action pack - lightgun games - lightgun games - rookie + robot attack + bullseye (side b)[lightgun].dsk" size="194816" crc="e706c6db" sha1="366a7b2b04a44007a3254fc0618ceb0d9df70e72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6001,13 +6001,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: Missile Ground Zero + Solar Invasion"/>
 			<dataarea name="flop" size="194816">
-				<rom name="sinclair action pack - lightgun games - lightgun games - missile ground zero + solar invasion (1989)(sinclair research)[lightgun][re-release].dsk" size="194816" crc="5af8ba21" sha1="f5d45c97f2cda96fe8ed5be37d81fbd916e38e17" offset="0" />
+				<rom name="sinclair action pack - lightgun games - lightgun games - missile ground zero + solar invasion [lightgun][re-release].dsk" size="194816" crc="5af8ba21" sha1="f5d45c97f2cda96fe8ed5be37d81fbd916e38e17" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Rookie + Robot Attack + Bullseye"/>
 			<dataarea name="flop" size="194816">
-				<rom name="sinclair action pack - lightgun games - lightgun games - rookie + robot attack + bullseye (1989)(sinclair research)[lightgun][re-release].dsk" size="194816" crc="f050f2ff" sha1="e68a94ee005f2ac47238ab43a1653ab641b25c0f" offset="0" />
+				<rom name="sinclair action pack - lightgun games - lightgun games - rookie + robot attack + bullseye [lightgun][re-release].dsk" size="194816" crc="f050f2ff" sha1="e68a94ee005f2ac47238ab43a1653ab641b25c0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

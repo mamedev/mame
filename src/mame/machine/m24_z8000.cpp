@@ -42,19 +42,21 @@ const tiny_rom_entry *m24_z8000_device::device_rom_region() const
 
 void m24_z8000_device::z8000_prog(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
+	map(0x000000, 0x0fffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
 
-	map(0x40000, 0x43fff).rom().region("z8000", 0);
-	map(0x50000, 0x53fff).rom().region("z8000", 0);
-	map(0x70000, 0x73fff).rom().region("z8000", 0);
+	map(0x040000, 0x043fff).rom().region("z8000", 0);
+	map(0x050000, 0x053fff).rom().region("z8000", 0);
+	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	// TODO: segments 0x10 and higher are trapped
 }
 
 void m24_z8000_device::z8000_data(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
+	map(0x000000, 0x0fffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
 
-	map(0x40000, 0x43fff).rom().region("z8000", 0);
-	map(0x70000, 0x73fff).rom().region("z8000", 0);
+	map(0x040000, 0x043fff).rom().region("z8000", 0);
+	map(0x070000, 0x073fff).rom().region("z8000", 0);
+	// TODO: segments 0x10 and higher are trapped
 }
 
 void m24_z8000_device::z8000_io(address_map &map)
@@ -74,7 +76,8 @@ void m24_z8000_device::device_add_mconfig(machine_config &config)
 	m_z8000->set_addrmap(AS_PROGRAM, &m24_z8000_device::z8000_prog);
 	m_z8000->set_addrmap(AS_DATA, &m24_z8000_device::z8000_data);
 	m_z8000->set_addrmap(AS_IO, &m24_z8000_device::z8000_io);
-	m_z8000->set_irq_acknowledge_callback(FUNC(m24_z8000_device::int_cb));
+	m_z8000->nviack().set(FUNC(m24_z8000_device::nviack_r));
+	m_z8000->viack().set(FUNC(m24_z8000_device::viack_r));
 	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
@@ -183,15 +186,15 @@ WRITE8_MEMBER(m24_z8000_device::serctl_w)
 	m_z8000_mem = (data & 0x20) ? true : false;
 }
 
-IRQ_CALLBACK_MEMBER(m24_z8000_device::int_cb)
+uint16_t m24_z8000_device::nviack_r()
 {
-	if (!irqline)
-	{
-		m_z8000->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
-		return 0xff; // NVI, value ignored
-	}
-	else
-		return m_pic->acknowledge();
+	m_z8000->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
+	return 0xffff;
+}
+
+uint16_t m24_z8000_device::viack_r()
+{
+	return m_pic->acknowledge() << 1;
 }
 
 READ8_MEMBER(m24_z8000_device::handshake_r)

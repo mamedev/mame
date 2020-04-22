@@ -29,13 +29,13 @@ public:
 	}
 	auto subres_cb() { return m_subres_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_READ8_MEMBER(sub_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_WRITE8_MEMBER(sub_w);
+	uint8_t main_r(offs_t offset);
+	uint8_t sub_r(offs_t offset);
+	void main_w(offs_t offset, uint8_t data);
+	void sub_w(offs_t offset, uint8_t data);
 
 	// FIXME: this doesn't belong here
-	DECLARE_WRITE8_MEMBER(sound_watchdog_w);
+	void sound_watchdog_w(uint8_t data);
 
 	offs_t remap(int whichcpu, offs_t offset) { return m_offsets[whichcpu][offset>>13] | (offset & 0x1fff); }
 

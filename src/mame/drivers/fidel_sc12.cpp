@@ -276,5 +276,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

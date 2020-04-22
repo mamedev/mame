@@ -11,9 +11,12 @@
  * Correctly note exact index timing.
  */
 
-#include "emu.h" // fatalerror
 #include "dfi_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 #include <zlib.h>
+
 #define NUMBER_OF_MULTIREADS 3
 // thresholds for brickwall windowing
 //define DFI_MIN_CLOCKS 65
@@ -59,8 +62,8 @@ int dfi_format::identify(io_generic *io, uint32_t form_factor)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4)==0)
-		fatalerror("Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
+	if (memcmp(sign, "DFER", 4) == 0)
+		throw emu_fatalerror("Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 

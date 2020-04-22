@@ -142,6 +142,9 @@ void pc8477a_device::map(address_map &map)
 
 void wd37c65c_device::map(address_map &map)
 {
+	// NOTE: this map only covers registers defined by CS.
+	// LDOR and LDCR must be mapped separately, since their addresses are
+	// defined only by external decoding circuits. LDIR (optional) is also separate.
 	map(0x0, 0x0).r(FUNC(wd37c65c_device::msr_r));
 	map(0x1, 0x1).rw(FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
 }
@@ -167,7 +170,7 @@ void tc8566af_device::map(address_map &map)
 constexpr int upd765_family_device::rates[4];
 
 upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	pc_fdc_interface(mconfig, type, tag, owner, clock),
+	device_t(mconfig, type, tag, owner, clock),
 	ready_connected(true),
 	ready_polled(true),
 	select_connected(true),
@@ -433,7 +436,7 @@ uint8_t upd765_family_device::msr_r()
 		msr |= MSR_CB;
 		if(spec & SPEC_ND)
 			msr |= MSR_EXM;
-		if(internal_drq) {
+		if(drq || internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)
 				msr |= MSR_DIO;
@@ -480,7 +483,7 @@ uint8_t upd765_family_device::fifo_r()
 	case PHASE_EXEC:
 		if(machine().side_effects_disabled())
 			return fifo[0];
-		if(internal_drq)
+		if(drq || internal_drq)
 			return fifo_pop(false);
 		LOGFIFO("fifo_r in phase %d\n", main_phase);
 		break;
@@ -531,7 +534,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 		break;
 	}
 	case PHASE_EXEC:
-		if(internal_drq) {
+		if(drq || internal_drq) {
 			fifo_push(data, false);
 			return;
 		}

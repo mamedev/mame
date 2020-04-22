@@ -50,7 +50,7 @@ protected:
 
 public:
 	// allow public deletion
-	virtual ~chd_codec() = default;
+	virtual ~chd_codec();
 
 	// accessors
 	chd_file &chd() const { return m_chd; }

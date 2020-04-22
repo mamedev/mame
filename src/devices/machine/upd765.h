@@ -15,30 +15,7 @@ class floppy_image_device;
  * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the fdcs that have reset-time selection
  */
 
-/* Interface required for PC ISA wrapping */
-class pc_fdc_interface : public device_t {
-protected:
-	using device_t::device_t;
-
-public:
-	typedef delegate<uint8_t ()> byte_read_cb;
-	typedef delegate<void (uint8_t)> byte_write_cb;
-
-	/* Note that the address map must cover and handle the whole 0-7
-	 * range.  The upd765, while conforming to the rest of the
-	 * interface, is not eligible as a result.
-	 */
-
-	virtual void map(address_map &map) = 0;
-
-	virtual uint8_t dma_r() = 0;
-	virtual void dma_w(uint8_t data) = 0;
-
-	virtual void tc_w(bool val) = 0;
-	virtual uint8_t do_dir_r() = 0;
-};
-
-class upd765_family_device : public pc_fdc_interface {
+class upd765_family_device : public device_t {
 public:
 	enum class mode_t { AT, PS2, M30 };
 
@@ -48,7 +25,7 @@ public:
 	auto us_wr_callback() { return us_cb.bind(); }
 	auto idx_wr_callback() { return idx_cb.bind(); }
 
-	virtual void map(address_map &map) override = 0;
+	virtual void map(address_map &map) = 0;
 
 	uint8_t sra_r();
 	uint8_t srb_r();
@@ -63,14 +40,14 @@ public:
 	uint8_t dir_r() { return do_dir_r(); }
 	void ccr_w(uint8_t data);
 
-	virtual uint8_t do_dir_r() override;
+	uint8_t do_dir_r();
 
-	uint8_t dma_r() override;
-	void dma_w(uint8_t data) override;
+	uint8_t dma_r();
+	void dma_w(uint8_t data);
 
 	bool get_irq() const;
 	bool get_drq() const;
-	void tc_w(bool val) override;
+	void tc_w(bool val);
 	void ready_w(bool val);
 
 	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }

@@ -20,17 +20,16 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 	m_in_p0_cb(*this),
 	m_out_p1_cb(*this), m_in_p1_cb(*this),
 	m_out_p2_cb(*this), m_in_p2_cb(*this),
-	base_timer2(0), ad_done(0), hsi_mode(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0), pwm_control(0),
+	base_timer2(0), ad_done(0), hsi_mode(0), hsi_status(0), hso_command(0), ad_command(0), hso_active(0), hso_time(0), ad_result(0), pwm_control(0),
 	port1(0), port2(0),
-	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
+	ios0(0), ios1(0), ioc0(0), ioc1(0), extint(false),
+	sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0), baud_reg(0), brh(false)
 {
 	for (auto &hso : hso_info)
 	{
-		hso.active = false;
 		hso.command = 0;
 		hso.time = 0;
 	}
-	hso_cam_hold.active = false;
 	hso_cam_hold.command = 0;
 	hso_cam_hold.time = 0;
 }
@@ -58,6 +57,9 @@ void i8x9x_device::device_start()
 	cycles_scaling = 3;
 
 	state_add(I8X9X_HSI_MODE,    "HSI_MODE",    hsi_mode);
+	state_add<u8>(I8X9X_HSI_STATUS, "HSI_STATUS",
+					[this]() -> u8 { return hsi_status; },
+					[this](u8 data) { hsi_status = (data & 0x55) | (hsi_status & 0xaa); });
 	state_add(I8X9X_HSO_TIME,    "HSO_TIME",    hso_time);
 	state_add(I8X9X_HSO_COMMAND, "HSO_COMMAND", hso_command);
 	state_add(I8X9X_AD_COMMAND,  "AD_COMMAND",  ad_command).mask(0xf);
@@ -73,24 +75,21 @@ void i8x9x_device::device_start()
 	state_add<u8>(I8X9X_PORT2,   "PORT2",       [this]() -> u8 { return port2; }, [this](u8 data) { port2_w(data); }).mask(i8x9x_p2_mask());
 	state_add(I8X9X_IOC0,        "IOC0",        ioc0).mask(0xfd);
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
-	state_add(I8X9X_IOS0,        "IOS0",        ios0);
+	state_add<u8>(I8X9X_IOS0,    "IOS0",        [this]() -> u8 { return ios0; }, [this](u8 data) { ios0_w(data); });
 	state_add(I8X9X_IOS1,        "IOS1",        ios1);
 
-	for(int i = 0; i < 8; i++)
-	{
-		save_item(NAME(hso_info[i].active), i);
-		save_item(NAME(hso_info[i].command), i);
-		save_item(NAME(hso_info[i].time), i);
-	}
-	save_item(NAME(hso_cam_hold.active));
+	save_item(STRUCT_MEMBER(hso_info, command));
+	save_item(STRUCT_MEMBER(hso_info, time));
 	save_item(NAME(hso_cam_hold.command));
 	save_item(NAME(hso_cam_hold.time));
 
 	save_item(NAME(base_timer2));
 	save_item(NAME(ad_done));
 	save_item(NAME(hsi_mode));
+	save_item(NAME(hsi_status));
 	save_item(NAME(hso_command));
 	save_item(NAME(ad_command));
+	save_item(NAME(hso_active));
 	save_item(NAME(hso_time));
 	save_item(NAME(ad_result));
 	save_item(NAME(port1));
@@ -100,6 +99,7 @@ void i8x9x_device::device_start()
 	save_item(NAME(ios1));
 	save_item(NAME(ioc0));
 	save_item(NAME(ioc1));
+	save_item(NAME(extint));
 	save_item(NAME(sbuf));
 	save_item(NAME(sp_con));
 	save_item(NAME(sp_stat));
@@ -112,9 +112,7 @@ void i8x9x_device::device_start()
 void i8x9x_device::device_reset()
 {
 	mcs96_device::device_reset();
-	for (auto &hso : hso_info)
-		hso.active = false;
-	hso_cam_hold.active = false;
+	hso_active = 0;
 	hso_command = 0;
 	hso_time = 0;
 	timer2_reset(total_cycles());
@@ -138,15 +136,17 @@ void i8x9x_device::device_reset()
 void i8x9x_device::commit_hso_cam()
 {
 	for(int i=0; i<8; i++)
-		if(!hso_info[i].active) {
+		if(!BIT(hso_active, i)) {
 			//logerror("hso cam %02x %04x in slot %d (%04x)\n", hso_command, hso_time, i, PPC);
-			hso_info[i].active = true;
+			hso_active |= 1 << i;
+			if(hso_active == 0xff)
+				ios0 |= 0x40;
 			hso_info[i].command = hso_command;
 			hso_info[i].time = hso_time;
 			internal_update(total_cycles());
 			return;
 		}
-	hso_cam_hold.active = true;
+	ios0 |= 0xc0;
 	hso_cam_hold.command = hso_command;
 	hso_cam_hold.time = hso_time;
 }
@@ -241,9 +241,7 @@ void i8x9x_device::hso_command_w(u8 data)
 
 u8 i8x9x_device::hsi_status_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("read hsi status (%04x)\n", PPC);
-	return 0x00;
+	return hsi_status;
 }
 
 void i8x9x_device::sbuf_w(u8 data)
@@ -267,7 +265,7 @@ void i8x9x_device::watchdog_w(u8 data)
 u16 i8x9x_device::timer1_r()
 {
 	u16 data = timer_value(1, total_cycles());
-	if (!machine().side_effects_disabled())
+	if (0 && !machine().side_effects_disabled())
 		logerror("read timer1 %04x (%04x)\n", data, PPC);
 	return data;
 }
@@ -331,7 +329,7 @@ void i8x9x_device::port2_w(u8 data)
 u8 i8x9x_device::port2_r()
 {
 	// P2.0 and P2.5 are for output only (but can be read back despite what Intel claims?)
-	return (m_in_p2_cb() | 0x21 | ~i8x9x_p2_mask()) & (port2 | 0x1e);
+	return (m_in_p2_cb() | 0x25 | ~i8x9x_p2_mask()) & (port2 | (extint ? 0x1e : 0x1a));
 }
 
 void i8x9x_device::sp_con_w(u8 data)
@@ -360,6 +358,14 @@ void i8x9x_device::ioc0_w(u8 data)
 u8 i8x9x_device::ios0_r()
 {
 	return ios0;
+}
+
+void i8x9x_device::ios0_w(u8 data)
+{
+	u8 mask = (data ^ ios0) & 0x3f;
+	ios0 = (data & 0x3f) | (ios0 & 0xc0);
+	if (mask != 0)
+		m_hso_cb(0, data & 0x3f, mask);
 }
 
 void i8x9x_device::ioc1_w(u8 data)
@@ -414,10 +420,29 @@ void i8x9x_device::timer2_reset(u64 current_time)
 	base_timer2 = current_time;
 }
 
+void i8x9x_device::set_hsi_state(int pin, bool state)
+{
+	if(pin == 0 && !BIT(hsi_status, 1) && state) {
+		if(BIT(ioc1, 1)) {
+			pending_irq |= IRQ_HSI0;
+			check_irq();
+		}
+		if((ioc0 & 0x28) == 0x28)
+			timer2_reset(total_cycles());
+	}
+
+	if(state)
+		hsi_status |= 2 << (pin * 2);
+	else
+		hsi_status &= ~(2 << (pin * 2));
+}
+
 void i8x9x_device::trigger_cam(int id, u64 current_time)
 {
 	hso_cam_entry &cam = hso_info[id];
-	cam.active = false;
+	if(hso_active == 0xff && !BIT(ios0, 7))
+		ios0 &= 0xbf;
+	hso_active &= ~(1 << id);
 	switch(cam.command & 0x0f) {
 	case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5:
 		set_hso(1 << (cam.command & 7), BIT(cam.command, 5));
@@ -470,7 +495,7 @@ void i8x9x_device::internal_update(u64 current_time)
 	u16 current_timer2 = timer_value(2, current_time);
 
 	for(int i=0; i<8; i++)
-		if(hso_info[i].active) {
+		if(BIT(hso_active, i)) {
 			u8 cmd = hso_info[i].command;
 			u16 t = hso_info[i].time;
 			if(((cmd & 0x40) && t == current_timer2) ||
@@ -493,12 +518,15 @@ void i8x9x_device::internal_update(u64 current_time)
 
 	u64 event_time = 0;
 	for(int i=0; i<8; i++) {
-		if(!hso_info[i].active && hso_cam_hold.active) {
+		if(!BIT(hso_active, i) && BIT(ios0, 7)) {
 			hso_info[i] = hso_cam_hold;
-			hso_cam_hold.active = false;
-			logerror("%s: hso cam %02x %04x in slot %d from hold\n", tag(), hso_cam_hold.command, hso_cam_hold.time, i);
+			hso_active |= 1 << i;
+			ios0 &= 0x7f;
+			if(hso_active == 0xff)
+				ios0 |= 0x40;
+			logerror("hso cam %02x %04x in slot %d from hold\n", hso_cam_hold.command, hso_cam_hold.time, i);
 		}
-		if(hso_info[i].active) {
+		if(BIT(hso_active, i)) {
 			u64 new_time = timer_time_until(hso_info[i].command & 0x40 ? 2 : 1, current_time, hso_info[i].time);
 			if(!event_time || new_time < event_time)
 				event_time = new_time;
@@ -512,6 +540,35 @@ void i8x9x_device::internal_update(u64 current_time)
 		event_time = serial_send_timer;
 
 	recompute_bcount(event_time);
+}
+
+void i8x9x_device::execute_set_input(int linenum, int state)
+{
+	switch(linenum) {
+	case EXTINT_LINE:
+		if(!extint && state && !BIT(ioc1, 1)) {
+			pending_irq |= IRQ_EXTINT;
+			check_irq();
+		}
+		extint = state;
+		break;
+
+	case HSI0_LINE:
+		set_hsi_state(0, state);
+		break;
+
+	case HSI1_LINE:
+		set_hsi_state(1, state);
+		break;
+
+	case HSI2_LINE:
+		set_hsi_state(2, state);
+		break;
+
+	case HSI3_LINE:
+		set_hsi_state(3, state);
+		break;
+	}
 }
 
 c8095_90_device::c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

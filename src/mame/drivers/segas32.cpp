@@ -1188,9 +1188,9 @@ void segas32_state::multi32_map(address_map &map)
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
 	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x610000, 0x61007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
+	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -5383,8 +5383,8 @@ ROM_END
 */
 ROM_START( as1 )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x2( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
-	ROM_LOAD32_WORD_x2( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
+	ROM_LOAD32_WORD_x4( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
+	ROM_LOAD32_WORD_x4( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )

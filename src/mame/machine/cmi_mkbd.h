@@ -41,12 +41,12 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	DECLARE_WRITE8_MEMBER( cmi10_u20_a_w );
-	DECLARE_WRITE8_MEMBER( cmi10_u20_b_w );
+	void cmi10_u20_a_w(u8 data);
+	void cmi10_u20_b_w(u8 data);
 	DECLARE_READ_LINE_MEMBER( cmi10_u20_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
-	DECLARE_READ8_MEMBER( cmi10_u21_a_r );
+	u8 cmi10_u21_a_r();
 
 	DECLARE_WRITE_LINE_MEMBER( kbd_acia_int );
 	DECLARE_WRITE_LINE_MEMBER( cmi_acia_int );

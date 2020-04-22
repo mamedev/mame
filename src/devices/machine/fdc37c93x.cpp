@@ -536,7 +536,7 @@ void fdc37c93x_device::map_fdc_addresses()
 {
 	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
 
-	m_isa->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+	m_isa->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
 }
 
 void fdc37c93x_device::unmap_fdc_addresses()

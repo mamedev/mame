@@ -78,17 +78,11 @@ private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void ddz_mem(address_map &map);
 };
 
-IRQ_CALLBACK_MEMBER(ddz_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 void ddz_state::ddz_mem(address_map &map)
 {
@@ -130,7 +124,7 @@ void ddz_state::ddz(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::ddz_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(ddz_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);

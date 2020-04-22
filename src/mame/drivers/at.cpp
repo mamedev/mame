@@ -316,7 +316,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_portb_r )
 {
-	uint8_t data = m_mb->portb_r(space, offset);
+	uint8_t data = m_mb->portb_r();
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data = (data & ~0x10) | ((machine().time().as_ticks(66291) & 1) ? 0x10 : 0);
 
@@ -1064,6 +1064,10 @@ ROM_START( ibm5162 ) //MB p/n 62x1168 - IBM 5162, 6 Mhz, zero wait state RAM
 	ROM_LOAD( "1501814.82s123an.u72", 0x0000, 0x0020, CRC(849c9217) SHA1(2955ae1705c3b59170f1373f99b3ea5c174c4544)) /* N82S123AN 8623 // SK-U 1501814 */
 	ROM_LOAD( "59x7594.82s147an.u90", 0x0020, 0x0200, NO_DUMP) /* S N82S147AN 8629 // VCT 59X7594 */
 ROM_END
+
+
+// According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
+// the IBM PS/1 Model 2011 use a customised version of the XTA (8-bit IDE) harddisk interface
 
 ROM_START( ibmps1es )
 	ROM_REGION16_LE(0x40000, "bios", 0)
@@ -4977,6 +4981,31 @@ ROM_START( ficvipio2 )
 	ROM_LOAD( "1164g701.awd", 0x00000, 0x20000, CRC(7b762683) SHA1(84debce7239c8b1978246688ae538f7c4f519d13))
 ROM_END
 
+
+//**************************************************************************
+//  80486 Desktop
+//**************************************************************************
+
+// NCR Class 3433 - CPU: 486SX/DX 25/33, coprocessor socket provided - Chipset: NCR WPD CLEMSON 006-2001325 CQO1842 9209N
+// LSI LOGIC L1A5840 006-2000654B NAR 9212Delta WG35494 GERMANY, NCR 006-2001895 WPD FALCON E CQO 2291 9218N, 
+// WD58C65JM, VLSI 9210AV 211411 VGA8203C4570 NCR PB 006-2001329, Dallas DS1387
+// OSC: 16.000000MHz, 1.8432MHz,  65.00000MHz, 25.175/26.322, 36.000000MHz, 50.000000MHz, 14.31818MHz, 66.66600MHz
+// on board VGA: NCR 77C22 VGA-2 609-3400639 CQO1570 9210R, 8xMCM514245AJ70
+// Slots: 4xMCA, 3x32-bit external memory card, 1xSCSI host adapter - ports: PS/2 mouse, keyboard, 2xserial, parallel, floppy
+ROM_START( ncr3433 )
+    ROM_REGION32_LE( 0x20000, "bios", 0 )
+	// 0: NCR ROM BIOS Version 82.01.00 (3433, 3434, 3432, 3437)
+	ROM_SYSTEM_BIOS(0, "82.01.00", "82.01.00")
+	ROMX_LOAD( "rbios206.bin", 0x00000, 0x20000, CRC(06e77547) SHA1(41c517b284ed6335024c2b8398504cf3eb8a09e1), ROM_BIOS(0) )
+	// 1: NCR ROM BIOS Version 83.01.00 (3433, 3434, 3432, 3437)
+	ROM_SYSTEM_BIOS(1, "83.01.00", "83.01.00")
+	ROMX_LOAD( "rbios1.bin", 0x00000, 0x20000, CRC(cf793ce9) SHA1(69d531d14a86bdada8940ba2466515ebcd870d0d), ROM_BIOS(1) )
+	
+	ROM_REGION( 0x0800, "keyboard", 0 ) 
+	ROM_LOAD( "i8742_150-0008390_vers_3.1.bin", 0x000, 0x800, CRC(1bf17f29) SHA1(031ea1bb40756e3e5a1f01b01a53cc3a7c074338) )
+ROM_END
+
+
 //**************************************************************************
 //  80486 Laptop/Notebook
 //**************************************************************************
@@ -5342,6 +5371,7 @@ COMP( 199?, uniwb4407, ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sm48650usc,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
 COMP( 199?, zito4dps,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "ZIDA", "Tomato board 4DPS", MACHINE_NOT_WORKING )
 COMP( 199?, zi4dvs,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "ZIDA", "4DVS", MACHINE_NOT_WORKING )
+COMP( 199?, ncr3433,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "NCR", "Class 3433", MACHINE_NOT_WORKING )
 COMP( 199?, ts34t25,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "486-25", MACHINE_NOT_WORKING )
 COMP( 199?, bluenote,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
 COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )

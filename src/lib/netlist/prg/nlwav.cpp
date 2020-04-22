@@ -404,9 +404,9 @@ public:
 				while (m_next_time < time && m_n < m_samples)
 				{
 					pstring o;
-					for (auto e = m_buf.begin(); e != m_buf.end(); e++)
+					for (auto &e : m_buf)
 					{
-						o += pstring(",") + plib::to_string(*e); // FIXME: locale!!
+						o += pstring(",") + plib::to_string(e); // FIXME: locale!!
 					}
 					write(o.substr(1) + "\n");
 					m_n++;

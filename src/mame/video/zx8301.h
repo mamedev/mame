@@ -57,9 +57,9 @@ public:
 
 	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	void control_w(uint8_t data);
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

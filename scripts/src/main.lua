@@ -234,11 +234,6 @@ if (STANDALONE~=true) then
 		"frontend",
 	}
 end
-if (MACHINES["NETLIST"]~=null) then
-	links {
-		"netlist",
-	}
-end
 	links {
 		"optional",
 		"emu",
@@ -252,6 +247,11 @@ if #disasm_files > 0 then
 	links {
 		"dasm",
 	}
+end
+if (MACHINES["NETLIST"]~=null) then
+  links {
+    "netlist",
+  }
 end
 	links {
 		"utils",

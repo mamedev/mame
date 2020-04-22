@@ -14,10 +14,6 @@
 
 //#define NL_AUTO_DEVICES 1
 
-#ifdef NL_AUTO_DEVICES
-#include "nld_devinc.h"
-
-// FIXME: copied from nld_twoterm.h
 #ifdef RES_R
 #warning "Do not include rescap.h in a netlist environment"
 #endif
@@ -32,6 +28,9 @@
 #define IND_N(ind) ((ind) * 1e-9)
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
+
+#ifdef NL_AUTO_DEVICES
+#include "nld_devinc.h"
 
 #include "netlist/macro/nlm_cd4xxx.h"
 #include "netlist/macro/nlm_opamp.h"

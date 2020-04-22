@@ -145,7 +145,7 @@ namespace netlist
 		m_last_state = -1;
 		m_RN.reset();
 		m_RP.reset();
-		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
+		m_is_timestep = (m_RN.m_P.net().solver()->timestep_device_count() > 0);
 		m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
 				logic_family()->low_offset_V(), nlconst::zero());
 		m_RP.set_G_V_I(G_OFF,

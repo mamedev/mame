@@ -230,7 +230,7 @@ Notes:
       DIP42     - DIP42 location for M27C160 2M x8 (16 MBit) EPROM (not populated)
       CN8/CN9   - Connectors joining to network PCB
       070XZ1H   - Sharp 070XZ1H Voltage Regulator
-      SD_CARD   - Standard SD Card slot (present only on Namco ROM cart version PCB, unused on Mario Kart)
+      SD_CARD   - Standard SD Card slot (present only on Namco ROM cart version PCB, used by Mario Kart game updates, and presumably for NAND cart initial programming)
       50HONDA   - 50-pin mini Honda connector for connection of standard Sega GDROM unit for GDROM-based games only.
                    - This connector is not present on the Namco ROM cart version of this PCB
       CN1S      - Connector joining to GameCube PCB (located under the PCB)
@@ -1196,6 +1196,27 @@ ROM_START( mkartagp )
 	ROM_LOAD("317-5109-com.pic", 0x00, 0x4000, CRC(b7159fe3) SHA1(886c026ae62651bb5f700dfd6f9ebb2c415c1ae8) )
 ROM_END
 
+ROM_START( mkartagpc )
+	TRIFORCE_BIOS
+
+	ROM_REGION(0x19000000, "rom_board", 0)
+	ROM_LOAD16_BYTE( "ic1_k9f1208u0b",  0x00000000, 0x4200000, BAD_DUMP CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic2_k9f1208u0b",  0x00000001, 0x4200000, BAD_DUMP CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic35_k9f1208u0b", 0x08400000, 0x4200000, BAD_DUMP CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) ) // This dump is completely blank (0xFF)
+	ROM_LOAD16_BYTE( "ic45_k9f1208u0b", 0x08400001, 0x4200000, BAD_DUMP CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic5_k9f1208u0b",  0x10800000, 0x4200000, BAD_DUMP CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD16_BYTE( "ic6_k9f1208u0b",  0x10800001, 0x4200000, BAD_DUMP CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD( "ic9_29lv400t",     0x18c00000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) ) // block mapping flash rom
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-5109-com.pic", 0x00, 0x4000, CRC(b7159fe3) SHA1(886c026ae62651bb5f700dfd6f9ebb2c415c1ae8) )
+
+	DISK_REGION( "sdcard" )
+	// Hagiwara SYS-COM SD-card labeled "UPDATE SOFTWARE MKA1 Ver. C"
+	// BAD_DUMP note: card was dumped using Windows without write blocker and "System Volume Information" folder was automatically created, actual update data is good.
+	DISK_IMAGE( "update_software_mka1_ver_c", 0, BAD_DUMP SHA1(92efde39eb65bf788ef4d022eb97925d13af5088) )
+ROM_END
+
 /*
 
 MK21 Ver.A
@@ -1350,5 +1371,6 @@ ROM_END
 // 837-xxxxx (Sega cart games)
 /* 14343-4S1  */ GAME( 2003, fzeroaxm, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega / Amusement Vision / Nintendo", "F-Zero AX Monster Ride", MACHINE_IS_SKELETON ) // 2003/09/04
 /* 14343-4T1  */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (Japan, MKA1 Ver.A1)", MACHINE_IS_SKELETON )
+/* 14343-4T1  */ GAME( 2006, mkartagpc,mkartagp, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (Japan, MKA1 Ver.C, update)", MACHINE_IS_SKELETON )
 /* 14343-R4S0 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (Japan, MK21 Ver.A)", MACHINE_IS_SKELETON )
 /* 14343-R4S0 */ GAME( 2007, mkartag2a,mkartag2, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (Japan, MK21 Ver.A, alt dump)", MACHINE_IS_SKELETON )

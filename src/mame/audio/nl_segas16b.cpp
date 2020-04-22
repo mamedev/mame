@@ -2,9 +2,7 @@
 // copyright-holders:Couriersud
 #include "netlist/devices/net_lib.h"
 
-#ifdef NLBASE_H_
-#error Somehow nl_base.h made it into the include chain.
-#endif
+//NL_CONTAINS segas16b_audio
 
 NETLIST_START(segas16b_audio)
 	SOLVER(Solver, 48000)

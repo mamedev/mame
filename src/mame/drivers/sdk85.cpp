@@ -103,7 +103,7 @@ private:
 void sdk85_state::machine_reset()
 {
 	// Prevent spurious TRAP when system is reset
-	m_maincpu->reset();
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(sdk85_state::reset_w)

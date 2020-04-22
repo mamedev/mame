@@ -1902,7 +1902,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="barcode" value="4 988658 041148"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel wish kimi no egao ni chu! (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
+				<disk name="angel wish kimi no egao ni chu (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1924,7 +1924,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <part interface="cdrom" name="cdrom2">
 	        <feature name="part_id" value="Original Voice Drama"/>
 	        <diskarea name="cdrom">
-	            <disk name="angel wish kimi no egao ni chu! - special pack-ban (jpn) (original voice drama)" status="nodump"/>
+	            <disk name="angel wish kimi no egao ni chu - special pack-ban (jpn) (original voice drama)" status="nodump"/>
 	        </diskarea>
 	    </part>
 	</software>
@@ -13745,7 +13745,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="ガイアマスター　決戦!世紀王伝説"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
-				<disk name="gaiamaster kessen! seiki-ou densetsu (jpn)" sha1="4b63aee3574b51f3b2a32ffcec52544361ff0641"/>
+				<disk name="gaiamaster kessen seiki-ou densetsu (jpn)" sha1="4b63aee3574b51f3b2a32ffcec52544361ff0641"/>
 			</diskarea>
 		</part>
 	</software>

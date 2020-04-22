@@ -121,25 +121,23 @@ void orca_ovg_40c_device::device_start()
 	save_item(NAME(m_flip_screen));
 }
 
-WRITE8_MEMBER(orca_ovg_40c_device::videoram_w)
+void orca_ovg_40c_device::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(orca_ovg_40c_device::videoram2_w)
+void orca_ovg_40c_device::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram_2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(orca_ovg_40c_device::attributes_w)
+void orca_ovg_40c_device::attributes_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) && m_attributeram[offset] != data)
 	{
-		int i;
-
-		for (i = offset / 2; i < m_videoram.bytes(); i += 32)
+		for (int i = offset / 2; i < m_videoram.bytes(); i += 32)
 		{
 			m_bg_tilemap->mark_tile_dirty(i);
 			m_fg_tilemap->mark_tile_dirty(i);
@@ -149,7 +147,7 @@ WRITE8_MEMBER(orca_ovg_40c_device::attributes_w)
 	m_attributeram[offset] = data;
 }
 
-WRITE8_MEMBER(orca_ovg_40c_device::flipscreen_w)
+void orca_ovg_40c_device::flipscreen_w(uint8_t data)
 {
 	m_flip_screen = ~data & 1;
 

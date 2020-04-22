@@ -33,8 +33,8 @@ public:
 	auto floating_bus_rd_callback() { return m_read_floating_bus.bind(); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( bus_r ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( bus_w ) { write(offset, data); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
@@ -184,12 +184,10 @@ protected:
 	static const device_timer_id TIMER_FSYNC_ON = 4;
 
 	// read/write
-	uint8_t read(offs_t offset);
 	uint8_t read_gime_register(offs_t offset);
 	uint8_t read_mmu_register(offs_t offset);
 	uint8_t read_palette_register(offs_t offset);
 	uint8_t read_floating_bus(void);
-	void write(offs_t offset, uint8_t data);
 	void write_gime_register(offs_t offset, uint8_t data);
 	void write_mmu_register(offs_t offset, uint8_t data);
 	void write_palette_register(offs_t offset, uint8_t data);

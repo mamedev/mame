@@ -166,7 +166,7 @@ Questions / Notes
 
 Sound notes for games with a Z80:
 
-mustangb and tdragonb use the Seibu Raiden sound hardware and a modified
+mustangb, strahljb and tdragonb use the Seibu Raiden sound hardware and a modified
 Z80 program (but the music is intact and recognizable).  See audio/seibu.cpp
 for more info on this.
 
@@ -383,7 +383,7 @@ void nmk16_state::scroll_w(offs_t offset, u8 data)
 
 			}
 		}
-		m_bg_tilemap[Layer]->set_scrollx(0,((m_scroll[Layer][0] << 8) | m_scroll[Layer][1]) - m_videoshift);
+		m_bg_tilemap[Layer]->set_scrollx(0,(m_scroll[Layer][0] << 8) | m_scroll[Layer][1]);
 	}
 }
 
@@ -1101,6 +1101,24 @@ void nmk16_state::strahl_map(address_map &map)
 	map(0x80015, 0x80015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x80016, 0x80017).w(FUNC(nmk16_state::nmk004_x0016_w));
 	map(0x8001f, 0x8001f).w(m_nmk004, FUNC(nmk004_device::write));
+	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
+	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x94000, 0x97fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
+	map(0x9c000, 0x9c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0xf0000, 0xfffff).ram().share("mainram");
+}
+
+void nmk16_state::strahljbl_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x80000, 0x80001).portr("IN0");
+	map(0x80002, 0x80003).portr("IN1");
+	map(0x80008, 0x80009).portr("DSW1");
+	map(0x8000a, 0x8000b).portr("DSW2");
+	map(0x80015, 0x80015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x8001e, 0x8001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -2085,6 +2103,13 @@ static INPUT_PORTS_START( strahl )
 	PORT_DIPSETTING(    0x20, "300k and every 300k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( strahljbl )
+	PORT_INCLUDE(strahl)
+
+	PORT_START("COIN")  // referenced by Seibu sound board
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( acrobatm )
@@ -4087,19 +4112,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	const int NUM_SCANLINES = 256;
 	const int IRQ1_SCANLINE = 25; // guess
 	const int VBIN_SCANLINE = 0;
-	const int VBOUT_sCANLINE = 240;
-	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
+	const int VBOUT_SCANLINE = 240;
 
 	int scanline = param;
 
-	if (scanline == VBOUT_sCANLINE) // vblank-out irq
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	if (scanline == SPRDMA_SCANLINE)
+	if (scanline == VBOUT_SCANLINE) // vblank-out irq
 	{
-		// 2 buffers confirmed on PCB
-		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
-		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_dma_timer->adjust(attotime::from_usec(256)); // 256 USEC after VBOUT
 	}
 
 	/* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
@@ -4114,6 +4134,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	/* 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time) */
 	if (scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
 		m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(nmk16_state::dma_callback)
+{
+	// 2 buffers confirmed on PCB, 1 on sabotenb
+	memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+	memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+	//m_maincpu->spin_until_time(attotime::from_usec(694)); // stop cpu during DMA?
 }
 
 void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
@@ -4560,6 +4588,40 @@ void nmk16_state::strahl(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
+void nmk16_state::strahljbl(machine_config &config)
+{
+	M68000(config, m_maincpu, 12_MHz_XTAL); 
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::strahljbl_map);
+	set_hacky_interrupt_timing(config);
+
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // XTAL confirmed, divisor not
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+
+	set_hacky_screen_lowres(config);
+	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
+	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+
+	SPEAKER(config, "mono").front_center();
+
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 12_MHz_XTAL / 4)); // XTAL confirmed, divisor not
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // XTAL confirmed, divisor not
+
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
 void nmk16_state::hachamf(machine_config &config)
 {
 	/* basic machine hardware */
@@ -4791,7 +4853,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); /* Z0840006PSC 4 MHz  */
+	Z80(config, m_audiocpu, 4000000); /* Z0840006PSC 4? MHz  */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -4915,12 +4977,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 	int scanline = param;
 
 	if (scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	if (scanline == 248)
 	{
 		// only a single buffer
 		memcpy(m_spriteram_old2.get(), m_mainram + m_sprdma_base / 2, 0x1000);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	/* This is either vblank-in or sprite dma irq complete */
@@ -6429,6 +6489,36 @@ ROM_START( strahlja )
 	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
 	ROM_CONTINUE(             0x20000, 0x20000 )    /* banked */
+ROM_END
+
+ROM_START( strahljbl ) // N0 892 PCB, this bootleg uses SEIBU sound system
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a7.u3", 0x00000, 0x20000, CRC(3ddca4f7) SHA1(83ab6278fced912759c20eba6254bc544dc1ffdf) )
+	ROM_LOAD16_BYTE( "a8.u2", 0x00001, 0x20000, CRC(890f74d0) SHA1(50c4781642cb95c82d1a4d2e8e8d0be2baea29a7) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 ) // same as original
+	ROM_LOAD( "cha.38",  0x000000, 0x10000, CRC(2273b33e) SHA1(fa53e91b80dfea3f8b2c1f0ce66e5c6920c4960f) ) // Characters
+
+	ROM_REGION( 0x40000, "bgtile", 0 ) // same as original
+	ROM_LOAD( "6.2m", 0x000000, 0x40000, CRC(5769e3e1) SHA1(7d7a16b11027d0a7618df1ec1e3484224b772e90) ) // Tiles
+
+	ROM_REGION( 0x180000, "sprites", 0 ) // same as original, just a bigger ROM
+	ROM_LOAD( "d.8m",  0x000000, 0x100000, CRC(09ede4d4) SHA1(5c5dcc57f78145b9c6e711a32afc0aab7a5a0450) )
+	ROM_LOAD( "5.4m",  0x100000, 0x080000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) // same as original
+	ROM_LOAD( "4.4m", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) // Tiles
+
+	ROM_REGION(0x20000, "audiocpu", 0 )
+	ROM_LOAD( "a6.u417",    0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                       0x010000, 0x08000 )
+	ROM_COPY( "audiocpu",     0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "a5.u304",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+
+	ROM_REGION( 0x800, "p_rom", 0 ) // not used by the emulation
+	ROM_LOAD( "129.u28", 0x0000, 0x800, CRC(034f68ca) SHA1(377d0951f96d81d389aa96e2f7912a89a136d357) )
 ROM_END
 
 ROM_START( hachamf )
@@ -8514,6 +8604,7 @@ GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_stat
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg)", 0 )
+GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
 GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", MACHINE_NO_COCKTAIL )

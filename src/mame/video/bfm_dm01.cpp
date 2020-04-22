@@ -134,14 +134,14 @@ int bfm_dm01_device::read_data(void)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_dm01_device::control_r )
+uint8_t bfm_dm01_device::control_r()
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_dm01_device::control_w )
+void bfm_dm01_device::control_w(uint8_t data)
 {
 	int changed = m_control ^ data;
 
@@ -168,14 +168,14 @@ WRITE8_MEMBER( bfm_dm01_device::control_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_dm01_device::mux_r )
+uint8_t bfm_dm01_device::mux_r()
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_dm01_device::mux_w )
+void bfm_dm01_device::mux_w(uint8_t data)
 {
 	g_profiler.start(PROFILER_USER2);
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( bfm_dm01_device::mux_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_dm01_device::comm_r )
+uint8_t bfm_dm01_device::comm_r()
 {
 	int result = 0;
 
@@ -245,19 +245,19 @@ READ8_MEMBER( bfm_dm01_device::comm_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_dm01_device::comm_w )
+void bfm_dm01_device::comm_w(uint8_t data)
 {
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_dm01_device::unknown_r )
+uint8_t bfm_dm01_device::unknown_r()
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_dm01_device::unknown_w )
+void bfm_dm01_device::unknown_w(uint8_t data)
 {
 	m_matrixcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
 }

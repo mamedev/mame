@@ -66,7 +66,7 @@ offs_t upd78k1_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if ((op2 & 0xf8) == 0x68)
 	{
-		util::stream_format(stream, "%-8sA,", s_alu_ops[op2 & 0x07]);
+		util::stream_format(stream, "%-8s", s_alu_ops[op2 & 0x07]);
 		format_sfr(stream, opcodes.r8(pc + 2));
 		stream << ",";
 		format_imm8(stream, opcodes.r8(pc + 3));

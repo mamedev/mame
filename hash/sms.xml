@@ -1133,7 +1133,7 @@ license:CC0
 		<info name="serial" value="028.600"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up! (brazil).bin" size="524288" crc="b3768a7a" sha1="e1f8da3897f0756c8764ece6605f940ce79e81ca" offset="000000" />
+				<rom name="bonkers wax up (brazil).bin" size="524288" crc="b3768a7a" sha1="e1f8da3897f0756c8764ece6605f940ce79e81ca" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1265,7 +1265,7 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="32768">
-				<rom name="c_so! [msx] (kr).bin" size="32768" crc="0918fba0" sha1="e7fefabd7a920fd71e87509d065080855b5b233c" offset="000000" />
+				<rom name="c_so [msx] (kr).bin" size="32768" crc="0918fba0" sha1="e7fefabd7a920fd71e87509d065080855b5b233c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3075,7 +3075,7 @@ license:CC0
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="great golf (ue) (v1.0) [!].bin" size="131072" crc="c6611c84" sha1="eab0eed872dd26b13bcf0b2dd74fcbbc078812c9" offset="000000" />
+				<rom name="great golf (ue) (v1.0).bin" size="131072" crc="c6611c84" sha1="eab0eed872dd26b13bcf0b2dd74fcbbc078812c9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3305,7 +3305,7 @@ license:CC0
 		<info name="alt_title" value="ハイスクール!奇面組" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="high school! kimengumi (japan).bin" size="131072" crc="9eb1aa4f" sha1="d3c0aeeacccef77c45ab4219c7d6d8ed04d467cb" offset="000000" />
+				<rom name="high school kimengumi (japan).bin" size="131072" crc="9eb1aa4f" sha1="d3c0aeeacccef77c45ab4219c7d6d8ed04d467cb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5027,7 +5027,7 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="phantasy star (j) (from saturn collection cd) [!].bin" size="524288" crc="07301f83" sha1="b3ae447dc739256616b44cbd77cb903c9f19e980" offset="000000" />
+				<rom name="phantasy star (j) (from saturn collection cd).bin" size="524288" crc="07301f83" sha1="b3ae447dc739256616b44cbd77cb903c9f19e980" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="8192">
 			</dataarea>
@@ -6351,7 +6351,7 @@ license:CC0
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="spy vs. spy (u) (display-unit cart) [!].bin" size="262144" crc="b87e1b2b" sha1="03eec0d33d7c3b376fe08ffec79f84091f58366b" offset="000000" />
+				<rom name="spy vs. spy (u) (display-unit cart).bin" size="262144" crc="b87e1b2b" sha1="03eec0d33d7c3b376fe08ffec79f84091f58366b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

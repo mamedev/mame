@@ -2259,6 +2259,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[0]->set_tile_callback(FUNC(dec8_state::oscar_tile_cb));
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
 
@@ -3461,77 +3462,77 @@ ROM_END
 
 ROM_START( srdarwin )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "dy00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "dy_00.b16",   0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 0160: B4 6B 0D : cjne  a,#$6B,$0170   (ID code 0x6b = World version)
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
+	ROM_LOAD( "dy-e.d11", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
+	ROM_LOAD( "dy_05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dy07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
-	ROM_LOAD( "dy06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
-	ROM_LOAD( "dy09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
-	ROM_LOAD( "dy08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
-	ROM_LOAD( "dy11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
-	ROM_LOAD( "dy10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
+	ROM_LOAD( "dy_07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
+	ROM_LOAD( "dy_06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
+	ROM_LOAD( "dy_09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
+	ROM_LOAD( "dy_08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
+	ROM_LOAD( "dy_11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
+	ROM_LOAD( "dy_10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dy03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
-	ROM_CONTINUE(         0x20000, 0x4000 )
-	ROM_CONTINUE(         0x30000, 0x4000 )
-	ROM_LOAD( "dy02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
-	ROM_CONTINUE(         0x18000, 0x4000 )
-	ROM_CONTINUE(         0x28000, 0x4000 )
-	ROM_CONTINUE(         0x38000, 0x4000 )
+	ROM_LOAD( "dy_03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_CONTINUE(          0x20000, 0x4000 )
+	ROM_CONTINUE(          0x30000, 0x4000 )
+	ROM_LOAD( "dy_02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(          0x18000, 0x4000 )
+	ROM_CONTINUE(          0x28000, 0x4000 )
+	ROM_CONTINUE(          0x38000, 0x4000 )
 
 	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
 ROM_END
 
 ROM_START( srdarwinj )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy_01.rom", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
+	ROM_LOAD( "dy_01.b14", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
-	ROM_LOAD( "dy00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
+	ROM_LOAD( "dy.d11", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
+	ROM_LOAD( "dy_05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dy07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
-	ROM_LOAD( "dy06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
-	ROM_LOAD( "dy09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
-	ROM_LOAD( "dy08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
-	ROM_LOAD( "dy11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
-	ROM_LOAD( "dy10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
+	ROM_LOAD( "dy_07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
+	ROM_LOAD( "dy_06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
+	ROM_LOAD( "dy_09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
+	ROM_LOAD( "dy_08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
+	ROM_LOAD( "dy_11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
+	ROM_LOAD( "dy_10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dy03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
-	ROM_CONTINUE(         0x20000, 0x4000 )
-	ROM_CONTINUE(         0x30000, 0x4000 )
-	ROM_LOAD( "dy02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
-	ROM_CONTINUE(         0x18000, 0x4000 )
-	ROM_CONTINUE(         0x28000, 0x4000 )
-	ROM_CONTINUE(         0x38000, 0x4000 )
+	ROM_LOAD( "dy_03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_CONTINUE(          0x20000, 0x4000 )
+	ROM_CONTINUE(          0x30000, 0x4000 )
+	ROM_LOAD( "dy_02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(          0x18000, 0x4000 )
+	ROM_CONTINUE(          0x28000, 0x4000 )
+	ROM_CONTINUE(          0x38000, 0x4000 )
 
 	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
 ROM_END
 
 ROM_START( cobracom )

@@ -84,7 +84,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="24370">
-				<rom name="toshiba home computer hx-10 sample program (19xx)(toshiba)(jp)(en)[!].cas" size="24370" crc="686a6db6" sha1="1d90e7cfa05db433203f181d0fb3b6ab1a04889f"/>
+				<rom name="toshiba home computer hx-10 sample program (19xx)(toshiba)(jp)(en).cas" size="24370" crc="686a6db6" sha1="1d90e7cfa05db433203f181d0fb3b6ab1a04889f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +332,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="164708">
-				<rom name="aaargh! (1989)(dro soft)(es)[run'cas-'].cas" size="164708" crc="1cdc6750" sha1="a04b93d5a2be443e03c2d9fa53e993410f866e6d"/>
+				<rom name="aaargh (1989)(dro soft)(es)[run'cas-'].cas" size="164708" crc="1cdc6750" sha1="a04b93d5a2be443e03c2d9fa53e993410f866e6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="164708">
-				<rom name="aaargh! (1989)(dro soft)(es)[a][run'cas-'].cas" size="164708" crc="8d5e7952" sha1="b8f8b206463b63522b85b3a9b1f795badf70c0e2"/>
+				<rom name="aaargh (1989)(dro soft)(es)[a][run'cas-'].cas" size="164708" crc="8d5e7952" sha1="b8f8b206463b63522b85b3a9b1f795badf70c0e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -641,7 +641,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="60431">
-				<rom name="ale hop! (1988)(topo soft)(es)[run'cas-'].cas" size="60431" crc="accb059b" sha1="44c869318655cb2ede4565f37a20d64360003bcf"/>
+				<rom name="ale hop (1988)(topo soft)(es)[run'cas-'].cas" size="60431" crc="accb059b" sha1="44c869318655cb2ede4565f37a20d64360003bcf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1846,7 +1846,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="10287">
-				<rom name="bop! (1986)(bug-byte software)(gb)[run'cas-'].cas" size="10287" crc="c5463d0c" sha1="0edea07a714b12606266656793728b5704cc210e"/>
+				<rom name="bop (1986)(bug-byte software)(gb)[run'cas-'].cas" size="10287" crc="c5463d0c" sha1="0edea07a714b12606266656793728b5704cc210e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1989,7 +1989,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="64019">
-				<rom name="break out! (1985)(toshiba-emi)(jp)[needs 64k in slot 2][run'cas-'].cas" size="64019" crc="89517540" sha1="7f5a140d241329f5184635f5567715e0a9f7860b"/>
+				<rom name="break out (1985)(toshiba-emi)(jp)[needs 64k in slot 2][run'cas-'].cas" size="64019" crc="89517540" sha1="7f5a140d241329f5184635f5567715e0a9f7860b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2002,7 +2002,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63987">
-				<rom name="break out! (1985)(toshiba-emi)(jp)[a][needs 64k in slot 2][run'cas-'].cas" size="63987" crc="994eb452" sha1="84d22f3c7066f9dea1947ad5fc73745c3d7b95f3"/>
+				<rom name="break out (1985)(toshiba-emi)(jp)[a][needs 64k in slot 2][run'cas-'].cas" size="63987" crc="994eb452" sha1="84d22f3c7066f9dea1947ad5fc73745c3d7b95f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2015,7 +2015,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63987">
-				<rom name="break out! (1985)(toshiba-emi)(jp)[a2][needs 64k in slot 2][run'cas-'].cas" size="63987" crc="0f2f5296" sha1="e345fa1186c2288dc28d7a02d365461f0cfd67e6"/>
+				<rom name="break out (1985)(toshiba-emi)(jp)[a2][needs 64k in slot 2][run'cas-'].cas" size="63987" crc="0f2f5296" sha1="e345fa1186c2288dc28d7a02d365461f0cfd67e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2256,7 +2256,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="27901">
-				<rom name="buzz off! (1984)(electric software)(gb)[run'cas-'].cas" size="27901" crc="2c76939c" sha1="04d75481ce4360bb4be1111ba63ea38e6239d223"/>
+				<rom name="buzz off (1984)(electric software)(gb)[run'cas-'].cas" size="27901" crc="2c76939c" sha1="04d75481ce4360bb4be1111ba63ea38e6239d223"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2269,7 +2269,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="27877">
-				<rom name="buzz off! (1984)(electric software)(gb)[a][run'cas-'].cas" size="27877" crc="81ab541b" sha1="382cb0d06b547773c8f1fd3c4f2a1c98ae50e205"/>
+				<rom name="buzz off (1984)(electric software)(gb)[a][run'cas-'].cas" size="27877" crc="81ab541b" sha1="382cb0d06b547773c8f1fd3c4f2a1c98ae50e205"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2282,7 +2282,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="27589">
-				<rom name="buzz off! (1984)(electric software)(gb)[bload'cas-',r].cas" size="27589" crc="7444cf48" sha1="3d726714ca3bebcb16d32148fefe5f05e1a6f675"/>
+				<rom name="buzz off (1984)(electric software)(gb)[bload'cas-',r].cas" size="27589" crc="7444cf48" sha1="3d726714ca3bebcb16d32148fefe5f05e1a6f675"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2624,7 +2624,7 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="28711">
-				<rom name="checkmate! first moves in chess (1985)(toshiba-emi)(jp)[needs 64k in slot 2][run'cas-'].cas" size="28711" crc="11b75f83" sha1="0bce6c2647cb8a3991df89d7fe5e5959dcaa1006"/>
+				<rom name="checkmate first moves in chess (1985)(toshiba-emi)(jp)[needs 64k in slot 2][run'cas-'].cas" size="28711" crc="11b75f83" sha1="0bce6c2647cb8a3991df89d7fe5e5959dcaa1006"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2637,7 +2637,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="28703">
-				<rom name="checkmate! first moves in chess (1985)(toshiba-emi)(jp)[a][needs 64k in slot 2][run'cas-'].cas" size="28703" crc="8b2ff75a" sha1="27519d27f7390ca84f364a9e306107a85aad89ca"/>
+				<rom name="checkmate first moves in chess (1985)(toshiba-emi)(jp)[a][needs 64k in slot 2][run'cas-'].cas" size="28703" crc="8b2ff75a" sha1="27519d27f7390ca84f364a9e306107a85aad89ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2650,7 +2650,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="28527">
-				<rom name="checkmate! first moves in chess (1985)(toshiba-emi)(jp)[a2][needs 64k in slot 2][run'cas-'].cas" size="28527" crc="bf2678d3" sha1="a513a5f44b837d70b4e3de65cd770ab67221b628"/>
+				<rom name="checkmate first moves in chess (1985)(toshiba-emi)(jp)[a2][needs 64k in slot 2][run'cas-'].cas" size="28527" crc="bf2678d3" sha1="a513a5f44b837d70b4e3de65cd770ab67221b628"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6044,13 +6044,13 @@ license:CC0
 		<part name="cass1" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="42554">
-				<rom name="gunsmoke (1987)(go!)(side a)[aka desperado][run'cas-'].cas" size="42554" crc="aab5ec8e" sha1="af17a78d71c808dae8e62b6c966c06a505f34462"/>
+				<rom name="gunsmoke (1987)(go)(side a)[aka desperado][run'cas-'].cas" size="42554" crc="aab5ec8e" sha1="af17a78d71c808dae8e62b6c966c06a505f34462"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="120735">
-				<rom name="gunsmoke (1987)(go!)(side b)[aka desperado][run'cas-'].cas" size="120735" crc="bbf880c6" sha1="ef295704a821ee76e33774108148ce79621e8c1a"/>
+				<rom name="gunsmoke (1987)(go)(side b)[aka desperado][run'cas-'].cas" size="120735" crc="bbf880c6" sha1="ef295704a821ee76e33774108148ce79621e8c1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10069,7 +10069,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="14102">
-				<rom name="oh mummy!! (1984)(longman software)[bload'cas-',r].cas" size="14102" crc="6c4668ca" sha1="2614b8beed07b4ed9f3755c317d70989aacb4c4b"/>
+				<rom name="oh mummy (1984)(longman software)[bload'cas-',r].cas" size="14102" crc="6c4668ca" sha1="2614b8beed07b4ed9f3755c317d70989aacb4c4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10082,7 +10082,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="32195">
-				<rom name="oh shit! (1986)(aackosoft)(nl)[run'cas-'].cas" size="32195" crc="7a5a1a72" sha1="fa696ce173087af24adebde834c8d959c94cc6c7"/>
+				<rom name="oh shit (1986)(aackosoft)(nl)[run'cas-'].cas" size="32195" crc="7a5a1a72" sha1="fa696ce173087af24adebde834c8d959c94cc6c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10095,7 +10095,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="32784">
-				<rom name="oh shit! (1986)(aackosoft)(nl)[a][run'cas-'].cas" size="32784" crc="5fc9b6a2" sha1="7db51c6c9792b472cb41521233f105aa6c89c48e"/>
+				<rom name="oh shit (1986)(aackosoft)(nl)[a][run'cas-'].cas" size="32784" crc="5fc9b6a2" sha1="7db51c6c9792b472cb41521233f105aa6c89c48e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10121,7 +10121,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="33151">
-				<rom name="ole! (1986)(bug-byte software)(gb)[bload'cas-',r][martos].cas" size="33151" crc="273bb568" sha1="e09d422f805e74606079317e62889bf1ae72fbe8"/>
+				<rom name="ole (1986)(bug-byte software)(gb)[bload'cas-',r][martos].cas" size="33151" crc="273bb568" sha1="e09d422f805e74606079317e62889bf1ae72fbe8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14110,7 +14110,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="39742">
-				<rom name="trantor - the last stormtrooper (1987)(go!)[run'cas-'].cas" size="39742" crc="2cea057a" sha1="a9ee3a57f3fe1eac1b4e7a69701707a8847bbee6"/>
+				<rom name="trantor - the last stormtrooper (1987)(go)[run'cas-'].cas" size="39742" crc="2cea057a" sha1="a9ee3a57f3fe1eac1b4e7a69701707a8847bbee6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14123,7 +14123,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="39694">
-				<rom name="trantor - the last stormtrooper (1987)(go!)[a][run'cas-'].cas" size="39694" crc="a594e5a1" sha1="af8910259cfcc75c2da65e78892c8748837ac08c"/>
+				<rom name="trantor - the last stormtrooper (1987)(go)[a][run'cas-'].cas" size="39694" crc="a594e5a1" sha1="af8910259cfcc75c2da65e78892c8748837ac08c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14136,7 +14136,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="39694">
-				<rom name="trantor - the last stormtrooper (1987)(go!)[a2][run'cas-'].cas" size="39694" crc="b08cd00b" sha1="55362fb2514a99a076ffefd4f6c9465e554f68bb"/>
+				<rom name="trantor - the last stormtrooper (1987)(go)[a2][run'cas-'].cas" size="39694" crc="b08cd00b" sha1="55362fb2514a99a076ffefd4f6c9465e554f68bb"/>
 			</dataarea>
 		</part>
 	</software>

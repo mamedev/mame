@@ -36,6 +36,32 @@ Micro Surgeon (Imagic)
 FaceMaker (Spinnaker)
 KinderComp (Spinnaker)
 *Fraction Fever (Spinnaker)
+
+
+Information about Lotus 1-2-3
+
+Lotus123 comes with 2 cartridges and 3 floppy disks. None of the disks are bootable, so a pcdos boot disk has been
+included. Since the computer only has one floppy, you need to use Mame's File Manager to switch disks as needed.
+Please note that most actions take quite a while to happen.
+
+Start the emulation with >mame64 ibmpcjr lotus123
+Wait for the floppy to boot, and answer the questions about date and time. The carts add 3 new internal commands:
+* TUTOR - to use the tutorial, select the Tutorial disk, then type in TUTOR. After a while it will start up.
+* 123 - this is the direct way to use the Lotus 1-2-3 spreadsheet program. To quit, press /QY .
+* LOTUS - this starts a menu where you can select various utilities.
+
+The lotus utilities:
+1-2-3 - you need to select the Help and Utility disk, then choose this option.
+File-Manager - select whatever disk you want to manage, then choose this option.
+PrintGraph - this option doesn't work because the menu thinks that there's not enough memory.
+Translate - this option doesn't work because the menu thinks that there's not enough memory.
+Exit - back to DOS.
+
+Printgraph and Translate can be run from DOS.
+- To run PrintGraph, select the Printgraph disk, then type GRAPH.
+- To run Translate (a file conversion program), insert the Help and Utility disk, then type TRANSLAT.
+
+
 -->
 
 	<software name="basic">
@@ -107,8 +133,7 @@ KinderComp (Spinnaker)
 		<description>Lotus 123jr</description>
 		<year>1984</year>
 		<publisher>Lotus Development</publisher>
-		<info name="usage" value="Mount both carts and a DOS floppy and type 'TUTOR'" />
-		<sharedfeat name="requirement" value="ibmpcjr_flop:pcdos21"/>
+		<info name="usage" value="Wait for the floppy to boot and type '123'" />
 		<part name="cart1" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223"/>
@@ -117,6 +142,30 @@ KinderComp (Spinnaker)
 		<part name="cart2" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="PCDOS Boot Disk" />
+			<dataarea name="flop" size="184320">
+				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Help and Utility Disk" />
+			<dataarea name="flop" size="368640">
+				<rom name="help and utility.img" size="368640" crc="a791d674" sha1="001bfa1f571b8f6c5257521ede65552d6a96b324"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Tutorial Disk" />
+			<dataarea name="flop" size="368640">
+				<rom name="tutorial disk.img" size="368640" crc="f4e70b7c" sha1="d3f76f58a2a11d59b6346c7c3d2810854ec38be8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Printgraph Disk" />
+			<dataarea name="flop" size="368640">
+				<rom name="printgraph.img" size="368640" crc="edb3c740" sha1="b503e24b86ba50a10e5b394b9c66fbbe810c02b2"/>
 			</dataarea>
 		</part>
 	</software>

@@ -27,7 +27,8 @@
 	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
 			(const pstring &classname) \
 	{ \
-		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, __FILE__); \
+		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
+		return devtype::create(p_name, classname, p_def_param, __FILE__); \
 	} \
 	\
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
@@ -54,7 +55,7 @@ namespace factory {
 
 		COPYASSIGNMOVE(element_t, default)
 
-		virtual unique_pool_ptr<device_t> Create(nlmempool &pool,
+		virtual unique_pool_ptr<device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
@@ -87,11 +88,18 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile)
 		: element_t(name, classname, def_param, sourcefile) { }
 
-		unique_pool_ptr<device_t> Create(nlmempool &pool,
+		unique_pool_ptr<device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
 			return pool.make_unique<C>(anetlist, name);
+		}
+
+		static plib::unique_ptr<device_element_t<C>> create(const pstring &name,
+			const pstring &classname, const pstring &def_param,
+			const pstring &sourcefile)
+		{
+			return plib::make_unique<device_element_t<C>>(name, classname, def_param, sourcefile);
 		}
 	};
 
@@ -105,9 +113,9 @@ namespace factory {
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
-			const pstring &def_param)
+			const pstring &def_param, const pstring &sourcefile)
 		{
-			register_device(plib::make_unique<device_element_t<device_class>>(name, classname, def_param));
+			register_device(device_element_t<device_class>::create(name, classname, def_param, sourcefile));
 		}
 
 		void register_device(plib::unique_ptr<element_t> &&factory) noexcept(false);
@@ -151,7 +159,7 @@ namespace factory {
 		{
 		}
 
-		unique_pool_ptr<device_t> Create(nlmempool &pool,
+		unique_pool_ptr<device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
 

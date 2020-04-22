@@ -71,12 +71,15 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_LITTLE, 32, 20, 0, address_map_constructor(FUNC(stvcd_device::io_regs), this))
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
 	, m_cdda(*this, "cdda")
 {
 }
+
 
 void stvcd_device::device_add_mconfig(machine_config &config)
 {
@@ -94,6 +97,352 @@ void stvcd_device::device_start()
 {
 }
 
+device_memory_interface::space_config_vector stvcd_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+/*
+ * Block interface
+ */
+
+void stvcd_device::io_regs(address_map &map)
+{
+	map(0x18000, 0x18003).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
+	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
+	map(0x90008, 0x9000b).mirror(0x08000).rw(FUNC(stvcd_device::hirq_r), FUNC(stvcd_device::hirq_w)).umask32(0xffffffff);
+	map(0x9000c, 0x9000f).mirror(0x08000).rw(FUNC(stvcd_device::hirqmask_r), FUNC(stvcd_device::hirqmask_w)).umask32(0xffffffff);
+	map(0x90018, 0x9001b).mirror(0x08000).rw(FUNC(stvcd_device::cr1_r), FUNC(stvcd_device::cr1_w)).umask32(0xffffffff);
+	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(stvcd_device::cr2_r), FUNC(stvcd_device::cr2_w)).umask32(0xffffffff);
+	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(stvcd_device::cr3_r), FUNC(stvcd_device::cr3_w)).umask32(0xffffffff);
+	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
+}
+
+READ32_MEMBER( stvcd_device::datatrns_r )
+{
+	u32 rv;
+
+	if (mem_mask == 0xffffffff)
+	{
+		rv = dataxfer_long_r();
+	}
+	else if (mem_mask == 0xffff0000)
+	{
+		rv = dataxfer_word_r()<<16;
+	}
+	else if (mem_mask == 0x0000ffff)
+	{
+		rv = dataxfer_word_r();
+	}
+	else
+	{
+		printf("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
+		rv = 0;
+	}
+	return rv;
+}
+
+WRITE32_MEMBER( stvcd_device::datatrns_w )
+{
+	if (mem_mask == 0xffffffff)
+		dataxfer_long_w(data);
+	else
+		printf("CD: Unknown data buffer write with mask = %08x\n", mem_mask);
+}
+
+inline u32 stvcd_device::dataxfer_long_r()
+{
+	uint32_t rv = 0;
+
+	switch (xfertype32)
+	{
+		case XFERTYPE32_GETSECTOR:
+		case XFERTYPE32_GETDELETESECTOR:
+			// make sure we have sectors left
+			if (xfersect < xfersectnum)
+			{
+				// get next longword
+				rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
+						(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
+
+				xferdnum += 4;
+				xferoffs += 4;
+
+				// did we run out of sector?
+				if (xferoffs >= transpart->blocks[xfersect]->size)
+				{
+					LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
+
+					xferoffs = 0;
+					xfersect++;
+				}
+			}
+			else    // sectors are done, kill 'em all if we can
+			{
+				if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
+				{
+					int32_t i;
+
+					LOG("Killing sectors in done\n");
+
+					// deallocate the blocks
+					for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+					{
+						cd_free_block(transpart->blocks[i]);
+						transpart->blocks[i] = (blockT *)nullptr;
+						transpart->bnum[i] = 0xff;
+					}
+
+					// defrag what's left
+					cd_defragblocks(transpart);
+
+					// clean up our state
+					transpart->size -= xferdnum;
+					transpart->numblks -= xfersectnum;
+
+					/* TODO: is this correct? */
+					xfertype32 = XFERTYPE32_INVALID;
+				}
+			}
+			break;
+
+		default:
+			osd_printf_error("CD: unhandled 32-bit transfer type\n");
+			break;
+	}
+		
+	return rv;
+}
+
+inline void stvcd_device::dataxfer_long_w(u32 data)
+{
+	switch (xfertype32)
+	{
+		case XFERTYPE32_PUTSECTOR:
+			// make sure we have sectors left
+			if (xfersect < xfersectnum)
+			{
+				// get next longword
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
+				transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
+
+				xferdnum += 4;
+				xferoffs += 4;
+
+				// did we run out of sector?
+				if (xferoffs >= transpart->blocks[xfersectpos+xfersect]->size)
+				{
+					LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
+
+					xferoffs = 0;
+					xfersect++;
+				}
+			}
+			else    // sectors are done
+			{
+				/* Virtual On doesnt want this to be resetted. */
+				//xfertype32 = XFERTYPE32_INVALID;
+			}
+			break;
+
+		default:
+			printf("CD: unhandled 32-bit transfer type write\n");
+			break;
+	}
+}
+
+inline u16 stvcd_device::dataxfer_word_r()
+{
+	u16 rv;
+
+	rv = 0xffff;
+	switch (xfertype)
+	{
+		case XFERTYPE_TOC:
+			rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 102*4)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_FILEINFO_1:
+			rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 6*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_FILEINFO_254: // Lunar 2
+			if((xfercount % (6 * 2)) == 0)
+			{
+				uint32_t temp = 2 + (xfercount / (0x6 * 2));
+
+				// first 4 bytes = FAD
+				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
+				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
+				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
+				finfbuf[3] = (curdir[temp].firstfad&0xff);
+				// second 4 bytes = length of file
+				finfbuf[4] = (curdir[temp].length>>24)&0xff;
+				finfbuf[5] = (curdir[temp].length>>16)&0xff;
+				finfbuf[6] = (curdir[temp].length>>8)&0xff;
+				finfbuf[7] = (curdir[temp].length&0xff);
+				finfbuf[8] = curdir[temp].interleave_gap_size;
+				finfbuf[9] = curdir[temp].file_unit_size;
+				finfbuf[10] = temp;
+				finfbuf[11] = curdir[temp].flags;
+			}
+
+			rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > (254 * 6 * 2))
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		case XFERTYPE_SUBQ:
+			rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 5*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+
+		case XFERTYPE_SUBRW:
+			rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
+
+			xfercount += 2;
+			xferdnum += 2;
+
+			if (xfercount > 12*2)
+			{
+				xfercount = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+
+		default:
+			osd_printf_error("STVCD: Unhandled xfer type %d\n", (int)xfertype);
+			rv = 0;
+			break;
+	}
+
+	return rv;
+}
+
+READ16_MEMBER( stvcd_device::hirq_r ) 
+{
+	// TODO: this member must return the register only
+	u16 rv;
+
+//  LOG("RW HIRQ: %04x\n", rv);
+
+	rv = hirqreg;
+
+	rv &= ~DCHG;    // always clear bit 6 (tray open)
+
+	if (buffull) rv |= BFUL; else rv &= ~BFUL;
+	if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
+
+	hirqreg = rv;
+
+	return rv;
+}
+
+WRITE16_MEMBER( stvcd_device::hirq_w ) { hirqreg &= data; }
+
+// TODO: these two are actually never read or written to by host?
+READ16_MEMBER( stvcd_device::hirqmask_r ) 
+{ 
+	printf("RW HIRM: %04x\n", hirqmask);
+	return hirqmask; 
+}
+
+WRITE16_MEMBER( stvcd_device::hirqmask_w ) 
+{ 
+	printf("WW HIRM: %04x => %04x\n", hirqmask, data);
+	COMBINE_DATA(&hirqmask); 
+}
+
+READ16_MEMBER( stvcd_device::cr1_r ) { return cr1; }
+READ16_MEMBER( stvcd_device::cr2_r ) { return cr2; }
+READ16_MEMBER( stvcd_device::cr3_r ) { return cr3; }
+READ16_MEMBER( stvcd_device::cr4_r ) 
+{ 
+	cmd_pending = 0;
+	cd_stat |= CD_STAT_PERI;
+	return cr4; 
+}
+
+// TODO: understand how dual-port interface really works out
+WRITE16_MEMBER( stvcd_device::cr1_w )
+{
+	cr1 = data;
+	cd_stat &= ~CD_STAT_PERI;
+	cmd_pending |= 1;
+	m_sh1_timer->adjust(attotime::never);
+}
+
+WRITE16_MEMBER( stvcd_device::cr2_w )
+{
+	cr2 = data;
+	cmd_pending |= 2;	
+}
+
+WRITE16_MEMBER( stvcd_device::cr3_w )
+{
+	cr3 = data;
+	cmd_pending |= 4;
+}
+
+WRITE16_MEMBER( stvcd_device::cr4_w )
+{
+	cr4 = data;
+	cmd_pending |= 8;
+	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));	
+}
+
+READ32_MEMBER( stvcd_device::stvcd_r )
+{
+	return this->space().read_dword(offset<<2, mem_mask);
+}
+
+WRITE32_MEMBER( stvcd_device::stvcd_w )
+{
+	this->space().write_dword(offset<<2,data, mem_mask);
+}
+
+/*
+ * CDC command helpers
+ */
 int stvcd_device::get_timing_command(void)
 {
 	/* TODO: calculate timings based off command params */
@@ -157,10 +506,1369 @@ void stvcd_device::mpeg_standard_return(uint16_t cur_status)
 	cr4 = 0x1000; // video status
 }
 
-void stvcd_device::cd_exec_command()
+/*
+ * CDC commands
+ */
+
+void stvcd_device::cmd_get_status()
+{
+	//LOG("%s: Get Status\n", machine().describe_context();
+	hirqreg |= CMOK;
+	if(status_type == 0)
+		cr_standard_return(cd_stat);
+	else
+	{
+		cr1 = (cd_stat) | (prev_cr1 & 0xff);
+		cr2 = prev_cr2;
+		cr3 = prev_cr3;
+		cr4 = prev_cr4;
+		status_type = 0; /* Road Blaster and friends needs this otherwise they won't boot. */
+	}
+	//LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+}
+
+void stvcd_device::cmd_get_hw_info()
+{
+	LOG("%s: Get Hardware Info\n", machine().describe_context());
+	hirqreg |= CMOK;
+	cr1 = cd_stat;
+	cr2 = 0x0201;
+	cr3 = 0x0000;
+	cr4 = 0x0400;
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_toc()
+{
+	LOG("%s: Get TOC\n", machine().describe_context());
+	cd_readTOC();
+	cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
+	cr1 = cd_stat;
+	cr2 = 102*2;    // TOC length in words (102 entries @ 2 words/4bytes each)
+	cr3 = 0;
+	cr4 = 0;
+	xferdnum = 0;
+	hirqreg |= (CMOK|DRDY);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_session_info()
+{
+	// get session info (lower byte = session # to get?)
+	// bios is interested in returns in cr3 and cr4
+	// cr3 should be data track #
+	// cr4 must be > 1 and < 100 or bios gets angry.
+	LOG("%s: Get Session Info\n", machine().describe_context());
+	cd_readTOC();
+	switch (cr1 & 0xff)
+	{
+		case 0: // get total session info / disc end
+			cd_stat = CD_STAT_PAUSE;
+			cr1 = cd_stat;
+			cr2 = 0;
+			cr3 = 0x0100 | tocbuf[(101*4)+1];
+			cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
+			break;
+
+		case 1: // get total session info / disc start
+			cd_stat = CD_STAT_PAUSE;
+			cr1 = cd_stat;
+			cr2 = 0;
+			cr3 = 0x0100;   // sessions in high byte, session start in lower
+			cr4 = 0;
+			break;
+
+		default:
+			osd_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
+			cr1 = cd_stat;
+			cr2 = 0;
+			cr3 = 0;
+			cr4 = 0;
+			break;
+	}
+
+	hirqreg |= (CMOK);
+	status_type = 0;	
+}
+
+void stvcd_device::cmd_init_cdsystem()
+{
+	// TODO: double check this
+	// initialize CD system
+	// CR1 & 1 = reset software
+	// CR1 & 2 = decode RW subcode
+	// CR1 & 4 = don't confirm mode 2 subheader
+	// CR1 & 8 = retry reading mode 2 sectors
+	// CR1 & 10 = force single-speed
+	// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
+	LOG("%s: Initialize CD system\n", machine().describe_context());
+	//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
+	{
+		if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+		{
+			cd_stat = CD_STAT_PAUSE;
+			cd_curfad = 150;
+			//cur_track = 1;
+			fadstoplay = 0;
+		}
+		in_buffer = 0;
+		buffull = 0;
+		hirqreg &= 0xffe5;
+		cd_speed = (cr1 & 0x10) ? 1 : 2;
+
+		/* reset filter connections */
+		/* Guess: X-Men COTA sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10, without this game throws a FAD reject error */
+		/* X-Men vs. SF is even fussier, sequence is  0x04 (1) 0x04 (0) 0x03 (0) 0x03 (1) 0x30 */
+		#if 0
+		for(int i=0;i<MAX_FILTERS;i++)
+		{
+			filters[i].fad = 0;
+			filters[i].range = 0xffffffff;
+			filters[i].mode = 0;
+			filters[i].chan = 0;
+			filters[i].smmask = 0;
+			filters[i].cimask = 0;
+			filters[i].fid = 0;
+			filters[i].smval = 0;
+			filters[i].cival = 0;
+		}
+		#endif
+
+		/* reset CD device connection */
+		//cddevice = (filterT *)nullptr;
+	}
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_end_data_transfer()
+{
+	// end data transfer (TODO: needs to be worked on!)
+	// returns # of bytes transferred (24 bits) in
+	// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
+	LOG("%s: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum);
+
+	// clear the "transfer" flag
+	cd_stat &= ~CD_STAT_TRANS;
+
+	if (xferdnum)
+	{
+		cr1 = (cd_stat) | ((xferdnum>>17) & 0xff);
+		cr2 = (xferdnum>>1)&0xffff;
+		cr3 = 0;
+		cr4 = 0;
+	}
+	else
+	{
+		logerror("No xferdnum error\n");
+		cr1 = (cd_stat) | (0xff);   // is this right?
+		cr2 = 0xffff;
+		cr3 = 0;
+		cr4 = 0;
+	}
+
+	// try to clean up any transfers still in progress
+	switch (xfertype32)
+	{
+		case XFERTYPE32_GETSECTOR:
+		case XFERTYPE32_PUTSECTOR:
+			hirqreg |= EHST;
+			break;
+
+		case XFERTYPE32_GETDELETESECTOR:
+			if (transpart->size > 0)
+			{
+				int32_t i;
+
+				xfertype32 = XFERTYPE32_INVALID;
+
+				// deallocate the blocks
+				for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+				{
+					cd_free_block(transpart->blocks[i]);
+					transpart->blocks[i] = (blockT *)nullptr;
+					transpart->bnum[i] = 0xff;
+				}
+
+				// defrag what's left
+				cd_defragblocks(transpart);
+
+				// clean up our state
+				transpart->size -= xferdnum;
+				transpart->numblks -= xfersectnum;
+
+				if (freeblocks == 200)
+				{
+					sectorstore = 0;
+				}
+
+				hirqreg |= EHST;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+
+	xferdnum = 0;
+	hirqreg |= CMOK;
+
+	LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+	status_type = 1;
+}
+
+void stvcd_device::cmd_play_disc()
+{
+	// Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
+	uint32_t start_pos, end_pos;
+	uint8_t play_mode;
+
+	LOG("%s: Play Disc\n",   machine().describe_context());
+	cd_stat = CD_STAT_PLAY;
+
+	play_mode = (cr3 >> 8) & 0x7f;
+
+	if (!(cr3 & 0x8000))    // preserve current position if bit 7 set
+	{
+		start_pos = ((cr1&0xff)<<16) | cr2;
+		end_pos = ((cr3&0xff)<<16) | cr4;
+
+		if (start_pos & 0x800000)
+		{
+			if (start_pos != 0xffffff)
+				cd_curfad = start_pos & 0xfffff;
+
+			logerror("fad mode\n");
+			cur_track = cdrom_get_track(cdrom, cd_curfad-150);
+		}
+		else
+		{
+			// track mode
+			if(((start_pos)>>8) != 0)
+			{
+				cur_track = (start_pos)>>8;
+				cd_fad_seek = cdrom_get_track_start(cdrom, cur_track-1);
+				cd_stat = CD_STAT_SEEK;
+				m_cdda->pause_audio(0);
+			}
+			else
+			{
+				/* TODO: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now. */
+				popmessage("Warning: track mode == 0, contact MAMEdev");
+				cr_standard_return(cd_stat);
+				hirqreg |= (CMOK);
+				return;
+			}
+
+			printf("track mode %d\n",cur_track);
+		}
+
+		if (end_pos & 0x800000)
+		{
+			if (end_pos != 0xffffff)
+				fadstoplay = end_pos & 0xfffff;
+		}
+		else
+		{
+			uint8_t end_track;
+
+			end_track = (end_pos)>>8;
+			fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_fad_seek;
+		}
+	}
+	else    // play until the end of the disc
+	{
+		start_pos = ((cr1&0xff)<<16) | cr2;
+		end_pos = ((cr3&0xff)<<16) | cr4;
+
+		if(start_pos != 0xffffff)
+		{
+			/* Madou Monogatari sets 0xff80xxxx as end position, needs investigation ... */
+			if(end_pos & 0x800000)
+				fadstoplay = end_pos & 0xfffff;
+			else
+			{
+				if(end_pos == 0)
+					fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+				else
+					fadstoplay = (cdrom_get_track_start(cdrom, (end_pos & 0xff00) >> 8)) - cd_curfad;
+			}
+			logerror("track mode %08x %08x\n",cd_curfad,fadstoplay);
+		}
+		else
+		{
+			/* resume from a pause state */
+			/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
+			   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
+			   be countless possible combinations ... */
+			if(fadstoplay == 0)
+			{
+				cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+				fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
+			}
+			logerror("track resume %08x %08x\n",cd_curfad,fadstoplay);
+		}
+	}
+
+	LOG("Play Disc: start %x length %x\n", cd_curfad, fadstoplay);
+
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK);
+	oddframe = 0;
+	in_buffer = 0;
+
+	playtype = 0;
+
+	// cdda
+	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
+	{
+		m_cdda->pause_audio(0);
+		//m_cdda->start_audio(cd_curfad, fadstoplay);
+		//cdda_repeat_count = 0;
+	}
+
+	if(play_mode != 0x7f)
+		cdda_maxrepeat = play_mode & 0xf;
+	else
+		cdda_maxrepeat = 0;
+
+	cdda_repeat_count = 0;
+	status_type = 0;
+}
+
+void stvcd_device::cmd_seek_disc()
 {
 	uint32_t temp;
 
+	LOG("%s: Disc seek\n",   machine().describe_context());
+	//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
+	if (cr1 & 0x80)
+	{
+		temp = (cr1&0xff)<<16;  // get FAD to seek to
+		temp |= cr2;
+
+		//cd_curfad = temp;
+
+		if (temp == 0xffffff)
+		{
+			cd_stat = CD_STAT_PAUSE;
+			m_cdda->pause_audio(1);
+		}
+		else
+		{
+			cd_curfad = ((cr1&0x7f)<<16) | cr2;
+			printf("disc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
+		}
+	}
+	else
+	{
+		// is it a valid track?
+		if (cr2 >> 8)
+		{
+			cd_stat = CD_STAT_PAUSE;
+			cur_track = cr2>>8;;
+			cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+			m_cdda->pause_audio(1);
+			// (index is cr2 low byte)
+		}
+		else // error!
+		{
+			cd_stat = CD_STAT_STANDBY;
+			cd_curfad = 0xffffffff;
+			cur_track = 0xff;
+			m_cdda->stop_audio(); //stop any pending CD-DA
+		}
+	}
+
+
+	hirqreg |= CMOK;
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_ffwd_rew_disc()
+{
+	// FFWD / REW
+	// cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
+	// TODO: unemulated, can be triggered thru BIOS player
+	// ...
+}
+
+void stvcd_device::cmd_get_subcode_q_rw_channel()
+{
+	// Get SubCode Q / RW Channel
+	switch(cr1 & 0xff)
+	{
+		case 0: // Get Q
+		{
+			uint32_t msf_abs,msf_rel;
+			uint8_t track;
+			cr1 = cd_stat | 0;
+			cr2 = 10/2;
+			cr3 = 0;
+			cr4 = 0;
+
+			/*
+			Subcode Q info should be:
+			---- --x- S0
+			---- ---x S1
+			xxxx ---- [0] Control (bit 7 Pre-emphasis, bit 6: copy permitted, bit 5 undefined, bit 4 number of channels)
+			---- xxxx [0] address (0x0001 Mode 1)
+			xxxx xxxx [1] track number (1-99, AA lead-out), BCD format
+			xxxx xxxx [2] index (01 lead-out), BCD format
+			xxxx xxxx [3] Time within' track M
+			xxxx xxxx [4] Time within' track S
+			xxxx xxxx [5] Time within' track F
+			xxxx xxxx [6] Zero
+			xxxx xxxx [7] Absolute M
+			xxxx xxxx [8] Absolute S
+			xxxx xxxx [9] Absolute F
+			xxxx xxxx [10] CRCC
+			xxxx xxxx [11] CRCC
+			*/
+
+			msf_abs = lba_to_msf_alt( cd_curfad - 150 );
+			track = cdrom_get_track( cdrom, cd_curfad );
+			msf_rel = lba_to_msf_alt( cd_curfad - 150 - cdrom_get_track_start( cdrom, track ) );
+
+			xfertype = XFERTYPE_SUBQ;
+			xfercount = 0;
+			subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
+			subqbuf[1] = dec_2_bcd(track+1);
+			subqbuf[2] = dec_2_bcd(get_track_index(cd_curfad));
+			subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
+			subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
+			subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
+			subqbuf[6] = 0;
+			subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
+			subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
+			subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
+		}
+		break;
+
+		case 1: // Get RW
+			cr1 = cd_stat | 0;
+			cr2 = 12;
+			cr3 = 0;
+			cr4 = 0;
+
+			xfertype = XFERTYPE_SUBRW;
+			xfercount = 0;
+
+			/* return null data for now */
+			{
+				int i;
+
+				for(i=0;i<12*2;i++)
+					subrwbuf[i] = 0;
+			}
+			break;
+	}
+	hirqreg |= CMOK|DRDY;
+	status_type = 0;
+}
+
+void stvcd_device::cmd_set_cddevice_connection()
+{
+	// Set CD Device connection
+	uint8_t parm;
+
+	// get operation
+	parm = cr3>>8;
+
+	LOG("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm);
+
+	cddevicenum = parm;
+
+	if (parm == 0xff)
+	{
+		cddevice = (filterT *)nullptr;
+	}
+	else
+	{
+		if (parm < MAX_FILTERS)
+		{
+			cddevice = &filters[parm];
+		}
+	}
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_cddevice_connection()
+{
+	popmessage("Get CD Device Connection, contact MAMEdev");
+	hirqreg |= CMOK;
+}
+
+void stvcd_device::cmd_last_buffer_destination()
+{
+	// Last Buffer Destination
+	cr1 = cd_stat | 0;
+	cr2 = 0;
+	cr3 = lastbuf << 8;
+	cr4 = 0;
+	hirqreg |= (CMOK);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_set_filter_range()
+{
+	// Set Filter Range
+	// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
+	// cr3 hi = filter num.
+	uint8_t fnum = (cr3>>8)&0xff;
+
+	LOG("%s: Set Filter Range\n",   machine().describe_context());
+
+	filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
+	filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
+
+	printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_filter_range()
+{
+	popmessage("Get Filter Range, contact MAMEdev");
+	hirqreg |= CMOK;
+}
+
+void stvcd_device::cmd_set_filter_subheader_conditions()
+{
+    // Set Filter Subheader conditions
+	uint8_t fnum = (cr3>>8)&0xff;
+
+	LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+
+	filters[fnum].chan = cr1 & 0xff;
+	filters[fnum].smmask = (cr2>>8)&0xff;
+	filters[fnum].cimask = cr2&0xff;
+	filters[fnum].fid = cr3&0xff;
+	filters[fnum].smval = (cr4>>8)&0xff;
+	filters[fnum].cival = cr4&0xff;
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+
+void stvcd_device::cmd_get_filter_subheader_conditions()
+{
+	// Get Filter Subheader conditions
+	uint8_t fnum = (cr3>>8)&0xff;
+
+	LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+
+	cr1 = cd_stat | (filters[fnum].chan & 0xff);
+	cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
+	cr3 = filters[fnum].fid;
+	cr4 = (filters[fnum].smval << 8) | (filters[fnum].cival & 0xff);
+
+	hirqreg |= (CMOK|ESEL);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_set_filter_mode()
+{
+	// Set Filter Mode
+	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t mode = (cr1 & 0xff);
+
+	// initialize filter?
+	if (mode & 0x80)
+	{
+		memset(&filters[fnum], 0, sizeof(filterT));
+	}
+	else
+	{
+		filters[fnum].mode = mode;
+	}
+
+	LOG("%s: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode);
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_filter_mode()
+{
+	// Get Filter Mode
+	uint8_t fnum = (cr3>>8)&0xff;
+
+	cr1 = cd_stat | (filters[fnum].mode & 0xff);
+	cr2 = 0;
+	cr3 = 0;
+	cr4 = 0;
+
+	hirqreg |= (CMOK|ESEL);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_set_filter_connection()
+{
+	// Set Filter Connection
+	/* TODO: maybe condition false is cr3 low? */
+	uint8_t fnum = (cr3>>8)&0xff;
+
+	LOG("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
+
+	if (cr1 & 1)    // set true condition
+		filters[fnum].condtrue = (cr2>>8)&0xff;
+
+	if (cr1 & 2)    // set false condition
+		filters[fnum].condfalse = cr2&0xff;
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_reset_selector()
+{
+	int i,j;
+	// Reset Selector
+
+	LOG("%s: Reset Selector\n",   machine().describe_context());
+
+	if((cr1 & 0xff) == 0x00)
+	{
+		uint8_t bufnum = cr3>>8;
+
+		if(bufnum < MAX_FILTERS)
+		{
+			for (i = 0; i < MAX_BLOCKS; i++)
+			{
+				cd_free_block(partitions[bufnum].blocks[i]);
+				partitions[bufnum].blocks[i] = (blockT *)nullptr;
+				partitions[bufnum].bnum[i] = 0xff;
+			}
+
+			partitions[bufnum].size = -1;
+			partitions[bufnum].numblks = 0;
+		}
+
+		// TODO: buffer full flag
+
+		if (freeblocks == 200) { sectorstore = 0; }
+
+		hirqreg |= (CMOK|ESEL);
+		cr_standard_return(cd_stat);
+		status_type = 0;
+		return;
+	}
+
+	/* reset false filter output conditions */
+	/* TODO: check these two. */
+	if(cr1 & 0x80)
+	{
+		for(i=0;i<MAX_FILTERS;i++)
+			filters[i].condfalse = 0;
+	}
+
+	/* reset true filter output conditions */
+	if(cr1 & 0x40)
+	{
+		for(i=0;i<MAX_FILTERS;i++)
+			filters[i].condtrue = 0;
+	}
+
+	/* reset filter conditions*/
+	if(cr1 & 0x10)
+	{
+		for(i=0;i<MAX_FILTERS;i++)
+		{
+			filters[i].fad = 0;
+			filters[i].range = 0xffffffff;
+			filters[i].mode = 0;
+			filters[i].chan = 0;
+			filters[i].smmask = 0;
+			filters[i].cimask = 0;
+			filters[i].fid = 0;
+			filters[i].smval = 0;
+			filters[i].cival = 0;
+		}
+	}
+
+	/* reset partition buffer data */
+	if(cr1 & 0x4)
+	{
+		for(i=0;i<MAX_FILTERS;i++)
+		{
+			for (j = 0; j < MAX_BLOCKS; j++)
+			{
+				cd_free_block(partitions[i].blocks[j]);
+				partitions[i].blocks[j] = (blockT *)nullptr;
+				partitions[i].bnum[j] = 0xff;
+			}
+
+			partitions[i].size = -1;
+			partitions[i].numblks = 0;
+		}
+
+		buffull = sectorstore = 0;
+	}
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_buffer_size()
+{	
+	// get Buffer Size
+	cr1 = cd_stat;
+	cr2 = (freeblocks > 200) ? 200 : freeblocks;
+	cr3 = 0x1800;
+	cr4 = 200;
+	LOG("Get Buffer Size = %d\n", cr2);
+	hirqreg |= (CMOK);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_buffer_partition_sector_number()
+{
+	// get # sectors used in a buffer
+
+	uint32_t bufnum = cr3>>8;
+
+	LOG("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
+	cr1 = cd_stat;
+	cr2 = 0;
+	cr3 = 0;
+	if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
+		printf("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+
+	// is the partition empty?
+	if (partitions[bufnum].size == -1)
+	{
+		cr4 = 0;
+	}
+	else
+	{
+		cr4 = partitions[bufnum].numblks;
+		//printf("Partition %08x %04x\n",bufnum,cr4);
+	}
+
+	//printf("%04x\n",cr4);
+	if(cr4 == 0)
+		hirqreg |= (CMOK);
+	else
+		hirqreg |= (CMOK|DRDY);
+	status_type = 1;
+}
+
+void stvcd_device::cmd_calculate_actual_data_size()
+{
+	// calculate actual size
+	uint32_t bufnum = cr3>>8;
+	uint32_t sectoffs = cr2;
+	uint32_t numsect = cr4;
+
+	LOG("%s: Calculate actual size: buf %x offs %x numsect %x\n", machine().describe_context(), bufnum, sectoffs, numsect);
+
+	calcsize = 0;
+	if (partitions[bufnum].size != -1)
+	{
+		int32_t i;
+
+		for (i = 0; i < numsect; i++)
+		{
+			if (partitions[bufnum].blocks[sectoffs+i])
+			{
+				calcsize += (partitions[bufnum].blocks[sectoffs+i]->size / 2);
+			}
+		}
+	}
+
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_actual_data_size()
+{
+	// get actual block size
+	LOG("%s: Get actual block size\n", machine().describe_context());
+	cr1 = cd_stat | ((calcsize>>16)&0xff);
+	cr2 = (calcsize & 0xffff);
+	cr3 = 0;
+	cr4 = 0;
+	hirqreg |= (CMOK|ESEL);
+	status_type = 1;
+}
+
+void stvcd_device::cmd_get_sector_information()
+{
+	// get sector info
+	uint32_t sectoffs = cr2 & 0xff;
+	uint32_t bufnum = cr3>>8;
+
+	if (bufnum >= MAX_FILTERS || !partitions[bufnum].blocks[sectoffs])
+	{
+		cr1 |= CD_STAT_REJECT & 0xff00;
+		hirqreg |= (CMOK|ESEL);
+		printf("Get sector info reject\n");
+	}
+	else
+	{
+		cr1 = cd_stat | ((partitions[bufnum].blocks[sectoffs]->FAD >> 16) & 0xff);
+		cr2 = partitions[bufnum].blocks[sectoffs]->FAD & 0xffff;
+		cr3 = ((partitions[bufnum].blocks[sectoffs]->fnum & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->chan & 0xff);
+		cr4 = ((partitions[bufnum].blocks[sectoffs]->subm & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->cinf & 0xff);
+		hirqreg |= (CMOK|ESEL);
+	}
+
+	status_type = 0;
+}
+
+void stvcd_device::cmd_set_sector_length()
+{
+	// set sector length
+	LOG("%s: Set sector length\n",   machine().describe_context());
+
+	switch (cr1 & 0xff)
+	{
+		case 0:
+			sectlenin = 2048;
+			break;
+		case 1:
+			sectlenin = 2336;
+			break;
+		case 2:
+			sectlenin = 2340;
+			break;
+		case 3:
+			sectlenin = 2352;
+			break;
+	}
+
+	switch ((cr2>>8) & 0xff)
+	{
+		case 0:
+			sectlenout = 2048;
+			break;
+		case 1:
+			sectlenout = 2336;
+			break;
+		case 2:
+			sectlenout = 2340;
+			break;
+		case 3:
+			sectlenout = 2352;
+			break;
+	}
+	hirqreg |= (CMOK|ESEL);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_sector_data()
+{
+	// get sector data
+	uint32_t sectnum = cr4;
+	uint32_t sectofs = cr2;
+	uint32_t bufnum = cr3>>8;
+
+	LOG("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+
+	if (bufnum >= MAX_FILTERS)
+	{
+		osd_printf_error("CD: invalid buffer number\n");
+		/* TODO: why this is happening? */
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	if (partitions[bufnum].numblks < sectnum)
+	{
+		osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
+	xfertype32 = XFERTYPE32_GETSECTOR;
+	xferoffs = 0;
+	xfersect = 0;
+	xferdnum = 0;
+	xfersectpos = sectofs;
+	xfersectnum = sectnum;
+	transpart = &partitions[bufnum];
+
+	cd_stat |= CD_STAT_TRANS;
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK|EHST|DRDY);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_delete_sector_data()
+{
+	// delete sector data
+	uint32_t sectnum = cr4;
+	uint32_t sectofs = cr2;
+	uint32_t bufnum = cr3>>8;
+	int32_t i;
+
+	LOG("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+
+	if (bufnum >= MAX_FILTERS)
+	{
+		osd_printf_error("CD: invalid buffer number\n");
+		/* TODO: why this is happening? */
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	/* TODO: Phantasy Star 2 throws this one. */
+	if (partitions[bufnum].numblks == 0)
+	{
+		osd_printf_error("CD: buffer is already empty\n");
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
+	for (i = sectofs; i < (sectofs + sectnum); i++)
+	{
+		partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
+		cd_free_block(partitions[bufnum].blocks[i]);
+		partitions[bufnum].blocks[i] = (blockT *)nullptr;
+		partitions[bufnum].bnum[i] = 0xff;
+	}
+
+	cd_defragblocks(&partitions[bufnum]);
+
+	partitions[bufnum].numblks -= sectnum;
+
+	if (freeblocks == 200)
+	{
+		sectorstore = 0;
+	}
+
+	cd_stat &= ~CD_STAT_TRANS;
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK|EHST);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_and_delete_sector_data()
+{
+	// get then delete sector data
+
+	uint32_t sectnum = cr4;
+	uint32_t sectofs = cr2;
+	uint32_t bufnum = cr3>>8;
+
+	LOG("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+
+	if (bufnum >= MAX_FILTERS)
+	{
+		osd_printf_error("CD: invalid buffer number\n");
+		/* TODO: why this is happening? */
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
+	if (partitions[bufnum].numblks < sectnum)
+	{
+		osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK|EHST);
+		return;
+	}
+
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
+	xfertype32 = XFERTYPE32_GETDELETESECTOR;
+	xferoffs = 0;
+	xfersect = 0;
+	xferdnum = 0;
+	xfersectpos = sectofs;
+	xfersectnum = sectnum;
+	transpart = &partitions[bufnum];
+
+	cd_stat |= CD_STAT_TRANS;
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK|EHST|DRDY);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_put_sector_data()
+{
+	// put sector data
+	/* After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
+
+	uint32_t sectnum = cr4 & 0xff;
+	uint32_t sectofs = cr2;
+	uint32_t bufnum = cr3>>8;
+
+	xfertype32 = XFERTYPE32_PUTSECTOR;
+
+	/*TODO: eventual errors? */
+
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
+	cd_stat |= CD_STAT_TRANS;
+
+	xferoffs = 0;
+	xfersect = 0;
+	xferdnum = 0;
+	xfersectpos = sectofs;
+	xfersectnum = sectnum;
+	transpart = &partitions[bufnum];
+
+	// allocate the blocks
+	for (int i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+	{
+		transpart->blocks[i] = cd_alloc_block(&transpart->bnum[i]);
+		if(transpart->size == -1)
+			transpart->size = 0;
+		transpart->size += transpart->blocks[i]->size;
+		transpart->numblks++;
+	}
+
+	hirqreg |= (CMOK|DRDY);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_move_sector_data()
+{
+	popmessage("Move Sector data, contact MAMEdev");
+	hirqreg |= (CMOK);
+}
+
+void stvcd_device::cmd_copy_sector_data()
+{
+	// copy sector data
+	/* Sword & Sorcery / Riglord Saga 2 uses this */
+	// TODO: incomplete
+	uint32_t src_filter = (cr3>>8)&0xff;
+	uint32_t dst_filter = cr1&0xff;
+	uint32_t sectnum = cr4 & 0xff;
+
+	//cd_stat |= CD_STAT_TRANS;
+	//transpart = &partitions[dst_filter];
+
+	for (int i = 0; i < sectnum; i++)
+	{
+		// allocate the dst blocks
+		partitions[dst_filter].blocks[i] = cd_alloc_block(&partitions[dst_filter].bnum[i]);
+		if(partitions[dst_filter].size == -1)
+			partitions[dst_filter].size = 0;
+		partitions[dst_filter].size += partitions[dst_filter].blocks[i]->size;
+		partitions[dst_filter].numblks++;
+
+		//copy data
+		for(int j = 0; j < sectlenin; j++)
+			partitions[dst_filter].blocks[i]->data[j] = partitions[src_filter].blocks[i]->data[j];
+
+		//deallocate the src blocks
+		//partitions[src_filter].size -= partitions[src_filter].blocks[i]->size;
+		//cd_free_block(partitions[src_filter].blocks[i]);
+		//partitions[src_filter].blocks[i] = (blockT *)nullptr;
+		//partitions[src_filter].bnum[i] = 0xff;
+	}
+
+	hirqreg |= (CMOK|ECPY);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_sector_data_copy_or_move_error()
+{
+	// get copy error
+	LOG("%s: Get copy error\n",   machine().describe_context());
+	logerror("Get copy error\n");
+	cr1 = cd_stat;
+	cr2 = 0;
+	cr3 = 0;
+	cr4 = 0;
+	hirqreg |= (CMOK);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_change_directory()
+{
+	uint32_t temp;
+	// change directory
+	LOG("%s: Change Directory\n",   machine().describe_context());
+	hirqreg |= (CMOK|EFLS);
+
+	temp = (cr3&0xff)<<16;
+	temp |= cr4;
+
+	read_new_dir(temp);
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_read_directory()
+{
+	// Read directory entry
+	LOG("%s: Read Directory Entry\n",   machine().describe_context());
+//  uint32_t read_dir;
+
+//  read_dir = ((cr3&0xff)<<16)|cr4;
+
+	if((cr3 >> 8) < MAX_FILTERS)
+		cddevice = &filters[cr3 >> 8];
+	else
+		cddevice = (filterT *)nullptr;
+
+	// TODO: how to actually read?
+	//read_new_dir(read_dir - 2);
+
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK|EFLS);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_file_scope()
+{	
+	// Get file system scope
+	LOG("%s: Get file system scope\n", machine().describe_context());
+	hirqreg |= (CMOK|EFLS);
+	cr1 = cd_stat;
+	cr2 = numfiles; // # of files in directory
+	cr3 = 0x0100;   // report directory held
+	cr4 = firstfile;    // first file id
+	printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_target_file_info()
+{
+	uint32_t temp;
+
+	// Get File Info
+	LOG("%s: Get File Info\n",   machine().describe_context());
+	cd_stat |= CD_STAT_TRANS;
+	cd_stat &= 0xff00;      // clear top byte of return value
+	playtype = 0;
+	cdda_repeat_count = 0;
+	hirqreg |= (CMOK|DRDY);
+
+	temp = (cr3&0xff)<<16;
+	temp |= cr4;
+
+	if (temp == 0xffffff)   // special
+	{
+		xfertype = XFERTYPE_FILEINFO_254;
+		xfercount = 0;
+
+		cr1 = cd_stat;
+		cr2 = 0x5f4;
+		cr3 = 0;
+		cr4 = 0;
+	}
+	else
+	{
+		cr1 = cd_stat;
+		cr2 = 6;    // 6 words for single file
+					// first 4 bytes = FAD address
+					// second 4 bytes = length
+					// last 4 bytes:
+					// - unit size
+					// - gap size
+					// - file #
+					// attributes flags
+
+		cr3 = 0;
+		cr4 = 0;
+
+		printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
+		// first 4 bytes = FAD
+		finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
+		finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
+		finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
+		finfbuf[3] = (curdir[temp].firstfad&0xff);
+		// second 4 bytes = length of file
+		finfbuf[4] = (curdir[temp].length>>24)&0xff;
+		finfbuf[5] = (curdir[temp].length>>16)&0xff;
+		finfbuf[6] = (curdir[temp].length>>8)&0xff;
+		finfbuf[7] = (curdir[temp].length&0xff);
+		finfbuf[8] = curdir[temp].interleave_gap_size;
+		finfbuf[9] = curdir[temp].file_unit_size;
+		finfbuf[10] = temp;
+		finfbuf[11] = curdir[temp].flags;
+
+		xfertype = XFERTYPE_FILEINFO_1;
+		xfercount = 0;
+	}
+	LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_read_file()
+{
+	// Read File
+	LOG("%s: Read File\n",   machine().describe_context());
+	uint16_t file_offset,file_filter,file_id,file_size;
+
+	file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
+	file_filter = cr3 >> 8;
+	file_id = ((cr3 & 0xff) << 16)|(cr4);
+	file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
+
+	cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
+	cd_curfad = (curdir[file_id].firstfad + file_offset);
+	fadstoplay = file_size;
+	if(file_filter < MAX_FILTERS)
+		cddevice = &filters[file_filter];
+	else
+		cddevice = (filterT *)nullptr;
+
+	printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
+
+	cr_standard_return(cd_stat);
+
+	oddframe = 0;
+	in_buffer = 0;
+
+	playtype = 1;
+
+	hirqreg |= (CMOK|EHST);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_abort_file()
+{
+	LOG("%s: Abort File\n",   machine().describe_context());
+	// bios expects "2bc" mask to work against this
+	hirqreg |= (CMOK|EFLS);
+	sectorstore = 0;
+	xfertype32 = XFERTYPE32_INVALID;
+	xferdnum = 0;
+	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+		cd_stat = CD_STAT_PAUSE;    // force to pause
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_check_copy_protection()
+{
+	// appears to be copy protection check.  needs only to return OK.
+	LOG("%s: Verify copy protection\n",   machine().describe_context());
+	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+		cd_stat = CD_STAT_PAUSE;
+
+//   cr1 = cd_stat;  // necessary to pass
+//   cr2 = 0x4;
+//   hirqreg |= (CMOK|EFLS|CSCT);
+	if(cr2 == 0x0001) // MPEG card
+	{
+		hirqreg |= (CMOK|MPED);
+	}
+	else
+	{
+		sectorstore = 1;
+		hirqreg = 0x7c5;
+	}
+	cr_standard_return(cd_stat);
+	status_type = 0;
+}
+
+void stvcd_device::cmd_get_disc_region()
+{
+	// get disc region
+	LOG("%s: Get disc region\n",   machine().describe_context());
+	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+		cd_stat = CD_STAT_PAUSE;
+	cr1 = cd_stat;  // necessary to pass
+	if(cr2 == 0x0001) // MPEG card
+		cr2 = 0x2;
+	else
+		cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc
+	cr3 = 0;
+	cr4 = 0;
+	hirqreg |= (CMOK);
+//	cr_standard_return(cd_stat);
+	status_type = 0;
+
+}
+
+void stvcd_device::cmd_get_mpeg_card_boot_rom()
+{
+	// Get MPEG Card Boot ROM
+	// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
+
+	cr_standard_return(cd_stat);
+	hirqreg |= (CMOK|MPED);
+}
+
+void stvcd_device::cmd_mpeg_get_status()
+{
+	// MPEG Get Status
+	// ...
+	mpeg_standard_return(cd_stat);
+	hirqreg |= (CMOK);
+}
+
+void stvcd_device::cmd_mpeg_get_irq()
+{
+	// MPEG get IRQ
+	// ...
+	cr1 = cd_stat | 0;
+	cr2 = 5;
+	cr3 = 0;
+	cr4 = 0;
+	hirqreg |= (CMOK);
+}
+
+
+void stvcd_device::cmd_mpeg_set_irq_mask()
+{
+	// MPEG Set IRQ Mask
+	// ...
+	mpeg_standard_return(cd_stat);
+	hirqreg |= (CMOK);	
+}
+
+void stvcd_device::cmd_mpeg_set_mode()
+{
+	// MPEG Set Mode
+	// ...
+	mpeg_standard_return(cd_stat);
+	hirqreg |= (CMOK);
+}
+
+
+void stvcd_device::cmd_mpeg_init()
+{
+	// MPEG init
+	// ...
+	hirqreg |= (CMOK|MPED);
+	if(cr2 == 0x0001)
+		hirqreg |= (MPCM);
+
+	cr1 = cd_stat;
+	cr2 = 0;
+	cr3 = 0;
+	cr4 = 0;
+
+}
+
+void stvcd_device::cd_exec_command()
+{
 	if(cr1 != 0 &&
 		((cr1 & 0xff00) != 0x5100) &&
 		((cr1 & 0xff00) != 0x5200) &&
@@ -170,1287 +1878,66 @@ void stvcd_device::cd_exec_command()
 
 	switch ((cr1 >> 8) & 0xff)
 	{
-		case 0x00:
-			//LOG("%s: Get Status\n", machine().describe_context();
-			hirqreg |= CMOK;
-			if(status_type == 0)
-				cr_standard_return(cd_stat);
-			else
-			{
-				cr1 = (cd_stat) | (prev_cr1 & 0xff);
-				cr2 = prev_cr2;
-				cr3 = prev_cr3;
-				cr4 = prev_cr4;
-				status_type = 0; /* Road Blaster and friends needs this otherwise they won't boot. */
-			}
-			//LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
-			break;
-
-		case 0x01:
-			LOG("%s: Get Hardware Info\n", machine().describe_context());
-			hirqreg |= CMOK;
-			cr1 = cd_stat;
-			cr2 = 0x0201;
-			cr3 = 0x0000;
-			cr4 = 0x0400;
-			status_type = 0;
-			break;
-
-		case 0x02:    // Get TOC
-			LOG("%s: Get TOC\n", machine().describe_context());
-			cd_readTOC();
-			cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
-			cr1 = cd_stat;
-			cr2 = 102*2;    // TOC length in words (102 entries @ 2 words/4bytes each)
-			cr3 = 0;
-			cr4 = 0;
-			xferdnum = 0;
-			hirqreg |= (CMOK|DRDY);
-			status_type = 0;
-			break;
-
-		case 0x03:    // get session info (lower byte = session # to get?)
-						// bios is interested in returns in cr3 and cr4
-						// cr3 should be data track #
-						// cr4 must be > 1 and < 100 or bios gets angry.
-			LOG("%s: Get Session Info\n", machine().describe_context());
-			cd_readTOC();
-			switch (cr1 & 0xff)
-			{
-				case 0: // get total session info / disc end
-					cd_stat = CD_STAT_PAUSE;
-					cr1 = cd_stat;
-					cr2 = 0;
-					cr3 = 0x0100 | tocbuf[(101*4)+1];
-					cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
-					break;
-
-				case 1: // get total session info / disc start
-					cd_stat = CD_STAT_PAUSE;
-					cr1 = cd_stat;
-					cr2 = 0;
-					cr3 = 0x0100;   // sessions in high byte, session start in lower
-					cr4 = 0;
-					break;
-
-				default:
-					osd_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
-					cr1 = cd_stat;
-					cr2 = 0;
-					cr3 = 0;
-					cr4 = 0;
-					break;
-			}
-
-			hirqreg |= (CMOK);
-			status_type = 0;
-			break;
-
-		/* TODO: double check this */
-		case 0x04:    // initialize CD system
-				// CR1 & 1 = reset software
-				// CR1 & 2 = decode RW subcode
-				// CR1 & 4 = don't confirm mode 2 subheader
-				// CR1 & 8 = retry reading mode 2 sectors
-				// CR1 & 10 = force single-speed
-				// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
-			LOG("%s: Initialize CD system\n", machine().describe_context());
-			//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
-			{
-				if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-				{
-					cd_stat = CD_STAT_PAUSE;
-					cd_curfad = 150;
-					//cur_track = 1;
-					fadstoplay = 0;
-				}
-				in_buffer = 0;
-				buffull = 0;
-				hirqreg &= 0xffe5;
-				cd_speed = (cr1 & 0x10) ? 1 : 2;
-
-				/* reset filter connections */
-				/* Guess: X-Men COTA sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10, without this game throws a FAD reject error */
-				/* X-Men vs. SF is even fussier, sequence is  0x04 (1) 0x04 (0) 0x03 (0) 0x03 (1) 0x30 */
-				#if 0
-				for(int i=0;i<MAX_FILTERS;i++)
-				{
-					filters[i].fad = 0;
-					filters[i].range = 0xffffffff;
-					filters[i].mode = 0;
-					filters[i].chan = 0;
-					filters[i].smmask = 0;
-					filters[i].cimask = 0;
-					filters[i].fid = 0;
-					filters[i].smval = 0;
-					filters[i].cival = 0;
-				}
-				#endif
-
-				/* reset CD device connection */
-				//cddevice = (filterT *)nullptr;
-			}
-
-			hirqreg |= (CMOK|ESEL);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0x06:    // end data transfer (TODO: needs to be worked on!)
-				// returns # of bytes transferred (24 bits) in
-				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
-			LOG("%s: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum);
-
-			// clear the "transfer" flag
-			cd_stat &= ~CD_STAT_TRANS;
-
-			if (xferdnum)
-			{
-				cr1 = (cd_stat) | ((xferdnum>>17) & 0xff);
-				cr2 = (xferdnum>>1)&0xffff;
-				cr3 = 0;
-				cr4 = 0;
-			}
-			else
-			{
-				logerror("No xferdnum error\n");
-				cr1 = (cd_stat) | (0xff);   // is this right?
-				cr2 = 0xffff;
-				cr3 = 0;
-				cr4 = 0;
-			}
-
-			// try to clean up any transfers still in progress
-			switch (xfertype32)
-			{
-				case XFERTYPE32_GETSECTOR:
-				case XFERTYPE32_PUTSECTOR:
-					hirqreg |= EHST;
-					break;
-
-				case XFERTYPE32_GETDELETESECTOR:
-					if (transpart->size > 0)
-					{
-						int32_t i;
-
-						xfertype32 = XFERTYPE32_INVALID;
-
-						// deallocate the blocks
-						for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
-						{
-							cd_free_block(transpart->blocks[i]);
-							transpart->blocks[i] = (blockT *)nullptr;
-							transpart->bnum[i] = 0xff;
-						}
-
-						// defrag what's left
-						cd_defragblocks(transpart);
-
-						// clean up our state
-						transpart->size -= xferdnum;
-						transpart->numblks -= xfersectnum;
-
-						if (freeblocks == 200)
-						{
-							sectorstore = 0;
-						}
-
-						hirqreg |= EHST;
-					}
-					break;
-
-				default:
-					break;
-			}
-
-
-			xferdnum = 0;
-			hirqreg |= CMOK;
-
-			LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
-			status_type = 1;
-			break;
-
-		case 0x10: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
-			uint32_t start_pos,end_pos;
-			uint8_t play_mode;
-
-			LOG("%s: Play Disc\n",   machine().describe_context());
-			cd_stat = CD_STAT_PLAY;
-
-			play_mode = (cr3 >> 8) & 0x7f;
-
-			if (!(cr3 & 0x8000))    // preserve current position if bit 7 set
-			{
-				start_pos = ((cr1&0xff)<<16) | cr2;
-				end_pos = ((cr3&0xff)<<16) | cr4;
-
-				if (start_pos & 0x800000)
-				{
-					if (start_pos != 0xffffff)
-						cd_curfad = start_pos & 0xfffff;
-
-					logerror("fad mode\n");
-					cur_track = cdrom_get_track(cdrom, cd_curfad-150);
-				}
-				else
-				{
-					// track mode
-					if(((start_pos)>>8) != 0)
-					{
-						cur_track = (start_pos)>>8;
-						cd_fad_seek = cdrom_get_track_start(cdrom, cur_track-1);
-						cd_stat = CD_STAT_SEEK;
-						m_cdda->pause_audio(0);
-					}
-					else
-					{
-						/* TODO: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now. */
-						popmessage("Warning: track mode == 0, contact MAMEdev");
-						cr_standard_return(cd_stat);
-						hirqreg |= (CMOK);
-						return;
-					}
-
-					printf("track mode %d\n",cur_track);
-				}
-
-				if (end_pos & 0x800000)
-				{
-					if (end_pos != 0xffffff)
-						fadstoplay = end_pos & 0xfffff;
-				}
-				else
-				{
-					uint8_t end_track;
-
-					end_track = (end_pos)>>8;
-					fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_fad_seek;
-				}
-			}
-			else    // play until the end of the disc
-			{
-				start_pos = ((cr1&0xff)<<16) | cr2;
-				end_pos = ((cr3&0xff)<<16) | cr4;
-
-				if(start_pos != 0xffffff)
-				{
-					/* Madou Monogatari sets 0xff80xxxx as end position, needs investigation ... */
-					if(end_pos & 0x800000)
-						fadstoplay = end_pos & 0xfffff;
-					else
-					{
-						if(end_pos == 0)
-							fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
-						else
-							fadstoplay = (cdrom_get_track_start(cdrom, (end_pos & 0xff00) >> 8)) - cd_curfad;
-					}
-					logerror("track mode %08x %08x\n",cd_curfad,fadstoplay);
-				}
-				else
-				{
-					/* resume from a pause state */
-					/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-					   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
-					   be countless possible combinations ... */
-					if(fadstoplay == 0)
-					{
-						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-						fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
-					}
-					logerror("track resume %08x %08x\n",cd_curfad,fadstoplay);
-				}
-			}
-
-			LOG("Play Disc: start %x length %x\n", cd_curfad, fadstoplay);
-
-			cr_standard_return(cd_stat);
-			hirqreg |= (CMOK);
-			oddframe = 0;
-			in_buffer = 0;
-
-			playtype = 0;
-
-			// cdda
-			if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
-			{
-				m_cdda->pause_audio(0);
-				//m_cdda->start_audio(cd_curfad, fadstoplay);
-				//cdda_repeat_count = 0;
-			}
-
-			if(play_mode != 0x7f)
-				cdda_maxrepeat = play_mode & 0xf;
-			else
-				cdda_maxrepeat = 0;
-
-			cdda_repeat_count = 0;
-			status_type = 0;
-			break;
-
-		case 0x11: // disc seek
-			LOG("%s: Disc seek\n",   machine().describe_context());
-			//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
-			if (cr1 & 0x80)
-			{
-				temp = (cr1&0xff)<<16;  // get FAD to seek to
-				temp |= cr2;
-
-				//cd_curfad = temp;
-
-				if (temp == 0xffffff)
-				{
-					cd_stat = CD_STAT_PAUSE;
-					m_cdda->pause_audio(1);
-				}
-				else
-				{
-					cd_curfad = ((cr1&0x7f)<<16) | cr2;
-					printf("disc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
-				}
-			}
-			else
-			{
-				// is it a valid track?
-				if (cr2 >> 8)
-				{
-					cd_stat = CD_STAT_PAUSE;
-					cur_track = cr2>>8;;
-					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-					m_cdda->pause_audio(1);
-					// (index is cr2 low byte)
-				}
-				else // error!
-				{
-					cd_stat = CD_STAT_STANDBY;
-					cd_curfad = 0xffffffff;
-					cur_track = 0xff;
-					m_cdda->stop_audio(); //stop any pending CD-DA
-				}
-			}
-
-
-			hirqreg |= CMOK;
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0x12: // FFWD / REW
-			//cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
-			// ...
-			break;
-
-		case 0x20: // Get SubCode Q / RW Channel
-			switch(cr1 & 0xff)
-			{
-				case 0: // Get Q
-				{
-					uint32_t msf_abs,msf_rel;
-					uint8_t track;
-					cr1 = cd_stat | 0;
-					cr2 = 10/2;
-					cr3 = 0;
-					cr4 = 0;
-
-					/*
-					Subcode Q info should be:
-					---- --x- S0
-					---- ---x S1
-					xxxx ---- [0] Control (bit 7 Pre-emphasis, bit 6: copy permitted, bit 5 undefined, bit 4 number of channels)
-					---- xxxx [0] address (0x0001 Mode 1)
-					xxxx xxxx [1] track number (1-99, AA lead-out), BCD format
-					xxxx xxxx [2] index (01 lead-out), BCD format
-					xxxx xxxx [3] Time within' track M
-					xxxx xxxx [4] Time within' track S
-					xxxx xxxx [5] Time within' track F
-					xxxx xxxx [6] Zero
-					xxxx xxxx [7] Absolute M
-					xxxx xxxx [8] Absolute S
-					xxxx xxxx [9] Absolute F
-					xxxx xxxx [10] CRCC
-					xxxx xxxx [11] CRCC
-					*/
-
-					msf_abs = lba_to_msf_alt( cd_curfad - 150 );
-					track = cdrom_get_track( cdrom, cd_curfad );
-					msf_rel = lba_to_msf_alt( cd_curfad - 150 - cdrom_get_track_start( cdrom, track ) );
-
-					xfertype = XFERTYPE_SUBQ;
-					xfercount = 0;
-					subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
-					subqbuf[1] = dec_2_bcd(track+1);
-					subqbuf[2] = dec_2_bcd(get_track_index(cd_curfad));
-					subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
-					subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
-					subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
-					subqbuf[6] = 0;
-					subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
-					subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
-					subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
-				}
-				break;
-
-				case 1: // Get RW
-					cr1 = cd_stat | 0;
-					cr2 = 12;
-					cr3 = 0;
-					cr4 = 0;
-
-					xfertype = XFERTYPE_SUBRW;
-					xfercount = 0;
-
-					/* return null data for now */
-					{
-						int i;
-
-						for(i=0;i<12*2;i++)
-							subrwbuf[i] = 0;
-					}
-					break;
-			}
-			hirqreg |= CMOK|DRDY;
-			status_type = 0;
-			break;
-
-		case 0x30:    // Set CD Device connection
-			{
-				uint8_t parm;
-
-				// get operation
-				parm = cr3>>8;
-
-				LOG("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm);
-
-				cddevicenum = parm;
-
-				if (parm == 0xff)
-				{
-					cddevice = (filterT *)nullptr;
-				}
-				else
-				{
-					if (parm < MAX_FILTERS)
-					{
-						cddevice = &filters[parm];
-					}
-				}
-
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x31:
-			popmessage("Get CD Device Connection, contact MAMEdev");
-			hirqreg |= CMOK;
-			break;
-
-		case 0x32:    // Last Buffer Destination
-			cr1 = cd_stat | 0;
-			cr2 = 0;
-			cr3 = lastbuf << 8;
-			cr4 = 0;
-			hirqreg |= (CMOK);
-			status_type = 0;
-			break;
-
-		case 0x40:    // Set Filter Range
-						// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
-						// cr3 hi = filter num.
-			{
-				uint8_t fnum = (cr3>>8)&0xff;
-
-				LOG("%s: Set Filter Range\n",   machine().describe_context());
-
-				filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
-				filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
-
-				printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x41:
-			popmessage("Get Filter Range, contact MAMEdev");
-			hirqreg |= CMOK;
-			break;
-
-		case 0x42:    // Set Filter Subheader conditions
-			{
-				uint8_t fnum = (cr3>>8)&0xff;
-
-				LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
-
-				filters[fnum].chan = cr1 & 0xff;
-				filters[fnum].smmask = (cr2>>8)&0xff;
-				filters[fnum].cimask = cr2&0xff;
-				filters[fnum].fid = cr3&0xff;
-				filters[fnum].smval = (cr4>>8)&0xff;
-				filters[fnum].cival = cr4&0xff;
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x43:    // Get Filter Subheader conditions
-			{
-				uint8_t fnum = (cr3>>8)&0xff;
-
-				LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
-
-				cr1 = cd_stat | (filters[fnum].chan & 0xff);
-				cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
-				cr3 = filters[fnum].fid;
-				cr4 = (filters[fnum].smval << 8) | (filters[fnum].cival & 0xff);
-
-				hirqreg |= (CMOK|ESEL);
-				status_type = 0;
-			}
-			break;
-
-		case 0x44:    // Set Filter Mode
-			{
-				uint8_t fnum = (cr3>>8)&0xff;
-				uint8_t mode = (cr1 & 0xff);
-
-				// initialize filter?
-				if (mode & 0x80)
-				{
-					memset(&filters[fnum], 0, sizeof(filterT));
-				}
-				else
-				{
-					filters[fnum].mode = mode;
-				}
-
-				LOG("%s: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode);
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x45:    // Get Filter Mode
-			{
-				uint8_t fnum = (cr3>>8)&0xff;
-
-				cr1 = cd_stat | (filters[fnum].mode & 0xff);
-				cr2 = 0;
-				cr3 = 0;
-				cr4 = 0;
-
-				hirqreg |= (CMOK|ESEL);
-				status_type = 0;
-			}
-			break;
-
-		case 0x46:    // Set Filter Connection
-			{
-				/* TODO: maybe condition false is cr3 low? */
-				uint8_t fnum = (cr3>>8)&0xff;
-
-				LOG("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
-
-				if (cr1 & 1)    // set true condition
-					filters[fnum].condtrue = (cr2>>8)&0xff;
-
-				if (cr1 & 2)    // set false condition
-					filters[fnum].condfalse = cr2&0xff;
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x48:    // Reset Selector
-			{
-			int i,j;
-
-			LOG("%s: Reset Selector\n",   machine().describe_context());
-
-			if((cr1 & 0xff) == 0x00)
-			{
-				uint8_t bufnum = cr3>>8;
-
-				if(bufnum < MAX_FILTERS)
-				{
-					for (i = 0; i < MAX_BLOCKS; i++)
-					{
-						cd_free_block(partitions[bufnum].blocks[i]);
-						partitions[bufnum].blocks[i] = (blockT *)nullptr;
-						partitions[bufnum].bnum[i] = 0xff;
-					}
-
-					partitions[bufnum].size = -1;
-					partitions[bufnum].numblks = 0;
-				}
-
-				// TODO: buffer full flag
-
-				if (freeblocks == 200) { sectorstore = 0; }
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-				return;
-			}
-
-			/* reset false filter output conditions */
-			/* TODO: check these two. */
-			if(cr1 & 0x80)
-			{
-				for(i=0;i<MAX_FILTERS;i++)
-					filters[i].condfalse = 0;
-			}
-
-			/* reset true filter output conditions */
-			if(cr1 & 0x40)
-			{
-				for(i=0;i<MAX_FILTERS;i++)
-					filters[i].condtrue = 0;
-			}
-
-			/* reset filter conditions*/
-			if(cr1 & 0x10)
-			{
-				for(i=0;i<MAX_FILTERS;i++)
-				{
-					filters[i].fad = 0;
-					filters[i].range = 0xffffffff;
-					filters[i].mode = 0;
-					filters[i].chan = 0;
-					filters[i].smmask = 0;
-					filters[i].cimask = 0;
-					filters[i].fid = 0;
-					filters[i].smval = 0;
-					filters[i].cival = 0;
-				}
-			}
-
-			/* reset partition buffer data */
-			if(cr1 & 0x4)
-			{
-				for(i=0;i<MAX_FILTERS;i++)
-				{
-					for (j = 0; j < MAX_BLOCKS; j++)
-					{
-						cd_free_block(partitions[i].blocks[j]);
-						partitions[i].blocks[j] = (blockT *)nullptr;
-						partitions[i].bnum[j] = 0xff;
-					}
-
-					partitions[i].size = -1;
-					partitions[i].numblks = 0;
-				}
-
-				buffull = sectorstore = 0;
-			}
-
-			hirqreg |= (CMOK|ESEL);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			}
-			break;
-
-		case 0x50:    // get Buffer Size
-			cr1 = cd_stat;
-			cr2 = (freeblocks > 200) ? 200 : freeblocks;
-			cr3 = 0x1800;
-			cr4 = 200;
-			LOG("Get Buffer Size = %d\n", cr2);
-			hirqreg |= (CMOK);
-			status_type = 0;
-			break;
-
-		case 0x51:    // get # sectors used in a buffer
-			{
-				uint32_t bufnum = cr3>>8;
-
-				LOG("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
-				cr1 = cd_stat;
-				cr2 = 0;
-				cr3 = 0;
-				if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
-					printf("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
-
-				// is the partition empty?
-				if (partitions[bufnum].size == -1)
-				{
-					cr4 = 0;
-				}
-				else
-				{
-					cr4 = partitions[bufnum].numblks;
-					//printf("Partition %08x %04x\n",bufnum,cr4);
-				}
-
-				//printf("%04x\n",cr4);
-				if(cr4 == 0)
-					hirqreg |= (CMOK);
-				else
-					hirqreg |= (CMOK|DRDY);
-				status_type = 1;
-			}
-			break;
-
-		case 0x52:    // calculate actual size
-			{
-				uint32_t bufnum = cr3>>8;
-				uint32_t sectoffs = cr2;
-				uint32_t numsect = cr4;
-
-				LOG("%s: Calculate actual size: buf %x offs %x numsect %x\n", machine().describe_context(), bufnum, sectoffs, numsect);
-
-				calcsize = 0;
-				if (partitions[bufnum].size != -1)
-				{
-					int32_t i;
-
-					for (i = 0; i < numsect; i++)
-					{
-						if (partitions[bufnum].blocks[sectoffs+i])
-						{
-							calcsize += (partitions[bufnum].blocks[sectoffs+i]->size / 2);
-						}
-					}
-				}
-
-				hirqreg |= (CMOK|ESEL);
-				cr_standard_return(cd_stat);
-				status_type = 0;
-			}
-			break;
-
-		case 0x53:    // get actual block size
-			LOG("%s: Get actual block size\n", machine().describe_context());
-			cr1 = cd_stat | ((calcsize>>16)&0xff);
-			cr2 = (calcsize & 0xffff);
-			cr3 = 0;
-			cr4 = 0;
-			hirqreg |= (CMOK|ESEL);
-			status_type = 1;
-			break;
-
-		case 0x54:    // get sector info
-			{
-				uint32_t sectoffs = cr2 & 0xff;
-				uint32_t bufnum = cr3>>8;
-
-				if (bufnum >= MAX_FILTERS || !partitions[bufnum].blocks[sectoffs])
-				{
-					cr1 |= CD_STAT_REJECT & 0xff00;
-					hirqreg |= (CMOK|ESEL);
-					printf("Get sector info reject\n");
-				}
-				else
-				{
-					cr1 = cd_stat | ((partitions[bufnum].blocks[sectoffs]->FAD >> 16) & 0xff);
-					cr2 = partitions[bufnum].blocks[sectoffs]->FAD & 0xffff;
-					cr3 = ((partitions[bufnum].blocks[sectoffs]->fnum & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->chan & 0xff);
-					cr4 = ((partitions[bufnum].blocks[sectoffs]->subm & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->cinf & 0xff);
-					hirqreg |= (CMOK|ESEL);
-				}
-
-				status_type = 0;
-			}
-			break;
-
-		case 0x60:    // set sector length
-			LOG("%s: Set sector length\n",   machine().describe_context());
-
-			switch (cr1 & 0xff)
-			{
-				case 0:
-					sectlenin = 2048;
-					break;
-				case 1:
-					sectlenin = 2336;
-					break;
-				case 2:
-					sectlenin = 2340;
-					break;
-				case 3:
-					sectlenin = 2352;
-					break;
-			}
-
-			switch ((cr2>>8) & 0xff)
-			{
-				case 0:
-					sectlenout = 2048;
-					break;
-				case 1:
-					sectlenout = 2336;
-					break;
-				case 2:
-					sectlenout = 2340;
-					break;
-				case 3:
-					sectlenout = 2352;
-					break;
-			}
-			hirqreg |= (CMOK|ESEL);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0x61:    // get sector data
-			{
-				uint32_t sectnum = cr4;
-				uint32_t sectofs = cr2;
-				uint32_t bufnum = cr3>>8;
-
-				LOG("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
-
-				if (bufnum >= MAX_FILTERS)
-				{
-					osd_printf_error("CD: invalid buffer number\n");
-					/* TODO: why this is happening? */
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				if (partitions[bufnum].numblks < sectnum)
-				{
-					osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-
-				xfertype32 = XFERTYPE32_GETSECTOR;
-				xferoffs = 0;
-				xfersect = 0;
-				xferdnum = 0;
-				xfersectpos = sectofs;
-				xfersectnum = sectnum;
-				transpart = &partitions[bufnum];
-
-				cd_stat |= CD_STAT_TRANS;
-				cr_standard_return(cd_stat);
-				hirqreg |= (CMOK|EHST|DRDY);
-				status_type = 0;
-			}
-			break;
-
-		case 0x62:    // delete sector data
-			{
-				uint32_t sectnum = cr4;
-				uint32_t sectofs = cr2;
-				uint32_t bufnum = cr3>>8;
-				int32_t i;
-
-				LOG("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
-
-				if (bufnum >= MAX_FILTERS)
-				{
-					osd_printf_error("CD: invalid buffer number\n");
-					/* TODO: why this is happening? */
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				/* TODO: Phantasy Star 2 throws this one. */
-				if (partitions[bufnum].numblks == 0)
-				{
-					osd_printf_error("CD: buffer is already empty\n");
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-
-				for (i = sectofs; i < (sectofs + sectnum); i++)
-				{
-					partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
-					cd_free_block(partitions[bufnum].blocks[i]);
-					partitions[bufnum].blocks[i] = (blockT *)nullptr;
-					partitions[bufnum].bnum[i] = 0xff;
-				}
-
-				cd_defragblocks(&partitions[bufnum]);
-
-				partitions[bufnum].numblks -= sectnum;
-
-				if (freeblocks == 200)
-				{
-					sectorstore = 0;
-				}
-
-				cd_stat &= ~CD_STAT_TRANS;
-				cr_standard_return(cd_stat);
-				hirqreg |= (CMOK|EHST);
-				status_type = 0;
-			}
-			break;
-
-		case 0x63:    // get then delete sector data
-			{
-				uint32_t sectnum = cr4;
-				uint32_t sectofs = cr2;
-				uint32_t bufnum = cr3>>8;
-
-				LOG("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
-
-				if (bufnum >= MAX_FILTERS)
-				{
-					osd_printf_error("CD: invalid buffer number\n");
-					/* TODO: why this is happening? */
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
-				if (partitions[bufnum].numblks < sectnum)
-				{
-					osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
-					cr_standard_return(CD_STAT_REJECT);
-					hirqreg |= (CMOK|EHST);
-					return;
-				}
-
-				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-
-				xfertype32 = XFERTYPE32_GETDELETESECTOR;
-				xferoffs = 0;
-				xfersect = 0;
-				xferdnum = 0;
-				xfersectpos = sectofs;
-				xfersectnum = sectnum;
-				transpart = &partitions[bufnum];
-
-				cd_stat |= CD_STAT_TRANS;
-				cr_standard_return(cd_stat);
-				hirqreg |= (CMOK|EHST|DRDY);
-				status_type = 0;
-			}
-			break;
-
-		case 0x64:    // put sector data
-			/* After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
-			{
-				uint32_t sectnum = cr4 & 0xff;
-				uint32_t sectofs = cr2;
-				uint32_t bufnum = cr3>>8;
-
-				xfertype32 = XFERTYPE32_PUTSECTOR;
-
-				/*TODO: eventual errors? */
-
-				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-
-				cd_stat |= CD_STAT_TRANS;
-
-				xferoffs = 0;
-				xfersect = 0;
-				xferdnum = 0;
-				xfersectpos = sectofs;
-				xfersectnum = sectnum;
-				transpart = &partitions[bufnum];
-
-				// allocate the blocks
-				for (int i = xfersectpos; i < xfersectpos+xfersectnum; i++)
-				{
-					transpart->blocks[i] = cd_alloc_block(&transpart->bnum[i]);
-					if(transpart->size == -1)
-						transpart->size = 0;
-					transpart->size += transpart->blocks[i]->size;
-					transpart->numblks++;
-				}
-			}
-
-			hirqreg |= (CMOK|DRDY);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0x65:
-			popmessage("Move Sector data, contact MAMEdev");
-			hirqreg |= (CMOK);
-			break;
-
-		case 0x66:    // copy sector data
-			/* TODO: Sword & Sorcery / Riglord Saga 2 */
-			{
-				uint32_t src_filter = (cr3>>8)&0xff;
-				uint32_t dst_filter = cr1&0xff;
-				uint32_t sectnum = cr4 & 0xff;
-
-				//cd_stat |= CD_STAT_TRANS;
-				//transpart = &partitions[dst_filter];
-
-				for (int i = 0; i < sectnum; i++)
-				{
-					// allocate the dst blocks
-					partitions[dst_filter].blocks[i] = cd_alloc_block(&partitions[dst_filter].bnum[i]);
-					if(partitions[dst_filter].size == -1)
-						partitions[dst_filter].size = 0;
-					partitions[dst_filter].size += partitions[dst_filter].blocks[i]->size;
-					partitions[dst_filter].numblks++;
-
-					//copy data
-					for(int j = 0; j < sectlenin; j++)
-						partitions[dst_filter].blocks[i]->data[j] = partitions[src_filter].blocks[i]->data[j];
-
-					//deallocate the src blocks
-					//partitions[src_filter].size -= partitions[src_filter].blocks[i]->size;
-					//cd_free_block(partitions[src_filter].blocks[i]);
-					//partitions[src_filter].blocks[i] = (blockT *)nullptr;
-					//partitions[src_filter].bnum[i] = 0xff;
-				}
-
-			}
-
-			hirqreg |= (CMOK|ECPY);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-
-		case 0x67:    // get copy error
-			LOG("%s: Get copy error\n",   machine().describe_context());
-			logerror("Get copy error\n");
-			cr1 = cd_stat;
-			cr2 = 0;
-			cr3 = 0;
-			cr4 = 0;
-			hirqreg |= (CMOK);
-			status_type = 0;
-			break;
-
-		case 0x70:    // change directory
-			LOG("%s: Change Directory\n",   machine().describe_context());
-			hirqreg |= (CMOK|EFLS);
-
-			temp = (cr3&0xff)<<16;
-			temp |= cr4;
-
-			read_new_dir(temp);
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0x71:    // Read directory entry
-			LOG("%s: Read Directory Entry\n",   machine().describe_context());
-//          uint32_t read_dir;
-
-//          read_dir = ((cr3&0xff)<<16)|cr4;
-
-			if((cr3 >> 8) < MAX_FILTERS)
-				cddevice = &filters[cr3 >> 8];
-			else
-				cddevice = (filterT *)nullptr;
-
-			/* TODO:  */
-			//read_new_dir(read_dir - 2);
-
-			cr_standard_return(cd_stat);
-			hirqreg |= (CMOK|EFLS);
-			status_type = 0;
-			break;
-
-		case 0x72:    // Get file system scope
-			LOG("%s: Get file system scope\n", machine().describe_context());
-			hirqreg |= (CMOK|EFLS);
-			cr1 = cd_stat;
-			cr2 = numfiles; // # of files in directory
-			cr3 = 0x0100;   // report directory held
-			cr4 = firstfile;    // first file id
-			printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
-			status_type = 0;
-			break;
-
-		case 0x73:    // Get File Info
-			LOG("%s: Get File Info\n",   machine().describe_context());
-			cd_stat |= CD_STAT_TRANS;
-			cd_stat &= 0xff00;      // clear top byte of return value
-			playtype = 0;
-			cdda_repeat_count = 0;
-			hirqreg |= (CMOK|DRDY);
-
-			temp = (cr3&0xff)<<16;
-			temp |= cr4;
-
-			if (temp == 0xffffff)   // special
-			{
-				xfertype = XFERTYPE_FILEINFO_254;
-				xfercount = 0;
-
-				cr1 = cd_stat;
-				cr2 = 0x5f4;
-				cr3 = 0;
-				cr4 = 0;
-			}
-			else
-			{
-				cr1 = cd_stat;
-				cr2 = 6;    // 6 words for single file
-							// first 4 bytes = FAD address
-							// second 4 bytes = length
-							// last 4 bytes:
-							// - unit size
-							// - gap size
-							// - file #
-							// attributes flags
-
-				cr3 = 0;
-				cr4 = 0;
-
-				printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
-				// first 4 bytes = FAD
-				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-				finfbuf[3] = (curdir[temp].firstfad&0xff);
-				// second 4 bytes = length of file
-				finfbuf[4] = (curdir[temp].length>>24)&0xff;
-				finfbuf[5] = (curdir[temp].length>>16)&0xff;
-				finfbuf[6] = (curdir[temp].length>>8)&0xff;
-				finfbuf[7] = (curdir[temp].length&0xff);
-				finfbuf[8] = curdir[temp].interleave_gap_size;
-				finfbuf[9] = curdir[temp].file_unit_size;
-				finfbuf[10] = temp;
-				finfbuf[11] = curdir[temp].flags;
-
-				xfertype = XFERTYPE_FILEINFO_1;
-				xfercount = 0;
-			}
-			LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
-			status_type = 0;
-			break;
-
-		case 0x74:    // Read File
-			LOG("%s: Read File\n",   machine().describe_context());
-			uint16_t file_offset,file_filter,file_id,file_size;
-
-			file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
-			file_filter = cr3 >> 8;
-			file_id = ((cr3 & 0xff) << 16)|(cr4);
-			file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
-
-			cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
-			cd_curfad = (curdir[file_id].firstfad + file_offset);
-			fadstoplay = file_size;
-			if(file_filter < MAX_FILTERS)
-				cddevice = &filters[file_filter];
-			else
-				cddevice = (filterT *)nullptr;
-
-			printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
-
-			cr_standard_return(cd_stat);
-
-			oddframe = 0;
-			in_buffer = 0;
-
-			playtype = 1;
-
-			hirqreg |= (CMOK|EHST);
-			status_type = 0;
-			break;
-
-		case 0x75:
-			LOG("%s: Abort File\n",   machine().describe_context());
-			// bios expects "2bc" mask to work against this
-			hirqreg |= (CMOK|EFLS);
-			sectorstore = 0;
-			xfertype32 = XFERTYPE32_INVALID;
-			xferdnum = 0;
-			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-				cd_stat = CD_STAT_PAUSE;    // force to pause
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0xe0:    // appears to be copy protection check.  needs only to return OK.
-			LOG("%s: Verify copy protection\n",   machine().describe_context());
-			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-				cd_stat = CD_STAT_PAUSE;
-//          cr1 = cd_stat;  // necessary to pass
-//          cr2 = 0x4;
-//          hirqreg |= (CMOK|EFLS|CSCT);
-			if(cr2 == 0x0001) // MPEG card
-			{
-				hirqreg |= (CMOK|MPED);
-			}
-			else
-			{
-				sectorstore = 1;
-				hirqreg = 0x7c5;
-			}
-			cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		case 0xe1:    // get disc region
-			LOG("%s: Get disc region\n",   machine().describe_context());
-			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
-				cd_stat = CD_STAT_PAUSE;
-			cr1 = cd_stat;  // necessary to pass
-			if(cr2 == 0x0001) // MPEG card
-				cr2 = 0x2;
-			else
-				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc
-			cr3 = 0;
-			cr4 = 0;
-			hirqreg |= (CMOK);
-//          cr_standard_return(cd_stat);
-			status_type = 0;
-			break;
-
-		// Get MPEG Card Boot ROM
-		// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
-		case 0xe2:
-			cr_standard_return(cd_stat);
-			hirqreg |= (CMOK|MPED);
-			break;
+		case 0x00: cmd_get_status(); break;
+		case 0x01: cmd_get_hw_info(); break;
+		case 0x02: cmd_get_toc(); break;
+		case 0x03: cmd_get_session_info(); break;
+		case 0x04: cmd_init_cdsystem(); break;
+		case 0x06: cmd_end_data_transfer(); break;
+
+		case 0x10: cmd_play_disc(); break;
+		case 0x11: cmd_seek_disc(); break;
+		case 0x12: cmd_ffwd_rew_disc(); break;
+
+		case 0x20: cmd_get_subcode_q_rw_channel(); break;
+
+		case 0x30: cmd_set_cddevice_connection(); break;
+		case 0x31: cmd_get_cddevice_connection(); break;
+		case 0x32: cmd_last_buffer_destination(); break;
+
+		case 0x40: cmd_set_filter_range(); break;
+		case 0x41: cmd_get_filter_range(); break;
+		case 0x42: cmd_set_filter_subheader_conditions(); break;
+		case 0x43: cmd_get_filter_subheader_conditions(); break;
+		case 0x44: cmd_set_filter_mode(); break;
+		case 0x45: cmd_get_filter_mode(); break;
+		case 0x46: cmd_set_filter_connection(); break;
+		case 0x48: cmd_reset_selector(); break;
+
+		case 0x50: cmd_get_buffer_size(); break;
+		case 0x51: cmd_get_buffer_partition_sector_number(); break;
+		case 0x52: cmd_calculate_actual_data_size(); break;
+		case 0x53: cmd_get_actual_data_size(); break;
+		case 0x54: cmd_get_sector_information(); break;
+//		case 0x55: cmd_execute_frame_address_search()
+//		case 0x56: cmd_get_frame_address_search_results()
+
+		case 0x60: cmd_set_sector_length();	break;
+		case 0x61: cmd_get_sector_data(); break;
+		case 0x62: cmd_delete_sector_data(); break;
+		case 0x63: cmd_get_and_delete_sector_data(); break;
+		case 0x64: cmd_put_sector_data(); break;
+		case 0x65: cmd_move_sector_data(); break;
+		case 0x66: cmd_copy_sector_data(); break;
+		case 0x67: cmd_get_sector_data_copy_or_move_error(); break;
+
+		case 0x70: cmd_change_directory(); break;    
+		case 0x71: cmd_read_directory(); break;
+		case 0x72: cmd_get_file_scope(); break;
+		case 0x73: cmd_get_target_file_info(); break;
+		case 0x74: cmd_read_file(); break;
+		case 0x75: cmd_abort_file(); break;
 
 		// following are MPEG commands, enough to get Sport Fishing to do something
-		// MPEG Get Status
-		case 0x90:
-		// MPEG Set IRQ Mask
-		case 0x92:
-		// MPEG Set Mode
-		case 0x94:
-			mpeg_standard_return(cd_stat);
-			hirqreg |= (CMOK);
-			break;
+		case 0x90: cmd_mpeg_get_status(); break;
+		case 0x91: cmd_mpeg_get_irq(); break;
+		case 0x92: cmd_mpeg_set_irq_mask(); break;
+		case 0x93: cmd_mpeg_init(); break;
+		case 0x94: cmd_mpeg_set_mode(); break;
 
-		// MPEG get IRQ
-		case 0x91:
-			cr1 = cd_stat | 0;
-			cr2 = 5;
-			cr3 = 0;
-			cr4 = 0;
-			hirqreg |= (CMOK);
-			break;
-
-		// MPEG init
-		case 0x93:
-			hirqreg |= (CMOK|MPED);
-			if(cr2 == 0x0001)
-				hirqreg |= (MPCM);
-
-			cr1 = cd_stat;
-			cr2 = 0;
-			cr3 = 0;
-			cr4 = 0;
-			break;
-
+		case 0xe0: cmd_check_copy_protection(); break;
+		case 0xe1: cmd_get_disc_region(); break;
+		case 0xe2: cmd_get_mpeg_card_boot_rom(); break;
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);
@@ -1658,464 +2145,6 @@ void stvcd_device::cd_defragblocks(partitionT *part)
 				part->bnum[j] = temp2;
 			}
 		}
-	}
-}
-
-uint16_t stvcd_device::cd_readWord(uint32_t addr)
-{
-	uint16_t rv;
-
-	switch (addr & 0xffff)
-	{
-		case 0x0008:    // read HIRQ register
-		case 0x000a:
-		case 0x8008:
-		case 0x800a:
-			rv = hirqreg;
-
-			rv &= ~DCHG;    // always clear bit 6 (tray open)
-
-			if (buffull) rv |= BFUL; else rv &= ~BFUL;
-			if (sectorstore) rv |= CSCT; else rv &= ~CSCT;
-
-			hirqreg = rv;
-
-//          LOG("RW HIRQ: %04x\n", rv);
-
-			return rv;
-
-		case 0x000c:
-		case 0x000e:
-		case 0x800c:
-		case 0x800e:
-//          LOG("RW HIRM: %04x\n", hirqmask);
-			printf("RW HIRM: %04x\n", hirqmask);
-			return hirqmask;
-
-		case 0x0018:
-		case 0x001a:
-		case 0x8018:
-		case 0x801a:
-//          LOG("RW CR1: %04x\n", cr1);
-			return cr1;
-
-		case 0x001c:
-		case 0x001e:
-		case 0x801c:
-		case 0x801e:
-//          LOG("RW CR2: %04x\n", cr2);
-			return cr2;
-
-		case 0x0020:
-		case 0x0022:
-		case 0x8020:
-		case 0x8022:
-//          LOG("RW CR3: %04x\n", cr3);
-			return cr3;
-
-		case 0x0024:
-		case 0x0026:
-		case 0x8024:
-		case 0x8026:
-//          LOG("RW CR4: %04x\n", cr4);
-			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
-			cmd_pending = 0;
-			cd_stat |= CD_STAT_PERI;
-			return cr4;
-
-		case 0x8000:
-			rv = 0xffff;
-			switch (xfertype)
-			{
-				case XFERTYPE_TOC:
-					rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 102*4)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_1:
-					rv = finfbuf[xfercount]<<8 | finfbuf[xfercount+1];
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 6*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_FILEINFO_254: // Lunar 2
-					if((xfercount % (6 * 2)) == 0)
-					{
-						uint32_t temp = 2 + (xfercount / (0x6 * 2));
-
-						// first 4 bytes = FAD
-						finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
-						finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
-						finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
-						finfbuf[3] = (curdir[temp].firstfad&0xff);
-						// second 4 bytes = length of file
-						finfbuf[4] = (curdir[temp].length>>24)&0xff;
-						finfbuf[5] = (curdir[temp].length>>16)&0xff;
-						finfbuf[6] = (curdir[temp].length>>8)&0xff;
-						finfbuf[7] = (curdir[temp].length&0xff);
-						finfbuf[8] = curdir[temp].interleave_gap_size;
-						finfbuf[9] = curdir[temp].file_unit_size;
-						finfbuf[10] = temp;
-						finfbuf[11] = curdir[temp].flags;
-					}
-
-					rv = finfbuf[xfercount % (6 * 2)]<<8 | finfbuf[(xfercount % (6 * 2)) +1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > (254 * 6 * 2))
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				case XFERTYPE_SUBQ:
-					rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 5*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-
-				case XFERTYPE_SUBRW:
-					rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
-
-					xfercount += 2;
-					xferdnum += 2;
-
-					if (xfercount > 12*2)
-					{
-						xfercount = 0;
-						xfertype = XFERTYPE_INVALID;
-					}
-					break;
-
-				default:
-					osd_printf_error("STVCD: Unhandled xfer type %d\n", (int)xfertype);
-					rv = 0;
-					break;
-			}
-
-			return rv;
-
-		default:
-			LOG("CD: RW %08x\n", addr);
-			return 0xffff;
-	}
-
-}
-
-uint32_t stvcd_device::cd_readLong(uint32_t addr)
-{
-	uint32_t rv = 0;
-
-	switch (addr & 0xffff)
-	{
-		case 0x8000:
-			switch (xfertype32)
-			{
-				case XFERTYPE32_GETSECTOR:
-				case XFERTYPE32_GETDELETESECTOR:
-					// make sure we have sectors left
-					if (xfersect < xfersectnum)
-					{
-						// get next longword
-						rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
-								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
-
-						xferdnum += 4;
-						xferoffs += 4;
-
-						// did we run out of sector?
-						if (xferoffs >= transpart->blocks[xfersect]->size)
-						{
-							LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
-
-							xferoffs = 0;
-							xfersect++;
-						}
-					}
-					else    // sectors are done, kill 'em all if we can
-					{
-						if (xfertype32 == XFERTYPE32_GETDELETESECTOR)
-						{
-							int32_t i;
-
-							LOG("Killing sectors in done\n");
-
-							// deallocate the blocks
-							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
-							{
-								cd_free_block(transpart->blocks[i]);
-								transpart->blocks[i] = (blockT *)nullptr;
-								transpart->bnum[i] = 0xff;
-							}
-
-							// defrag what's left
-							cd_defragblocks(transpart);
-
-							// clean up our state
-							transpart->size -= xferdnum;
-							transpart->numblks -= xfersectnum;
-
-							/* TODO: is this correct? */
-							xfertype32 = XFERTYPE32_INVALID;
-						}
-					}
-					break;
-
-				default:
-					osd_printf_error("CD: unhandled 32-bit transfer type\n");
-					break;
-			}
-
-			return rv;
-
-		default:
-			LOG("RL %08x\n", addr);
-			return 0xffff;
-	}
-}
-
-void stvcd_device::cd_writeLong(uint32_t addr, uint32_t data)
-{
-	switch (addr & 0xffff)
-	{
-		case 0x8000:
-			switch (xfertype32)
-			{
-				case XFERTYPE32_PUTSECTOR:
-					// make sure we have sectors left
-					if (xfersect < xfersectnum)
-					{
-						// get next longword
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
-						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
-
-						xferdnum += 4;
-						xferoffs += 4;
-
-						// did we run out of sector?
-						if (xferoffs >= transpart->blocks[xfersectpos+xfersect]->size)
-						{
-							LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
-
-							xferoffs = 0;
-							xfersect++;
-						}
-					}
-					else    // sectors are done
-					{
-						/* Virtual On doesnt want this to be resetted. */
-						//xfertype32 = XFERTYPE32_INVALID;
-					}
-					break;
-
-				default:
-					osd_printf_error("CD: unhandled 32-bit transfer type write\n");
-					break;
-			}
-			break;
-
-		default:
-			break;
-	}
-}
-
-void stvcd_device::cd_writeWord(uint32_t addr, uint16_t data)
-{
-	switch(addr & 0xffff)
-	{
-	case 0x0008:
-	case 0x000a:
-	case 0x8008:
-	case 0x800a:
-//      LOG("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data);
-		hirqreg &= data;
-		return;
-	case 0x000c:
-	case 0x000e:
-	case 0x800c:
-	case 0x800e:
-//      LOG("WW HIRM: %04x => %04x\n", hirqmask, data);
-		printf("WW HIRM: %04x => %04x\n", hirqmask, data);
-		hirqmask = data;
-		return;
-	case 0x0018:
-	case 0x001a:
-	case 0x8018:
-	case 0x801a:
-//      LOG("WW CR1: %04x\n", data);
-		cr1 = data;
-		cd_stat &= ~CD_STAT_PERI;
-		cmd_pending |= 1;
-		m_sh1_timer->adjust(attotime::never);
-		break;
-	case 0x001c:
-	case 0x001e:
-	case 0x801c:
-	case 0x801e:
-//      LOG("WW CR2: %04x\n", data);
-		cr2 = data;
-		cmd_pending |= 2;
-		break;
-	case 0x0020:
-	case 0x0022:
-	case 0x8020:
-	case 0x8022:
-//      LOG("WW CR3: %04x\n", data);
-		cr3 = data;
-		cmd_pending |= 4;
-		break;
-	case 0x0024:
-	case 0x0026:
-	case 0x8024:
-	case 0x8026:
-//      LOG("WW CR4: %04x\n", data);
-		cr4 = data;
-		cmd_pending |= 8;
-		m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
-		break;
-	default:
-		LOG("WW %08x %04x\n", addr, data);
-		break;
-	}
-}
-
-READ32_MEMBER( stvcd_device::stvcd_r )
-{
-	uint32_t rv = 0;
-
-	offset <<= 2;
-
-	switch (offset)
-	{
-		case 0x88008:
-		case 0x8800a:
-		case 0x8800c:
-		case 0x8800e:
-		case 0x88018:
-		case 0x8801a:
-		case 0x8801c:
-		case 0x8801e:
-		case 0x88020:
-		case 0x88022:
-		case 0x88024:
-		case 0x88026:
-		case 0x90008:
-		case 0x9000a:
-		case 0x9000c:
-		case 0x9000e:
-		case 0x90018:
-		case 0x9001a:
-		case 0x9001c:
-		case 0x9001e:
-		case 0x90020:
-		case 0x90022:
-		case 0x90024:
-		case 0x90026:
-			rv = cd_readWord(offset);
-			return rv<<16;
-
-		case 0x98000:
-		case 0x18000:
-			if (mem_mask == 0xffffffff)
-			{
-				rv = cd_readLong(offset);
-			}
-			else if (mem_mask == 0xffff0000)
-			{
-				rv = cd_readWord(offset)<<16;
-			}
-			else if (mem_mask == 0x0000ffff)
-			{
-				rv = cd_readWord(offset);
-			}
-			else
-			{
-				osd_printf_error("CD: Unknown data buffer read @ mask = %08x\n", mem_mask);
-			}
-
-			break;
-
-		default:
-			osd_printf_error("Unknown CD read %x\n", offset);
-			break;
-	}
-
-	return rv;
-}
-
-WRITE32_MEMBER( stvcd_device::stvcd_w )
-{
-	offset <<= 2;
-
-	switch (offset)
-	{
-		case 0x18000:
-			if (mem_mask == 0xffffffff)
-				cd_writeLong(offset, data);
-			else
-				osd_printf_error("CD: Unknown data buffer write @ mask = %08x\n", mem_mask);
-			break;
-
-		case 0x88008:
-		case 0x8800a:
-		case 0x8800c:
-		case 0x8800e:
-		case 0x88018:
-		case 0x8801a:
-		case 0x8801c:
-		case 0x8801e:
-		case 0x88020:
-		case 0x88022:
-		case 0x88024:
-		case 0x88026:
-		case 0x90008:
-		case 0x9000a:
-		case 0x9000c:
-		case 0x9000e:
-		case 0x90018:
-		case 0x9001a:
-		case 0x9001c:
-		case 0x9001e:
-		case 0x90020:
-		case 0x90022:
-		case 0x90024:
-		case 0x90026:
-			cd_writeWord(offset, data>>16);
-			break;
-
-		default:
-			osd_printf_error("Unknown CD write %x @ %x\n", data, offset);
-			//xferdnum = 0x8c00;
-			break;
 	}
 }
 

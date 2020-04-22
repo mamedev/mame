@@ -489,6 +489,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
 mbc200.cpp
@@ -517,6 +518,7 @@ mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
+mephisto_mondial.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
@@ -605,6 +607,7 @@ nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
+news_68k.cpp
 news_r3k.cpp
 next.cpp
 nforcepc.cpp
@@ -626,6 +629,7 @@ octane.cpp
 octopus.cpp
 odyssey2.cpp
 okean240.cpp
+olivpc1.cpp
 olyboss.cpp
 olytext.cpp
 ondra.cpp
@@ -763,6 +767,7 @@ roland_d50.cpp
 roland_jv80.cpp
 roland_jx3p.cpp
 roland_jx8p.cpp
+roland_mc50.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_ra30.cpp
@@ -786,6 +791,7 @@ saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
+saitek_exchess.cpp
 saitek_mark5.cpp
 saitek_prschess.cpp
 saitek_risc2500.cpp

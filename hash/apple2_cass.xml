@@ -47,7 +47,7 @@ license:CC0
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="3D Star Fire" />
 			<dataarea name="cass" size="8052074">
-				<rom name="3-d star fire! (1980)(tukumo original software).wav" size="8052074" crc="6ab161f2" sha1="504cdfbd49686afa542e03db7315803b40699877"/>
+				<rom name="3-d star fire (1980)(tukumo original software).wav" size="8052074" crc="6ab161f2" sha1="504cdfbd49686afa542e03db7315803b40699877"/>
 			</dataarea>
 		</part>
 	</software>

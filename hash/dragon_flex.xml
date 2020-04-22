@@ -21,7 +21,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Chatplus v1.0.2 (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="19ccacf0" sha1="5ada16ed7ffedb779fee6217c429a5d0eab607e8"/>
+				<rom name="Chatplus v1.0.2 (1985)(Compusense Ltd)[FLEX].vdk" size="184332" crc="19ccacf0" sha1="5ada16ed7ffedb779fee6217c429a5d0eab607e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="DBASIC (1984)(Compusense Ltd)[!][a][FLEX].vdk" size="89612" crc="8d0c7af0" sha1="8804954ab2a5ff0694f1f5d85d660ea1c5fd325c"/>
+				<rom name="DBASIC (1984)(Compusense Ltd)[a][FLEX].vdk" size="89612" crc="8d0c7af0" sha1="8804954ab2a5ff0694f1f5d85d660ea1c5fd325c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="DBASIC (1984)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="9e442c96" sha1="59e219fe8fc419acb607e09376a0ffcabc803b01"/>
+				<rom name="DBASIC (1984)(Compusense Ltd)[FLEX].vdk" size="89612" crc="9e442c96" sha1="59e219fe8fc419acb607e09376a0ffcabc803b01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Diagnostics (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="a7dc4a6d" sha1="3805b18f612ca0556555d5318fe71f9edd2fdd2c"/>
+				<rom name="Diagnostics (198x)(Compusense Ltd)[FLEX].vdk" size="184332" crc="a7dc4a6d" sha1="3805b18f612ca0556555d5318fe71f9edd2fdd2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="DragonPlus Updates (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="43b47717" sha1="89791522e0eb633c61021d16a463b32f7dccd1a5"/>
+				<rom name="DragonPlus Updates (1985)(Compusense Ltd)[FLEX].vdk" size="184332" crc="43b47717" sha1="89791522e0eb633c61021d16a463b32f7dccd1a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184345">
-				<rom name="Dynacalc (198x)(Compusense Ltd)[!][FLEX].vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791"/>
+				<rom name="Dynacalc (198x)(Compusense Ltd)[FLEX].vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102412">
-				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!][FLEX].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358"/>
+				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[FLEX].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Editor &amp; Assembler (1984)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="fbd982fc" sha1="0d61de42dac45f2177691483f2246d8613562611"/>
+				<rom name="Editor &amp; Assembler (1984)(Compusense Ltd)[FLEX].vdk" size="184332" crc="fbd982fc" sha1="0d61de42dac45f2177691483f2246d8613562611"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Editor &amp; Assembler (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="2401fb97" sha1="ac068e6b33f46c50a06a48f16dff2d5c7a2cb8cb"/>
+				<rom name="Editor &amp; Assembler (1985)(Compusense Ltd)[FLEX][DPLUS].vdk" size="184332" crc="2401fb97" sha1="ac068e6b33f46c50a06a48f16dff2d5c7a2cb8cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Extended Basic (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="c18a8f61" sha1="24b5d8add1bf1159d7687956c95967085ecfe597"/>
+				<rom name="Extended Basic (198x)(Compusense Ltd)[FLEX].vdk" size="184332" crc="c18a8f61" sha1="24b5d8add1bf1159d7687956c95967085ecfe597"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="f33017a8" sha1="ec48253caaa782e259c2b9055bc726b3f96f429c"/>
+				<rom name="SP-Edit (1985)(Compusense Ltd)[FLEX].vdk" size="184332" crc="f33017a8" sha1="ec48253caaa782e259c2b9055bc726b3f96f429c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="6e225972" sha1="744205c3603d2c043861b11e73d1b8a80abc35be"/>
+				<rom name="SP-Edit (1985)(Compusense Ltd)[FLEX][DPLUS].vdk" size="184332" crc="6e225972" sha1="744205c3603d2c043861b11e73d1b8a80abc35be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Super Sleuth Disassembler (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="75e73de8" sha1="e5498f4a8eee30bd1cfd94fed4edb3519f5ed334"/>
+				<rom name="Super Sleuth Disassembler (198x)(Compusense Ltd)[FLEX].vdk" size="184332" crc="75e73de8" sha1="e5498f4a8eee30bd1cfd94fed4edb3519f5ed334"/>
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Text Processing System (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="567ec37b" sha1="e88197c2961696eb2efc95e6fc1cd24ec3cc1e02"/>
+				<rom name="Text Processing System (198x)(Compusense Ltd)[FLEX].vdk" size="184332" crc="567ec37b" sha1="e88197c2961696eb2efc95e6fc1cd24ec3cc1e02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -307,7 +307,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Utilities (198x)(Compusense Ltd)[!][a][FLEX].vdk" size="184332" crc="87a482da" sha1="f910800793020845f26f10aa46fdcc22ea75d686"/>
+				<rom name="Utilities (198x)(Compusense Ltd)[a][FLEX].vdk" size="184332" crc="87a482da" sha1="f910800793020845f26f10aa46fdcc22ea75d686"/>
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +318,7 @@ Dragon 64 FLEX floppy disks
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="Utilities (198x)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="f36b61da" sha1="ed84f92d53b123e939a6f40c3eceb2a00019c3ef"/>
+				<rom name="Utilities (198x)(Compusense Ltd)[FLEX].vdk" size="89612" crc="f36b61da" sha1="ed84f92d53b123e939a6f40c3eceb2a00019c3ef"/>
 			</dataarea>
 		</part>
 	</software>

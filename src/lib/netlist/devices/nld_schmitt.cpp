@@ -82,7 +82,7 @@ namespace netlist
 				m_last_state = 1;
 				m_RVI.reset();
 				m_RVO.reset();
-				m_is_timestep = m_RVO.m_P.net().solver()->has_timestep_devices();
+				m_is_timestep = (m_RVO.m_P.net().solver()->timestep_device_count() > 0);
 				m_RVI.set_G_V_I(plib::reciprocal(m_model.m_RI()), m_model.m_VI, nlconst::zero());
 				m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
 			}

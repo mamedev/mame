@@ -189,8 +189,8 @@ license:CC0
 		<info name="serial" value="68 20018-41" />
 
 		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="85140">
-				<rom name="demo11.td0" size="85140" crc="77fd2490" sha1="ba953cf6496633c449b2b49ad707469a763e1fd3"/>
+			<dataarea name="flop" size="163840">
+				<rom name="demo11.dsk" size="163840" crc="f57d142d" sha1="f9c67904ddc8fa598353dcdcd8c0bc3eb4e91524"/>
 			</dataarea>
 		</part>
 	</software>

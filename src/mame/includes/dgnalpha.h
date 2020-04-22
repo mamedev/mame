@@ -53,7 +53,6 @@ public:
 private:
 	DECLARE_FLOPPY_FORMATS(dragon_formats);
 
-
 	/* pia2 */
 	DECLARE_WRITE8_MEMBER( pia2_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
@@ -74,9 +73,7 @@ private:
 	/* interrupts */
 	virtual bool firq_get_line(void) override;
 
-	/* PIA1 */
-	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
+	void dgnalpha_io1(address_map &map);
 
 	required_device<pia6821_device> m_pia_2;
 	required_device<ay8912_device> m_ay8912;

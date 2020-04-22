@@ -334,8 +334,7 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 		{
 			try
 			{
-				u64 expresult;
-				parsed_expression expression(m_machine.debugger().cpu().get_visible_symtable(), command_start, &expresult);
+				parsed_expression(m_machine.debugger().cpu().visible_symtable(), command_start).execute();
 			}
 			catch (expression_error &err)
 			{

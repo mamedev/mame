@@ -89,6 +89,7 @@ private:
 
 	int m_cs;
 	int m_rdy;
+	int m_req;
 	int m_sasi_req;
 	int m_sasi_io;
 	int m_sasi_cd;

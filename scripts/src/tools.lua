@@ -462,6 +462,10 @@ includedirs {
   MAME_DIR .. "src/lib/netlist",
 }
 
+defines {
+  "NL_DISABLE_DYNAMIC_LOAD=1",
+}
+
 files {
 	MAME_DIR .. "src/lib/netlist/prg/nltool.cpp",
 }

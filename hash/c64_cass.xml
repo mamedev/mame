@@ -10,22 +10,23 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 
-	<software name="10cohit2">
+	<software name="10hits2">
 		<description>10 Computer Hits 2</description>
 		<year>1986</year>
-		<publisher>Beau Jolly</publisher>
+		<publisher>Beau-Jolly</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Tape A"/>
-			<dataarea name="cass" size="1756359">
-				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1762760">
+				<rom name="10hits2a.tap" size="1762760" crc="362781a0" sha1="35556185604bef3b91d49367adee9eba11e4975a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Tape B"/>
-			<dataarea name="cass" size="1767233">
-				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1773633">
+				<rom name="10hits2b.tap" size="1773633" crc="a8ece050" sha1="71e252d2b3c620796d1234877e68a9418f01bd89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -200,22 +201,23 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="actionpk">
-		<description>The Action Pack</description>
+	<software name="actionp">
+		<description>Action Pack</description>
 		<year>1990</year>
-		<publisher>Paxman Promotions</publisher>
+		<publisher>Prism Leisure Corporation</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Rock &amp; Wrestle / I Ball"/>
-			<dataarea name="cass" size="1408819">
-				<rom name="Action_Pack,_The_Side_1.tap" size="1408819" crc="78270669" sha1="58c29c640ae4ff421df411fe23c9768ba1d32fbd"/>
+			<dataarea name="cass" size="1408943">
+				<rom name="actionpa.tap" size="1408943" crc="83e0479f" sha1="e254ae6b0a91eedec0fb153ef3c1d59b353d484a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side 2: Sea Base Delta / Thrust"/>
-			<dataarea name="cass" size="997661">
-				<rom name="Action_Pack,_The_Side_2.tap" size="997661" crc="e0b5b90b" sha1="67672a5320a8b8dda6452fe2f48aadb43a3ef995"/>
+			<dataarea name="cass" size="997801">
+				<rom name="actionpb.tap" size="997801" crc="44e0a2c3" sha1="0cf00f97787e176343a80b2f24e115fe6ad4c23b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -239,7 +241,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="860602">
-				<rom name="Agent_X_II-_The_Mad_Prof's_Back!.tap" size="860602" crc="8f9b14d5" sha1="8cca587622c32c9fa2a8276203a9d523d14f6df1"/>
+				<rom name="Agent_X_II-_The_Mad_Prof's_Back.tap" size="860602" crc="8f9b14d5" sha1="8cca587622c32c9fa2a8276203a9d523d14f6df1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -337,10 +339,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Alleykat</description>
 		<year>1986</year>
 		<publisher>Hewson Consultants</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
-		<part name="cass1" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="489454">
-				<rom name="Alleykat.tap" size="489454" crc="f8b33ba9" sha1="78392282306e82d5885a6291b1984dbdf0365156"/>
+				<rom name="alleykat.tap" size="489454" crc="7398138b" sha1="781fe0d1dc599ae65733a25fc002e9d68c4e9710"/>
 			</dataarea>
 		</part>
 	</software>
@@ -367,10 +370,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Anarchy</description>
 		<year>1987</year>
 		<publisher>Rack It</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
-		<part name="cass1" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="386234">
-				<rom name="Anarchy.tap" size="386234" crc="84bd0b2c" sha1="e281f3369a74c3639192d213f37698d0ee72a729"/>
+				<rom name="anarchy.tap" size="386234" crc="ded3f7a5" sha1="36c4884399ada2b6f9f28026e39cbea07e4ad89d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -442,18 +446,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>APB</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side 1"/>
-			<dataarea name="cass" size="582695">
-				<rom name="APB_Side_1.tap" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="582692">
+				<rom name="apba.tap" size="582692" crc="6bd55d0f" sha1="54cadbb25e03ce82eeba4fd5a46db21f6236c9fb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side 2"/>
-			<dataarea name="cass" size="591908">
-				<rom name="APB_Side_2.tap" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="591896">
+				<rom name="apbb.tap" size="591896" crc="2405c53d" sha1="2a8f9757d7c38462314aada36598f8b0c802c0a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -548,20 +553,23 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="mtntcmls">
+	<software name="atcamel">
 		<description>Attack of the Mutant Camels</description>
 		<year>1983</year>
 		<publisher>Llamasoft</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="281694">
-				<rom name="Attack_of_the_Mutant_Camels.tap" size="281694" crc="832623e9" sha1="a0599d6df71e94dfc54e704c72fa0c667813205a"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="281695">
+				<rom name="atcamela.tap" size="281695" crc="18919d6b" sha1="001462db8a5b194d22f12148e1af9273c2125521"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="281695">
-				<rom name="Attack_of_the_Mutant_Camels_a1.tap" size="281695" crc="c2b94853" sha1="61fc913a287ae06268a28282125cf52a60ff4678"/>
+				<rom name="atcamelb.tap" size="281695" crc="22087b7c" sha1="33953669cdf0c7994a1008070ae2aee9b00deb86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2682,7 +2690,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="569573">
-				<rom name="Gary_Lineker's_Hot-Shot!.tap" size="569573" crc="68ccedcf" sha1="a46a875909293d14930779bdec8a24ca15fc2fa6"/>
+				<rom name="Gary_Lineker's_Hot-Shot.tap" size="569573" crc="68ccedcf" sha1="a46a875909293d14930779bdec8a24ca15fc2fa6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5003,7 +5011,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="375074">
-				<rom name="Oh_No!.tap" size="375074" crc="96625901" sha1="2b25b7a0b04a4bbc3d043e2c56f6783bc2476ec8"/>
+				<rom name="Oh_No.tap" size="375074" crc="96625901" sha1="2b25b7a0b04a4bbc3d043e2c56f6783bc2476ec8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5015,13 +5023,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="619099">
-				<rom name="Oink!.tap" size="619099" crc="de5e5603" sha1="bd60bfdea81b5a6f169bc1f0a17d404e092f5f17"/>
+				<rom name="Oink.tap" size="619099" crc="de5e5603" sha1="bd60bfdea81b5a6f169bc1f0a17d404e092f5f17"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="619099">
-				<rom name="Oink!_a1.tap" size="619099" crc="d747631a" sha1="2ff65ddf63619645874dadda6b3a3e5e302d4e73"/>
+				<rom name="Oink_a1.tap" size="619099" crc="d747631a" sha1="2ff65ddf63619645874dadda6b3a3e5e302d4e73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6020,7 +6028,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="429826">
-				<rom name="Rescue_on_Fractalus!.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
+				<rom name="Rescue_on_Fractalus.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7963,13 +7971,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="518131">
-				<rom name="Wanted!_Monty_Mole.tap" size="518131" crc="41e484a4" sha1="430b33c240f4d11e8b48941a4e3bd12957085291"/>
+				<rom name="Wanted_Monty_Mole.tap" size="518131" crc="41e484a4" sha1="430b33c240f4d11e8b48941a4e3bd12957085291"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="518132">
-				<rom name="Wanted!_Monty_Mole_a1.tap" size="518132" crc="429cddc7" sha1="c5fc773a41880338aa481853bf037121166beab7"/>
+				<rom name="Wanted_Monty_Mole_a1.tap" size="518132" crc="429cddc7" sha1="c5fc773a41880338aa481853bf037121166beab7"/>
 			</dataarea>
 		</part>
 	</software>

@@ -10,6 +10,9 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "softlist_dev.h"
 
+// According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
+// the IBM PS/2 Model 25-286 and Model 30-286 use a customised version of the XTA (8-bit IDE) harddisk interface
+
 class ps2_state : public driver_device
 {
 public:

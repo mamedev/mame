@@ -18,6 +18,7 @@
 #define LOG 0
 #define LOG_MAC 0
 #define LOG_DMA 0
+#define LOG_IO 0
 
 
 #define A0          BIT(offset, 0)
@@ -245,8 +246,11 @@ uint8_t abc1600_mac_device::read_user_memory(offs_t offset)
 {
 	int nonx = 0, wp = 0;
 	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
+	uint8_t data = space().read_byte(virtual_offset);
 
-	return space().read_byte(virtual_offset);
+	if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user read %06x:%02x\n", machine().describe_context(), virtual_offset, data);
+	
+	return data;
 }
 
 
@@ -261,6 +265,8 @@ void abc1600_mac_device::write_user_memory(offs_t offset, uint8_t data)
 
 	//if (nonx || !wp) return;
 
+	if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user write %06x:%02x\n", machine().describe_context(), virtual_offset, data);
+	
 	space().write_byte(virtual_offset, data);
 }
 

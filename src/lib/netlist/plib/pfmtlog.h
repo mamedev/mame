@@ -47,12 +47,12 @@ namespace plib {
 
 	#if (PUSE_FLOAT128)
 	template <>
-	struct ptype_traits_base<__float128>
+	struct ptype_traits_base<FLOAT128>
 	{
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
 		static char32_t fmt_spec() { return 'f'; }
-		static inline void streamify(std::ostream &s, const __float128 &v)
+		static inline void streamify(std::ostream &s, const FLOAT128 &v)
 		{
 			s << static_cast<long double>(v);
 		}
@@ -153,7 +153,7 @@ namespace plib {
 
 	#if (PUSE_FLOAT128)
 	template<>
-	struct ptype_traits<__float128> : ptype_traits_base<__float128>
+	struct ptype_traits<FLOAT128> : ptype_traits_base<FLOAT128>
 	{
 		static char32_t fmt_spec() { return 'f'; }
 	};
@@ -202,20 +202,20 @@ namespace plib {
 		operator pstring() const { return m_str; }
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		typename std::enable_if<plib::is_floating_point<T>::value, pfmt &>::type
 		f(const T &x) {return format_element('f', x);  }
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		typename std::enable_if<plib::is_floating_point<T>::value, pfmt &>::type
 		e(const T &x) {return format_element('e', x);  }
-
+#if 0
 	#if PUSE_FLOAT128
 		// FIXME: should use quadmath_snprintf
-		pfmt & e(const __float128 &x) {return format_element('e', static_cast<long double>(x));  }
+		pfmt & e(const FLOAT128 &x) {return format_element('e', static_cast<long double>(x));  }
 	#endif
-
+#endif
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
+		typename std::enable_if<plib::is_floating_point<T>::value, pfmt &>::type
 		g(const T &x) {return format_element('g', x);  }
 
 		pfmt &operator ()(const void *x) {return format_element('p', x);  }
@@ -245,14 +245,14 @@ namespace plib {
 		}
 
 		template<typename T>
-		typename std::enable_if<std::is_integral<T>::value, pfmt &>::type
+		typename std::enable_if<plib::is_integral<T>::value, pfmt &>::type
 		x(const T &x)
 		{
 			return format_element('x', x);
 		}
 
 		template<typename T>
-		typename std::enable_if<std::is_integral<T>::value, pfmt &>::type
+		typename std::enable_if<plib::is_integral<T>::value, pfmt &>::type
 		o(const T &x)
 		{
 			return format_element('o', x);

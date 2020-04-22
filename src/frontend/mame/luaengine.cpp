@@ -227,13 +227,13 @@ static input_seq_type parse_seq_type(const std::string &s)
 //	string
 //-------------------------------------------------
 
-static video_manager::movie_format parse_movie_format(const std::string &s)
+static movie_recording::format parse_movie_format(const std::string &s)
 {
-	video_manager::movie_format result = video_manager::MF_AVI;
+	movie_recording::format result = movie_recording::format::AVI;
 	if (s == "avi")
-		result = video_manager::MF_AVI;
+		result = movie_recording::format::AVI;
 	else if (s == "mng")
-		result = video_manager::MF_MNG;
+		result = movie_recording::format::MNG;
 	return result;
 }
 
@@ -2160,15 +2160,15 @@ void lua_engine::initialize()
 	video_type.set("begin_recording", sol::overload(
 		[this](video_manager &vm, const char *filename, const char *format_string) {
 			std::string fn = process_snapshot_filename(machine(), filename);
-			video_manager::movie_format format = parse_movie_format(format_string);
+			movie_recording::format format = parse_movie_format(format_string);
 			vm.begin_recording(fn.c_str(), format);
 		},
 		[this](video_manager &vm, const char *filename) {
 			std::string fn = process_snapshot_filename(machine(), filename);
-			vm.begin_recording(fn.c_str(), video_manager::MF_AVI);
+			vm.begin_recording(fn.c_str(), movie_recording::format::AVI);
 		},
 		[](video_manager &vm) {
-			vm.begin_recording(nullptr, video_manager::MF_AVI);
+			vm.begin_recording(nullptr, movie_recording::format::AVI);
 		}));
 	video_type.set("end_recording", [this](video_manager &vm) {
 			if(!vm.is_recording())
@@ -2176,7 +2176,7 @@ void lua_engine::initialize()
 				machine().logerror("[luaengine] No active recording to stop\n");
 				return;
 			}
-			vm.end_recording(video_manager::MF_AVI);
+			vm.end_recording();
 		});
 	video_type.set("snapshot", &video_manager::save_active_screen_snapshots);
 	video_type.set("is_recording", &video_manager::is_recording);

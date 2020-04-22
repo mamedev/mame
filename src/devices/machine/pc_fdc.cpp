@@ -26,11 +26,6 @@
 
 
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
-DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
-
-void pc_fdc_family_device::map(address_map &map)
-{
-}
 
 // The schematics show address decoding is minimal
 void pc_fdc_xt_device::map(address_map &map)
@@ -43,16 +38,8 @@ void pc_fdc_xt_device::map(address_map &map)
 }
 
 
-// Decoding is through a PAL, so presumably complete
-void pc_fdc_at_device::map(address_map &map)
-{
-	map(0x2, 0x2).rw(FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
-	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
-	map(0x7, 0x7).rw(FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
-}
-
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
+	device_t(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
 {
@@ -136,23 +123,11 @@ uint8_t pc_fdc_family_device::dor_r()
 	return dor;
 }
 
-uint8_t pc_fdc_family_device::dir_r()
-{
-	return do_dir_r();
-}
-
 void pc_fdc_family_device::ccr_w(uint8_t data)
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
 	LOG("ccr = %02x\n", data);
 	fdc->set_rate(rates[data & 3]);
-}
-
-uint8_t pc_fdc_family_device::do_dir_r()
-{
-	if(floppy[dor & 3])
-		return floppy[dor & 3]->dskchg_r() ? 0x00 : 0x80;
-	return 0x00;
 }
 
 void pc_fdc_xt_device::dor_fifo_w(uint8_t data)
@@ -192,9 +167,5 @@ void pc_fdc_family_device::check_drq()
 }
 
 pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
-{
-}
-
-pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, tag, owner, clock)
 {
 }

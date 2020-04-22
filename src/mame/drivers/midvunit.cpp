@@ -63,8 +63,8 @@ void midvunit_state::machine_start()
 
 void midvunit_state::machine_reset()
 {
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
@@ -73,8 +73,8 @@ void midvunit_state::machine_reset()
 
 MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 {
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
@@ -182,7 +182,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 		m_watchdog->watchdog_reset();
 
 	/* bit 1 is the DCS sound reset */
-	m_dcs->reset_w((~m_control_data >> 1) & 1);
+	m_dcs->reset_w((m_control_data >> 1) & 1);
 
 	/* log anything unusual */
 	if ((olddata ^ m_control_data) & ~0x00e8)
@@ -196,7 +196,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
-	m_dcs->reset_w((~m_control_data >> 11) & 1);
+	m_dcs->reset_w((m_control_data >> 11) & 1);
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0200)

@@ -55,6 +55,12 @@
         paccon:  Pac-Man - Bottom set of Power Pills are squashed.
                  Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
+
+	JAKKS Pacific Test modes:
+
+	jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
+	            the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
+
 */
 
 #include "emu.h"
@@ -283,8 +289,17 @@ READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 	if (!m_nandregion)
 		return 0x0000;
 
-	return (offset < m_size) ? m_nandregion[offset] : 0xFF;
-	//return m_strippedrom[offset & (m_strippedsize - 1)];
+	if (offset < m_size)
+	{
+		return m_nandregion[offset];
+	}
+	else
+	{
+		popmessage("read outside of NAND ROM space (offset %08x) (size %08x)\n", offset, m_size);
+		return 0xff;
+	}
+
+	return 0x00;
 }
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -1288,6 +1303,141 @@ static INPUT_PORTS_START( paccon ) // for Test Mode hold buttons 1+2 until the s
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( jak_hsm )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 ROM_START( smartfp )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -1534,6 +1684,101 @@ ROM_START( jak_car2 )
 	ROM_LOAD( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
+
+/*  The following pinout was used when dumping jak_sspop, jak_hmhsm, jak_umdf
+    For the 256Mbyte parts the parameters of the programmer had to be overridden to dump the full capacity as there were no equivalent parts.
+
+	   Sandisk TSOP32 NAND Flash
+
+       +----------------------------------------------+
+    NC-|01                                          32|-NC
+   VSS-|02                                          31|-NC
+   R/B-|03                  SanDisk                 30|-I/O7
+    NC-|04                   NAND                   29|-I/O6
+    RE-|05                                          28|-I/O5
+    CE-|06                   32PIN                  27|-I/O4
+    NC-|07                                          26|-VCC
+   VCC-|08                                          25|-VSS
+   VSS-|09                                          24|-NC
+    NC-|10                                          23|-I/O3
+    NC-|11                                          22|-I/O2
+   CLE-|12                                          21|-I/O1
+   ALE-|13                                          20|-I/O0
+    WE-|14                                          19|-NC
+    WP-|15                                          18|-NC
+    NC-|16                                          17|-NC
+       +----------------------------------------------+
+
+One of the games has pin 2 grounded, and the other 2 have it N/C.  I'm not sure what it would be, since all the signals are accounted for.
+
+*/
+
+ROM_START( jak_sspop )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	/* TSOP32 NAND ROM
+	
+	S976172-1
+	SanDisk
+	11015-128B
+	POC142
+	0845
+	<obscured #>	
+
+	appears to be a 128MByte part (or at least that is how much service mode tests)
+
+	*/
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "singscenepop_as_hy27us081g1m_4579.bin", 0x0000, 0x8400000, CRC(4c8123fe) SHA1(388fda8ddd90b541a53eac4bcbe66bebe7360724) )
+ROM_END
+
+ROM_START( jak_hmhsm )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	
+	/* TSOP32 NAND ROM
+	
+	5769522.1
+	SanDisk
+	11354-256B
+	P44247.00
+	xx20
+	01xxxx_HSM
+
+	256Mbyte part, 2nd half is just 0xff filled tho so a 128Mbyte part would have been fine
+
+	*/
+
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hmhsm.bin", 0x0000, 0x10800000, CRC(e63ad24c) SHA1(a7844b14af701914150aa7c06743a410f478ff7b) )
+ROM_END
+
+
+ROM_START( jak_umdf )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	
+	/* TSOP32 NAND ROM
+	
+	S744565-1
+	SanDisk
+	11352-256B
+	PA2777.00
+	0834
+	61050	
+	
+	again part number would suggest that this is a 256MByte ROM, although in reality all data fits into 64Mbyte, rest is blank
+
+	*/
+
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "jak_umdf.bin", 0x0000, 0x10800000, CRC(05f47aca) SHA1(61b417141ccc22324224b1862ea2f5778453f206) )
+ROM_END
+
+
+
 ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -1616,13 +1861,13 @@ CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Ba
 
 CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
-CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
-CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -1800,20 +2045,25 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,      "JAKKS Pacific Inc",                   "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,  "Hasbro",                              "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, mgtfit,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "MGT",                                 "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
-CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech",                               "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS(200?, jak_gtg,    0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / HotGen Ltd",           "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, jak_tsm,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,           "JAKKS Pacific Inc / Schell Games",         "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2009, jak_sspop,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe 2-in-1 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_umdf,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// Ultimotion Swing Zone is SPG29xx instead
 
 // There were 1 player and 2 player versions for several of the JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc",                   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
-CONS(2013, jak_swc,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2013, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
-CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2012, jak_wdzh,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc / Merge Interactive",    "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
+CONS(2013, jak_swc,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2013, jak_duck,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Merge Interactive",    "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
+CONS(2014, jak_wdbg,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Super Happy Fun Fun",  "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 ROM_START( bkrankp )

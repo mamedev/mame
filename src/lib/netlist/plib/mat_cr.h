@@ -83,6 +83,13 @@ namespace plib
 				A[i] = scalar;
 		}
 
+		void set_row_scalar(C r, T val) noexcept
+		{
+			C ri = row_idx[r];
+			while (ri < row_idx[r+1])
+				A[ri++] = val;
+		}
+
 		void set(C r, C c, T val) noexcept
 		{
 			C ri = row_idx[r];

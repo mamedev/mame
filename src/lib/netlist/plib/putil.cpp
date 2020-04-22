@@ -16,14 +16,19 @@ namespace plib
 	{
 		#ifdef _WIN32
 		static constexpr const char PATH_SEP = '\\';
+		static constexpr const char *PATH_SEPS = "\\/";
 		#else
 		static constexpr const char PATH_SEP = '/';
+		static constexpr const char *PATH_SEPS = "/";
 		#endif
 
-		pstring basename(const pstring &filename)
+		pstring basename(const pstring &filename, const pstring &suffix)
 		{
-			auto p=find_last_of(filename, pstring(1, PATH_SEP));
-			return (p == pstring::npos) ? filename : filename.substr(p+1);
+			auto p=find_last_of(filename, pstring(PATH_SEPS));
+			pstring ret = (p == pstring::npos) ? filename : filename.substr(p+1);
+			if (suffix != "" && endsWith(ret, suffix))
+				return ret.substr(0, ret.length() - suffix.length());
+			return ret;
 		}
 
 		pstring path(const pstring &filename)

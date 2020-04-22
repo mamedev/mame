@@ -401,6 +401,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hlcd0488.h,VIDEOS["HLCD0488"] = true
+--------------------------------------------------
+
+if (VIDEOS["HLCD0488"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hlcd0488.cpp",
+		MAME_DIR .. "src/devices/video/hlcd0488.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hlcd0515.h,VIDEOS["HLCD0515"] = true
 --------------------------------------------------
 
@@ -742,6 +754,18 @@ if (VIDEOS["PCD8544"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/pcd8544.cpp",
 		MAME_DIR .. "src/devices/video/pcd8544.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/pcf2100.h,VIDEOS["PCF2100"] = true
+--------------------------------------------------
+
+if (VIDEOS["PCF2100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pcf2100.cpp",
+		MAME_DIR .. "src/devices/video/pcf2100.h",
 	}
 end
 

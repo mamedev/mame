@@ -90,12 +90,12 @@ void mephisto_display_module2_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(mephisto_display_module2_device::latch_w)
+void mephisto_display_module2_device::latch_w(uint8_t data)
 {
 	m_latch = data;
 }
 
-WRITE8_MEMBER(mephisto_display_module2_device::io_w)
+void mephisto_display_module2_device::io_w(uint8_t data)
 {
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcdc->write(BIT(data, 0), m_latch);

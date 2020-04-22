@@ -9,7 +9,7 @@
 
 class esqvfd_device : public device_t {
 public:
-	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
+	void write(uint8_t data) { write_char(data); }
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();

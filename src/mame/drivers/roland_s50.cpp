@@ -261,11 +261,11 @@ void roland_s50_state::s50(machine_config &config)
 	m_io->set_addrmap(0, &roland_s50_state::s50_io_map);
 
 	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
-	//m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1770-00 or WD1772-02
-	//m_fdc->drq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI2_LINE);
-	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI2_LINE);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
 
 	// Floppy unit: FDD4261A0K or FDD4251G0K
 	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
@@ -318,7 +318,7 @@ void roland_w30_state::w30(machine_config &config)
 	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
 
 	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
-	//m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 	m_fdc->intrq_wr_callback().set(FUNC(roland_w30_state::fdc_irq_w));

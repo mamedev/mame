@@ -18,8 +18,17 @@
 
 #include <limits>
 
+// ----------------------------------------------------------------------------------------
+// Statically compiled solvers for mame netlist
+// ----------------------------------------------------------------------------------------
+
 namespace netlist
 {
+
+	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
+	{
+		return plib::make_unique<plib::dynlib_static>(nullptr);
+	}
 
 	// ----------------------------------------------------------------------------------------
 	// logic_family_ttl_t
@@ -103,7 +112,7 @@ namespace netlist
 
 	detail::queue_t::queue_t(netlist_t &nl)
 		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
-		, netlist_ref(nl)
+		, netlist_object_t(nl, nl.nlstate().name() + ".queue")
 		, m_qsize(0)
 		, m_times(512)
 		, m_net_ids(512)
@@ -140,13 +149,14 @@ namespace netlist
 		}
 	}
 
+#if 0
 	// ----------------------------------------------------------------------------------------
 	// netlist_ref_t
 	// ----------------------------------------------------------------------------------------
 
 	detail::netlist_ref::netlist_ref(netlist_t &nl)
 	: m_netlist(nl) { }
-
+#endif
 	// ----------------------------------------------------------------------------------------
 	// device_object_t
 	// ----------------------------------------------------------------------------------------
@@ -201,8 +211,8 @@ namespace netlist
 	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
-		pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		m_lib = plib::make_unique<plib::dynlib>(libpath);
+
+		m_lib = m_callbacks->static_solver_lib();
 
 		m_setup = plib::make_unique<setup_t>(*this);
 		// create the run interface
@@ -227,7 +237,7 @@ namespace netlist
 		"#define IND_U(ind) ((ind) * 1e-6)   \n"
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
+		setup().add_include<a>("netlist/devices/net_lib.h", content);
 		NETLIST_NAME(base)(*m_setup);
 	}
 
@@ -543,11 +553,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
-		: object_t(name)
-		, netlist_ref(owner.exec())
+		: netlist_object_t(owner.exec(), name)
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
+		// FIXME: logic_family should always be nullptr here
 		if (logic_family() == nullptr)
 			set_logic_family(family_TTL());
 		if (exec().stats_enabled())
@@ -555,8 +565,7 @@ namespace netlist
 	}
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
-		: object_t(owner.name() + "." + name)
-		, netlist_ref(owner.state().exec())
+		: netlist_object_t(owner.state().exec(), owner.name() + "." + name)
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
@@ -657,14 +666,14 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal)
-		: object_t(aname)
-		, netlist_ref(nl.exec())
+		: netlist_object_t(nl.exec(), aname)
 		, m_new_Q(*this, "m_new_Q", 0)
 		, m_cur_Q (*this, "m_cur_Q", 0)
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
 		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
 		, m_railterminal(railterminal)
 	{
+		props::add(this, props::value_type());
 	}
 
 	void detail::net_t::rebuild_list()
@@ -672,7 +681,7 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : m_core_terms)
+		for (auto & term : core_terms())
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
@@ -697,7 +706,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : m_core_terms)
+		for (core_terminal_t *ct : core_terms())
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
@@ -708,7 +717,7 @@ namespace netlist
 
 	void detail::net_t::add_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
-		for (auto &t : m_core_terms)
+		for (auto &t : core_terms())
 			if (t == &terminal)
 			{
 				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
@@ -717,15 +726,15 @@ namespace netlist
 
 		terminal.set_net(this);
 
-		m_core_terms.push_back(&terminal);
+		core_terms().push_back(&terminal);
 	}
 
 	void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
-		if (plib::container::contains(m_core_terms, &terminal))
+		if (plib::container::contains(core_terms(), &terminal))
 		{
 			terminal.set_net(nullptr);
-			plib::container::remove(m_core_terms, &terminal);
+			plib::container::remove(core_terms(), &terminal);
 		}
 		else
 		{
@@ -736,9 +745,9 @@ namespace netlist
 
 	void detail::net_t::move_connections(detail::net_t &dest_net)
 	{
-		for (auto &ct : m_core_terms)
+		for (auto &ct : core_terms())
 			dest_net.add_terminal(*ct);
-		m_core_terms.clear();
+		core_terms().clear();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -795,9 +804,9 @@ namespace netlist
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm)
 	: analog_t(dev, aname, STATE_BIDIR)
-	, m_Idr1(nullptr)
-	, m_go1(nullptr)
-	, m_gt1(nullptr)
+	, m_Idr(nullptr)
+	, m_go(nullptr)
+	, m_gt(nullptr)
 	{
 		state().setup().register_term(*this, *otherterm);
 	}

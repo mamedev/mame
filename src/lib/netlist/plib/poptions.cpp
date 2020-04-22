@@ -169,7 +169,7 @@ namespace plib {
 	}
 
 	pstring options::split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-			unsigned firstline_indent)
+			unsigned firstline_indent, const pstring &line_end)
 	{
 		auto paragraphs = psplit(text,"\n");
 		pstring ret("");
@@ -181,12 +181,14 @@ namespace plib {
 			{
 				if (line.length() + s.length() > width)
 				{
-					ret += line + "\n";
+					ret += line + line_end;
 					line = plib::rpad(pstring(""), pstring(" "), indent);
 				}
 				line += s + " ";
 			}
-			ret += line + "\n";
+			ret += line;
+			if (p != paragraphs.back())
+				ret += line_end;
 		}
 		return ret;
 	}
@@ -196,7 +198,7 @@ namespace plib {
 	{
 		pstring ret;
 
-		ret = split_paragraphs(description, width, 0, 0) + "\n";
+		ret = split_paragraphs(description, width, 0, 0) + "\n\n";
 		ret += "Usage:\t" + usage + "\n\nOptions:\n\n";
 
 		for (const auto & optbase : m_opts )
@@ -238,15 +240,15 @@ namespace plib {
 				{
 					//ret += "TestGroup abc\n  def gef\nxyz\n\n" ;
 					ret += line + "\n";
-					ret += split_paragraphs(opt->help(), width, indent, indent);
+					ret += split_paragraphs(opt->help(), width, indent, indent) + "\n";
 				}
 				else
-					ret += split_paragraphs(line + opt->help(), width, indent, 0);
+					ret += split_paragraphs(line + opt->help(), width, indent, 0) + "\n";
 			}
 			else if (auto *grp = dynamic_cast<option_group *>(optbase))
 			{
 				ret += "\n" + grp->group() + ":\n";
-				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n";
+				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n\n";
 			}
 		}
 		// FIXME: other help ...
@@ -255,8 +257,9 @@ namespace plib {
 		{
 			if (auto *example = dynamic_cast<option_example *>(optbase))
 			{
-				ex += "> " + example->example()+"\n\n";
-				ex += split_paragraphs(example->help(), width, 4, 4) + "\n";
+				// help2man doesn't like \\ line continuation in output
+				ex += split_paragraphs(example->example(), width, 8, 0, "\n") + "\n\n";
+				ex += split_paragraphs(example->help(), width, 4, 4) + "\n\n";
 			}
 		}
 		if (ex.length() > 0)

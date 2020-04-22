@@ -6,7 +6,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/pc_fdc.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pic8259.h"

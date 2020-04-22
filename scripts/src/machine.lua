@@ -874,6 +874,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/bq4847.h,MACHINES["BQ4847"] = true
+---------------------------------------------------
+
+if (MACHINES["BQ4847"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bq4847.cpp",
+		MAME_DIR .. "src/devices/machine/bq4847.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/bq48x2.h,MACHINES["BQ4852"] = true
+---------------------------------------------------
+
+if (MACHINES["BQ4852"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bq48x2.cpp",
+		MAME_DIR .. "src/devices/machine/bq48x2.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/busmouse.h,MACHINES["BUSMOUSE"] = true
 ---------------------------------------------------
 
@@ -1758,6 +1782,18 @@ if (MACHINES["LINFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/linflash.cpp",
 		MAME_DIR .. "src/devices/machine/linflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/m3002.h,MACHINES["M3002"] = true
+---------------------------------------------------
+
+if (MACHINES["M3002"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m3002.cpp",
+		MAME_DIR .. "src/devices/machine/m3002.h",
 	}
 end
 

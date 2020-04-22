@@ -143,7 +143,7 @@ class core_proxy_file : public core_file
 {
 public:
 	core_proxy_file(core_file &file) : m_file(file) { }
-	virtual ~core_proxy_file() override = default;
+	virtual ~core_proxy_file() override { }
 	virtual osd_file::error compress(int level) override { return m_file.compress(level); }
 
 	virtual int seek(std::int64_t offset, int whence) override { return m_file.seek(offset, whence); }
@@ -1231,6 +1231,15 @@ osd_file::error core_file::load(std::string const &filename, std::vector<uint8_t
 
 	// close the file and return data
 	return osd_file::error::NONE;
+}
+
+
+/*-------------------------------------------------
+    protected constructor
+-------------------------------------------------*/
+
+core_file::core_file()
+{
 }
 
 } // namespace util

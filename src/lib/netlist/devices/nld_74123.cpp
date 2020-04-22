@@ -46,8 +46,8 @@ namespace netlist
 			connect(m_RN.m_R.m_P, m_RP.m_R.m_N);
 			connect(m_CV, m_RN.m_R.m_P);
 
-			m_RP.m_RON.setTo(m_RI());
-			m_RN.m_RON.setTo(m_RI());
+			m_RP.m_RON.set(m_RI());
+			m_RN.m_RON.set(m_RI());
 		}
 
 		NETLIB_RESETI();

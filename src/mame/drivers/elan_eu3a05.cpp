@@ -775,6 +775,7 @@ void elan_eu3a05_state::elan_sudoku(machine_config& config)
 	elan_eu3a05(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
 	m_vid->set_is_sudoku();
+	m_vid->set_use_spritepages();
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 

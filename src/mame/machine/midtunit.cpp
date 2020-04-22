@@ -491,8 +491,8 @@ void midtunit_state::machine_reset()
 			break;
 
 		case SOUND_DCS:
-			m_dcs->reset_w(1);
 			m_dcs->reset_w(0);
+			m_dcs->reset_w(1);
 			break;
 	}
 }
@@ -554,7 +554,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 
 			case SOUND_DCS:
 				logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
-				m_dcs->reset_w(~data & 0x100);
+				m_dcs->reset_w(data & 0x100);
 				m_dcs->data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				m_fake_sound_state = 128;

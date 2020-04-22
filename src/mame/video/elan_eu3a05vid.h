@@ -22,6 +22,7 @@ public:
 
 	void set_is_sudoku();
 	void set_is_pvmilfin();
+	void set_use_spritepages() { m_use_spritepages = true; };
 
 protected:
 	// device-level overrides
@@ -82,6 +83,7 @@ private:
 	int m_bytes_per_tile_entry;
 	int m_vrambase;
 	int m_spritebase;
+	bool m_use_spritepages;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)

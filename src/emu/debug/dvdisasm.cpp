@@ -117,7 +117,11 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 		adjust_visible_y_for_cursor();
 
 	else if(type == VIEW_NOTIFY_SOURCE_CHANGED)
-		m_expression.set_context(&downcast<const debug_view_disasm_source *>(m_source)->device()->debug()->symtable());
+	{
+		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
+		m_expression.set_context(&source.device()->debug()->symtable());
+		m_expression.set_default_base(source.space().is_octal() ? 8 : 16);
+	}
 }
 
 

@@ -18,18 +18,18 @@ namespace analog
 	void NETLIB_NAME(twoterm)::solve_now()
 	{
 		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
+		if (m_P.has_net() && !m_P.net().is_rail_net())
 			m_P.solve_now();
-		else if (m_N.has_net() && !m_N.net().isRailNet())
+		else if (m_N.has_net() && !m_N.net().is_rail_net())
 			m_N.solve_now();
 	}
 
 	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay) noexcept
 	{
 		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
+		if (m_P.has_net() && !m_P.net().is_rail_net())
 			m_P.schedule_solve_after(delay);
-		else if (m_N.has_net() && !m_N.net().isRailNet())
+		else if (m_N.has_net() && !m_N.net().is_rail_net())
 			m_N.schedule_solve_after(delay);
 	}
 
@@ -164,8 +164,8 @@ namespace analog
 	NETLIB_UPDATE_TERMINALS(D)
 	{
 		m_D.update_diode(deltaV());
-		const nl_fptype G = m_D.G();
-		const nl_fptype I = m_D.Ieq();
+		const nl_fptype G(m_D.G());
+		const nl_fptype I(m_D.Ieq());
 		set_mat( G, -G, -I,
 				-G,  G,  I);
 		//set(m_D.G(), 0.0, m_D.Ieq());

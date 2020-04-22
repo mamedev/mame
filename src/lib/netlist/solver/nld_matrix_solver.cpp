@@ -66,6 +66,8 @@ namespace solver
 	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
 	{
 		log().debug("New solver setup\n");
+		std::vector<core_device_t *> step_devices;
+		std::vector<core_device_t *> dynamic_devices;
 
 		m_terms.clear();
 
@@ -85,16 +87,16 @@ namespace solver
 
 			for (auto &p : net->core_terms())
 			{
-				log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
+				log().debug("{1} {2} {3}\n", p->name(), net->name(), net->is_rail_net());
 				switch (p->type())
 				{
 					case detail::terminal_type::TERMINAL:
 						if (p->device().is_timestep())
-							if (!plib::container::contains(m_step_devices, &p->device()))
-								m_step_devices.push_back(&p->device());
+							if (!plib::container::contains(step_devices, &p->device()))
+								step_devices.push_back(&p->device());
 						if (p->device().is_dynamic())
-							if (!plib::container::contains(m_dynamic_devices, &p->device()))
-								m_dynamic_devices.push_back(&p->device());
+							if (!plib::container::contains(dynamic_devices, &p->device()))
+								dynamic_devices.push_back(&p->device());
 						{
 							auto *pterm = dynamic_cast<terminal_t *>(p);
 							add_term(k, pterm);
@@ -131,6 +133,10 @@ namespace solver
 				}
 			}
 		}
+		for (auto &d : step_devices)
+			m_step_funcs.emplace_back(nldelegate_ts(&core_device_t::timestep, d));
+		for (auto &d : dynamic_devices)
+			m_dynamic_funcs.emplace_back(nldelegate_dyn(&core_device_t::update_terminals, d));
 	}
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
@@ -213,11 +219,11 @@ namespace solver
 		// rebuild
 		for (auto &term : m_terms)
 		{
-			int *other = term.m_connected_net_idx.data();
+			//int *other = term.m_connected_net_idx.data();
 			for (std::size_t i = 0; i < term.count(); i++)
 				//FIXME: this is weird
-				if (other[i] != -1)
-					other[i] = get_net_idx(get_connected_net(term.terms()[i]));
+				if (term.m_connected_net_idx[i] != -1)
+					term.m_connected_net_idx[i] = get_net_idx(get_connected_net(term.terms()[i]));
 		}
 	}
 
@@ -368,11 +374,9 @@ namespace solver
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto count = m_terms[k].count();
-
 			for (std::size_t i = 0; i < count; i++)
 			{
 				m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-				//m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				m_connected_net_Vn[k][i] = get_connected_net(m_terms[k].terms()[i])->Q_Analog_state_ptr();
 			}
 		}
@@ -385,11 +389,11 @@ namespace solver
 			inp->push(inp->proxied_net()->Q_Analog());
 	}
 
-	void matrix_solver_t::update_dynamic()
+	void matrix_solver_t::update_dynamic() noexcept
 	{
 		// update all non-linear devices
-		for (auto &dyn : m_dynamic_devices)
-			dyn->update_terminals();
+		for (auto &dyn : m_dynamic_funcs)
+			dyn();
 	}
 
 	void matrix_solver_t::reset()
@@ -402,7 +406,7 @@ namespace solver
 		const netlist_time new_timestep = solve(exec().time());
 		update_inputs();
 
-		if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
+		if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
 		}
@@ -420,17 +424,17 @@ namespace solver
 
 		update_inputs();
 
-		if (m_params.m_dynamic_ts && has_timestep_devices())
+		if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
 		}
 	}
 
-	void matrix_solver_t::step(const netlist_time &delta)
+	void matrix_solver_t::step(netlist_time delta) noexcept
 	{
 		const auto dd(delta.as_fp<nl_fptype>());
-		for (auto &d : m_step_devices)
-			d->timestep(dd);
+		for (auto &d : m_step_funcs)
+			d(dd);
 	}
 
 	netlist_time matrix_solver_t::solve(netlist_time_ext now)
@@ -447,31 +451,40 @@ namespace solver
 		step(static_cast<netlist_time>(delta));
 
 		++m_stat_vsolver_calls;
-		if (has_dynamic_devices())
+		if (dynamic_device_count() != 0)
 		{
-			std::size_t this_resched(0);
+			bool this_resched(false);
 			std::size_t newton_loops = 0;
 			do
 			{
 				update_dynamic();
 				// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
 				this->m_stat_calculations++;
-				this_resched = this->vsolve_non_dynamic(true);
+				this->vsolve_non_dynamic();
+				this_resched = this->check_err();
+				this->store();
 				newton_loops++;
-			} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
+			} while (this_resched && newton_loops < m_params.m_nr_loops);
 
 			m_stat_newton_raphson += newton_loops;
 			// reschedule ....
-			if (this_resched > 1 && !m_Q_sync.net().is_queued())
+			if (this_resched && !m_Q_sync.net().is_queued())
 			{
 				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
+				// FIXME: test and enable - this is working better, though not optimal yet
+#if 0
+				// Don't store, the result can not be used
+				return netlist_time::from_fp(m_params.m_nr_recalc_delay());
+#else
 				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
+#endif
 			}
 		}
 		else
 		{
 			this->m_stat_calculations++;
-			this->vsolve_non_dynamic(false);
+			this->vsolve_non_dynamic();
+			this->store();
 		}
 
 		return compute_next_timestep(delta.as_fp<nl_fptype>());
@@ -550,7 +563,7 @@ namespace solver
 
 	void matrix_solver_t::add_term(std::size_t net_idx, terminal_t *term)
 	{
-		if (get_connected_net(term)->isRailNet())
+		if (get_connected_net(term)->is_rail_net())
 		{
 			m_rails_temp[net_idx].add_terminal(term, -1, false);
 		}
@@ -576,8 +589,8 @@ namespace solver
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());
 			log().verbose("       ==> {1} nets", this->m_terms.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
-			log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
-			log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
+			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
+			log().verbose("       has {1} timestep elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
 						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",

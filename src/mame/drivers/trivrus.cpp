@@ -64,8 +64,6 @@ private:
 	DECLARE_WRITE32_MEMBER(FlashCmd_w);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void trivrus_mem(address_map &map);
@@ -81,10 +79,6 @@ private:
 	uint8_t m_trivrus_input;
 };
 
-IRQ_CALLBACK_MEMBER(trivrus_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 WRITE32_MEMBER(trivrus_state::FlashCmd_w)
 {
@@ -295,7 +289,7 @@ void trivrus_state::trivrus(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &trivrus_state::trivrus_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(trivrus_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
