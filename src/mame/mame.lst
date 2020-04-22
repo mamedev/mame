@@ -35120,6 +35120,9 @@ cp2000                          //
 @source:saitek_delta1.cpp
 ccdelta1                        //
 
+@source:saitek_exchess.cpp
+exchess
+
 @source:saitek_mark5.cpp
 ccmk5
 ccmk6

@@ -791,6 +791,7 @@ saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
+saitek_exchess.cpp
 saitek_mark5.cpp
 saitek_prschess.cpp
 saitek_risc2500.cpp

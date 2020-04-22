@@ -365,7 +365,7 @@ void savant_state::savant(machine_config &config)
 	m_mcu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 4_MHz_XTAL/2);
-	m_psu->set_int_vector(0x20);
+	m_psu->set_int_vector(0x0020);
 	m_psu->int_req_callback().set_inputline(m_mcu, F8_INPUT_LINE_INT_REQ);
 	m_psu->write_a().set(FUNC(savant_state::lcd_w));
 	m_psu->read_b().set(FUNC(savant_state::input_r));

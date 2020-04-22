@@ -2736,7 +2736,7 @@ WRITE16_MEMBER(einvader2_state::grid_w)
 READ16_MEMBER(einvader2_state::input_r)
 {
 	// D13-D15: multiplexed inputs
-	return read_inputs(6) << 13;
+	return read_inputs(3) << 13;
 }
 
 // config

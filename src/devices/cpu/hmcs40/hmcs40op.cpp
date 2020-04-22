@@ -669,7 +669,7 @@ void hmcs40_cpu_device::op_p()
 	if (o & 0x100)
 	{
 		// B3 B2 B1 B0 A0 A1 A2 A3
-		m_a = bitswap<8>(o,7,6,5,4,0,1,2,3) & 0xf;
+		m_a = bitswap<4>(o,0,1,2,3);
 		m_b = o >> 4 & 0xf;
 	}
 	if (o & 0x200)

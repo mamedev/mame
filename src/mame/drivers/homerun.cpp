@@ -496,16 +496,16 @@ void homerun_state::ganjaja(machine_config &config)
 
 ROM_START( homerun )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "homerun.ic43",   0x00000, 0x20000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
+	ROM_LOAD( "homerun.ic43",    0x00000, 0x20000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "homerun.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
+	ROM_LOAD( "homerun.ic60",    0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "homerun.ic120",  0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
+	ROM_LOAD( "homerun.ic120",   0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
 
 	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
-	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) // D7756C built-in rom - very likely the same rom as Moero!! Pro Yakyuu (Black/Red) on Famicom
+	ROM_LOAD( "d7756c_146.ic98", 0x00000, 0x08000, NO_DUMP ) // D7756C built-in rom - same maskrom serial as Moero!! Pro Yakyuu (Black/Red) on Famicom
 ROM_END
 
 ROM_START( nhomerun )
@@ -519,21 +519,21 @@ ROM_START( nhomerun )
 	ROM_LOAD( "2.ic120",  0x00000, 0x20000, CRC(57e9b757) SHA1(8190d690721005407a5b06d13d64e70301d1e925) )
 
 	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
-	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "d7756c_146.ic98", 0x00000, 0x08000, NO_DUMP )
 ROM_END
 
 ROM_START( dynashot )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "1.ic43",         0x00000, 0x20000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
+	ROM_LOAD( "1.ic43",          0x00000, 0x20000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "3.ic60",         0x00000, 0x10000, CRC(77d6a608) SHA1(a31ff343a5d4d6f20301c030ecc2e252149bcf9d) )
+	ROM_LOAD( "3.ic60",          0x00000, 0x10000, CRC(77d6a608) SHA1(a31ff343a5d4d6f20301c030ecc2e252149bcf9d) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
+	ROM_LOAD( "2.ic120",         0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
 
 	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
-	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "d7756c_146.ic98", 0x00000, 0x08000, NO_DUMP ) // unused?
 ROM_END
 
 
