@@ -1210,4 +1210,17 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<!-- Added 2020-04-22 -->
+	<software name="starf">
+		<description>Starfighter</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Sparky Starks"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="17570860">
+				<rom name="starf.wav" size="17570860" crc="72ba90c4" sha1="89c992b2a132b2b6eecabfe180d5b5becd2f5de1" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
