@@ -578,14 +578,14 @@ void hmcs40_cpu_device::op_lti()
 {
 	// LTI i: Load Timer/Counter from Immediate
 	m_tc = m_i;
-	reset_prescaler();
+	m_prescaler = 0;
 }
 
 void hmcs40_cpu_device::op_lta()
 {
 	// LTA: Load Timer/Counter from A
 	m_tc = m_a;
-	reset_prescaler();
+	m_prescaler = 0;
 }
 
 void hmcs40_cpu_device::op_lat()
@@ -661,7 +661,6 @@ void hmcs40_cpu_device::op_lrb()
 void hmcs40_cpu_device::op_p()
 {
 	// P p: Pattern Generation
-	m_icount--;
 	u16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
 	u16 o = m_program->read_word(address & m_prgmask);
 
@@ -679,4 +678,6 @@ void hmcs40_cpu_device::op_p()
 		write_r(2, o & 0xf);
 		write_r(3, o >> 4 & 0xf);
 	}
+
+	cycle();
 }

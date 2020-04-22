@@ -7,7 +7,7 @@ SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
 
 Hardware notes:
-- 3850PK CPU at ~2.8MHz, 3853PK memory interface
+- 3850PK CPU at ~2.77MHz(averaged), 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
 - 4-digit 7seg panel, sensory chessboard
 

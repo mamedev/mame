@@ -17,6 +17,10 @@ SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
 it has the same MCU serial (SL90387). They added battery low voltage detection
 to it (rightmost digit DP lights up).
 
+TODO:
+- MCU frequency was actually measured ~3MHz, but this is much too slow when compared
+  to a video recording (of Novag Pocket Chess), need to reverify
+
 ******************************************************************************/
 
 #include "emu.h"

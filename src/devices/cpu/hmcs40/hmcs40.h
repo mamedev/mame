@@ -111,7 +111,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2+1; } // max 2 + interrupt
 	virtual u32 execute_input_lines() const noexcept override { return 2+1; } // 3rd one is internal
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
@@ -148,9 +148,8 @@ protected:
 	u16 m_prev_op;
 	u8 m_i;             // 4-bit immediate opcode param
 	int m_eint_line;    // which input_line caused an interrupt
-	emu_timer *m_timer;
 	int m_halt;         // internal HLT state
-	attotime m_timer_halted_remain;
+	u8 m_prescaler;     // internal timer prescaler
 	int m_icount;
 
 	u16 m_pc;           // Program Counter
@@ -194,8 +193,7 @@ protected:
 	virtual int read_d(int index);
 	virtual void write_d(int index, int state);
 
-	void reset_prescaler();
-	TIMER_CALLBACK_MEMBER( simple_timer_cb );
+	void cycle();
 	void increment_tc();
 	void do_interrupt();
 
