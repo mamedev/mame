@@ -46,7 +46,7 @@ public:
 	auto mcu_int() { return m_mcu_int_callback.bind(); }
 
 	// public interface
-	u8 read(offs_t offset);
+	u8 read(address_space &space, offs_t offset);
 	void write(offs_t offset, u8 data);
 	u8 pread();
 	void pwrite(u8 data);

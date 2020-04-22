@@ -176,7 +176,7 @@ void sega_315_5195_mapper_device::write(offs_t offset, u8 data)
 //  read - handle a read from the memory mapper
 //-------------------------------------------------
 
-u8 sega_315_5195_mapper_device::read(offs_t offset)
+u8 sega_315_5195_mapper_device::read(address_space &space, offs_t offset)
 {
 	// wraps every 32 bytes
 	offset &= 0x1f;
@@ -210,7 +210,7 @@ u8 sega_315_5195_mapper_device::read(offs_t offset)
 			logerror("Unknown memory_mapper_r from address %02X\n", offset);
 			break;
 	}
-	return (m_space->data_width() == 8) ? 0xff : open_bus_r();
+	return (space.data_width() == 8) ? 0xff : open_bus_r();
 }
 
 
@@ -483,7 +483,8 @@ void sega_315_5195_mapper_device::update_mapping()
 
 	// first reset everything back to the beginning
 	m_space->unmap_readwrite(0x000000, 0xffffff);
-	m_space->install_readwrite_handler(0x000000, 0xffffff, read8sm_delegate(*this, FUNC(sega_315_5195_mapper_device::read)), write8sm_delegate(*this, FUNC(sega_315_5195_mapper_device::write)), 0x00ff);
+	m_space->install_read_handler(0x000000, 0xffffff, read8m_delegate(*this, FUNC(sega_315_5195_mapper_device::read)), 0x00ff);
+	m_space->install_write_handler(0x000000, 0xffffff, write8sm_delegate(*this, FUNC(sega_315_5195_mapper_device::write)), 0x00ff);
 
 	// loop over the regions
 	for (int index = 7; index >= 0; index--)
