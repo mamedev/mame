@@ -215,6 +215,7 @@ void hmcs40_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
+	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;

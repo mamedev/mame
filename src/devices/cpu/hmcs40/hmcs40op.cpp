@@ -21,18 +21,26 @@ inline void hmcs40_cpu_device::ram_w(u8 data)
 	m_data->write_byte(address, data & 0xf);
 }
 
+void hmcs40_cpu_device::exc_stack()
+{
+	// exchange stack/pc
+	u16 pc = m_stack[m_sp] & m_pcmask;
+	m_stack[m_sp] = m_pc;
+	m_pc = pc;
+}
+
 void hmcs40_cpu_device::pop_stack()
 {
-	m_pc = m_stack[0] & m_pcmask;
-	for (int i = 0; i < m_stack_levels-1; i++)
-		m_stack[i] = m_stack[i+1];
+	if (++m_sp >= m_stack_levels)
+		m_sp = 0;
+	exc_stack();
 }
 
 void hmcs40_cpu_device::push_stack()
 {
-	for (int i = m_stack_levels-1; i >= 1; i--)
-		m_stack[i] = m_stack[i-1];
-	m_stack[0] = m_pc;
+	exc_stack();
+	if (--m_sp < 0)
+		m_sp = m_stack_levels - 1;
 }
 
 
