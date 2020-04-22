@@ -27,7 +27,7 @@ WRITE8_MEMBER(mb89371_device::write)
 	switch (offset)
 	{
 	case 0: // data
-		printf("%c", data);
+		//printf("%c", data);
 		break;
 	case 1: // control (0x40 = error reset)
 	case 2: // baud (9600 = 2)
