@@ -16,7 +16,12 @@ O denotes the output.
 Now in netlist syntax this looks like:
 
 ~~~{.cpp}
+#include "netlist/devices/net_lib.h"
+
 NETLIST_START(charge_discharge)
+
+	ANALOG_INPUT(V5, 5) // Clock needs a 5V power supply
+
     SOLVER(solver, 48000) // Fixed frequency solver
     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output
     RES(R, RES_K(1))
@@ -24,7 +29,9 @@ NETLIST_START(charge_discharge)
 
     NET_C(I.Q, R.1)
     NET_C(R.2, C.1)
-    NET_C(C.2, GND)
+
+    NET_C(GND, C.2, I.GND)
+    NET_C(V5, I.VCC)
 
     ALIAS(O, R.2) // Output O == C.1 == R.2
 NETLIST_END()
@@ -46,7 +53,7 @@ output "O" to log_O.log . The log files will be located in the current folder.
 Next, run
 
 ~~~
-> plot_nl I O
+> plot_nl O I
 ~~~
 
 ![](test1-50r.svg)
