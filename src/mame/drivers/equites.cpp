@@ -9,6 +9,7 @@ The Koukouyakyuh  (c) 1985 Alpha Denshi Co.
 Splendor Blast    (c) 1985 Alpha Denshi Co.
 Splendor Blast II (c) 1985 Alpha Denshi Co.
 High Voltage      (c) 1985 Alpha Denshi Co.
+Bingo Time        (c) 1986 CLS
 
 The following are not dumped yet:
 Champion Croquet  (c) 1984 Alpha Denshi Co. (sports)
@@ -721,7 +722,35 @@ static INPUT_PORTS_START( hvoltage )
 	PORT_ADJUSTER(27, "MSM5232 Clock") // approximate factory setting
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bngotime )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) // tilt up, only has effect when ball's in play
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) // tilt right, only has effect when ball's in play
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // tilt left, only has effect when ball's in play
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // spring launcher and tilt up (doubled?)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 ) // starts game after betting, also changes background before launching first ball
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN1 )
 
+	PORT_START("IN1")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_HIGH ) // settings // allows to set coinage, odds, 'rank', etc.
+INPUT_PORTS_END
 
 /******************************************************************************/
 // Graphics Layouts
@@ -1713,7 +1742,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bngotime,  0,        bngotime, equites,  equites_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // needs inputs, emulation of the sound board
+GAME( 1986, bngotime,  0,        bngotime, bngotime, equites_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs verification of the inputs, emulation of the sound board (flag is in the audio device)
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
