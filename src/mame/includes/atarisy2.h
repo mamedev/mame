@@ -116,9 +116,9 @@ private:
 
 	output_finder<2> m_leds;
 
-	void scanline_int_ack_w(uint16_t data);
-	void video_int_ack_w(uint16_t data);
-	void int0_ack_w(uint16_t data);
+	void scanline_int_ack_w(uint8_t data);
+	void video_int_ack_w(uint8_t data);
+	void int0_ack_w(uint8_t data);
 	void sound_reset_w(uint8_t data);
 	void int_enable_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);

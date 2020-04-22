@@ -169,14 +169,14 @@ void atarisy2_state::update_interrupts()
 }
 
 
-void atarisy2_state::scanline_int_ack_w(uint16_t data)
+void atarisy2_state::scanline_int_ack_w(uint8_t data)
 {
 	m_scanline_int_state = false;
 	update_interrupts();
 }
 
 
-void atarisy2_state::video_int_ack_w(uint16_t data)
+void atarisy2_state::video_int_ack_w(uint8_t data)
 {
 	m_video_int_state = false;
 	update_interrupts();
@@ -197,11 +197,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy2_state::scanline_update)
 	{
 		// generate the 32V interrupt (IRQ 2)
 		if ((scanline % 64) == 0)
-			if (m_interrupt_enable & 4)
-			{
-				m_scanline_int_state = true;
-				update_interrupts();
-			}
+		{
+			// clock the state through
+			m_scanline_int_state = BIT(m_interrupt_enable, 2);
+			update_interrupts();
+		}
 	}
 }
 
@@ -253,16 +253,16 @@ void atarisy2_state::machine_reset()
 
 WRITE_LINE_MEMBER(atarisy2_state::vblank_int)
 {
-	// clock the VBLANK through
-	if (state && BIT(m_interrupt_enable, 3))
+	if (state)
 	{
-		m_video_int_state = true;
+		// clock the VBLANK through
+		m_video_int_state = BIT(m_interrupt_enable, 3);
 		update_interrupts();
 	}
 }
 
 
-void atarisy2_state::int0_ack_w(uint16_t data)
+void atarisy2_state::int0_ack_w(uint8_t data)
 {
 	// reset sound IRQ
 	m_p2portrd_state = false;
@@ -334,8 +334,8 @@ void atarisy2_state::bankselect_w(offs_t offset, uint16_t data)
 	    63, 59, 55, 51
 	};*/
 
-	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
-	banknumber = bitswap<16>(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
+	uint8_t banknumber = ((data >> 10) & 077) ^ 3;
+	banknumber = bitswap<6>(banknumber, 5, 4, 1, 0, 3, 2);
 
 	m_rombank[offset]->set_entry(banknumber);
 }
@@ -709,7 +709,7 @@ uint16_t atarisy2_state::sound_r()
 void atarisy2_state::sound_6502_w(uint8_t data)
 {
 	// clock the state through
-	m_p2portwr_state = (m_interrupt_enable & 2) != 0;
+	m_p2portwr_state = BIT(m_interrupt_enable, 1);
 	update_interrupts();
 
 	// handle it normally otherwise
@@ -722,7 +722,7 @@ uint8_t atarisy2_state::sound_6502_r()
 	if (!machine().side_effects_disabled())
 	{
 		// clock the state through
-		m_p2portrd_state = (m_interrupt_enable & 1) != 0;
+		m_p2portrd_state = BIT(m_interrupt_enable, 0);
 		update_interrupts();
 	}
 
@@ -777,26 +777,27 @@ void atarisy2_state::coincount_w(uint8_t data)
 void atarisy2_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x11ff).mirror(0x0200).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
-	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
-	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x1580, 0x1581).mirror(0x001e).w(FUNC(atarisy2_state::int0_ack_w));
-	map(0x15a0, 0x15a0).mirror(0x001e).w(FUNC(atarisy2_state::sound_reset_w));
-	map(0x15c0, 0x15c1).mirror(0x001e).w(FUNC(atarisy2_state::scanline_int_ack_w));
-	map(0x15e0, 0x15e1).mirror(0x001e).w(FUNC(atarisy2_state::video_int_ack_w));
-	map(0x1600, 0x1600).mirror(0x007e).w(FUNC(atarisy2_state::int_enable_w));
-	map(0x1680, 0x1680).mirror(0x007e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1700, 0x1701).mirror(0x007e).w(FUNC(atarisy2_state::xscroll_w)).share("xscroll");
-	map(0x1780, 0x1781).mirror(0x007e).w(FUNC(atarisy2_state::yscroll_w)).share("yscroll");
-	map(0x1800, 0x1801).mirror(0x03fe).r(FUNC(atarisy2_state::switch_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x1c00, 0x1c01).mirror(0x03fe).r(FUNC(atarisy2_state::sound_r));
-	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap16));
-	map(0x4000, 0x5fff).bankr("rombank1");
-	map(0x6000, 0x7fff).bankr("rombank2");
-	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x81ff).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
+	map(0000000, 0007777).ram();
+	map(0010000, 0010777).mirror(01000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0012000, 0012000).mirror(00176).r("adc", FUNC(adc0808_device::data_r));
+	map(0012000, 0012003).mirror(00174).w(FUNC(atarisy2_state::bankselect_w));
+	map(0012200, 0012217).mirror(00160).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
+	map(0012600, 0012600).mirror(00036).w(FUNC(atarisy2_state::int0_ack_w));
+	map(0012640, 0012640).mirror(00036).w(FUNC(atarisy2_state::sound_reset_w));
+	map(0012700, 0012700).mirror(00036).w(FUNC(atarisy2_state::scanline_int_ack_w));
+	map(0012740, 0012740).mirror(00036).w(FUNC(atarisy2_state::video_int_ack_w));
+	map(0013000, 0013000).mirror(00176).w(FUNC(atarisy2_state::int_enable_w));
+	map(0013200, 0013200).mirror(00176).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0013400, 0013401).mirror(00176).w(FUNC(atarisy2_state::xscroll_w)).share("xscroll");
+	map(0013600, 0013601).mirror(00176).w(FUNC(atarisy2_state::yscroll_w)).share("yscroll");
+	map(0014000, 0014001).mirror(01776).r(FUNC(atarisy2_state::switch_r));
+	map(0014000, 0014000).mirror(01776).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0016000, 0016001).mirror(01776).r(FUNC(atarisy2_state::sound_r));
+	map(0020000, 0037777).m(m_vrambank, FUNC(address_map_bank_device::amap16));
+	map(0040000, 0057777).bankr("rombank1");
+	map(0060000, 0077777).bankr("rombank2");
+	map(0100000, 0177777).rom();
+	map(0100000, 0100777).rw(FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
 }
 
 
@@ -810,10 +811,10 @@ void atarisy2_state::main_map(address_map &map)
 void atarisy2_state::vrambank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x17ff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0x1800, 0x1fff).ram().w(FUNC(atarisy2_state::spriteram_w)).share("mob");
-	map(0x2000, 0x3fff).ram();
-	map(0x4000, 0x7fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(000000, 013777).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(014000, 017777).ram().w(FUNC(atarisy2_state::spriteram_w)).share("mob");
+	map(020000, 037777).ram();
+	map(040000, 077777).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 }
 
 
@@ -1268,7 +1269,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(atarisy2_state::vblank_int));
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000);
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 020000);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
