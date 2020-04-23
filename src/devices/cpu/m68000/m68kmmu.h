@@ -563,11 +563,6 @@ u32 pmmu_translate_addr_with_fc(u32 addr_in, u8 fc, bool rw, const int limit = 7
 
 	if (!ptest && !pload && pmmu_atc_lookup<false>(addr_in, fc, rw, addr_out))
 	{
-		if (pload)
-		{
-			return addr_out;
-		}
-
 		if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) || (!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
 		{
 			MMULOG("set atc hit buserror: addr_in=%08x, addr_out=%x, rw=%x, fc=%d, sz=%d\n",
