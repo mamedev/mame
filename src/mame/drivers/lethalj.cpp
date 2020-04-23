@@ -173,7 +173,7 @@ Pin #11(+) | | R               |
              GND             | e | 27|          GND
              GND             | f | 28|          GND
 
-There is a resistor connected between +12v & Marquee - so it's to power the light
+* There is a resistor connected between +12v & Marquee - so it's to power the light
 
 ***************************************************************************/
 
@@ -1025,7 +1025,7 @@ ROM_START( franticf )
 	ROM_COPY( "maincpu", 0x00000, 0x080000, 0x080000 )
 
 	ROM_REGION16_LE( 0x600000, "gfx", 0 )          /* graphics data */
-	ROM_LOAD16_BYTE( "cfgr_1.0.gr1", 0x000000, 0x080000, CRC(5a60aca0) SHA1(33ad0a03ab70e29c0dbf2b034498e9fd395eb353) ) /* Also known to be labeled "CFGR 1.0" */
+	ROM_LOAD16_BYTE( "cfgr_1.0.gr1", 0x000000, 0x080000, CRC(5a60aca0) SHA1(33ad0a03ab70e29c0dbf2b034498e9fd395eb353) ) /* Also known to be labeled "FFCGR 1.0" */
 	ROM_LOAD16_BYTE( "cfgr_2.gr2",   0x000001, 0x080000, CRC(fc44a126) SHA1(54d27c3f5bdea33c72ea5595410178f1e70ac43b) )
 	ROM_LOAD16_BYTE( "cfgr_4.gr4",   0x200000, 0x080000, CRC(b3997f9d) SHA1(25d67ee122eb342f3c617fef345a32abe965739e) ) /* Also known to be labeled "CF GR 4.00" */
 	ROM_LOAD16_BYTE( "cfgr_3.gr3",   0x200001, 0x080000, CRC(0834b6fe) SHA1(779fb60ce6b1dcdb432c6e3b48864ddb05b73038) )
@@ -1033,13 +1033,13 @@ ROM_START( franticf )
 	ROM_LOAD16_BYTE( "ffgr5.gr5",    0x400001, 0x080000, CRC(ca8a5e67) SHA1(ec9d74f13c21897a3d36626a2fc0320979aa6a3a) ) /* Also known to be labeled "FF GR 5.00" */
 
 	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
-	ROM_LOAD( "ffu18.u20", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to labeled either "FFU 18" or "FF U18/U20" */
+	ROM_LOAD( "ffu18.u20", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
 
 	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
-	ROM_LOAD( "ffu21.u21", 0x00000, 0x80000, CRC(7d9c85c8) SHA1(6090645d981d56eb8d072d042c0f02114c874137) )
+	ROM_LOAD( "ffu21.u21", 0x00000, 0x80000, CRC(7d9c85c8) SHA1(6090645d981d56eb8d072d042c0f02114c874137) ) /* known to be labeled either "CFU 21" */
 
 	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
-	ROM_LOAD( "ffu18.u18", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to labeled either "FFU 18" or "FF U18/U20" */
+	ROM_LOAD( "ffu18.u18", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
 ROM_END
 
 
