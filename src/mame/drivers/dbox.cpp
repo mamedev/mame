@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /*
- * The Dbox-1 CPU board.
+ * The Dbox-1 is a DVB Satellite and cable digital television set-top box.
+ *
+ * The CPU board:
  *__________________________________________________________________________________________________________
  *                                                                                                          |
  *                                                                                                          |
@@ -33,15 +35,15 @@
  * History of Nokia Multimedia Division
  *-------------------------------------
  * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
- * by Nokia 1985. Luxor designed among other things TV setsm Radios and the famous ABC-80. The Nokia Multimedia
- * Division was formed in Linköping as a result of the Luxor aquesition. Their main design was a satellite
+ * by Nokia 1985. Luxor designed among other things TV sets, Radios and the famous ABC-80. The Nokia Multimedia
+ * Division was formed in Linköping as a result of the Luxor aquisition. Their main design was a satellite
  * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very
  * low at best and the Kirsch Gruppe went bankrupt in 2002 and Nokia decided to shutdown the facility in Linköping.
  *
- * The heavily subsidiced Dbox was very popular in Holland since Kirsch Gruppe didn't lock use to themselfs. This was
+ * The heavily subsidised Dbox was very popular in Holland since Kirsch Gruppe didn't lock usage to themselves. This was
  * corrected in a forced firmware upgrade leaving the "customers" in Holland without a working box. Pretty soon a
  * shareware software developed by Uli Hermann appeared called DVB98 and later DVB2000 reenabling the boxes in  Holland
  * and blocking upgrades. Uli's software was by many considered better than the original software.
@@ -55,7 +57,7 @@
  *
  * Misc findings
  *--------------
- * - Serial port on the back runs at 19200 at issues modem commands when attached to terminal
+ * - Serial port on the back runs at 19200 and issues modem commands when attached to terminal
  * - It is possible to attach a BDM emulator and retrieve the ROM through it.
  * - It is possible to flash new firmware through BDM by adding jumper XP06 (under the modem board)
  * - The bootstrap is based on RTXC 3.2g RTOS
@@ -235,7 +237,7 @@
  *                            - ignore FREEZE
  *                            - The crystal clock is the clear-to-send input capture clock for both channels
  *  SIM40 + 0x0701: 0x8A     Serial Module - MCR Low Byte
- *                            - The serial control regosters are only accessable from supervisor mode
+ *                            - The serial control registers are only accessable from supervisor mode
  *                            - IARB = 0x0A - serial module has priority level 10d
  *  SIM40 + 0x0704: 0x01     Serial Module - ILR Interrupt Level
  *  SIM40 + 0x0705: 0x44     Serial Module - IVR Interrupt Vector
@@ -507,7 +509,7 @@ WRITE8_MEMBER (dbox_state::write_pa){
 }
 
 #if LOCALFLASH
-/* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallell */
+/* Lcoal emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallel */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
 WRITE16_MEMBER (dbox_state::sysflash_w){
 	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
@@ -610,7 +612,7 @@ void dbox_state::dbox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
 	m_maincpu->pa_out_callback().set(FUNC(dbox_state::write_pa));
 
-	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
+	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler module */
 	//m_maincpu->tout2_out_callback().set("dcs", FUNC(descrambler_device::txd_receiver));
 	//m_maincpu->tgate2_in_callback().set("dsc", FUNC(descrambler_device::rxd_receiver));
 
