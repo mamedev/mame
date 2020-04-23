@@ -29,7 +29,7 @@ public:
 	auto flg() { return m_flg_handler.bind(); }
 	auto dmar() { return m_dmar_handler.bind(); }
 
-	uint8_t int_r();
+	uint8_t int_r(offs_t offset);
 	void pa_w(uint8_t data);
 
 	void set_irq(uint8_t sc , int state);

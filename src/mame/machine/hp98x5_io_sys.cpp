@@ -70,9 +70,9 @@ void hp98x5_io_sys_device::device_reset()
 	update_dmar();
 }
 
-uint8_t hp98x5_io_sys_device::int_r()
+uint8_t hp98x5_io_sys_device::int_r(offs_t offset)
 {
-	if ((m_irq_pending & 0xff00) == 0) {
+	if (offset == 0) {
 		return m_irq_pending & 0xff;
 	} else {
 		return m_irq_pending >> 8;

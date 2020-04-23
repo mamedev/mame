@@ -1326,8 +1326,8 @@ void hp_hybrid_cpu_device::check_for_interrupts()
 
 	standard_irq_callback(irqline);
 
-	// Get interrupt vector in low byte
-	uint8_t vector = m_int_func();
+	// Get interrupt vector in low byte (level is available on PA3)
+	uint8_t vector = m_int_func(BIT(m_flags , HPHYBRID_IRH_BIT) ? 1 : 0);
 	uint8_t new_PA;
 
 	// Get highest numbered 1
