@@ -4948,7 +4948,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool::partition &partition, const ch
 
 		/* free data AUs */
 //      fphysrecs =
-			get_UINT16BE(fdr.fphysrecs);
+		get_UINT16BE(fdr.fphysrecs);
 
 		i = 0;
 		cluster_index = 0;

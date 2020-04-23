@@ -745,6 +745,11 @@ end
 			"_7ZIP_ST",
 		}
 
+	if string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
+		buildoptions_c {
+			"-Wno-misleading-indentation",
+		}
+	end
 	files {
 			MAME_DIR .. "3rdparty/lzma/C/7zAlloc.c",
 			MAME_DIR .. "3rdparty/lzma/C/7zArcIn.c",
@@ -1506,6 +1511,11 @@ project "portaudio"
 					"-Wno-incompatible-pointer-types-discards-qualifiers",
 				}
 			end
+		end
+		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
+			buildoptions_c {
+				"-Wno-misleading-indentation",
+			}
 		end
 	end
 	configuration { "vs*" }

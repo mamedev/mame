@@ -1978,7 +1978,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 	/* TODO: doesn't boot if a disk isn't in? */
 	/* TODO: Check out when this really happens. (Daytona USA original version definitely wants it to be on).*/
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		hirqreg |= SCDQ;
+	hirqreg |= SCDQ;
 
 	if(cd_stat & CD_STAT_PERI)
 	{

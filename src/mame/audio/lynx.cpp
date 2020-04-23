@@ -228,7 +228,7 @@ void lynx_sound_device::count_down(int nr)
 	if (nr == 0)
 		m_mixer_channel->update();
 	//if ((channel->reg.control1 & 0x0f) == 0x0f) //count down if linking enabled and count enabled
-		channel->count--;
+	channel->count--;
 }
 
 void lynx_sound_device::shift(int chan_nr)
