@@ -1036,7 +1036,7 @@ ROM_START( franticf )
 	ROM_LOAD( "ffu18.u20", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
 
 	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
-	ROM_LOAD( "ffu21.u21", 0x00000, 0x80000, CRC(7d9c85c8) SHA1(6090645d981d56eb8d072d042c0f02114c874137) ) /* known to be labeled either "CFU 21" */
+	ROM_LOAD( "ffu21.u21", 0x00000, 0x80000, CRC(7d9c85c8) SHA1(6090645d981d56eb8d072d042c0f02114c874137) ) /* Also known to be labeled "CFU 21" */
 
 	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "ffu18.u18", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) ) /* known to be labeled either "FFU18" or "FF U18/U20" */
