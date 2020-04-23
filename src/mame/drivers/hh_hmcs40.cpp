@@ -91,9 +91,9 @@
 
   TODO:
   - cgalaxn discrete sound (alien attacking sound effect)
-  - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
-    works ok if stack levels is increased, 38800 B rev. has more stack levels?
-    Or it could be a race condition: irq happening too late/early.
+  - gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
+    It can be tested by jumping up repeatedly at the start position under the ladder,
+    if the glitch happens there, you can jump onto the 2nd floor. Maybe BTANB?
   - epacman2 booting the game in demo mode, pacman should take the shortest route to
     the upper-left power pill: mcu cycle/interrupt timing related
   - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
@@ -4315,7 +4315,7 @@ CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, empty_in
 CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )

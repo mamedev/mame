@@ -2,13 +2,19 @@
 // copyright-holders:hap
 /*
 
-  Hitachi HMCS40 MCU family cores
+Hitachi HMCS40 MCU family cores
 
-  References:
-  - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
-  - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
-  - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
-    (verified a while later after new documentation was found)
+References:
+- 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
+- 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
+- opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
+  (verified a while later after new documentation was found)
+
+TODO:
+- How the stack works, is probably m_stack_levels+1 program counters, and
+  an index pointing to the current program counter. Then push/pop simply
+  decrements/increments the index. The way it is implemented right now
+  behaves the same.
 
 */
 
