@@ -146,22 +146,22 @@ TIMER_CALLBACK_MEMBER( namco_50xx_device::readrequest_callback )
 	m_latched_rw = 1;
 }
 
-READ8_MEMBER( namco_50xx_device::K_r )
+uint8_t namco_50xx_device::K_r()
 {
 	return m_latched_cmd >> 4;
 }
 
-READ8_MEMBER( namco_50xx_device::R0_r )
+uint8_t namco_50xx_device::R0_r()
 {
 	return m_latched_cmd & 0x0f;
 }
 
-READ8_MEMBER( namco_50xx_device::R2_r )
+uint8_t namco_50xx_device::R2_r()
 {
 	return m_latched_rw & 1;
 }
 
-WRITE8_MEMBER( namco_50xx_device::O_w )
+void namco_50xx_device::O_w(uint8_t data)
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
@@ -187,7 +187,7 @@ void namco_50xx_device::irq_set()
 	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
 }
 
-WRITE8_MEMBER( namco_50xx_device::write )
+void namco_50xx_device::write(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::latch_callback),this), data);
 
@@ -203,7 +203,7 @@ WRITE_LINE_MEMBER(namco_50xx_device::read_request)
 }
 
 
-READ8_MEMBER( namco_50xx_device::read )
+uint8_t namco_50xx_device::read()
 {
 	uint8_t res = m_portO;
 

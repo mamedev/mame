@@ -20,10 +20,10 @@ public:
 
 	template <unsigned N> auto write_callback() { return m_write[N].bind(); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( ctrl_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_r();
+	void ctrl_w(uint8_t data);
 
 protected:
 	// device-level overrides

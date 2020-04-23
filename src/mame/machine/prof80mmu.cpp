@@ -73,7 +73,7 @@ device_memory_interface::space_config_vector prof80_mmu_device::memory_space_con
 //  par_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_mmu_device::par_w )
+void prof80_mmu_device::par_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 12;
 
@@ -95,7 +95,7 @@ WRITE_LINE_MEMBER( prof80_mmu_device::mme_w )
 //  program_r - program space read
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_mmu_device::program_r )
+uint8_t prof80_mmu_device::program_r(offs_t offset)
 {
 	if (m_enabled)
 	{
@@ -115,7 +115,7 @@ READ8_MEMBER( prof80_mmu_device::program_r )
 //  program_w - program space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_mmu_device::program_w )
+void prof80_mmu_device::program_w(offs_t offset, uint8_t data)
 {
 	if (m_enabled)
 	{

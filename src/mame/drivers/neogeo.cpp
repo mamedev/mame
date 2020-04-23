@@ -1065,7 +1065,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 	uint16_t ret;
 
 	if (m_memcard->present())
-		ret = m_memcard->read(space, offset) | 0xff00;
+		ret = m_memcard->read(offset) | 0xff00;
 	else
 		ret = 0xffff;
 
@@ -1080,7 +1080,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_memcard->present())
-				m_memcard->write(space, offset, data);
+				m_memcard->write(offset, data);
 	}
 }
 

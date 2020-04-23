@@ -61,7 +61,7 @@ void wpc_out_device::send_output(int sid, int state)
 		machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(wpc_out_device::out_w)
+void wpc_out_device::out_w(offs_t offset, uint8_t data)
 {
 	first_after_led = false;
 	uint8_t diff = state[offset] ^ data;
@@ -90,14 +90,14 @@ WRITE8_MEMBER(wpc_out_device::out_w)
 			}
 }
 
-WRITE8_MEMBER(wpc_out_device::out4_w)
+void wpc_out_device::out4_w(uint8_t data)
 {
 	// This is gross, probably wrong, but also the best I could find.
 	// Test case is No Good Gofers (ngg_13).
-	out_w(space, first_after_led ? 5 : 4, data, mem_mask);
+	out_w(first_after_led ? 5 : 4, data);
 }
 
-WRITE8_MEMBER(wpc_out_device::gi_w)
+void wpc_out_device::gi_w(uint8_t data)
 {
 	gi_update();
 	if((gi^data) & 0x80)
@@ -105,7 +105,7 @@ WRITE8_MEMBER(wpc_out_device::gi_w)
 	gi = data;
 }
 
-WRITE8_MEMBER(wpc_out_device::led_w)
+void wpc_out_device::led_w(uint8_t data)
 {
 	first_after_led = true;
 	machine().output().set_value("L:cpu led", data & 0x80 ? 1 : 0);

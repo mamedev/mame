@@ -65,10 +65,10 @@
 #include "logmacro.h"
 
 
-#define READ_PORT(num)           m_in[num](space, 0)
-#define WRITE_PORT(num, data)    m_out[num](space, 0, data)
+#define READ_PORT(num)           m_in[num](0)
+#define WRITE_PORT(num, data)    m_out[num](0, data)
 
-WRITE8_MEMBER( namco_51xx_device::write )
+void namco_51xx_device::write(uint8_t data)
 {
 	data &= 0x07;
 
@@ -166,7 +166,7 @@ static const int joy_map[16] =
 {    0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
 
 
-READ8_MEMBER( namco_51xx_device::read )
+uint8_t namco_51xx_device::read()
 {
 	LOG("%s: custom 51XX read\n",machine().describe_context());
 

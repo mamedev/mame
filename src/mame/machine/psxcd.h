@@ -27,8 +27,8 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 	void start_dma(uint8_t *mainram, uint32_t size);
 
 protected:

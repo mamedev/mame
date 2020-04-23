@@ -22,7 +22,7 @@ public:
 	// construction/destruction
 	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(p0_w);
+	void p0_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(data_w);
 
@@ -44,11 +44,11 @@ private:
 
 	void scan_kbd_col(int col);
 
-	DECLARE_READ8_MEMBER(p0_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p0_r();
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 };
 
 // device type definition

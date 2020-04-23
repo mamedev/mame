@@ -13,9 +13,9 @@ class namco_50xx_device : public device_t
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	WRITE8_MEMBER( write );
+	void write(uint8_t data);
 	WRITE_LINE_MEMBER(read_request);
-	READ8_MEMBER( read );
+	uint8_t read();
 
 protected:
 	// device-level overrides
@@ -36,10 +36,10 @@ private:
 	uint8_t                   m_portO;
 	emu_timer * m_irq_cleared_timer;
 
-	READ8_MEMBER( K_r );
-	READ8_MEMBER( R0_r );
-	READ8_MEMBER( R2_r );
-	WRITE8_MEMBER( O_w );
+	uint8_t K_r();
+	uint8_t R0_r();
+	uint8_t R2_r();
+	void O_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device)

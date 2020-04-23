@@ -33,7 +33,7 @@ public:
 	// construction/destruction
 	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read();
 
 protected:
 	// device-level overrides

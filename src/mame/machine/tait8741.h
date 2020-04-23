@@ -27,14 +27,14 @@ public:
 	void set_mode(int num, uint8_t mode) { m_taito8741[num].mode = mode; }
 	void set_connect(int num, int conn) { m_taito8741[num].connect = conn; }
 
-	DECLARE_READ8_MEMBER( read_0 ) { if(offset&1) return status_r(0); else return data_r(0); }
-	DECLARE_WRITE8_MEMBER( write_0 ) { if(offset&1) command_w(0,data); else data_w(0,data); }
-	DECLARE_READ8_MEMBER( read_1 ) { if(offset&1) return status_r(1); else return data_r(1); }
-	DECLARE_WRITE8_MEMBER( write_1 ) { if(offset&1) command_w(1,data); else data_w(1,data); }
-	DECLARE_READ8_MEMBER( read_2 ) { if(offset&1) return status_r(2); else return data_r(2); }
-	DECLARE_WRITE8_MEMBER( write_2 ) { if(offset&1) command_w(2,data); else data_w(2,data); }
-	DECLARE_READ8_MEMBER( read_3 ) { if(offset&1) return status_r(3); else return data_r(3); }
-	DECLARE_WRITE8_MEMBER( write_3 ) { if(offset&1) command_w(3,data); else data_w(3,data); }
+	uint8_t read_0(offs_t offset) { if(offset&1) return status_r(0); else return data_r(0); }
+	void write_0(offs_t offset, uint8_t data) { if(offset&1) command_w(0,data); else data_w(0,data); }
+	uint8_t read_1(offs_t offset) { if(offset&1) return status_r(1); else return data_r(1); }
+	void write_1(offs_t offset, uint8_t data) { if(offset&1) command_w(1,data); else data_w(1,data); }
+	uint8_t read_2(offs_t offset) { if(offset&1) return status_r(2); else return data_r(2); }
+	void write_2(offs_t offset, uint8_t data) { if(offset&1) command_w(2,data); else data_w(2,data); }
+	uint8_t read_3(offs_t offset) { if(offset&1) return status_r(3); else return data_r(3); }
+	void write_3(offs_t offset, uint8_t data) { if(offset&1) command_w(3,data); else data_w(3,data); }
 
 	TIMER_CALLBACK_MEMBER( serial_tx );
 	void update(int num);

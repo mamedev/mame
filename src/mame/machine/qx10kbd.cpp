@@ -42,7 +42,7 @@ void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 	m_clk_state = !m_clk_state;
 }
 
-WRITE8_MEMBER(qx10_keyboard_device::mcu_p1_w)
+void qx10_keyboard_device::mcu_p1_w(u8 data)
 {
 	m_row = data & 0xf;
 	output_rxd(BIT(data, 7));

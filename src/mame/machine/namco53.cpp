@@ -62,32 +62,32 @@
 #include "logmacro.h"
 
 
-READ8_MEMBER( namco_53xx_device::K_r )
+uint8_t namco_53xx_device::K_r()
 {
 	return m_k(0);
 }
 
-READ8_MEMBER( namco_53xx_device::R0_r )
+uint8_t namco_53xx_device::R0_r()
 {
 	return m_in[0](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R1_r )
+uint8_t namco_53xx_device::R1_r()
 {
 	return m_in[1](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R2_r )
+uint8_t namco_53xx_device::R2_r()
 {
 	return m_in[2](0);
 }
 
-READ8_MEMBER( namco_53xx_device::R3_r )
+uint8_t namco_53xx_device::R3_r()
 {
 	return m_in[3](0);
 }
 
-WRITE8_MEMBER( namco_53xx_device::O_w )
+void namco_53xx_device::O_w(uint8_t data)
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
@@ -96,9 +96,9 @@ WRITE8_MEMBER( namco_53xx_device::O_w )
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-WRITE8_MEMBER( namco_53xx_device::P_w )
+void namco_53xx_device::P_w(uint8_t data)
 {
-	m_p(space, 0, data);
+	m_p(0, data);
 }
 
 
@@ -119,7 +119,7 @@ WRITE_LINE_MEMBER(namco_53xx_device::read_request)
 	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
 }
 
-READ8_MEMBER( namco_53xx_device::read )
+uint8_t namco_53xx_device::read()
 {
 	uint8_t res = m_portO;
 

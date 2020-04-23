@@ -100,7 +100,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 }
 
 
-READ8_MEMBER( namco_06xx_device::data_r )
+uint8_t namco_06xx_device::data_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -112,16 +112,16 @@ READ8_MEMBER( namco_06xx_device::data_r )
 		return 0;
 	}
 
-	if (BIT(m_control, 0)) result &= m_read[0](space, 0);
-	if (BIT(m_control, 1)) result &= m_read[1](space, 0);
-	if (BIT(m_control, 2)) result &= m_read[2](space, 0);
-	if (BIT(m_control, 3)) result &= m_read[3](space, 0);
+	if (BIT(m_control, 0)) result &= m_read[0](0);
+	if (BIT(m_control, 1)) result &= m_read[1](0);
+	if (BIT(m_control, 2)) result &= m_read[2](0);
+	if (BIT(m_control, 3)) result &= m_read[3](0);
 
 	return result;
 }
 
 
-WRITE8_MEMBER( namco_06xx_device::data_w )
+void namco_06xx_device::data_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data);
 
@@ -130,20 +130,20 @@ WRITE8_MEMBER( namco_06xx_device::data_w )
 		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
 		return;
 	}
-	if (BIT(m_control, 0)) m_write[0](space, 0, data);
-	if (BIT(m_control, 1)) m_write[1](space, 0, data);
-	if (BIT(m_control, 2)) m_write[2](space, 0, data);
-	if (BIT(m_control, 3)) m_write[3](space, 0, data);
+	if (BIT(m_control, 0)) m_write[0](0, data);
+	if (BIT(m_control, 1)) m_write[1](0, data);
+	if (BIT(m_control, 2)) m_write[2](0, data);
+	if (BIT(m_control, 3)) m_write[3](0, data);
 }
 
 
-READ8_MEMBER( namco_06xx_device::ctrl_r )
+uint8_t namco_06xx_device::ctrl_r()
 {
 	LOG("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag());
 	return m_control;
 }
 
-WRITE8_MEMBER( namco_06xx_device::ctrl_w )
+void namco_06xx_device::ctrl_w(uint8_t data)
 {
 	LOG("%s: 06XX '%s' control %02x\n",machine().describe_context(),tag(),data);
 
@@ -166,10 +166,10 @@ WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 
 		if (m_control & 0x10)
 		{
-			if (BIT(m_control, 0)) m_readreq[0](space, 0);
-			if (BIT(m_control, 1)) m_readreq[1](space, 0);
-			if (BIT(m_control, 2)) m_readreq[2](space, 0);
-			if (BIT(m_control, 3)) m_readreq[3](space, 0);
+			if (BIT(m_control, 0)) m_readreq[0](0);
+			if (BIT(m_control, 1)) m_readreq[1](0);
+			if (BIT(m_control, 2)) m_readreq[2](0);
+			if (BIT(m_control, 3)) m_readreq[3](0);
 		}
 	}
 }

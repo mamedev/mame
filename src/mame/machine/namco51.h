@@ -17,8 +17,8 @@ public:
 	template <unsigned N> auto input_callback() { return m_in[N].bind(); }
 	template <unsigned N> auto output_callback() { return m_out[N].bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(uint8_t data);
+	uint8_t read();
 
 protected:
 	// device-level overrides
