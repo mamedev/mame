@@ -87,7 +87,8 @@
     4000-FFFF   R     xxxxxxxx   Program ROM
     ========================================================================
     Interrupts:
-        IRQ = timed interrupt (clocked by VBLANK ORed with 32V; YM2151 IRQ not used)
+        IRQ = timed interrupt (clocked by VBLANK ORed with 32V; YM2151 IRQ
+              is tested by service routine but not connected on hardware)
         NMI = latch on sound command
     ========================================================================
 
