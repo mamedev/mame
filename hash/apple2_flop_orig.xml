@@ -11829,4 +11829,452 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ladytut">
+		<description>Lady Tut</description>
+		<year>1983</year>
+		<publisher>Progame</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="108284">
+				<rom name="lady tut side a.woz" size="108284" crc="f0416052" sha1="4981fbc8493eafd372724f584cd3621652c51e35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="94976">
+				<rom name="lady tut side b.woz" size="94976" crc="7961300e" sha1="c8828a6bab99bb933068981c2c4b32b5e9b3c692"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="willwisp">
+		<description>Will O The Wisp</description>
+		<year>1983</year>
+		<publisher>General Masters</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="will o the wisp.woz" size="234816" crc="91741c6b" sha1="9413ad8171a84ec60c8f5f749274595baf5d9de5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprhuey">
+		<description>Super Huey</description>
+		<year>1985</year>
+		<publisher>Cosmi</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241466">
+				<rom name="super huey.woz" size="241466" crc="83119753" sha1="787b4172e512850772e36ccf743de0b644a9b39b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maddenfb">
+		<description>John Madden Football</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234810">
+				<rom name="john madden football side a.woz" size="234810" crc="8731f6c6" sha1="9e06385a69fd0045d0b1539fd16bdd8f8c7ca777"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234810">
+				<rom name="john madden football side b.woz" size="234810" crc="3cb6bc97" sha1="a866e7b854c3dfe4206317acf78a8f4b86a82783"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cindslpr">
+		<description>Who Stole Cinderella's Slipper? (Version 2.0)</description>
+		<year>1984</year>
+		<publisher>Book Lures</publisher>
+		<info name="release" value="2020-03-31"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234822">
+				<rom name="who stole cinderella's slipper.woz" size="234822" crc="aa512cc9" sha1="fe2aa70dd8e52543749829ba2df59b392fe62612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minesttn">
+		<description>Mines of Titan</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2020-03-31"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Game"/>
+			<dataarea name="flop" size="241424">
+				<rom name="mines of titan side a - game.woz" size="241424" crc="0cfb001a" sha1="dcbfd265cf708516c9c414205bcbff7e38d80dce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Player"/>
+			<dataarea name="flop" size="234768">
+				<rom name="mines of titan side b - player.woz" size="234768" crc="dbed7159" sha1="11b6138935f563c205a4d34d05f67af008aedb3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobgrev">
+		<description>Hobgoblin's Revenge</description>
+		<year>1987</year>
+		<publisher>Unpublished or self-published</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="234722">
+				<rom name="hobgoblin's revenge side a - program.woz" size="234722" crc="4b3b4a0d" sha1="c0c57f24c55c9850ca7abfbcb4f9dd4792fe53e0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Source code"/>
+			<dataarea name="flop" size="234722">
+				<rom name="hobgoblin's revenge side b - source code.woz" size="234722" crc="783acdb9" sha1="f56f464768716c662bc90d3b31f9ddf20f379369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typhstl">
+		<description>Typhoon of Steel (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+			<feature name="part_id" value="Asia disk"/>
+				<rom name="typhoon of steel - asia.woz" size="234760" crc="64f4fae2" sha1="2162afa7fc92e029ea45de9547cb9ec2244d7a2a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Europe disk"/>
+			<dataarea name="flop" size="234762">
+				<rom name="typhoon of steel - europe.woz" size="234762" crc="6c8b2f21" sha1="62212483a0845f019ce6526020614fdea2adec16"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Pacific disk"/>
+			<dataarea name="flop" size="234763">
+				<rom name="typhoon of steel - pacific.woz" size="234763" crc="f4f9ccc8" sha1="40fe14d68b358802dc32459b95ac6cb81a4a6728"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Scenarios disk"/>
+			<dataarea name="flop" size="234765">
+				<rom name="typhoon of steel - scenarios.woz" size="234765" crc="711b5ff8" sha1="6b505829f62dd39a3e558bdeaf655f796d41ec5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnmunch">
+		<description>Alien Munchies</description>
+		<year>1983</year>
+		<publisher>Gentry Software</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="alien munchies.woz" size="234769" crc="3b6311d4" sha1="a6f4d4a568c8ec5ec10eace1482f284483d19b62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crscali">
+		<description>Crosscountry California</description>
+		<year>1991</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234807">
+				<rom name="crosscountry california side a.woz" size="234807" crc="56f59507" sha1="c45ec9fa8e79dbc183a9f12561b1941b2cf64fcc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234807">
+				<rom name="crosscountry california side b.woz" size="234807" crc="2a468b66" sha1="afa5652b8d9fd78739ee9ab6832a4198fdab2393"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrlncstl">
+		<description>Merlin's Castle</description>
+		<year>1983</year>
+		<publisher>General Masters</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="merlin's castle.woz" size="234784" crc="cc70b746" sha1="27dc19d8bee980679ec46257fd7ce836a0ce13ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kmpfgp10">
+		<description>Kampfgruppe (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Game disk"/>
+			<dataarea name="flop" size="234782">
+				<rom name="kampfgruppe side a - game disk.woz" size="234782" crc="cade1355" sha1="191f53083835e2fe77b50d293391fcf85130ed66"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Historical scenarios"/>
+			<dataarea name="flop" size="234793">
+				<rom name="kampfgruppe side b - historical senarios.woz" size="234793" crc="43f3a85e" sha1="c045af7378e7dff9a3dac97e26e82543df3da566"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metinspc">
+		<description>Meteoroids in Space</description>
+		<year>1981</year>
+		<publisher>Quality Software</publisher>
+		<info name="release" value="2020-04-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+	
+    	<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48405">
+				<rom name="meteoroids in space.woz" size="48405" crc="7beb3c05" sha1="61cdb1028a091a7bd85ac636f1f29087b57b4426"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="latnhngm">
+		<description>The Latin Hangman (Revision 1004)</description>
+		<year>1983</year>
+		<publisher>Unknown</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 32K. -->
+		<!-- Game is copyright George Earl, but no apparent publisher -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234766">
+				<rom name="the latin hangman side a.woz" size="234766" crc="0811061d" sha1="801d724fdd4f62c7f4052eb15ca81eeb0142b88a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234766">
+				<rom name="the latin hangman side b.woz" size="234766" crc="1a30bfd6" sha1="ca7b7df68a89a3ab87d34ead7ca2fbb47c38ba15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="816pnt31">
+		<description>816/Paint (Version 3.1)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is the 5.25-inch disk part of version 3.1. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228110">
+				<rom name="816 paint v3.1.woz" size="228110" crc="5348048a" sha1="b8673692b4f3d4e8d2281dc58c48c2facd28a6f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Aliens</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241429">
+				<rom name="aliens.woz" size="241429" crc="2ccbad87" sha1="d254d20ef3095666ada034ea47327ef08375a672"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale3">
+		<description>The Bard's Tale III: The Thief of Fate</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Boot"/>
+			<dataarea name="flop" size="234820">
+				<rom name="the bard's tale iii disk 1a - boot.woz" size="234820" crc="0d92adf1" sha1="afec810cc36929f05d774f581c7a4b94588500b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Character"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 1b - character.woz" size="234825" crc="bc266220" sha1="b8db19d79fb182b95697262dece469067ffef65c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Dungeon A"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 2a - dungeon a.woz" size="234825" crc="2c962b97" sha1="200229e56978e57ac68183fffa4a1012c3ebfc95"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Dungeon B"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 2b - dungeon b.woz" size="234825" crc="ca6ef3c4" sha1="2c56ca1744e482864a49cf41b6355038d5a7c97e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tplogo11">
+		<description>Terrapin Logo Plus (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>Terrapin</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Language disk"/>
+			<dataarea name="flop" size="234808">
+				<rom name="terrapin logo plus v1.1 side a - language disk.woz" size="234808" crc="d8850aed" sha1="0a19f16147d5414d280d85ec198a56533c17a311"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Utilities disk"/>
+			<dataarea name="flop" size="234809">
+				<rom name="terrapin logo plus v1.1 side b - utilities disk.woz" size="234809" crc="d5c7efae" sha1="37fc098d799d6b32c5695288731adfb291219694"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abm">
+		<description>ABM</description>
+		<year>1980</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive and a 48K Apple II+ or later. -->
+		<!-- This image wes updated on 04/17/2020 to fix incorrectly
+		set sector type (it was incorrectly set to 15-sector) -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="abm.woz" size="234776" crc="e1f6c358" sha1="bddc3e453fc5c397b5666227de7b6ae17c1f9454" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnklobb">
+		<description>Tink!Tonk! Tonk in the Land of the Buddy-Bots</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="tink!tonk! tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbe">
+		<description>Microbe</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-04-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234852">
+				<rom name="microbe side a.woz" size="234852" crc="0d944e75" sha1="5a8e5a95c764d181e0410cc411b6b14be57e87a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234852">
+				<rom name="microbe side b.woz" size="234852" crc="e23a8340" sha1="1d085179f9e2905179b4eb57fbd716430da18c2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl4">
+		<description>Wild West Math Level 4</description>
+		<year>1990</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2020-04-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk a.woz" size="234794" crc="a43e5a5e" sha1="553ab5f970ee45190aa5dc29b0ca634a006fd337"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk b.woz" size="234794" crc="20a3050d" sha1="17af493d2f55e469ac14bc532553eae2dfca8fc3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk c.woz" size="234794" crc="aeb036c1" sha1="3f91f0f0e7ed453a8d91fb34656b04fdc5ce5818"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
