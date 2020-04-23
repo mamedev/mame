@@ -1482,13 +1482,13 @@ arcadia                         // Emerson Arcadia 2001
 bndarc                          // Bandai Arcadia
 dynavisn                        // Dynavision
 ekusera                         // Ekusera
+giglnrdo                        // Leonardo
 hanihac                         // Hanimex Home Arcade Centre
 hmg2650                         // Hanimex HMG-2650
 intervsn                        // Intervision 2001
 intmpt03                        // Intelligent Game MPT-03
 itmcmtp3                        // ITMC MPT-03
 ixl2000                         // Intercord XL 2000 System
-leonardo                        // Leonardo
 lvision                         // Leisure-Vision
 mratlus                         // Mr. Altus Tele Brain
 orbituvi                        // UVI Compu-Game
@@ -35128,6 +35128,11 @@ ccdelta1                        //
 @source:saitek_exchess.cpp
 exchess
 
+@source:saitek_leonardo.cpp
+galileo
+leonardo
+leonardoa
+
 @source:saitek_mark5.cpp
 ccmk5
 ccmk6
@@ -35135,10 +35140,14 @@ ccmk6
 @source:saitek_prschess.cpp
 prschess
 
+@source:saitek_renaissance.cpp
+renaissa
+renaissaa
+
 @source:saitek_risc2500.cpp
+montreux                        //
 risc2500                        //
 risc2500a                       //
-montreux                        //
 
 @source:saitek_schess.cpp
 schess

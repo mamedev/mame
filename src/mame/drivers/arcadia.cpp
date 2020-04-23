@@ -535,6 +535,11 @@ ROM_START(ekusera)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(giglnrdo)
+	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
+ROM_END
+
 ROM_START(hanihac)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
@@ -566,11 +571,6 @@ ROM_START(itmcmtp3)
 ROM_END
 
 ROM_START(lvision)
-	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(leonardo)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
@@ -807,11 +807,12 @@ void arcadia_state::init_arcadia()
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME */
 CONS(1983, advsnha,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
-CONS(1982, bndarc,   arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, bndarc,   arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Bandai",             "Arcadia (Bandai)", MACHINE_IMPERFECT_SOUND )        /* Japan */
 CONS(1982, arcadia,  0,        0,        arcadia, arcadia, arcadia_state, init_arcadia, "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */
 CONS(198?, tccosmos, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Mobilar?",           "Tele-Computer Cosmos", MACHINE_IMPERFECT_SOUND )    /* Spain? I have only found pictures of a German Cosmos ( http://www.pong-picture-page.de/catalog/product_info.php?products_id=2170 ) */
 CONS(1982, dynavisn, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Yamagiwa",           "Dynavision", MACHINE_IMPERFECT_SOUND )              /* Japan */
 CONS(1982, ekusera,  intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "P.I.C",              "Ekusera", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, giglnrdo, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "GiG Electronics",    "Leonardo (GiG Electronics)", MACHINE_IMPERFECT_SOUND ) /* Italy */
 CONS(1982, hanihac,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "Hanimex Home Arcade Centre", MACHINE_IMPERFECT_SOUND )  /* UK */
 CONS(1982, hmg2650,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "HMG-2650", MACHINE_IMPERFECT_SOUND )                 /* Germany */
 CONS(198?, intmpt03, 0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Intelligent Game",   "Intelligent Game MPT-03", MACHINE_IMPERFECT_SOUND )  /* U.S.A */
@@ -819,7 +820,6 @@ CONS(198?, ixl2000,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_a
 CONS(198?, intervsn, ormatu,   0,        arcadia, arcadia, arcadia_state, init_arcadia, "Intervision",        "Intervision 2001", MACHINE_IMPERFECT_SOUND )         /* Switzerland */
 CONS(198?, itmcmtp3, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "ITMC",               "ITMC MPT-03", MACHINE_IMPERFECT_SOUND )              /* France */
 CONS(1982, lvision,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Leisure-Dynamics",   "Leisure-Vision", MACHINE_IMPERFECT_SOUND )           /* Canada */
-CONS(1982, leonardo, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "GiG Electronics",    "Leonardo", MACHINE_IMPERFECT_SOUND )                 /* Italy */
 CONS(1983, mratlus,  plldium,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "H.G.S.",             "Mr. Altus Tele Brain", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )    /* Germany */
 CONS(198?, ormatu,   0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Ormatu Electronics", "Ormatu 2001", MACHINE_IMPERFECT_SOUND )              /* Netherlands */
 CONS(198?, plldium,  0,        arcadia,  arcadia, plldium, arcadia_state, init_arcadia, "Neckermann",         "Palladium Video-Computer-Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany, 16 keys instead of 12 */
