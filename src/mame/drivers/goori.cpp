@@ -5,10 +5,14 @@
 
 // background image is visible briefly at the start of level, is this correct?
 
+// is more than one button used?
+
+
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/eepromser.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -27,7 +31,8 @@ public:
 		m_oki(*this, "oki"),
 		m_spriteram(*this, "spriteram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	void goori(machine_config& config);
@@ -48,10 +53,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<okim6295_device> m_oki;
+	required_device<okim6295_device> m_oki;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_device<screen_device> m_screen;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	tilemap_t* m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
@@ -125,7 +131,15 @@ WRITE16_MEMBER(goori_state::goori_300008_w)
 
 WRITE16_MEMBER(goori_state::goori_30000e_w)
 {
-	//popmessage("goori_30000e_w %04x %04x\n", data, mem_mask); // startup only?
+	// eeprom writes?
+	logerror("%06x goori_30000e_w %04x %04x\n", machine().describe_context(), data, mem_mask); // startup only?
+
+	if (mem_mask & 0x00ff)
+	{
+		m_eeprom->di_write((data & 0x0004) >> 2);
+		m_eeprom->cs_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void goori_state::goori_map(address_map &map)
@@ -154,71 +168,25 @@ void goori_state::goori_map(address_map &map)
 
 static INPUT_PORTS_START( goori )
 	PORT_START("DSW1")  /* 500001 */
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* 500003 */
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")    /* 500005 */
@@ -227,9 +195,9 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // makes sound but doesn't add a coin
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
 INPUT_PORTS_END
 
 static const gfx_layout layout_16x16x8 =
@@ -279,6 +247,8 @@ void goori_state::goori(machine_config &config)
 	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(goori_state::screen_update));
 	m_screen->set_palette(m_palette);
+
+	EEPROM_93C46_16BIT(config, "eeprom"); // 93C46C81
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 
