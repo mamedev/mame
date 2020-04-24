@@ -260,7 +260,7 @@ void goori_state::goori(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
