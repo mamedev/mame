@@ -15164,6 +15164,9 @@ goodejan                        // (c) 1991 Seibu/Tecmo
 goodejana                       // (c) 1991 Seibu/Tecmo
 totmejan                        // (c) 1991 Seibu/Tecmo
 
+@source:goori.cpp
+goori
+
 @source:gotcha.cpp
 gotcha                          // (c) 1997 Dongsung + "presented by Para"
 ppchamp                         // (c) 1997 Dongsung + "presented by Para"
