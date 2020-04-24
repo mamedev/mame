@@ -8,7 +8,7 @@
 #include "includes/drgnmst.h"
 
 
-rgb_t drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)
+rgb_t drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)
 {
 	int const bright = 0x5 + ((raw >> 12) & 0xf);    // TODO : verify brightness value from real pcb
 	int r = (pal4bit((raw >> 8) & 0x0f) * bright) / 0x14;
@@ -25,24 +25,24 @@ rgb_t drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)
 	return rgb_t(r, g, b);
 }
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(drgnmst_base_state::get_fg_tile_info)
 {
 	int tileno, colour, flipyx;
 	tileno = m_fg_videoram[tile_index * 2] & 0xfff;
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
 
-	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1
+	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1 (not on mastfury? or because bad dump)
 	tileinfo.set(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::fg_videoram_w)
+WRITE16_MEMBER(drgnmst_base_state::fg_videoram_w)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(drgnmst_base_state::get_bg_tile_info)
 {
 	int tileno, colour, flipyx;
 	tileno = (m_bg_videoram[tile_index * 2]& 0x1fff) + 0x800;
@@ -52,13 +52,13 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_bg_tile_info)
 	tileinfo.set(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::bg_videoram_w)
+WRITE16_MEMBER(drgnmst_base_state::bg_videoram_w)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_md_tile_info)
+TILE_GET_INFO_MEMBER(drgnmst_base_state::get_md_tile_info)
 {
 	int tileno, colour, flipyx;
 	tileno = (m_md_videoram[tile_index * 2] & 0x7fff) - 0x2000;
@@ -68,13 +68,13 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_md_tile_info)
 	tileinfo.set(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::md_videoram_w)
+WRITE16_MEMBER(drgnmst_base_state::md_videoram_w)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
+void drgnmst_base_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	uint16_t *source = m_spriteram;
@@ -121,37 +121,37 @@ void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 }
 
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::fg_tilemap_scan_cols)
+TILEMAP_MAPPER_MEMBER(drgnmst_base_state::fg_tilemap_scan_cols)
 {
 	return ((col & 0x3f) << 5) | (row & 0x1f) | ((row & 0x20) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::md_tilemap_scan_cols)
+TILEMAP_MAPPER_MEMBER(drgnmst_base_state::md_tilemap_scan_cols)
 {
 	return ((col & 0x3f) << 4) | (row & 0x0f) | ((row & 0x30) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::bg_tilemap_scan_cols)
+TILEMAP_MAPPER_MEMBER(drgnmst_base_state::bg_tilemap_scan_cols)
 {
 	return ((col & 0x3f) << 3) | (row & 0x07) | ((row & 0x38) << 6);
 }
 
-void drgnmst_state::video_start()
+void drgnmst_base_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_state::fg_tilemap_scan_cols)), 8, 8, 64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_base_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_base_state::fg_tilemap_scan_cols)), 8, 8, 64,64);
 	m_fg_tilemap->set_transparent_pen(15);
 
-	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_state::get_md_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_state::md_tilemap_scan_cols)), 16, 16, 64,64);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_base_state::get_md_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_base_state::md_tilemap_scan_cols)), 16, 16, 64,64);
 	m_md_tilemap->set_transparent_pen(15);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_state::bg_tilemap_scan_cols)), 32, 32, 64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drgnmst_base_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(drgnmst_base_state::bg_tilemap_scan_cols)), 32, 32, 64,64);
 	m_bg_tilemap->set_transparent_pen(15);
 
 	// do the other tilemaps have rowscroll too? probably not ..
 	m_md_tilemap->set_scroll_rows(1024);
 }
 
-uint32_t drgnmst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, rowscroll_bank;
 

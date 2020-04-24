@@ -4330,6 +4330,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/unico.cpp",
 	MAME_DIR .. "src/mame/includes/unico.h",
 	MAME_DIR .. "src/mame/video/unico.cpp",
+	MAME_DIR .. "src/mame/drivers/goori.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "univers")
