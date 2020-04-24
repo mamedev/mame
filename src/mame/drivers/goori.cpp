@@ -20,7 +20,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_spriteram(*this, "spriteram"),
+		m_screen(*this, "screen")
 	{ }
 
 	void goori(machine_config &config);
@@ -37,13 +39,39 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<okim6295_device> m_oki;
 
-
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<screen_device> m_screen;
 private:
 
 };
 
 uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
+	bitmap.fill(0, cliprect);
+
+	// is this sprite format a clone of anything? (looks VERY similar to snowbros but this hardware also has a tile layer and 8bpp)
+	for (int i = 0; i < 0x2000 / 2; i += 8)
+	{
+		// 0 unused
+		// 1 unused
+		// 2 unused
+		// 3
+		// 4
+		// 5
+		// 6
+		// 7
+
+		uint16_t tile = m_spriteram[i + 6] | ((m_spriteram[i + 7] & 0x3f) << 8);
+		int x = m_spriteram[i + 4];
+		int y = m_spriteram[i + 5];
+		uint16_t colour = (m_spriteram[i + 3] & 0xf8) >> 3;
+
+		x |= (m_spriteram[i + 3] & 1) << 8;
+
+		gfx_element *gfx = m_gfxdecode->gfx(0);
+		gfx->transpen(bitmap,cliprect,tile,colour,0,0,x,y,0xff);
+	}
+	
 	return 0;
 }
 
@@ -53,7 +81,7 @@ void goori_state::goori_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); // RAM main
 	map(0x400000, 0x400fff).ram(); // RAM tilemaps
 	map(0x600000, 0x603fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x700000, 0x701fff).ram(); // RAM sprites
+	map(0x700000, 0x701fff).ram().share("spriteram"); // RAM sprites (8-bit?)
 }
 
 static INPUT_PORTS_START( goori )
@@ -64,7 +92,7 @@ static const gfx_layout layout_16x16x8 =
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,8,9,10,11 },
+	{ 8,9,10,11, 0,1,2,3},
 	{ 0,4,16,20,32,36,48,52, 512+0, 512+4, 512+16, 512+20, 512+32, 512+36, 512+48, 512+52 },
 	{   STEP8(0,8*8), STEP8(1024,8*8)},
 	8*8*8*4,
@@ -87,13 +115,13 @@ void goori_state::goori(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(goori_state::irq4_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 224);
-	screen.set_visarea(0, 384-1, 0, 224-1);
-	screen.set_screen_update(FUNC(goori_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // not verified
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(48*8, 262);
+	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(goori_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 
@@ -121,11 +149,11 @@ ROM_START( goori )
 	ROM_LOAD16_BYTE( "goori03.4m", 0x000001, 0x040000, CRC(de4b8818) SHA1(599ab6a354ab21d50c1b8c11e980f0b16f18e4dd) )
 	ROM_CONTINUE(0x000001, 0x040000)
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_INVERT ) // sprites?
+	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites?
 	ROM_LOAD( "goori04ol.16m", 0x000000, 0x200000, CRC(f26451b9) SHA1(c6818a44115d3efed2566442295dc0b253057602) )
 	ROM_LOAD( "goori05oh.16m", 0x200000, 0x200000, CRC(058ceaec) SHA1(8639d41685a6f3fb2d81b9aaf3c160666de8155d) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_INVERT ) // bgs?
+	ROM_REGION( 0x400000, "gfx2", 0 ) // bgs?
 	ROM_LOAD( "goori06cl.16m", 0x000000, 0x200000, CRC(8603a662) SHA1(fbe5ccb3fded60b431ffee27471158c95a8328f8) )
 	ROM_LOAD( "goori07ch.16m", 0x200000, 0x200000, CRC(4223383e) SHA1(aa17eab343dad3f6eab05a844081370e3eebcd2e) )
 
