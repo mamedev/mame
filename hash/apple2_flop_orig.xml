@@ -11971,8 +11971,8 @@ license:CC0
 		<!-- It requires a 48K Apple II+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234760">
 			<feature name="part_id" value="Asia disk"/>
+			<dataarea name="flop" size="234760">
 				<rom name="typhoon of steel - asia.woz" size="234760" crc="64f4fae2" sha1="2162afa7fc92e029ea45de9547cb9ec2244d7a2a"/>
 			</dataarea>
 		</part>
@@ -12222,7 +12222,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234814">
-				<rom name="tink!tonk! tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2"/>
+				<rom name="tink tonk tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2"/>
 			</dataarea>
 		</part>
 	</software>
