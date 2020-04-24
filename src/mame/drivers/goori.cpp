@@ -11,8 +11,8 @@
 #include "screen.h"
 #include "tilemap.h"
 //#include "sound/3812intf.h"
-//#include "sound/okim6295.h"
-//#include "sound/ym2151.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 class goori_state : public driver_device
@@ -40,6 +40,9 @@ protected:
 
 private:
 	void goori_map(address_map& map);
+
+	DECLARE_WRITE16_MEMBER(goori_300008_w);
+	DECLARE_WRITE16_MEMBER(goori_30000e_w);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -114,10 +117,28 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 	return 0;
 }
 
+WRITE16_MEMBER(goori_state::goori_300008_w)
+{
+	//popmessage("goori_300008_w %04x %04x\n", data, mem_mask); // possibly display disable?
+}
+
+WRITE16_MEMBER(goori_state::goori_30000e_w)
+{
+	//popmessage("goori_30000e_w %04x %04x\n", data, mem_mask); // startup only?
+}
+
 void goori_state::goori_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram(); // RAM main
+
+	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
+	map(0x300004, 0x300004).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+
+	map(0x300008, 0x300009).w(FUNC(goori_state::goori_300008_w));
+
+	map(0x30000e, 0x30000f).w(FUNC(goori_state::goori_30000e_w));
+
 	map(0x400000, 0x400fff).ram().w(FUNC(goori_state::bg_videoram_w)).share("bg_videoram"); // 8-bit?
 
 	map(0x500000, 0x500001).portr("DSW1");
@@ -266,15 +287,11 @@ void goori_state::goori(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	/*
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); // not verified
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
-
 	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
-	*/
+
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.40).add_route(1, "rspeaker", 0.40); // not verified
 }
 
 ROM_START( goori )
