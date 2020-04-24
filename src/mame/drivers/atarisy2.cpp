@@ -305,6 +305,14 @@ void atarisy2_state::sound_irq_ack_w(uint8_t data)
 }
 
 
+WRITE_LINE_MEMBER(atarisy2_state::boost_interleave_hack)
+{
+	// apb3 fails the self-test with a 100 µs delay or less
+	if (state)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
+}
+
+
 
 /*************************************
  *
@@ -1277,6 +1285,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+	m_soundlatch->data_pending_callback().append(FUNC(atarisy2_state::boost_interleave_hack));
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 

@@ -123,6 +123,7 @@ private:
 	void int_enable_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
 	void bankselect_w(offs_t offset, uint16_t data);
 	uint16_t switch_r();
 	uint8_t switch_6502_r();
