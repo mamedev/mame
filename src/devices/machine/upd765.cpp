@@ -436,7 +436,7 @@ uint8_t upd765_family_device::msr_r()
 		msr |= MSR_CB;
 		if(spec & SPEC_ND)
 			msr |= MSR_EXM;
-		if(drq || internal_drq) {
+		if(internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)
 				msr |= MSR_DIO;
