@@ -66,13 +66,13 @@ void coco12_state::coco_ram(address_map &map)
 void coco12_state::coco_rom0(address_map &map)
 {
 	// $8000-$9FFF
-	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x0000);
+	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x0000).nopw();
 }
 
 void coco12_state::coco_rom1(address_map &map)
 {
 	// $A000-$BFFF
-	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x2000);
+	map(0x0000, 0x1fff).rom().region(MAINCPU_TAG, 0x2000).nopw();
 }
 
 void coco12_state::coco_rom2(address_map &map)

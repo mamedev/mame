@@ -162,7 +162,7 @@ uint8_t sam6883_device::read(offs_t offset)
 	}
 	else if (offset < 0xff00)
 	{
-		// ROM2 space: C000–DFFF
+		// ROM2 space: C000–FEFF
 		return m_rom_space[2]->read_byte(offset & 0x3fff);
 	}
 	else if (offset < 0xff60)
@@ -184,10 +184,10 @@ uint8_t sam6883_device::read(offs_t offset)
 
 void sam6883_device::write(offs_t offset, uint8_t data)
 {
+	bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 	if (offset < 0x8000)
 	{
 		// RAM write space: 0000–7FFF (nominally space 7)
-		bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 		if (mode_64k && (m_sam_state & (SAM_STATE_TY|SAM_STATE_P1)) == SAM_STATE_P1)
 			offset |= 0x8000;
 		m_ram_space->write_byte(offset, data);
@@ -195,11 +195,15 @@ void sam6883_device::write(offs_t offset, uint8_t data)
 	else if (offset < 0xc000 || offset >= 0xffe0)
 	{
 		// ROM spaces: 8000–9FFF and A000–BFFF + FFE0–FFFF (may write through to RAM)
+		if (offset < 0xc000 && mode_64k && (m_sam_state & SAM_STATE_TY))
+			m_ram_space->write_byte(offset, data);
 		m_rom_space[BIT(offset, 13)]->write_byte(offset & 0x1fff, data);
 	}
 	else if (offset < 0xff00)
 	{
-		// ROM2 space: C000–DFFF (may write through to RAM)
+		// ROM2 space: C000–FEFF (may write through to RAM)
+		if (mode_64k && (m_sam_state & SAM_STATE_TY))
+			m_ram_space->write_byte(offset, data);
 		m_rom_space[2]->write_byte(offset & 0x3fff, data);
 	}
 	else if (offset < 0xff60)
