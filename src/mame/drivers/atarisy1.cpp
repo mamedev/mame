@@ -14,7 +14,8 @@
         * Road Blasters (1987) [10 sets]
 
     Known bugs:
-        * none at this time
+        * indytemp: "Welcome" doesn't play at start (regression). Code for
+          speech (0x46) is written but fails to play due to timing issues.
 
 ****************************************************************************
 
@@ -78,7 +79,7 @@
     MAIN CPU
     ========================================================================
     000000-07FFFF   R     xxxxxxxx xxxxxxxx   Program ROM
-    080000-087FFF   R     xxxxxxxx xxxxxxxx   Slapstic-protected ROM
+    080000-087FFF   R     xxxxxxxx xxxxxxxx   Slapstic-protected ROM (depending on game board)
     2E0000          R     -------- x-------   Sprite interrupt state
     400000-401FFF   R/W   xxxxxxxx xxxxxxxx   Program RAM
     800000            W   -------x xxxxxxxx   Playfield X scroll
@@ -144,7 +145,7 @@
     SOUND CPU
     ========================================================================
     0000-0FFF   R/W   xxxxxxxx   Program RAM
-    1000-100F   R/W   xxxxxxxx   M6522
+    1000-100F   R/W   xxxxxxxx   M6522 (on game board)
     1000-1FFF   R/W   xxxxxxxx   Catridge external RAM/ROM
     1800-1801   R/W   xxxxxxxx   YM2151 communications
     1810        R     xxxxxxxx   Sound command read
@@ -440,7 +441,6 @@ void atarisy1_state::main_map(address_map &map)
 void atarisy1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
-	map(0x1000, 0x100f).mirror(0x27f0).m(m_via, FUNC(via6522_device::map)); // SNDEXT
 	map(0x1800, 0x1801).mirror(0x278e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1810, 0x1810).mirror(0x278f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1810, 0x1810).mirror(0x278f).w(m_mainlatch, FUNC(generic_latch_8_device::write));
@@ -450,6 +450,11 @@ void atarisy1_state::sound_map(address_map &map)
 	map(0x4000, 0xffff).rom();
 }
 
+void atarisy1_state::sound_ext_map(address_map &map)
+{
+	sound_map(map);
+	map(0x1000, 0x100f).mirror(0x27f0).m(m_via, FUNC(via6522_device::map)); // SNDEXT
+}
 
 
 /*************************************
@@ -702,6 +707,21 @@ void atarisy1_state::add_adc(machine_config &config)
 	m_ajsint->output_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 }
 
+void atarisy1_state::add_speech(machine_config &config)
+{
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy1_state::sound_ext_map);
+
+	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
+	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
+	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
+	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
+	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
+	m_via->writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
+}
+
 void atarisy1_state::atarisy1(machine_config &config)
 {
 	// basic machine hardware
@@ -764,16 +784,6 @@ void atarisy1_state::atarisy1(machine_config &config)
 	pokey_device &pokey(POKEY(config, "pokey", 14.318181_MHz_XTAL/8));
 	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
-
-	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	VIA6522(config, m_via, 14.318181_MHz_XTAL/8);
-	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
-	m_via->readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
-	m_via->writepa_handler().set(m_tms, FUNC(tms5220_device::data_w));
-	m_via->writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
 }
 
 void atarisy1_state::marble(machine_config &config)
@@ -799,6 +809,7 @@ void atarisy1_state::indytemp(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
+	add_speech(config);
 	SLAPSTIC(config, "slapstic", 105, true);
 
 	// Digital joystick read through ADC
@@ -812,6 +823,7 @@ void atarisy1_state::roadrunn(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
+	add_speech(config);
 	SLAPSTIC(config, "slapstic", 108, true);
 
 	// Hall-effect analog joystick
@@ -823,6 +835,7 @@ void atarisy1_state::roadb109(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
+	add_speech(config);
 	SLAPSTIC(config, "slapstic", 109, true);
 
 	// Road Blasters gas pedal
@@ -833,6 +846,7 @@ void atarisy1_state::roadb110(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
+	add_speech(config);
 	SLAPSTIC(config, "slapstic", 110, true);
 
 	// Road Blasters gas pedal
@@ -2532,12 +2546,12 @@ GAME( 1984, marble5,    marble,   marble,   marble,   atarisy1_state, init_marbl
 
 GAME( 1984, peterpak,   atarisy1, peterpak, peterpak, atarisy1_state, init_peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
 
-GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
-GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
-GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
-GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
-GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, indytemp,   atarisy1, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1985, indytemp2,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1985, indytemp3,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", MACHINE_IMPERFECT_SOUND )
+GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", MACHINE_IMPERFECT_SOUND )
+GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )

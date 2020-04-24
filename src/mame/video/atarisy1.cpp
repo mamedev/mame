@@ -203,7 +203,8 @@ void atarisy1_state::bankselect_w(uint8_t data)
 		if (!BIT(newselect, 7))
 		{
 			m_mainlatch->acknowledge_w();
-			m_via->reset();
+			if (m_via.found())
+				m_via->reset();
 		}
 	}
 

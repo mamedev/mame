@@ -95,10 +95,10 @@ protected:
 	uint8_t           m_scanline_int_state;
 
 	/* speech */
-	required_device<tms5220_device> m_tms;
+	optional_device<tms5220_device> m_tms;
 
 	required_device<ls259_device> m_outlatch;
-	required_device<via6522_device> m_via;
+	optional_device<via6522_device> m_via;
 
 	/* graphics bank tracking */
 	uint8_t           m_bank_gfx[3][8];
@@ -135,10 +135,12 @@ protected:
 
 	static const atari_motion_objects_config s_mob_config;
 	void add_adc(machine_config &config);
+	void add_speech(machine_config &config);
 	void atarisy1(machine_config &config);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+	void sound_ext_map(address_map &map);
 };
 
 class atarisy1r_state : public atarisy1_state
