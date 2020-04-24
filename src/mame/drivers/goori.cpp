@@ -7,7 +7,6 @@
 
 // is more than one button used?
 
-// eeprom hookup
 
 #include "emu.h"
 
@@ -198,7 +197,7 @@ static INPUT_PORTS_START( goori )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // makes sound but doesn't add a coin
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
 INPUT_PORTS_END
 
 static const gfx_layout layout_16x16x8 =
@@ -249,7 +248,7 @@ void goori_state::goori(machine_config &config)
 	m_screen->set_screen_update(FUNC(goori_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	EEPROM_93C46_8BIT(config, "eeprom"); // type?
+	EEPROM_93C46_16BIT(config, "eeprom"); // 93C46C81
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 
