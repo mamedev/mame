@@ -2205,26 +2205,3 @@ project "wdlfft"
 		MAME_DIR .. "3rdparty/wdlfft/fft.c",
 		MAME_DIR .. "3rdparty/wdlfft/fft.h"
 	}
-
-
---------------------------------------------------
--- portcurses library objects
---------------------------------------------------
-
-if string.find(_ACTION, "vs+") then
-project "portcurses"
-	uuid "b3f9cf9c-4bd6-4ccb-8d64-ecb752509625"
-	kind "StaticLib"
-
-	configuration { "gmake or ninja" }
-		buildoptions_c {
-			"-Wno-strict-prototypes",
-		}
-
-	configuration { }
-
-	files {
-		MAME_DIR .. "3rdparty/portcurses/ncurses/ncurses.c",
-		MAME_DIR .. "3rdparty/portcurses/ncurses/ncurses.h"
-	}
-end

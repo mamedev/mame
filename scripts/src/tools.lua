@@ -113,20 +113,6 @@ if _OPTIONS["SEPARATE_BIN"]~="1" then
 	targetdir(MAME_DIR)
 end
 
-if string.find(_ACTION, "vs+") then
-	includedirs {
-		MAME_DIR .. "3rdparty/portcurses",
-	}
-
-	links {
-		ext_lib("portcurses"),
-	}
-else
-	links {
-		ext_lib("ncurses"),
-	}
-end
-
 links {
 	"utils",
 	ext_lib("expat"),

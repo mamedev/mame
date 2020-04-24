@@ -118,12 +118,6 @@
 #include <cstring>
 #include <cctype>
 
-#if !defined(__APPLE__) && !defined(__linux__)
-#include <ncurses/ncurses.h>
-#else
-#include <ncurses.h>
-#endif
-
 #include "corestr.h"
 #include "jedparse.h"
 #include "plaparse.h"
@@ -7878,135 +7872,6 @@ static int write_dest_file(const char *dstfile)
 
 
 /*-------------------------------------------------
-	get_total_pals_match_fuse_count - returns a
-	count of the pals that contain the specified
-	number of fuses
--------------------------------------------------*/
-
-static int get_total_pals_match_fuse_count(int numfuses)
-{
-	int count = 0;
-	int index;
-
-	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
-	{
-		if (paldata[index].numfuses == numfuses)
-		{
-			++count;
-		}
-	}
-
-	return count;
-}
-
-
-
-/*-------------------------------------------------
-	display_view_find_menu - displays a menu for
-	the user to choose a pal
--------------------------------------------------*/
-
-static int display_view_find_menu(int* pal_indices, int count, int* pal_index)
-{
-	WINDOW* mainwin;
-	int total_pages = 0;
-	int start_index = 0;
-	int quit = 0;
-	int index;
-	int ch;
-	int row;
-	int result = 1;
-
-	if ((mainwin = initscr()) == nullptr)
-	{
-		fprintf(stderr, "Error initializing ncurses.\n");
-		return 1;
-	}
-
-	cbreak();
-	noecho();
-
-	do
-	{
-		++total_pages;
-	} while (total_pages * MAXIMUM_PAGE_ITEMS < count);
-
-	quit = 0;
-
-	while (!quit)
-	{
-		row = 0;
-
-		clear();
-
-		mvaddstr(row, 0, "Choose PAL");
-
-		row += 2;
-
-		for (index = 0; start_index + index < count && index < MAXIMUM_PAGE_ITEMS; ++index)
-		{
-			mvprintw(row, 0, "%d - %s\n", index, paldata[pal_indices[start_index + index]].name);
-
-			++row;
-		}
-
-		++row;
-
-		if (total_pages > 1)
-		{
-			mvaddstr(row, 0, "n - Next page");
-
-			++row;
-		}
-
-		mvaddstr(row, 0, "q - Quit");
-
-		switch ((ch = getch()))
-		{
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				*pal_index = pal_indices[start_index + (ch - '0')];
-
-				quit = 1;
-				result = 0;
-				break;
-			case 'q':
-			case 'Q':
-				quit = 1;
-				result = 1;
-				break;
-			case 'n':
-			case 'N':
-				if (total_pages > 1)
-				{
-					start_index += MAXIMUM_PAGE_ITEMS;
-
-					if (start_index >= count)
-					{
-						start_index = 0;
-					}
-				}
-				break;
-		}
-	}
-
-	delwin(mainwin);
-	endwin();
-
-	return result;
-}
-
-
-
-/*-------------------------------------------------
     print_usage - prints out the supported command
     line arguments
 -------------------------------------------------*/
@@ -8021,8 +7886,6 @@ static int print_usage()
 		"  jedutil -view <source.jed> <device> -- dump JED logic equations\n"
 		"  jedutil -view <source.bin> <device> -- dump binary logic equations\n"
 		"  jedutil -viewlist -- view list of supported devices\n"
-		"  jedutil -viewfind <source.jed> -- dump JED logic equations from listed devices\n"
-		"  jedutil -viewfind <source.bin> -- dump binary logic equations from listed devices\n"
 		"  jedutil -listcompatible <source.jed> -- list compatible devices\n"
 		"  jedutil -listcompatible <source.bin> -- list compatible devices\n"
 	);
@@ -8281,133 +8144,6 @@ static int command_viewlist(int argc, char *argv[])
 
 
 /*-------------------------------------------------
-    command_viewfind - views the contents of a file
-                       after prompting for the device
--------------------------------------------------*/
-
-static int command_viewfind(int argc, char *argv[])
-{
-	int result = 0;
-	const char *srcfile;
-	int is_jed;
-	jed_data jed;
-	int err;
-	int index;
-	int count;
-	int index2;
-	int* pal_indices;
-	const pal_data* pal;
-
-	if (argc != 1)
-	{
-		return print_usage();
-	}
-
-	/* extract arguments */
-	srcfile = argv[0];
-
-	/* does the source end in '.jed'? */
-	is_jed = is_jed_file(srcfile);
-
-	/* read the source file */
-	err = read_source_file(srcfile);
-	if (err != 0)
-	{
-		result = 1;
-		goto end;
-	}
-
-	/* if the source is JED, convert to binary */
-	if (is_jed)
-	{
-		/* read the JEDEC data */
-		err = jed_parse(srcbuf, srcbuflen, &jed);
-		switch (err)
-		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
-			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); result = 1; goto end;
-			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); result = 1; goto end;
-		}
-	}
-	else
-	{
-		/* read the binary data */
-		err = jedbin_parse(srcbuf, srcbuflen, &jed);
-		switch (err)
-		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
-		}
-	}
-
-	count = get_total_pals_match_fuse_count(jed.numfuses);
-
-	if (count == 0)
-	{
-		fprintf(stderr, "Fatal error: No matches found\n");
-
-		result = 1;
-
-		goto end;
-	}
-
-	pal_indices = (int*)malloc(sizeof(int) * count);
-
-	if (pal_indices == nullptr)
-	{
-		fprintf(stderr, "Fatal error: Could not allocate memory\n");
-
-		result = 1;
-
-		goto end;
-	}
-
-	index2 = 0;
-
-	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
-	{
-		if (paldata[index].numfuses == jed.numfuses)
-		{
-			pal_indices[index2] = index;
-
-			++index2;
-		}
-	}
-
-	result = display_view_find_menu(pal_indices, count, &index);
-
-	if (!result)
-	{
-		pal = &paldata[index];
-
-		printf("\n");
-		printf("**** Generating equations for %s ****\n", pal->name);
-		printf("\n");
-
-		/* generate equations from fuse map */
-
-		pal->config_pins(pal, &jed);
-
-		if (pal->print_product_terms)
-		{
-			pal->print_product_terms(pal, &jed);
-		}
-		else
-		{
-			fprintf(stderr, "Viewing product terms not supported for this pal type.");
-			result = 1;
-		}
-	}
-
-	free(pal_indices);
-
-end:
-	free(srcbuf);
-	return result;
-}
-
-
-
-/*-------------------------------------------------
     command_listcompatible - views the list of
                              compatible devices
 -------------------------------------------------*/
@@ -8487,7 +8223,6 @@ int main(int argc, char *argv[])
 		{"-convert",        &command_convert},
 		{"-view",           &command_view},
 		{"-viewlist",       &command_viewlist},
-		{"-viewfind",       &command_viewfind},
 		{"-listcompatible", &command_listcompatible}};
 	int index;
 
