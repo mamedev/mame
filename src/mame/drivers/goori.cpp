@@ -3,6 +3,8 @@
 
 // hardware is loosely derived from snowbros / Kaneko Pandora
 
+// background image is visible briefly at the start of level, is this correct?
+
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
@@ -10,7 +12,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
-//#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -129,7 +130,7 @@ WRITE16_MEMBER(goori_state::goori_30000e_w)
 
 void goori_state::goori_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
+	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram(); // RAM main
 
 	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
@@ -255,8 +256,8 @@ static const gfx_layout layout_16x16x8_alt =
 };
 
 static GFXDECODE_START( gfx_unico )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8_alt, 0x0, 0x20 ) // [1] Layers
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8_alt, 0x0, 0x20 )
 GFXDECODE_END
 
 void goori_state::machine_start()
@@ -295,23 +296,23 @@ void goori_state::goori(machine_config &config)
 }
 
 ROM_START( goori )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // first half empty
+	ROM_REGION( 0x080000, "maincpu", 0 ) // first half empty
 	ROM_LOAD16_BYTE( "goori02.4m", 0x000000, 0x040000, CRC(65a8568e) SHA1(c1a07f3a009df4af898ab62c15416073fcf768d9) )
 	ROM_CONTINUE(0x000000, 0x040000)
 	ROM_LOAD16_BYTE( "goori03.4m", 0x000001, 0x040000, CRC(de4b8818) SHA1(599ab6a354ab21d50c1b8c11e980f0b16f18e4dd) )
 	ROM_CONTINUE(0x000001, 0x040000)
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites?
+	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
 	ROM_LOAD( "goori04ol.16m", 0x000000, 0x200000, CRC(f26451b9) SHA1(c6818a44115d3efed2566442295dc0b253057602) )
 	ROM_LOAD( "goori05oh.16m", 0x200000, 0x200000, CRC(058ceaec) SHA1(8639d41685a6f3fb2d81b9aaf3c160666de8155d) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) // bgs?
+	ROM_REGION( 0x400000, "gfx2", 0 ) // bgs
 	ROM_LOAD( "goori06cl.16m", 0x000000, 0x200000, CRC(8603a662) SHA1(fbe5ccb3fded60b431ffee27471158c95a8328f8) )
 	ROM_LOAD( "goori07ch.16m", 0x200000, 0x200000, CRC(4223383e) SHA1(aa17eab343dad3f6eab05a844081370e3eebcd2e) )
 
-	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "goori01.2m", 0x000000, 0x040000, CRC(c74351b9) SHA1(397f4b6aea23e6619e099c5cc99f38bae74bc3e8) )
 ROM_END
 
-GAME( 1999, goori, 0,       goori, goori, goori_state,    empty_init, ROT0, "Unico", "Goori Goori", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, goori, 0,       goori, goori, goori_state,    empty_init, ROT0, "Unico", "Goori Goori", 0 )
 
