@@ -209,6 +209,14 @@ void drgnmst_pic_state::drgnmst_main_map_with_pic(address_map& map)
 	map(0x800189, 0x800189).w(FUNC(drgnmst_pic_state::snd_flag_w));
 }
 
+void drgnmst_ym_state::drgnmst_main_map_with_ym(address_map& map)
+{
+	drgnmst_main_map(map);
+	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+}
+
 
 void drgnmst_pic_state::drgnmst_oki1_map(address_map &map)
 {
@@ -438,12 +446,25 @@ void drgnmst_pic_state::drgnmst_with_pic(machine_config& config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
+void drgnmst_ym_state::drgnmst_ym(machine_config& config)
+{
+	drgnmst(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_ym_state::drgnmst_main_map_with_ym);
+
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); // not verified
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
+
 ROM_START( mastfury )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "master012.4m", 0x000000, 0x080000, CRC(020a3c50) SHA1(d6762b66f06fe91f3bff8cdcbff42c247df64671) )
 	ROM_LOAD16_BYTE( "master013.4m", 0x000001, 0x080000, CRC(1e7dd287) SHA1(67764aa054731a0548f6c7d3b898597792d96eec) )
 
-	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "master011.2m", 0x00000, 0x40000, CRC(fc5161a1) SHA1(999e73e36df317aabefebf94444690f439d64559) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites (16x16x4) */ // these are marked as 0032 which seems to be 32MBit, first half is missing
@@ -456,11 +477,9 @@ ROM_START( mastfury )
 	ROM_CONTINUE(0x300001, 0x080000)
 	ROM_CONTINUE(0x700001, 0x080000)
 
-	ROM_REGION( 0x800000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */ // marked as 0016, so probably correct size
-	ROM_LOAD16_BYTE( "mf0016-3", 0x000000, 0x100000, CRC(0946bc61) SHA1(8b10c7f76daf21afb2aa6961100d83b1f6ca89bb) )
-	ROM_CONTINUE(0x400000, 0x100000)
-	ROM_LOAD16_BYTE( "mf0016-4", 0x000001, 0x100000, CRC(8f5b7c82) SHA1(5947c015c8a13539a3125c7ffe07cca0691b4348) )
-	ROM_CONTINUE(0x400001, 0x100000)
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */ // marked as 0016, so probably correct size
+	ROM_LOAD16_BYTE( "mf0016-3", 0x000000, 0x200000, CRC(0946bc61) SHA1(8b10c7f76daf21afb2aa6961100d83b1f6ca89bb) )
+	ROM_LOAD16_BYTE( "mf0016-4", 0x000001, 0x200000, CRC(8f5b7c82) SHA1(5947c015c8a13539a3125c7ffe07cca0691b4348) )
 ROM_END
 
 
@@ -623,4 +642,4 @@ void drgnmst_pic_state::init_drgnmst()
 GAME( 1994, drgnmst,        0, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, drgnmst2, drgnmst, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, mastfury,        drgnmst, drgnmst,  drgnmst, drgnmst_base_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1996, mastfury,       0, drgnmst_ym,  drgnmst, drgnmst_ym_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump

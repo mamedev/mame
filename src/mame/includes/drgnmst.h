@@ -7,6 +7,9 @@
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
+#include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -119,5 +122,22 @@ private:
 
 	void drgnmst_oki1_map(address_map &map);
 };
+
+class drgnmst_ym_state : public drgnmst_base_state
+{
+public:
+	drgnmst_ym_state(const machine_config& mconfig, device_type type, const char* tag) :
+		drgnmst_base_state(mconfig, type, tag),
+		m_oki(*this, "oki")
+	{ }
+
+	void drgnmst_ym(machine_config& config);
+
+private:
+	required_device<okim6295_device> m_oki;
+
+	void drgnmst_main_map_with_ym(address_map& map);
+};
+
 
 #endif // MAME_INCLUDES_DRGNMST_H
