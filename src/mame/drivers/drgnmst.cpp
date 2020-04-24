@@ -8,6 +8,8 @@ the hardware seems to fall somewhere between the
 hardware playmark commonly used and the hardware
 unico used for zero point etc.
 
+(also seems to be related to cps1 bootlegs?)
+
 PCB Layout
 ----------
 
@@ -46,32 +48,32 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(drgnmst_state::coin_w)
+WRITE16_MEMBER(drgnmst_base_state::coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x100);
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_command_w)
+WRITE8_MEMBER(drgnmst_pic_state::snd_command_w)
 {
 	m_snd_command = data;
 	m_maincpu->yield();
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_flag_w)
+WRITE8_MEMBER(drgnmst_pic_state::snd_flag_w)
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
 	m_snd_flag = 1;
 }
 
 
-READ8_MEMBER(drgnmst_state::pic16c5x_port0_r)
+READ8_MEMBER(drgnmst_pic_state::pic16c5x_port0_r)
 {
 	return m_pic16c5x_port0;
 }
 
-READ8_MEMBER(drgnmst_state::snd_command_r)
+READ8_MEMBER(drgnmst_pic_state::snd_command_r)
 {
 	uint8_t data = 0;
 
@@ -87,7 +89,7 @@ READ8_MEMBER(drgnmst_state::snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(drgnmst_state::snd_flag_r)
+READ8_MEMBER(drgnmst_pic_state::snd_flag_r)
 {
 	if (m_snd_flag)
 	{
@@ -98,7 +100,7 @@ READ8_MEMBER(drgnmst_state::snd_flag_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(drgnmst_state::pcm_banksel_w)
+WRITE8_MEMBER(drgnmst_pic_state::pcm_banksel_w)
 {
 	/*  This is a 4 bit port.
 	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
@@ -108,12 +110,12 @@ WRITE8_MEMBER(drgnmst_state::pcm_banksel_w)
 	m_pic16c5x_port0 = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::oki_w)
+WRITE8_MEMBER(drgnmst_pic_state::oki_w)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_control_w)
+WRITE8_MEMBER(drgnmst_pic_state::snd_control_w)
 {
 	/*  This port controls communications to and from the 68K, both OKI
 	    devices, and part of the OKI PCM ROM bank selection.
@@ -177,32 +179,38 @@ WRITE8_MEMBER(drgnmst_state::snd_control_w)
 
 /***************************** 68000 Memory Map *****************************/
 
-void drgnmst_state::drgnmst_main_map(address_map &map)
+void drgnmst_base_state::drgnmst_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x800000, 0x800001).portr("P1_P2");
 	map(0x800018, 0x800019).portr("SYSTEM");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x800030, 0x800031).w(FUNC(drgnmst_state::coin_w));
+	map(0x800030, 0x800031).w(FUNC(drgnmst_base_state::coin_w));
 	map(0x800100, 0x80011f).writeonly().share("vidregs");
 	map(0x800120, 0x800121).nopw();
 	map(0x80014a, 0x80014b).nopw();
 	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
 	map(0x800176, 0x800177).portr("EXTRA");
-	map(0x800181, 0x800181).w(FUNC(drgnmst_state::snd_command_w));
-	map(0x800189, 0x800189).w(FUNC(drgnmst_state::snd_flag_w));
 	map(0x8001e0, 0x8001e1).nopw();
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::md_videoram_w)).share("md_videoram");
-	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::bg_videoram_w)).share("bg_videoram");
-	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::fg_videoram_w)).share("fg_videoram");
+	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_base_state::md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_base_state::bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_base_state::fg_videoram_w)).share("fg_videoram");
 	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
 	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
 }
 
-void drgnmst_state::drgnmst_oki1_map(address_map &map)
+void drgnmst_pic_state::drgnmst_main_map_with_pic(address_map& map)
+{
+	drgnmst_main_map(map);
+	map(0x800181, 0x800181).w(FUNC(drgnmst_pic_state::snd_command_w));
+	map(0x800189, 0x800189).w(FUNC(drgnmst_pic_state::snd_flag_w));
+}
+
+
+void drgnmst_pic_state::drgnmst_oki1_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki1bank");
@@ -354,8 +362,13 @@ static GFXDECODE_START( gfx_drgnmst )
 GFXDECODE_END
 
 
-void drgnmst_state::machine_start()
+void drgnmst_base_state::machine_start()
 {
+}
+
+void drgnmst_pic_state::machine_start()
+{
+	drgnmst_base_state::machine_start();
 	save_item(NAME(m_snd_flag));
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));
@@ -363,8 +376,14 @@ void drgnmst_state::machine_start()
 	save_item(NAME(m_oki_bank));
 }
 
-void drgnmst_state::machine_reset()
+void drgnmst_base_state::machine_reset()
 {
+}
+
+void drgnmst_pic_state::machine_reset()
+{
+	drgnmst_base_state::machine_reset();
+
 	m_snd_flag = 0;
 	m_oki_control = 0;
 	m_oki_command = 0;
@@ -373,19 +392,12 @@ void drgnmst_state::machine_reset()
 	m_oki_bank[0] = 0;
 }
 
-void drgnmst_state::drgnmst(machine_config &config)
+
+void drgnmst_base_state::drgnmst(machine_config &config)
 {
 	M68000(config, m_maincpu, 12_MHz_XTAL); /* Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_state::drgnmst_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_state::irq2_line_hold));
-
-	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
-	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
-	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
-	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
-	m_audiocpu->write_b().set(FUNC(drgnmst_state::oki_w));
-	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_base_state::drgnmst_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_base_state::irq2_line_hold));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
@@ -394,21 +406,63 @@ void drgnmst_state::drgnmst(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(drgnmst_state::screen_update));
+	screen.set_screen_update(FUNC(drgnmst_base_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
+	PALETTE(config, m_palette).set_format(2, &drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
+}
+
+void drgnmst_pic_state::drgnmst_with_pic(machine_config& config)
+{
+	drgnmst(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_pic_state::drgnmst_main_map_with_pic);
+
+	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
+	m_audiocpu->read_a().set(FUNC(drgnmst_pic_state::pic16c5x_port0_r));
+	m_audiocpu->write_a().set(FUNC(drgnmst_pic_state::pcm_banksel_w));
+	m_audiocpu->read_b().set(FUNC(drgnmst_pic_state::snd_command_r));
+	m_audiocpu->write_b().set(FUNC(drgnmst_pic_state::oki_w));
+	m_audiocpu->read_c().set(FUNC(drgnmst_pic_state::snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(drgnmst_pic_state::snd_control_w));
+
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->set_addrmap(0, &drgnmst_state::drgnmst_oki1_map);
+	m_oki[0]->set_addrmap(0, &drgnmst_pic_state::drgnmst_oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
+
+ROM_START( mastfury )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "master012.4m", 0x000000, 0x080000, CRC(020a3c50) SHA1(d6762b66f06fe91f3bff8cdcbff42c247df64671) )
+	ROM_LOAD16_BYTE( "master013.4m", 0x000001, 0x080000, CRC(1e7dd287) SHA1(67764aa054731a0548f6c7d3b898597792d96eec) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
+	ROM_LOAD( "master011.2m", 0x00000, 0x40000, CRC(fc5161a1) SHA1(999e73e36df317aabefebf94444690f439d64559) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites (16x16x4) */
+	ROM_LOAD16_BYTE( "master11.16m", 0x200000, 0x080000, BAD_DUMP CRC(a248d170) SHA1(2ceca7087e9aa299f4283508bd32b27a4c37577d) ) // half size
+	ROM_CONTINUE(0x600000, 0x080000)
+	ROM_CONTINUE(0x300000, 0x080000)
+	ROM_CONTINUE(0x700000, 0x080000)
+	ROM_LOAD16_BYTE( "master12.16m", 0x200001, 0x080000, BAD_DUMP CRC(09ea6ad0) SHA1(c5173259a8bf5ca44dcf584eab36d662b8b9a1f7) ) // half size
+	ROM_CONTINUE(0x600001, 0x080000)
+	ROM_CONTINUE(0x300001, 0x080000)
+	ROM_CONTINUE(0x700001, 0x080000)
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
+	ROM_LOAD16_BYTE( "master13.16m", 0x000000, 0x100000, BAD_DUMP CRC(0946bc61) SHA1(8b10c7f76daf21afb2aa6961100d83b1f6ca89bb) ) // not verified, could also be half size
+	ROM_CONTINUE(0x400000, 0x100000)
+	ROM_LOAD16_BYTE( "master14.16m", 0x000001, 0x100000, BAD_DUMP CRC(8f5b7c82) SHA1(5947c015c8a13539a3125c7ffe07cca0691b4348) ) // not verified, could also be half size
+	ROM_CONTINUE(0x400001, 0x100000)
+ROM_END
+
 
 
 ROM_START( drgnmst )
@@ -485,7 +539,7 @@ ROM_START( drgnmst2 ) // only the maincpu ROMs were provided for this set
 	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
 ROM_END
 
-uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
+uint8_t drgnmst_pic_state::drgnmst_asciitohex( uint8_t data )
 {
 	/* Convert ASCII data to HEX */
 
@@ -497,7 +551,7 @@ uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 }
 
 
-void drgnmst_state::init_drgnmst()
+void drgnmst_pic_state::init_drgnmst()
 {
 	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
 	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();
@@ -566,5 +620,7 @@ void drgnmst_state::init_drgnmst()
 }
 
 
-GAME( 1994, drgnmst,        0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, drgnmst2, drgnmst, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst,        0, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst2, drgnmst, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1996, mastfury,        drgnmst, drgnmst,  drgnmst, drgnmst_base_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump

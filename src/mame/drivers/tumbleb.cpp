@@ -2718,6 +2718,7 @@ ROM_START( fncywld )
 	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
 ROM_END
 
+
 /*
 
 Magic Purple, (c) 1996 Unico
@@ -3869,6 +3870,7 @@ GAME( 1994, pangpang, 0,       pangpang,     tumblepb, tumbleb_state, init_tumbl
 GAME( 1994, suprtrio, 0,       suprtrio,     suprtrio, tumbleb_state, init_suprtrio, ROT0, "Gameace", "Super Trio", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, fncywld,  0,       fncywld,      fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
+
 
 GAME( 1996, magipur,  0,       magipur,      magipur, tumbleb_state,  init_magipur,  ROT0, "Unico",   "Magic Purple" , MACHINE_SUPPORTS_SAVE )
 
