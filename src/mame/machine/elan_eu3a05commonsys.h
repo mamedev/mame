@@ -22,8 +22,8 @@ public:
 
 	virtual void map(address_map& map);
 
-	DECLARE_READ8_MEMBER(nmi_vector_r);
-	DECLARE_READ8_MEMBER(irq_vector_r);
+	uint8_t nmi_vector_r(offs_t offset);
+	uint8_t irq_vector_r(offs_t offset);
 
 	void set_alt_timer() { m_whichtimer = 1; }
 
@@ -49,18 +49,18 @@ protected:
 	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
 	bool m_allow_timer_irq;
 private:
-	DECLARE_READ8_MEMBER(intmask_r);
-	DECLARE_WRITE8_MEMBER(intmask_w);
+	uint8_t intmask_r(offs_t offset);
+	void intmask_w(offs_t offset, uint8_t data);
 
 
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_w);
-	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_r);
+	void elan_eu3a05_rombank_w(offs_t offset, uint8_t data);
+	uint8_t elan_eu3a05_rombank_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
-	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
+	uint8_t elan_eu3a05_5003_r();
+	uint8_t elan_eu3a05_pal_ntsc_r();
+	void elan_eu3a05_500b_unk_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(radica_5009_unk_r) { return machine().rand(); };
+	uint8_t radica_5009_unk_r() { return machine().rand(); };
 
 	emu_timer *m_unk_timer;
 	static const device_timer_id TIMER_UNK = 0;

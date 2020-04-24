@@ -74,14 +74,14 @@ void taito_en_device::device_reset()
  *
  *************************************/
 
-WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
+void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
 	/* mask out unused bits */
 	data &= m_bankmask;
 	m_ensoniq->voice_bank_w(offset,data<<20);
 }
 
-WRITE8_MEMBER( taito_en_device::en_volume_w )
+void taito_en_device::en_volume_w(offs_t offset, uint8_t data)
 {
 	m_mb87078->data_w(offset ^ 1, data);
 }
@@ -120,7 +120,7 @@ void taito_en_device::fc7_map(address_map &map)
  *
  *************************************/
 
-WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
+void taito_en_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
 	if (offset > 1)
 	{
@@ -164,7 +164,7 @@ void taito_en_device::es5505_clock_changed(u32 data)
     IP5: 1MHz
 */
 
-WRITE8_MEMBER(taito_en_device::duart_output)
+void taito_en_device::duart_output(uint8_t data)
 {
 	if (data & 0x40)
 	{

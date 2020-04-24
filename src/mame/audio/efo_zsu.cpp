@@ -76,7 +76,7 @@ cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconf
 }
 
 
-WRITE8_MEMBER(efo_zsu_device::sound_command_w)
+void efo_zsu_device::sound_command_w(u8 data)
 {
 	m_soundlatch->write(data);
 }
@@ -115,7 +115,7 @@ void efo_zsu_device::zsu_io(address_map &map)
 
 }
 
-WRITE8_MEMBER(efo_zsu_device::adpcm_fifo_w)
+void efo_zsu_device::adpcm_fifo_w(u8 data)
 {
 	// Z80 code first unpacks 8 bytes of ADPCM sample data into nibbles
 	// and, upon receiving interrupt vector E6, fills FIFO at once using OTIR
@@ -125,12 +125,12 @@ WRITE8_MEMBER(efo_zsu_device::adpcm_fifo_w)
 	m_fifo->si_w(0);
 }
 
-WRITE8_MEMBER(cedar_magnet_sound_device::ay0_porta_w)
+void cedar_magnet_sound_device::ay0_porta_w(u8 data)
 {
 	// unknown (not in ZSU schematic); 0x80 written on reset
 }
 
-WRITE8_MEMBER(efo_zsu_device::ay1_porta_w)
+void efo_zsu_device::ay1_porta_w(u8 data)
 {
 	m_adpcm->reset_w(data & 1);
 	if (data & 1)

@@ -55,19 +55,19 @@ void trackfld_audio_device::device_reset()
     the no of cycles by 4 to undo the 14.318/4 operation
 */
 
-READ8_MEMBER( trackfld_audio_device::trackfld_sh_timer_r )
+uint8_t trackfld_audio_device::trackfld_sh_timer_r()
 {
 	uint32_t clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }
 
-READ8_MEMBER( trackfld_audio_device::trackfld_speech_r )
+uint8_t trackfld_audio_device::trackfld_speech_r()
 {
 	return m_vlm->bsy() ? 0x10 : 0;
 }
 
-WRITE8_MEMBER( trackfld_audio_device::trackfld_sound_w )
+void trackfld_audio_device::trackfld_sound_w(offs_t offset, uint8_t data)
 {
 	int changes = offset ^ m_last_addr;
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER( trackfld_audio_device::trackfld_sound_w )
 	m_last_addr = offset;
 }
 
-READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
+uint8_t trackfld_audio_device::hyperspt_sh_timer_r()
 {
 	uint32_t clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
@@ -96,7 +96,7 @@ READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
 		return (clock & 0x3);
 }
 
-WRITE8_MEMBER( trackfld_audio_device::hyperspt_sound_w )
+void trackfld_audio_device::hyperspt_sound_w(offs_t offset, uint8_t data)
 {
 	int changes = offset ^ m_last_addr;
 

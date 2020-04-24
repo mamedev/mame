@@ -38,7 +38,7 @@ public:
 	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 	// internal communications
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
@@ -58,7 +58,7 @@ private:
 
 	uint8_t m_sndcmd;
 
-	DECLARE_READ8_MEMBER( r6530b_r );
+	uint8_t r6530b_r();
 };
 
 // ======================> gottlieb_sound_r1_device
@@ -108,8 +108,8 @@ protected:
 	virtual void device_post_load() override;
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER( votrax_data_w );
-	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
+	void votrax_data_w(uint8_t data);
+	void speech_clock_dac_w(uint8_t data);
 
 	virtual void gottlieb_sound_r1_map(address_map &map) override;
 
@@ -138,14 +138,14 @@ public:
 	void write(u8 data);
 
 	// internal communications
-	DECLARE_READ8_MEMBER( speech_data_r );
-	DECLARE_READ8_MEMBER( audio_data_r );
-	DECLARE_WRITE8_MEMBER( signal_audio_nmi_w );
-	DECLARE_WRITE8_MEMBER( nmi_rate_w );
+	uint8_t speech_data_r();
+	uint8_t audio_data_r();
+	void signal_audio_nmi_w(uint8_t data);
+	void nmi_rate_w(uint8_t data);
 	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
-	DECLARE_WRITE8_MEMBER( speech_control_w );
-	DECLARE_WRITE8_MEMBER( sp0250_latch_w );
-	DECLARE_WRITE8_MEMBER( psg_latch_w );
+	void speech_control_w(uint8_t data);
+	void sp0250_latch_w(uint8_t data);
+	void psg_latch_w(uint8_t data);
 
 	void gottlieb_sound_r2_map(address_map &map);
 	void gottlieb_speech_r2_map(address_map &map);

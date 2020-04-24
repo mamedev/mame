@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( midway_cheap_squeak_deluxe_device::reset_w )
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::porta_w )
+void midway_cheap_squeak_deluxe_device::porta_w(uint8_t data)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -165,7 +165,7 @@ WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::porta_w )
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::portb_w )
+void midway_cheap_squeak_deluxe_device::portb_w(uint8_t data)
 {
 	// bit 4-5, status
 	uint8_t z_mask = m_pia->port_b_z_mask();

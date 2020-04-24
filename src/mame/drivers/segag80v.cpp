@@ -218,7 +218,7 @@ WRITE8_MEMBER(segag80v_state::mainram_w)
 	m_mainram[decrypt_offset(offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ m_usb->ram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ m_usb->ram_w(decrypt_offset(offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
 	m_vectorram[decrypt_offset(offset)] = data;
@@ -1333,8 +1333,8 @@ void segag80v_state::init_spacfury()
 	m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::spacfury1_sh_w)));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::spacfury2_sh_w)));
 }
@@ -1348,8 +1348,8 @@ void segag80v_state::init_zektor()
 	m_decrypt = segag80_security(82);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_aysnd, FUNC(ay8912_device::address_data_w)));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::zektor1_sh_w)));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::zektor2_sh_w)));
@@ -1369,8 +1369,8 @@ void segag80v_state::init_tacscan()
 	m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
 	/* configure inputs */
@@ -1388,11 +1388,11 @@ void segag80v_state::init_startrek()
 	m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
 	/* configure inputs */

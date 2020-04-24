@@ -273,7 +273,7 @@ void atari_jsa_base_device::device_reset()
 //  main_command_w: Handle command writes
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_base_device::main_command_w )
+void atari_jsa_base_device::main_command_w(uint8_t data)
 {
 	m_soundcomm->main_command_w(data);
 }
@@ -283,7 +283,7 @@ WRITE8_MEMBER( atari_jsa_base_device::main_command_w )
 //  main_response_r: Handle response reads
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_base_device::main_response_r )
+uint8_t atari_jsa_base_device::main_response_r()
 {
 	return m_soundcomm->main_response_r();
 }
@@ -293,7 +293,7 @@ READ8_MEMBER( atari_jsa_base_device::main_response_r )
 //  sound_reset_w: Reset the sound board
 //-------------------------------------------------
 
-WRITE16_MEMBER( atari_jsa_base_device::sound_reset_w )
+void atari_jsa_base_device::sound_reset_w(uint16_t data)
 {
 	m_soundcomm->sound_reset_w();
 }
@@ -304,7 +304,7 @@ WRITE16_MEMBER( atari_jsa_base_device::sound_reset_w )
 //  output port
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_base_device::ym2151_port_w )
+void atari_jsa_base_device::ym2151_port_w(uint8_t data)
 {
 	m_ym2151_ct1 = (data >> 0) & 1;
 	m_ym2151_ct2 = (data >> 1) & 1;
@@ -428,7 +428,7 @@ atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconf
 //  on the JSA II, III, and IIIs boards
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
+uint8_t atari_jsa_oki_base_device::oki_r(offs_t offset)
 {
 	// JSA IIIs selects the 2nd OKI via the low bit, so select it
 	if (m_oki2 != nullptr && offset == 1)
@@ -448,7 +448,7 @@ READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
 //  on the JSA II, III, and IIIs boards
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
+void atari_jsa_oki_base_device::oki_w(offs_t offset, uint8_t data)
 {
 	// JSA IIIs selects the 2nd OKI via the low bit, so select it
 	if (m_oki2 != nullptr && offset == 1)
@@ -465,7 +465,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
 //  I/O port on JSA II, III, and IIIs boards
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
+void atari_jsa_oki_base_device::wrio_w(uint8_t data)
 {
 	//
 	//  0xc0 = bank address
@@ -514,7 +514,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 //  register on JSA II, III, and IIIs boards
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
+void atari_jsa_oki_base_device::mix_w(uint8_t data)
 {
 	//
 	//  0xc0 = right OKI6295 bank bits 0-1 (JSA IIIs only)
@@ -546,7 +546,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
 //  total sound volume on JSA III/IIIs boards
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_oki_base_device::overall_volume_w )
+void atari_jsa_oki_base_device::overall_volume_w(uint8_t data)
 {
 	m_overall_volume = data / 127.0;
 	update_all_volumes();
@@ -640,7 +640,7 @@ atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char
 //  port on a JSA I board
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_i_device::rdio_r )
+uint8_t atari_jsa_i_device::rdio_r()
 {
 	//
 	//  0x80 = self test
@@ -670,7 +670,7 @@ READ8_MEMBER( atari_jsa_i_device::rdio_r )
 //  port on a JSA I board
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
+void atari_jsa_i_device::wrio_w(uint8_t data)
 {
 	//
 	//  0xc0 = bank address
@@ -708,7 +708,7 @@ WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
 //  on a JSA I board
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_i_device::mix_w )
+void atari_jsa_i_device::mix_w(uint8_t data)
 {
 	//
 	//  0xc0 = TMS5220 volume (0-3)
@@ -729,7 +729,7 @@ WRITE8_MEMBER( atari_jsa_i_device::mix_w )
 //  voice data register
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
+void atari_jsa_i_device::tms5220_voice(uint8_t data)
 {
 	if (m_tms5220 != nullptr)
 		m_tms5220->data_w(data);
@@ -741,7 +741,7 @@ WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
 //  present
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_i_device::pokey_r )
+uint8_t atari_jsa_i_device::pokey_r(offs_t offset)
 {
 	if (m_pokey != nullptr)
 		return m_pokey->read(offset);
@@ -754,7 +754,7 @@ READ8_MEMBER( atari_jsa_i_device::pokey_r )
 //  present
 //-------------------------------------------------
 
-WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
+void atari_jsa_i_device::pokey_w(offs_t offset, uint8_t data)
 {
 	if (m_pokey != nullptr)
 		m_pokey->write(offset, data);
@@ -871,7 +871,7 @@ atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const ch
 //  port on a JSA II board
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_ii_device::rdio_r )
+uint8_t atari_jsa_ii_device::rdio_r()
 {
 	//
 	//  0x80 = self test
@@ -955,7 +955,7 @@ atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device
 //  port on a JSA III/IIIs board
 //-------------------------------------------------
 
-READ8_MEMBER( atari_jsa_iii_device::rdio_r )
+uint8_t atari_jsa_iii_device::rdio_r()
 {
 	//
 	//  0x80 = self test (active high)

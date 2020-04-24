@@ -17,10 +17,10 @@ public:
 	auto read_1_callback() { return m_read_1_callback.bind(); }
 	auto read_2_callback() { return m_read_2_callback.bind(); }
 
-	DECLARE_READ8_MEMBER(gpio_r);
-	DECLARE_WRITE8_MEMBER(gpio_w);
+	uint8_t gpio_r(offs_t offset);
+	void gpio_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(gpio_unk_w);
+	void gpio_unk_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

@@ -309,7 +309,7 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
 
 WRITE8_MEMBER(catnmous_state::csound1_w)
 {
-	m_audiopcb->sound_w(space, offset, data);
+	m_audiopcb->sound_w(data);
 
 	m_csound1 = data;
 }

@@ -278,12 +278,12 @@ void elan_eu3a05commonsys_device::device_reset()
 	m_unk_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(2048));
 }
 
-READ8_MEMBER(elan_eu3a05commonsys_device::intmask_r)
+uint8_t elan_eu3a05commonsys_device::intmask_r(offs_t offset)
 {
 	return m_intmask[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05commonsys_device::intmask_w)
+void elan_eu3a05commonsys_device::intmask_w(offs_t offset, uint8_t data)
 {
 	m_intmask[offset] = data;
 }
@@ -319,7 +319,7 @@ void elan_eu3a05commonsys_device::generate_custom_interrupt(int level)
 	}
 }
 
-READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
+uint8_t elan_eu3a05commonsys_device::nmi_vector_r(offs_t offset)
 {
 	if (m_custom_nmi)
 	{
@@ -335,7 +335,7 @@ READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
 }
 
 // not currently used
-READ8_MEMBER(elan_eu3a05commonsys_device::irq_vector_r)
+uint8_t elan_eu3a05commonsys_device::irq_vector_r(offs_t offset)
 {
 	if(machine().side_effects_disabled())
 		return 0x00;
@@ -354,7 +354,7 @@ READ8_MEMBER(elan_eu3a05commonsys_device::irq_vector_r)
 }
 
 
-WRITE8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w)
+void elan_eu3a05commonsys_device::elan_eu3a05_rombank_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x00)
 	{
@@ -371,7 +371,7 @@ WRITE8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w)
 	}
 }
 
-READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r)
+uint8_t elan_eu3a05commonsys_device::elan_eu3a05_rombank_r(offs_t offset)
 {
 	if (offset == 0x00)
 	{
@@ -384,7 +384,7 @@ READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r)
 }
 
 
-READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_pal_ntsc_r)
+uint8_t elan_eu3a05commonsys_device::elan_eu3a05_pal_ntsc_r()
 {
 	// the text under the radica logo differs between regions, sometimes the titles too
 	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
@@ -392,7 +392,7 @@ READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_pal_ntsc_r)
 	else return 0x00; // PAL
 }
 
-READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_5003_r)
+uint8_t elan_eu3a05commonsys_device::elan_eu3a05_5003_r()
 {
 	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
 
@@ -411,7 +411,7 @@ READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_5003_r)
 
 
 
-WRITE8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_500b_unk_w)
+void elan_eu3a05commonsys_device::elan_eu3a05_500b_unk_w(uint8_t data)
 {
 	// this is the PAL / NTSC flag when read, so what are writes?
 	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);

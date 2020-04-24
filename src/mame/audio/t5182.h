@@ -29,18 +29,13 @@ public:
 		SETIRQ_CB
 	};
 
-	DECLARE_WRITE8_MEMBER(sound_irq_w );
-	DECLARE_READ8_MEMBER(sharedram_semaphore_snd_r);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_acquire_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_release_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_snd_acquire_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_snd_release_w);
-	DECLARE_READ8_MEMBER(sharedram_semaphore_main_r);
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
+	void sound_irq_w(uint8_t data);
+	uint8_t sharedram_semaphore_snd_r();
+	void sharedram_semaphore_main_acquire_w(uint8_t data);
+	void sharedram_semaphore_main_release_w(uint8_t data);
+	uint8_t sharedram_r(offs_t offset);
+	void sharedram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_handler);
-	DECLARE_WRITE8_MEMBER(ym2151_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cpu_irq_ack_w);
 
 	void t5182_io(address_map &map);
 	void t5182_map(address_map &map);
@@ -61,6 +56,12 @@ private:
 	int m_semaphore_snd;
 	emu_timer *m_setirq_cb;
 	TIMER_CALLBACK_MEMBER( setirq_callback );
+
+	void sharedram_semaphore_snd_acquire_w(uint8_t data);
+	void sharedram_semaphore_snd_release_w(uint8_t data);;
+	uint8_t sharedram_semaphore_main_r();
+	void ym2151_irq_ack_w(uint8_t data);
+	void cpu_irq_ack_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(T5182, t5182_device)

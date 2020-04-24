@@ -16,18 +16,12 @@ public:
 	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~exidy440_sound_device() {}
 
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_READ8_MEMBER(sound_volume_r);
-	DECLARE_WRITE8_MEMBER(sound_volume_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sound_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
-	DECLARE_READ8_MEMBER(m6844_r);
-	DECLARE_WRITE8_MEMBER(m6844_w);
-	DECLARE_WRITE8_MEMBER(sound_banks_w);
-
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();
+
+	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -118,6 +112,14 @@ private:
 
 	void add_and_scale_samples(int ch, int32_t *dest, int samples, int volume);
 	void mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right);
+
+	uint8_t sound_command_r();
+	uint8_t sound_volume_r(offs_t offset);
+	void sound_volume_w(offs_t offset, uint8_t data);
+	void sound_interrupt_clear_w(uint8_t data);
+	uint8_t m6844_r(offs_t offset);
+	void m6844_w(offs_t offset, uint8_t data);
+	void sound_banks_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(EXIDY440, exidy440_sound_device)

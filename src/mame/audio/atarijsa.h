@@ -67,12 +67,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
-	DECLARE_WRITE8_MEMBER(main_command_w);
-	DECLARE_READ8_MEMBER(main_response_r);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void main_command_w(uint8_t data);
+	uint8_t main_response_r();
+	void sound_reset_w(uint16_t data);
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER(ym2151_port_w);
+	void ym2151_port_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(main_test_read_line);
 
 	// I/O lines
@@ -127,11 +127,11 @@ protected:
 
 public:
 	// read/write handlers
-	DECLARE_READ8_MEMBER( oki_r );
-	DECLARE_WRITE8_MEMBER( oki_w );
-	DECLARE_WRITE8_MEMBER( wrio_w );
-	DECLARE_WRITE8_MEMBER( mix_w );
-	DECLARE_WRITE8_MEMBER( overall_volume_w );
+	uint8_t oki_r(offs_t offset);
+	void oki_w(offs_t offset, uint8_t data);
+	void wrio_w(uint8_t data);
+	void mix_w(uint8_t data);
+	void overall_volume_w(uint8_t data);
 
 protected:
 	// device level overrides
@@ -170,12 +170,12 @@ public:
 	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
-	DECLARE_WRITE8_MEMBER( wrio_w );
-	DECLARE_WRITE8_MEMBER( mix_w );
-	DECLARE_WRITE8_MEMBER( tms5220_voice );
-	DECLARE_READ8_MEMBER( pokey_r );
-	DECLARE_WRITE8_MEMBER( pokey_w );
+	uint8_t rdio_r();
+	void wrio_w(uint8_t data);
+	void mix_w(uint8_t data);
+	void tms5220_voice(uint8_t data);
+	uint8_t pokey_r(offs_t offset);
+	void pokey_w(offs_t offset, uint8_t data);
 
 	void atarijsa1_map(address_map &map);
 protected:
@@ -208,7 +208,7 @@ public:
 	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
+	uint8_t rdio_r();
 
 	void atarijsa2_map(address_map &map);
 protected:
@@ -236,7 +236,7 @@ protected:
 
 public:
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
+	uint8_t rdio_r();
 
 protected:
 	// device level overrides
