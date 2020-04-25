@@ -394,6 +394,9 @@ enum vgmplay_inputs : uint8_t
 	VGMPLAY_RESTART,
 	VGMPLAY_LOOP,
 	VGMPLAY_VIZ,
+	VGMPLAY_RATE_DOWN,
+	VGMPLAY_RATE_UP,
+	VGMPLAY_RATE_RST
 };
 
 class vgmplay_state : public driver_device
@@ -957,14 +960,15 @@ void vgmplay_device::execute_run()
 			uint32_t version = m_file->read_dword(8);
 			m_pc = 0x34 + m_file->read_dword(0x34);
 
-			if ((version < 0x150 && m_pc != 0x34) ||
-				(version >= 0x150 && m_pc == 0x34))
+			if ((version < 0x150 && m_pc != 0x34) || (version >= 0x150 && m_pc == 0x34))
 			{
 				osd_printf_error("bad rip detected, v%x invalid header size 0x%x\n", version, m_pc);
 				m_pc = 0x40;
 			}
 			else if (version < 0x150)
+			{
 				m_pc = 0x40;
+			}
 
 			m_state = RUN;
 			break;
@@ -3160,6 +3164,15 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	case VGMPLAY_VIZ:
 		m_mixer->cycle_viz_mode();
 		break;
+	case VGMPLAY_RATE_DOWN:
+		m_vgmplay->set_unscaled_clock((uint32_t)(m_vgmplay->clock() * 0.95f));
+		break;
+	case VGMPLAY_RATE_UP:
+		m_vgmplay->set_unscaled_clock((uint32_t)(m_vgmplay->clock() / 0.95f));
+		break;
+	case VGMPLAY_RATE_RST:
+		m_vgmplay->set_unscaled_clock(44100);
+		break;
 	}
 }
 
@@ -3171,6 +3184,9 @@ static INPUT_PORTS_START( vgmplay )
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_U) PORT_NAME("Reset Rate")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
