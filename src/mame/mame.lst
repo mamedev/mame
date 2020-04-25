@@ -37467,6 +37467,7 @@ lx_jg7415                       //
 mywicodx                        //
 zon32bit                        // Zone 32-bit
 oplayer
+dnv200fs
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
