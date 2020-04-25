@@ -143,13 +143,11 @@ namespace solver
 
 		terminal_t **terms() noexcept { return m_terms.data(); }
 
-		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, void>>
-		FT getV() const noexcept { return static_cast<FT>(m_net->Q_Analog()); }
+		nl_fptype getV() const noexcept { return m_net->Q_Analog(); }
 
-		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, void>>
-		void setV(FT v) noexcept { m_net->set_Q_Analog(static_cast<nl_fptype>(v)); }
+		void setV(nl_fptype v) noexcept { m_net->set_Q_Analog(v); }
 
-		bool isNet(const analog_net_t * net) const noexcept { return net == m_net; }
+		bool is_net(const analog_net_t * net) const noexcept { return net == m_net; }
 
 		void set_railstart(std::size_t val) noexcept { m_railstart = val; }
 
@@ -191,6 +189,14 @@ namespace solver
 		netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
+		/// \brief Checks if solver may alter a net
+		///
+		/// This checks if a solver will alter a net. Returns true if the
+		/// net is either part of the voltage vector or if it belongs to
+		/// the analog input nets connected to the solver.
+
+		bool updates_net(const analog_net_t *net) const noexcept;
+
 		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
 		std::size_t timestep_device_count() const noexcept { return m_step_funcs.size(); }
 
@@ -199,11 +205,30 @@ namespace solver
 		/// This should only be called from update and update_param events.
 		/// It's purpose is to bring voltage values to the current timestep.
 		/// This will be called BEFORE updating object properties.
-		void solve_now();
-
-		void update_after(netlist_time after) noexcept
+		void solve_now()
 		{
-			m_Q_sync.net().toggle_and_push_to_queue(after);
+			// this should only occur outside of execution and thus
+			// using time should be safe.
+
+			const netlist_time new_timestep = solve(exec().time());
+			plib::unused_var(new_timestep);
+
+			update_inputs();
+
+			if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
+			{
+				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
+			}
+		}
+
+		template <typename F>
+		void change_state(F f, netlist_time delay = netlist_time::quantum())
+		{
+			// We only need to update the net first if this is a time stepping net
+			if (timestep_device_count() > 0)
+				solve_now();
+			f();
+			m_Q_sync.net().toggle_and_push_to_queue(delay);
 		}
 
 		// netdevice functions
@@ -413,7 +438,7 @@ namespace solver
 		{
 			const std::size_t iN = size();
 			for (std::size_t i = 0; i < iN; i++)
-				this->m_terms[i].setV(m_new_V[i]);
+				this->m_terms[i].setV(static_cast<nl_fptype>(m_new_V[i]));
 		}
 #else
 		// global tanh damping (4.197)
@@ -439,7 +464,7 @@ namespace solver
 			const auto vntol(static_cast<float_type>(m_params.m_vntol));
 			for (std::size_t i = 0; i < iN; i++)
 			{
-				const auto vold(this->m_terms[i].template getV<float_type>());
+				const auto vold(static_cast<float_type>(this->m_terms[i].getV()));
 				const auto vnew(m_new_V[i]);
 				const auto tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
 				if (plib::abs(vnew - vold) > tol)
@@ -455,7 +480,7 @@ namespace solver
 			for (std::size_t k = 0; k < size(); k++)
 			{
 				const auto &t = m_terms[k];
-				const auto v(t.template getV<nl_fptype>());
+				const auto v(static_cast<nl_fptype>(t.getV()));
 				// avoid floating point exceptions
 				const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),
 					std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(v - m_last_V[k])));

@@ -798,6 +798,8 @@ namespace netlist
 
 		const analog_net_t & net() const noexcept;
 		analog_net_t & net() noexcept;
+
+		solver::matrix_solver_t *solver() const noexcept;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -834,7 +836,6 @@ namespace netlist
 		}
 
 		void solve_now();
-		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
@@ -944,6 +945,11 @@ namespace netlist
 		//FIXME: needed by current solver code
 		solver::matrix_solver_t *solver() const noexcept { return m_solver; }
 		void set_solver(solver::matrix_solver_t *solver) noexcept { m_solver = solver; }
+
+		friend constexpr bool operator==(const analog_net_t &lhs, const analog_net_t &rhs) noexcept
+		{
+			return &lhs == &rhs;
+		}
 
 	private:
 		state_var<nl_fptype>     m_cur_Analog;
@@ -1938,6 +1944,13 @@ namespace netlist
 	inline analog_net_t & analog_t::net() noexcept
 	{
 		return static_cast<analog_net_t &>(core_terminal_t::net());
+	}
+
+	inline solver::matrix_solver_t *analog_t::solver() const noexcept
+	{
+		if (this->has_net())
+			return net().solver();
+		return nullptr;
 	}
 
 	inline nl_fptype terminal_t::operator ()() const noexcept { return net().Q_Analog(); }

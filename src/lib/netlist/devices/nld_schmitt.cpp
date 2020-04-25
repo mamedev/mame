@@ -67,7 +67,6 @@ namespace netlist
 				, m_RVO(*this, "RVO")
 				, m_model(*this, "MODEL", "TTL_7414_GATE")
 				, m_last_state(*this, "m_last_var", 1)
-				, m_is_timestep(false)
 			{
 				register_subalias("Q", m_RVO.m_P);
 
@@ -82,7 +81,6 @@ namespace netlist
 				m_last_state = 1;
 				m_RVI.reset();
 				m_RVO.reset();
-				m_is_timestep = (m_RVO.m_P.net().solver()->timestep_device_count() > 0);
 				m_RVI.set_G_V_I(plib::reciprocal(m_model.m_RI()), m_model.m_VI, nlconst::zero());
 				m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
 			}
@@ -95,10 +93,10 @@ namespace netlist
 					if (va < m_model.m_VTM)
 					{
 						m_last_state = 0;
-						if (m_is_timestep)
-							m_RVO.solve_now();
-						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROH()), m_model.m_VOH, nlconst::zero());
-						m_RVO.solve_later();
+						m_RVO.change_state([this]()
+						{
+							m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROH()), m_model.m_VOH, nlconst::zero());
+						});
 					}
 				}
 				else
@@ -106,10 +104,10 @@ namespace netlist
 					if (va > m_model.m_VTP)
 					{
 						m_last_state = 1;
-						if (m_is_timestep)
-							m_RVO.solve_now();
-						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
-						m_RVO.solve_later();
+						m_RVO.change_state([this]()
+						{
+							m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
+						});
 					}
 				}
 			}
@@ -121,7 +119,6 @@ namespace netlist
 			analog::NETLIB_SUB(twoterm) m_RVO;
 			schmitt_trigger_model_t m_model;
 			state_var<int> m_last_state;
-			bool m_is_timestep;
 		};
 
 		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")

@@ -86,9 +86,17 @@ namespace analog
 
 		NETLIB_UPDATEI();
 
-		void solve_now();
+		solver::matrix_solver_t *solver() const noexcept;
 
-		void solve_later(netlist_time delay = netlist_time::quantum()) noexcept;
+		void solve_now() const;
+
+		template <typename F>
+		void change_state(F f, netlist_time delay = netlist_time::quantum())
+		{
+			auto *solv(solver());
+			if (solv)
+				solv->change_state(f, delay);
+		}
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
 		{
@@ -168,9 +176,10 @@ namespace analog
 		NETLIB_UPDATE_PARAMI()
 		{
 			// FIXME: We only need to update the net first if this is a time stepping net
-			solve_now();
-			set_R(std::max(m_R(), exec().gmin()));
-			solve_later();
+			change_state([this]()
+			{
+				set_R(std::max(m_R(), exec().gmin()));
+			});
 		}
 
 	private:
@@ -524,11 +533,12 @@ namespace analog
 		{
 			// FIXME: We only need to update the net first if this is a time stepping net
 			//FIXME: works only for CS without function
-			solve_now();
-			const auto zero(nlconst::zero());
-			set_mat(zero, zero, -m_I(),
-					zero, zero,  m_I());
-			solve_later();
+			change_state([this]()
+			{
+				const auto zero(nlconst::zero());
+				set_mat(zero, zero, -m_I(),
+						zero, zero,  m_I());
+			});
 		}
 
 	private:

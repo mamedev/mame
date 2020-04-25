@@ -389,6 +389,20 @@ namespace solver
 			inp->push(inp->proxied_net()->Q_Analog());
 	}
 
+	bool matrix_solver_t::updates_net(const analog_net_t *net) const noexcept
+	{
+		if (net != nullptr)
+		{
+			for (const auto &t : m_terms )
+				if (t.is_net(net))
+					return true;
+			for (const auto &inp : m_inps)
+				if (&inp->net() == net)
+					return true;
+		}
+		return false;
+	}
+
 	void matrix_solver_t::update_dynamic() noexcept
 	{
 		// update all non-linear devices
@@ -409,22 +423,6 @@ namespace solver
 		if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
-		}
-	}
-
-	void matrix_solver_t::solve_now()
-	{
-		// this should only occur outside of execution and thus
-		// using time should be safe.
-
-		const netlist_time new_timestep = solve(exec().time());
-		plib::unused_var(new_timestep);
-
-		update_inputs();
-
-		if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
-		{
-			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
 		}
 	}
 
@@ -495,7 +493,7 @@ namespace solver
 	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept
 	{
 		for (std::size_t k = 0; k < m_terms.size(); k++)
-			if (m_terms[k].isNet(net))
+			if (m_terms[k].is_net(net))
 				return static_cast<int>(k);
 		return -1;
 	}

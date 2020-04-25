@@ -69,9 +69,7 @@ namespace netlist
 			if (R > nlconst::zero() && (m_last != new_state))
 			{
 				m_last = new_state;
-				m_R.solve_now();
-				m_R.set_R(R);
-				m_R.solve_later();
+				m_R.change_state([this, &R]() -> void { this->m_R.set_R(R);});
 			}
 		}
 

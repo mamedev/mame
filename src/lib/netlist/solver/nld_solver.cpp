@@ -183,30 +183,27 @@ namespace devices
 				{
 					return create_solver<FT, -16>(net_count, sname, nets);
 				}
-				else if (net_count <= 32)
+				if (net_count <= 32)
 				{
 					return create_solver<FT, -32>(net_count, sname, nets);
 				}
-				else if (net_count <= 64)
+				if (net_count <= 64)
 				{
 					return create_solver<FT, -64>(net_count, sname, nets);
 				}
-				else if (net_count <= 128)
+				if (net_count <= 128)
 				{
 					return create_solver<FT, -128>(net_count, sname, nets);
 				}
-				else if (net_count <= 256)
+				if (net_count <= 256)
 				{
 					return create_solver<FT, -256>(net_count, sname, nets);
 				}
-				else if (net_count <= 512)
+				if (net_count <= 512)
 				{
 					return create_solver<FT, -512>(net_count, sname, nets);
 				}
-				else
-				{
-					return create_solver<FT, 0>(net_count, sname, nets);
-				}
+				return create_solver<FT, 0>(net_count, sname, nets);
 				break;
 		}
 	}
