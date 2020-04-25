@@ -771,11 +771,11 @@ uint64_t z8002_device::DIVL(uint64_t dest, uint32_t value)
 		remainder = dest % value;
 		if (qsign) result = -result;
 		if (rsign) remainder = -remainder;
-		if ((int64_t)result < -0x80000000 || (int64_t)result > 0x7fffffff)
+		if ((int64_t)result < -0x80000000LL || (int64_t)result > 0x7fffffff)
 		{
 			int64_t temp = (int64_t)result >> 1;
 			SET_V;
-			if (temp >= -0x80000000 && temp <= 0x7fffffff)
+			if (temp >= -0x80000000LL && temp <= 0x7fffffff)
 			{
 				result = (temp < 0) ? -1 : 0;
 				CHK_XXXL_ZS;

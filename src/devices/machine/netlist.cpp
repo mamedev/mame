@@ -847,7 +847,7 @@ netlist_mame_int_input_device::netlist_mame_int_input_device(const machine_confi
 
 void netlist_mame_int_input_device::set_params(const char *param_name, const uint32_t mask, const uint32_t shift)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 	m_shift = shift;
 	m_mask = mask;
@@ -890,7 +890,7 @@ netlist_mame_logic_input_device::netlist_mame_logic_input_device(const machine_c
 
 void netlist_mame_logic_input_device::set_params(const char *param_name, const uint32_t shift)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 	m_shift = shift;
 }
@@ -942,7 +942,7 @@ netlist_mame_ram_pointer_device::netlist_mame_ram_pointer_device(const machine_c
 
 void netlist_mame_ram_pointer_device::set_params(const char *param_name)
 {
-	if (LOG_DEV_CALLS) logerror("set_params\n");
+	LOGDEVCALLS("set_params\n");
 	m_param_name = param_name;
 }
 

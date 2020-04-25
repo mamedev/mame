@@ -822,7 +822,7 @@ void mastboy_state::mastboy(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(6000000.0f / 384.0f / 282.0f);
+	screen.set_refresh_hz(6000000.0 / 384.0 / 282.0);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 256-16-1);
