@@ -106,7 +106,7 @@ namespace netlist
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
-				m_RV.update();
+				m_RV.solve_now();
 			m_RV.set_G_V_I(plib::reciprocal(R), V, nlconst::zero());
 			m_RV.solve_later(NLTIME_FROM_NS(1));
 		}

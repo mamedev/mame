@@ -947,7 +947,7 @@ void setup_t::resolve_inputs()
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 			if (connect(*t1, *t2))
-				m_links.erase(m_links.begin() + i);
+				m_links.erase(m_links.begin() + static_cast<std::ptrdiff_t>(i));
 			else
 				i++;
 		}

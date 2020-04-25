@@ -161,7 +161,7 @@ namespace netlist
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 			{
-				m_RN.update(); // RN, RP are connected ...
+				m_RN.solve_now(); // RN, RP are connected ...
 			}
 			if (state)
 			{

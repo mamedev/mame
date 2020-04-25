@@ -118,8 +118,8 @@
 /// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
 
 #ifndef NL_USE_FLOAT_MATRIX
-#define NL_USE_FLOAT_MATRIX (NL_USE_ACADEMIC_SOLVERS)
-//#define NL_USE_FLOAT_MATRIX 1
+//#define NL_USE_FLOAT_MATRIX (NL_USE_ACADEMIC_SOLVERS)
+#define NL_USE_FLOAT_MATRIX 1
 #endif
 
 /// \brief Support long double type for matrix calculations.
@@ -127,8 +127,8 @@
 /// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
 
 #ifndef NL_USE_LONG_DOUBLE_MATRIX
-#define NL_USE_LONG_DOUBLE_MATRIX (NL_USE_ACADEMIC_SOLVERS)
-//#define NL_USE_LONG_DOUBLE_MATRIX 1
+//#define NL_USE_LONG_DOUBLE_MATRIX (NL_USE_ACADEMIC_SOLVERS)
+#define NL_USE_LONG_DOUBLE_MATRIX 1
 #endif
 
 //============================================================

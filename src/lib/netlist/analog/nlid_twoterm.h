@@ -463,7 +463,6 @@ namespace analog
 		}
 
 	protected:
-		// NETLIB_UPDATEI() {   NETLIB_NAME(twoterm)::update(time); }
 
 		NETLIB_RESETI()
 		{
@@ -513,7 +512,6 @@ namespace analog
 
 	protected:
 
-		//NETLIB_UPDATEI() { NETLIB_NAME(twoterm)::update(time); }
 		NETLIB_RESETI()
 		{
 			NETLIB_NAME(twoterm)::reset();

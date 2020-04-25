@@ -412,13 +412,11 @@ namespace solver
 		}
 	}
 
-	// update_forced is called from within param_update
-	//
-	// this should only occur outside of execution and thus
-	// using time should be safe.
-
-	void matrix_solver_t::update_forced()
+	void matrix_solver_t::solve_now()
 	{
+		// this should only occur outside of execution and thus
+		// using time should be safe.
+
 		const netlist_time new_timestep = solve(exec().time());
 		plib::unused_var(new_timestep);
 
@@ -487,7 +485,11 @@ namespace solver
 			this->store();
 		}
 
-		return compute_next_timestep(delta.as_fp<nl_fptype>());
+
+		if (m_params.m_dynamic_ts)
+			return compute_next_timestep(delta.as_fp<nl_fptype>(), m_params.m_max_timestep);
+
+		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
 
 	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept

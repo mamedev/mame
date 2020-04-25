@@ -194,7 +194,13 @@ namespace solver
 		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
 		std::size_t timestep_device_count() const noexcept { return m_step_funcs.size(); }
 
-		void update_forced();
+		/// \brief Immediately solve system at current time
+		///
+		/// This should only be called from update and update_param events.
+		/// It's purpose is to bring voltage values to the current timestep.
+		/// This will be called BEFORE updating object properties.
+		void solve_now();
+
 		void update_after(netlist_time after) noexcept
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(after);
@@ -224,7 +230,7 @@ namespace solver
 			const solver_parameters_t *params);
 
 		virtual void vsolve_non_dynamic() = 0;
-		virtual netlist_time compute_next_timestep(nl_fptype cur_ts) = 0;
+		virtual netlist_time compute_next_timestep(nl_fptype cur_ts, nl_fptype max_ts) = 0;
 		virtual bool check_err() = 0;
 		virtual void store() = 0;
 
@@ -402,13 +408,26 @@ namespace solver
 			return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim;
 		}
 
+#if 1
 		void store() override
 		{
 			const std::size_t iN = size();
 			for (std::size_t i = 0; i < iN; i++)
 				this->m_terms[i].setV(m_new_V[i]);
 		}
-
+#else
+		// global tanh damping (4.197)
+		// partially cures the symptoms but not the cause
+		void store() override
+		{
+			const std::size_t iN = size();
+			for (std::size_t i = 0; i < iN; i++)
+			{
+				auto oldV = this->m_terms[i].template getV<nl_fptype>();
+				this->m_terms[i].setV(oldV + 0.02 * plib::tanh((m_new_V[i]-oldV)*50.0));
+			}
+		}
+#endif
 		bool check_err() override
 		{
 			// NOTE: Ideally we should also include currents (RHS) here. This would
@@ -429,38 +448,35 @@ namespace solver
 			return false;
 		}
 
-		netlist_time compute_next_timestep(const nl_fptype cur_ts) override
+		netlist_time compute_next_timestep(nl_fptype cur_ts, nl_fptype max_ts) override
 		{
-			nl_fptype new_solver_timestep = m_params.m_max_timestep;
+			nl_fptype new_solver_timestep(max_ts);
 
-			if (m_params.m_dynamic_ts)
+			for (std::size_t k = 0; k < size(); k++)
 			{
-				for (std::size_t k = 0; k < size(); k++)
-				{
-					const auto &t = m_terms[k];
-					const auto v(t.template getV<nl_fptype>());
-					// avoid floating point exceptions
-					const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),
-						std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(v - m_last_V[k])));
+				const auto &t = m_terms[k];
+				const auto v(t.template getV<nl_fptype>());
+				// avoid floating point exceptions
+				const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),
+					std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(v - m_last_V[k])));
 
-					m_last_V[k] = v;
-					const nl_fptype hn = cur_ts;
+				m_last_V[k] = v;
+				const nl_fptype hn = cur_ts;
 
-					//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
-					nl_fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
-					nl_fptype new_net_timestep(0);
+				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
+				nl_fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
+				nl_fptype new_net_timestep(0);
 
-					m_h_n_m_1[k] = hn;
-					m_DD_n_m_1[k] = DD_n;
-					if (plib::abs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
-						new_net_timestep = plib::sqrt(m_params.m_dynamic_lte / plib::abs(nlconst::magic(0.5)*DD2));
-					else
-						new_net_timestep = m_params.m_max_timestep;
+				m_h_n_m_1[k] = hn;
+				m_DD_n_m_1[k] = DD_n;
+				if (plib::abs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
+					new_net_timestep = plib::sqrt(m_params.m_dynamic_lte / plib::abs(nlconst::magic(0.5)*DD2));
+				else
+					new_net_timestep = m_params.m_max_timestep;
 
-					new_solver_timestep = std::min(new_net_timestep, new_solver_timestep);
-				}
-				new_solver_timestep = std::max(new_solver_timestep, m_params.m_min_timestep);
+				new_solver_timestep = std::min(new_net_timestep, new_solver_timestep);
 			}
+			new_solver_timestep = std::max(new_solver_timestep, m_params.m_min_timestep);
 
 			// FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
 			return std::max(netlist_time::from_fp(new_solver_timestep), netlist_time::quantum() * 2);

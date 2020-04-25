@@ -816,7 +816,7 @@ namespace netlist
 		// Nets may belong to railnets which do not have a solver attached
 		if (this->has_net())
 			if (net().solver() != nullptr)
-				net().solver()->update_forced();
+				net().solver()->solve_now();
 	}
 
 	void terminal_t::schedule_solve_after(netlist_time after) noexcept

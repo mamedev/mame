@@ -80,7 +80,7 @@ namespace solver
 			const nl_fptype * const Idr = this->m_Idrn[k];
 			auto other_cur_analog = this->m_connected_net_Vn[k];
 
-			this->m_new_V[k] = this->m_terms[k].template getV<float_type>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 
 			for (std::size_t i = 0; i < term_count; i++)
 			{

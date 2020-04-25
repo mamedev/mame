@@ -96,7 +96,7 @@ namespace netlist
 					{
 						m_last_state = 0;
 						if (m_is_timestep)
-							m_RVO.update();
+							m_RVO.solve_now();
 						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROH()), m_model.m_VOH, nlconst::zero());
 						m_RVO.solve_later();
 					}
@@ -107,7 +107,7 @@ namespace netlist
 					{
 						m_last_state = 1;
 						if (m_is_timestep)
-							m_RVO.update();
+							m_RVO.solve_now();
 						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
 						m_RVO.solve_later();
 					}
