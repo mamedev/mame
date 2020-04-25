@@ -93,7 +93,7 @@
   - cgalaxn discrete sound (alien attacking sound effect)
   - gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
     It can be tested by jumping up repeatedly at the start position under the ladder,
-    if the glitch happens there, you can jump onto the 2nd floor. Maybe BTANB?
+    if the glitch happens there, you can jump onto the 2nd floor.
   - epacman2 booting the game in demo mode, pacman should take the shortest route to
     the upper-left power pill: mcu cycle/interrupt timing related
   - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from

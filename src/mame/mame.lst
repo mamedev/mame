@@ -11415,7 +11415,7 @@ ch2001
 sdtor
 
 @source:cxg_scptchess.cpp
-prtchess2
+prtchess
 scptchess
 
 @source:cxg_sphinx40.cpp

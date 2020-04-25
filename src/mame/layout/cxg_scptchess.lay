@@ -8,6 +8,11 @@ license:CC0
 
 	<element name="white2"><rect><color red="0.76" green="0.75" blue="0.74" /></rect></element>
 
+	<element name="save" defstate="0">
+		<text state="0" string="POWER SW.: ON" align="1"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text state="1" string="POWER SW.: SAVE" align="1"><color red="0.81" green="0.8" blue="0.79" /></text>
+	</element>
+
 	<element name="but" defstate="0">
 		<rect state="1"><color red="0.25" green="0.24" blue="0.24" /></rect>
 		<rect state="0"><color red="0.17" green="0.16" blue="0.16" /></rect>
@@ -389,6 +394,8 @@ license:CC0
 		<bezel element="text_l5"><bounds x="86" y="56.5" width="14" height="2" /></bezel>
 		<bezel element="text_l6"><bounds x="86" y="66.5" width="14" height="2" /></bezel>
 		<bezel element="text_l7"><bounds x="86" y="76.5" width="14" height="2" /></bezel>
+
+		<bezel element="save" inputtag="IN.1" inputmask="0x02"><bounds x="87" y="87.1" width="14.5" height="2" /></bezel>
 
 	</view>
 </mamelayout>

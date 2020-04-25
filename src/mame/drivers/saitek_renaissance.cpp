@@ -15,6 +15,9 @@ Hardware notes:
 - LCD screen
 - magnet sensors chessboard with 81 leds
 
+The 6301Y0 seen on one of them, was a SX8A 6301Y0G84P, this is in fact the
+MCU(+internal maskrom, disabled here) used in Saitek Conquistador.
+
 The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
