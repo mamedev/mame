@@ -745,7 +745,7 @@ end
 			"_7ZIP_ST",
 		}
 
-	if string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
 		buildoptions_c {
 			"-Wno-misleading-indentation",
 		}
@@ -1512,7 +1512,7 @@ project "portaudio"
 				}
 			end
 		end
-		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
 			buildoptions_c {
 				"-Wno-misleading-indentation",
 			}
