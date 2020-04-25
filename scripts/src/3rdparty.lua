@@ -1523,7 +1523,7 @@ project "portaudio"
 				}
 			end
 		end
-		if _string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
+		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
 			buildoptions_c {
 				"-Wno-misleading-indentation",
 			}
