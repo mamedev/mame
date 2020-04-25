@@ -73,9 +73,26 @@ protected:
 	virtual DECLARE_READ16_MEMBER(porta_r) override;
 	virtual DECLARE_READ16_MEMBER(portb_r) override;
 	virtual DECLARE_READ16_MEMBER(portc_r) override;
-
 };
 
+class denver_200in1_state : public mywicodx_state
+{
+public:
+	denver_200in1_state(const machine_config& mconfig, device_type type, const char* tag) :
+		mywicodx_state(mconfig, type, tag)
+	{ }
+
+	void init_denver();
+
+protected:
+	virtual void machine_reset() override;
+
+	virtual DECLARE_READ16_MEMBER(porta_r) override;
+	virtual DECLARE_READ16_MEMBER(portb_r) override;
+	virtual DECLARE_READ16_MEMBER(portc_r) override;
+
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+};
 
 void zon32bit_state::device_post_load()
 {
@@ -144,6 +161,7 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
+
 	m_porta_dat = data;
 
 	int oldbank = m_basebank;
@@ -166,6 +184,80 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 
 	if (oldbank != m_basebank)
 		m_maincpu->invalidate_cache();
+
+
+}
+
+
+WRITE16_MEMBER(denver_200in1_state::porta_w)
+{
+	if (0)
+	{
+		if (m_maincpu->pc() < 0x10000)
+		{
+			logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+				(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+				(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+				(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+				(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+				(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+				(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+				(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+				(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+				(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+				(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+				(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+				(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+				(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+				(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+				(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+				(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+		}
+	}
+
+	if (m_maincpu->pc() < 0x10000)
+	{
+		int oldbank = m_basebank;
+
+		if (mem_mask & 0x0200)
+		{
+			if (data & 0x0200)
+			{
+				m_basebank |= 4;
+			}
+			else
+			{
+				m_basebank &= ~4;
+			}
+		}
+
+		if (mem_mask & 0x0400)
+		{
+			if (data & 0x0400)
+			{
+				m_basebank |= 1;
+			}
+			else
+			{
+				m_basebank &= ~1;
+			}
+		}
+
+		if (mem_mask & 0x0800)
+		{
+			if (data & 0x0800)
+			{
+				m_basebank |= 2;
+			}
+			else
+			{
+				m_basebank &= ~2;
+			}
+		}
+
+		if (oldbank != m_basebank)
+			m_maincpu->invalidate_cache();
+	}
 }
 
 
@@ -275,6 +367,7 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 	int base = 0x0000000;
 
+	if (m_basebank & 4)  base |= 0x4000000;
 	if (m_basebank & 2)  base |= 0x2000000;
 	if (m_basebank & 1)  base |= 0x1000000;
 
@@ -294,6 +387,22 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 	return 0x0000;// m_romregion[offset];
 }
+
+READ16_MEMBER(denver_200in1_state::portc_r)
+{
+	return m_io_p3->read();
+}
+
+READ16_MEMBER(denver_200in1_state::portb_r)
+{
+	return m_io_p2->read();
+}
+
+READ16_MEMBER(denver_200in1_state::porta_r)
+{
+	return 0x0ff8 | (machine().rand()&1);
+}
+
 
 void zon32bit_state::machine_start()
 {
@@ -325,6 +434,14 @@ void mywicodx_state::machine_reset()
 	m_basebank = 3;
 	m_maincpu->invalidate_cache();
 }
+
+void denver_200in1_state::machine_reset()
+{
+	zon32bit_state::machine_reset();
+	m_basebank = 6;
+	m_maincpu->invalidate_cache();
+}
+
 
 
 static INPUT_PORTS_START( zon32bit )
@@ -655,6 +772,13 @@ ROM_START( oplayer )
 	ROM_LOAD16_WORD_SWAP( "oplayer.bin", 0x0000000, 0x4000000, CRC(aa09c358) SHA1(df2855cdfdf2b693636cace8768e579b9d5bc657) )
 ROM_END
 
+ROM_START( dnv200fs )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "famsport200in1.u2", 0x0000000, 0x8000000, CRC(f59221e2) SHA1(d532cf5a80ffe9d527efcccbf380a7a860f0fbd9) )
+ROM_END
+
+
+
 
 void oplayer_100in1_state::init_oplayer()
 {
@@ -671,6 +795,24 @@ void oplayer_100in1_state::init_oplayer()
 	rom[0xc351e + (0x3000000 / 2)] = 0xf165;
 }
 
+void denver_200in1_state::init_denver()
+{
+	// TODO: remove these hacks
+
+	// patch checks when booting each bank, similar to oplayer
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x175f7 + (0x0000000 / 2)] = 0xf165;
+	rom[0x18f47 + (0x1000000 / 2)] = 0xf165;
+	rom[0x33488 + (0x2000000 / 2)] = 0xf165;
+	rom[0x87f81 + (0x3000000 / 2)] = 0xf165;
+	rom[0x764d9 + (0x4000000 / 2)] = 0xf165;
+	rom[0xb454e + (0x5000000 / 2)] = 0xf165;
+	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot
+	rom[0x1fb00 + (0x7000000 / 2)] = 0xf165;
+
+	// no exit patches required?
+}
+
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
@@ -682,4 +824,24 @@ CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,   
 
 // issues with 'low battery' always showing, but otherwise functional
 CONS( 200?, oplayer,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+/*
+DENVER(r)
+
+PO:9075
+Model: GMP-270CMK2
+OPERATED BY 3 X AAA-BATTERIES (NOT INCL)
+OR MINI-USB POWER SOURCE
+Power consumption:0.6W/hour
+Standby consumption:0.25mW/hour
+Imported by:
+DENVER ELECTRONICS A/S
+Stavneagervej 22
+DK-8250 EGAA
+DENMARK
+
+*/
+
+CONS( 200?, dnv200fs,   0, 0, zon32bit, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
