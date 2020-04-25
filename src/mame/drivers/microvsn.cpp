@@ -302,7 +302,7 @@ WRITE16_MEMBER(microvision_state::tms1100_r_w)
 	if (~m_r & data & 4 && m_paddle_on)
 	{
 		// note that the games don't use the whole range, so there's a deadzone around the edges
-		const float step = (2000 - 500) / 255.0; // approximation
+		const float step = (2000 - 500) / 255.0f; // approximation
 		m_paddle_timer->adjust(attotime::from_usec(500 + m_paddle->read() * step));
 	}
 
@@ -369,7 +369,7 @@ WRITE8_MEMBER(microvision_state::i8021_p2_w)
 	// P22,P23: charge paddle capacitor when low
 	if (m_p2 & 0xc && (data & 0xc) == 0 && m_paddle_on)
 	{
-		const float step = (1000 - 10) / 255.0; // approximation
+		const float step = (1000 - 10) / 255.0f; // approximation
 		m_paddle_timer->adjust(attotime::from_usec(10 + (m_paddle->read() ^ 0xff) * step));
 	}
 
