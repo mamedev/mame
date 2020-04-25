@@ -17,6 +17,8 @@ public:
 	auto k_port_callback() { return m_k.bind(); }
 	auto p_port_callback() { return m_p.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( reset );
+	DECLARE_WRITE_LINE_MEMBER( chip_select );
 	DECLARE_WRITE_LINE_MEMBER(read_request);
 	uint8_t read();
 
@@ -26,8 +28,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	TIMER_CALLBACK_MEMBER( irq_clear );
-
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
@@ -35,7 +35,6 @@ private:
 	devcb_read8    m_k;
 	devcb_read8::array<4> m_in;
 	devcb_write8   m_p;
-	emu_timer *m_irq_cleared_timer;
 
 	uint8_t K_r();
 	uint8_t R0_r();
@@ -44,6 +43,7 @@ private:
 	uint8_t R3_r();
 	void O_w(uint8_t data);
 	void P_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER( chip_select_sync );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device)

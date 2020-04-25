@@ -15,6 +15,7 @@ public:
 	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }
 
+	DECLARE_WRITE_LINE_MEMBER( reset );
 	void write(uint8_t data);
 
 protected:

@@ -50,6 +50,12 @@
 #include "emu.h"
 #include "namco52.h"
 
+WRITE_LINE_MEMBER( namco_52xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
+
 TIMER_CALLBACK_MEMBER( namco_52xx_device::latch_callback )
 {
 	m_latched_cmd = param;

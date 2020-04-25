@@ -31,8 +31,8 @@
          (ANS5) O5|9   20|R7 (n.c.)
          (ANS6) O6|10  19|R6 (n.c.)
          (ANS7) O7|11  18|R5 (n.c.)
-         (CMD0) R7|12  17|R4 (n.c.)
-         (CMD1) R0|13  16|R3 (CMD3)
+         (CMD0) R0|12  17|R4 (n.c.)
+         (CMD1) R1|13  16|R3 (CMD3)
                GND|14  15|R2 (CMD2)
                   +------+
 
@@ -135,30 +135,26 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "emu.h"
 #include "namco50.h"
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::latch_callback )
+WRITE_LINE_MEMBER( namco_50xx_device::reset )
 {
-	m_latched_cmd = param;
-	m_latched_rw = 0;
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
 }
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::readrequest_callback )
-{
-	m_latched_rw = 1;
-}
 
 uint8_t namco_50xx_device::K_r()
 {
-	return m_latched_cmd >> 4;
+	return m_cmd >> 4;
 }
 
 uint8_t namco_50xx_device::R0_r()
 {
-	return m_latched_cmd & 0x0f;
+	return m_cmd & 0x0f;
 }
 
 uint8_t namco_50xx_device::R2_r()
 {
-	return m_latched_rw & 1;
+	return m_rw & 1;
 }
 
 void namco_50xx_device::O_w(uint8_t data)
@@ -170,46 +166,39 @@ void namco_50xx_device::O_w(uint8_t data)
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::irq_clear )
+WRITE_LINE_MEMBER( namco_50xx_device::rw )
 {
-	m_cpu->set_input_line(0, CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::rw_sync),this), state);
 }
 
-void namco_50xx_device::irq_set()
+TIMER_CALLBACK_MEMBER( namco_50xx_device::rw_sync )
 {
-	m_cpu->set_input_line(0, ASSERT_LINE);
+	m_rw = param;
+}
 
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
+WRITE_LINE_MEMBER( namco_50xx_device::chip_select )
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::chip_select_sync),this), state);
+}
+
+TIMER_CALLBACK_MEMBER( namco_50xx_device::chip_select_sync )
+{
+	m_cpu->set_input_line(0, param);
 }
 
 void namco_50xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::latch_callback),this), data);
-
-	irq_set();
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::write_sync),this), data);
 }
 
-
-WRITE_LINE_MEMBER(namco_50xx_device::read_request)
+TIMER_CALLBACK_MEMBER( namco_50xx_device::write_sync )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::readrequest_callback),this), 0);
-
-	irq_set();
+	m_cmd = param;
 }
-
 
 uint8_t namco_50xx_device::read()
 {
-	uint8_t res = m_portO;
-
-	read_request(0);
-
-	return res;
+	return m_portO;
 }
 
 
@@ -228,8 +217,8 @@ DEFINE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device, "namco50", "Namco 50xx")
 namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_50XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
-	m_latched_cmd(0),
-	m_latched_rw(0),
+	m_rw(0),
+	m_cmd(0),
 	m_portO(0)
 {
 }
@@ -241,10 +230,8 @@ namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *
 
 void namco_50xx_device::device_start()
 {
-	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_50xx_device::irq_clear), this));
-
-	save_item(NAME(m_latched_cmd));
-	save_item(NAME(m_latched_rw));
+	save_item(NAME(m_rw));
+	save_item(NAME(m_cmd));
 	save_item(NAME(m_portO));
 }
 
@@ -256,9 +243,9 @@ void namco_50xx_device::device_add_mconfig(machine_config &config)
 {
 	MB8842(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
 	m_cpu->read_k().set(FUNC(namco_50xx_device::K_r));
-	m_cpu->write_o().set(FUNC(namco_50xx_device::O_w));
 	m_cpu->read_r<0>().set(FUNC(namco_50xx_device::R0_r));
 	m_cpu->read_r<2>().set(FUNC(namco_50xx_device::R2_r));
+	m_cpu->write_o().set(FUNC(namco_50xx_device::O_w));
 }
 
 //-------------------------------------------------

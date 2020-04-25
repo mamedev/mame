@@ -17,6 +17,7 @@ public:
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( reset );
 	void write(uint8_t data);
 
 protected:
