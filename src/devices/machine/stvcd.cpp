@@ -21,6 +21,23 @@
   LBA except it counts starting at absolute zero instead of
   the first sector (00:02:00 in MSF format).
 
+============================================================================
+TODO:
+- finish off code cleanups (repetition etc.);
+- improve debugging;
+- fix DRQ behaviour, several softwares gets to the point of filling 
+  the buffer (and probably don't know what to do);
+- fix startup, cfr. cdblock branch;
+- merge common components with lle version via superclass (i.e. comms);
+- derive MPEG commands in a subdevice;
+
+DASM notes:
+* whizzj:
+- wpset 0x605e4b8,4,w,wpdata==0x4e
+  (second trigger)
+- write to 0x605e498 -> 1 
+  (PUBLISH.CPK tries to playback a few frames then keeps looping)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -487,10 +504,6 @@ void stvcd_device::cr_standard_return(uint16_t cur_status)
 	}
 	else
 	{
-		/*
-		TODO:
-		- Whizz: wpset 0x608f030,4,w,wpdata==0x100&&pc!=0x6040006
-		*/
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, cur_track)<<8) | (cdrom_get_track(cdrom, cd_curfad-150)+1));
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
