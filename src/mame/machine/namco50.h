@@ -31,7 +31,6 @@ private:
 	uint8_t                   m_rw;
 	uint8_t                   m_cmd;
 	uint8_t                   m_portO;
-	emu_timer * m_irq_cleared_timer;
 
 	TIMER_CALLBACK_MEMBER( chip_select_sync );
 	TIMER_CALLBACK_MEMBER( rw_sync );
