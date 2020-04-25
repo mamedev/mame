@@ -11,7 +11,7 @@ Hardware notes:
 - 4-digit 7seg panel, sensory board with 50 buttons
 - PCB label 510-1030A01
 
-It's a checkers game for once instead of chess.
+Instead of chess, it's a checkers game for once (international rules).
 
 When playing it on MAME with the sensorboard device, use the modifier keys
 (eg. hold CTRL to ignore sensor). The game expects the player to press a sensor

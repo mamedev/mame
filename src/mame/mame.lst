@@ -11414,6 +11414,10 @@ ch2001
 @source:cxg_dominator.cpp
 sdtor
 
+@source:cxg_scptchess.cpp
+prtchess2
+scptchess
+
 @source:cxg_sphinx40.cpp
 sphinx40
 

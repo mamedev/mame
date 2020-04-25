@@ -21,6 +21,7 @@ TODO:
 #include "machine/f3853.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+#include "screen.h"
 
 // internal artwork
 //#include "saitek_exchess.lh" // clickable
@@ -37,10 +38,14 @@ public:
 		m_lcd1(*this, "lcd1"),
 		m_lcd2(*this, "lcd2"),
 		m_display(*this, "display"),
+		m_battery(*this, "battery"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void exchess(machine_config &config);
+
+	// battery status indicator is not software controlled
+	DECLARE_INPUT_CHANGED_MEMBER(battery) { m_battery = newval; }
 
 protected:
 	virtual void machine_start() override;
@@ -51,7 +56,8 @@ private:
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
-	required_ioport_array<3> m_inputs;
+	output_finder<> m_battery;
+	required_ioport_array<4> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -72,6 +78,7 @@ private:
 
 void exchess_state::machine_start()
 {
+	m_battery.resolve();
 	m_ram = make_unique_clear<u8[]>(0x400);
 
 	// register for savestates
@@ -127,7 +134,7 @@ u8 exchess_state::ram_address_r()
 	u8 data = m_ram_address[N];
 
 	// P13: Enter button
-	return (N) ? data | m_inputs[0]->read() : data;
+	return (N) ? data | (m_inputs[0]->read() & 8) : data;
 }
 
 void exchess_state::ram_data_w(u8 data)
@@ -183,6 +190,11 @@ static INPUT_PORTS_START( exchess )
 
 	PORT_START("IN.2")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("IN.3")
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, exchess_state, battery, 0)
+	PORT_CONFSETTING(    0x01, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 
@@ -218,6 +230,11 @@ void exchess_state::exchess(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 26+34);
 	//config.set_default_layout(layout_saitek_exchess);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(977, 1080);
+	screen.set_visarea_full();
 }
 
 
@@ -229,6 +246,9 @@ void exchess_state::exchess(machine_config &config)
 ROM_START( exchess )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("sl90553", 0x0000, 0x1000, CRC(a61b0c7e) SHA1(a13b11a93f78236223c5c0b9879a93284b7f7525) )
+
+	ROM_REGION( 774009, "screen", ROMREGION_ERASE00 )
+	//ROM_LOAD("exchess.svg", 0, 774009, CRC(795d66e0) SHA1(5f786c00bf33793bfba7065d8e9ec476e02e5c46) )
 ROM_END
 
 } // anonymous namespace

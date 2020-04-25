@@ -14,7 +14,7 @@ Mark VI/Philidor was released a year later, it was a plug-in module for the Mark
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
 When using the MAME sensorboard interface with MK VI, reset the board by pressing
-CLEAR before RESET, needed on 1st power-on or when starting a new game.
+CLEAR before RESET, needed when starting a new game.
 
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
@@ -122,11 +122,12 @@ private:
 	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
 	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
 
-	u8 m_dac_data;
-	u8 m_lcd_lcd;
-	u8 m_lcd_rowsel;
-	u8 m_cb_mux;
+	u8 m_dac_data = 0;
+	u8 m_lcd_lcd = 0;
+	u8 m_lcd_rowsel = 0;
+	u8 m_cb_mux = 0;
 
+	emu_timer *m_cb_startdelay;
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
@@ -137,11 +138,8 @@ void mark5_state::machine_start()
 	m_out_x.resolve();
 	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
 
-	// zerofill
-	m_dac_data = 0;
-	m_lcd_lcd = 0;
-	m_lcd_rowsel = 0;
-	m_cb_mux = 0;
+	m_cb_startdelay = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_cb_startdelay->adjust(attotime::from_msec(100));
 
 	// register for savestates
 	save_item(NAME(m_dac_data));
@@ -279,7 +277,7 @@ WRITE8_MEMBER(mark5_state::cb_w)
 
 READ8_MEMBER(mark5_state::cb_r)
 {
-	if (~m_inputs[6]->read() & 0x20)
+	if (~m_inputs[6]->read() & 0x20 || m_cb_startdelay->enabled())
 		return 0xff;
 
 	// read chessboard sensors
