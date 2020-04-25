@@ -11590,55 +11590,6 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="simcity">
-		<description>SimCity (3.5", v2.00)</description>
-		<year>1993</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="developer" value="Maxis Software" />
-		<info name="version" value="2.00" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simcity102" cloneof="simcity">
-		<description>SimCity (5.25", v1.02)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="developer" value="Maxis Software" />
-		<info name="version" value="1.02" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 1 of 2].img" size="368640" crc="f7a34a71" sha1="5d2564e539c3b9930a901758e1d2ed4e79e9110d"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="a5dcfae9" sha1="7747f44cf8f4b0640569b8fac73a23fa950a86f9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simcity102_35" cloneof="simcity">
-		<description>SimCity (3.5", v1.02)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="developer" value="Maxis Software" />
-		<info name="version" value="1.02" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="SimCity (v1.02) [Maxis] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9b9e4a89" sha1="c19037384dc0956cf7ecfdc393d87018a8a32913"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simcity107" cloneof="simcity">
 		<description>SimCity (5.25", v1.07)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
@@ -11656,7 +11607,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="simcity107_35" cloneof="simcity">
+	<software name="simcity35" cloneof="simcity">
 		<description>SimCity (3.5", v1.07)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
@@ -11665,6 +11616,55 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimCity (v1.07) [Maxis] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3c572a40" sha1="d2b26ed8f7456930d8a05ed4354b3746f9a68215"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcitya" cloneof="simcity">
+		<description>SimCity (5.25", v1.02)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 1 of 2].img" size="368640" crc="f7a34a71" sha1="5d2564e539c3b9930a901758e1d2ed4e79e9110d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="a5dcfae9" sha1="7747f44cf8f4b0640569b8fac73a23fa950a86f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcitya35" cloneof="simcity">
+		<description>SimCity (3.5", v1.02)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9b9e4a89" sha1="c19037384dc0956cf7ecfdc393d87018a8a32913"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcitycl">
+		<description>SimCity Classic (3.5", v2.00)</description>
+		<year>1993</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="2.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893"/>
 			</dataarea>
 		</part>
 	</software>
