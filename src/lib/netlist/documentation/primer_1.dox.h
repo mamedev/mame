@@ -20,7 +20,7 @@ Now in netlist syntax this looks like:
 
 NETLIST_START(charge_discharge)
 
-	ANALOG_INPUT(V5, 5) // Clock needs a 5V power supply
+    ANALOG_INPUT(V5, 5) // Clock needs a 5V power supply
 
     SOLVER(solver, 48000) // Fixed frequency solver
     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output

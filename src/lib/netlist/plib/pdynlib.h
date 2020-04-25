@@ -46,6 +46,11 @@ namespace plib {
 
 		~dynlib() override;
 
+		COPYASSIGN(dynlib, delete)
+
+		dynlib(dynlib &&) noexcept = default;
+		dynlib &operator=(dynlib &&) noexcept = default;
+
 	protected:
 		void *getsym_p(const pstring &name) const noexcept override;
 
