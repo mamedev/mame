@@ -1,12 +1,54 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+/*
 
-// hardware is loosely derived from snowbros / Kaneko Pandora
+  Goori Goori (c) Unico 1999
 
-// background image is visible briefly at the start of level, is this correct?
+ hardware is loosely derived from snowbros / Kaneko Pandora
 
-// is more than one button used?
+ ToDo:
+ background image is visible briefly at the start of level, is this correct?
+ is more than one button used?
 
+Goori Goori PCB layout:
++-----------------------------------------------+
+|               1         29F1610_OL 29F1610_SL |
+|LED VR       M6295       29F1610_OH 29F1610_SH |
+| YM3012  YM2151 3.579545MHz                    |
+|                                               |
+|                      GAL                      |
+|J                 6164   +---------+  681000   |
+|A                 6164   |  Actel  |           |
+|M                        |A40MX04-F|  681000   |
+|M                        |  PL84   |           |
+|A                        +---------+  681000   |
+|                       +---------+             |
+|                       |  Actel  |    681000   |
+|                  2    |A40MX04-F|             |
+|            3   62H256 |  PL84   |             |
+| 93C46    62H256       +---------+ 76C88       |
+|    S1     68000    W2465                 6116 |
+|16.000MHz                                      |
++-----------------------------------------------+
+
+   CPU: MC68HC000FN16
+ Sound: OKI M6295, YM2151+YM3012 (rebadged as AD-65, BS901+BS902)
+   OSC: 16.000MHz, 3.579545MHz
+EEPROM: ST 93C46CB1 (set to 16bit with jumper pad)
+   RAM: SEC KM681000BLG-7L (x4), HMC62H256AK-15 (x2), UM6164DK-12 (x2)
+        Winbond W2465AK-15, LGS GM76C88ALK-15 & HT6116-70
+ Other: GAL16V8D, LED power LED, VR volume pot, S1 Service button
+
+ROMS:
+   1 - TMS 27C020-15 - Sound samples
+   2 - unknown type  - 68000 Program code EVEN bytes (jumper pad made for 2M ROMs)
+   3 - unknown type  - 68000 Program code ODD bytes  (jumper pad made for 2M ROMs)
+   29F1610_OL - MX 29F1610ML - PCB silkscreened OBJ 16M/L
+   29F1610_OH - MX 29F1610ML - PCB silkscreened OBJ 16M/H
+   29F1610_SL - MX 29F1610ML - PCB silkscreened SCR 16M/L
+   29F1610_SH - MX 29F1610ML - PCB silkscreened SCR 16M/H
+
+*/
 
 #include "emu.h"
 
@@ -235,7 +277,7 @@ void goori_state::machine_start()
 void goori_state::goori(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2); /* 16MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL); /* 16MHz MC68HC000FN16 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &goori_state::goori_map);
 	m_maincpu->set_vblank_int("screen", FUNC(goori_state::irq4_line_hold));
 
@@ -248,7 +290,7 @@ void goori_state::goori(machine_config &config)
 	m_screen->set_screen_update(FUNC(goori_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	EEPROM_93C46_16BIT(config, "eeprom"); // 93C46C81
+	EEPROM_93C46_16BIT(config, "eeprom"); // 93C46CB1 - Jumper pads for 16bit made
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
 
@@ -258,30 +300,28 @@ void goori_state::goori(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.40).add_route(1, "rspeaker", 0.40); // not verified
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.40).add_route(1, "rspeaker", 0.40);
 }
 
 ROM_START( goori )
-	ROM_REGION( 0x080000, "maincpu", 0 ) // first half empty
-	ROM_LOAD16_BYTE( "goori02.4m", 0x000000, 0x040000, CRC(65a8568e) SHA1(c1a07f3a009df4af898ab62c15416073fcf768d9) )
-	ROM_CONTINUE(0x000000, 0x040000)
-	ROM_LOAD16_BYTE( "goori03.4m", 0x000001, 0x040000, CRC(de4b8818) SHA1(599ab6a354ab21d50c1b8c11e980f0b16f18e4dd) )
-	ROM_CONTINUE(0x000001, 0x040000)
+	ROM_REGION( 0x080000, "maincpu", 0 ) // Support for 2M or 4M ROMs, jumper pad made for 2M
+	ROM_LOAD16_BYTE( "2", 0x000000, 0x040000, CRC(82eae7bf) SHA1(a76743f8134f1614ec7fed76f33c5ee8dfe8ab2c) ) // Unico style label, simply labeled 2
+	ROM_LOAD16_BYTE( "3", 0x000001, 0x040000, CRC(39093929) SHA1(2e13690ee4994cc5225a96ee47cfcb84cf63041f) ) // Unico style label, simply labeled 3
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
-	ROM_LOAD( "goori04ol.16m", 0x000000, 0x200000, CRC(f26451b9) SHA1(c6818a44115d3efed2566442295dc0b253057602) )
-	ROM_LOAD( "goori05oh.16m", 0x200000, 0x200000, CRC(058ceaec) SHA1(8639d41685a6f3fb2d81b9aaf3c160666de8155d) )
+	ROM_LOAD( "mx29f1610ml_obj_16m_l", 0x000000, 0x200000, CRC(f26451b9) SHA1(c6818a44115d3efed2566442295dc0b253057602) ) // MX 29F1610ML - PCB silkscreened OBJ 16M/L
+	ROM_LOAD( "mx29f1610ml_obj_16m_h", 0x200000, 0x200000, CRC(058ceaec) SHA1(8639d41685a6f3fb2d81b9aaf3c160666de8155d) ) // MX 29F1610ML - PCB silkscreened OBJ 16M/H
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) // bgs
-	ROM_LOAD( "goori06cl.16m", 0x000000, 0x200000, CRC(8603a662) SHA1(fbe5ccb3fded60b431ffee27471158c95a8328f8) )
-	ROM_LOAD( "goori07ch.16m", 0x200000, 0x200000, CRC(4223383e) SHA1(aa17eab343dad3f6eab05a844081370e3eebcd2e) )
+	ROM_LOAD( "mx29f1610ml_scr_16m_l", 0x000000, 0x200000, CRC(8603a662) SHA1(fbe5ccb3fded60b431ffee27471158c95a8328f8) ) // MX 29F1610ML - PCB silkscreened SCR 16M/L
+	ROM_LOAD( "mx29f1610ml_scr_16m_h", 0x200000, 0x200000, CRC(4223383e) SHA1(aa17eab343dad3f6eab05a844081370e3eebcd2e) ) // MX 29F1610ML - PCB silkscreened SCR 16M/H
 
 	ROM_REGION( 0x040000, "oki", 0 )
-	ROM_LOAD( "goori01.2m", 0x000000, 0x040000, CRC(c74351b9) SHA1(397f4b6aea23e6619e099c5cc99f38bae74bc3e8) )
+	ROM_LOAD( "1", 0x000000, 0x040000, CRC(c74351b9) SHA1(397f4b6aea23e6619e099c5cc99f38bae74bc3e8) ) // Unico style label, simply labeled 1
 ROM_END
 
 GAME( 1999, goori, 0,       goori, goori, goori_state,    empty_init, ROT0, "Unico", "Goori Goori", 0 )
