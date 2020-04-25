@@ -12,13 +12,13 @@ class galaxian_sound_device : public device_t
 public:
 	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( pitch_w );
-	DECLARE_WRITE8_MEMBER( vol_w );
-	DECLARE_WRITE8_MEMBER( noise_enable_w );
-	DECLARE_WRITE8_MEMBER( background_enable_w );
-	DECLARE_WRITE8_MEMBER( fire_enable_w );
-	DECLARE_WRITE8_MEMBER( lfo_freq_w );
+	void pitch_w(uint8_t data);
+	void vol_w(offs_t offset, uint8_t data);
+	void noise_enable_w(uint8_t data);
+	void background_enable_w(offs_t offset, uint8_t data);
+	void fire_enable_w(uint8_t data);
+	void lfo_freq_w(offs_t offset, uint8_t data);
+	void sound_w(offs_t offset, uint8_t data);
 
 protected:
 	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -20,8 +20,13 @@ public:
 	// construction/destruction
 	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// callback configuration
+	auto machinex_cb() { return m_machinex_cb.bind(); }
+	auto iackx_cb() { return m_iackx_cb.bind(); }
+
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -44,6 +49,9 @@ protected:
 
 private:
 	address_space_config m_program_config;
+
+	devcb_write8 m_machinex_cb;
+	devcb_read8 m_iackx_cb;
 
 	//GPR
 	uint32_t m_R[8];

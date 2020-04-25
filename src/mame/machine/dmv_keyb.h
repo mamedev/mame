@@ -48,9 +48,9 @@ private:
 	int     m_sd_data_state;
 	int     m_sd_poll_state;
 
-	DECLARE_READ8_MEMBER( port1_r );
-	DECLARE_READ8_MEMBER( port2_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
+	uint8_t port1_r();
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
 };
 
 

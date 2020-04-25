@@ -413,7 +413,7 @@ void cloud9_state::cloud9(machine_config &config)
 	PALETTE(config, m_palette).set_entries(64);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL);
+	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
 	m_screen->set_vblank_time(0);          /* VBLANK is handled manually */
 	m_screen->set_visarea(0, 255, 0, 231);

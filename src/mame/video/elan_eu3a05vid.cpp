@@ -511,25 +511,25 @@ uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind1
 
 // Tile bases
 
-WRITE8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_lo_w)
+void elan_eu3a05vid_device::tile_gfxbase_lo_w(uint8_t data)
 {
 	//logerror("%s: tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_hi_w)
+void elan_eu3a05vid_device::tile_gfxbase_hi_w(uint8_t data)
 {
 	//logerror("%s: tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_lo_r)
+uint8_t elan_eu3a05vid_device::tile_gfxbase_lo_r()
 {
 	//logerror("%s: tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
 	return m_tile_gfxbase_lo_data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_hi_r)
+uint8_t elan_eu3a05vid_device::tile_gfxbase_hi_r()
 {
 	//logerror("%s: tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
 	return m_tile_gfxbase_hi_data;
@@ -539,25 +539,25 @@ READ8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_hi_r)
 
 // Sprite Tile bases
 
-WRITE8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_lo_w)
+void elan_eu3a05vid_device::sprite_gfxbase_lo_w(uint8_t data)
 {
 	//logerror("%s: sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_hi_w)
+void elan_eu3a05vid_device::sprite_gfxbase_hi_w(uint8_t data)
 {
 	//logerror("%s: sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_lo_r)
+uint8_t elan_eu3a05vid_device::sprite_gfxbase_lo_r()
 {
 	//logerror("%s: sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
 	return m_sprite_gfxbase_lo_data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_hi_r)
+uint8_t elan_eu3a05vid_device::sprite_gfxbase_hi_r()
 {
 	//logerror("%s: sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
 	return m_sprite_gfxbase_hi_data;
@@ -565,22 +565,22 @@ READ8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_hi_r)
 
 
 
-READ8_MEMBER(elan_eu3a05vid_device::tile_scroll_r)
+uint8_t elan_eu3a05vid_device::tile_scroll_r(offs_t offset)
 {
 	return m_tile_scroll[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::tile_scroll_w)
+void elan_eu3a05vid_device::tile_scroll_w(offs_t offset, uint8_t data)
 {
 	m_tile_scroll[offset] = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::splitpos_r)
+uint8_t elan_eu3a05vid_device::splitpos_r(offs_t offset)
 {
 	return m_splitpos[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::splitpos_w)
+void elan_eu3a05vid_device::splitpos_w(offs_t offset, uint8_t data)
 {
 	m_splitpos[offset] = data;
 }
@@ -598,12 +598,12 @@ uint16_t elan_eu3a05vid_device::get_scroll(int which)
 	return 0x0000;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r)
+uint8_t elan_eu3a05vid_device::elan_eu3a05_vidctrl_r()
 {
 	return m_vidctrl;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
+void elan_eu3a05vid_device::elan_eu3a05_vidctrl_w(uint8_t data)
 {
 	logerror("%s: elan_eu3a05_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
 	/*
@@ -629,13 +629,13 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 	m_vidctrl = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::read_unmapped)
+uint8_t elan_eu3a05vid_device::read_unmapped(offs_t offset)
 {
 	logerror("%s: elan_eu3a05vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::write_unmapped)
+void elan_eu3a05vid_device::write_unmapped(offs_t offset, uint8_t data)
 {
 	logerror("%s: elan_eu3a05vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }

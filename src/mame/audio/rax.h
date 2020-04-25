@@ -22,16 +22,8 @@ public:
 	// construction/destruction
 	acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	READ16_MEMBER( data_r );
-	WRITE16_MEMBER( data_w );
-
-	READ16_MEMBER(adsp_control_r);
-	WRITE16_MEMBER(adsp_control_w);
-	WRITE16_MEMBER(ram_bank_w);
-	WRITE16_MEMBER(rom_bank_w);
-
-	READ16_MEMBER(host_r);
-	WRITE16_MEMBER(host_w);
+	uint16_t data_r();
+	void data_w(uint16_t data);
 
 	void update_data_ram_bank();
 	void adsp_irq(int which);
@@ -88,11 +80,19 @@ private:
 
 	timer_device *m_dma_timer;
 
-	WRITE32_MEMBER(adsp_sound_tx_callback);
+	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
 	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
-	WRITE32_MEMBER(dmovlay_callback);
+	void dmovlay_callback(uint32_t data);
+
+	uint16_t adsp_control_r(offs_t offset);
+	void adsp_control_w(offs_t offset, uint16_t data);
+	void ram_bank_w(uint16_t data);
+	void rom_bank_w(uint16_t data);
+
+	uint16_t host_r();
+	void host_w(uint16_t data);
 };
 
 // device type definition

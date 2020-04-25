@@ -38,7 +38,7 @@ public:
 		write(m_data);
 	}
 
-	COPYASSIGNMOVE(wav_t, delete)
+	PCOPYASSIGNMOVE(wav_t, delete)
 
 	~wav_t()
 	{

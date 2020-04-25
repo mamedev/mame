@@ -56,8 +56,8 @@ private:
 	uint16_t m_dacval;
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 

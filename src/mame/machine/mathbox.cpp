@@ -66,7 +66,7 @@ void mathbox_device::device_reset()
 }
 
 
-WRITE8_MEMBER( mathbox_device::go_w )
+void mathbox_device::go_w(offs_t offset, uint8_t data)
 {
 	int32_t mb_temp;  /* temp 32-bit multiply results */
 	int16_t mb_q;     /* temp used in division */
@@ -286,17 +286,17 @@ WRITE8_MEMBER( mathbox_device::go_w )
 	LOG(("  result %04x\n", m_result & 0xffff));
 }
 
-READ8_MEMBER( mathbox_device::status_r )
+uint8_t mathbox_device::status_r()
 {
 	return 0x00; /* always done! */
 }
 
-READ8_MEMBER( mathbox_device::lo_r )
+uint8_t mathbox_device::lo_r()
 {
 	return m_result & 0xff;
 }
 
-READ8_MEMBER( mathbox_device::hi_r )
+uint8_t mathbox_device::hi_r()
 {
 	return (m_result >> 8) & 0xff;
 }

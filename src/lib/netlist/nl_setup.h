@@ -186,7 +186,7 @@ namespace netlist
 
 		source_netlist_t() = default;
 
-		COPYASSIGNMOVE(source_netlist_t, delete)
+		PCOPYASSIGNMOVE(source_netlist_t, delete)
 		~source_netlist_t() noexcept override = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
@@ -200,7 +200,7 @@ namespace netlist
 
 		source_data_t() = default;
 
-		COPYASSIGNMOVE(source_data_t, delete)
+		PCOPYASSIGNMOVE(source_data_t, delete)
 		~source_data_t() noexcept override = default;
 	};
 
@@ -254,24 +254,18 @@ namespace netlist
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
+
 		void register_param(const pstring &param, const pstring &value);
 
 		// FIXME: quick hack
 		void register_param_x(const pstring &param, nl_fptype value);
 
 		template <typename T>
-		typename std::enable_if<std::is_floating_point<T>::value || std::is_integral<T>::value>::type
+		typename std::enable_if<plib::is_floating_point<T>::value || plib::is_integral<T>::value>::type
 		register_param_val(const pstring &param, T value)
 		{
 			register_param_x(param, static_cast<nl_fptype>(value));
 		}
-
-#if PUSE_FLOAT128
-		void register_param(const pstring &param, __float128 value)
-		{
-			register_param_x(param, static_cast<nl_fptype>(value));
-		}
-#endif
 
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
@@ -379,7 +373,7 @@ namespace netlist
 		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept = default;
 
-		COPYASSIGNMOVE(setup_t, delete)
+		PCOPYASSIGNMOVE(setup_t, delete)
 
 		netlist_state_t &nlstate() { return m_nlstate; }
 		const netlist_state_t &nlstate() const { return m_nlstate; }

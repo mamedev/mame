@@ -42,15 +42,15 @@ public:
 
 	auto int_cb() { return m_int_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_WRITE8_MEMBER( control_w );
+	void data_w(uint8_t data);
+	void control_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( t0_r );
 	DECLARE_READ_LINE_MEMBER( t1_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p1_r();
+	uint8_t rom_r(offs_t offset);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 
@@ -87,13 +87,13 @@ public:
 
 	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
+	uint8_t status_r();
+	void data_w(uint8_t data);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( workram_r );
-	DECLARE_WRITE8_MEMBER( workram_w );
+	uint8_t workram_r(offs_t offset);
+	void workram_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( increment_t1_clock_timer_cb );
 
@@ -184,9 +184,9 @@ private:
 	void timer_w(int which, u8 offset, u8 data);
 	void env_w(int which, u8 offset, u8 data);
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 };
 

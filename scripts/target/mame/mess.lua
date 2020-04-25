@@ -2063,6 +2063,7 @@ createMESSProjects(_target, _subtarget, "cxg")
 files {
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_dominator.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_scptchess.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_sphinx40.cpp",
 }
 
@@ -3345,8 +3346,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_cp2000.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_delta1.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_exchess.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_leonardo.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_prschess.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_renaissance.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_schess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_ssystem3.cpp",

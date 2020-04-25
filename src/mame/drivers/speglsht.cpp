@@ -394,7 +394,7 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 
 	//draw st0016 gfx to temporary bitmap (indexed 16)
 	m_bitmap->fill(0);
-	m_maincpu->st0016_draw_screen(screen, *m_bitmap, cliprect);
+	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
 	for(y=cliprect.min_y; y<cliprect.max_y;y++)
@@ -462,7 +462,7 @@ ROM_END
 
 void speglsht_state::init_speglsht()
 {
-	m_maincpu->set_st0016_game_flag(3);
+	m_maincpu->set_game_flag(3);
 }
 
 

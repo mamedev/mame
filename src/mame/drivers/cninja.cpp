@@ -11,8 +11,8 @@
   Robocop 2         (c) 1991 Data East Corporation (Japanese version)
   Robocop 2         (c) 1991 Data East Corporation (World version)
   Stone Age         (Italian bootleg)
-  Mutant Fighter    (c) 1992 Data East Corporation (World version)
-  Death Brade       (c) 1992 Data East Corporation (Japanese version)
+  Mutant Fighter    (c) 1991 Data East Corporation (World version)
+  Death Brade       (c) 1991 Data East Corporation (Japanese version)
 
   Edward Randy runs on the same board as Caveman Ninja but the protection
   chip is different.  Robocop 2 also has a different protection chip but
@@ -2209,8 +2209,8 @@ GAME( 1991, robocop2u,  robocop2, robocop2,  robocop2, cninja_state, empty_init,
 GAME( 1991, robocop2ua, robocop2, robocop2,  robocop2, cninja_state, empty_init,     ROT0, "Data East Corporation", "Robocop 2 (US v0.05)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, robocop2j,  robocop2, robocop2,  robocop2, cninja_state, empty_init,     ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mutantf,    0,        mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf4,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf3,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mutantf2,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, deathbrd,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf,    0,        mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf4,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf3,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mutantf2,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, deathbrd,   mutantf,  mutantf,   mutantf,  cninja_state, init_mutantf,   ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)",    MACHINE_SUPPORTS_SAVE )

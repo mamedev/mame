@@ -187,7 +187,6 @@ private:
 	uint32_t    m_maxbank;
 	uint32_t    m_FlashCmd;
 
-	IRQ_CALLBACK_MEMBER(icallback);
 	DECLARE_READ32_MEMBER(system_input_r);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ32_MEMBER(FlashCmd_r);
@@ -206,10 +205,6 @@ private:
 	uint32_t m_PIO;
 };
 
-IRQ_CALLBACK_MEMBER(crystal_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 READ32_MEMBER(crystal_state::system_input_r)
 {
@@ -553,7 +548,7 @@ void crystal_state::crystal(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(crystal_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

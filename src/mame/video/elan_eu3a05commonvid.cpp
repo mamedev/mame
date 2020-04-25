@@ -75,12 +75,12 @@ void elan_eu3a05commonvid_device::update_pen(int pen)
 }
 
 
-READ8_MEMBER(elan_eu3a05commonvid_device::palette_r)
+uint8_t elan_eu3a05commonvid_device::palette_r(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05commonvid_device::palette_w)
+void elan_eu3a05commonvid_device::palette_w(offs_t offset, uint8_t data)
 {
 	m_palram[offset] = data;
 	update_pen(offset/2);

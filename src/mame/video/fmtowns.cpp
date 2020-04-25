@@ -670,7 +670,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 //          if(towns_tvram_enable == 0)
 //              return towns_sprram[offset];
 //          else
-				return m_towns_txtvram[offset];
+			return m_towns_txtvram[offset];
 		}
 		else
 			return RAM[offset + 0xc8000];
@@ -688,7 +688,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 //          if(towns_tvram_enable == 0)
 //              return m_towns_sprram[offset];
 //          else
-				return m_towns_txtvram[offset];
+			return m_towns_txtvram[offset];
 		}
 		else
 			return RAM[offset + 0xca000];

@@ -74925,10 +74925,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
-				<rom name="garou densetsu special (unl).chr" size="262144" crc="0fcb3727" sha1="ce84a9666542b14483b23d66ce57994901a8803a" offset="00000" status="baddump" />
+				<rom name="garou densetsu special (unl)[a2].chr" size="262144" crc="0fcb3727" sha1="ce84a9666542b14483b23d66ce57994901a8803a" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="garou densetsu special (unl).prg" size="262144" crc="08fe3b15" sha1="524a29f11851a379443ffcc5bb41e40c0211e01c" offset="00000" status="baddump" />
+				<rom name="garou densetsu special (unl)[a2].prg" size="262144" crc="08fe3b15" sha1="524a29f11851a379443ffcc5bb41e40c0211e01c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74957,7 +74957,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="kof96" />
 			<feature name="pcb" value="UNL-KOF96" />
 			<dataarea name="chr" size="262144">
-				<rom name="garou densetsu special (unl).chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
+				<rom name="garou densetsu special (unl)[a1].chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="garou densetsu special (unl)[a1].prg" size="131072" crc="5618e180" sha1="64f5f87a733f44c29da9f8a2ffc794b11f664930" offset="00000" status="baddump" />

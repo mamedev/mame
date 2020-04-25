@@ -101,7 +101,7 @@ namespace solver
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k].template getV<FT>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 
 		do {
 			resched = false;

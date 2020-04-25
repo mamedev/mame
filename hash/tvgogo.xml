@@ -5,21 +5,26 @@ license:CC0
 
     Known cartridges
 
-Dumped|Name       |Notes
-______|___________|______
-  Y   |4 in 1     |No controller
-  Y   |Whac-A-Mole|Hammer-shaped IR motion controller
-  Y   |Tennis     |Racquet-shaped IR motion controller
-      |Paintball  |Gun controller
-      |Skateboard |Skateboard-shaped motion controller
-  -   |Basketball |Ball-shaped motion controller
-  Y   |Dodgeball  |Motion controller
-  -   |Baseball   |Baseball Bat shaped motion controller
+Dumped | Dumped | Name       |Notes
+_(EU)__|__(US)__|____________|_____________________________________
+  Y*   |   Y    | 4 in 1     |No controller
+  Y    |   -    | Whac-A-Mole|Hammer-shaped IR motion controller
+  Y    |        | Tennis     |Racquet-shaped IR motion controller
+       |        | Paintball  |Gun controller
+       |        | Skateboard |Skateboard-shaped motion controller
+  -    |        | Basketball |Ball-shaped motion controller
+       |   Y    | Dodgeball  |Motion controller
+       |   -    | Baseball   |Baseball Bat shaped motion controller
 
 
-	The US carts do not appear to have a language selection screen
+    The US carts do not appear to have a language selection screen
   while the EU ones do.
-  
+
+  * language selection automatcially moves to 'French' on startup
+    is this an emulation issue, or maybe a French cartridge?
+
+  Were all carts released in all regions?
+
 -->
 
 <softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">
@@ -34,7 +39,18 @@ ______|___________|______
 		</part>
 	</software>
 
-	<software name="tennis" supported="no">
+  <software name="4in1u" cloneof="4in1" supported="no">
+	<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (US)</description>
+	<year>2005</year>
+	<publisher>Toyquest</publisher>
+	<part name="cart" interface="tvgogo_cart">
+	  <dataarea name="rom" size="0x400000">
+		<rom name="tvgogo4in1_m5m29gb320_001c0021.bin" size="0x400000" crc="2bbcbeff" sha1="1e58c05c1efa344622962476d465c1540d964d14"/>
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="tennis" supported="no">
 		<description>Tennis (EU)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
@@ -56,16 +72,15 @@ ______|___________|______
 		</part>
 	</software>
 
-  <software name="dodgebal" supported="no">
-    <description>Dodgeball (US)</description>
-    <year>2005</year>
-    <publisher>Toyquest</publisher>
-    <part name="cart" interface="tvgogo_cart">
-      <dataarea name="rom" size="0x400000">
-        <rom name="tvgogododgeball_m5m29gt320_001c0020.bin" size="0x400000" crc="785f4305" sha1="0c96d6330acd2771adb4dbdcb6b9ccaa73ffc513"/>
-      </dataarea>
-    </part>
+  <software name="dodgebalu" supported="no">
+	<description>Dodgeball (US)</description>
+	<year>2005</year>
+	<publisher>Toyquest</publisher>
+	<part name="cart" interface="tvgogo_cart">
+	  <dataarea name="rom" size="0x400000">
+		<rom name="tvgogododgeball_m5m29gt320_001c0020.bin" size="0x400000" crc="785f4305" sha1="0c96d6330acd2771adb4dbdcb6b9ccaa73ffc513"/>
+	  </dataarea>
+	</part>
   </software>
-
 
 </softwarelist>

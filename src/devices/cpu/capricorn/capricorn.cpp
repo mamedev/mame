@@ -143,7 +143,8 @@ capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const 
 	: cpu_device(mconfig, HP_CAPRICORN, tag, owner, clock),
 	m_program_config("program" , ENDIANNESS_LITTLE , 8 , 16),
 	m_opcode_func(*this),
-	m_lma_out(*this)
+	m_lma_out(*this),
+	m_intack_in(*this)
 {
 }
 
@@ -184,6 +185,7 @@ void capricorn_cpu_device::device_start()
 
 	m_opcode_func.resolve_safe();
 	m_lma_out.resolve_safe();
+	m_intack_in.resolve_safe(0);
 }
 
 void capricorn_cpu_device::device_reset()
@@ -1534,8 +1536,9 @@ void capricorn_cpu_device::take_interrupt()
 	// Int. ack sequence takes 9 cycles
 	// Microcode FSM runs through this state sequence (see patent):
 	// 31-15-26-13-23-22-30-16-20
+	standard_irq_callback(0);
 	m_icount -= 9;
 	push_pc();
-	uint8_t vector = (uint8_t)standard_irq_callback(0);
+	uint8_t vector = m_intack_in();
 	vector_to_pc(vector);
 }

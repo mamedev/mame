@@ -49,7 +49,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 
 
 z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 2)
+	: z8002_device(mconfig, Z8001, tag, owner, clock, 23, 2)
 {
 }
 
@@ -492,7 +492,7 @@ void z8002_device::clear_internal_state()
 
 void z8002_device::register_debug_state()
 {
-	state_add( Z8000_PC,      "PC",      m_pc      ).formatstr("%08X");
+	state_add( Z8000_PC,      "PC",      m_pc      ).mask(m_program->addrmask());
 	state_add( Z8000_NSPOFF,  "NSPOFF",  m_nspoff  ).formatstr("%04X");
 	state_add( Z8000_NSPSEG,  "NSPSEG",  m_nspseg  ).formatstr("%04X");
 	state_add( Z8000_FCW,     "FCW",     m_fcw     ).formatstr("%04X");

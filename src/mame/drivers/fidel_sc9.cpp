@@ -344,7 +344,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE    INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, fscc9,   0,       0, sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, fscc9ps, fscc9,   0, playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,   0,       0, sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
+CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, fscc9ps, fscc9,   0, playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here

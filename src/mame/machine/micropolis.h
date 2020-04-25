@@ -41,14 +41,8 @@ public:
 
 	void set_drive(uint8_t drive); // set current drive (0-3)
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( data_r );
-
-	DECLARE_WRITE8_MEMBER( command_w );
-	DECLARE_WRITE8_MEMBER( data_w );
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -85,6 +79,12 @@ private:
 
 	void read_sector();
 	void write_sector();
+
+	uint8_t status_r(offs_t offset);
+	uint8_t data_r();
+
+	void command_w(uint8_t data);
+	void data_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(MICROPOLIS, micropolis_device)

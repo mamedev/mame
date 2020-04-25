@@ -94,7 +94,7 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
     Read a tape image
 */
 
-READ8_MEMBER(apexc_tape_reader_image_device::read)
+uint8_t apexc_tape_reader_image_device::read()
 {
 	uint8_t reply;
 	if (exists() && (fread(&reply, 1) == 1))

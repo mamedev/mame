@@ -16,14 +16,15 @@ namespace plib {
 	// pdynlib: dynamic loading of libraries  ...
 	// ----------------------------------------------------------------------------------------
 
-	class dynlib_base : public nocopyassignmove
+	class dynlib_base
 	{
 	public:
 		explicit dynlib_base() : m_is_loaded(false) { }
 
 		virtual ~dynlib_base() = default;
 
-		COPYASSIGNMOVE(dynlib_base, delete)
+		PCOPYASSIGN(dynlib_base, delete)
+		PMOVEASSIGN(dynlib_base, default)
 
 		bool isLoaded() const { return m_is_loaded; }
 
@@ -45,6 +46,9 @@ namespace plib {
 		dynlib(const pstring &path, const pstring &libname);
 
 		~dynlib() override;
+
+		PCOPYASSIGN(dynlib, delete)
+		PMOVEASSIGN(dynlib, default)
 
 	protected:
 		void *getsym_p(const pstring &name) const noexcept override;

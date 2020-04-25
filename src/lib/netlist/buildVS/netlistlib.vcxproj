@@ -167,6 +167,7 @@
     <ClCompile Include="..\devices\nld_tristate.cpp" />
     <ClCompile Include="..\devices\nlid_proxy.cpp" />
     <ClCompile Include="..\devices\nlid_truthtable.cpp" />
+    <ClCompile Include="..\generated\static_solvers.cpp" />
     <ClCompile Include="..\macro\nlm_base.cpp" />
     <ClCompile Include="..\macro\nlm_cd4xxx.cpp" />
     <ClCompile Include="..\macro\nlm_opamp.cpp" />

@@ -476,7 +476,7 @@ void namco58xx_device::customio_run()
 
 
 
-READ8_MEMBER( namcoio_device::read )
+uint8_t namcoio_device::read(offs_t offset)
 {
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
@@ -486,7 +486,7 @@ READ8_MEMBER( namcoio_device::read )
 	return 0xf0 | m_ram[offset];
 }
 
-WRITE8_MEMBER( namcoio_device::write )
+void namcoio_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x3f;
 	data &= 0x0f;   // RAM is 4-bit wide

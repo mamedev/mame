@@ -177,6 +177,7 @@ hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device
 	, m_pa_changed_func(*this)
 	, m_opcode_func(*this)
 	, m_stm_func(*this)
+	, m_int_func(*this)
 	, m_addr_mask((1U << addrwidth) - 1)
 	, m_relative_mode(true)
 	, m_r_cycles(DEF_MEM_R_CYCLES)
@@ -245,6 +246,7 @@ void hp_hybrid_cpu_device::device_start()
 	m_pa_changed_func.resolve_safe();
 	m_opcode_func.resolve_safe();
 	m_stm_func.resolve();
+	m_int_func.resolve_safe(0xff);
 }
 
 void hp_hybrid_cpu_device::device_reset()
@@ -1322,8 +1324,10 @@ void hp_hybrid_cpu_device::check_for_interrupts()
 		return;
 	}
 
-	// Get interrupt vector in low byte
-	uint8_t vector = uint8_t(standard_irq_callback(irqline));
+	standard_irq_callback(irqline);
+
+	// Get interrupt vector in low byte (level is available on PA3)
+	uint8_t vector = m_int_func(BIT(m_flags , HPHYBRID_IRH_BIT) ? 1 : 0);
 	uint8_t new_PA;
 
 	// Get highest numbered 1

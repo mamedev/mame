@@ -230,19 +230,19 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (offset >= 0x18000 && offset <= 0x18003)
 	{
-		data = m_zx8302->rtc_r(space, offset & 0x03);
+		data = m_zx8302->rtc_r(offset & 0x03);
 	}
 	if (offset == 0x18020)
 	{
-		data = m_zx8302->status_r(space, 0);
+		data = m_zx8302->status_r();
 	}
 	if (offset == 0x18021)
 	{
-		data = m_zx8302->irq_status_r(space, 0);
+		data = m_zx8302->irq_status_r();
 	}
 	if (offset >= 0x18022 && offset <= 0x18023)
 	{
-		data = m_zx8302->mdv_track_r(space, offset & 0x01);
+		data = m_zx8302->mdv_track_r();
 	}
 	if (offset >= 0x20000 && offset < 0x40000)
 	{
@@ -277,27 +277,27 @@ WRITE8_MEMBER( ql_state::write )
 {
 	if (offset >= 0x18000 && offset <= 0x18001)
 	{
-		m_zx8302->rtc_w(space, offset & 0x01, data);
+		m_zx8302->rtc_w(data);
 	}
 	if (offset == 0x18002)
 	{
-		m_zx8302->control_w(space, 0, data);
+		m_zx8302->control_w(data);
 	}
 	if (offset == 0x18003)
 	{
-		m_zx8302->ipc_command_w(space, 0, data);
+		m_zx8302->ipc_command_w(data);
 	}
 	if (offset == 0x18020)
 	{
-		m_zx8302->mdv_control_w(space, 0, data);
+		m_zx8302->mdv_control_w(data);
 	}
 	if (offset == 0x18021)
 	{
-		m_zx8302->irq_acknowledge_w(space, 0, data);
+		m_zx8302->irq_acknowledge_w(data);
 	}
 	if (offset == 0x18022)
 	{
-		m_zx8302->data_w(space, 0, data);
+		m_zx8302->data_w(data);
 	}
 	if (offset == 0x18063)
 	{

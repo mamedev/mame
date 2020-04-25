@@ -705,7 +705,7 @@ license:CC0
 		<info name="release" value="19981223" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king of fighters '98, the - the slugfest (1998)(snk)(jp)[king of fighters '98, the - dream match never ends][ngcd-2420 mt a04, ngcd-2421]" sha1="a9347d7ca911be575fc1d4da01b9376f05057181"/>
+				<disk name="king of fighters '98, the - the slugfest (1998)(snk)(jp)[king of fighters '98, the - dream match never ends]" sha1="a9347d7ca911be575fc1d4da01b9376f05057181"/>
 			</diskarea>
 		</part>
 	</software>

@@ -177,6 +177,8 @@ files {
 	MAME_DIR .. "src/emu/profiler.h",
 	MAME_DIR .. "src/emu/output.cpp",
 	MAME_DIR .. "src/emu/output.h",
+	MAME_DIR .. "src/emu/recording.cpp",
+	MAME_DIR .. "src/emu/recording.h",
 	MAME_DIR .. "src/emu/render.cpp",
 	MAME_DIR .. "src/emu/render.h",
 	MAME_DIR .. "src/emu/rendfont.cpp",

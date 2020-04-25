@@ -374,7 +374,7 @@ void sente6vb_device::update_counter_0_timer()
  *
  *************************************/
 
-READ8_MEMBER(sente6vb_device::counter_state_r)
+uint8_t sente6vb_device::counter_state_r()
 {
 	// bit D0 is the inverse of the flip-flop state
 	int result = !m_counter_0_ff;
@@ -386,7 +386,7 @@ READ8_MEMBER(sente6vb_device::counter_state_r)
 }
 
 
-WRITE8_MEMBER(sente6vb_device::counter_control_w)
+void sente6vb_device::counter_control_w(uint8_t data)
 {
 	uint8_t diff_counter_control = m_counter_control ^ data;
 
@@ -439,7 +439,7 @@ WRITE8_MEMBER(sente6vb_device::counter_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(sente6vb_device::chip_select_w)
+void sente6vb_device::chip_select_w(uint8_t data)
 {
 	static constexpr uint8_t register_map[8] =
 	{
@@ -502,7 +502,7 @@ WRITE8_MEMBER(sente6vb_device::chip_select_w)
 
 
 
-WRITE8_MEMBER(sente6vb_device::dac_data_w)
+void sente6vb_device::dac_data_w(offs_t offset, uint8_t data)
 {
 	// LSB or MSB?
 	if (offset & 1)
@@ -514,13 +514,13 @@ WRITE8_MEMBER(sente6vb_device::dac_data_w)
 	if ((m_chip_select & 0x3f) != 0x3f)
 	{
 		uint8_t temp = m_chip_select;
-		chip_select_w(space, 0, 0x3f);
-		chip_select_w(space, 0, temp);
+		chip_select_w(0x3f);
+		chip_select_w(temp);
 	}
 }
 
 
-WRITE8_MEMBER(sente6vb_device::register_addr_w)
+void sente6vb_device::register_addr_w(uint8_t data)
 {
 	m_dac_register = data & 7;
 }

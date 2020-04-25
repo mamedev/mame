@@ -118,6 +118,7 @@ namespace netlist
 	// nld_solver.cpp
 
 	PERRMSGV(MI_NO_SPECIFIC_SOLVER,                 1, "No specific solver found for netlist of size {1}")
+	PERRMSGV(MW_SOLVER_METHOD_NOT_SUPPORTED,        2, "Solver method {1} not supported. Falling back to {2}")
 
 	// nld_mm5837.cpp
 

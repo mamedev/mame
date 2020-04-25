@@ -26,16 +26,10 @@ public:
 	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( lower_write );
-	DECLARE_WRITE8_MEMBER( upper_write );
+	void lower_write(offs_t offset, uint8_t data);
+	void upper_write(offs_t offset, uint8_t data);
 //  virtual void lower_map(address_map &map);
 //  virtual void upper_map(address_map &map);
-	DECLARE_WRITE8_MEMBER( frequency_w );
-	DECLARE_WRITE8_MEMBER( repeat_w );
-	DECLARE_WRITE8_MEMBER( unk_w );
-	DECLARE_WRITE8_MEMBER( volume_w );
-	DECLARE_WRITE8_MEMBER( start_address_w );
-	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 
 	void regs_map(address_map &map);
 protected:
@@ -83,6 +77,13 @@ private:
 
 	const uint8_t *m_sample_rom;
 	const uint8_t *m_volume_rom;
+
+	void frequency_w(offs_t offset, uint8_t data);
+	void repeat_w(offs_t offset, uint8_t data);
+	void unk_w(offs_t offset, uint8_t data);
+	void volume_w(offs_t offset, uint8_t data);
+	void start_address_w(offs_t offset, uint8_t data);
+	void sample_trigger_w(offs_t offset, uint8_t data);
 };
 
 

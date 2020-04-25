@@ -29,13 +29,6 @@ public:
 	required_memory_bank m_fixedbank;
 	required_memory_region m_rom;
 
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
-
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
 	uint8_t ctrl_r();
@@ -62,6 +55,13 @@ private:
 	devcb_write_line m_reply_cb;
 
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+
+	void bg_speech_clock_w(uint8_t data);
+	void bg_speech_digit_w(uint8_t data);
+	void rombank_w(uint8_t data);
+	uint8_t latch_r();
+	void latch_w(uint8_t data);
+	void volume_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)

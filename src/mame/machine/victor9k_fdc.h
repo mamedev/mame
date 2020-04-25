@@ -35,12 +35,12 @@ public:
 	auto syn_wr_callback() { return m_syn_cb.bind(); }
 	auto lbrdy_wr_callback() { return m_lbrdy_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(offset); }
-	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(offset, data); }
-	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(offset); }
-	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(offset, data); }
-	DECLARE_READ8_MEMBER( cs7_r );
-	DECLARE_WRITE8_MEMBER( cs7_w );
+	uint8_t cs5_r(offs_t offset) { return m_via4->read(offset); }
+	void cs5_w(offs_t offset, uint8_t data) { m_via4->write(offset, data); }
+	uint8_t cs6_r(offs_t offset) { return m_via6->read(offset); }
+	void cs6_w(offs_t offset, uint8_t data) { m_via6->write(offset, data); }
+	uint8_t cs7_r(offs_t offset);
+	void cs7_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -196,29 +196,29 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( floppy_p1_r );
-	DECLARE_WRITE8_MEMBER( floppy_p1_w );
-	DECLARE_READ8_MEMBER( floppy_p2_r );
-	DECLARE_WRITE8_MEMBER( floppy_p2_w );
+	uint8_t floppy_p1_r();
+	void floppy_p1_w(uint8_t data);
+	uint8_t floppy_p2_r();
+	void floppy_p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( tach0_r );
 	DECLARE_READ_LINE_MEMBER( tach1_r );
-	DECLARE_WRITE8_MEMBER( da_w );
+	void da_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( via4_pa_r );
-	DECLARE_WRITE8_MEMBER( via4_pa_w );
-	DECLARE_READ8_MEMBER( via4_pb_r );
-	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	uint8_t via4_pa_r();
+	void via4_pa_w(uint8_t data);
+	uint8_t via4_pb_r();
+	void via4_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
-	DECLARE_READ8_MEMBER( via5_pa_r );
-	DECLARE_WRITE8_MEMBER( via5_pb_w );
+	uint8_t via5_pa_r();
+	void via5_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
 
-	DECLARE_READ8_MEMBER( via6_pa_r );
-	DECLARE_READ8_MEMBER( via6_pb_r );
-	DECLARE_WRITE8_MEMBER( via6_pa_w );
-	DECLARE_WRITE8_MEMBER( via6_pb_w );
+	uint8_t via6_pa_r();
+	uint8_t via6_pb_r();
+	void via6_pa_w(uint8_t data);
+	void via6_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( drw_w );
 	DECLARE_WRITE_LINE_MEMBER( erase_w );
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );

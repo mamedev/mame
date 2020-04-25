@@ -985,12 +985,13 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		length -= 1;
 		src_addr += 1;
 	}
-	else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	{
-		// Legacy mode for DGUN-2573 compat
-		m_ppu->set_vram_dest(0x3F00);
-		m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	}
+	//TODO (always false)
+	//else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	//{
+	//	// Legacy mode for DGUN-2573 compat
+	//	m_ppu->set_vram_dest(0x3F00);
+	//	m_ppu->set_palette_mode(PAL_MODE_VT0x);
+	//}
 
 	for (int i = 0; i < length; i++)
 	{

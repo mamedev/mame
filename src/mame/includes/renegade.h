@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "tilemap.h"
+#include "screen.h"
 
 class renegade_state : public driver_device
 {
@@ -21,6 +22,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_mcu(*this, "mcu")
 		, m_msm(*this, "msm")
+		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_soundlatch(*this, "soundlatch")
 		, m_fg_videoram(*this, "fg_videoram")
@@ -35,6 +37,7 @@ public:
 	void kuniokunb(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
 	virtual void machine_start() override;
@@ -46,6 +49,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<taito68705_mcu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -67,7 +71,8 @@ private:
 
 	DECLARE_READ8_MEMBER(mcu_reset_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);

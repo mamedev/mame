@@ -44,20 +44,20 @@ public:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	DECLARE_READ8_MEMBER( ddr_r );
-	DECLARE_WRITE8_MEMBER( ddr_w );
-	DECLARE_READ8_MEMBER( ports_r );
-	DECLARE_WRITE8_MEMBER( ports_w );
-	DECLARE_READ8_MEMBER( pll_r );
-	DECLARE_WRITE8_MEMBER( pll_w );
-	DECLARE_READ8_MEMBER( timer_ctrl_r );
-	DECLARE_WRITE8_MEMBER( timer_ctrl_w );
-	DECLARE_READ8_MEMBER( timer_counter_r );
-	DECLARE_WRITE8_MEMBER( timer_counter_w );
-	DECLARE_READ8_MEMBER( onesec_r );
-	DECLARE_WRITE8_MEMBER( onesec_w );
-	DECLARE_READ8_MEMBER( pram_r );
-	DECLARE_WRITE8_MEMBER( pram_w );
+	uint8_t ddr_r(offs_t offset);
+	void ddr_w(offs_t offset, uint8_t data);
+	uint8_t ports_r(offs_t offset);
+	void ports_w(offs_t offset, uint8_t data);
+	uint8_t pll_r();
+	void pll_w(uint8_t data);
+	uint8_t timer_ctrl_r();
+	void timer_ctrl_w(uint8_t data);
+	uint8_t timer_counter_r();
+	void timer_counter_w(uint8_t data);
+	uint8_t onesec_r();
+	void onesec_w(uint8_t data);
+	uint8_t pram_r(offs_t offset);
+	void pram_w(offs_t offset, uint8_t data);
 
 	// interface routines
 	uint8_t get_xcvr_session() { return xcvr_session; }
@@ -107,7 +107,7 @@ private:
 	uint8_t pram[0x100], disk_pram[0x100];
 	bool pram_loaded;
 
-	void send_port(address_space &space, uint8_t offset, uint8_t data);
+	void send_port(uint8_t offset, uint8_t data);
 };
 
 // device type definition

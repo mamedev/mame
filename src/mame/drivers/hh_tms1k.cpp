@@ -115,7 +115,7 @@
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable, pinout seems to match TMS1670)
+ *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -5333,8 +5333,8 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 226185, "screen", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
+	ROM_REGION( 227224, "screen", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 227224, CRC(f220711a) SHA1(729ad85fb9d9853a77c45b5ed072f10ede7649c4) )
 ROM_END
 
 

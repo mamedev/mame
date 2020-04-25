@@ -50,12 +50,18 @@
 #include "emu.h"
 #include "namco52.h"
 
+WRITE_LINE_MEMBER( namco_52xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
+
 TIMER_CALLBACK_MEMBER( namco_52xx_device::latch_callback )
 {
 	m_latched_cmd = param;
 }
 
-READ8_MEMBER( namco_52xx_device::K_r )
+uint8_t namco_52xx_device::K_r()
 {
 	return m_latched_cmd & 0x0f;
 }
@@ -65,33 +71,33 @@ READ_LINE_MEMBER( namco_52xx_device::SI_r )
 	return m_si(0) ? 1 : 0;
 }
 
-READ8_MEMBER( namco_52xx_device::R0_r )
+uint8_t namco_52xx_device::R0_r()
 {
 	return m_romread(m_address) & 0x0f;
 }
 
-READ8_MEMBER( namco_52xx_device::R1_r )
+uint8_t namco_52xx_device::R1_r()
 {
 	return m_romread(m_address) >> 4;
 }
 
 
-WRITE8_MEMBER( namco_52xx_device::P_w )
+void namco_52xx_device::P_w(uint8_t data)
 {
 	m_discrete->write(NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R2_w )
+void namco_52xx_device::R2_w(uint8_t data)
 {
 	m_address = (m_address & 0xfff0) | ((data & 0xf) << 0);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R3_w )
+void namco_52xx_device::R3_w(uint8_t data)
 {
 	m_address = (m_address & 0xff0f) | ((data & 0xf) << 4);
 }
 
-WRITE8_MEMBER( namco_52xx_device::O_w )
+void namco_52xx_device::O_w(uint8_t data)
 {
 	if (data & 0x10)
 		m_address = (m_address & 0x0fff) | ((data & 0xf) << 12);
@@ -104,7 +110,7 @@ TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_52xx_device::write )
+void namco_52xx_device::write(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
 

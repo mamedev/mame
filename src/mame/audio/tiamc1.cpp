@@ -321,17 +321,17 @@ char tiamc1_sound_device::timer8253_get_output(struct timer8253struct *t, int ch
 
 
 
-WRITE8_MEMBER( tiamc1_sound_device::tiamc1_timer0_w )
+void tiamc1_sound_device::tiamc1_timer0_w(offs_t offset, uint8_t data)
 {
 	timer8253_wr(&m_timer0, offset, data);
 }
 
-WRITE8_MEMBER( tiamc1_sound_device::tiamc1_timer1_w )
+void tiamc1_sound_device::tiamc1_timer1_w(offs_t offset, uint8_t data)
 {
 	timer8253_wr(&m_timer1, offset, data);
 }
 
-WRITE8_MEMBER( tiamc1_sound_device::tiamc1_timer1_gate_w )
+void tiamc1_sound_device::tiamc1_timer1_gate_w(uint8_t data)
 {
 	timer8253_set_gate(&m_timer1, 0, (data & 1) ? 1 : 0);
 	timer8253_set_gate(&m_timer1, 1, (data & 2) ? 1 : 0);

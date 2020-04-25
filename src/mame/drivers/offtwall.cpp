@@ -339,7 +339,7 @@ GFXDECODE_END
 void offtwall_state::offtwall(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &offtwall_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -359,7 +359,7 @@ void offtwall_state::offtwall(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	screen.set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	screen.set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	screen.set_screen_update(FUNC(offtwall_state::screen_update_offtwall));
 	screen.set_palette("palette");
 

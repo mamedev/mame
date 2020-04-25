@@ -27,17 +27,12 @@ public:
 
 	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(busy_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ16_MEMBER(latch_r);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE16_MEMBER(status_w);
-	DECLARE_WRITE16_MEMBER(crtc_address_w);
-	DECLARE_WRITE16_MEMBER(crtc_register_w);
-	DECLARE_READ16_MEMBER(crtc_status_r);
-
 	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+
+	void data_w(uint8_t data);
+	uint8_t busy_r();
+	void ctrl_w(uint8_t data);
+	uint16_t status_r();
 
 	void decodmd3_map(address_map &map);
 protected:
@@ -64,6 +59,12 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	uint16_t latch_r();
+	void status_w(uint16_t data);
+	void crtc_address_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crtc_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t crtc_status_r(offs_t offset, uint16_t mem_mask = ~0);
 };
 
 DECLARE_DEVICE_TYPE(DECODMD3, decodmd_type3_device)

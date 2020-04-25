@@ -42951,17 +42951,17 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="release" value="198807xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (1988)(riverhill soft)(disk 1 of 3).hdm" size="1261568" crc="ce6f573d" sha1="34d8827f0f8b427a32e11ed6d2dca27f6802e66e" offset="0" />
+				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (disk 1 of 3).hdm" size="1261568" crc="ce6f573d" sha1="34d8827f0f8b427a32e11ed6d2dca27f6802e66e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (1988)(riverhill soft)(disk 2 of 3).hdm" size="1261568" crc="f6038db6" sha1="e092d392b2ced318d9cf22c3fbda0c17d8f1cd43" offset="0" />
+				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (disk 2 of 3).hdm" size="1261568" crc="f6038db6" sha1="e092d392b2ced318d9cf22c3fbda0c17d8f1cd43" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (1988)(riverhill soft)(disk 3 of 3).hdm" size="1261568" crc="889f85f8" sha1="3a2d31df411f335c40fec23e315c16c971fda906" offset="0" />
+				<rom name="[pc98] - toudou ryunosuke tantei nikki kohaku-iro no yuigon - seiyou koppai renzoku satsujin jiken (disk 3 of 3).hdm" size="1261568" crc="889f85f8" sha1="3a2d31df411f335c40fec23e315c16c971fda906" offset="0" />
 			</dataarea>
 		</part>
 	</software>

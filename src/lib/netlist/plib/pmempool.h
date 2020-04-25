@@ -47,7 +47,7 @@ namespace plib {
 		{
 		}
 
-		COPYASSIGNMOVE(mempool, delete)
+		PCOPYASSIGNMOVE(mempool, delete)
 
 		~mempool()
 		{
@@ -63,13 +63,7 @@ namespace plib {
 				//::operator delete(b->m_data);
 			}
 		}
-#if 0
-		static inline mempool &instance()
-		{
-			static mempool s_mempool;
-			return s_mempool;
-		}
-#endif
+
 		void *allocate(size_t align, size_t size)
 		{
 			block *b = nullptr;
@@ -216,7 +210,7 @@ namespace plib {
 		{
 			info(block *b, size_type p) : m_block(b), m_pos(p) { }
 			~info() = default;
-			COPYASSIGNMOVE(info, default)
+			PCOPYASSIGNMOVE(info, default)
 
 			block * m_block;
 			size_type m_pos;

@@ -15,24 +15,21 @@ namespace analog
 	// nld_twoterm
 	// ----------------------------------------------------------------------------------------
 
-	void NETLIB_NAME(twoterm)::solve_now()
+	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
 	{
-		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
-			m_P.solve_now();
-		else if (m_N.has_net() && !m_N.net().isRailNet())
-			m_N.solve_now();
+		auto *solv(m_P.solver());
+		if (solv)
+			return solv;
+		return m_N.solver();
 	}
 
-	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay) noexcept
-	{
-		// we only need to call the non-rail terminal
-		if (m_P.has_net() && !m_P.net().isRailNet())
-			m_P.schedule_solve_after(delay);
-		else if (m_N.has_net() && !m_N.net().isRailNet())
-			m_N.schedule_solve_after(delay);
-	}
 
+	void NETLIB_NAME(twoterm)::solve_now() const
+	{
+		auto *solv(solver());
+		if (solv)
+			solv->solve_now();
+	}
 
 	NETLIB_UPDATE(twoterm)
 	{
@@ -66,19 +63,22 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT)
 	{
-		// FIXME: We only need to update the net first if this is a time stepping net
-		m_R1.solve_now();
-		m_R2.solve_now();
-
 		nl_fptype v = m_Dial();
 		if (m_DialIsLog())
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 		if (m_Reverse())
 			v = nlconst::one() - v;
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-		m_R2.set_R(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
-		m_R1.solve_later();
-		m_R2.solve_later();
+
+		nl_fptype r1(std::max(m_R() * v, exec().gmin()));
+		nl_fptype r2(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
+
+		if (m_R1.solver() == m_R2.solver())
+			m_R1.change_state([this, &r1, &r2]() { m_R1.set_R(r1); m_R2.set_R(r2); });
+		else
+		{
+			m_R1.change_state([this, &r1]() { m_R1.set_R(r1); });
+			m_R2.change_state([this, &r2]() { m_R2.set_R(r2); });
+		}
 
 	}
 
@@ -100,17 +100,17 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT2)
 	{
-		// FIXME: We only need to update the net first if this is a time stepping net
-		m_R1.solve_now();
-
 		nl_fptype v = m_Dial();
 
 		if (m_DialIsLog())
 			v = (plib::exp(v) - nlconst::one()) / (plib::exp(nlconst::one()) - nlconst::one());
 		if (m_Reverse())
 			v = nlconst::one() - v;
-		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
-		m_R1.solve_later();
+
+		m_R1.change_state([this, &v]()
+		{
+			m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+		});
 	}
 
 	// ----------------------------------------------------------------------------------------

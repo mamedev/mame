@@ -18,7 +18,7 @@
 
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_MEMBER(pce_common_state::pce_joystick_w)
+void pce_common_state::pce_joystick_w(uint8_t data)
 {
 	/* bump counter on a low-to-high transition of bit 1 */
 	if((!m_joystick_data_select) && (data & JOY_CLOCK))
@@ -41,7 +41,7 @@ uint8_t pce_common_state::joy_read()
 	return ioport("JOY")->read();
 }
 
-READ8_MEMBER(pce_common_state::pce_joystick_r)
+uint8_t pce_common_state::pce_joystick_r()
 {
 	uint8_t ret;
 	int data = joy_read();

@@ -483,6 +483,9 @@ ROM_START(mpatrol)
 
 	ROM_REGION(0x0100, "spr_clut", 0)
 	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b))
+
+	ROM_REGION(0x0200, "unkprom", 0) // PROM is on bottom board of 4-board stack
+	ROM_LOAD("mp_7621-5.7h", 0x0000, 0x0200, CRC(cf1fd9d0) SHA1(f9575bc59bf21dfecd10133264835e02890562f8))
 ROM_END
 
 ROM_START(mpatrolw)
@@ -525,6 +528,9 @@ ROM_START(mpatrolw)
 
 	ROM_REGION(0x0100, "spr_clut", 0)
 	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b))
+
+	ROM_REGION(0x0200, "unkprom", 0) // PROM is on bottom board of 4-board stack
+	ROM_LOAD("mp_7621-5.7h", 0x0000, 0x0200, CRC(cf1fd9d0) SHA1(f9575bc59bf21dfecd10133264835e02890562f8))
 ROM_END
 
 ROM_START(mranger)

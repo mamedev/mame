@@ -83,7 +83,7 @@ imds2ioc_device::imds2ioc_device(const machine_config &mconfig, const char *tag,
 }
 
 
-WRITE8_MEMBER(imds2ioc_device::miscout_w)
+void imds2ioc_device::miscout_w(uint8_t data)
 {
 	m_miscout = data;
 	update_beeper();
@@ -91,7 +91,7 @@ WRITE8_MEMBER(imds2ioc_device::miscout_w)
 	m_master_intr_cb(BIT(m_miscout, 1));
 }
 
-READ8_MEMBER(imds2ioc_device::miscin_r)
+uint8_t imds2ioc_device::miscin_r()
 {
 	uint8_t res = m_ioc_options->read();
 	return res | ((m_beeper_timer == 0) << 2);
@@ -103,19 +103,19 @@ WRITE_LINE_MEMBER(imds2ioc_device::beep_timer_w)
 	update_beeper();
 }
 
-WRITE8_MEMBER(imds2ioc_device::start_timer_w)
+void imds2ioc_device::start_timer_w(uint8_t data)
 {
 	// Trigger timer 2 of ioctimer
 	m_ioctimer->write_gate2(0);
 	m_ioctimer->write_gate2(1);
 }
 
-READ8_MEMBER(imds2ioc_device::kb_read)
+uint8_t imds2ioc_device::kb_read(offs_t offset)
 {
 	return m_kbcpu->upi41_master_r((offset & 2) >> 1);
 }
 
-READ8_MEMBER(imds2ioc_device::kb_port_p2_r)
+uint8_t imds2ioc_device::kb_port_p2_r()
 {
 	if ((m_kb_p1 & 3) == 0) {
 		// Row selected
@@ -175,7 +175,7 @@ READ8_MEMBER(imds2ioc_device::kb_port_p2_r)
 	}
 }
 
-WRITE8_MEMBER(imds2ioc_device::kb_port_p1_w)
+void imds2ioc_device::kb_port_p1_w(uint8_t data)
 {
 	m_kb_p1 = data;
 }
@@ -194,37 +194,37 @@ READ_LINE_MEMBER(imds2ioc_device::kb_port_t1_r)
 	return 0;
 }
 
-WRITE8_MEMBER(imds2ioc_device::ioc_dbbout_w)
+void imds2ioc_device::ioc_dbbout_w(offs_t offset, uint8_t data)
 {
 	m_ioc_obf = ~data;
 	// Set/reset OBF flag (b0)
 	m_ipc_ioc_status = ((offset & 1) == 0) | (m_ipc_ioc_status & ~0x01);
 }
 
-WRITE8_MEMBER(imds2ioc_device::ioc_f0_w)
+void imds2ioc_device::ioc_f0_w(offs_t offset, uint8_t data)
 {
 	// Set/reset F0 flag (b2)
 	m_ipc_ioc_status = ((offset & 1) << 2) | (m_ipc_ioc_status & ~0x04);
 }
 
-WRITE8_MEMBER(imds2ioc_device::ioc_set_f1_w)
+void imds2ioc_device::ioc_set_f1_w(uint8_t data)
 {
 	// Set F1 flag (b3)
 	m_ipc_ioc_status |= 0x08;
 }
 
-WRITE8_MEMBER(imds2ioc_device::ioc_reset_f1_w)
+void imds2ioc_device::ioc_reset_f1_w(uint8_t data)
 {
 	// Reset F1 flag (b3)
 	m_ipc_ioc_status &= ~0x08;
 }
 
-READ8_MEMBER(imds2ioc_device::ioc_status_r)
+uint8_t imds2ioc_device::ioc_status_r()
 {
 	return ~m_ipc_ioc_status;
 }
 
-READ8_MEMBER(imds2ioc_device::ioc_dbbin_r)
+uint8_t imds2ioc_device::ioc_dbbin_r()
 {
 	// Reset IBF flag (b1)
 	if (!machine().side_effects_disabled())
@@ -232,7 +232,7 @@ READ8_MEMBER(imds2ioc_device::ioc_dbbin_r)
 	return ~m_ioc_ibf;
 }
 
-READ8_MEMBER(imds2ioc_device::dbb_master_r)
+uint8_t imds2ioc_device::dbb_master_r(offs_t offset)
 {
 	// Read status register
 	if (BIT(offset, 0))
@@ -248,7 +248,7 @@ READ8_MEMBER(imds2ioc_device::dbb_master_r)
 	}
 }
 
-WRITE8_MEMBER(imds2ioc_device::dbb_master_w)
+void imds2ioc_device::dbb_master_w(offs_t offset, uint8_t data)
 {
 	// Set IBF flag (b1)
 	m_ipc_ioc_status |= 0x02;
@@ -275,19 +275,19 @@ WRITE_LINE_MEMBER(imds2ioc_device::hrq_w)
 	m_iocdma->hlda_w(state);
 }
 
-READ8_MEMBER(imds2ioc_device::ioc_mem_r)
+uint8_t imds2ioc_device::ioc_mem_r(offs_t offset)
 {
 	address_space& prog_space = m_ioccpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(imds2ioc_device::ioc_mem_w)
+void imds2ioc_device::ioc_mem_w(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_ioccpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(imds2ioc_device::pio_port_p1_r)
+uint8_t imds2ioc_device::pio_port_p1_r()
 {
 	// If STATUS ENABLE/ == 0 return inverted device status byte, else return 0xff
 	// STATUS ENABLE/ == 0 when P23-P20 == 12 & P24 == 0 & P25 = 1 & P26 = 1
@@ -298,18 +298,18 @@ READ8_MEMBER(imds2ioc_device::pio_port_p1_r)
 }
 }
 
-WRITE8_MEMBER(imds2ioc_device::pio_port_p1_w)
+void imds2ioc_device::pio_port_p1_w(uint8_t data)
 {
 	m_pio_port1 = data;
 	update_printer();
 }
 
-READ8_MEMBER(imds2ioc_device::pio_port_p2_r)
+uint8_t imds2ioc_device::pio_port_p2_r()
 {
 	return m_pio_port2;
 }
 
-WRITE8_MEMBER(imds2ioc_device::pio_port_p2_w)
+void imds2ioc_device::pio_port_p2_w(uint8_t data)
 {
 	m_pio_port2 = data;
 	update_printer();
@@ -397,12 +397,12 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 	}
 }
 
-READ8_MEMBER(imds2ioc_device::pio_master_r)
+uint8_t imds2ioc_device::pio_master_r(offs_t offset)
 {
 	return m_iocpio->upi41_master_r(offset);
 }
 
-WRITE8_MEMBER(imds2ioc_device::pio_master_w)
+void imds2ioc_device::pio_master_w(offs_t offset, uint8_t data)
 {
 	m_iocpio->upi41_master_w(offset, data);
 }

@@ -235,38 +235,38 @@ void m2comm_device::device_reset()
 	m_fg = 0;
 }
 
-READ8_MEMBER(m2comm_device::zfg_r)
+uint8_t m2comm_device::zfg_r(offs_t offset)
 {
 	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 	LOG("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(m2comm_device::zfg_w)
+void m2comm_device::zfg_w(uint8_t data)
 {
 	LOG("m2comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
-READ8_MEMBER(m2comm_device::share_r)
+uint8_t m2comm_device::share_r(offs_t offset)
 {
 	uint8_t result = m_shared[offset];
 	LOG("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(m2comm_device::share_w)
+void m2comm_device::share_w(offs_t offset, uint8_t data)
 {
 	LOG("m2comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(m2comm_device::cn_r)
+uint8_t m2comm_device::cn_r()
 {
 	return m_cn | 0xfe;
 }
 
-WRITE8_MEMBER(m2comm_device::cn_w)
+void m2comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -316,7 +316,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 #endif
 }
 
-READ8_MEMBER(m2comm_device::fg_r)
+uint8_t m2comm_device::fg_r()
 {
 #ifdef M2COMM_SIMULATION
 	read_fg();
@@ -324,7 +324,7 @@ READ8_MEMBER(m2comm_device::fg_r)
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-WRITE8_MEMBER(m2comm_device::fg_w)
+void m2comm_device::fg_w(uint8_t data)
 {
 	m_fg = data & 0x01;
 }

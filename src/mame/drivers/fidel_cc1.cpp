@@ -5,8 +5,8 @@
 
 Fidelity's 1st generation chess computers:
 - *Chess Challenger
-- Chess Challenger 3
-- *Chess Challenger 10 (UCC10)
+- Chess Challenger (upgraded version) - more commonly known as CC3
+- *Chess Challenger (model UCC10) - more commonly known as CC10 ver. C
 
 * denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
 
@@ -30,13 +30,19 @@ CC1 hardware overview:
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
 - 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
 
-Chess Challenger 3 is on the same hardware, but with double ROM size, and they
-corrected the reversed chess notation. It was also offered as an upgrade to CC1.
-PCB label P179 C-3 9.77.
+Chess Challenger (upgraded version) is on the same hardware, but with double the
+ROM size, and they corrected the reversed chess notation. It was also offered as
+an upgrade to CC1. PCB label P179 C-3 9.77.
 
-Chess Challenger 10 version 'C'(model UCC10) is on (nearly) the same PCB too,
-same label as CC3, with a small daughterboard for 8KB ROM. Again, it was also
-offered as an upgrade to CC1, or CC3.
+Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
+with a small daughterboard for 8KB ROM. Again, it was also offered as an upgrade
+to CC1, or CC3.
+
+Note that although these 2 newer versions are known as "Chess Challenger 3" and
+"Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
+says "upgraded version" on the 1st page of the manual (even the newly sold ones,
+not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Fidelity
+started adding level numbers to their chesscomputer titles with CCX and CC7.
 
 ******************************************************************************/
 
@@ -258,7 +264,6 @@ ROM_START( cc1 )
 	ROM_LOAD( "d2316ac_011", 0x0000, 0x0800, BAD_DUMP CRC(e27f9816) SHA1(ad9881b3bf8341829a27e86de27805fc2ccb5f7d) ) // A4 line was broken
 ROM_END
 
-
 ROM_START( cc3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2332c_011", 0x0000, 0x1000, CRC(51cf4682) SHA1(197374c633a0bf1a9b7ea51a72dc2b89a6c9c508) )
@@ -274,5 +279,4 @@ ROM_END
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1977, cc1,  0,      0, cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-
-CONS( 1977, cc3,  0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger 3", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1977, cc3,  0,      0, cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3

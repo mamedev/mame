@@ -21,8 +21,8 @@ class saa7191_device : public device_t
 public:
 	saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	DECLARE_WRITE8_MEMBER(i2c_data_w);
-	DECLARE_READ8_MEMBER(i2c_data_r);
+	void i2c_data_w(uint8_t data);
+	uint8_t i2c_data_r();
 	DECLARE_WRITE_LINE_MEMBER(i2c_stop_w);
 
 	DECLARE_WRITE_LINE_MEMBER(iicsa_w);
@@ -42,7 +42,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(reg_w);
+	void reg_w(uint8_t data);
 
 	enum
 	{

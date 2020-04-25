@@ -8014,6 +8014,24 @@ ROM_START( galaxianrp )
 	ROM_LOAD( "6l.bpr", 0x0000, 0x0020, BAD_DUMP CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )     // Taken from the parent set
 ROM_END
 
+// PCB is a bootleg Galaxian, with ROMs 1-4 on a large daughterboard mounted on PCB stilts. The game plays just like regular Galaxian, but the PCB
+// has no on-board audio amplifier. The markings 'SGx' were all written in pencil on the ceramic body of the EPROMs. This is of European origin.
+ROM_START( galaxyx )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "sg1",    0x0000, 0x0800, CRC(d493cfd1) SHA1(a93e2aa7e179fb8adbc26f19f3319236b22f882f) )
+	ROM_LOAD( "sg2",    0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
+	ROM_LOAD( "sg3",    0x1000, 0x0800, CRC(4c7031c0) SHA1(97f7ab0cedcd8eba1c8f6f516d84d672a2108258) )
+	ROM_LOAD( "sg4",    0x1800, 0x0800, CRC(04329e33) SHA1(a85256a7fcfb84d8fdc4830171092c6061f8a979) )
+	ROM_LOAD( "sg5.7l", 0x2000, 0x0800, CRC(878de26d) SHA1(baf6a1cec80596453f8fef4d24d6985d9d859412) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "sg6.1h", 0x0000, 0x0800, CRC(39fb43a4) SHA1(4755609bd974976f04855d51e08ec0d62ab4bc07) )
+	ROM_LOAD( "sg7.1k", 0x0800, 0x0800, CRC(7e3f56a2) SHA1(a9795d8b7388f404f3b0e2c6ce15d713a4c5bafa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sgprom.6l", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( galaxrfgg )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gxrf.7f",       0x0000, 0x1000, CRC(c06eeb10) SHA1(cf1006a7ff02fe8b04a096d802fb8d8937dd913d) )
@@ -12960,6 +12978,7 @@ GAME( 1980, galaxrf,     galaxian, galaxian,   galaxrf,    galaxian_state, init_
 GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",          "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Covadonga)",            "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Covadonga Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianrp,  galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg (Valadon Automation / Rene Pierre)", "Galaxian (Rene Pierre bootleg)",                                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxyx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxy X (bootleg of Galaxian)",                                                               MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                     MACHINE_SUPPORTS_SAVE ) // or bootleg?

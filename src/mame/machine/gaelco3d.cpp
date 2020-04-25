@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER(gaelco_serial_device::irq_enable)
 	LOGMSG(("???? irq enable %d\n", state));
 }
 
-READ8_MEMBER(gaelco_serial_device::status_r)
+uint8_t gaelco_serial_device::status_r()
 {
 	uint8_t ret = 0;
 
@@ -363,7 +363,7 @@ READ8_MEMBER(gaelco_serial_device::status_r)
 	return ret;
 }
 
-WRITE8_MEMBER(gaelco_serial_device::data_w)
+void gaelco_serial_device::data_w(uint8_t data)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER(gaelco_serial_device::data_w)
 	LOGMSG(("command send %02x at %d\n", data, m_out_ptr->cnt));
 }
 
-READ8_MEMBER( gaelco_serial_device::data_r)
+uint8_t gaelco_serial_device::data_r()
 {
 	uint8_t ret;
 

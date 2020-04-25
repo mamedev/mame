@@ -26,29 +26,18 @@ tosh1000_bram_device::tosh1000_bram_device(const machine_config &mconfig, const 
 {
 }
 
-uint8_t tosh1000_bram_device::read(int offset)
+uint8_t tosh1000_bram_device::read(offs_t offset)
 {
 	assert(BRAM_SIZE > offset);
 	return m_bram[offset];
 }
 
-void tosh1000_bram_device::write(int offset, uint8_t data)
+void tosh1000_bram_device::write(offs_t offset, uint8_t data)
 {
 	assert(BRAM_SIZE > offset);
 	m_bram[offset] = data;
 }
 
-READ8_MEMBER( tosh1000_bram_device::read )
-{
-	assert(BRAM_SIZE > offset);
-	return m_bram[offset];
-}
-
-WRITE8_MEMBER( tosh1000_bram_device::write )
-{
-	assert(BRAM_SIZE > offset);
-	m_bram[offset] = data;
-}
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to

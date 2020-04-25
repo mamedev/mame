@@ -40,11 +40,11 @@ private:
 	devcb_write_line m_out_strobe;
 	required_device<i8049_device> m_mcu;
 
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(p2_r);
+	void bus_w(uint8_t data);
+	uint8_t bus_r();
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t p2_r();
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 };

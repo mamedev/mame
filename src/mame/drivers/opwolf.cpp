@@ -922,7 +922,7 @@ void opwolf_state::opwolf(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(0);
@@ -996,7 +996,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(0);

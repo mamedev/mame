@@ -52,8 +52,8 @@ private:
 	devcb_write_line m_tx_handler;
 	devcb_write_line m_rts_handler;
 
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	template<int P> void i8243_port_w(uint8_t data);
 };

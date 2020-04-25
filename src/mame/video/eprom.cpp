@@ -179,10 +179,10 @@ VIDEO_START_MEMBER(eprom_state,guts)
  *
  *************************************/
 
-void eprom_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(eprom_state::scanline_update)
 {
 	/* update the playfield */
-	if (scanline == 0)
+	if (param == 0)
 	{
 		int xscroll = (m_alpha_tilemap->basemem_read(0x780) >> 7) & 0x1ff;
 		int yscroll = (m_alpha_tilemap->basemem_read(0x781) >> 7) & 0x1ff;

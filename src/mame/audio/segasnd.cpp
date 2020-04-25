@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    segasnd.c
+    segasnd.cpp
 
     Sound boards for early Sega G-80 based games.
 
@@ -117,23 +117,23 @@ READ_LINE_MEMBER( speech_sound_device::t1_r )
 	return m_drq;
 }
 
-READ8_MEMBER( speech_sound_device::p1_r )
+uint8_t speech_sound_device::p1_r()
 {
 	return m_latch & 0x7f;
 }
 
-READ8_MEMBER( speech_sound_device::rom_r )
+uint8_t speech_sound_device::rom_r(offs_t offset)
 {
 	return m_speech->base()[0x100 * (m_p2 & 0x3f) + offset];
 }
 
-WRITE8_MEMBER( speech_sound_device::p1_w )
+void speech_sound_device::p1_w(uint8_t data)
 {
 	if (!(data & 0x80))
 		m_t0 = 0;
 }
 
-WRITE8_MEMBER( speech_sound_device::p2_w )
+void speech_sound_device::p2_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -176,13 +176,13 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 }
 
 
-WRITE8_MEMBER( speech_sound_device::data_w )
+void speech_sound_device::data_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
 }
 
 
-WRITE8_MEMBER( speech_sound_device::control_w )
+void speech_sound_device::control_w(uint8_t data)
 {
 	LOG("Speech control = %X\n", data);
 }
@@ -399,7 +399,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::increment_t1_clock_timer_cb )
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::status_r )
+uint8_t usb_sound_device::status_r()
 {
 	LOG("%s:usb_data_r = %02X\n", machine().describe_context(), (m_out_latch & 0x81) | (m_in_latch & 0x7e));
 
@@ -427,7 +427,7 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::data_w )
+void usb_sound_device::data_w(uint8_t data)
 {
 	LOG("%s:usb_data_w = %02X\n", machine().describe_context(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
@@ -437,13 +437,13 @@ WRITE8_MEMBER( usb_sound_device::data_w )
 }
 
 
-READ8_MEMBER( usb_sound_device::ram_r )
+uint8_t usb_sound_device::ram_r(offs_t offset)
 {
 	return m_program_ram[offset];
 }
 
 
-WRITE8_MEMBER( usb_sound_device::ram_w )
+void usb_sound_device::ram_w(offs_t offset, uint8_t data)
 {
 	if (m_in_latch & 0x80)
 		m_program_ram[offset] = data;
@@ -459,7 +459,7 @@ WRITE8_MEMBER( usb_sound_device::ram_w )
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::p1_r )
+uint8_t usb_sound_device::p1_r()
 {
 	/* bits 0-6 are inputs and map to bits 0-6 of the input latch */
 	if ((m_in_latch & 0x7f) != 0)
@@ -468,7 +468,7 @@ READ8_MEMBER( usb_sound_device::p1_r )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::p1_w )
+void usb_sound_device::p1_w(uint8_t data)
 {
 	/* bit 7 maps to bit 0 on the output latch */
 	m_out_latch = (m_out_latch & 0xfe) | (data >> 7);
@@ -476,7 +476,7 @@ WRITE8_MEMBER( usb_sound_device::p1_w )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::p2_w )
+void usb_sound_device::p2_w(uint8_t data)
 {
 	u8 old = m_last_p2_value;
 	m_last_p2_value = data;
@@ -649,14 +649,14 @@ void usb_sound_device::env_w(int which, u8 offset, u8 data)
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::workram_r )
+uint8_t usb_sound_device::workram_r(offs_t offset)
 {
 	offset += 256 * m_work_ram_bank;
 	return m_work_ram[offset];
 }
 
 
-WRITE8_MEMBER( usb_sound_device::workram_w )
+void usb_sound_device::workram_w(offs_t offset, uint8_t data)
 {
 	offset += 256 * m_work_ram_bank;
 	m_work_ram[offset] = data;

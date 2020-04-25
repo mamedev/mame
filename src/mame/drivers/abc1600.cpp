@@ -6,13 +6,13 @@
 
     How to create HDD image:
     ------------------------
-    chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
+    ./chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
+    ./chdman createhd -chs 1024,8,17 -ss 512 -o micr1325a.chd
 
     How to format HDD:
     ------------------
     mf(2,0)
     mf(2,0)
-    abcenix
     sas/format/format
     sa(40,0)
     y
@@ -377,7 +377,7 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 
 	*/
 
-	if (LOG) logerror("FW0 %02x\n", data);
+	if (LOG) logerror("%s FW0 %02x\n", machine().describe_context(), data);
 
 	// drive select
 	floppy_image_device *floppy = nullptr;
@@ -414,7 +414,7 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 	*/
 
-	if (LOG) logerror("FW1 %02x\n", data);
+	if (LOG) logerror("%s FW1 %02x\n", machine().describe_context(), data);
 
 	// FDC master reset
 	if (!BIT(data, 0)) m_fdc->reset();

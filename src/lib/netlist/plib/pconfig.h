@@ -134,6 +134,10 @@ typedef __uint128_t UINT128;
 typedef __int128_t INT128;
 #endif
 
+#if (PUSE_FLOAT128)
+typedef __float128 FLOAT128;
+#endif
+
 //============================================================
 // Check for OpenMP
 //============================================================

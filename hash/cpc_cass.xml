@@ -17411,37 +17411,37 @@ Please stick to using the floppy versions for the time being...
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="44269">
-				<rom name="hebdogiciel hors serie 1 (f) (face 1a) (1985) (1. interieur partie 1) [hebdogiciel] [original] [tape] [compilation].cdt" size="44269" crc="80d9c1d0" sha1="d0634353498289caf66ffe5ec7be5d84c7966b7e"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 1a) (1985) (1. interieur partie 1)[original] [tape] [compilation].cdt" size="44269" crc="80d9c1d0" sha1="d0634353498289caf66ffe5ec7be5d84c7966b7e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="42045">
-				<rom name="hebdogiciel hors serie 1 (f) (face 1b) (1985) (1. interieur suite - 2. master rubik's cube - 3. l'age de pierre) [hebdogiciel] [original] [tape] [compilation].cdt" size="42045" crc="897ee64e" sha1="5337ae7703d828c63090afec3ed871371a2225f3"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 1b) (1. interieur suite - 2. master rubik's cube - 3. l'age de pierre) [compilation].cdt" size="42045" crc="897ee64e" sha1="5337ae7703d828c63090afec3ed871371a2225f3"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="cpc_cass">
 			<dataarea name="cass" size="41386">
-				<rom name="hebdogiciel hors serie 1 (f) (face 2a) (1985) (1. electric runner - 2. gobpuzzle) [hebdogiciel] [original] [tape] [compilation].cdt" size="41386" crc="3d6d5560" sha1="390b9ee53bcea90bc7b2582c6fe76c10c31b5a1b"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 2a) (1985) (1. electric runner - 2. gobpuzzle) [original] [tape] [compilation].cdt" size="41386" crc="3d6d5560" sha1="390b9ee53bcea90bc7b2582c6fe76c10c31b5a1b"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="cpc_cass">
 			<dataarea name="cass" size="40658">
-				<rom name="hebdogiciel hors serie 1 (f) (face 2b) (1985) (3. autocar - 4. tridi - 5. meteores) [hebdogiciel] [original] [tape] [compilation].cdt" size="40658" crc="842393fb" sha1="e58d054d3f2de81659ae7d5b08720ee8edb6462c"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 2b) (1985) (3. autocar - 4. tridi - 5. meteores) [original] [tape] [compilation].cdt" size="40658" crc="842393fb" sha1="e58d054d3f2de81659ae7d5b08720ee8edb6462c"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="cpc_cass">
 			<dataarea name="cass" size="43237">
-				<rom name="hebdogiciel hors serie 1 (f) (face 3a) (1985) (1. la ville infernale - 2. 3d morpion) [hebdogiciel] [original] [tape] [compilation].cdt" size="43237" crc="04d04759" sha1="47ba7c47c9ad92225aa606caa32e9ec211e77a90"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 3a) (1985) (1. la ville infernale - 2. 3d morpion) [original] [tape] [compilation].cdt" size="43237" crc="04d04759" sha1="47ba7c47c9ad92225aa606caa32e9ec211e77a90"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="cpc_cass">
 			<dataarea name="cass" size="41846">
-				<rom name="hebdogiciel hors serie 1 (f) (face 3b) (1985) (3. donald et riri - 4. othello) [hebdogiciel] [original] [tape] [compilation].cdt" size="41846" crc="5fd54dd1" sha1="b3d552babf9f093dfb916fd4bee2cc0523186208"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 3b) (1985) (3. donald et riri - 4. othello) [original] [tape] [compilation].cdt" size="41846" crc="5fd54dd1" sha1="b3d552babf9f093dfb916fd4bee2cc0523186208"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="cpc_cass">
 			<dataarea name="cass" size="42919">
-				<rom name="hebdogiciel hors serie 1 (f) (face 4a) (1985) (1. moon control - 2. la boule infernale) [hebdogiciel] [original] [tape] [compilation].cdt" size="42919" crc="dcaa42b6" sha1="726fa3a3353cac1b251fe4b6891dad2961a610b5"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 4a) (1985) (1. moon control - 2. la boule infernale) [original] [tape] [compilation].cdt" size="42919" crc="dcaa42b6" sha1="726fa3a3353cac1b251fe4b6891dad2961a610b5"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="cpc_cass">
@@ -17456,17 +17456,17 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass10" interface="cpc_cass">
 			<dataarea name="cass" size="41596">
-				<rom name="hebdogiciel hors serie 1 (f) (face 5b) (1985) (3. le temple maudit - 4. cubert) [hebdogiciel] [original] [tape] [compilation].cdt" size="41596" crc="bbf119c1" sha1="5742782d82ea9098ce5be1120a9e85077426cba8"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 5b) (1985) (3. le temple maudit - 4. cubert) [original] [tape] [compilation].cdt" size="41596" crc="bbf119c1" sha1="5742782d82ea9098ce5be1120a9e85077426cba8"/>
 			</dataarea>
 		</part>
 		<part name="cass11" interface="cpc_cass">
 			<dataarea name="cass" size="33031">
-				<rom name="hebdogiciel hors serie 1 (f) (face 6a) (1985) (1. star fight - 2. jump-man - 3. monkey king) [hebdogiciel] [original] [tape] [compilation].cdt" size="33031" crc="14051f95" sha1="1fe35412a81b35616a40a36f47a701a8c90dfbea"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 6a) (1985) (1. star fight - 2. jump-man - 3. monkey king) [original] [compilation].cdt" size="33031" crc="14051f95" sha1="1fe35412a81b35616a40a36f47a701a8c90dfbea"/>
 			</dataarea>
 		</part>
 		<part name="cass12" interface="cpc_cass">
 			<dataarea name="cass" size="22947">
-				<rom name="hebdogiciel hors serie 1 (f) (face 6b) (1985) (4. meynaupede - 5. planet defender) [hebdogiciel] [original] [tape] [compilation].cdt" size="22947" crc="0b04aae3" sha1="9c51fee391ecb838cfd6f41ebef1a51b15ab7aa8"/>
+				<rom name="hebdogiciel hors serie 1 (f) (face 6b) (1985) (4. meynaupede - 5. planet defender) [original] [tape] [compilation].cdt" size="22947" crc="0b04aae3" sha1="9c51fee391ecb838cfd6f41ebef1a51b15ab7aa8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25776,22 +25776,22 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass5" interface="cpc_cass">
 			<dataarea name="cass" size="136657">
-				<rom name="nrj la compil'action (uk,f,s) (64k) (face 3a) (1990) (4. north and south - les tuniques bleues part 1) [original] [tape] [compilation].cdt" size="136657" crc="d9f86b27" sha1="b8376deec83e2cc8e1d04f84f33ccc9331c8988d"/>
+				<rom name="nrj la compil'action (uk,f,s) (64k) (face 3a) (1990) (4. north and south - les tuniques bleues part 1) [compilation].cdt" size="136657" crc="d9f86b27" sha1="b8376deec83e2cc8e1d04f84f33ccc9331c8988d"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="cpc_cass">
 			<dataarea name="cass" size="60831">
-				<rom name="nrj la compil'action (uk,f,s) (64k) (face 3b) (1990) (4. north and south - les tuniques bleues part 2) [original] [tape] [compilation].cdt" size="60831" crc="687bb4f9" sha1="9230a4a6f15ceaa428fcae114c47998874abf85e"/>
+				<rom name="nrj la compil'action (uk,f,s) (64k) (face 3b) (1990) (4. north and south - les tuniques bleues part 2) [compilation].cdt" size="60831" crc="687bb4f9" sha1="9230a4a6f15ceaa428fcae114c47998874abf85e"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="cpc_cass">
 			<dataarea name="cass" size="25173">
-				<rom name="nrj la compil'action (uk,f,s) (64k) (face 4a) (1990) (4. north and south - les tuniques bleues part 3) [original] [tape] [compilation].cdt" size="25173" crc="b71bbb8a" sha1="e718e8d319edf48ede7c57353068bb11c68c3fb7"/>
+				<rom name="nrj la compil'action (uk,f,s) (64k) (face 4a) (1990) (4. north and south - les tuniques bleues part 3) [compilation].cdt" size="25173" crc="b71bbb8a" sha1="e718e8d319edf48ede7c57353068bb11c68c3fb7"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="cpc_cass">
 			<dataarea name="cass" size="40681">
-				<rom name="nrj la compil'action (uk,f,s) (64k) (face 4b) (1990) (4. north and south - les tuniques bleues part 4) [original] [tape] [compilation].cdt" size="40681" crc="60797b28" sha1="839bc31681a8c23d07ab2da0132c230c11dda5b6"/>
+				<rom name="nrj la compil'action (uk,f,s) (64k) (face 4b) (1990) (4. north and south - les tuniques bleues part 4) [compilation].cdt" size="40681" crc="60797b28" sha1="839bc31681a8c23d07ab2da0132c230c11dda5b6"/>
 			</dataarea>
 		</part>
 		<part name="cass9" interface="cpc_cass">
@@ -36197,27 +36197,27 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass3" interface="cpc_cass">
 			<dataarea name="cass" size="136657">
-				<rom name="le temps des heros (uk,f,s) (64k) (face 2a) (1991) (2. north &amp; south - les tuniques bleues part 1) (1990) [original] [tape] [compilation].cdt" size="136657" crc="d9f86b27" sha1="b8376deec83e2cc8e1d04f84f33ccc9331c8988d"/>
+				<rom name="le temps des heros (uk,f,s) (64k) (face 2a) (1991) (2. north &amp; south - les tuniques bleues part 1) (1990) [compilation].cdt" size="136657" crc="d9f86b27" sha1="b8376deec83e2cc8e1d04f84f33ccc9331c8988d"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="cpc_cass">
 			<dataarea name="cass" size="60831">
-				<rom name="le temps des heros (uk,f,s) (64k) (face 2b) (1991) (2. north &amp; south - les tuniques bleues part 2) (1990) [original] [tape] [compilation].cdt" size="60831" crc="687bb4f9" sha1="9230a4a6f15ceaa428fcae114c47998874abf85e"/>
+				<rom name="le temps des heros (uk,f,s) (64k) (face 2b) (1991) (2. north &amp; south - les tuniques bleues part 2) (1990) [compilation].cdt" size="60831" crc="687bb4f9" sha1="9230a4a6f15ceaa428fcae114c47998874abf85e"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="cpc_cass">
 			<dataarea name="cass" size="25173">
-				<rom name="le temps des heros (uk,f,s) (64k) (face 3a) (1991) (2. north &amp; south - les tuniques bleues part 3) (1990) [original] [tape] [compilation].cdt" size="25173" crc="b71bbb8a" sha1="e718e8d319edf48ede7c57353068bb11c68c3fb7"/>
+				<rom name="le temps des heros (uk,f,s) (64k) (face 3a) (1991) (2. north &amp; south - les tuniques bleues part 3) (1990) [compilation].cdt" size="25173" crc="b71bbb8a" sha1="e718e8d319edf48ede7c57353068bb11c68c3fb7"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="cpc_cass">
 			<dataarea name="cass" size="40681">
-				<rom name="le temps des heros (uk,f,s) (64k) (face 3b) (1991) (2. north &amp; south - les tuniques bleues part 4) (1990) [original] [tape] [compilation].cdt" size="40681" crc="60797b28" sha1="839bc31681a8c23d07ab2da0132c230c11dda5b6"/>
+				<rom name="le temps des heros (uk,f,s) (64k) (face 3b) (1991) (2. north &amp; south - les tuniques bleues part 4) (1990) [compilation].cdt" size="40681" crc="60797b28" sha1="839bc31681a8c23d07ab2da0132c230c11dda5b6"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="cpc_cass">
 			<dataarea name="cass" size="168536">
-				<rom name="le temps des heros (f) (64k) (face 4a) (1991) (3. prince de perse) (1990) (version basic 1.0) [original] [tape] [compilation].cdt" size="168536" crc="281f4168" sha1="d68ad560b34d329768e2f0acf71f9113906d3145"/>
+				<rom name="le temps des heros (f) (64k) (face 4a) (1991) (3. prince de perse) (1990) (version basic 1.0) [compilation].cdt" size="168536" crc="281f4168" sha1="d68ad560b34d329768e2f0acf71f9113906d3145"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37624,7 +37624,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 		<part name="cass2" interface="cpc_cass">
 			<dataarea name="cass" size="69277">
-				<rom name="total eclipse + total eclipse ii - the sphinx jinx (uk) (face b) (1989) (2. total eclipse ii - the sphinx jinx) [original] [tape] [compilation].cdt" size="69277" crc="38108b35" sha1="b78a5a8cb703de222fb15ecaa579479388f14641"/>
+				<rom name="total eclipse + total eclipse ii - the sphinx jinx (uk) (face b) (2. total eclipse ii - the sphinx jinx) [compilation].cdt" size="69277" crc="38108b35" sha1="b78a5a8cb703de222fb15ecaa579479388f14641"/>
 			</dataarea>
 		</part>
 	</software>

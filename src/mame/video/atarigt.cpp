@@ -141,9 +141,9 @@ uint16_t atarigt_state::atarigt_colorram_r(offs_t address)
  *
  *************************************/
 
-void atarigt_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(atarigt_state::scanline_update)
 {
-	int i;
+	int scanline = param;
 
 	/* keep in range */
 	int offset = ((scanline & ~7) << 3) + 48;
@@ -151,7 +151,7 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 		return;
 
 	/* update the playfield scrolls */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
 
@@ -162,14 +162,14 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrollx(0, newscroll);
 				m_playfield_xscroll = newscroll;
 			}
 			if (newbank != m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_palette_offset((newbank & 0x1f) << 8);
 				m_playfield_color_bank = newbank;
 			}
@@ -183,14 +183,14 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrolly(0, newscroll);
 				m_playfield_yscroll = newscroll;
 			}
 			if (newbank != m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_tile_bank = newbank;
 			}

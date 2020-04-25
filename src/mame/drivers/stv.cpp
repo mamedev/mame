@@ -1135,7 +1135,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 {
 	// FIXME
 	if(ACCESSING_BITS_16_31)
-		m_rax->data_w(space, 0, data >> 16, 0x0000ffff);
+		m_rax->data_w(data >> 16);
 	if(ACCESSING_BITS_0_15)
 		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }

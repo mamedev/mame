@@ -672,13 +672,13 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 		return; // Nothing to do
 	}
 
-	if (thisnet.isRailNet() && othernet.isRailNet())
+	if (thisnet.is_rail_net() && othernet.is_rail_net())
 	{
 		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 		throw nl_exception(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
 	}
 
-	if (othernet.isRailNet())
+	if (othernet.is_rail_net())
 	{
 		log().debug("othernet is railnet\n");
 		merge_nets(othernet, thisnet);
@@ -799,7 +799,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	bool ret = false;
 	if (t1.has_net())
 	{
-		if (t1.net().isRailNet())
+		if (t1.net().is_rail_net())
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
@@ -814,7 +814,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	}
 	if (!ret && t2.has_net())
 	{
-		if (t2.net().isRailNet())
+		if (t2.net().is_rail_net())
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
@@ -839,7 +839,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 
 	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
-		if (t2.has_net() && t2.net().isRailNet())
+		if (t2.has_net() && t2.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
@@ -848,7 +848,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
-		if (t1.has_net() && t1.net().isRailNet())
+		if (t1.has_net() && t1.net().is_rail_net())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
 			throw nl_exception(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
@@ -893,17 +893,43 @@ void setup_t::resolve_inputs()
 	// after all other terminals were connected.
 
 	unsigned tries = m_netlist_params->m_max_link_loops();
+#if 0
+	// This code fails for some netlists when the element at position 0
+	// is deleted. It will fail somewhere deep in std::pair releasing
+	// std::string called from erase.
+	//
+	// One example is the this netlist:
+	//
+	// #include "netlist/devices/net_lib.h"
+	// NETLIST_START(charge_discharge)
+	//     SOLVER(solver, 48000) // Fixed frequency solver
+	//     CLOCK(I, 200) // 200 Hz  clock as input, TTL logic output
+	//     RES(R, RES_K(1))
+	//     CAP(C, CAP_U(1))
+	//
+	//     NET_C(I.Q, R.1)
+	//     NET_C(R.2, C.1)
+	//     NET_C(C.2, GND)
+	//
+	//     ALIAS(O, R.2) // Output O == C.1 == R.2
+	// // NETLIST_END()
+	//
+	// Just save the net list as /tmp/test1.cpp, run
+	// ./nltool --cmd=run -t 0.05 -l O -l I /tmp/test1.cpp
+	// and see it crash with this code enabled.
+	//
+	// g++-7 (Ubuntu 7.4.0-1ubuntu1~16.04~ppa1) 7.4.0
+	//
 	while (!m_links.empty() && tries >  0)
 	{
-
-		for (auto li = m_links.begin(); li != m_links.end(); )
+		auto li = m_links.begin();
+		while (li != m_links.end())
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 
-			//printf("%s %s\n", t1s.c_str(), t2s.c_str());
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
 			else
@@ -911,6 +937,23 @@ void setup_t::resolve_inputs()
 		}
 		tries--;
 	}
+#else
+	while (!m_links.empty() && tries > 0)
+	{
+		for (std::size_t i = 0; i < m_links.size(); )
+		{
+			const pstring t1s(m_links[i].first);
+			const pstring t2s(m_links[i].second);
+			detail::core_terminal_t *t1 = find_terminal(t1s);
+			detail::core_terminal_t *t2 = find_terminal(t2s);
+			if (connect(*t1, *t2))
+				m_links.erase(m_links.begin() + static_cast<std::ptrdiff_t>(i));
+			else
+				i++;
+		}
+		tries--;
+	}
+#endif
 	if (tries == 0)
 	{
 		for (auto & link : m_links)
@@ -947,7 +990,7 @@ void setup_t::resolve_inputs()
 			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
 			err = true;
 		}
-		else if (term->net().num_cons() == 0)
+		else if (!term->net().has_connections())
 		{
 			if (term->is_logic_input())
 				log().warning(MW_LOGIC_INPUT_1_WITHOUT_CONNECTIONS(term->name()));
@@ -1183,12 +1226,12 @@ void setup_t::delete_empty_nets()
 {
 	m_nlstate.nets().erase(
 		std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
-			[](owned_pool_ptr<detail::net_t> &x)
+			[](owned_pool_ptr<detail::net_t> &net)
 			{
-				if (x->num_cons() == 0)
+				if (!net->has_connections())
 				{
-					x->state().log().verbose("Deleting net {1} ...", x->name());
-					x->state().run_state_manager().remove_save_items(x.get());
+					net->state().log().verbose("Deleting net {1} ...", net->name());
+					net->state().run_state_manager().remove_save_items(net.get());
 					return true;
 				}
 				return false;
@@ -1293,7 +1336,7 @@ void setup_t::prepare_to_run()
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
-		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		if (t->m_N.net().is_rail_net() && t->m_P.net().is_rail_net())
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
 				t->name(), t->m_N.net().name(), t->m_P.net().name()));

@@ -235,7 +235,7 @@ void mackbd_device::scan_kbd_col(int col)
 	p2 = ioport("MODS")->read() & 0xc;
 }
 
-READ8_MEMBER(mackbd_device::p0_r)
+uint8_t mackbd_device::p0_r()
 {
 	uint8_t ret = p0;
 
@@ -248,7 +248,7 @@ READ8_MEMBER(mackbd_device::p0_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mackbd_device::p0_w)
+void mackbd_device::p0_w(uint8_t data)
 {
 	if (!(data & 2))
 	{
@@ -266,12 +266,12 @@ WRITE8_MEMBER(mackbd_device::p0_w)
 	}
 }
 
-READ8_MEMBER(mackbd_device::p1_r)
+uint8_t mackbd_device::p1_r()
 {
 	return p1;
 }
 
-WRITE8_MEMBER(mackbd_device::p1_w)
+void mackbd_device::p1_w(uint8_t data)
 {
 	data ^= 0xff;
 	if (data & 0x01) scan_kbd_col(1);
@@ -284,12 +284,12 @@ WRITE8_MEMBER(mackbd_device::p1_w)
 	if (data & 0x80) scan_kbd_col(8);
 }
 
-READ8_MEMBER(mackbd_device::p2_r)
+uint8_t mackbd_device::p2_r()
 {
 	return p2 | data_from_mac;
 }
 
-WRITE8_MEMBER(mackbd_device::p2_w)
+void mackbd_device::p2_w(uint8_t data)
 {
 	// prevent key scan accesses to the port from messing with the data line (how does this work on h/w?)
 	if (m_maincpu->pc() != 0x19e && m_maincpu->pc() != 0x1a3)
