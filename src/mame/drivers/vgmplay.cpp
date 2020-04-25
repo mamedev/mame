@@ -396,7 +396,8 @@ enum vgmplay_inputs : uint8_t
 	VGMPLAY_VIZ,
 	VGMPLAY_RATE_DOWN,
 	VGMPLAY_RATE_UP,
-	VGMPLAY_RATE_RST
+	VGMPLAY_RATE_RST,
+	VGMPLAY_HOLD,
 };
 
 class vgmplay_state : public driver_device
@@ -450,6 +451,9 @@ public:
 	template<int Index> void ga20_map(address_map &map);
 
 private:
+	virtual void machine_start() override;
+
+	uint32_t m_held_clock;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<vgmviz_device> m_mixer;
@@ -2605,6 +2609,11 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	std::fill(std::begin(m_upd7759_drq), std::end(m_upd7759_drq), 0);
 }
 
+void vgmplay_state::machine_start()
+{
+	save_item(NAME(m_held_clock));
+}
+
 uint32_t vgmplay_state::r32(int off) const
 {
 	if (off + 3 < int(m_file_data.size()))
@@ -3140,11 +3149,10 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 
 INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 {
-	if (!newval)
+	if (!newval && param != VGMPLAY_HOLD)
 		return;
 
-	int val = (uint8_t)param;
-	switch (val)
+	switch (param)
 	{
 	case VGMPLAY_STOP:
 		m_vgmplay->stop();
@@ -3173,20 +3181,31 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	case VGMPLAY_RATE_RST:
 		m_vgmplay->set_unscaled_clock(44100);
 		break;
+	case VGMPLAY_HOLD:
+		if (newval)
+		{
+			m_held_clock = m_vgmplay->clock();
+			m_vgmplay->set_unscaled_clock(0);
+		}
+		else
+		{
+			m_vgmplay->set_unscaled_clock(m_held_clock);
+		}
 	}
 }
 
 static INPUT_PORTS_START( vgmplay )
 	PORT_START("CONTROLS")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_U) PORT_NAME("Reset Rate")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_Y) PORT_NAME("Rate Reset")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_HOLD)        PORT_CODE(KEYCODE_U) PORT_NAME("Rate Hold")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)
