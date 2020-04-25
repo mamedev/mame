@@ -898,8 +898,6 @@ void polepos_state::polepos(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(polepos_state::scanline), "screen", 0, 1);
@@ -1011,8 +1009,6 @@ void polepos_state::topracern(machine_config &config)
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
-
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

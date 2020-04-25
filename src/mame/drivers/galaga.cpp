@@ -1641,8 +1641,6 @@ void bosco_state::bosco(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16);
@@ -1717,8 +1715,6 @@ void galaga_state::galaga(machine_config &config)
 	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_w));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
-
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1831,8 +1827,6 @@ void xevious_state::xevious(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	config.set_maximum_quantum(attotime::from_hz(60000)); /* 1000 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
@@ -1944,8 +1938,6 @@ void digdug_state::digdug(machine_config &config)
 	m_videolatch->q_out_cb<2>().set(FUNC(digdug_state::tx_color_mode_w));
 	m_videolatch->q_out_cb<3>().set(FUNC(digdug_state::bg_disable_w));
 	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_w));
-
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	ER2055(config, m_earom);
 
