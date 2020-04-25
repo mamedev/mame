@@ -1,5 +1,5 @@
 
-// Driver for Grant Searle's Simple 6502 Computer
+// Driver for Grant Searle's Simple 6809 Computer
 
 #include "emu.h"
 
@@ -47,7 +47,7 @@ DEVICE_INPUT_DEFAULTS_END
 void gs6809_state::gs6809(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, XTAL(7'372'800));
+	MC6809(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gs6809_state::gs6809_mem);
 	
 	// Configure UART (via m_acia)
