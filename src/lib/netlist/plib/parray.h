@@ -165,7 +165,7 @@ namespace plib {
 			}
 		}
 
-		COPYASSIGNMOVE(parray2D, default)
+		PCOPYASSIGNMOVE(parray2D, default)
 
 		~parray2D() noexcept = default;
 

@@ -19,15 +19,19 @@
 #endif
 
 // noexcept on move operator -> issue with macosx clang
-#define COPYASSIGNMOVE(name, def)  \
+#define PCOPYASSIGNMOVE(name, def)  \
 		name(const name &) = def; \
 		name(name &&) noexcept = def; \
 		name &operator=(const name &) = def; \
 		name &operator=(name &&) noexcept = def;
 
-#define COPYASSIGN(name, def)  \
+#define PCOPYASSIGN(name, def)  \
 		name(const name &) = def; \
 		name &operator=(const name &) = def; \
+
+#define PMOVEASSIGN(name, def)  \
+		name(name &&) noexcept = def; \
+		name &operator=(name &&) noexcept = def;
 
 namespace plib
 {
@@ -79,32 +83,6 @@ namespace plib
 		}
 	};
 #endif
-
-	//============================================================
-	// prevent implicit copying
-	//============================================================
-
-	struct nocopyassignmove
-	{
-		nocopyassignmove(const nocopyassignmove &) = delete;
-		nocopyassignmove(nocopyassignmove &&) noexcept = delete;
-		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
-		nocopyassignmove &operator=(nocopyassignmove &&) noexcept = delete;
-	protected:
-		nocopyassignmove() = default;
-		~nocopyassignmove() noexcept = default;
-	};
-
-	struct nocopyassign
-	{
-		nocopyassign(const nocopyassign &) = delete;
-		nocopyassign &operator=(const nocopyassign &) = delete;
-	protected:
-		nocopyassign() = default;
-		~nocopyassign() noexcept = default;
-		nocopyassign(nocopyassign &&) noexcept = default;
-		nocopyassign &operator=(nocopyassign &&) noexcept = default;
-	};
 
 	//============================================================
 	// Avoid unused variable warnings

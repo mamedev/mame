@@ -259,7 +259,7 @@ namespace netlist
 	public:
 		logic_family_desc_t();
 
-		COPYASSIGNMOVE(logic_family_desc_t, delete)
+		PCOPYASSIGNMOVE(logic_family_desc_t, delete)
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
@@ -304,7 +304,7 @@ namespace netlist
 	{
 	public:
 		logic_family_t() : m_logic_family(nullptr) {}
-		COPYASSIGNMOVE(logic_family_t, delete)
+		PCOPYASSIGNMOVE(logic_family_t, delete)
 
 		const logic_family_desc_t *logic_family() const noexcept { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) noexcept { m_logic_family = fam; }
@@ -485,7 +485,7 @@ namespace netlist
 				props::add(this, aname);
 			}
 
-			COPYASSIGNMOVE(object_t, delete)
+			PCOPYASSIGNMOVE(object_t, delete)
 			/// \brief return name of the object
 			///
 			/// \returns name of the object.
@@ -516,7 +516,7 @@ namespace netlist
 			, m_netlist(nl)
 			{ }
 
-			COPYASSIGNMOVE(netlist_object_t, delete)
+			PCOPYASSIGNMOVE(netlist_object_t, delete)
 
 			netlist_state_t & state() noexcept;
 			const netlist_state_t & state() const noexcept;
@@ -603,7 +603,7 @@ namespace netlist
 					state_e state, nldelegate delegate = nldelegate());
 			virtual ~core_terminal_t() noexcept = default;
 
-			COPYASSIGNMOVE(core_terminal_t, delete)
+			PCOPYASSIGNMOVE(core_terminal_t, delete)
 
 			/// \brief The object type.
 			/// \returns type of the object
@@ -672,7 +672,7 @@ namespace netlist
 
 			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal = nullptr);
 
-			COPYASSIGNMOVE(net_t, delete)
+			PCOPYASSIGNMOVE(net_t, delete)
 
 			virtual ~net_t() noexcept = default;
 
@@ -1007,7 +1007,7 @@ namespace netlist
 		core_device_t(netlist_state_t &owner, const pstring &name);
 		core_device_t(core_device_t &owner, const pstring &name);
 
-		COPYASSIGNMOVE(core_device_t, delete)
+		PCOPYASSIGNMOVE(core_device_t, delete)
 
 		virtual ~core_device_t() noexcept = default;
 
@@ -1085,7 +1085,7 @@ namespace netlist
 		device_t(netlist_state_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
-		COPYASSIGNMOVE(device_t, delete)
+		PCOPYASSIGNMOVE(device_t, delete)
 
 		~device_t() noexcept override = default;
 
@@ -1124,7 +1124,7 @@ namespace netlist
 
 		param_t(device_t &device, const pstring &name);
 
-		COPYASSIGNMOVE(param_t, delete)
+		PCOPYASSIGNMOVE(param_t, delete)
 
 		param_type_t param_type() const noexcept(false);
 
@@ -1377,7 +1377,7 @@ namespace netlist
 		netlist_state_t(const pstring &aname,
 			plib::unique_ptr<callbacks_t> &&callbacks);
 
-		COPYASSIGNMOVE(netlist_state_t, delete)
+		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
 		/// \brief Destructor
 		///
@@ -1645,7 +1645,7 @@ namespace netlist
 
 		explicit netlist_t(netlist_state_t &state);
 
-		COPYASSIGNMOVE(netlist_t, delete)
+		PCOPYASSIGNMOVE(netlist_t, delete)
 
 		virtual ~netlist_t() noexcept = default;
 

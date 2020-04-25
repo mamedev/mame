@@ -186,7 +186,7 @@ namespace netlist
 
 		source_netlist_t() = default;
 
-		COPYASSIGNMOVE(source_netlist_t, delete)
+		PCOPYASSIGNMOVE(source_netlist_t, delete)
 		~source_netlist_t() noexcept override = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
@@ -200,7 +200,7 @@ namespace netlist
 
 		source_data_t() = default;
 
-		COPYASSIGNMOVE(source_data_t, delete)
+		PCOPYASSIGNMOVE(source_data_t, delete)
 		~source_data_t() noexcept override = default;
 	};
 
@@ -373,7 +373,7 @@ namespace netlist
 		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept = default;
 
-		COPYASSIGNMOVE(setup_t, delete)
+		PCOPYASSIGNMOVE(setup_t, delete)
 
 		netlist_state_t &nlstate() { return m_nlstate; }
 		const netlist_state_t &nlstate() const { return m_nlstate; }

@@ -51,7 +51,7 @@ namespace plib {
 		{
 		}
 
-		COPYASSIGNMOVE(uninitialised_array_t, delete)
+		PCOPYASSIGNMOVE(uninitialised_array_t, delete)
 		~uninitialised_array_t() noexcept
 		{
 			if (m_initialized>=N)
@@ -115,7 +115,7 @@ namespace plib {
 			constexpr element_t() : m_next(nullptr), m_prev(nullptr) {}
 			~element_t() noexcept = default;
 
-			COPYASSIGNMOVE(element_t, delete)
+			PCOPYASSIGNMOVE(element_t, delete)
 
 			constexpr LC *next() const noexcept { return m_next; }
 			constexpr LC *prev() const noexcept { return m_prev; }
@@ -284,7 +284,7 @@ namespace plib {
 
 	// Use TS = true for a threadsafe queue
 	template <class T, bool TS>
-	class timed_queue_linear : nocopyassignmove
+	class timed_queue_linear
 	{
 	public:
 
@@ -293,6 +293,8 @@ namespace plib {
 		{
 			clear();
 		}
+
+		PCOPYASSIGNMOVE(timed_queue_linear, delete)
 
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
@@ -412,7 +414,7 @@ namespace plib {
 	};
 
 	template <class T, bool TS>
-	class timed_queue_heap : nocopyassignmove
+	class timed_queue_heap
 	{
 	public:
 
@@ -426,6 +428,8 @@ namespace plib {
 		{
 			clear();
 		}
+
+		PCOPYASSIGNMOVE(timed_queue_heap, delete)
 
 		std::size_t capacity() const noexcept { return m_list.capacity(); }
 		bool empty() const noexcept { return &m_list[0] == m_end; }

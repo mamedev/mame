@@ -65,7 +65,7 @@ public:
 	protected:
 		callback_t() = default;
 		virtual ~callback_t() = default;
-		COPYASSIGNMOVE(callback_t, default)
+		PCOPYASSIGNMOVE(callback_t, default)
 	};
 
 	struct entry_t
