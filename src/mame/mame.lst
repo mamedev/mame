@@ -42142,3 +42142,6 @@ gsz80
 
 @source:gscpm.cpp
 gscpm
+
+@source:gs6502.cpp
+gs6502
