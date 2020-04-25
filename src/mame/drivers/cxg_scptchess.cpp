@@ -21,14 +21,15 @@ Hardware notes (Sensor Computachess):
 - buzzer, 16 leds, button sensors chessboard
 
 HD44801A50 used in:
-- CXG Sensor Computachess - 1st use
+- CXG Sensor Computachess (1981 version) - 1st use
 - CXG Portachess (1983 version, has "Sound" button)
 - Hanimex HCG 1500
 - Schneider Sensor Chesspartner MK 3
 - Systema Computachess
 
 HD44801C89 used in:
-- CXG Portachess (1985 version) - 1st use
+- CXG Portachess (1985 version, "NEW 16 LEVELS") - 1st use
+- CXG Sensor Computachess (198? rerelease, "NEW 16 LEVELS")
 - CXG Portachess II (1986)
 - CXG Computachess IV (1986)
 - CXG Sphinx Chess Voyager? (1992)
@@ -224,7 +225,7 @@ ROM_END
 
 ROM_START( prtchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
+	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) ) // 202 = Portachess model#
 ROM_END
 
 } // anonymous namespace
@@ -235,7 +236,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, scptchess, 0,      0, scptchess, scptchess, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
-CONS( 1985, prtchess,  0,      0, scptchess, prtchess,  scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, scptchess, 0,         0, scptchess, scptchess, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, prtchess,  scptchess, 0, scptchess, prtchess,  scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

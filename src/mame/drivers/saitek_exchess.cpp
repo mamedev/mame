@@ -21,7 +21,7 @@ Hardware notes:
 #include "screen.h"
 
 // internal artwork
-//#include "saitek_exchess.lh" // clickable
+#include "saitek_exchess.lh" // clickable
 
 
 namespace {
@@ -233,7 +233,7 @@ void exchess_state::exchess(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 26+34);
 	m_display->set_interpolation(0.2);
-	//config.set_default_layout(layout_saitek_exchess);
+	config.set_default_layout(layout_saitek_exchess);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
@@ -251,8 +251,8 @@ ROM_START( exchess )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("sl90553", 0x0000, 0x1000, CRC(a61b0c7e) SHA1(a13b11a93f78236223c5c0b9879a93284b7f7525) )
 
-	ROM_REGION( 852610, "screen", ROMREGION_ERASE00 )
-	//ROM_LOAD("exchess.svg", 0, 852610, CRC(cb36f9d3) SHA1(83be9b5d906d185b7cf6895f50992e7eea390c7a) )
+	ROM_REGION( 852610, "screen", 0 )
+	ROM_LOAD("exchess.svg", 0, 852610, CRC(cb36f9d3) SHA1(83be9b5d906d185b7cf6895f50992e7eea390c7a) )
 ROM_END
 
 } // anonymous namespace
@@ -264,4 +264,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, exchess, 0,      0, exchess, exchess, exchess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, exchess, 0,      0, exchess, exchess, exchess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
