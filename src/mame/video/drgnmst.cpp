@@ -27,12 +27,21 @@ rgb_t drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)
 
 TILE_GET_INFO_MEMBER(drgnmst_base_state::get_fg_tile_info)
 {
+	// 8x8 tile layer
 	int tileno, colour, flipyx;
 	tileno = m_fg_videoram[tile_index * 2] & 0xfff;
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
+	
+	if ((m_fg_videoram[tile_index * 2] & 0x4000))
+		tileno |= 0x10000;
 
-	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1 (not on mastfury? or because bad dump)
+	if ((m_fg_videoram[tile_index * 2] & 0x8000))
+		tileno |= 0x8000;
+
+	tileno ^= 0x18000;
+	
+//	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1 (not on mastfury at least)
 	tileinfo.set(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
@@ -44,10 +53,16 @@ WRITE16_MEMBER(drgnmst_base_state::fg_videoram_w)
 
 TILE_GET_INFO_MEMBER(drgnmst_base_state::get_bg_tile_info)
 {
+	// 32x32 tile layer
 	int tileno, colour, flipyx;
-	tileno = (m_bg_videoram[tile_index * 2]& 0x1fff) + 0x800;
+	tileno = (m_bg_videoram[tile_index * 2] & 0x3ff) + 0xc00;
 	colour = m_bg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0x60) >> 5;
+
+	if ((m_bg_videoram[tile_index * 2] & 0x1000))
+		tileno |= 0x1000;
+
+	tileno ^= 0x1000;
 
 	tileinfo.set(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
@@ -60,10 +75,16 @@ WRITE16_MEMBER(drgnmst_base_state::bg_videoram_w)
 
 TILE_GET_INFO_MEMBER(drgnmst_base_state::get_md_tile_info)
 {
+	// 16x16 tile layer
 	int tileno, colour, flipyx;
-	tileno = (m_md_videoram[tile_index * 2] & 0x7fff) - 0x2000;
+	tileno = (m_md_videoram[tile_index * 2] & 0x3fff) - 0x2000;
 	colour = m_md_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_md_videoram[tile_index * 2 + 1] & 0x60) >> 5;
+
+	if ((m_md_videoram[tile_index * 2] & 0x4000))
+		tileno |= 0x4000;
+
+	tileno ^= 0x4000;
 
 	tileinfo.set(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
@@ -113,7 +134,7 @@ void drgnmst_base_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cli
 				realy = ypos + incy * y;
 				realnumber = number + x + y * 16;
 
-					gfx->transpen(bitmap,cliprect, realnumber, colr, flipx, flipy, realx, realy, 15);
+				gfx->transpen(bitmap,cliprect, realnumber, colr, flipx, flipy, realx, realy, 15);
 			}
 		}
 		source += 4;
@@ -151,23 +172,46 @@ void drgnmst_base_state::video_start()
 	m_md_tilemap->set_scroll_rows(1024);
 }
 
+void drgnmst_ym_state::video_start()
+{
+	drgnmst_base_state::video_start();
+	m_alt_scrolling = true;
+}
+
 uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, rowscroll_bank;
+	m_fg_tilemap->set_scrollx(0, m_vidregs[0x6] - 18); // verify (test mode colour test needs it)
+	m_fg_tilemap->set_scrolly(0, m_vidregs[0x7]); // verify
 
-	m_bg_tilemap->set_scrollx(0, m_vidregs[10] - 18); // verify
-	m_bg_tilemap->set_scrolly(0, m_vidregs[11]); // verify
+	int rowscroll_bank = (m_vidregs[4] & 0x30) >> 4;
 
-//  m_md_tilemap->set_scrollx(0, m_vidregs[8] - 16); // rowscrolled
-	m_md_tilemap->set_scrolly(0, m_vidregs[9]); // verify
+	if (!m_alt_scrolling)
+	{
+		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
+		m_bg_tilemap->set_scrolly(0, m_vidregs[0xb]); // verify
 
-	m_fg_tilemap->set_scrollx(0, m_vidregs[6] - 18); // verify (test mode colour test needs it)
-	m_fg_tilemap->set_scrolly(0, m_vidregs[7]); // verify
+	//  m_md_tilemap->set_scrollx(0, m_vidregs[0x8] - 16); // rowscrolled
+		m_md_tilemap->set_scrolly(0, m_vidregs[0x9]); // verify
 
-	rowscroll_bank = (m_vidregs[4] & 0x30) >> 4;
+		for (int y = 0; y < 1024; y++)
+			m_md_tilemap->set_scrollx(y, m_vidregs[0x8] - 16 + m_rowscrollram[y + 0x800 * rowscroll_bank]);
 
-	for (y = 0; y < 1024; y++)
-		m_md_tilemap->set_scrollx(y, m_vidregs[8] - 16 + m_rowscrollram[y + 0x800 * rowscroll_bank]);
+		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
+		m_bg_tilemap->set_scrolly(0, m_vidregs[0xb]); // verify
+	}
+	else
+	{
+	//  m_md_tilemap->set_scrollx(0, m_vidregs[0x9] - 16); // rowscrolled
+		m_md_tilemap->set_scrolly(0, m_vidregs[0x8]); // verify
+
+		for (int y = 0; y < 1024; y++)
+			m_md_tilemap->set_scrollx(y, m_vidregs[0x9] - 16 + m_rowscrollram[y + 0x800 * rowscroll_bank]);
+
+		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
+		m_bg_tilemap->set_scrolly(0, m_vidregs[0xb] -0x400); // verify
+
+	}
+
 
 	// todo: figure out which bits relate to the order
 	switch (m_vidregs2[0])
@@ -208,7 +252,10 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 	draw_sprites(bitmap,cliprect);
 
 //  popmessage ("x %04x x %04x x %04x x %04x x %04x", m_vidregs2[0], m_vidregs[12], m_vidregs[13], m_vidregs[14], m_vidregs[15]);
-//  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);
+
+	//popmessage ("x objbase: %04x scr0base %04x scr1base %04x scr2base %04x otherbase %04x palbase %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);
+	//popmessage ("x fgx: %04x fgy: %04x 16x: %04x 16y: %04x 32x: %04x 32y: %04x",m_vidregs[0x6],m_vidregs[0x7],m_vidregs[0x8],m_vidregs[0x9],m_vidregs[0xa],m_vidregs[0xb]);
 
 	return 0;
 }
+

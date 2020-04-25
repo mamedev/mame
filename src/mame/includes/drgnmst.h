@@ -19,6 +19,7 @@ public:
 	drgnmst_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_alt_scrolling(false),
 		m_vidregs(*this, "vidregs"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -40,6 +41,13 @@ protected:
 	void drgnmst_main_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 
+	/* video-related */
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_md_tilemap;
+
+	bool m_alt_scrolling;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_vidregs;
@@ -49,12 +57,6 @@ private:
 	required_shared_ptr<uint16_t> m_rowscrollram;
 	required_shared_ptr<uint16_t> m_vidregs2;
 	required_shared_ptr<uint16_t> m_spriteram;
-
-
-	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_md_tilemap;
 
 	/* devices */
 	DECLARE_WRITE16_MEMBER(coin_w);
@@ -132,6 +134,9 @@ public:
 	{ }
 
 	void drgnmst_ym(machine_config& config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<okim6295_device> m_oki;
