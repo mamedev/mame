@@ -135,9 +135,9 @@ private:
 
 	DECLARE_READ16_MEMBER(grid_9ff0_r);
 	DECLARE_READ16_MEMBER(grid_keyb_r);
-	DECLARE_READ16_MEMBER(grid_gpib_r);
+	DECLARE_READ8_MEMBER(grid_modem_r);
 	DECLARE_WRITE16_MEMBER(grid_keyb_w);
-	DECLARE_WRITE16_MEMBER(grid_gpib_w);
+	DECLARE_WRITE8_MEMBER(grid_modem_w);
 
 	DECLARE_WRITE8_MEMBER(grid_dma_w);
 	DECLARE_READ8_MEMBER(grid_dma_r);
@@ -212,49 +212,29 @@ void gridcomp_state::kbd_put(u16 data)
 
 
 // reject all commands
-READ16_MEMBER(gridcomp_state::grid_gpib_r)
+READ8_MEMBER(gridcomp_state::grid_modem_r)
 {
-	uint16_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = 0x10; // BO
-		break;
-
-	case 1:
-		data = 0x40; // ERR
-		m_osp->ir5_w(CLEAR_LINE);
-		break;
-	}
-
-	LOG("GPIB %02x == %02x\n", 0xdff80 + (offset << 1), data);
+	uint8_t data = 0;
+	LOG("MDM %02x == %02x\n", 0xdfec0 + (offset << 1), data);
 
 	return data;
 }
 
-WRITE16_MEMBER(gridcomp_state::grid_gpib_w)
+WRITE8_MEMBER(gridcomp_state::grid_modem_w)
 {
-	switch (offset)
-	{
-	case 7:
-		m_osp->ir5_w(ASSERT_LINE);
-		break;
-	}
-
-	LOG("GPIB %02x <- %02x\n", 0xdff80 + (offset << 1), data);
+	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
 WRITE8_MEMBER(gridcomp_state::grid_dma_w)
 {
 	m_tms9914->write(7, data);
-	LOG("DMA %02x <- %02x\n", offset, data);
+	// LOG("DMA %02x <- %02x\n", offset, data);
 }
 
 READ8_MEMBER(gridcomp_state::grid_dma_r)
 {
 	int ret = m_tms9914->read(7);
-	LOG("DMA %02x == %02x\n", offset, ret);
+	// LOG("DMA %02x == %02x\n", offset, ret);
 	return ret;
 }
 
@@ -324,7 +304,8 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map.unmap_value_high();
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
-	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdff00, 0xdff1f).rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
@@ -343,7 +324,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
-	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
@@ -430,6 +411,14 @@ void gridcomp_state::grid1101(machine_config &config)
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274(config, m_uart8274, XTAL(4'032'000));
+	m_uart8274->out_txda_callback().set("rs232_port", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232_port", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232_port", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232_port(RS232_PORT(config, "rs232_port", default_rs232_devices, nullptr));
+	rs232_port.rxd_handler().set("uart8274", FUNC(i8274_device::rxa_w));
+	rs232_port.dcd_handler().set("uart8274", FUNC(i8274_device::dcda_w));
+	rs232_port.cts_handler().set("uart8274", FUNC(i8274_device::ctsa_w));
 
 	I8255(config, "modem", 0);
 

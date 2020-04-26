@@ -13,6 +13,11 @@ DEFINE_DEVICE_TYPE(GRID2102, grid2102_device, "grid2102", "GRID2102")
 DEFINE_DEVICE_TYPE(GRID2101_FLOPPY, grid2101_floppy_device, "grid2101_floppy", "GRID2101_FLOPPY")
 DEFINE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device, "grid2101_hdd", "GRID2101_HDD")
 
+#define LOG_BYTES_MASK    (LOG_GENERAL << 1)
+#define LOG_BYTES(...)    LOGMASKED(LOG_BYTES_MASK, __VA_ARGS__)
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 #define GRID2102_FETCH32(Array, Offset) ((uint32_t)(\
     (Array[Offset] << 0) |\
     (Array[Offset + 1] << 8) |\
@@ -114,7 +119,7 @@ void grid210x_device::accept_transfer() {
             uint8_t command = m_data_buffer[0];
             uint32_t sector_number = GRID2102_FETCH32(m_data_buffer, 3);
             uint16_t data_size = GRID2102_FETCH16(m_data_buffer, 7);
-            logerror("grid210x_device command %u, data size %u, sector no %u\n", (unsigned)command, (unsigned)data_size, (unsigned)sector_number);
+            LOG("grid210x_device command %u, data size %u, sector no %u\n", (unsigned)command, (unsigned)data_size, (unsigned)sector_number);
             (void)(sector_number);
             if (command == 0x1) { // ddGetStatus
                 for (int i = 0; i < 56 && i < data_size; i++) {
@@ -153,7 +158,7 @@ void grid210x_device::ieee488_dav(int state) {
         m_bus->nrfd_w(this, 0);
         uint8_t data = m_bus->read_dio() ^ 0xFF;
         int eoi = m_bus->eoi_r() ^ 1;
-        logerror("grid210x_device byte recv %02x atn %d eoi %d\n", data, atn, eoi);
+        LOG_BYTES("grid210x_device byte recv %02x atn %d eoi %d\n", data, atn, eoi);
         m_last_recv_byte = data;
         m_last_recv_atn = atn;
         m_last_recv_eoi = eoi;
@@ -171,21 +176,21 @@ void grid210x_device::ieee488_dav(int state) {
                 if ((m_last_recv_byte & 0x1F) == bus_addr) {
                     // dev-id = 5
                     listening = true;
-                    logerror("grid210x_device now listening\n");
+                    LOG("grid210x_device now listening\n");
                 } else if((m_last_recv_byte & 0x1F) == 0x1F) {
                     // reset listen
                     listening = false;
-                    logerror("grid210x_device now not listening\n");
+                    LOG("grid210x_device now not listening\n");
                 }
             } else if ((m_last_recv_byte & 0xE0) == 0x40) {
                 if ((m_last_recv_byte & 0x1F) == bus_addr) {
                     // dev-id = 5
                     talking = true;
-                    logerror("grid210x_device now talking\n");
+                    LOG("grid210x_device now talking\n");
                 } else {
                     // reset talk
                     talking = false;
-                    logerror("grid210x_device now not talking\n");
+                    LOG("grid210x_device now not talking\n");
                 }
             } else if (m_last_recv_byte == 0x18) {
                 // serial poll enable
@@ -231,7 +236,7 @@ void grid210x_device::ieee488_nrfd(int state) {
         m_bus->dav_w(this, 0);
         m_bus->ndac_w(this, 1);
         m_gpib_loop_state = GRID210X_GPIB_STATE_WAIT_NDAC_FALSE;
-        logerror("grid210x_device byte send %02x eoi %d\n", m_byte_to_send, m_send_eoi);
+        LOG_BYTES("grid210x_device byte send %02x eoi %d\n", m_byte_to_send, m_send_eoi);
         ieee488_ndac(m_bus->ndac_r());
     }
     // logerror("grid210x_device nrfd state set to %d\n", state);
@@ -286,7 +291,7 @@ void grid210x_device::update_ndac(int atn) {
 }
 
 void grid210x_device::ieee488_ren(int state) {
-    logerror("grid210x_device ren state set to %d\n", state);
+    LOG("grid210x_device ren state set to %d\n", state);
 }
 
 grid2101_hdd_device::grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
