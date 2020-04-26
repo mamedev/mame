@@ -2,15 +2,17 @@
 // copyright-holders:Sandro Ronco, hap
 /***************************************************************************
 
-Schachcomputer SC 2 driver
+Schachcomputer SC 2 (G-5002.500)
 
-VEB Mikroelektronik's 2nd chess computer. The chess program is based on
-Fidelity Chess Challenger 10(C?).
+2nd chess computer by VEB(Volkseigener Betrieb) Funkwerk Erfurt. The company
+was renamed to VEB Mikroelektronik "Karl Marx" Erfurt in 1983, and formed into
+X-FAB Semiconductor Foundries AG after the German unification. SC 2 chess
+program is based on Fidelity Chess Challenger 10(C?).
 
 3 versions known: initial version, revision E, revision EP.
 
 Schachcomputer SC 1 was canceled before wide release, it's assumed to
-be on similar hardware(but PCB photos show 10 ROM chips instead of 9).
+be on similar hardware, but PCB photos show 10 ROM chips instead of 9.
 
 keypad legend:
 
@@ -264,5 +266,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC 2 (rev. E)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1981, sc2a, sc2,    0,      sc2,     sc2,   sc2_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC 2", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2 (rev. E)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, sc2a, sc2,    0,      sc2,     sc2,   sc2_state, empty_init, "VEB Funkwerk Erfurt", "Schachcomputer SC 2", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
