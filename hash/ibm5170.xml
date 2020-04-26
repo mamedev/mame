@@ -839,7 +839,7 @@ license:CC0
 		</part>
 	</software>
 
-	
+
 	<!-- not original, has WinImage header -->
 	<software name="1stword">
 		<description>1st Word Plus 2.0</description>
@@ -12423,7 +12423,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rotd">
 		<description>Rise of the Dragon</description>
 		<year>1990</year>
@@ -12729,7 +12729,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sq1">
 		<description>Space Quest I: Roger Wilco in the Sarien Encounter (VGA release)</description>
 		<year>1991</year>

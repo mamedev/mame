@@ -164,7 +164,7 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 
                             Zoomed Sprites Drawing
 
-	Sprite format with zoom, 16 bytes per each sprites
+    Sprite format with zoom, 16 bytes per each sprites
 
     Offset:     Bits:                   Value:
 
@@ -189,13 +189,13 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 
     0E.w                                Unused
 
-	* S.9.6 Fixed point or 10 bit signed integer,
-	  Configured from videoregs
+    * S.9.6 Fixed point or 10 bit signed integer,
+      Configured from videoregs
 
 
                                 Sprites Drawing
 
-	Sprite format without zoom, 16 bytes per each sprites
+    Sprite format without zoom, 16 bytes per each sprites
 
     Offset:     Bits:                   Value:
 
@@ -224,7 +224,7 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 
     0E.w                                Unused
 
-	** 10 bit signed only? need verifications.
+    ** 10 bit signed only? need verifications.
 
 ***************************************************************************/
 

@@ -39,61 +39,61 @@ Notes:
 
 /*
 
-	TODO
+    TODO
 
-	- command execution gets stuck in message in phase
+    - command execution gets stuck in message in phase
 
-		08A88	move.l	D7,D0				D0=00000025
-		08A8A	lsl.l	#5, D0				D0=000004A0
-		08A8C	ori.l	#$7e000, D0			D0=0007E4A0
-		08A92	movea.l	D0, A0				A0=0007E4A0
-		08A94	move.b	($2,A0), D0			D0=0007E4AF
-		08A98	btst	#$2, D0
-		08A9C	beq		$8aa4
-		08AA0	bra		$8a88
+        08A88   move.l  D7,D0               D0=00000025
+        08A8A   lsl.l   #5, D0              D0=000004A0
+        08A8C   ori.l   #$7e000, D0         D0=0007E4A0
+        08A92   movea.l D0, A0              A0=0007E4A0
+        08A94   move.b  ($2,A0), D0         D0=0007E4AF
+        08A98   btst    #$2, D0
+        08A9C   beq     $8aa4
+        08AA0   bra     $8a88
 
-		[:bus2:4105:sasi:0:s1410] state=3.1 change
-		[:bus2:4105:sasi:0:s1410] state=3.0 change
-		[:bus2:4105:sasi] ctrl .....B.CI stat 0005
-		[:bus2:4105:sasi] 0=ICB
-		[:bus2:4105:sasi] ctrl .....B.CI stat 0005
-		[:bus2:4105:sasi] 0=ICB
-		[:bus2:4105:sasi] ctrl .....B.CI stat 0000
-		[:bus2:4105:sasi] 0=ICB
-		[:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-		[:bus2:4105:sasi] 0=QICB
-		[:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-		[:bus2:4105:sasi] 0=QICB
-		[:bus2:4105:sasi:0:s1410] state=3.4 change
-		[:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-		[:bus2:4105:sasi] 0=QICB
-		[:] ':3f' (089A8) STAT 25: 45
-		[:bus2:4105:sasi] ctrl ..KQ.B.CI stat 0000
-		[:bus2:4105:sasi] 0=QICB
-		[:bus2:4105:sasi] 1=K
-		[:bus2:4105:sasi:0:s1410] state=3.4 change
-		[:bus2:4105:sasi] ctrl ..K..B.CI stat 0000
-		[:bus2:4105:sasi] 0=ICB
-		[:bus2:4105:sasi] 1=K
-		[:bus2:4105:sasi] ctrl .....B.CI stat 0000
-		[:bus2:4105:sasi] 0=ICB
-		[:bus2:4105:sasi:0:s1410] state=3.3 change
-		[:bus2:4105:sasi:0:s1410] state=3.0 change
-		[:bus2:4105:sasi] ctrl .....BMCI min  0000
-		[:bus2:4105:sasi] 0=MICB
-		[:bus2:4105:sasi] ctrl .....BMCI min  0000
-		[:bus2:4105:sasi] 0=MICB
-		[:bus2:4105:sasi] ctrl .....BMCI min  0000
-		[:bus2:4105:sasi] 0=MICB
-		[:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-		[:bus2:4105:sasi] 0=QMICB
-		[:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-		[:bus2:4105:sasi] 0=QMICB
-		[:bus2:4105:sasi:0:s1410] state=3.4 change
-		[:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-		[:bus2:4105:sasi] 0=QMICB
-		[:] ':3f' (089D4) INP 25: 00
-		[:] ':3f' (089E8) STAT 25: 05
+        [:bus2:4105:sasi:0:s1410] state=3.1 change
+        [:bus2:4105:sasi:0:s1410] state=3.0 change
+        [:bus2:4105:sasi] ctrl .....B.CI stat 0005
+        [:bus2:4105:sasi] 0=ICB
+        [:bus2:4105:sasi] ctrl .....B.CI stat 0005
+        [:bus2:4105:sasi] 0=ICB
+        [:bus2:4105:sasi] ctrl .....B.CI stat 0000
+        [:bus2:4105:sasi] 0=ICB
+        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
+        [:bus2:4105:sasi] 0=QICB
+        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
+        [:bus2:4105:sasi] 0=QICB
+        [:bus2:4105:sasi:0:s1410] state=3.4 change
+        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
+        [:bus2:4105:sasi] 0=QICB
+        [:] ':3f' (089A8) STAT 25: 45
+        [:bus2:4105:sasi] ctrl ..KQ.B.CI stat 0000
+        [:bus2:4105:sasi] 0=QICB
+        [:bus2:4105:sasi] 1=K
+        [:bus2:4105:sasi:0:s1410] state=3.4 change
+        [:bus2:4105:sasi] ctrl ..K..B.CI stat 0000
+        [:bus2:4105:sasi] 0=ICB
+        [:bus2:4105:sasi] 1=K
+        [:bus2:4105:sasi] ctrl .....B.CI stat 0000
+        [:bus2:4105:sasi] 0=ICB
+        [:bus2:4105:sasi:0:s1410] state=3.3 change
+        [:bus2:4105:sasi:0:s1410] state=3.0 change
+        [:bus2:4105:sasi] ctrl .....BMCI min  0000
+        [:bus2:4105:sasi] 0=MICB
+        [:bus2:4105:sasi] ctrl .....BMCI min  0000
+        [:bus2:4105:sasi] 0=MICB
+        [:bus2:4105:sasi] ctrl .....BMCI min  0000
+        [:bus2:4105:sasi] 0=MICB
+        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
+        [:bus2:4105:sasi] 0=QMICB
+        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
+        [:bus2:4105:sasi] 0=QMICB
+        [:bus2:4105:sasi:0:s1410] state=3.4 change
+        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
+        [:bus2:4105:sasi] 0=QMICB
+        [:] ':3f' (089D4) INP 25: 00
+        [:] ':3f' (089E8) STAT 25: 05
 
 */
 

@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(mpu4dealem_state::tile_info)
 
 	uint16_t tile = ((attr & 0x07) << 8) | data;
 	uint8_t color = (attr >> 4) & 0x0f;
-	
+
 	tileinfo.set(0, tile, color, 0);
 }
 

@@ -58,7 +58,7 @@ DIMM controller registers
 28          16bit  dddd---c ------ba
                     a - 0->1 NAOMI reset
                     b - 1 activates sdram command "load mode register", followed by write 01010101 to bank 10 offset 000110 or 000190 depending on cas latency
-					    address bits 12-3 correspond to bits A9-A0 in the sdram chip address bus when sending the command
+                        address bits 12-3 correspond to bits A9-A0 in the sdram chip address bus when sending the command
                     c - unk, set to 1 in VxWorks, 0 in 1.02
                     d - unk, checked for == 1 in 1.02
 

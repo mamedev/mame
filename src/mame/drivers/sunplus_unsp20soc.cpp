@@ -56,10 +56,10 @@
                  Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
 
-	JAKKS Pacific Test modes:
+    JAKKS Pacific Test modes:
 
-	jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
-	            the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
+    jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
+                the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
 
 */
 
@@ -1688,7 +1688,7 @@ ROM_END
 /*  The following pinout was used when dumping jak_sspop, jak_hmhsm, jak_umdf
     For the 256Mbyte parts the parameters of the programmer had to be overridden to dump the full capacity as there were no equivalent parts.
 
-	   Sandisk TSOP32 NAND Flash
+       Sandisk TSOP32 NAND Flash
 
        +----------------------------------------------+
     NC-|01                                          32|-NC
@@ -1718,13 +1718,13 @@ ROM_START( jak_sspop )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	/* TSOP32 NAND ROM
-	
+
 	S976172-1
 	SanDisk
 	11015-128B
 	POC142
 	0845
-	<obscured #>	
+	<obscured #>
 
 	appears to be a 128MByte part (or at least that is how much service mode tests)
 
@@ -1737,9 +1737,9 @@ ROM_END
 ROM_START( jak_hmhsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-	
+
 	/* TSOP32 NAND ROM
-	
+
 	5769522.1
 	SanDisk
 	11354-256B
@@ -1759,16 +1759,16 @@ ROM_END
 ROM_START( jak_umdf )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-	
+
 	/* TSOP32 NAND ROM
-	
+
 	S744565-1
 	SanDisk
 	11352-256B
 	PA2777.00
 	0834
-	61050	
-	
+	61050
+
 	again part number would suggest that this is a 256MByte ROM, although in reality all data fits into 64Mbyte, rest is blank
 
 	*/

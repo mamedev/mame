@@ -658,7 +658,7 @@ static INPUT_PORTS_START( franticf ) // how do the directional inputs work?
 /*
                     "Play Based" Tickets despenced based on setting of DSW6-8
                     --------------------------------------------------------------
-Apples Per Game     0x7000  0x6000  0x5000  0x4000  0x3000  0x2000  0x1000  0x0000  
+Apples Per Game     0x7000  0x6000  0x5000  0x4000  0x3000  0x2000  0x1000  0x0000
 ----------------------------------------------------------------------------------
        5              3       9       3       9       7       6       5       5
        7              4      10       4      13       8       7       9       7
@@ -748,20 +748,20 @@ static INPUT_PORTS_START( franticfa ) // how do the directional inputs work?
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 /*
-	PORT_DIPNAME( 0x1c00, 0x0400, "Number of Fruit" )
-	PORT_DIPSETTING(      0x0000, "3" )
-	PORT_DIPSETTING(      0x0400, "5" )
-	PORT_DIPSETTING(      0x0800, "7" )
-	PORT_DIPSETTING(      0x0c00, "9" )
-	PORT_DIPSETTING(      0x1000, "9 (duplicate 1)" ) // appear to be duplicates but could affect something else too
-	PORT_DIPSETTING(      0x1400, "9 (duplicate 2)" )
-	PORT_DIPSETTING(      0x1800, "9 (duplicate 3)" )
-	PORT_DIPSETTING(      0x1c00, "9 (duplicate 4)" )
-	PORT_DIPNAME( 0x6000, 0x2000, "Initial Fruit Values" )
-	PORT_DIPSETTING(      0x0000, "Lowest" )
-	PORT_DIPSETTING(      0x2000, "Low" )
-	PORT_DIPSETTING(      0x4000, "Medium" )
-	PORT_DIPSETTING(      0x6000, "High" )
+    PORT_DIPNAME( 0x1c00, 0x0400, "Number of Fruit" )
+    PORT_DIPSETTING(      0x0000, "3" )
+    PORT_DIPSETTING(      0x0400, "5" )
+    PORT_DIPSETTING(      0x0800, "7" )
+    PORT_DIPSETTING(      0x0c00, "9" )
+    PORT_DIPSETTING(      0x1000, "9 (duplicate 1)" ) // appear to be duplicates but could affect something else too
+    PORT_DIPSETTING(      0x1400, "9 (duplicate 2)" )
+    PORT_DIPSETTING(      0x1800, "9 (duplicate 3)" )
+    PORT_DIPSETTING(      0x1c00, "9 (duplicate 4)" )
+    PORT_DIPNAME( 0x6000, 0x2000, "Initial Fruit Values" )
+    PORT_DIPSETTING(      0x0000, "Lowest" )
+    PORT_DIPSETTING(      0x2000, "Low" )
+    PORT_DIPSETTING(      0x4000, "Medium" )
+    PORT_DIPSETTING(      0x6000, "High" )
 */
 
 	PORT_DIPNAME( 0x0c00, 0x0400, "Apples Per Game" )       PORT_DIPLOCATION("SW3:4,3")

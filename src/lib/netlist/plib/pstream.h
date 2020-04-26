@@ -36,7 +36,7 @@ class putf8_reader
 {
 public:
 
-	COPYASSIGN(putf8_reader, delete)
+	PCOPYASSIGN(putf8_reader, delete)
 	virtual ~putf8_reader() = default;
 
 	putf8_reader(putf8_reader &&rhs) noexcept
@@ -118,7 +118,7 @@ public:
 
 	putf8_writer(putf8_writer &&src) noexcept : m_strm(src.m_strm) {}
 
-	COPYASSIGN(putf8_writer, delete)
+	PCOPYASSIGN(putf8_writer, delete)
 	putf8_writer &operator=(putf8_writer &&src) = delete;
 
 	virtual ~putf8_writer() = default;
@@ -155,7 +155,7 @@ public:
 	{
 	}
 
-	COPYASSIGNMOVE(putf8_fmt_writer, delete)
+	PCOPYASSIGNMOVE(putf8_fmt_writer, delete)
 
 	~putf8_fmt_writer() override = default;
 
@@ -179,7 +179,7 @@ public:
 	explicit pbinary_writer(std::ostream &strm) : m_strm(strm) {}
 	pbinary_writer(pbinary_writer &&src) noexcept : m_strm(src.m_strm) {}
 
-	COPYASSIGN(pbinary_writer, delete)
+	PCOPYASSIGN(pbinary_writer, delete)
 	pbinary_writer &operator=(pbinary_writer &&src) = delete;
 
 	virtual ~pbinary_writer() = default;
@@ -216,7 +216,7 @@ public:
 	explicit pbinary_reader(std::istream &strm) : m_strm(strm) {}
 	pbinary_reader(pbinary_reader &&src) noexcept : m_strm(src.m_strm) { }
 
-	COPYASSIGN(pbinary_reader, delete)
+	PCOPYASSIGN(pbinary_reader, delete)
 	pbinary_reader &operator=(pbinary_reader &&src) = delete;
 
 	virtual ~pbinary_reader() = default;

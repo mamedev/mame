@@ -143,7 +143,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 
 	    aa = same as unk2 on tiles? ( --pp ---- )
-		p = page
+	    p = page
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
@@ -226,7 +226,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
 		int page = (unk2 & 0x30) >> 4;
-		
+
 		// rad_sinv menu screen and phoenix don't agree with this, but carlecfg needs it
 		if (m_use_spritepages)
 		{

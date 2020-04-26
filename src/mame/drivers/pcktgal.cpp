@@ -67,7 +67,7 @@ WRITE8_MEMBER(pcktgal_state::adpcm_data_w)
 READ8_MEMBER(pcktgal_state::sound_unk_r)
 {
 	// POST only? Unknown purpose
-//	m_msm->reset_w(0);
+//  m_msm->reset_w(0);
 	return 0;
 }
 

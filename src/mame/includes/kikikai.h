@@ -57,7 +57,7 @@ private:
 	required_device<cpu_device>         m_maincpu;
 	required_device<cpu_device>         m_audiocpu;
 	optional_device<cpu_device>         m_subcpu;
-	optional_device<cpu_device>			m_mcu;
+	optional_device<cpu_device>         m_mcu;
 	optional_device<m68705p_device>     m_68705mcu;
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;

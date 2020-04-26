@@ -1006,7 +1006,7 @@ WRITE16_MEMBER(dpb7000_state::cpu_ctrlbus_w)
 
 		//m_store_addr[1]->reg_w(data);
 		//if (BIT(data, 15))
-		//	m_store_addr[0]->reg_w(data);
+		//  m_store_addr[0]->reg_w(data);
 		break;
 
 	case 8: // Brush Address Card, "Select 8" signal to PAL 16L8, BE

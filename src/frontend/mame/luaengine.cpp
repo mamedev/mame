@@ -276,8 +276,8 @@ static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser
 
 
 //-------------------------------------------------
-//	process_snapshot_filename - processes a snapshot
-//	filename
+//  process_snapshot_filename - processes a snapshot
+//  filename
 //-------------------------------------------------
 
 static std::string process_snapshot_filename(running_machine &machine, const char *s)

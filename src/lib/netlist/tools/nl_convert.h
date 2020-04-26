@@ -24,7 +24,7 @@ class nl_convert_base_t
 public:
 	using str_list = std::vector<pstring>;
 
-	COPYASSIGNMOVE(nl_convert_base_t, delete)
+	PCOPYASSIGNMOVE(nl_convert_base_t, delete)
 
 	virtual ~nl_convert_base_t();
 

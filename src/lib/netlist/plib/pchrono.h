@@ -196,7 +196,7 @@ namespace plib {
 				explicit guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 				~guard_t() noexcept { m_m.m_time += T::stop(); ++m_m.m_count; }
 
-				COPYASSIGNMOVE(guard_t, default)
+				PCOPYASSIGNMOVE(guard_t, default)
 
 			private:
 				timer &m_m;
@@ -232,7 +232,7 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = default;
-				COPYASSIGNMOVE(guard_t, default)
+				PCOPYASSIGNMOVE(guard_t, default)
 				// using default constructor will trigger warning on
 				// unused local variable.
 

@@ -3,10 +3,10 @@
 /***************************************************************************
 
 KiKi KaiKai - (c) 1987 Taito
-	+ Knight Boy (bootleg with 68705)
+    + Knight Boy (bootleg with 68705)
 
 Kick & Run - (c) 1987 Taito
-	+ Mexico 86 (bootleg with 68705)
+    + Mexico 86 (bootleg with 68705)
 
 
 

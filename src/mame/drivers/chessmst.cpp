@@ -2,10 +2,12 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Chess-Master
+Chess-Master (G-5003-500) (10*U505 roms)
+Chess-Master (G-5003-501) (2 roms set)
+Chess-Master Diamond (G-5004-500)
 
-        TODO:
-        - figure out why chessmsta won't work, for starters it assume z80 carry flag is set at poweron?
+TODO:
+- figure out why chessmsta won't work, u2616 is probably a bad dump or misplaced
 
 ****************************************************************************/
 
@@ -398,8 +400,8 @@ ROM_END
 
 ROM_START( chessmsta )
 	ROM_REGION( 0x2800, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "2764.bin",       0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) )
-	ROM_LOAD( "u2616bm108.bin", 0x2000, 0x0800, CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) )
+	ROM_LOAD( "2764.bin", 0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) )
+	ROM_LOAD( "u2616bm108.bin", 0x2000, 0x0800, BAD_DUMP CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) )
 ROM_END
 
 ROM_START( chessmstdm )
@@ -410,7 +412,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                       FULLNAME                FLAGS
-COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

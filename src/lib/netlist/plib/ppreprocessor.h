@@ -44,7 +44,7 @@ namespace plib {
 
 		explicit ppreprocessor(psource_collection_t<> &sources, defines_map_type *defines = nullptr);
 
-		COPYASSIGN(ppreprocessor, delete)
+		PCOPYASSIGN(ppreprocessor, delete)
 		ppreprocessor &operator=(ppreprocessor &&src) = delete;
 
 		ppreprocessor(ppreprocessor &&s) noexcept
@@ -87,7 +87,7 @@ namespace plib {
 			explicit readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf()
 			{ setg(nullptr, nullptr, nullptr); }
 			readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
-			COPYASSIGN(readbuffer, delete)
+			PCOPYASSIGN(readbuffer, delete)
 			readbuffer &operator=(readbuffer &&src) = delete;
 			~readbuffer() override = default;
 

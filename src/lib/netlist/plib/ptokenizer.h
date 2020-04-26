@@ -35,7 +35,7 @@ namespace plib {
 			m_source_location.emplace_back(plib::source_location("Unknown", 0));
 		}
 
-		COPYASSIGNMOVE(ptokenizer, delete)
+		PCOPYASSIGNMOVE(ptokenizer, delete)
 
 		virtual ~ptokenizer() = default;
 

@@ -36,10 +36,10 @@ wofpic:            No sound. Some minor gfx issues (sprite priorities mainly).  
 all dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
 
 brightness circuity present on pcb?
-	slampic2	yes
-	dinopic3	no
-	jurassic99	no
-	others		tbc...   assume no for now
+    slampic2    yes
+    dinopic3    no
+    jurassic99  no
+    others      tbc...   assume no for now
 */
 
 #include "emu.h"
@@ -92,7 +92,7 @@ public:
 	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fcrash_state(mconfig, type, tag)
 	{ }
-	
+
 	void slampic2(machine_config &config);
 	void init_slampic2();
 
@@ -111,7 +111,7 @@ public:
 	dinopic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps1bl_pic_state(mconfig, type, tag)
 	{ }
-	
+
 	void dinopic(machine_config &config);
 
 private:
@@ -127,7 +127,7 @@ public:
 	wofpic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dinopic_state(mconfig, type, tag)
 	{ }
-	
+
 	void wofpic(machine_config &config);
 	void init_wofpic();
 
@@ -305,15 +305,15 @@ WRITE16_MEMBER(wofpic_state::wofpic_layer_w)
 			// see bootleggers routines starting at $101000
 			// writes values 0-f to 98000c
 			// how does this relate to layer control reg value?
-			
+
 			// original game values:
 			// m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x6398 / 2];
 			// m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x639a / 2];
 			// m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x639c / 2];
 			// m_cps_b_regs[m_layer_mask_reg[3] / 2] = m_mainram[0x639e / 2];
-			
+
 			m_cps_b_regs[0x3e / 2] = data;
-			
+
 			switch (data)
 			{
 			case 0:    // 12ce
@@ -1240,37 +1240,37 @@ ROM_START( dinopic3 )
 ROM_END
 
 /*
-	Jurassic 99 (Cadillacs and Dinosaurs bootleg)
-	pcb marking: H11F6
-	uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
-	
-	Confirmed clocks (measured):
+    Jurassic 99 (Cadillacs and Dinosaurs bootleg)
+    pcb marking: H11F6
+    uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
+
+    Confirmed clocks (measured):
      xtals: 30MHz, 24MHz
      68k  = 12MHz
      em78 = 3.75MHz
      oki  = 1MHz     pin 7 high
-	
-	  __________________________________________
-	  |TDA2003(V)  U6295  ROM 30MHz   6116      |
-	  | 93C46   EM78P447AP            6116      |
-	==                                6116      |
-	==       6116                     6116      |
-	==       6116       P2                      |
-	==                       P3       A1020A    |
-	==         (T)                        P8    |
-	==       62256               P6     6116    |
-	==       62256                      6116    |
-	==       ROM1            P4  P8             |
-	==       ROM2            P5  P8   GFXROM1   |
-	==                    62256  P8             |
-	  # 68K  P1   24MHz   62256  P8	  GFXROM2   |
-	  |_________________________________________|
-	
-	V = volume pot
-	# = player 3 connector	
-	T = test mode button
-	U6295 = oki M6295 clone
-	68K = MC68HC000FN16 PLCC68
+
+      __________________________________________
+      |TDA2003(V)  U6295  ROM 30MHz   6116      |
+      | 93C46   EM78P447AP            6116      |
+    ==                                6116      |
+    ==       6116                     6116      |
+    ==       6116       P2                      |
+    ==                       P3       A1020A    |
+    ==         (T)                        P8    |
+    ==       62256               P6     6116    |
+    ==       62256                      6116    |
+    ==       ROM1            P4  P8             |
+    ==       ROM2            P5  P8   GFXROM1   |
+    ==                    62256  P8             |
+      # 68K  P1   24MHz   62256  P8   GFXROM2   |
+      |_________________________________________|
+
+    V = volume pot
+    # = player 3 connector
+    T = test mode button
+    U6295 = oki M6295 clone
+    68K = MC68HC000FN16 PLCC68
 */
 ROM_START( jurassic99 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
@@ -1307,7 +1307,7 @@ ROM_START( jurassic99 )
 	U99G   ATF16V8B-15PC  8
 	U134G  ATF16V8B-15PC  8?
 	U124   Actel A1020A   84-pin PLCC
-	
+
 	3rd column numbers are what's hand-written on each chip
 	? = hard to read or rubbed off
 	seems to be no #7 ?

@@ -136,7 +136,7 @@ namespace plib
 
 		psource_t() noexcept = default;
 
-		COPYASSIGNMOVE(psource_t, delete)
+		PCOPYASSIGNMOVE(psource_t, delete)
 
 		virtual ~psource_t() noexcept = default;
 
@@ -159,7 +159,7 @@ namespace plib
 		: m_name(std::move(name)), m_str(std::move(str))
 		{}
 
-		COPYASSIGNMOVE(psource_str_t, delete)
+		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
 
 		typename TS::stream_ptr stream(const pstring &name) override
@@ -185,7 +185,7 @@ namespace plib
 
 		psource_collection_t() noexcept = default;
 
-		COPYASSIGNMOVE(psource_collection_t, delete)
+		PCOPYASSIGNMOVE(psource_collection_t, delete)
 		virtual ~psource_collection_t() noexcept = default;
 
 		void add_source(source_type &&src)

@@ -29,7 +29,7 @@
   - implement sprite-playfield collisions;
   - sprite-playfield colors are dubious at best;
   - Tiles may be flipped for playfield in final stage;
-  - Ranking table doesn't sort properly when player gets a better score than 
+  - Ranking table doesn't sort properly when player gets a better score than
     the ones listed, CPU core bug?
   - improve gfx layers superimposing, honor PAL timings;
   - sound (2x SN76477)
@@ -149,7 +149,7 @@ void malzak_state::malzak2_map(address_map &map)
 
 READ8_MEMBER(malzak_state::s2650_data_r)
 {
-//	popmessage("S2650 data port read");
+//  popmessage("S2650 data port read");
 	return 0xff;
 }
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER(malzak_state::port40_w)
 	m_mainbank->set_entry((data & 0x40) >> 6);
 	// bit 7 is set at final stage
 	u8 gfx_bank = ((data & 0x80) >> 7);
-	if (m_playfield_bank != gfx_bank) 
+	if (m_playfield_bank != gfx_bank)
 	{
 		m_playfield_bank = gfx_bank;
 		m_playfield_tilemap->mark_all_dirty();
@@ -398,7 +398,7 @@ ROM_START( malzak2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
-	
+
 	ROM_REGION( 0x0100, "nvram", 0 )
 	// default nvram so that game boots in version II off the bat
 	ROM_LOAD( "malzak2.nv",    0x0000, 0x0100, CRC(aadf03d8) SHA1(9d751c4249faab7f5d88d0c99f33468f439641ad) )

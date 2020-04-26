@@ -249,9 +249,9 @@ if #disasm_files > 0 then
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
-  links {
-    "netlist",
-  }
+	links {
+		"netlist",
+	}
 end
 	links {
 		"utils",

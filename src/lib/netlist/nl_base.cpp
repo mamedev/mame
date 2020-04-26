@@ -813,18 +813,10 @@ namespace netlist
 
 	void terminal_t::solve_now()
 	{
+		const auto *solv(solver());
 		// Nets may belong to railnets which do not have a solver attached
-		if (this->has_net())
-			if (net().solver() != nullptr)
-				net().solver()->solve_now();
-	}
-
-	void terminal_t::schedule_solve_after(netlist_time after) noexcept
-	{
-		// Nets may belong to railnets which do not have a solver attached
-		if (this->has_net())
-			if (net().solver() != nullptr)
-				net().solver()->update_after(after);
+		if (solv)
+				solver()->solve_now();
 	}
 
 	// ----------------------------------------------------------------------------------------

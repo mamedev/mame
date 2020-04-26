@@ -4,7 +4,7 @@
 /******************************************************************************
 
 CXG Sensor Computachess (CXG-001 or WA-001)
-CXG Portachess, Portachess II, Sphinx Chess Voyager
+CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
 
 Sensor Computachess is White & Allcock's first original chesscomputer. Cassia's
 Chess Mate (aka Computachess) doesn't really count since it was a bootleg of
@@ -21,23 +21,23 @@ Hardware notes (Sensor Computachess):
 - buzzer, 16 leds, button sensors chessboard
 
 HD44801A50 used in:
-- CXG Sensor Computachess
+- CXG Sensor Computachess (1981 version) - 1st use
+- CXG Portachess (1983 version, has "Sound" button)
 - Hanimex HCG 1500
 - Schneider Sensor Chesspartner MK 3
 - Systema Computachess
 
 HD44801C89 used in:
-- CXG Portachess II
-- CXG Computachess IV
+- CXG Portachess (1985 version, "NEW 16 LEVELS") - 1st use
+- CXG Sensor Computachess (198? rerelease, "NEW 16 LEVELS")
+- CXG Portachess II (1986)
+- CXG Computachess IV (1986)
+- CXG Sphinx Chess Voyager? (1992)
 - Fidelity Computachess IV
 - Fidelity Mini Chess Challenger (same housing as Portachess II)
 - Schneider MK 7 (same housing as Portachess II)
 - Schneider Sensor Chessmaster MK 6
 - Schneider Sensor Chesspartner MK 4
-
-TODO:
-- Does the 1st Portachess have the same rom data as prtchess2? HD44801C89
-  says "202" which is the model number of Portachess, although C89 is from 1985.
 
 ******************************************************************************/
 
@@ -69,11 +69,12 @@ public:
 
 	void scptchess(machine_config &config);
 
-	// assume that New Game button is directly tied to MCU reset
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(save_switch) { update_halt(); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { update_halt(); }
 
 private:
 	// devices/pointers
@@ -83,6 +84,7 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
+	void update_halt();
 	void update_display();
 	template<int N> void mux_w(u8 data);
 	void leds_w(u16 data);
@@ -96,6 +98,20 @@ void scptchess_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+}
+
+void scptchess_state::update_halt()
+{
+	// power switch to "Save" disables the leds and halts the MCU
+	m_maincpu->set_input_line(HMCS40_INPUT_LINE_HLT, (m_inputs[1]->read() & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_display->clear();
+}
+
+INPUT_CHANGED_MEMBER(scptchess_state::reset_button)
+{
+	// New Game button is directly tied to MCU reset
+	if (~m_inputs[1]->read() & 2)
+		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -155,11 +171,12 @@ static INPUT_PORTS_START( scptchess )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reverse Play")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
-	PORT_START("IN.1")
+	PORT_START("IN.1") // these are not available up on 1st version
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, reset_button, 0) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, save_switch, 0) PORT_NAME("Save Switch")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( prtchess2 )
+static INPUT_PORTS_START( prtchess )
 	PORT_INCLUDE( scptchess )
 
 	PORT_MODIFY("IN.0")
@@ -206,9 +223,9 @@ ROM_START( scptchess )
 	ROM_LOAD("white_allcock_44801a50", 0x0000, 0x2000, CRC(c5c53e05) SHA1(8fa9b8e48ca54f08585afd83ae78fb1970fbd382) )
 ROM_END
 
-ROM_START( prtchess2 )
+ROM_START( prtchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
+	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) ) // 202 = Portachess model#
 ROM_END
 
 } // anonymous namespace
@@ -219,7 +236,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, scptchess, 0,      0, scptchess, scptchess, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
-CONS( 1985, prtchess2, 0,      0, scptchess, prtchess2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, scptchess, 0,         0, scptchess, scptchess, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, prtchess,  scptchess, 0, scptchess, prtchess,  scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -5,13 +5,27 @@
     apple2gs.cpp - Apple IIgs
 
     Next generation driver written June 2018 by R. Belmont.
-    Thanks to the original Apple IIgs driver's authors: Nathan Woods, and R. Belmont
+    Thanks to the original Apple IIgs driver's authors: Nathan Woods and R. Belmont
     Thanks also to the Apple II Documentation Project/Antoine Vignau, Peter Ferrie, and Olivier Galibert.
 
     Unique hardware configurations:
     - ROM 00/01: original motherboard, 256K of RAM (banks 00/01/E0/E1 only), FPI chip manages fast/slow side
     - ROM 03: revised motherboard, 1M of RAM (banks 00/01/->0F/E0/E1), CYA chip replaces FPI
     - Expanded IIe: ROM 00/01 motherboard in a IIe case with a IIe keyboard rather than ADB
+
+    Timing in terms of the 14M 14.3181818 MHz clock (1/2 of the 28.6363636 master clock):
+    - 1 65816 cycle is 5 14M clocks
+    - Every 50 14M clocks (10 65816 cycles) DRAM refresh occurs for 5 14M clocks
+      * During this time, CPU accesses to ROM, Mega II side I/O, or banks E0/E1 are not penalized (but a side-sync penalty is incurred)
+      * Accesses to banks 00-7F are penalized except for I/O in banks 0/1.
+    - The Mega II 1 MHz side runs for 64 cycles at 14 14M clocks and every 65th is stretched to 16 14M clocks.
+      This allows 8-bit Apple II raster demos to work.  Each scanline is (64*14) + 16 = 912 14M clocks.
+      Due to this stretch, which does not occur on the fast side, the fast and 1 Mhz sides drift from each other
+      and sync up every 22800 14M clocks (25 scan lines).
+
+    One video line is: 6 cycles of right border, 13 cycles of hblank, 6 cycles of left border, and 40 cycles of active video
+
+    640 + 96 + 96 = 832 (make borders each 38 pixels wider in A2 modes)
 
     FF6ACF is speed test in ROM
     Diags:
@@ -55,6 +69,7 @@
 #include "emu.h"
 #include "video/apple2.h"
 #include "machine/apple2common.h"
+//#include "machine/apple2host.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/ramcard16k.h"
@@ -90,6 +105,7 @@
 #include "bus/a2bus/4play.h"
 //#include "bus/a2bus/pc_xporter.h"
 #include "bus/a2bus/byte8251.h"
+//#include "bus/a2bus/hostram.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -165,6 +181,7 @@ public:
 		m_video(*this, A2GS_VIDEO_TAG),
 		m_a2bus(*this, A2GS_BUS_TAG),
 		m_a2common(*this, "a2common"),
+//      m_a2host(*this, "a2host"),
 		m_gameio(*this, "gameio"),
 		m_speaker(*this, A2GS_SPEAKER_TAG),
 		m_upperbank(*this, A2GS_UPPERBANK_TAG),
@@ -219,6 +236,7 @@ public:
 	required_device<a2_video_device> m_video;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_common_device> m_a2common;
+//  required_device<apple2_host_device> m_a2host;
 	required_device<apple2_gameio_device> m_gameio;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
@@ -497,6 +515,7 @@ private:
 	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	DECLARE_WRITE8_MEMBER(wdm_trampoline) { }; //m_a2host->wdm_w(space, offset, data); }
 
 private:
 	bool m_is_rom3;
@@ -542,6 +561,7 @@ private:
 
 	uint8_t *m_ram_ptr;
 	int m_ram_size;
+	uint8_t m_megaii_ram[0x20000];  // 128K of "slow RAM" at $E0/0000
 
 	int m_inh_bank;
 
@@ -1229,8 +1249,8 @@ void apple2gs_state::machine_start()
 	}
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = &m_ram_ptr[0x10000];
+	m_video->m_ram_ptr = m_megaii_ram;
+	m_video->m_aux_ptr = &m_megaii_ram[0x10000];
 	m_video->m_char_ptr = memregion("gfx1")->base();
 	m_video->m_char_size = memregion("gfx1")->bytes();
 	m_video->m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192);
@@ -1240,11 +1260,11 @@ void apple2gs_state::machine_start()
 
 	// install memory beyond 256K/1M
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	int ramsize = m_ram_size - 0x40000;
+	int ramsize = m_ram_size - 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
 
-	// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
+	// RAM sizes for both classes of machine no longer include the Mega II RAM
 	space.install_readwrite_bank(0x020000, ramsize - 1 + 0x20000, "bank1");
-	membank("bank1")->set_base(m_ram_ptr + 0x040000);
+	membank("bank1")->set_base(m_ram_ptr + 0x020000);
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -1297,6 +1317,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inten));
 	save_item(NAME(m_slot_irq));
 	save_item(NAME(m_slow_counter));
+	save_item(NAME(m_megaii_ram));
 	save_item(m_clkdata, "CLKDATA");
 	save_item(m_clock_control, "CLKCTRL");
 	save_item(m_clock_read, "CLKRD");
@@ -1534,7 +1555,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		uint8_t scb;
 
-		scb = m_ram_ptr[0x19d00 + scanline - BORDER_TOP + 1];
+		scb = m_megaii_ram[0x19d00 + scanline - BORDER_TOP + 1];
 
 		if (scb & 0x40)
 		{
@@ -3005,15 +3026,15 @@ READ8_MEMBER(apple2gs_state::lc_r)
 	{
 		if (m_lcram2)
 		{
-			return m_ram_ptr[(offset & 0xfff) + 0xc000];
+			return m_megaii_ram[(offset & 0xfff) + 0xc000];
 		}
 		else
 		{
-			return m_ram_ptr[(offset & 0xfff) + 0xd000];
+			return m_megaii_ram[(offset & 0xfff) + 0xd000];
 		}
 	}
 
-	return m_ram_ptr[(offset & 0x1fff) + 0xe000];
+	return m_megaii_ram[(offset & 0x1fff) + 0xe000];
 }
 
 WRITE8_MEMBER(apple2gs_state::lc_w)
@@ -3028,21 +3049,141 @@ WRITE8_MEMBER(apple2gs_state::lc_w)
 	{
 		if (m_lcram2)
 		{
-			m_ram_ptr[(offset & 0xfff) + 0xc000] = data;
+			m_megaii_ram[(offset & 0xfff) + 0xc000] = data;
 		}
 		else
 		{
-			m_ram_ptr[(offset & 0xfff) + 0xd000] = data;
+			m_megaii_ram[(offset & 0xfff) + 0xd000] = data;
 		}
 		return;
 	}
 
-	m_ram_ptr[(offset & 0x1fff) + 0xe000] = data;
+	m_megaii_ram[(offset & 0x1fff) + 0xe000] = data;
 }
 
 READ8_MEMBER(apple2gs_state::lc_aux_r)
 {
 	slow_cycle();
+	if (offset < 0x1000)
+	{
+		if (m_lcram2)
+		{
+			return m_megaii_ram[(offset & 0xfff) + 0x1c000];
+		}
+		else
+		{
+			return m_megaii_ram[(offset & 0xfff) + 0x1d000];
+		}
+	}
+
+	return m_megaii_ram[(offset & 0x1fff) + 0x1e000];
+}
+
+WRITE8_MEMBER(apple2gs_state::lc_aux_w)
+{
+	slow_cycle();
+	if (!m_lcwriteenable)
+	{
+		return;
+	}
+
+	if (offset < 0x1000)
+	{
+		if (m_lcram2)
+		{
+			m_megaii_ram[(offset & 0xfff) + 0x1c000] = data;
+		}
+		else
+		{
+			m_megaii_ram[(offset & 0xfff) + 0x1d000] = data;
+		}
+		return;
+	}
+
+	m_megaii_ram[(offset & 0x1fff) + 0x1e000] = data;
+}
+
+READ8_MEMBER(apple2gs_state::lc_00_r)
+{
+	if (m_altzp)
+	{
+		if (offset < 0x1000)
+		{
+			if (m_lcram2)
+			{
+				return m_ram_ptr[(offset & 0xfff) + 0x1c000];
+			}
+			else
+			{
+				return m_ram_ptr[(offset & 0xfff) + 0x1d000];
+			}
+		}
+
+		return m_ram_ptr[(offset & 0x1fff) + 0x1e000];
+	}
+	else
+	{
+		if (offset < 0x1000)
+		{
+			if (m_lcram2)
+			{
+				return m_ram_ptr[(offset & 0xfff) + 0xc000];
+			}
+			else
+			{
+				return m_ram_ptr[(offset & 0xfff) + 0xd000];
+			}
+		}
+
+		return m_ram_ptr[(offset & 0x1fff) + 0xe000];
+	}
+}
+
+WRITE8_MEMBER(apple2gs_state::lc_00_w)
+{
+	if (!m_lcwriteenable)
+	{
+		return;
+	}
+
+	if (m_altzp)
+	{
+		if (offset < 0x1000)
+		{
+			if (m_lcram2)
+			{
+				m_ram_ptr[(offset & 0xfff) + 0x1c000] = data;
+			}
+			else
+			{
+				m_ram_ptr[(offset & 0xfff) + 0x1d000] = data;
+			}
+			return;
+		}
+
+		m_ram_ptr[(offset & 0x1fff) + 0x1e000] = data;
+	}
+	else
+	{
+		if (offset < 0x1000)
+		{
+			if (m_lcram2)
+			{
+				m_ram_ptr[(offset & 0xfff) + 0xc000] = data;
+			}
+			else
+			{
+				m_ram_ptr[(offset & 0xfff) + 0xd000] = data;
+			}
+			return;
+		}
+
+		m_ram_ptr[(offset & 0x1fff) + 0xe000] = data;
+	}
+}
+
+READ8_MEMBER(apple2gs_state::lc_01_r)
+{
 	if (offset < 0x1000)
 	{
 		if (m_lcram2)
@@ -3058,9 +3199,8 @@ READ8_MEMBER(apple2gs_state::lc_aux_r)
 	return m_ram_ptr[(offset & 0x1fff) + 0x1e000];
 }
 
-WRITE8_MEMBER(apple2gs_state::lc_aux_w)
+WRITE8_MEMBER(apple2gs_state::lc_01_w)
 {
-	slow_cycle();
 	if (!m_lcwriteenable)
 	{
 		return;
@@ -3080,125 +3220,6 @@ WRITE8_MEMBER(apple2gs_state::lc_aux_w)
 	}
 
 	m_ram_ptr[(offset & 0x1fff) + 0x1e000] = data;
-}
-
-READ8_MEMBER(apple2gs_state::lc_00_r)
-{
-	if (m_altzp)
-	{
-		if (offset < 0x1000)
-		{
-			if (m_lcram2)
-			{
-				return m_ram_ptr[(offset & 0xfff) + 0x3c000];
-			}
-			else
-			{
-				return m_ram_ptr[(offset & 0xfff) + 0x3d000];
-			}
-		}
-
-		return m_ram_ptr[(offset & 0x1fff) + 0x3e000];
-	}
-	else
-	{
-		if (offset < 0x1000)
-		{
-			if (m_lcram2)
-			{
-				return m_ram_ptr[(offset & 0xfff) + 0x2c000];
-			}
-			else
-			{
-				return m_ram_ptr[(offset & 0xfff) + 0x2d000];
-			}
-		}
-
-		return m_ram_ptr[(offset & 0x1fff) + 0x2e000];
-	}
-}
-
-WRITE8_MEMBER(apple2gs_state::lc_00_w)
-{
-	if (!m_lcwriteenable)
-	{
-		return;
-	}
-
-	if (m_altzp)
-	{
-		if (offset < 0x1000)
-		{
-			if (m_lcram2)
-			{
-				m_ram_ptr[(offset & 0xfff) + 0x3c000] = data;
-			}
-			else
-			{
-				m_ram_ptr[(offset & 0xfff) + 0x3d000] = data;
-			}
-			return;
-		}
-
-		m_ram_ptr[(offset & 0x1fff) + 0x3e000] = data;
-	}
-	else
-	{
-		if (offset < 0x1000)
-		{
-			if (m_lcram2)
-			{
-				m_ram_ptr[(offset & 0xfff) + 0x2c000] = data;
-			}
-			else
-			{
-				m_ram_ptr[(offset & 0xfff) + 0x2d000] = data;
-			}
-			return;
-		}
-
-		m_ram_ptr[(offset & 0x1fff) + 0x2e000] = data;
-	}
-}
-
-READ8_MEMBER(apple2gs_state::lc_01_r)
-{
-	if (offset < 0x1000)
-	{
-		if (m_lcram2)
-		{
-			return m_ram_ptr[(offset & 0xfff) + 0x3c000];
-		}
-		else
-		{
-			return m_ram_ptr[(offset & 0xfff) + 0x3d000];
-		}
-	}
-
-	return m_ram_ptr[(offset & 0x1fff) + 0x3e000];
-}
-
-WRITE8_MEMBER(apple2gs_state::lc_01_w)
-{
-	if (!m_lcwriteenable)
-	{
-		return;
-	}
-
-	if (offset < 0x1000)
-	{
-		if (m_lcram2)
-		{
-			m_ram_ptr[(offset & 0xfff) + 0x3c000] = data;
-		}
-		else
-		{
-			m_ram_ptr[(offset & 0xfff) + 0x3d000] = data;
-		}
-		return;
-	}
-
-	m_ram_ptr[(offset & 0x1fff) + 0x3e000] = data;
 }
 
 // floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
@@ -3328,121 +3349,121 @@ uint8_t apple2gs_state::read_floatingbus()
 		}
 	}
 
-	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
+	return m_megaii_ram[address % m_ram_size]; // FIX: this seems to work, but is it right!?
 }
 
 /***************************************************************************
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(apple2gs_state::ram0000_r)  { slow_cycle(); return m_ram_ptr[offset]; }
-WRITE8_MEMBER(apple2gs_state::ram0000_w) { slow_cycle(); m_ram_ptr[offset] = data; }
-READ8_MEMBER(apple2gs_state::auxram0000_r)  { slow_cycle(); return m_ram_ptr[offset+0x10000]; }
+READ8_MEMBER(apple2gs_state::ram0000_r)  { slow_cycle(); return m_megaii_ram[offset]; }
+WRITE8_MEMBER(apple2gs_state::ram0000_w) { slow_cycle(); m_megaii_ram[offset] = data; }
+READ8_MEMBER(apple2gs_state::auxram0000_r)  { slow_cycle(); return m_megaii_ram[offset+0x10000]; }
 WRITE8_MEMBER(apple2gs_state::auxram0000_w)
 {
 	slow_cycle();
-	m_ram_ptr[offset+0x10000] = data;
+	m_megaii_ram[offset+0x10000] = data;
 
 	if ((offset >= 0x9e00) && (offset <= 0x9fff))
 	{
 		int color = (offset - 0x9e00) >> 1;
 
 		m_video->m_shr_palette[color] = rgb_t(
-			((m_ram_ptr[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
-			((m_ram_ptr[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
-			((m_ram_ptr[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
+			((m_megaii_ram[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
+			((m_megaii_ram[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
+			((m_megaii_ram[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
 	}
 }
 
-READ8_MEMBER( apple2gs_state::b0ram0000_r)  { return m_ram_ptr[offset+0x20000]; }
-WRITE8_MEMBER(apple2gs_state::b0ram0000_w) { m_ram_ptr[offset+0x20000] = data; }
-READ8_MEMBER( apple2gs_state::b0ram0200_r)  { return m_ram_ptr[offset+0x20200]; }
-WRITE8_MEMBER(apple2gs_state::b0ram0200_w) { m_ram_ptr[offset+0x20200] = data; }
-READ8_MEMBER( apple2gs_state::b0ram0400_r)  { return m_ram_ptr[offset+0x20400]; }
+READ8_MEMBER( apple2gs_state::b0ram0000_r)  { return m_ram_ptr[offset]; }
+WRITE8_MEMBER(apple2gs_state::b0ram0000_w) { m_ram_ptr[offset] = data; }
+READ8_MEMBER( apple2gs_state::b0ram0200_r)  { return m_ram_ptr[offset+0x200]; }
+WRITE8_MEMBER(apple2gs_state::b0ram0200_w) { m_ram_ptr[offset+0x200] = data; }
+READ8_MEMBER( apple2gs_state::b0ram0400_r)  { return m_ram_ptr[offset+0x400]; }
 WRITE8_MEMBER(apple2gs_state::b0ram0400_w)
 {
-	m_ram_ptr[offset+0x20400] = data;
+	m_ram_ptr[offset+0x400] = data;
 	if (!(m_shadow & SHAD_TXTPG1))
 	{
 		slow_cycle();
-		m_ram_ptr[offset+0x0400] = data;
+		m_megaii_ram[offset+0x0400] = data;
 	}
 }
-READ8_MEMBER( apple2gs_state::b0ram0800_r)  { return m_ram_ptr[offset+0x20800]; }
+READ8_MEMBER( apple2gs_state::b0ram0800_r)  { return m_ram_ptr[offset+0x800]; }
 WRITE8_MEMBER(apple2gs_state::b0ram0800_w)
 {
-	m_ram_ptr[offset+0x20800] = data;
+	m_ram_ptr[offset+0x800] = data;
 
-	if (offset < 0x400) // TODO: ROM 03
+	if (offset < 0x400)
 	{
 		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
 		{
 			slow_cycle();
-			m_ram_ptr[offset+0x800] = data;
+			m_megaii_ram[offset+0x800] = data;
 		}
 	}
 }
-READ8_MEMBER( apple2gs_state::b0ram2000_r)  { return m_ram_ptr[offset+0x22000]; }
+READ8_MEMBER( apple2gs_state::b0ram2000_r)  { return m_ram_ptr[offset+0x2000]; }
 WRITE8_MEMBER(apple2gs_state::b0ram2000_w)
 {
-	m_ram_ptr[offset+0x22000] = data;
+	m_ram_ptr[offset+0x2000] = data;
 	if (!(m_shadow & SHAD_HIRESPG1))
 	{
 		slow_cycle();
-		m_ram_ptr[offset+0x2000] = data;
+		m_megaii_ram[offset+0x2000] = data;
 	}
 }
-READ8_MEMBER( apple2gs_state::b0ram4000_r)  { return m_ram_ptr[offset+0x24000]; }
+READ8_MEMBER( apple2gs_state::b0ram4000_r)  { return m_ram_ptr[offset+0x4000]; }
 WRITE8_MEMBER(apple2gs_state::b0ram4000_w)
 {
-	m_ram_ptr[offset+0x24000] = data;
+	m_ram_ptr[offset+0x4000] = data;
 	if (offset < 0x2000)
 	{
 		if (!(m_shadow & SHAD_HIRESPG2))
 		{
 			slow_cycle();
-			m_ram_ptr[offset+0x4000] = data;
+			m_megaii_ram[offset+0x4000] = data;
 		}
 	}
 }
 
-READ8_MEMBER( apple2gs_state::b1ram0000_r)  { return m_ram_ptr[offset+0x30000]; }
-WRITE8_MEMBER(apple2gs_state::b1ram0000_w) { m_ram_ptr[offset+0x30000] = data; }
-READ8_MEMBER( apple2gs_state::b1ram0200_r)  { return m_ram_ptr[offset+0x30200]; }
-WRITE8_MEMBER(apple2gs_state::b1ram0200_w) { m_ram_ptr[offset+0x30200] = data; }
-READ8_MEMBER( apple2gs_state::b1ram0400_r)  { return m_ram_ptr[offset+0x30400]; }
+READ8_MEMBER( apple2gs_state::b1ram0000_r)  { return m_ram_ptr[offset+0x10000]; }
+WRITE8_MEMBER(apple2gs_state::b1ram0000_w) { m_ram_ptr[offset+0x10000] = data; }
+READ8_MEMBER( apple2gs_state::b1ram0200_r)  { return m_ram_ptr[offset+0x10200]; }
+WRITE8_MEMBER(apple2gs_state::b1ram0200_w) { m_ram_ptr[offset+0x10200] = data; }
+READ8_MEMBER( apple2gs_state::b1ram0400_r)  { return m_ram_ptr[offset+0x10400]; }
 WRITE8_MEMBER(apple2gs_state::b1ram0400_w)
 {
-	m_ram_ptr[offset+0x30400] = data;
+	m_ram_ptr[offset+0x10400] = data;
 	if (!(m_shadow & SHAD_TXTPG1))
 	{
 		slow_cycle();
-		m_ram_ptr[offset+0x10400] = data;
+		m_megaii_ram[offset+0x10400] = data;
 	}
 }
-READ8_MEMBER( apple2gs_state::b1ram0800_r) { return m_ram_ptr[offset+0x30800]; }
+READ8_MEMBER( apple2gs_state::b1ram0800_r) { return m_ram_ptr[offset+0x10800]; }
 WRITE8_MEMBER(apple2gs_state::b1ram0800_w)
 {
-	m_ram_ptr[offset+0x30800] = data;
+	m_ram_ptr[offset+0x10800] = data;
 	if (offset < 0x400)
 	{
 		slow_cycle();
-		m_ram_ptr[offset+0x10800] = data;
+		m_megaii_ram[offset+0x10800] = data;
 	}
 }
-READ8_MEMBER( apple2gs_state::b1ram2000_r)  { return m_ram_ptr[offset+0x32000]; }
+READ8_MEMBER( apple2gs_state::b1ram2000_r)  { return m_ram_ptr[offset+0x12000]; }
 WRITE8_MEMBER(apple2gs_state::b1ram2000_w)
 {
-	m_ram_ptr[offset+0x32000] = data;
+	m_ram_ptr[offset+0x12000] = data;
 	if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 	{
 		auxram0000_w(space, offset+0x2000, data);
 	}
 }
-READ8_MEMBER( apple2gs_state::b1ram4000_r)  { return m_ram_ptr[offset+0x34000]; }
+READ8_MEMBER( apple2gs_state::b1ram4000_r)  { return m_ram_ptr[offset+0x14000]; }
 WRITE8_MEMBER(apple2gs_state::b1ram4000_w)
 {
-	m_ram_ptr[offset+0x34000] = data;
+	m_ram_ptr[offset+0x14000] = data;
 	if (offset < 0x2000)
 	{
 		if (!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES))
@@ -3468,10 +3489,10 @@ READ8_MEMBER(apple2gs_state::bank0_c000_r)
 
 	if (m_ramrd)
 	{
-		return m_ram_ptr[offset + 0x3c000];
+		return m_ram_ptr[offset + 0x1c000];
 	}
 
-	return m_ram_ptr[offset + 0x2c000];
+	return m_ram_ptr[offset + 0xc000];
 }
 
 WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
@@ -3483,20 +3504,20 @@ WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 
 	if (m_ramwrt)
 	{
-		m_ram_ptr[offset + 0x3c000] = data;
+		m_ram_ptr[offset + 0x1c000] = data;
 		return;
 	}
 
-	m_ram_ptr[offset + 0x2c000] = data;
+	m_ram_ptr[offset + 0xc000] = data;
 }
 
-READ8_MEMBER(apple2gs_state::bank1_0000_r) { return m_ram_ptr[offset + 0x30000]; }
-WRITE8_MEMBER(apple2gs_state::bank1_0000_w) { m_ram_ptr[offset + 0x30000] = data; }
-READ8_MEMBER(apple2gs_state::bank1_c000_r) { if (offset & 0x2000) offset ^= 0x1000; return m_ram_ptr[offset + 0x3c000]; }
-WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { if (offset & 0x2000) offset ^= 0x1000; m_ram_ptr[offset + 0x3c000] = data; }
+READ8_MEMBER(apple2gs_state::bank1_0000_r) { return m_ram_ptr[offset + 0x10000]; }
+WRITE8_MEMBER(apple2gs_state::bank1_0000_w) { m_ram_ptr[offset + 0x10000] = data; }
+READ8_MEMBER(apple2gs_state::bank1_c000_r) { if (offset & 0x2000) offset ^= 0x1000; return m_ram_ptr[offset + 0x1c000]; }
+WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { if (offset & 0x2000) offset ^= 0x1000; m_ram_ptr[offset + 0x1c000] = data; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 {
-	m_ram_ptr[offset + 0x30000] = data;
+	m_ram_ptr[offset + 0x10000] = data;
 
 	switch (offset>>8)
 	{
@@ -3507,7 +3528,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 			if (!(m_shadow & SHAD_TXTPG1))
 			{
 				slow_cycle();
-				m_ram_ptr[offset + 0x10000] = data;
+				m_megaii_ram[offset + 0x10000] = data;
 			}
 			break;
 
@@ -3518,7 +3539,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 			if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
 			{
 				slow_cycle();
-				m_ram_ptr[offset + 0x10000] = data;
+				m_megaii_ram[offset + 0x10000] = data;
 			}
 			break;
 
@@ -3530,7 +3551,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 			if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 			{
 				slow_cycle();
-				m_ram_ptr[offset + 0x10000] = data;
+				m_megaii_ram[offset + 0x10000] = data;
 			}
 			break;
 
@@ -3542,7 +3563,7 @@ WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 			if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 			{
 				slow_cycle();
-				m_ram_ptr[offset + 0x10000] = data;
+				m_megaii_ram[offset + 0x10000] = data;
 			}
 			break;
 
@@ -4554,6 +4575,7 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
+//  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4563,6 +4585,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
+	m_maincpu->wdm_handler().set(FUNC(apple2gs_state::wdm_trampoline));
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -4604,6 +4627,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M);
 	m_a2common->set_GS_cputag(m_maincpu);
+
+//  APPLE2_HOST(config, m_a2host, A2GS_14M);
+//  m_a2host->set_cputag(m_maincpu);
+//  m_a2host->set_space(m_maincpu, AS_PROGRAM);
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 

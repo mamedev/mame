@@ -3,49 +3,49 @@
 /*
     Open questions:
 
-	- In f1en, the scrolling text in attract mode is very jumpy. Whatever
-	  double buffering they are using seems to be out of sync with the sprite
-	  rendering.
+    - In f1en, the scrolling text in attract mode is very jumpy. Whatever
+      double buffering they are using seems to be out of sync with the sprite
+      rendering.
 
-	- In radr, NBG1 should be opaque on select screen, and NBG3 should be
-	  opaque while driving. 
-	  This is controlled by register $31ff8e (respectively $200 and $800), 
-	  likewise darkedge sets $800 on the first attract fight 
-	  (which has ugly black pens which should be white according to the ref). 
-	  harddunk sets $0f00 which completely breaks text display if current 
-	  hookup is enabled. 
-	  The theory is that opaque pens should go above background layer and 
-	  behind everything else like System 24.
+    - In radr, NBG1 should be opaque on select screen, and NBG3 should be
+      opaque while driving.
+      This is controlled by register $31ff8e (respectively $200 and $800),
+      likewise darkedge sets $800 on the first attract fight
+      (which has ugly black pens which should be white according to the ref).
+      harddunk sets $0f00 which completely breaks text display if current
+      hookup is enabled.
+      The theory is that opaque pens should go above background layer and
+      behind everything else like System 24.
 
-	- radr uses $1A0 as the X center for zooming; however, this
-	  contradicts the theory that bit 9 is a sign bit. For now, the code
-	  assumes that the X center has 10 bits of resolution. 
+    - radr uses $1A0 as the X center for zooming; however, this
+      contradicts the theory that bit 9 is a sign bit. For now, the code
+      assumes that the X center has 10 bits of resolution.
 
-	- In svf (the field) and radr (on the field), they use tilemap-specific
-	  flip in conjunction with rowscroll AND rowselect. According to Charles,
-	  in this case, the rowselect lookups should be done in reverse order,
-	  but this results in an incorrect display. For now, we assume there is
-	  a bug in the procedure and implement it so that it looks correct.
+    - In svf (the field) and radr (on the field), they use tilemap-specific
+      flip in conjunction with rowscroll AND rowselect. According to Charles,
+      in this case, the rowselect lookups should be done in reverse order,
+      but this results in an incorrect display. For now, we assume there is
+      a bug in the procedure and implement it so that it looks correct.
 
-	- titlef NBG0 and NBG2 layers are currently hidden during gameplay.
-	  It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
-	  Game actually uses the "rowscroll/rowselect" tables for a line window 
-	  effect to draw the boxing ring over NBG0. 
-	  Same deal for ga2 when in stage 2 cave a wall torch is lit.
-	  
-	- harddunk draws solid white in attract mode when the players are presented.
-	  NBG0 is set with $200 on center X/Y, same as above or perhaps missing
-	  tilemap wraparound?
+    - titlef NBG0 and NBG2 layers are currently hidden during gameplay.
+      It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
+      Game actually uses the "rowscroll/rowselect" tables for a line window
+      effect to draw the boxing ring over NBG0.
+      Same deal for ga2 when in stage 2 cave a wall torch is lit.
 
-	- Wrong priority cases (parenthesis for the level setup):
-	  dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f). 
-	  dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels). 
-	  f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
-	  f1lap: attract mode map display (after aforementioned), sprite-based turn names 
-	  ($a) are hidden by map ($d) again;
-	  (Note: Theory about these being CPU core bug(s) is debunked by the fact that latter 
-	   sets up via immediate opcodes)
-	
+    - harddunk draws solid white in attract mode when the players are presented.
+      NBG0 is set with $200 on center X/Y, same as above or perhaps missing
+      tilemap wraparound?
+
+    - Wrong priority cases (parenthesis for the level setup):
+      dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
+      dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels).
+      f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
+      f1lap: attract mode map display (after aforementioned), sprite-based turn names
+      ($a) are hidden by map ($d) again;
+      (Note: Theory about these being CPU core bug(s) is debunked by the fact that latter
+       sets up via immediate opcodes)
+
     Information extracted from below, and from Modeler:
 
     Tile format:
@@ -73,15 +73,15 @@
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
                    ---- ---- ---- ---0 : 1= X+Y flip for NBG0
          $31FF02 : x--- ---- --x- ---- : Bitmap layer enable (?)
-				   -x-- ---- ---- ---- : 1= NBG3 page wrapping disable (clipping enable according to code?)
-				   --x- ---- ---- ---- : 1= NBG2 page wrapping disable
+                   -x-- ---- ---- ---- : 1= NBG3 page wrapping disable (clipping enable according to code?)
+                   --x- ---- ---- ---- : 1= NBG2 page wrapping disable
                    ---1 ---- ---- ---- : 1= NBG1 page wrapping disable
                    ---- 0--- ---- ---- : 1= NBG0 page wrapping disable
-				   ---- -x-- ---- ---- : 1= bitmap layer clipping mode (1=outside)
-				   ---- --x- ---- ---- : 1= NBG3 clipping mode (1=outside)
-				   ---- ---x ---- ---- : 1= NBG2 clipping mode (1=outside)
-				   ---- ---- x--- ---- : 1= NBG1 clipping mode (1=outside)
-				   ---- ---- -x-- ---- : 1= NBG0 clipping mode (1=outside)
+                   ---- -x-- ---- ---- : 1= bitmap layer clipping mode (1=outside)
+                   ---- --x- ---- ---- : 1= NBG3 clipping mode (1=outside)
+                   ---- ---x ---- ---- : 1= NBG2 clipping mode (1=outside)
+                   ---- ---- x--- ---- : 1= NBG1 clipping mode (1=outside)
+                   ---- ---- -x-- ---- : 1= NBG0 clipping mode (1=outside)
                    ---- ---- --b- ---- : 1= Bitmap layer disable
                    ---- ---- ---t ---- : 1= Text layer disable
                    ---- ---- ---- 3--- : 1= NBG3 layer disable
@@ -1240,7 +1240,7 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 {
 	bitmap_ind16 &bitmap = *layer->bitmap;
 	int x, y;
-	
+
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);

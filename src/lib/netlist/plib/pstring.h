@@ -420,7 +420,7 @@ struct pwchar_traits
 	{
 		if (sizeof(wchar_t) == 2)
 		{
-			auto c = static_cast<uint16_t>(*p);
+			auto c = static_cast<uint16_t>(static_cast<unsigned char>(*p));
 			return ((c & 0xd800) == 0xd800) ? 2 : 1;
 		}
 
@@ -439,7 +439,7 @@ struct pwchar_traits
 	{
 		if (sizeof(wchar_t) == 2)
 		{
-			auto c = static_cast<uint32_t>(*p++);
+			auto c = static_cast<uint32_t>(static_cast<unsigned char>(*p++));
 			if ((c & 0xd800) == 0xd800)
 			{
 				c = (c - 0xd800) << 10;

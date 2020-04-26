@@ -655,7 +655,7 @@ u8 dp8344_device::rotate_right(u8 data, u8 b)
 u8 dp8344_device::add_nzcv(u8 s1, u8 s2, bool carry_in)
 {
 	s16 result = s8(s1) + s8(s2) + (carry_in ? 1 : 0);
-	if (result >= 128 && result < -128)
+	if (result >= 128 || result < -128)
 		m_ccr |= 0x04;
 	else
 		m_ccr &= 0xfb;
@@ -674,7 +674,7 @@ u8 dp8344_device::add_nzcv(u8 s1, u8 s2, bool carry_in)
 u8 dp8344_device::sub_nzcv(u8 s1, u8 s2, bool carry_in)
 {
 	s16 result = s8(s1) - s8(s2) - (carry_in ? 1 : 0);
-	if (result >= 128 && result < -128)
+	if (result >= 128 || result < -128)
 		m_ccr |= 0x04;
 	else
 		m_ccr &= 0xfb;

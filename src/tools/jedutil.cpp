@@ -2208,7 +2208,7 @@ static pal_data paldata[] = {
 		nullptr},
 	/*{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
-    {"PAL22V10", 5828,
+	{"PAL22V10", 5828,
 		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
 		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
 		print_palce22v10_pal22v10_product_terms,

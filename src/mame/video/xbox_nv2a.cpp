@@ -3570,11 +3570,11 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			offset = data;
 			texture[unit].buffer = direct_access_ptr(offset);
 			/*if (dma0 != 0) {
-				dmahand=channel[channel][subchannel].object.method[0x184/4];
-				geforce_read_dma_object(dmahand,dmaoff,dmasiz);
+			    dmahand=channel[channel][subchannel].object.method[0x184/4];
+			    geforce_read_dma_object(dmahand,dmaoff,dmasiz);
 			} else if (dma1 != 0) {
-				dmahand=channel[channel][subchannel].object.method[0x188/4];
-				geforce_read_dma_object(dmahand,dmaoff,dmasiz);
+			    dmahand=channel[channel][subchannel].object.method[0x188/4];
+			    geforce_read_dma_object(dmahand,dmaoff,dmasiz);
 			}*/
 		}
 		if (maddress == 0x1b04) {
@@ -4631,7 +4631,7 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 {
 /*#ifdef LOG_NV2A
-	printf("vblank_callback\n\r");
+    printf("vblank_callback\n\r");
 #endif*/
 	if ((state != 0) && (puller_waiting == 1)) {
 		puller_waiting = 0;

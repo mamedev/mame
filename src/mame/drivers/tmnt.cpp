@@ -18,11 +18,11 @@ Notes:
   buttons for shot direction (right/left) and club selection.
   Twist the "shot controller" to adjust shot power, then release it.
   The controller returns to its default position by internal spring.
-  
+
 TODO:
 
 - glfgreat: imperfect protection emulation:
-  1. putting to MAX power on green causes the game to return an incorrect 
+  1. putting to MAX power on green causes the game to return an incorrect
      value a.k.a. it detects a bunker/rough/water hazard;
   2. top/back spins doesn't seem to have any effect in-game;
 - prmrsocr: when the field rotates before the penalty kicks, parts of the
@@ -1622,7 +1622,7 @@ static INPUT_PORTS_START( glfgreat )
 	PORT_START("P3/P4")
 	KONAMI16_LSB( 3, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(3)
 	KONAMI16_MSB( 4, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(4)
-	
+
 	// actually unused by World/US sets but still tested in service mode
 	PORT_START("CONTROLA")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(1)
@@ -1663,9 +1663,9 @@ static INPUT_PORTS_START( glfgreatj )
 	// (where stance button is on top of the ball shaped controller)
 	PORT_MODIFY("P1/P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Stance Select Button")
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Left Direction Button")
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Direction Button")
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Club Select Button")

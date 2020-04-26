@@ -717,6 +717,11 @@ project "7z"
 			"-Wno-undef",
 			"-Wno-strict-prototypes",
 		}
+if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
+		buildoptions_c {
+			"-Wno-misleading-indentation",
+		}
+end
 
 	configuration { "mingw*" }
 		buildoptions_c {
@@ -729,6 +734,11 @@ project "7z"
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
+if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-misleading-indentation",
+		}
+end
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
@@ -745,11 +755,6 @@ end
 			"_7ZIP_ST",
 		}
 
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
-		buildoptions_c {
-			"-Wno-misleading-indentation",
-		}
-	end
 	files {
 			MAME_DIR .. "3rdparty/lzma/C/7zAlloc.c",
 			MAME_DIR .. "3rdparty/lzma/C/7zArcIn.c",
@@ -983,6 +988,12 @@ project "sqlite3"
 if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		buildoptions_c {
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
+		}
+end
+	configuration { "vs*" }
+if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-implicit-int-float-conversion",
 		}
 end
 	configuration { "winstore*" }
@@ -1512,7 +1523,7 @@ project "portaudio"
 				}
 			end
 		end
-		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
+		if string.find(_OPTIONS["gcc"], "clang") and version >= 100000 then
 			buildoptions_c {
 				"-Wno-misleading-indentation",
 			}

@@ -195,7 +195,7 @@ namespace plib {
 		{
 		}
 
-		COPYASSIGNMOVE(pfmt, default)
+		PCOPYASSIGNMOVE(pfmt, default)
 
 		~pfmt() noexcept = default;
 
@@ -208,12 +208,7 @@ namespace plib {
 		template <typename T>
 		typename std::enable_if<plib::is_floating_point<T>::value, pfmt &>::type
 		e(const T &x) {return format_element('e', x);  }
-#if 0
-	#if PUSE_FLOAT128
-		// FIXME: should use quadmath_snprintf
-		pfmt & e(const FLOAT128 &x) {return format_element('e', static_cast<long double>(x));  }
-	#endif
-#endif
+
 		template <typename T>
 		typename std::enable_if<plib::is_floating_point<T>::value, pfmt &>::type
 		g(const T &x) {return format_element('g', x);  }
@@ -317,7 +312,7 @@ namespace plib {
 	public:
 		explicit pfmt_writer_t() : m_enabled(true)  { }
 
-		COPYASSIGNMOVE(pfmt_writer_t, delete)
+		PCOPYASSIGNMOVE(pfmt_writer_t, delete)
 
 		// runtime enable
 		template<bool enabled, typename... Args>
@@ -370,7 +365,7 @@ namespace plib {
 	public:
 		explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
 
-		COPYASSIGNMOVE(plog_channel, delete)
+		PCOPYASSIGNMOVE(plog_channel, delete)
 
 		~plog_channel() noexcept = default;
 
@@ -398,7 +393,7 @@ namespace plib {
 			fatal(proxy)
 		{}
 
-		COPYASSIGNMOVE(plog_base, default)
+		PCOPYASSIGNMOVE(plog_base, default)
 		virtual ~plog_base() noexcept = default;
 
 		plog_channel<T, plog_level::DEBUG, debug_enabled> debug;
