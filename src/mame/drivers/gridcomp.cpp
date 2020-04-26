@@ -19,7 +19,7 @@
     - Texas Instruments TMS9914 GPIB controller
     - Intel 7220 Bubble Memory Controller
         - 7110 Magnetic Bubble Memory modules and support chips
-    - (unknown) - EAROM for machine ID
+    - X2210D - EAROM for machine ID
     - MM58174AN - Real-Time Clock
     - (custom DMA logic)
     - Intel 8741 - keyboard MCU
