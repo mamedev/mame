@@ -234,7 +234,7 @@ namespace plib {
 		}
 
 		template <class AR1, class T1, std::size_t A1, class AR2, class T2, std::size_t A2>
-		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs,
+		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs, // NOLINT
 			const arena_allocator<AR2, T2, A2>& rhs) noexcept;
 
 		template <class AU, class U, std::size_t A>
