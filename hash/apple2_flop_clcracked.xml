@@ -36650,4 +36650,82 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="awwolves">
+		<description>Animal Watch: Wolves (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2020-04-25"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- wolves (4am crack) disk 1 - program.dsk" size="143360" crc="d0e4b70b" sha1="32de9ad23a860e2218dbb6198c64f16628e69985"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenes"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- wolves (4am crack) disk 2a - scenes.dsk" size="143360" crc="14d4417a" sha1="5e9724f16616ffbe4b93e7eb073da4250a0d6345"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Activities"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- wolves (4am crack) disk 2b - activities.dsk" size="143360" crc="7a2ed1cf" sha1="c79ac23d449a2ab7f73d002cdfc0b9e4f3463d07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awwhales">
+		<description>Animal Watch: Whales (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2020-04-25"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- whales (4am crack) disk 1 - program.dsk" size="143360" crc="78ca371f" sha1="18854f265f1996ac0a2499607fb0bd45ddf61cfa"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenes"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- whales (4am crack) disk 2a - scenes.dsk" size="143360" crc="cc831be5" sha1="fdbd0ea38cf0ac1305aa46a9f453cfbb888df223"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Activities"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- whales (4am crack) disk 2b - activities.dsk" size="143360" crc="4bcd9623" sha1="7a5fbb3039e6de67534eaff131c72ff9823e379c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awtracks">
+		<description>Animal Watch: Tracks (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2020-04-25"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- tracks (4am crack) disk 1 - program.dsk" size="143360" crc="51f7be11" sha1="ef32db1b9d50dbf138d9f60da81a01b3999a78a3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenes"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- tracks (4am crack) disk 2a - scenes.dsk" size="143360" crc="a7b5d0b4" sha1="68a2d7e81363ed106e7450ef85ffb942c0bc5bdb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Activities"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animal watch- tracks (4am crack) disk 2b - activities.dsk" size="143360" crc="0aab1827" sha1="1066c98e07376fb672ae9650dbe644eaf0f0a25b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
