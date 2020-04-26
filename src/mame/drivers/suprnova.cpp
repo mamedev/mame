@@ -800,7 +800,7 @@ void skns_state::skns(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 33333333 / 2));
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'333'333) / 2));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
