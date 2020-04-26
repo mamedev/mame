@@ -12,7 +12,7 @@
    the analysis below is for wrlshunt, although gormiti could prove to be an easier case to look at
    while jak_ths and jak_swc might be more difficult (the latter uses line/bitmap mode, but still
    fails to copy the line data)
-   
+
 
    --
 
@@ -24,7 +24,7 @@
    (287b-287c) = 30 5e 12 00 (00125e30) (address for other layer tilemap) (or 'end' of above)
    where do we get these copied to registers or used as a source to copy from?
 
-   
+
    -- callled from here
    058F79: call 054e56 (with values above, for tilemap 0)
    and
@@ -34,61 +34,61 @@
    there are other calls in the code, but those are the ones before sprites are uploaded for the menu
 
    --
-	054E91: r4 = [bp+27] (contains lower part of address)
-	054E92: ds:[r1++] = r4    -- write 5698  to 2879
-	054E93: r4 = [bp+28] (contains upper part of address)
-	054E94: ds:[r1] = r4   -- write 0012  to 287a
+    054E91: r4 = [bp+27] (contains lower part of address)
+    054E92: ds:[r1++] = r4    -- write 5698  to 2879
+    054E93: r4 = [bp+28] (contains upper part of address)
+    054E94: ds:[r1] = r4   -- write 0012  to 287a
 
-	(this is a huge function that ends at 55968, also has lots of calls in it)
+    (this is a huge function that ends at 55968, also has lots of calls in it)
 
-	---
+    ---
 
-	the base for tilemap params being written to RAM is 2879 + 0xe * tilmap number (0,1,2,3)
-	the code to calculate this offset from base uses 32-bit multiplication and even sign extends the tilemap number before using it, making it
-	look more complex than it really is!
+    the base for tilemap params being written to RAM is 2879 + 0xe * tilmap number (0,1,2,3)
+    the code to calculate this offset from base uses 32-bit multiplication and even sign extends the tilemap number before using it, making it
+    look more complex than it really is!
 
-	054E7B: 0B0D 0088 bp = bp + 0088
-	054E7D: 9800      r4 = [bp+00]  -- which tilemap? (0,1,2,3)
-	054E7E: 2B0D 0088 bp = bp - 0088
+    054E7B: 0B0D 0088 bp = bp + 0088
+    054E7D: 9800      r4 = [bp+00]  -- which tilemap? (0,1,2,3)
+    054E7E: 2B0D 0088 bp = bp - 0088
 
-	054E80: 973C      r3 = r4 asr 4  -- sign extend tilemap 16-bit register r4 with r3 forming the upper word (always 0) 
-	054E81: 973B      r3 = r3 asr 4
-	054E82: 973B      r3 = r3 asr 4
-	054E83: 973B      r3 = r3 asr 4
+    054E80: 973C      r3 = r4 asr 4  -- sign extend tilemap 16-bit register r4 with r3 forming the upper word (always 0)
+    054E81: 973B      r3 = r3 asr 4
+    054E82: 973B      r3 = r3 asr 4
+    054E83: 973B      r3 = r3 asr 4
 
-	054E84: D688      push r3, r3 to [sp] -- push onto stack for use in call below
-	054E85: D888      push r4, r4 to [sp]
+    054E84: D688      push r3, r3 to [sp] -- push onto stack for use in call below
+    054E85: D888      push r4, r4 to [sp]
 
-	054E86: 964E      r3 = 0e -- store 0000 000e as the 32-bit value to multply with
-	054E87: 9840      r4 = 00
-	054E88: D890      push r3, r4 to [sp] -- push that onto stack for function call below
+    054E86: 964E      r3 = 0e -- store 0000 000e as the 32-bit value to multply with
+    054E87: 9840      r4 = 00
+    054E88: D890      push r3, r4 to [sp] -- push that onto stack for function call below
 
-	054E89: F045 D706 call 05d706   -- returns result in r1,r2
+    054E89: F045 D706 call 05d706   -- returns result in r1,r2
 
-	the result of this is then added to the base value of 2879 (which was stored earlier)
-	an additional offset is then added for each parameter.
+    the result of this is then added to the base value of 2879 (which was stored earlier)
+    an additional offset is then added for each parameter.
 
-	this code is repeated multiple times, with slight changes
+    this code is repeated multiple times, with slight changes
 
-	---
+    ---
 
-	by the time you hit 055098 (which is a switch on tilemap type to disable a tilemap) the following params have been put at
-	2879 ( tilemap 0 call )
-	2879 + 0x0e (tilemap 1 call )
+    by the time you hit 055098 (which is a switch on tilemap type to disable a tilemap) the following params have been put at
+    2879 ( tilemap 0 call )
+    2879 + 0x0e (tilemap 1 call )
 
-	tmap0 params
-	5698 0012 | 5E30 0012 | 0280 01E0   | 0002 0020 0020 0000 0000 0100 0000 0000 
-	125698    | 125e30    | = 640 = 480
+    tmap0 params
+    5698 0012 | 5E30 0012 | 0280 01E0   | 0002 0020 0020 0000 0000 0100 0000 0000
+    125698    | 125e30    | = 640 = 480
 
-	tmap1 params
-	7280 000D | 89F0 000D | 0280 01E0   | 0002 0020 0020 0002 0000 0040 0000 0000
-	0d7280    | 0d89f0    | = 640 = 480 |
+    tmap1 params
+    7280 000D | 89F0 000D | 0280 01E0   | 0002 0020 0020 0002 0000 0040 0000 0000
+    0d7280    | 0d89f0    | = 640 = 480 |
 
-	these parameter lists are not read after this? is there some kind of indirect dma mode, or is code not being called that should use them.
-	plenty more code is called, including more that looks a lot like the above, some use of 707f and at the end of the funciton, code to
-	write various tilemap registers, including reenabling the tilemap that was disabled around 055098.
+    these parameter lists are not read after this? is there some kind of indirect dma mode, or is code not being called that should use them.
+    plenty more code is called, including more that looks a lot like the above, some use of 707f and at the end of the funciton, code to
+    write various tilemap registers, including reenabling the tilemap that was disabled around 055098.
 
-	--
+    --
 
 
    if you return rand() on 707f reads sometimes you see

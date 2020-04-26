@@ -94,7 +94,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
-	
+
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
 	DECLARE_WRITE8_MEMBER(in0_w);
@@ -119,7 +119,7 @@ protected:
 	uint8_t m_410x_scramble[2];
 
 	uint8_t m_8000_addr_latch;
-	
+
 	uint8_t m_4242;
 	uint8_t m_411c;
 	uint8_t m_411d;
@@ -223,8 +223,8 @@ protected:
 	DECLARE_READ8_MEMBER(vt03_413x_r);
 	DECLARE_WRITE8_MEMBER(vt03_413x_w);
 
- 	DECLARE_READ8_MEMBER(vt03_414f_r);
-	
+	DECLARE_READ8_MEMBER(vt03_414f_r);
+
 	DECLARE_READ8_MEMBER(vt03_415c_r);
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);

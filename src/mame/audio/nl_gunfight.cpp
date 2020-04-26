@@ -11,8 +11,8 @@
 
 #endif
 
-#define USE_FRONTIERS	1
-#define FAST_SWITCHES	1
+#define USE_FRONTIERS   1
+#define FAST_SWITCHES   1
 
 // I got this circuit's layout from Midway's schematic, "Gun Fight Sound
 // Generator Detail P.C. 597-907E".

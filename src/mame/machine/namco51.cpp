@@ -105,7 +105,7 @@ void namco_51xx_device::write(uint8_t data)
 
 TIMER_CALLBACK_MEMBER( namco_51xx_device::write_sync )
 {
-        m_portO = param;
+	m_portO = param;
 }
 
 uint8_t namco_51xx_device::K_r()
@@ -135,11 +135,11 @@ uint8_t namco_51xx_device::R3_r()
 
 void namco_51xx_device::O_w(uint8_t data)
 {
-        uint8_t out = (data & 0x0f);
-        if (data & 0x10)
-                m_portO = (m_portO & 0x0f) | (out << 4);
-        else
-                m_portO = (m_portO & 0xf0) | (out);
+	uint8_t out = (data & 0x0f);
+	if (data & 0x10)
+		m_portO = (m_portO & 0x0f) | (out << 4);
+	else
+		m_portO = (m_portO & 0xf0) | (out);
 }
 
 /***************************************************************************

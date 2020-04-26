@@ -548,7 +548,7 @@ ROM_START( euroxt )
 	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v1.04", "EuroXT v1.04" )
 	ROMX_LOAD("euro_xt_bios_v1.04_cs8b00_5.12.89_21_25.bin", 0x8000, 0x8000, CRC(24033a62) SHA1(9d1d89cb8b99569b6c0aaa7c6aceb355dc20b2fd), ROM_BIOS(2))
-	
+
 	// BIOS ROM versions 1.02 and 1.04 were accompanied by identical char ROM versions 50146, which in turn match the one used in /bus/isa/aga.cpp
 ROM_END
 

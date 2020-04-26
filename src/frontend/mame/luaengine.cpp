@@ -223,8 +223,8 @@ static input_seq_type parse_seq_type(const std::string &s)
 
 
 //-------------------------------------------------
-//	parse_movie_format - processes a movie format
-//	string
+//  parse_movie_format - processes a movie format
+//  string
 //-------------------------------------------------
 
 static movie_recording::format parse_movie_format(const std::string &s)
@@ -239,8 +239,8 @@ static movie_recording::format parse_movie_format(const std::string &s)
 
 
 //-------------------------------------------------
-//	process_snapshot_filename - processes a snapshot
-//	filename
+//  process_snapshot_filename - processes a snapshot
+//  filename
 //-------------------------------------------------
 
 static std::string process_snapshot_filename(running_machine &machine, const char *s)

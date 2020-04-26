@@ -113,7 +113,7 @@ protected:
 	optional_device<msm5205_device> m_msm_2;
 
 	optional_memory_bank m_okibank;
-	
+
 	optional_ioport_array<3> m_sgyxz_dsw;
 };
 

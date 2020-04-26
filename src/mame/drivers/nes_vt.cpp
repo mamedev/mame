@@ -69,7 +69,7 @@ protected:
 
 	DECLARE_READ8_MEMBER(vt_rom_r);
 	DECLARE_WRITE8_MEMBER(vtspace_w);
-	
+
 	void configure_soc(nes_vt_soc_device* soc);
 
 	DECLARE_READ8_MEMBER(upper_412c_r);
@@ -190,7 +190,7 @@ public:
 	nes_vt_hum_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
-	
+
 	void nes_vt_hummer_2mb(machine_config& config);
 	void nes_vt_hummer_4mb(machine_config& config);
 };
@@ -494,7 +494,7 @@ READ8_MEMBER(nes_vt_base_state::extrain_0_r)
 	{
 		logerror("%s: extrain_0_r (not hooked up)\n", machine().describe_context());
 	}
-	return 0x00;	
+	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_base_state::extrain_1_r)
@@ -505,7 +505,7 @@ READ8_MEMBER(nes_vt_base_state::extrain_1_r)
 	{
 		logerror("%s: extrain_1_r (not hooked up)\n", machine().describe_context());
 	}
-	return 0x00;	
+	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_base_state::extrain_2_r)
@@ -516,7 +516,7 @@ READ8_MEMBER(nes_vt_base_state::extrain_2_r)
 	{
 		logerror("%s: extrain_2_r (not hooked up)\n", machine().describe_context());
 	}
-	return 0x00;	
+	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_base_state::extrain_3_r)
@@ -527,7 +527,7 @@ READ8_MEMBER(nes_vt_base_state::extrain_3_r)
 	{
 		logerror("%s: extrain_3_r (not hooked up)\n", machine().describe_context());
 	}
-	return 0x00;	
+	return 0x00;
 }
 
 /* Standard I/O handlers (NES Controller clone) */
@@ -1018,7 +1018,7 @@ void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	*/
@@ -1070,7 +1070,7 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
-	
+
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
@@ -1091,7 +1091,7 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	*/
@@ -1286,7 +1286,7 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	
+
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
@@ -1309,7 +1309,7 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
 void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
 	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);	
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 

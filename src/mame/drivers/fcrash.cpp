@@ -90,10 +90,10 @@ sgyxz:              Priority problems - doesn't seem to write the layer mask val
 wofr1bl:            Priority problems - doesn't seem to write the layer mask values anywhere.
 
 brightness circuity present on pcb?
-	sgyxz		no
-	wofabl		no
-	wofr1bl		no
-	others		tbc...   assume yes for now
+    sgyxz       no
+    wofabl      no
+    wofr1bl     no
+    others      tbc...   assume yes for now
 */
 
 #include "emu.h"
@@ -336,15 +336,15 @@ WRITE16_MEMBER(fcrash_state::wofr1bl_layer_w)
 			// see bootleggers routines starting at $101000
 			// writes values 0-f to 98000c
 			// how does this relate to layer control reg value?
-			
+
 			// original game values:
 			// m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x6398 / 2];
 			// m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x639a / 2];
 			// m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x639c / 2];
 			// m_cps_b_regs[m_layer_mask_reg[3] / 2] = m_mainram[0x639e / 2];
-			
+
 			m_cps_b_regs[0x3e / 2] = data;
-			
+
 			switch (data)
 			{
 			case 0:    // 12ce
@@ -1008,7 +1008,7 @@ MACHINE_START_MEMBER(fcrash_state, sgyxz)
 {
 	m_layer_enable_reg = 0x20;
 	// palette_control  = 0x2a
-	
+
 	// layer priority masks:
 	// clears 0x28, 0x2c, 0x2e at boot, then never writes any layer mask values anywhere outside main ram.
 	// (bootleggers have nop'd the original code)
@@ -1017,14 +1017,14 @@ MACHINE_START_MEMBER(fcrash_state, sgyxz)
 	m_layer_mask_reg[1] = 0x3a;
 	m_layer_mask_reg[2] = 0x3c;
 	m_layer_mask_reg[3] = 0x3e;
-	
+
 	m_layer_scroll1x_offset = 0x40;
 	m_layer_scroll2x_offset = 0x40;
 	m_layer_scroll3x_offset = 0x40;
 	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0x8000;
 	m_sprite_x_offset = 0;
-	
+
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -1433,10 +1433,10 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )  // test mode doesn't work
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	// No COIN3, must use SERVICE1 to credit 3P in "3 Players, 3 Chutes" mode
 	// STARTx changes character during gameplay
-	
+
 	PORT_START ("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1483,7 +1483,7 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_DIPSETTING( 0x80, "2" )
 	PORT_DIPSETTING( 0x40, "1" )
 	PORT_DIPSETTING( 0x00, "0" )
-	
+
 	PORT_START("DSWC")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW(C):1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW(C):2" )
@@ -1519,7 +1519,7 @@ static INPUT_PORTS_START( wofabl )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START ("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1537,7 +1537,7 @@ static INPUT_PORTS_START( wofabl )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(A):1,2,3,4")
 	PORT_DIPSETTING( 0x0f, DEF_STR( 1C_1C ) )
@@ -1555,7 +1555,7 @@ static INPUT_PORTS_START( wofabl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(A):6" )  // 1c 8c?
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(A):7" )  // 2 coins start?
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(A):8" )  // 1c 7c?
-	
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x04, "Game Difficulty" ) PORT_DIPLOCATION("SW(B):1,2,3")
 	PORT_DIPSETTING( 0x07, "0 (Extra Easy)" )
@@ -1577,7 +1577,7 @@ static INPUT_PORTS_START( wofabl )
 	PORT_DIPSETTING( 0x10, "Start 3, Continue 4" )
 	PORT_DIPSETTING( 0x00, "Start 4, Continue 5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
-	
+
 	PORT_START("DSWC")
 	PORT_DIPNAME( 0x03, 0x03, "Cabinet" ) PORT_DIPLOCATION("SW(C):1,2")
 	PORT_DIPSETTING( 0x03, "3 Players, 3 Chutes" )
@@ -1715,8 +1715,8 @@ void cps1bl_no_brgt::fcrash_build_palette()
 	// some bootlegs don't have the brightness hardware, the 2x 74ls07 and 2x extra resistor arrays
 	// are either unpopulated or simply don't exist in the bootleg design.
 	// this is a problem as some games (wofabl, jurassic99) use erroneous brightness values
-	// which have no effect on the bootleg pcb, but cause issues in mame (as they would on genuine hardware).	
-	
+	// which have no effect on the bootleg pcb, but cause issues in mame (as they would on genuine hardware).
+
 	int offset;
 
 	// all the bootlegs seem to write the palette offset as usual
@@ -2112,13 +2112,13 @@ ROM_END
     24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
     sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
     3x8 dsws
-	
-	bootlegger hacks:
-	2 extra playable characters (7 total)
-	can swap character during gameplay (press start to cycle)
-	new special move (button 3)
-	level order is changed
-	attract sequence shortened
+
+    bootlegger hacks:
+    2 extra playable characters (7 total)
+    can swap character during gameplay (press start to cycle)
+    new special move (button 3)
+    level order is changed
+    attract sequence shortened
 */
 ROM_START( sgyxz )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */
@@ -2264,7 +2264,7 @@ ROM_START( sf2m9 )
 	ROM_CONTINUE(                  0x000006, 0x40000)
 	ROM_LOAD64_BYTE( "tat-06.bin", 0x000003, 0x40000, CRC(90f2053e) SHA1(a78710421e702b410650c45c3dec21bf16799fb4) )
 	ROM_CONTINUE(                  0x000007, 0x40000)
-                                   
+
 	ROM_LOAD64_BYTE( "tat-03.bin", 0x200000, 0x40000, CRC(79fa8bf0) SHA1(9f8f7b8dc54a75226beb017b9ca9fd62a9e42f6b) )
 	ROM_CONTINUE(                  0x200004, 0x40000)
 	ROM_LOAD64_BYTE( "tat-07.bin", 0x200001, 0x40000, CRC(6a5f153c) SHA1(f3d82ad01e2e4bdb2039815747fa14399c69753a) )
@@ -2273,7 +2273,7 @@ ROM_START( sf2m9 )
 	ROM_CONTINUE(                  0x200006, 0x40000)
 	ROM_LOAD64_BYTE( "tat-08.bin", 0x200003, 0x40000, CRC(c16579ae) SHA1(42c9d6df9f3b015f5d1ad4fa2b34ea90bb37bcae) )
 	ROM_CONTINUE(                  0x200007, 0x40000)
-                                   
+
 	ROM_LOAD64_BYTE( "tat-09.bin", 0x400000, 0x40000, CRC(169d85a6) SHA1(dd98c8807e80465858b2eac10825e598c37e1a93) )
 	ROM_CONTINUE(                  0x400004, 0x40000)
 	ROM_LOAD64_BYTE( "tat-11.bin", 0x400001, 0x40000, CRC(32a3a841) SHA1(6f9a13b8828998d194dd3933b032c75efed9cab3) )

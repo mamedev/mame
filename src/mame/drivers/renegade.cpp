@@ -23,13 +23,13 @@ Known issues:
   Most likely ends when specific data format is encountered during playback
   cfr. jantotsu.cpp;
 - Verify irq sources;
-- Unemulated partial update bg scrolling, which should effectively add layer 
-  tearing at line ~12 according to the refs. Scrolling currently 
+- Unemulated partial update bg scrolling, which should effectively add layer
+  tearing at line ~12 according to the refs. Scrolling currently
   triggers at line 6 with current timings so we are quite off.
-  Additionally scrolling updates every other frame so simply using partial 
+  Additionally scrolling updates every other frame so simply using partial
   updates won't cope with it;
-- None of the refs has the top 8 pixels shown but 256x232 seems unlikely. 
-  Verify what it shows on real HW, should be either garbage or vblank or 
+- None of the refs has the top 8 pixels shown but 256x232 seems unlikely.
+  Verify what it shows on real HW, should be either garbage or vblank or
   border color;
 - Verify if coin counter is really tied to $3807;
 
@@ -292,7 +292,7 @@ void renegade_state::renegade_sound_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(renegade_state::adpcm_addr_w));
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0x3000, 0x3000).w(FUNC(renegade_state::adpcm_stop_w));
-//	map(0x2000, 0x7fff) read in service mode during sound test
+//  map(0x2000, 0x7fff) read in service mode during sound test
 	map(0x8000, 0xffff).rom();
 }
 

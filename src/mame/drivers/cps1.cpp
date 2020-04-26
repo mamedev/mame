@@ -346,7 +346,7 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 
 /*
   /INT2 (IRQ4) is tied high on some early B boards (eg. 89624B-3),
-  On later B boards (90629B-2, 91634B-2, 91635B-2) it is passed to the C board via connector CNA pin 9. 
+  On later B boards (90629B-2, 91634B-2, 91635B-2) it is passed to the C board via connector CNA pin 9.
   On the later cps-b-21 based C boards (92631C-6, 90631C-5, 92641C-1) it then passes to pin 57 of the cps-b-21 via jumper JP1.
   Ganbare! Marine Kun (B:91634B-2, C:92631C-6) is only game known to use it, requires a cps-b-21 C-board (90631C-5, 92631C-6, 92641C-1) with JP1 closed.
   Strider has a handler but no h/w support to call it, perhaps a remnant of some dev tool?
@@ -2968,7 +2968,7 @@ INPUT_PORTS_END
 // Note: if you have service mode stuck then start button doesn't get recognized on title screen.
 static INPUT_PORTS_START( gulunpa )
 	PORT_INCLUDE( cps1_2b )
-	
+
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW(A):1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -2993,7 +2993,7 @@ static INPUT_PORTS_START( gulunpa )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(A):8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW(B):1,2,3")
 	PORT_DIPSETTING(    0x07, "1 Easiest" )
@@ -3020,7 +3020,7 @@ static INPUT_PORTS_START( gulunpa )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSWC")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -3043,7 +3043,7 @@ static INPUT_PORTS_START( gulunpa )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Mode")	PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")  PORT_DIPLOCATION("SW(C):8")
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
@@ -13264,7 +13264,7 @@ ROM_END
 ROM_START( gulunpa ) // ROMs could do with 2nd pass dump verification
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "26",           0x00000, 0x020000, CRC(f30ffa29) SHA1(9e70daf4229485dc5700b074dba55839c7357351) )
-    ROM_LOAD16_BYTE( "30",           0x00001, 0x020000, CRC(5d35f737) SHA1(47b6bfa6eaa512684e12c23162243d1a21cb1a7a) )
+	ROM_LOAD16_BYTE( "30",           0x00001, 0x020000, CRC(5d35f737) SHA1(47b6bfa6eaa512684e12c23162243d1a21cb1a7a) )
 
 	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "9",            0x00000, 0x08000, CRC(15afd06f) SHA1(1a4ff3e11e55266e7c93743b6564c226eaaba142) )
@@ -13276,7 +13276,7 @@ ROM_START( gulunpa ) // ROMs could do with 2nd pass dump verification
 	ROM_LOAD64_WORD( "3",            0x000004, 0x080000, CRC(36c3951a) SHA1(74edaca2c78dd6a304ea702091a9f0b7f6036e41) )
 	ROM_LOAD64_WORD( "4",            0x000006, 0x080000, BAD_DUMP CRC(ff0cb826) SHA1(fec7833652e6789e886a1ec7b4680a608ddbbe20) )
 	ROM_FILL(0x000006, 1, 0xff) // patch first byte of ROM 4 pending redump (corrupt top line of 0 character, 8x8 tile data should match between ROM pairs)
-//	ROM_COPY( "gfx", 0x000000, 0x200000, 0x200000 )
+//  ROM_COPY( "gfx", 0x000000, 0x200000, 0x200000 )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "18",          0x00000, 0x20000, CRC(9997a34f) SHA1(8e107d6413836c48fc57e4a9b89ae99a9e381e8b) )
@@ -13654,7 +13654,7 @@ void cps_state::init_pang3()
 	// encryption is switched on/off by pin 37.
 	// encrypted code range is controlled by PAL CP1B9K which sets pin 37 such that: 00000-7ffff unencrypted, >=80000 encrypted.
 	// the mach215 responds to R/W 800174-80017B enabled by pin 36, range set by PAL CP1B8K.
-	
+
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int A, src, dst;
 

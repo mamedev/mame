@@ -30,9 +30,9 @@ static INPUT_PORTS_START( jak_sharp )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) 
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) 
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 
 	PORT_START("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -50,7 +50,7 @@ void jakks_sharp_state::base_config(machine_config& config)
 	spg2xx_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_sharp_state::mem_map_1m);
-	
+
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
@@ -73,7 +73,7 @@ ROM_END
 // has UK specific voice actors, US versions on YouTube have different voices not present in this set
 CONS( 2007, jsc_thom, 0, 0, base_config_pal,     jak_sharp,      jakks_sharp_state, empty_init, "JAKKS Pacific Inc / Child Guidance / Pronto Games",          "Thomas & Friends - Learning Circus Express (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is pink/purple.
 
-// The Amazing Spider-Man - Great Math Caper 
+// The Amazing Spider-Man - Great Math Caper
 // Scooby-Doo! - The Pirate's Puzzles
-// Go Diego Go - Aztec ABC Adventure 
-// Dora the Explorer - Dora Saves the Mermaids 
+// Go Diego Go - Aztec ABC Adventure
+// Dora the Explorer - Dora Saves the Mermaids

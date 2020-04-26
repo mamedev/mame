@@ -369,11 +369,11 @@ void ks0164_device::cpu_map(address_map &map)
 
 u16 ks0164_device::uncomp_8_16(u8 value)
 {
-    int xp = value >> 5;
-    s16 o = (0x10 | (value & 0xf)) << 10;
-    o = o >> xp;
-    if(value & 0x10)
-      o = -o;
+	int xp = value >> 5;
+	s16 o = (0x10 | (value & 0xf)) << 10;
+	o = o >> xp;
+	if(value & 0x10)
+	  o = -o;
 	return o;
 }
 

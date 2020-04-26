@@ -37,7 +37,7 @@ public:
 	DECLARE_READ16_MEMBER(mslug5p_prot_r);
 	//DECLARE_WRITE16_MEMBER(ms5plus_bankswitch_w);
 	uint32_t mslug5p_bank_base(uint16_t sel);
-	
+
 	void mslug5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size);
 	void mslug5b_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_size);
 

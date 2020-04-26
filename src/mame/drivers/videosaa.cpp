@@ -4,28 +4,28 @@
 
     Joker Lady
     Lady Gum
-	Paradar
-	Winner
+    Paradar
+    Winner
 
-	© 1995? Videos A A
+    © 1995? Videos A A
 
     TODO:
-	- Palette
-	- Unknown tile attributes
+    - Palette
+    - Unknown tile attributes
 
-	Notes:
+    Notes:
 
     Probably manufactured in Italy since PCBs are marked 'lato componenti'
-	(components side) and 'lato saldature' (solder side). Lady Gum's 68HC705
-	ROM contains strings in French, though.
+    (components side) and 'lato saldature' (solder side). Lady Gum's 68HC705
+    ROM contains strings in French, though.
 
     PCBs couldn't be tested so game titles are taken from ROM stickers.
 
     The only complete dump is Lady Gum, all the others are missing at least
-	the 68HC705 internal ROM.
+    the 68HC705 internal ROM.
 
-	On the first service mode screen hold PROG (HOLD5), then push COIN (HOLD1)
-	to adjust the coin values.
+    On the first service mode screen hold PROG (HOLD5), then push COIN (HOLD1)
+    to adjust the coin values.
 
     Hardware:
     - CPU: MC68HC705C8ACS (verified on Winner, stickers/PCB marks say 68HC705)
@@ -86,7 +86,7 @@ private:
 	required_ioport m_dip;
 
 	output_finder<6> m_lamps;
-	
+
 	uint8_t maincpu_porta_r();
 	void maincpu_porta_w(uint8_t data);
 	void maincpu_portb_w(uint8_t data);
@@ -277,7 +277,7 @@ void videosaa_state::maincpu_portb_w(uint8_t data)
 				m_lamps[5] = BIT(m_porta, 5);
 				break;
 
-			case 4: 
+			case 4:
 				// always 0?
 				if (m_porta)
 					logerror("Latch 4 port A = %02x\n", m_porta);
@@ -313,14 +313,14 @@ void videosaa_state::maincpu_portb_w(uint8_t data)
 		{
 			case 0:
 				m_video_latch[0] = m_portc;
-				
+
 				if (m_video_latch[0] < 0x08)
 				{
 					offs_t address = (m_video_latch[0] << 8) | m_video_latch[1];
-					
+
 					m_vram0[address] = m_video_latch[3];
 					m_vram1[address] = m_video_latch[2];
-					
+
 					m_tilemap->mark_tile_dirty(address);
 				}
 				else
@@ -331,11 +331,11 @@ void videosaa_state::maincpu_portb_w(uint8_t data)
 			case 1:
 				m_video_latch[1] = m_portc;
 				break;
-			
+
 			case 2:
 				m_video_latch[2] = m_portc;
 				break;
-			
+
 			case 3:
 				m_video_latch[3] = m_portc;
 				break;
@@ -346,7 +346,7 @@ void videosaa_state::maincpu_portb_w(uint8_t data)
 
 				if (BIT(m_chip_latch, 7) == 0 && BIT(m_chip_latch, 6) == 1)
 					m_crtc->register_w(m_portc);
-	
+
 				break;
 
 			default:

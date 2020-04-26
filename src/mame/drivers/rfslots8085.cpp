@@ -8,7 +8,7 @@
     IC21 = NEC uPD8279C-2 Programmable Keyboard Display Interface
     IC24 = Toshiba TMP8255AP-5 Programmable Peripheral Interface
     IC32 = 27C128
-    IC34 = Toshiba TC5517APL 2.048 Word X 8 Bit CMOS Static RAM 
+    IC34 = Toshiba TC5517APL 2.048 Word X 8 Bit CMOS Static RAM
     IC31 = uPD8085AC CPU (Xtal 5.0688 MHz)
     IC33 = AMD P8212 8-Bit IO Port
     IC40 = Signetics SCN8035A MCU (Xtal 6.000 MHz)
@@ -120,7 +120,7 @@ ROM_START(unkrfslt)
 	ROM_LOAD("m1-31_b_1704.ic32", 0x0000, 0x4000, CRC(a74a85b7) SHA1(f562495a6b97f34165cc9fd5c750664701cac21f))
 
 	ROM_REGION(0x1000, "audiocpu", 0)
-	ROM_LOAD( "8a.ic44", 0x0000, 0x1000, CRC(51b564b6) SHA1(8992a5cb4dff8c6b38b77a7e0199a71f2969b496) ) 
+	ROM_LOAD( "8a.ic44", 0x0000, 0x1000, CRC(51b564b6) SHA1(8992a5cb4dff8c6b38b77a7e0199a71f2969b496) )
 	ROM_IGNORE(                  0x3000 ) // 0xff filled and it's outside of the 8035's global address mask (fff)
 ROM_END
 

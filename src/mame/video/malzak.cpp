@@ -55,14 +55,14 @@ WRITE8_MEMBER(malzak_state::playfield_w)
 	m_playfield_code[tile] = data;
 	m_playfield_tilemap->mark_tile_dirty(tile);
 	// POST only, adds to the scrollx base address?
-//	if (offset & 0xf)
-//		popmessage("GFX: 0x16%02x write 0x%02x\n", offset, data);
+//  if (offset & 0xf)
+//      popmessage("GFX: 0x16%02x write 0x%02x\n", offset, data);
 }
 
 TILE_GET_INFO_MEMBER(malzak_state::get_tile_info)
 {
 	u8 code = (m_playfield_code[tile_index] & 0x1f) | (m_playfield_bank << 5);
-	u8 color = ((m_playfield_code[tile_index] & 0xe0) >> 5);	
+	u8 color = ((m_playfield_code[tile_index] & 0xe0) >> 5);
 	tileinfo.set(0, code, color, 0);
 }
 
@@ -99,7 +99,7 @@ uint32_t malzak_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			int s2636_pix_1 = s2636_1_bitmap.pix16(sy, sx);
 			rgb_t trom_pix = m_trom_bitmap->pix32(y, x);
 			rgb_t play_pix = m_playfield_bitmap->pix32(sy, sx);
-			
+
 			// SAA5050 > s2636[1] > s2636[0] > playfield
 			if (trom_pix != rgb_t::black())
 				bitmap.pix32(y, x) = trom_pix;

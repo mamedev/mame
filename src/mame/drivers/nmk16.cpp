@@ -4590,7 +4590,7 @@ void nmk16_state::strahl(machine_config &config)
 
 void nmk16_state::strahljbl(machine_config &config)
 {
-	M68000(config, m_maincpu, 12_MHz_XTAL); 
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::strahljbl_map);
 	set_hacky_interrupt_timing(config);
 

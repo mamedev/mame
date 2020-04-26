@@ -161,7 +161,7 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 		gfx_element *gfx = m_gfxdecode->gfx(0);
 		gfx->transpen(bitmap,cliprect,tile,colour,flipx,0,realx,y,0xff);
 	}
-	
+
 	return 0;
 }
 

@@ -491,7 +491,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
 	u32 end_addr = start_addr + 0x800;
-	
+
 
 	for (int offs=start_addr; offs<end_addr; offs+=8)
 	{

@@ -18,9 +18,9 @@ public:
 	auto lockout_callback() { return m_lockout.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( reset );
-        DECLARE_WRITE_LINE_MEMBER( vblank );
-        DECLARE_WRITE_LINE_MEMBER( rw );
-        DECLARE_WRITE_LINE_MEMBER( chip_select );
+	DECLARE_WRITE_LINE_MEMBER( vblank );
+	DECLARE_WRITE_LINE_MEMBER( rw );
+	DECLARE_WRITE_LINE_MEMBER( chip_select );
 	void write(uint8_t data);
 	uint8_t read();
 
@@ -33,8 +33,8 @@ protected:
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
-        uint8_t m_portO;
-        uint8_t m_rw;
+	uint8_t m_portO;
+	uint8_t m_rw;
 	devcb_read8::array<4> m_in;
 	devcb_write8 m_out;
 	devcb_write_line m_lockout;

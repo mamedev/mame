@@ -235,5 +235,5 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",
 
-    MAME_DIR .. "src/lib/netlist/generated/static_solvers.cpp",
+		MAME_DIR .. "src/lib/netlist/generated/static_solvers.cpp",
 	}

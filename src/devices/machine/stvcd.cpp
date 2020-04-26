@@ -25,7 +25,7 @@
 TODO:
 - finish off code cleanups (repetition etc.);
 - improve debugging;
-- fix DRQ behaviour, several softwares gets to the point of filling 
+- fix DRQ behaviour, several softwares gets to the point of filling
   the buffer (and probably don't know what to do);
 - fix startup, cfr. cdblock branch;
 - merge common components with lle version via superclass (i.e. comms);
@@ -35,7 +35,7 @@ DASM notes:
 * whizzj:
 - wpset 0x605e4b8,4,w,wpdata==0x4e
   (second trigger)
-- write to 0x605e498 -> 1 
+- write to 0x605e498 -> 1
   (PUBLISH.CPK tries to playback a few frames then keeps looping)
 
 ***************************************************************************/
@@ -231,7 +231,7 @@ inline u32 stvcd_device::dataxfer_long_r()
 			osd_printf_error("CD: unhandled 32-bit transfer type\n");
 			break;
 	}
-		
+
 	return rv;
 }
 
@@ -375,7 +375,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 	return rv;
 }
 
-READ16_MEMBER( stvcd_device::hirq_r ) 
+READ16_MEMBER( stvcd_device::hirq_r )
 {
 	// TODO: this member must return the register only
 	u16 rv;
@@ -397,26 +397,26 @@ READ16_MEMBER( stvcd_device::hirq_r )
 WRITE16_MEMBER( stvcd_device::hirq_w ) { hirqreg &= data; }
 
 // TODO: these two are actually never read or written to by host?
-READ16_MEMBER( stvcd_device::hirqmask_r ) 
-{ 
+READ16_MEMBER( stvcd_device::hirqmask_r )
+{
 	printf("RW HIRM: %04x\n", hirqmask);
-	return hirqmask; 
+	return hirqmask;
 }
 
-WRITE16_MEMBER( stvcd_device::hirqmask_w ) 
-{ 
+WRITE16_MEMBER( stvcd_device::hirqmask_w )
+{
 	printf("WW HIRM: %04x => %04x\n", hirqmask, data);
-	COMBINE_DATA(&hirqmask); 
+	COMBINE_DATA(&hirqmask);
 }
 
 READ16_MEMBER( stvcd_device::cr1_r ) { return cr1; }
 READ16_MEMBER( stvcd_device::cr2_r ) { return cr2; }
 READ16_MEMBER( stvcd_device::cr3_r ) { return cr3; }
-READ16_MEMBER( stvcd_device::cr4_r ) 
-{ 
+READ16_MEMBER( stvcd_device::cr4_r )
+{
 	cmd_pending = 0;
 	cd_stat |= CD_STAT_PERI;
-	return cr4; 
+	return cr4;
 }
 
 // TODO: understand how dual-port interface really works out
@@ -431,7 +431,7 @@ WRITE16_MEMBER( stvcd_device::cr1_w )
 WRITE16_MEMBER( stvcd_device::cr2_w )
 {
 	cr2 = data;
-	cmd_pending |= 2;	
+	cmd_pending |= 2;
 }
 
 WRITE16_MEMBER( stvcd_device::cr3_w )
@@ -444,7 +444,7 @@ WRITE16_MEMBER( stvcd_device::cr4_w )
 {
 	cr4 = data;
 	cmd_pending |= 8;
-	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));	
+	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
 }
 
 READ32_MEMBER( stvcd_device::stvcd_r )
@@ -601,7 +601,7 @@ void stvcd_device::cmd_get_session_info()
 	}
 
 	hirqreg |= (CMOK);
-	status_type = 0;	
+	status_type = 0;
 }
 
 void stvcd_device::cmd_init_cdsystem()
@@ -1057,7 +1057,7 @@ void stvcd_device::cmd_get_filter_range()
 
 void stvcd_device::cmd_set_filter_subheader_conditions()
 {
-    // Set Filter Subheader conditions
+	// Set Filter Subheader conditions
 	uint8_t fnum = (cr3>>8)&0xff;
 
 	LOG("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
@@ -1237,7 +1237,7 @@ void stvcd_device::cmd_reset_selector()
 }
 
 void stvcd_device::cmd_get_buffer_size()
-{	
+{
 	// get Buffer Size
 	cr1 = cd_stat;
 	cr2 = (freeblocks > 200) ? 200 : freeblocks;
@@ -1656,7 +1656,7 @@ void stvcd_device::cmd_read_directory()
 }
 
 void stvcd_device::cmd_get_file_scope()
-{	
+{
 	// Get file system scope
 	LOG("%s: Get file system scope\n", machine().describe_context());
 	hirqreg |= (CMOK|EFLS);
@@ -1814,7 +1814,7 @@ void stvcd_device::cmd_get_disc_region()
 	cr3 = 0;
 	cr4 = 0;
 	hirqreg |= (CMOK);
-//	cr_standard_return(cd_stat);
+//  cr_standard_return(cd_stat);
 	status_type = 0;
 
 }
@@ -1853,7 +1853,7 @@ void stvcd_device::cmd_mpeg_set_irq_mask()
 	// MPEG Set IRQ Mask
 	// ...
 	mpeg_standard_return(cd_stat);
-	hirqreg |= (CMOK);	
+	hirqreg |= (CMOK);
 }
 
 void stvcd_device::cmd_mpeg_set_mode()
@@ -1922,10 +1922,10 @@ void stvcd_device::cd_exec_command()
 		case 0x52: cmd_calculate_actual_data_size(); break;
 		case 0x53: cmd_get_actual_data_size(); break;
 		case 0x54: cmd_get_sector_information(); break;
-//		case 0x55: cmd_execute_frame_address_search()
-//		case 0x56: cmd_get_frame_address_search_results()
+//      case 0x55: cmd_execute_frame_address_search()
+//      case 0x56: cmd_get_frame_address_search_results()
 
-		case 0x60: cmd_set_sector_length();	break;
+		case 0x60: cmd_set_sector_length(); break;
 		case 0x61: cmd_get_sector_data(); break;
 		case 0x62: cmd_delete_sector_data(); break;
 		case 0x63: cmd_get_and_delete_sector_data(); break;
@@ -1934,7 +1934,7 @@ void stvcd_device::cd_exec_command()
 		case 0x66: cmd_copy_sector_data(); break;
 		case 0x67: cmd_get_sector_data_copy_or_move_error(); break;
 
-		case 0x70: cmd_change_directory(); break;    
+		case 0x70: cmd_change_directory(); break;
 		case 0x71: cmd_read_directory(); break;
 		case 0x72: cmd_get_file_scope(); break;
 		case 0x73: cmd_get_target_file_info(); break;
