@@ -338,16 +338,12 @@ namespace netlist
 		models_t &models() noexcept { return m_models; }
 		const models_t &models() const noexcept { return m_models; }
 
+		plib::psource_t::stream_ptr get_data_stream(const pstring &name);
+
 	protected:
-		models_t                                    m_models;
-		std::stack<pstring>                         m_namespace_stack;
 		std::unordered_map<pstring, pstring>        m_alias;
 		std::vector<link_t>                         m_links;
 		std::unordered_map<pstring, pstring>        m_param_values;
-
-		plib::psource_collection_t<>                m_sources;
-
-		factory::list_t                             m_factory;
 
 		// need to preserve order of device creation ...
 		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
@@ -356,6 +352,10 @@ namespace netlist
 	private:
 		plib::ppreprocessor::defines_map_type       m_defines;
 		plib::psource_collection_t<>                m_includes;
+		models_t                                    m_models;
+		std::stack<pstring>                         m_namespace_stack;
+		plib::psource_collection_t<>                m_sources;
+		factory::list_t                             m_factory;
 
 		setup_t  &m_setup;
 		log_type &m_log;
@@ -402,11 +402,6 @@ namespace netlist
 
 		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
 		void resolve_inputs();
-
-		plib::psource_t::stream_ptr get_data_stream(const pstring &name);
-
-		factory::list_t &factory() { return m_factory; }
-		const factory::list_t &factory() const { return m_factory; }
 
 		// helper - also used by nltool
 		pstring resolve_alias(const pstring &name) const;

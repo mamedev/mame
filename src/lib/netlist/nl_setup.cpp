@@ -329,6 +329,19 @@ namespace netlist
 	}
 
 	// ----------------------------------------------------------------------------------------
+	// Sources
+	// ----------------------------------------------------------------------------------------
+
+	plib::psource_t::stream_ptr nlparse_t::get_data_stream(const pstring &name)
+	{
+		auto strm = m_sources.get_stream<source_data_t>(name);
+		if (strm)
+			return strm;
+		log().warning(MW_DATA_1_NOT_FOUND(name));
+		return plib::psource_t::stream_ptr(nullptr);
+	}
+
+	// ----------------------------------------------------------------------------------------
 	// setup_t
 	// ----------------------------------------------------------------------------------------
 
@@ -1179,44 +1192,30 @@ unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
 
-	if (m_models.value_str(model, "TYPE") == "TTL")
+	if (models().value_str(model, "TYPE") == "TTL")
 		return family_TTL();
-	if (m_models.value_str(model, "TYPE") == "CD4XXX")
+	if (models().value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
-	auto it = m_nlstate.m_family_cache.find(model);
-	if (it != m_nlstate.m_family_cache.end())
+	auto it = m_nlstate.family_cache().find(model);
+	if (it != m_nlstate.family_cache().end())
 		return it->second.get();
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_low_thresh_PCNT = m_models.value(model, "IVL");
-	ret->m_high_thresh_PCNT = m_models.value(model, "IVH");
-	ret->m_low_VO = m_models.value(model, "OVL");
-	ret->m_high_VO = m_models. value(model, "OVH");
-	ret->m_R_low = m_models.value(model, "ORL");
-	ret->m_R_high = m_models.value(model, "ORH");
+	ret->m_low_thresh_PCNT = models().value(model, "IVL");
+	ret->m_high_thresh_PCNT = models().value(model, "IVH");
+	ret->m_low_VO = models().value(model, "OVL");
+	ret->m_high_VO = models(). value(model, "OVH");
+	ret->m_R_low = models().value(model, "ORL");
+	ret->m_R_high = models().value(model, "ORH");
 
 	auto *retp = ret.get();
 
-	m_nlstate.m_family_cache.emplace(model, std::move(ret));
+	m_nlstate.family_cache().emplace(model, std::move(ret));
 
 	return retp;
 }
-
-// ----------------------------------------------------------------------------------------
-// Sources
-// ----------------------------------------------------------------------------------------
-
-plib::psource_t::stream_ptr setup_t::get_data_stream(const pstring &name)
-{
-	auto strm = m_sources.get_stream<source_data_t>(name);
-	if (strm)
-		return strm;
-	log().warning(MW_DATA_1_NOT_FOUND(name));
-	return plib::psource_t::stream_ptr(nullptr);
-}
-
 
 // ----------------------------------------------------------------------------------------
 // Device handling
@@ -1271,8 +1270,8 @@ void setup_t::prepare_to_run()
 
 	// set default model parameters
 
-	m_models.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
-	m_models.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	models().register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	models().register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
 
 	// create devices
 

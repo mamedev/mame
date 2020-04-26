@@ -13,21 +13,21 @@ namespace analog
 	{
 	public:
 		diode()
-		: m_Is(nlconst::magic(1e-15))
-		, m_VT(nlconst::magic(0.0258))
+		: m_Is(nlconst::np_Is())
+		, m_VT(nlconst::np_VT())
 		, m_VT_inv(plib::reciprocal(m_VT))
 		{}
 
 		diode(nl_fptype Is, nl_fptype n)
 		{
 			m_Is = Is;
-			m_VT = nlconst::magic(0.0258) * n;
+			m_VT = nlconst::np_VT(n);
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		void set(nl_fptype Is, nl_fptype n) noexcept
 		{
 			m_Is = Is;
-			m_VT = nlconst::magic(0.0258) * n;
+			m_VT = nlconst::np_VT(n);
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		nl_fptype I(nl_fptype V) const noexcept { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }

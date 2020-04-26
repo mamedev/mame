@@ -23,7 +23,7 @@ namespace netlist
 		, m_tp(nullptr)
 		, m_tn(nullptr)
 	{
-		m_logic_family = inout_proxied->logic_family();
+		set_logic_family(inout_proxied->logic_family());
 
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 

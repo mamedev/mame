@@ -506,7 +506,7 @@ void tool_app_t::run()
 	auto emutime(t.as_seconds<nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
 			(ttr - nlstart).as_fp<nl_fptype>(), emutime,
-			(ttr - nlstart).as_fp<nl_fptype>() / emutime * netlist::nlconst::magic(100.0));
+			(ttr - nlstart).as_fp<nl_fptype>() / emutime * netlist::nlconst::hundred());
 }
 
 void tool_app_t::validate()

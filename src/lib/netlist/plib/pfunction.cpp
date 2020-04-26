@@ -14,6 +14,8 @@
 
 namespace plib {
 
+	static constexpr const std::size_t MAX_STACK = 32;
+
 	template <typename NT>
 	void pfunction<NT>::compile(const pstring &expr, const inputs_container &inputs) noexcept(false)
 	{
@@ -86,6 +88,8 @@ namespace plib {
 			}
 			if (stk < 1)
 				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+			if (stk >= static_cast<int>(MAX_STACK))
+				throw pexception(plib::pfmt("pfunction: stack overflow on token <{1}> in <{2}>")(cmd)(expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
@@ -242,8 +246,8 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
-		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffU);
+			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
+		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffU); // NOLINT
 	}
 
 	template <typename NT>
@@ -253,7 +257,7 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
+			lfsr ^= 0xB400U; // NOLINT: taps 15, 13, 12, 10
 		return static_cast<NT>(lfsr);
 	}
 
@@ -269,7 +273,7 @@ namespace plib {
 	template <typename NT>
 	NT pfunction<NT>::evaluate(const values_container &values) noexcept
 	{
-		std::array<value_type, 20> stack = { plib::constants<value_type>::zero() };
+		std::array<value_type, MAX_STACK> stack = { plib::constants<value_type>::zero() };
 		unsigned ptr = 0;
 		stack[0] = plib::constants<value_type>::zero();
 		for (auto &rc : m_precompiled)

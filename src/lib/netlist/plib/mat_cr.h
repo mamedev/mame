@@ -43,11 +43,16 @@ namespace plib
 			FILL_INFINITY = 9999999
 		};
 
+		// FIXME: these should be private
+		// NOLINTNEXTLINE
 		parray<index_type, N> diag;      // diagonal index pointer n
+		// NOLINTNEXTLINE
 		parray<index_type, Np1> row_idx;      // row index pointer n + 1
+		// NOLINTNEXTLINE
 		parray<index_type, NSQ> col_idx;       // column index array nz_num, initially (n * n)
+		// NOLINTNEXTLINE
 		parray<value_type, NSQ> A;    // Matrix elements nz_num, initially (n * n)
-
+		// NOLINTNEXTLINE
 		std::size_t nz_num;
 
 		explicit pmatrix_cr_t(std::size_t n)
@@ -237,6 +242,8 @@ namespace plib
 		}
 
 	protected:
+		// FIXME: this should be private
+		// NOLINTNEXTLINE
 		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination

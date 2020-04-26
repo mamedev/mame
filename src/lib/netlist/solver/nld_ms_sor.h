@@ -98,7 +98,7 @@ namespace solver
 				for (std::size_t i = 0; i < term_count; i++)
 					gabs_t = gabs_t + plib::abs(go[i]);
 
-				gabs_t *= nlconst::magic(0.5); // derived by try and error
+				gabs_t *= nlconst::half(); // derived by try and error
 				if (gabs_t <= gtot_t)
 				{
 					w[k] = ws / static_cast<float_type>(gtot_t);

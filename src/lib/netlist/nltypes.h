@@ -26,9 +26,23 @@
 
 namespace netlist
 {
-	/// \brief plib::constants struct specialized for nl_fptype.
+	/// \brief Constants and const calculations for the library
 	///
-	struct nlconst : public plib::constants<nl_fptype>
+	template<typename T>
+	struct nlconst_base : public plib::constants<T>
+	{
+		using BC = plib::constants<T>;
+
+		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
+		{ return n * temp * BC::k_b() / BC::Q_e(); }
+
+		static inline constexpr T np_Is() noexcept
+		{ return static_cast<T>(1e-15); } // NOLINT
+	};
+
+	/// \brief nlconst_base struct specialized for nl_fptype.
+	///
+	struct nlconst : public nlconst_base<nl_fptype>
 	{
 	};
 

@@ -455,7 +455,7 @@ namespace netlist
 				index.push_back(i);
 
 			std::sort(index.begin(), index.end(),
-					[&](size_t i1, size_t i2) { return m_state.m_devices[i1].second->m_stats->m_stat_total_time.total() < m_state.m_devices[i2].second->m_stats->m_stat_total_time.total(); });
+					[&](size_t i1, size_t i2) { return m_state.m_devices[i1].second->stats()->m_stat_total_time.total() < m_state.m_devices[i2].second->stats()->m_stat_total_time.total(); });
 
 			plib::pperftime_t<true>::type total_time(0);
 			plib::pperftime_t<true>::ctype total_count(0);
@@ -463,7 +463,7 @@ namespace netlist
 			for (auto & j : index)
 			{
 				auto *entry = m_state.m_devices[j].second.get();
-				auto *stats = entry->m_stats.get();
+				auto *stats = entry->stats();
 				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
 						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
@@ -515,7 +515,7 @@ namespace netlist
 			for (auto &entry : m_state.m_devices)
 			{
 				auto *ep = entry.second.get();
-				auto *stats = ep->m_stats.get();
+				auto *stats = ep->stats();
 				// Factor of 3 offers best performace increase
 				if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 					&& stats->m_stat_inc_active() > trigger)

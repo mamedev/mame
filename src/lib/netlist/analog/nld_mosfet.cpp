@@ -397,7 +397,7 @@ namespace analog
 			else if (Vctrl <= 0)
 			{
 				Cgb = -Vctrl * m_CoxWL / m_phi;
-				Cgs = Vctrl * m_CoxWL * nlconst::magic(4.0 / 3.0) / m_phi + nlconst::magic(2.0 / 3.0) * m_CoxWL;
+				Cgs = Vctrl * m_CoxWL * nlconst::fraction(4.0, 3.0) / m_phi + nlconst::two_thirds() * m_CoxWL;
 				Cgd = nlconst::zero();
 			}
 			else
@@ -408,7 +408,7 @@ namespace analog
 				if (Vdsat <= Vds)
 				{
 					Cgb = nlconst::zero();
-					Cgs = nlconst::magic(2.0 / 3.0) * m_CoxWL;
+					Cgs = nlconst::two_thirds() * m_CoxWL;
 					Cgd = nlconst::zero();
 				}
 				else
@@ -417,8 +417,8 @@ namespace analog
 					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
 					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
-					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::magic(2.0 / 3.0);
-					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::magic(2.0 / 3.0);
+					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::two_thirds();
+					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::two_thirds();
 				}
 			}
 		}

@@ -65,7 +65,7 @@ namespace plib {
 		///
 		///
 		pfunction(const pstring &name, const void *owner, state_manager_t &state_manager)
-		: m_lfsr(0xace1U)
+		: m_lfsr(0xace1U) // NOLINT
 		{
 			state_manager.save_item(owner, m_lfsr, name + ".lfsr");
 		}
@@ -73,7 +73,7 @@ namespace plib {
 		/// \brief Constructor without state saving support
 		///
 		pfunction()
-		: m_lfsr(0xace1U)
+		: m_lfsr(0xace1U) // NOLINT
 		{
 		}
 

@@ -226,13 +226,27 @@ namespace solver
 		{
 			// We only need to update the net first if this is a time stepping net
 			if (timestep_device_count() > 0)
-				solve_now();
+			{
+				const netlist_time new_timestep = solve(exec().time());
+				plib::unused_var(new_timestep);
+				update_inputs();
+			}
 			f();
 			m_Q_sync.net().toggle_and_push_to_queue(delay);
 		}
 
 		// netdevice functions
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			const netlist_time new_timestep = solve(exec().time());
+			update_inputs();
+
+			if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
+			{
+				m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
+			}
+		}
+
 		NETLIB_RESETI();
 
 		virtual void log_stats();
@@ -495,7 +509,7 @@ namespace solver
 				m_h_n_m_1[k] = hn;
 				m_DD_n_m_1[k] = DD_n;
 				if (plib::abs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
-					new_net_timestep = plib::sqrt(m_params.m_dynamic_lte / plib::abs(nlconst::magic(0.5)*DD2));
+					new_net_timestep = plib::sqrt(m_params.m_dynamic_lte / plib::abs(nlconst::half()*DD2));
 				else
 					new_net_timestep = m_params.m_max_timestep;
 

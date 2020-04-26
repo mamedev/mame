@@ -311,6 +311,7 @@ namespace netlist
 
 	protected:
 		~logic_family_t() noexcept = default; // prohibit polymorphic destruction
+	private:
 		const logic_family_desc_t *m_logic_family;
 	};
 
@@ -642,7 +643,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -1049,7 +1050,7 @@ namespace netlist
 			plib::pperfcount_t<true> m_stat_inc_active;
 		};
 
-		unique_pool_ptr<stats_t> m_stats;
+		stats_t * stats() noexcept { return m_stats.get(); }
 
 		virtual void update() noexcept { }
 		virtual void reset() { }
@@ -1072,6 +1073,7 @@ namespace netlist
 	private:
 		bool            m_hint_deactivate;
 		state_var_s32   m_active_outputs;
+		unique_pool_ptr<stats_t> m_stats;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1371,6 +1373,7 @@ namespace netlist
 	public:
 
 		using nets_collection_type = std::vector<owned_pool_ptr<detail::net_t>>;
+		using family_collection_type = std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>>;
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
@@ -1544,8 +1547,7 @@ namespace netlist
 		devices_collection_type & devices() noexcept { return m_devices; }
 		const devices_collection_type & devices() const noexcept { return m_devices; }
 
-		// sole use is to manage lifetime of family objects
-		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
+		family_collection_type &family_cache() { return m_family_cache; }
 
 		template<typename T, typename... Args>
 		unique_pool_ptr<T> make_object(Args&&... args)
@@ -1590,6 +1592,8 @@ namespace netlist
 		nets_collection_type                m_nets;
 		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
+		// sole use is to manage lifetime of family objects
+		family_collection_type m_family_cache;
 		bool m_extended_validation;
 
 		// dummy version
@@ -1628,8 +1632,8 @@ namespace netlist
 			}
 
 		public:
-			logic_output_t m_Q;
-			netlist_time m_inc;
+			logic_output_t m_Q; // NOLINT: needed in core
+			netlist_time m_inc; // NOLINT: needed in core
 		private:
 			param_fp_t m_freq;
 		};
@@ -2067,7 +2071,7 @@ namespace netlist
 			for (auto & p : m_list_active)
 			{
 				p.set_copied_input(sig);
-				auto *stats = p.device().m_stats.get();
+				auto *stats(p.device().stats());
 				stats->m_stat_call_count.inc();
 				if ((p.terminal_state() & mask))
 				{
