@@ -40014,8 +40014,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="bokuchoq" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bokuchoq" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Boku no Choro-Q (Japan) [SLPM-87024].bin" size="253016400" crc="75ae43fe" sha1="79ae72d1c0b0f09c783ac102f34c644a4f3f192e"/>
 		<rom name="Boku no Choro-Q (Japan) [SLPM-87024].cue" size="100" crc="aa931dd3" sha1="fb93321308aece5b0280fcaab2cebd1f46188684"/>
 		-->
@@ -40028,7 +40030,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku no choro-q (japan) [slpm-87024]" sha1="ff3cbcfd88c680f23067688dc8672d132fc65f90"/>
+				<disk name="boku no choro-q (japan) [slpm-87024]" sha1="ff3cbcfd88c680f23067688dc8672d132fc65f90" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -42976,8 +42978,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, locks up after all options of first dialogue runs out (with Marina) -->
 	<software name="eve0" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Eve Zero (Japan) (Disc 1) [SLPM-86478].bin" size="749598864" crc="cc2e2372" sha1="c3ecc645a50b605036840dc9018ff74b31680cba"/>
 		<rom name="Eve Zero (Japan) (Disc 1) [SLPM-86478].cue" size="166" crc="ca89ecd7" sha1="c06f36282f72acecb26651321f070e8d9f79cd6e"/>
 
@@ -42996,23 +43000,25 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eve zero (japan) (disc 1) [slpm-86478]" sha1="1cc13a88800f9731031506f92886975936cd1d9b"/>
+				<disk name="eve zero (japan) (disc 1) [slpm-86478]" sha1="1cc13a88800f9731031506f92886975936cd1d9b" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eve zero (japan) (disc 2) [slpm-86479]" sha1="ffa1fdc9608f2395bacfff29ef7327057f8a6071"/>
+				<disk name="eve zero (japan) (disc 2) [slpm-86479]" sha1="ffa1fdc9608f2395bacfff29ef7327057f8a6071" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eve zero (japan) (disc 3) [slpm-86480]" sha1="5d4e3efea081283c30e69b9929aa91c75dee9498"/>
+				<disk name="eve zero (japan) (disc 3) [slpm-86480]" sha1="5d4e3efea081283c30e69b9929aa91c75dee9498" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="evergren" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="evergren" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Evergreen Avenue (Japan) [SLPS-03278].bin" size="497419776" crc="fd3700aa" sha1="30720521378824ad64a68fc21cb1e909553c42c9"/>
 		<rom name="Evergreen Avenue (Japan) [SLPS-03278].cue" size="517" crc="709226bb" sha1="cae2c6250f02df14f0d3f0051b90ea1b3eb0dfae"/>
 		-->
@@ -43025,7 +43031,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="evergreen avenue (japan) [slps-03278]" sha1="5c47d5ea5b01ab49df8bd3deb7f9af036c6ac9f6"/>
+				<disk name="evergreen avenue (japan) [slps-03278]" sha1="5c47d5ea5b01ab49df8bd3deb7f9af036c6ac9f6" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43067,8 +43073,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="excitbas" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, no fish controller support -->
+	<software name="excitbas" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Exciting Bass (Japan) [SLPM-86124].bin" size="98809872" crc="df88753e" sha1="e66da59dd62ba22afa84845305c875d6467b6502"/>
 		<rom name="Exciting Bass (Japan) [SLPM-86124].cue" size="100" crc="390aaae3" sha1="e2543edab55be45687aaa6fced0693992e229284"/>
 		-->
@@ -43081,13 +43089,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="exciting bass (japan) [slpm-86124]" sha1="9fcba6f41cd2fef925c5c74f5f6c340d33bf7569"/>
+				<disk name="exciting bass (japan) [slpm-86124]" sha1="9fcba6f41cd2fef925c5c74f5f6c340d33bf7569" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="excitbs2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, no fish controller support -->
+	<software name="excitbs2" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Exciting Bass 2 (Japan) [SLPM-86295].bin" size="116781504" crc="75d07179" sha1="d5689d2dd9ce389df0855096da2ba1109f67218a"/>
 		<rom name="Exciting Bass 2 (Japan) [SLPM-86295].cue" size="102" crc="08fe6a11" sha1="2cbb150a1cc95e3e4ce6613e2aff1bd68d5a5d03"/>
 		-->
@@ -43100,7 +43110,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="exciting bass 2 (japan) [slpm-86295]" sha1="238cf7f26c7c8ad3cab0eeda85b9522cfb9a75ff"/>
+				<disk name="exciting bass 2 (japan) [slpm-86295]" sha1="238cf7f26c7c8ad3cab0eeda85b9522cfb9a75ff" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43208,8 +43218,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="favodenk" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Favorite Dear - Enkan no Monogatari (Japan) [SLPS-03286].bin" size="639219504" crc="8c4f696f" sha1="605d9dd7d6d6bf985d64f307540b431459797d35"/>
 		<rom name="Favorite Dear - Enkan no Monogatari (Japan) [SLPS-03286].cue" size="119" crc="045b31b1" sha1="6bd4b05765151adca29b81f3ca52e099e12e0977"/>
 		-->
@@ -43222,7 +43234,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="favorite dear - enkan no monogatari (japan) [slps-03286]" sha1="6f1d11128f58d84d80103013d94b6122448006c0"/>
+				<disk name="favorite dear - enkan no monogatari (japan) [slps-03286]" sha1="6f1d11128f58d84d80103013d94b6122448006c0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44163,8 +44175,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, pressing start on intro FMVs causes a lock up, eventually hangs anyway -->
 	<software name="gaogaigr" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].bin" size="708417696" crc="312b7d05" sha1="8ac17340c8ff0dff6479eb5c68752a7853d4ef17"/>
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].cue" size="131" crc="54b7c369" sha1="bdf27465b2e2f0e15c1550bda109ecc6f3559a71"/>
 		-->
@@ -44177,7 +44191,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king of braves gaogaigar - blockaded numbers (japan) [slps-01980]" sha1="f632b0044c09e7d867b297d771082a2b453e9776"/>
+				<disk name="king of braves gaogaigar - blockaded numbers (japan) [slps-01980]" sha1="f632b0044c09e7d867b297d771082a2b453e9776" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44495,8 +44509,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="ggoemoed" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="ggoemoed" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Ganbare Goemon - Ooedo Daikaiten (Japan) [SLPM-86774].bin" size="652637664" crc="493b07d8" sha1="7c8e8bee0590e7af9c69c60cb50f3b13dbd03581"/>
 		<rom name="Ganbare Goemon - Ooedo Daikaiten (Japan) [SLPM-86774].cue" size="119" crc="3464d571" sha1="b9ddd6b1073f42450f5c8ece7d512670668153a2"/>
 		-->
@@ -44509,7 +44525,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ganbare goemon - ooedo daikaiten (japan) [slpm-86774]" sha1="be72d2fee1dd78c03a8019d856dc38b4c5997341"/>
+				<disk name="ganbare goemon - ooedo daikaiten (japan) [slpm-86774]" sha1="be72d2fee1dd78c03a8019d856dc38b4c5997341" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44535,8 +44551,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="gijock2k" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="gijock2k" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="G1 Jockey 2000 (Japan) [SLPM-86413].bin" size="373586976" crc="d11ea058" sha1="de1b8fb1c6244114dbf1db79ec5aefe0f0e3a67e"/>
 		<rom name="G1 Jockey 2000 (Japan) [SLPM-86413].cue" size="451" crc="305dab4c" sha1="800d4b9ceaa7057cfc63be4aefecb530c548bbad"/>
 		-->
@@ -44549,7 +44567,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="g1 jockey 2000 (japan) [slpm-86413]" sha1="c10e71d108877d302e16ff53be728f374e7a30e0"/>
+				<disk name="g1 jockey 2000 (japan) [slpm-86413]" sha1="c10e71d108877d302e16ff53be728f374e7a30e0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44632,8 +44650,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="goemnsss" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="goemnsss" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Goemon - Shin Sedai Shuumei (Japan) [SLPM-86997].bin" size="613935504" crc="b44b4951" sha1="5fadbbfa9baed87b9b076031d9eee1362d2824f7"/>
 		<rom name="Goemon - Shin Sedai Shuumei (Japan) [SLPM-86997].cue" size="464" crc="669e686a" sha1="fd3dc83ae4b64060c2e6f9bb844d6e5d9a2654cf"/>
 		-->
@@ -44646,7 +44666,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="goemon - shin sedai shuumei (japan) [slpm-86997]" sha1="ab306ea0e57cfc5f71abdbad1fec4a5757b75a2f"/>
+				<disk name="goemon - shin sedai shuumei (japan) [slpm-86997]" sha1="ab306ea0e57cfc5f71abdbad1fec4a5757b75a2f" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44670,8 +44690,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="gogotrop" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, pause menu GFX doesn't get displayed until you unpause (and for a split frame) -->
+	<software name="gogotrop" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Guguthropus (Japan) [SLPM-86148].bin" size="77860608" crc="f1ed66f1" sha1="c557eb69f6909d8e85216f7f1ae12cdb37515137"/>
 		<rom name="Guguthropus (Japan) [SLPM-86148].cue" size="98" crc="be45e0be" sha1="3ba764d7f35b3a0a7a3c45cde24d9dc6847310a4"/>
 		-->
@@ -44684,7 +44706,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="guguthropus (japan) [slpm-86148]" sha1="f4591754cf9e7fcf3c6133b99d9ca0cc2cea2af4"/>
+				<disk name="guguthropus (japan) [slpm-86148]" sha1="f4591754cf9e7fcf3c6133b99d9ca0cc2cea2af4" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -44899,8 +44921,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="groovejv" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="groovejv" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Groove Jigoku V (Japan) [SLPS-01205].bin" size="353235120" crc="8a3cd804" sha1="edb48383cebe173b7d1f24c5136cc5846a61d0ad"/>
 		<rom name="Groove Jigoku V (Japan) [SLPS-01205].cue" size="100" crc="6b272ece" sha1="a6f34c7b1e22a149286d8afc8714eb7975f2bab2"/>
 		-->
@@ -44913,7 +44937,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="groove jigoku v (japan) [slps-01205]" sha1="9bfeb9c7cc0accf2697d74ddb93dcf589798f700"/>
+				<disk name="groove jigoku v (japan) [slps-01205]" sha1="9bfeb9c7cc0accf2697d74ddb93dcf589798f700" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45043,8 +45067,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
         </part>
     </software>
 
+	<!-- boot OK, gameplay cursor/portraits flickers, unresponsive inputs -->
 	<software name="gunghobr" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Gung-Ho Brigade (Japan) [SLPS-01902].bin" size="706362048" crc="c47c93c7" sha1="d1e2a0e49f9c133c05f981923601ee759a09cdb8"/>
 		<rom name="Gung-Ho Brigade (Japan) [SLPS-01902].cue" size="100" crc="0663de18" sha1="2e643fbe39eda4bcccb730d99da169ba45d06a58"/>
 		-->
@@ -45057,7 +45083,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gung-ho brigade (japan) [slps-01902]" sha1="f067ac6b2b3e7d2a20345b06c51c563e32f42135"/>
+				<disk name="gung-ho brigade (japan) [slps-01902]" sha1="f067ac6b2b3e7d2a20345b06c51c563e32f42135" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45612,8 +45638,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hellokwp" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hellokwp" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hello Kitty - White Present (Japan) (Track 01) [SLPS-01766].bin" size="19128816" crc="ef24b131" sha1="b1fd412d927ade61ddb186a52e0898321c921947"/>
 		<rom name="Hello Kitty - White Present (Japan) (Track 02) [SLPS-01766].bin" size="33941712" crc="82204a1d" sha1="ee9288bafcaa8839dc71fd0473fefdfffd654141"/>
 		<rom name="Hello Kitty - White Present (Japan) (Track 03) [SLPS-01766].bin" size="23296560" crc="af88b32c" sha1="6f7175d41471a89379a3a81c06eb5e3b299e4aeb"/>
@@ -45657,7 +45685,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hello kitty - white present (japan) [slps-01766]" sha1="4e6e3eb7ec6f69c8add7697aa32df1e63d18c8ce"/>
+				<disk name="hello kitty - white present (japan) [slps-01766]" sha1="4e6e3eb7ec6f69c8add7697aa32df1e63d18c8ce" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46071,8 +46099,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hxhgrisl" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hxhgrisl" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hunter X Hunter - Maboroshi no Greed Island (Japan) [SLPM-86651].bin" size="129124800" crc="aa4f8a5e" sha1="af7f343cb4b2f3f5055cef78a5238d490c63c7da"/>
 		<rom name="Hunter X Hunter - Maboroshi no Greed Island (Japan) [SLPM-86651].cue" size="128" crc="daad4edf" sha1="5fff7604aa0adffc2489c242e3c391a2ca0d9b27"/>
 		-->
@@ -46085,13 +46115,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hunter x hunter - maboroshi no greed island (japan) [slpm-86651]" sha1="0ee06252cd80a488b6ba0fa236815359f08ed0e3"/>
+				<disk name="hunter x hunter - maboroshi no greed island (japan) [slpm-86651]" sha1="0ee06252cd80a488b6ba0fa236815359f08ed0e3" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="hxhubast" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hxhubast" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hunter X Hunter - Ubawareta Aura Stone (Japan) [SLPM-86895].bin" size="109638480" crc="fdd4b7f9" sha1="6f184bd176aba9a37031a855ffe144cd9ac7fa50"/>
 		<rom name="Hunter X Hunter - Ubawareta Aura Stone (Japan) [SLPM-86895].cue" size="123" crc="b22f1ac0" sha1="2b5971136787ca98c4d7cac5c4940b8a25832fb3"/>
 		-->
@@ -46104,7 +46136,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hunter x hunter - ubawareta aura stone (japan) [slpm-86895]" sha1="77d54a30d9898d7d2642ce820b9036705abd691e"/>
+				<disk name="hunter x hunter - ubawareta aura stone (japan) [slpm-86895]" sha1="77d54a30d9898d7d2642ce820b9036705abd691e" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
