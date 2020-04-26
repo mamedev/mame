@@ -31,7 +31,7 @@ void advision_state::machine_start()
 
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
-	if (m_cart_rom != nullptr)
+	if (m_cart_rom)
 		m_bank1->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	m_bank1->set_entry(0);
@@ -62,7 +62,8 @@ void advision_state::machine_reset()
 
 	/* enable internal ROM */
 	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
-	m_bank1->set_entry(m_ea_bank);
+	if (m_cart_rom)
+		m_bank1->set_entry(m_ea_bank);
 
 	/* reset sound CPU */
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -76,7 +77,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 	m_rambank = (data & 0x03) << 8;
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
-	if (m_cart_rom != nullptr)
+	if (m_cart_rom)
 		m_bank1->set_entry(m_ea_bank);
 }
 
