@@ -368,7 +368,7 @@ const double XTAL::known_xtals[] = {
 	 33'264'000, /* 33.264_MHz_XTAL        Hazeltine 1500 terminal */
 	 33'330'000, /* 33.33_MHz_XTAL         Sharp X68000 XVI */
 	 33'333'000, /* 33.333_MHz_XTAL        Sega Model 3 CPU board, Vegas */
-	 33'333'333, /* 33.333333_MHz_XTAL     Super Kaneko Nova System Sound clock (2x) */
+	 33'333'333, /* 33.333333_MHz_XTAL     Super Kaneko Nova System Sound clock with /2 divider */
 	 33'833'000, /* 33.833_MHz_XTAL        - */
 	 33'868'800, /* 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
