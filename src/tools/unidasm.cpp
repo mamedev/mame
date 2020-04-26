@@ -297,6 +297,14 @@ struct hyperstone_unidasm_t : hyperstone_disassembler::config
 	virtual bool get_h() const { return h; }
 } hyperstone_unidasm;
 
+// Configuration missing
+struct nec_unidasm_t : nec_disassembler::config
+{
+	int mode;
+	nec_unidasm_t() { mode = 1; }
+	virtual ~nec_unidasm_t() override = default;
+	virtual int get_mode() const override { return mode; }
+} nec_unidasm;
 
 
 enum endianness { le, be };
@@ -461,7 +469,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips3le",         le,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
 	{ "nanoprocessor",   le,  0, []() -> util::disasm_interface * { return new hp_nanoprocessor_disassembler; } },
-	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler; } },
+	{ "nec",             le,  0, []() -> util::disasm_interface * { return new nec_disassembler(&nec_unidasm); } },
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },

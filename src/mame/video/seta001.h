@@ -18,31 +18,31 @@ public:
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_gfxbank_callback(T &&... args) { m_gfxbank_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_WRITE8_MEMBER(spritebgflag_w8);
+	void spritebgflag_w8(uint8_t data);
 
-	DECLARE_READ16_MEMBER(spritectrl_r16);
-	DECLARE_WRITE16_MEMBER(spritectrl_w16);
-	DECLARE_READ8_MEMBER(spritectrl_r8);
-	DECLARE_WRITE8_MEMBER(spritectrl_w8);
+	uint16_t spritectrl_r16(offs_t offset);
+	void spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t spritectrl_r8(offs_t offset);
+	void spritectrl_w8(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER(spriteylow_r16);
-	DECLARE_WRITE16_MEMBER(spriteylow_w16);
-	DECLARE_READ8_MEMBER(spriteylow_r8);
-	DECLARE_WRITE8_MEMBER(spriteylow_w8);
+	uint16_t spriteylow_r16(offs_t offset);
+	void spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t spriteylow_r8(offs_t offset);
+	void spriteylow_w8(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(spritecodelow_r8);
-	DECLARE_WRITE8_MEMBER(spritecodelow_w8);
-	DECLARE_READ8_MEMBER(spritecodehigh_r8);
-	DECLARE_WRITE8_MEMBER(spritecodehigh_w8);
-	DECLARE_READ16_MEMBER(spritecode_r16);
-	DECLARE_WRITE16_MEMBER(spritecode_w16);
+	uint8_t spritecodelow_r8(offs_t offset);
+	void spritecodelow_w8(offs_t offset, uint8_t data);
+	uint8_t spritecodehigh_r8(offs_t offset);
+	void spritecodehigh_w8(offs_t offset, uint8_t data);
+	uint16_t spritecode_r16(offs_t offset);
+	void spritecode_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 
 	void setac_eof();
 	void tnzs_eof();
 
-	// position kludges for seta.c & srmp2.c
+	// position kludges for seta.cpp & srmp2.cpp
 	void set_fg_xoffsets(int flip, int noflip) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; };
 	void set_fg_yoffsets(int flip, int noflip) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; };
 	void set_bg_yoffsets(int flip, int noflip) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; };

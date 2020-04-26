@@ -297,7 +297,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="alien invaders - plus! (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
+				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
 			</dataarea>
 		</part>
 	</software>

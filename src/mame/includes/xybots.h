@@ -31,7 +31,7 @@ public:
 	void init_xybots();
 
 private:
-	virtual void update_interrupts() override;
+	void video_int_ack_w(uint16_t data = 0);
 	DECLARE_READ16_MEMBER(special_port1_r);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

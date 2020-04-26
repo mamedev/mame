@@ -77,7 +77,7 @@ void vs9209_device::device_reset()
 //  read - read from an input port
 //-------------------------------------------------
 
-READ8_MEMBER(vs9209_device::read)
+u8 vs9209_device::read(address_space &space, offs_t offset)
 {
 	int port = offset & 7;
 
@@ -107,7 +107,7 @@ READ8_MEMBER(vs9209_device::read)
 //  control registers
 //-------------------------------------------------
 
-WRITE8_MEMBER(vs9209_device::write)
+void vs9209_device::write(offs_t offset, u8 data)
 {
 	// port H is probably only 4 bits wide
 	int port = offset & 7;

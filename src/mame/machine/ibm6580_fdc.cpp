@@ -74,21 +74,21 @@ void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER( dw_fdc_device::p1_w )
+void dw_fdc_device::p1_w(uint8_t data)
 {
 	m_p1 = data;
 
 	LOGDBG("p1 <- %02x\n", data, m_p1);
 }
 
-WRITE8_MEMBER( dw_fdc_device::p2_w )
+void dw_fdc_device::p2_w(uint8_t data)
 {
 	m_p2 = data;
 
 	LOGDBG("p2 <- %02x\n", data);
 }
 
-READ8_MEMBER( dw_fdc_device::p2_r )
+uint8_t dw_fdc_device::p2_r()
 {
 	uint8_t data = m_p2;
 
@@ -111,12 +111,12 @@ READ_LINE_MEMBER( dw_fdc_device::t1_r )
 	return m_t1;
 }
 
-WRITE8_MEMBER( dw_fdc_device::bus_w )
+void dw_fdc_device::bus_w(uint8_t data)
 {
 	m_bus = data;
 }
 
-READ8_MEMBER( dw_fdc_device::bus_r )
+uint8_t dw_fdc_device::bus_r()
 {
 	return m_bus;
 }

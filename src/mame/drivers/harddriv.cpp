@@ -4714,7 +4714,7 @@ void harddriv_state::init_multisync(int compact_inputs)
 
 	// if we have a JSA board, install the read/write handlers
 	if (m_jsa.found())
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8_delegate(*m_jsa, FUNC(atari_jsa_base_device::main_response_r)), write8_delegate(*m_jsa, FUNC(atari_jsa_base_device::main_command_w)), 0xff00);
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x600000, 0x603fff, read8smo_delegate(*m_jsa, FUNC(atari_jsa_base_device::main_response_r)), write8smo_delegate(*m_jsa, FUNC(atari_jsa_base_device::main_command_w)), 0xff00);
 
 	/* install handlers for the compact driving games' inputs */
 	if (compact_inputs)

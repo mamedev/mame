@@ -28,7 +28,7 @@ public:
 
 	auto kbst_wr_callback() { return m_write_kbst.bind(); }
 
-	DECLARE_READ8_MEMBER( read ) { return m_data; }
+	uint8_t read() { return m_data; }
 
 	DECLARE_WRITE_LINE_MEMBER( bell_w )
 	{

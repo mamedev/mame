@@ -23,7 +23,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="777">
-				<rom name="ch$com.rku" size="777" crc="f2a598f4" sha1="62b200759ac8d7af0ba9ce8f90235de616a86e9d"/>
+				<rom name="chscom.rku" size="777" crc="f2a598f4" sha1="62b200759ac8d7af0ba9ce8f90235de616a86e9d"/>
 			</dataarea>
 		</part>
 	</software>

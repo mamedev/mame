@@ -167,11 +167,11 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			m_sound->sounddma_w(space, offset - 0x18, data);
+			m_sound->sounddma_w(offset - 0x18, data);
 			break;
 
 		case 0x28: case 0x29: case 0x2a:
-			m_sound->noise_w(space, offset - 0x28, data);
+			m_sound->noise_w(offset - 0x28, data);
 			break;
 
 		default:

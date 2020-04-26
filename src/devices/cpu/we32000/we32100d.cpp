@@ -360,7 +360,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		|| op == 0x00
 		|| op == 0x26
 		|| (op & 0xfa) == 0x0a
-		|| (op & 0xfd) == 0x12
+		|| (op & 0xfb) == 0x12
 		|| (op & 0xfe) == 0x1a
 		|| (op & 0xfc) == 0x98
 		|| (op & 0xde) == 0xc2

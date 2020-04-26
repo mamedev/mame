@@ -900,7 +900,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="shoot that flying windows! (1997)(nyyrikki)[mouse].dsk" size="737280" crc="1c8f1d96" sha1="d69c803efb9558314489ab04a25ec84a2901f49f"/>
+				<rom name="shoot that flying windows (1997)(nyyrikki)[mouse].dsk" size="737280" crc="1c8f1d96" sha1="d69c803efb9558314489ab04a25ec84a2901f49f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -913,7 +913,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="shoot that flying windows! (1997)(nyyrikki)[a][mouse].dsk" size="737280" crc="07a4a7ef" sha1="14e93cedcdd35e42c46d8d2c7b0b153012507bdb"/>
+				<rom name="shoot that flying windows (1997)(nyyrikki)[a][mouse].dsk" size="737280" crc="07a4a7ef" sha1="14e93cedcdd35e42c46d8d2c7b0b153012507bdb"/>
 			</dataarea>
 		</part>
 	</software>

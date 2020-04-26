@@ -196,6 +196,7 @@ CRUCLK*  51||52  DBIN
 #include "memex.h"
 #include "horizon.h"
 #include "forti.h"
+#include "pgram.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
@@ -488,6 +489,7 @@ void ti99_peribox_slot_standard(device_slot_interface &device)
 	device.option_add("tirs232",  TI99_RS232);
 	device.option_add("speech",   TI99_SPEECH);
 	device.option_add("horizon",  TI99_HORIZON);
+	device.option_add("pgram",    TI99_PGRAM);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("bwg",      TI99_BWG);
@@ -531,6 +533,7 @@ void ti99_peribox_slot_evpc(device_slot_interface &device)
 	device.option_add("tirs232",  TI99_RS232);
 	device.option_add("speech",   TI99_SPEECH);
 	device.option_add("horizon",  TI99_HORIZON);
+	device.option_add("pgram",    TI99_PGRAM);
 	device.option_add("ide",      TI99_IDE);
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("bwg",      TI99_BWG);

@@ -343,7 +343,7 @@ WRITE8_MEMBER(tvc_state::sound_w)
 	}
 
 	// sound ports
-	m_sound->write(space, offset, data);
+	m_sound->write(offset, data);
 }
 
 READ8_MEMBER(tvc_state::_5b_r)

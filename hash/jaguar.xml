@@ -480,9 +480,9 @@ Unreleased (possibly no prototypes exist):
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- below dump was mirrored
-				<rom name="flip out! (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
+				<rom name="flip out (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
 				-->
-				<rom name="flip out! (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<rom name="flip out (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@ Unreleased (possibly no prototypes exist):
 		<info name="serial" value="J9109E 705109-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
-				<rom name="zoop! (world).j64" size="1048576" crc="c5562581" sha1="52ec786f7536ab043dc24725af94068cad2b0ec3" offset="000000" />
+				<rom name="zoop (world).j64" size="1048576" crc="c5562581" sha1="52ec786f7536ab043dc24725af94068cad2b0ec3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

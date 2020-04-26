@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER( v1050_keyboard_device::si_w )
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
+uint8_t v1050_keyboard_device::kb_p1_r()
 {
 	uint8_t data = 0xff;
 
@@ -350,7 +350,7 @@ READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( v1050_keyboard_device::kb_p1_w )
+void v1050_keyboard_device::kb_p1_w(uint8_t data)
 {
 	m_keylatch = data & 0x0f;
 }
@@ -360,7 +360,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
+void v1050_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

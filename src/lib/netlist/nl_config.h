@@ -17,7 +17,7 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR           11
+#define NL_VERSION_MINOR           12
 /// \brief Version - Patch level.
 ///
 #define NL_VERSION_PATCHLEVEL      0
@@ -51,6 +51,23 @@
 
 #ifndef NL_USE_QUEUE_STATS
 #define NL_USE_QUEUE_STATS             (0)
+#endif
+
+/// \brief  Compile in academic solvers
+///
+/// Set to 0 to disable compiling the following solvers:
+///
+/// Sherman-Morrison, Woodbury, SOR and GMRES
+///
+/// In addition, compilation of FLOAT, LONGDOUBLE and FLOATQ128 matrix
+/// solvers will be disabled.
+/// GMRES may be added to productive solvers in the future
+/// again. Compiling in all solvers may increase compile
+/// time significantly.
+///
+
+#ifndef NL_USE_ACADEMIC_SOLVERS
+#define NL_USE_ACADEMIC_SOLVERS (1)
 #endif
 
 /// \brief  Store input values in logic_terminal_t.
@@ -98,18 +115,20 @@
 
 /// \brief Support float type for matrix calculations.
 ///
-/// Defaults to off to provide faster build times
+/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
 
 #ifndef NL_USE_FLOAT_MATRIX
-#define NL_USE_FLOAT_MATRIX (0)
+//#define NL_USE_FLOAT_MATRIX (NL_USE_ACADEMIC_SOLVERS)
+#define NL_USE_FLOAT_MATRIX 1
 #endif
 
 /// \brief Support long double type for matrix calculations.
 ///
-/// Defaults to off to provide faster build times
+/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
 
 #ifndef NL_USE_LONG_DOUBLE_MATRIX
-#define NL_USE_LONG_DOUBLE_MATRIX (0)
+//#define NL_USE_LONG_DOUBLE_MATRIX (NL_USE_ACADEMIC_SOLVERS)
+#define NL_USE_LONG_DOUBLE_MATRIX 1
 #endif
 
 //============================================================
@@ -172,6 +191,8 @@ static constexpr const int NETLIST_CLOCK = 1'000'000'000;
 ///
 
 using nl_fptype = double;
+//using nl_fptype = long double;
+//using nl_fptype = float;
 
 namespace netlist
 {
@@ -229,27 +250,27 @@ namespace netlist
 	};
 
 #if (NL_USE_FLOAT128)
-	/// \brief  Specific constants for __float128 floating point type
+	/// \brief  Specific constants for FLOAT128 floating point type
 	///
 	template <>
-	struct fp_constants<__float128>
+	struct fp_constants<FLOAT128>
 	{
 #if 0
 		// MAME compile doesn't support Q
-		static inline constexpr __float128 DIODE_MAXDIFF() noexcept { return  1e100Q; }
-		static inline constexpr __float128 DIODE_MAXVOLT() noexcept { return  300.0Q; }
+		static inline constexpr FLOAT128 DIODE_MAXDIFF() noexcept { return  1e100Q; }
+		static inline constexpr FLOAT128 DIODE_MAXVOLT() noexcept { return  300.0Q; }
 
-		static inline constexpr __float128 TIMESTEP_MAXDIFF() noexcept { return  1e100Q; }
-		static inline constexpr __float128 TIMESTEP_MINDIV() noexcept { return  1e-60Q; }
+		static inline constexpr FLOAT128 TIMESTEP_MAXDIFF() noexcept { return  1e100Q; }
+		static inline constexpr FLOAT128 TIMESTEP_MINDIV() noexcept { return  1e-60Q; }
 
-		static inline constexpr const char * name() noexcept { return "__float128"; }
+		static inline constexpr const char * name() noexcept { return "FLOAT128"; }
 		static inline constexpr const char * suffix() noexcept { return "Q"; }
 #else
-	static inline constexpr __float128 DIODE_MAXDIFF() noexcept { return static_cast<__float128>(1e100L); }
-	static inline constexpr __float128 DIODE_MAXVOLT() noexcept { return static_cast<__float128>(300.0L); }
+	static inline constexpr FLOAT128 DIODE_MAXDIFF() noexcept { return static_cast<FLOAT128>(1e100L); }
+	static inline constexpr FLOAT128 DIODE_MAXVOLT() noexcept { return static_cast<FLOAT128>(300.0L); }
 
-	static inline constexpr __float128 TIMESTEP_MAXDIFF() noexcept { return static_cast<__float128>(1e100L); }
-	static inline constexpr __float128 TIMESTEP_MINDIV() noexcept { return static_cast<__float128>(1e-60L); }
+	static inline constexpr FLOAT128 TIMESTEP_MAXDIFF() noexcept { return static_cast<FLOAT128>(1e100L); }
+	static inline constexpr FLOAT128 TIMESTEP_MINDIV() noexcept { return static_cast<FLOAT128>(1e-60L); }
 
 	static inline constexpr const char * name() noexcept { return "__float128"; }
 	static inline constexpr const char * suffix() noexcept { return "Q"; }

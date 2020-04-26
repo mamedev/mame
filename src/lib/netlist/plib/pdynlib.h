@@ -12,62 +12,113 @@
 #include "ptypes.h"
 
 namespace plib {
-// ----------------------------------------------------------------------------------------
-// pdynlib: dynamic loading of libraries  ...
-// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	// pdynlib: dynamic loading of libraries  ...
+	// ----------------------------------------------------------------------------------------
 
-class dynlib : public nocopyassignmove
-{
-public:
-	explicit dynlib(const pstring &libname);
-	dynlib(const pstring &path, const pstring &libname);
-
-	~dynlib();
-	COPYASSIGNMOVE(dynlib, delete)
-
-	bool isLoaded() const { return m_isLoaded; }
-
-	template <typename T>
-	T getsym(const pstring &name) const noexcept
+	class dynlib_base
 	{
-		return reinterpret_cast<T>(getsym_p(name));
-	}
-private:
-	void *getsym_p(const pstring &name) const noexcept;
+	public:
+		explicit dynlib_base() : m_is_loaded(false) { }
 
-	bool m_isLoaded;
-	void *m_lib;
-};
+		virtual ~dynlib_base() = default;
 
-template <typename R, typename... Args>
-class dynproc
-{
-public:
-	using calltype = R(*) (Args... args);
+		PCOPYASSIGN(dynlib_base, delete)
+		PMOVEASSIGN(dynlib_base, default)
 
-	dynproc() : m_sym(nullptr) { }
+		bool isLoaded() const { return m_is_loaded; }
 
-	dynproc(dynlib &dl, const pstring &name) noexcept
+		template <typename T>
+		T getsym(const pstring &name) const noexcept
+		{
+			return reinterpret_cast<T>(getsym_p(name));
+		}
+
+	protected:
+		bool m_is_loaded;
+		virtual void *getsym_p(const pstring &name) const noexcept = 0;
+	};
+
+	class dynlib : public dynlib_base
 	{
-		m_sym = dl.getsym<calltype>(name);
-	}
+	public:
+		explicit dynlib(const pstring &libname);
+		dynlib(const pstring &path, const pstring &libname);
 
-	void load(dynlib &dl, const pstring &name) noexcept
+		~dynlib() override;
+
+		PCOPYASSIGN(dynlib, delete)
+		PMOVEASSIGN(dynlib, default)
+
+	protected:
+		void *getsym_p(const pstring &name) const noexcept override;
+
+	private:
+		void *m_lib;
+	};
+
+	struct dynlib_static_sym
 	{
-		m_sym = dl.getsym<calltype>(name);
-	}
+		const char *name;
+		void       *addr;
+	};
 
-	R operator ()(Args&&... args) const
+	class dynlib_static : public dynlib_base
 	{
-		return m_sym(std::forward<Args>(args)...);
-		//return m_sym(args...);
-	}
+	public:
+		explicit dynlib_static(const dynlib_static_sym *syms)
+		: m_syms(syms)
+		{
+			if (syms != nullptr)
+				m_is_loaded = true;
+		}
 
-	bool resolved() const noexcept { return m_sym != nullptr; }
-private:
-	calltype m_sym;
-};
+	protected:
+		void *getsym_p(const pstring &name) const noexcept override
+		{
+			const dynlib_static_sym *p = m_syms;
+			while (p->name[0] != 0)
+			{
+				if (name == pstring(p->name))
+					return p->addr;
+				p++;
+			}
+			return nullptr;
+		}
+
+	private:
+		const dynlib_static_sym *m_syms;
+	};
+
+	template <typename R, typename... Args>
+	class dynproc
+	{
+	public:
+		using calltype = R(*) (Args... args);
+
+		dynproc() : m_sym(nullptr) { }
+
+		dynproc(dynlib_base &dl, const pstring &name) noexcept
+		{
+			m_sym = dl.getsym<calltype>(name);
+		}
+
+		void load(dynlib_base &dl, const pstring &name) noexcept
+		{
+			m_sym = dl.getsym<calltype>(name);
+		}
+
+		R operator ()(Args&&... args) const
+		{
+			return m_sym(std::forward<Args>(args)...);
+			//return m_sym(args...);
+		}
+
+		bool resolved() const noexcept { return m_sym != nullptr; }
+	private:
+		calltype m_sym;
+	};
 
 } // namespace plib
 
-#endif // PSTRING_H_
+#endif // PDYNLIB_H_

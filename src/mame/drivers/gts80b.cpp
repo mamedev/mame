@@ -376,7 +376,7 @@ WRITE8_MEMBER( gts80b_state::port3b_w )
 	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;
 	if (m_r0_sound)
-		m_r0_sound->write(space, offset, sndcmd);
+		m_r0_sound->write(offset, sndcmd);
 	if (m_r1_sound)
 		m_r1_sound->write(sndcmd);
 }

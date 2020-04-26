@@ -752,28 +752,28 @@ void macs_state::machine_reset()
 void macs_state::init_macs()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x80));
+	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
 void macs_state::init_macs2()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x80));
+	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
 void macs_state::init_kisekaeh()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((11 | 0x180));
+	m_maincpu->set_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
 void macs_state::init_kisekaem()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
-	m_maincpu->set_st0016_game_flag((10 | 0x180));
+	m_maincpu->set_game_flag((10 | 0x180));
 	m_rev = 1;
 }
 

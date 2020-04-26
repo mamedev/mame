@@ -8,7 +8,7 @@
     mwarr.cpp
 
     TODO:
-    Check if the sprites are an obvious clone of anything else and split out if neccessary
+    Check if the sprites are an obvious clone of anything else and split out if necessary
     Steel Force doesn't use the variable height sprites, does the hardware support them?
     Verify offsets / visible areas / overscan etc. especially text layer as Steel Force ending does not quite fit on screen
 */
@@ -74,42 +74,40 @@ void edevices_device::device_reset()
 	m_which = 0;
 }
 
-WRITE16_MEMBER(edevices_device::bg_videoram_w)
+void edevices_device::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(edevices_device::mlow_videoram_w)
+void edevices_device::mlow_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mlow_videoram[offset]);
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(edevices_device::mhigh_videoram_w)
+void edevices_device::mhigh_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mhigh_videoram[offset]);
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(edevices_device::tx_videoram_w)
+void edevices_device::tx_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(edevices_device::sprites_commands_w)
+void edevices_device::sprites_commands_w(uint16_t data)
 {
 	// TODO: I'm not convinced by this, from mwarr.cpp driver
 	if (m_which)
 	{
-		int i;
-
 		switch (data & 0xf)
 		{
 		case 0:
 			/* clear sprites on screen */
-			for (i = 0; i < 0x400; i++)
+			for (int i = 0; i < 0x400; i++)
 			{
 				m_sprites_buffer[i] = 0;
 			}
@@ -120,7 +118,7 @@ WRITE16_MEMBER(edevices_device::sprites_commands_w)
 			// allow everything else to fall through, other games are writing other values
 		case 0xf: // mwarr
 			/* refresh sprites on screen */
-			for (i = 0; i < 0x400; i++)
+			for (int i = 0; i < 0x400; i++)
 			{
 				m_sprites_buffer[i] = m_spriteram[i];
 			}

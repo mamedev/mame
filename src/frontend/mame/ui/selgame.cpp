@@ -897,7 +897,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname);
 		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 
-		media_auditor::summary const summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+		media_auditor::summary const summary = auditor.audit_software(*swlist, *swinfo, AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{

@@ -273,7 +273,7 @@ void konamigx_state::wipezbuf(int noshadow)
  * shadow enables transparent shadows. Note that it applies to the last sprite pen ONLY.
  * The rest of the sprite remains normal.
  */
-#define GX_MAX_SPRITES 512
+#define GX_MAX_SPRITES 512*2
 #define GX_MAX_LAYERS  6
 #define GX_MAX_OBJECTS (GX_MAX_SPRITES + GX_MAX_LAYERS)
 
@@ -292,7 +292,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 
 	if (objdma)
 	{
-		m_gx_spriteram = auto_alloc_array(machine(), uint16_t, 0x1000/2);
+		m_gx_spriteram = auto_alloc_array(machine(), uint16_t, 0x2000/2);
 		m_gx_objdma = 1;
 	}
 	else
@@ -489,7 +489,11 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 //  i = j = 0xff;
 	int l = 0;
 
-	for (int offs=0; offs<0x800; offs+=8)
+	u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
+	u32 end_addr = start_addr + 0x800;
+
+
+	for (int offs=start_addr; offs<end_addr; offs+=8)
 	{
 		int pri = 0;
 
@@ -920,12 +924,21 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 }
 
 
-WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
+WRITE8_MEMBER(konamigx_state::type3_bank_w)
 {
 	// other bits are used for something...
 
-	COMBINE_DATA(&m_konamigx_type3_psac2_bank[offset]);
-	m_konamigx_type3_psac2_actual_bank = (m_konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
+	if (offset == 0)
+	{
+		m_type3_psac2_bank = (data & 0x10) >> 4;
+		// swap sprite display bank for left/right screens
+		// bit 6 works for soccerss, doesn't for type4 (where they never enable it)
+		// so the best candidate is bit 0
+		//m_type3_spriteram_bank = (data & 0x40) >> 6;
+		m_type3_spriteram_bank = (data & 0x01);
+	}
+	else
+		logerror("Write to type3 bank %02x address %02x\n",offset, data);
 
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
 	if (m_konamigx_type3_psac2_actual_bank!=m_konamigx_type3_psac2_actual_last_bank)
@@ -940,7 +953,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
-	{
+{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base();
 
@@ -958,10 +971,10 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
 	tileinfo.set(0, tileno, colour, flip);
-	}
+}
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
-	{
+{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base()+0x20000;
 
@@ -979,7 +992,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
 	tileinfo.set(0, tileno, colour, flip);
-	}
+}
 
 
 /* PSAC4 */
@@ -1433,7 +1446,7 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 		temprect = cliprect;
 		temprect.max_x = cliprect.min_x+320;
 
-		if (m_konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		if (m_type3_psac2_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
 		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 

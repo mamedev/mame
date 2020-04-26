@@ -122,8 +122,6 @@ private:
 
 	DECLARE_READ32_MEMBER(crzyddz2_key_r);
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void menghong_mem(address_map &map);
@@ -144,11 +142,6 @@ private:
 };
 
 
-
-IRQ_CALLBACK_MEMBER(menghong_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 WRITE32_MEMBER(menghong_state::Banksw_w)
 {
@@ -469,7 +462,7 @@ void menghong_state::menghong(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::menghong_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(menghong_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	// HY04 running at 8 MHz
 

@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 //  m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
-WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
+void s11c_bg_device::pia40_pb_w(uint8_t data)
 {
 //  m_pia34->portb_w(data);
 }
@@ -104,19 +104,19 @@ WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)
 		m_pia40->ca1_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_clock_w )
+void s11c_bg_device::bg_speech_clock_w(uint8_t data)
 {
 	// pulses clock input?
 	m_hc55516->clock_w(1);
 	m_hc55516->clock_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_digit_w )
+void s11c_bg_device::bg_speech_digit_w(uint8_t data)
 {
 	m_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bgbank_w )
+void s11c_bg_device::bgbank_w(uint8_t data)
 {
 	uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	m_cpubank->set_entry(bank);

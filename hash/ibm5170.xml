@@ -839,7 +839,7 @@ license:CC0
 		</part>
 	</software>
 
-	
+
 	<!-- not original, has WinImage header -->
 	<software name="1stword">
 		<description>1st Word Plus 2.0</description>
@@ -4993,18 +4993,6 @@ license:CC0
 
 	<!-- Driver Disks -->
 
-	<software name="amouse7">
-		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
-		<description>AMouse Mouse Driver Disk</description>
-		<year>1991</year>
-		<publisher>ULTIMA Electronics Corp.</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="AMouse-driver-disk-7.0.img" size="737280" crc="e49af872" sha1="4ee28d6149cf6c4e3fc8562a8fe6f738c6b1b83d"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scrlmous">
 		<description>Genius Scroll Mouse</description>
 		<year>2004</year>
@@ -5014,26 +5002,6 @@ license:CC0
 			<feature name="disk_serial" value="12060321100-B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sicmouse">
-		<description>SICOS Mouse</description>
-		<year>1990</year>
-		<publisher>SICOS</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
-			<dataarea name="flop" size="368640">
-				<rom name="sicos_mouse.img" size="368640" crc="3f927fd3" sha1="f1372c69d5d497ca6f3ce85ec144b714dfb2ab94"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="SICOS PAINT\nThe SICOS mouse - paint program"/>
-			<dataarea name="flop" size="368640">
-				<rom name="sicos_paint.img" size="368640" crc="b93dd558" sha1="3e78a30acf4adddbabb04babdc469b5c4ff4af4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5540,20 +5508,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="88372">
 				<rom name="mitsumi mouse driver 6.0.imd" size="88372" crc="0b009fd5" sha1="3cdad00105af7a69ba7bd941498f5816039a0596"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mousetb">
-		<description>Mouse/Trackball</description>
-		<year>1992</year>
-		<publisher>Compaq</publisher>
-		<info name="version" value="6.20 Rev. A" />
-		<info name="release" value="19921005"/>
-		<info name="serial" value="133446-002" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="133446-002.img" size="737280" crc="b8f7b556" sha1="548b551ed6e3242b8d361f803db2580a1a3995ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9370,7 +9324,7 @@ license:CC0
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9383,12 +9337,12 @@ license:CC0
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 2).img" size="1228800" crc="dc214a07" sha1="bc9eff392f349dadf379ef7c6296ad2aa01bac24"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (EGA) (5.25'') (Disk 2).img" size="1228800" crc="dc214a07" sha1="bc9eff392f349dadf379ef7c6296ad2aa01bac24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9401,7 +9355,7 @@ license:CC0
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9414,7 +9368,7 @@ license:CC0
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
-				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0"/>
+				<rom name="Commander Keen in Goodbye, Galaxy (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9428,17 +9382,17 @@ license:CC0
 		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 2).img" size="737280" crc="5e1ad85b" sha1="eb96e4cc6200992ab6a65ac01c1daffb12684ade"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 2).img" size="737280" crc="5e1ad85b" sha1="eb96e4cc6200992ab6a65ac01c1daffb12684ade"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 3).img" size="737280" crc="2134a756" sha1="788d6b36c389f810384e4ae6969f39bad288cef6"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.5) (3.5'') (Disk 3).img" size="737280" crc="2134a756" sha1="788d6b36c389f810384e4ae6969f39bad288cef6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9476,12 +9430,12 @@ license:CC0
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 2).img" size="737280" crc="9b481464" sha1="c0bb6de99c61b68d5aac8c14076d3129716cd30c"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.0) (3.5'') (Disk 2).img" size="737280" crc="9b481464" sha1="c0bb6de99c61b68d5aac8c14076d3129716cd30c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9494,17 +9448,17 @@ license:CC0
 		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 2).img" size="368640" crc="ea21f0e3" sha1="213b9421f1d529e28ff7fa94f80a3c4f7822388d"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 2).img" size="368640" crc="ea21f0e3" sha1="213b9421f1d529e28ff7fa94f80a3c4f7822388d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 3).img" size="368640" crc="a6a8c7b9" sha1="bd470395c6cd7dc8d467c48184f687c1452d4508"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (v1.4) (5.25'') (Disk 3).img" size="368640" crc="a6a8c7b9" sha1="bd470395c6cd7dc8d467c48184f687c1452d4508"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9517,7 +9471,7 @@ license:CC0
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9675,12 +9629,12 @@ license:CC0
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.0  #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
+				<rom name="DZone 1.0  #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="D!Zone 1.0  #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
+				<rom name="DZone 1.0  #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9692,17 +9646,17 @@ license:CC0
 		<info name="version" value="1.3a" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
+				<rom name="DZone 1.3a  #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
+				<rom name="DZone 1.3a  #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="D!Zone 1.3a  #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
+				<rom name="DZone 1.3a  #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9957,40 +9911,7 @@ license:CC0
 		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #1.img" size="1474560" crc="6bb31858" sha1="746653c590e2d528249bcafe74da6c7c805187fd"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #2.img" size="1474560" crc="e1a91aa2" sha1="eedce368b970077490df421f567dd22cc974c7be"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #3.img" size="1474560" crc="3fc281a4" sha1="def3e6746e9fa4815162c45f5c1e5f6a3b430db0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #4.img" size="1474560" crc="80d22e1a" sha1="32067ea046127630fbf0b3ec6a79d9d8d53e4a81"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 2 1.7 #5.img" size="1474560" crc="15495bde" sha1="df4365f4969fc82c97269116e3da5fa81029f8b6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doom2a" cloneof="doom2">
-		<description>DOOM II: Hell on Earth (1.7, alt)</description>
-		<year>1994</year>
-		<publisher>GT Interactive</publisher>
-		<info name="developer" value="id Software" />
-		<info name="version" value="1.7" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match the doom2 set after removing this -->
+				<!-- 1024-byte footer removed from an image with size 1475584 crc c9c3bdc9, disks 2-5 match other dumps after removing this -->
 				<rom name="Doom II v1.7 (1994)(id Software) - Floppy Disk 1.img" size="1474560" crc="9ad5a439" sha1="1d2a3ee9e9578884f602ab69da12c5b2f962b456"/>
 			</dataarea>
 		</part>
@@ -10657,7 +10578,7 @@ license:CC0
 		<publisher>Virgin Interactive</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "4252733">
-				<rom name="Goal! [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
+				<rom name="Goal [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11388,49 +11309,49 @@ license:CC0
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1474560">
 				<!-- has a saved configuration file -->
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 1 of 8).dsk" size="1474560" crc="f5ba7763" sha1="17308670441b68975e62e43fd5e62e450b63aa39" status="baddump"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 1 of 8).dsk" size="1474560" crc="f5ba7763" sha1="17308670441b68975e62e43fd5e62e450b63aa39" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 2 of 8).dsk" size="1474560" crc="64301d2a" sha1="42b88d1f42166159933ab6732842794592edb4a5"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 2 of 8).dsk" size="1474560" crc="64301d2a" sha1="42b88d1f42166159933ab6732842794592edb4a5"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 3 of 8).dsk" size="1474560" crc="a4a83cf3" sha1="b9e93420475e20333735bc45eed5035aebd304cd"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 3 of 8).dsk" size="1474560" crc="a4a83cf3" sha1="b9e93420475e20333735bc45eed5035aebd304cd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 4 of 8).dsk" size="1474560" crc="9471702d" sha1="b7d86ed264c382a6dd5c273665950282f62a7fa1"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 4 of 8).dsk" size="1474560" crc="9471702d" sha1="b7d86ed264c382a6dd5c273665950282f62a7fa1"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 5 of 8).dsk" size="1474560" crc="a7db36ba" sha1="71e8917cb7b416cfc550328ef0b4f9dfc5585a39"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 5 of 8).dsk" size="1474560" crc="a7db36ba" sha1="71e8917cb7b416cfc550328ef0b4f9dfc5585a39"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 6 of 8).dsk" size="1474560" crc="3eb4d622" sha1="624c19c35a5614f81972d3ef461114462211a4b3"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 6 of 8).dsk" size="1474560" crc="3eb4d622" sha1="624c19c35a5614f81972d3ef461114462211a4b3"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 7 of 8).dsk" size="1474560" crc="c6d32a66" sha1="bf4ad8019fa543046c46cc06002f8b4185fe38b2"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 7 of 8).dsk" size="1474560" crc="c6d32a66" sha1="bf4ad8019fa543046c46cc06002f8b4185fe38b2"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size = "1474560">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (1990)(Sierra On-Line)(Disk 8 of 8).dsk" size="1474560" crc="474c2cc7" sha1="8847d6dc07c49dcc2022c46fb1086c77155c7f47"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (1990)(Sierra On-Line)(Disk 8 of 8).dsk" size="1474560" crc="474c2cc7" sha1="8847d6dc07c49dcc2022c46fb1086c77155c7f47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11442,55 +11363,55 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 9).img" size="1228800" crc="6f17c558" sha1="1a357f90580470d2afd905657087b45eba4beba0"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 9).img" size="1228800" crc="6f17c558" sha1="1a357f90580470d2afd905657087b45eba4beba0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 1).img" size="1228800" crc="ce59191c" sha1="0f02214a7c4358075e49d553c3865be5d6847f8c"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 1).img" size="1228800" crc="ce59191c" sha1="0f02214a7c4358075e49d553c3865be5d6847f8c"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 2).img" size="1228800" crc="12977d48" sha1="09b3d3d33c854458249dc1568fe02174646f4ff6"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 2).img" size="1228800" crc="12977d48" sha1="09b3d3d33c854458249dc1568fe02174646f4ff6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 3).img" size="1228800" crc="56ea7dd6" sha1="6a8910ba2a9c6e07accd09e7636dea43d16c7282"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 3).img" size="1228800" crc="56ea7dd6" sha1="6a8910ba2a9c6e07accd09e7636dea43d16c7282"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 4).img" size="1228800" crc="37d3bd46" sha1="0cec3d03ac78aaa063cde53a44f5a5b6b9afee6a"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 4).img" size="1228800" crc="37d3bd46" sha1="0cec3d03ac78aaa063cde53a44f5a5b6b9afee6a"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 5).img" size="1228800" crc="2427f41f" sha1="66bac67e2c5c4daa98cf95b6efbeb81d33ee218c"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 5).img" size="1228800" crc="2427f41f" sha1="66bac67e2c5c4daa98cf95b6efbeb81d33ee218c"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 6).img" size="1228800" crc="62792b08" sha1="ced1e2c11067f29c16fe5ca7e744cb984d68f77d"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 6).img" size="1228800" crc="62792b08" sha1="ced1e2c11067f29c16fe5ca7e744cb984d68f77d"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 7).img" size="1228800" crc="3769b33b" sha1="fa322e80edb7b17a4541d69ca6648a0d3c88dec1"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 7).img" size="1228800" crc="3769b33b" sha1="fa322e80edb7b17a4541d69ca6648a0d3c88dec1"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size = "1228800">
-				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef"/>
+				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12445,6 +12366,64 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rnebular">
+		<description>Rex Nebular and the Cosmic Gender-Bender</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="8.44 14-Sept-92" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="b909632f" sha1="a96039324e7e700877ba73bc3cb67a483252f54d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="bc664cf8" sha1="ae55574089bd55b624bc701091bb387986ddebde"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="0ae60f2b" sha1="4a8763082dfa2cd43add0a7cbc03328de9e7ce36"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="46b49f10" sha1="8d21b852cc030f4efba8947d9a16e0d5a812a9c5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="d3b40a21" sha1="04c5ae012260545ed35ae046bea1e54b5a0b3b24"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="39df9cb8" sha1="48b19b6974e7b63bcf9f344db8445ce64b71c132"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="952246d4" sha1="42d0d901e3bcfc16985368be2aed7bd0f314f03f"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="afff088b" sha1="e87915eaf0f546c2034fd636248a1ae9592854b8"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="6c2beb55" sha1="6ddd53a40a7cfb53672970ff69dadb7241eafa64"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rex Nebular and the Cosmic Gender Bender [MicroProse] [1992] [3.5HD] [Bonus Disk].img" size="1474560" crc="3476543e" sha1="8f6842b87f7abdf1b1e0ee31aa4354cbc2782733"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rotd">
 		<description>Rise of the Dragon</description>
 		<year>1990</year>
@@ -12750,7 +12729,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sq1">
 		<description>Space Quest I: Roger Wilco in the Sarien Encounter (VGA release)</description>
 		<year>1991</year>
@@ -13694,7 +13673,7 @@ license:CC0
 	<software name="wcgps">
 		<description>World Circuit - Grand Prix Simulation</description>
 		<year>1992</year>
-		<publisher>MicroProse Ltd.</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="Disc Code" value="4861A" />
@@ -13813,12 +13792,12 @@ license:CC0
 		<publisher>Apogee Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 1).img" size="737280" crc="37203373" sha1="594ac2225f0544739c53cdab1a8e3d3f36d7f373"/>
+				<rom name="Wolfenstein 3-D Super Upgrades (USA) (Disk 1).img" size="737280" crc="37203373" sha1="594ac2225f0544739c53cdab1a8e3d3f36d7f373"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4"/>
+				<rom name="Wolfenstein 3-D Super Upgrades (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4"/>
 			</dataarea>
 		</part>
 	</software>

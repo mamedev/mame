@@ -132,7 +132,7 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 
 WRITE8_MEMBER(fantasy_state::fantasy_flipscreen_w)
 {
-	m_sound->sound_w(space, offset | 0x03, data, mem_mask);
+	m_sound->sound_w(offset | 0x03, data);
 	flipscreen_w(space, offset, data, mem_mask);
 }
 

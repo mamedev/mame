@@ -128,7 +128,7 @@ void alpha68k_palette_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( alpha68k_palette_device::read )
+uint16_t alpha68k_palette_device::read(offs_t offset)
 {
 	return m_paletteram[offset];
 }
@@ -147,7 +147,7 @@ inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data, i
 	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]);
 }
 
-WRITE16_MEMBER( alpha68k_palette_device::write )
+void alpha68k_palette_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	u16 pal_data = m_paletteram[offset];

@@ -17,7 +17,6 @@ Hardware notes:
 TODO:
 - verify irq source/frequency, probably a 555 ic, current approximation is from
   comparing led blink rate with a video recording
-- ARC0/ARC2 rom labels might be the wrong way around
 
 ******************************************************************************/
 
@@ -207,9 +206,9 @@ void regence_state::regence(machine_config &config)
 
 ROM_START( regence )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("arc0.ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
-	ROM_LOAD("arc1.ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
-	ROM_LOAD("arc2.ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
+	ROM_LOAD("ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
+	ROM_LOAD("ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
+	ROM_LOAD("ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
 ROM_END
 
 } // anonymous namespace

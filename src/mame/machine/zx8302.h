@@ -67,16 +67,16 @@ public:
 	auto out_raw2_callback() { return m_out_raw2_cb.bind(); }
 	auto in_raw2_callback() { return m_in_raw2_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( mdv_track_r );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( ipc_command_w );
-	DECLARE_WRITE8_MEMBER( mdv_control_w );
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_acknowledge_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t rtc_r(offs_t offset);
+	void rtc_w(uint8_t data);
+	void control_w(uint8_t data);
+	uint8_t mdv_track_r();
+	uint8_t status_r();
+	void ipc_command_w(uint8_t data);
+	void mdv_control_w(uint8_t data);
+	uint8_t irq_status_r();
+	void irq_acknowledge_w(uint8_t data);
+	void data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	DECLARE_WRITE_LINE_MEMBER( comctl_w );
 	DECLARE_WRITE_LINE_MEMBER( comdata_w );

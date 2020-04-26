@@ -97,8 +97,10 @@
                                        zone.
 */
 
-#include "emu.h" // osd_printf_verbose, BIT, emu_fatalerror
 #include "formats/victor9k_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 victor9k_format::victor9k_format()
 {
@@ -173,7 +175,7 @@ void victor9k_format::log_boot_sector(uint8_t *data)
 	osd_printf_verbose("Boot start: %04x\n", (data[29] << 8) | data[30]);
 
 	// Flags
-	osd_printf_verbose("%s sided\n", BIT(data[33], 0) ? "Double" : "Single");
+	osd_printf_verbose("%s sided\n", util::BIT(data[33], 0) ? "Double" : "Single");
 	osd_printf_verbose("Interleave factor: %u\n", data[32] >> 4);
 
 	// Disc type

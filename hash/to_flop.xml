@@ -6157,7 +6157,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="335426">
-				<rom name="elvis lives! (puls) (samuel devulder) (2013) (to8) (disk orig).sap" size="335426" crc="87b0ca2a" sha1="2b68e1751919cf3c9ecc54fdeba44a42a56c9cb5"/>
+				<rom name="elvis lives (puls) (samuel devulder) (2013) (to8) (disk orig).sap" size="335426" crc="87b0ca2a" sha1="2b68e1751919cf3c9ecc54fdeba44a42a56c9cb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6169,7 +6169,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="335426">
-				<rom name="elvis lives! (puls) (samuel devulder) (2013) (to8) (disk).sap" size="335426" crc="f11c7d82" sha1="88ca1bc6310d6206d66b81379542f42d8fb40df8"/>
+				<rom name="elvis lives (puls) (samuel devulder) (2013) (to8) (disk).sap" size="335426" crc="f11c7d82" sha1="88ca1bc6310d6206d66b81379542f42d8fb40df8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6426,7 +6426,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="oh la belle bleue! (2011)(puls)(fr).fd" size="327680" crc="27cf319a" sha1="8930d753e9d1b7c03d95ead339d22a5c8cec14b5"/>
+				<rom name="oh la belle bleue (2011)(puls)(fr).fd" size="327680" crc="27cf319a" sha1="8930d753e9d1b7c03d95ead339d22a5c8cec14b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8941,7 +8941,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="guten tag! - deutsche grammatik - erste stufe (1988)(vifi-nathan)(fr)(de-fr).fd" size="327680" crc="bf27c9fa" sha1="3828f78b0397d60c4c8f5370b993a89d081f1f38"/>
+				<rom name="guten tag - deutsche grammatik - erste stufe (1988)(vifi-nathan)(fr)(de-fr).fd" size="327680" crc="bf27c9fa" sha1="3828f78b0397d60c4c8f5370b993a89d081f1f38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8953,7 +8953,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="335426">
-				<rom name="guten tag! - deutsche grammatik - erste stufe (1988)(vifi-nathan)(fr)(de-fr).sap" size="335426" crc="604f9718" sha1="bc23cf7c03ea72c34b277dd8fa5b5e42ee27f278"/>
+				<rom name="guten tag - deutsche grammatik - erste stufe (1988)(vifi-nathan)(fr)(de-fr).sap" size="335426" crc="604f9718" sha1="bc23cf7c03ea72c34b277dd8fa5b5e42ee27f278"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10166,7 +10166,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="blitz! (1986)(fil)(fr).fd" size="327680" crc="ad704d90" sha1="075662741d841d848dec3380fe78f0737a805b9a"/>
+				<rom name="blitz (1986)(fil)(fr).fd" size="327680" crc="ad704d90" sha1="075662741d841d848dec3380fe78f0737a805b9a"/>
 			</dataarea>
 		</part>
 	</software>

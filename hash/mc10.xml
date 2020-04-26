@@ -99,7 +99,7 @@ Undumped: Full Micro Games and Math Design tapes (we only have split dumps curre
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="3819">
-				<rom name="bandit! (19xx)(jim gerrie).cas" size="3819" crc="66495f69" sha1="3b95ed544fe1f0d9e4096251d4d519c655e13edf"/>
+				<rom name="bandit (19xx)(jim gerrie).cas" size="3819" crc="66495f69" sha1="3b95ed544fe1f0d9e4096251d4d519c655e13edf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -579,7 +579,7 @@ Undumped: Full Micro Games and Math Design tapes (we only have split dumps curre
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="2632">
-				<rom name="humbug assemble-disassemble (1983)(p. stark)[$4400-$4eff].cas" size="2632" crc="94e384cc" sha1="ec3a4e5b44526e317f8a6761f384dcb6f5786f7b"/>
+				<rom name="humbug assemble-disassemble (1983)(p. stark)[4400-4eff].cas" size="2632" crc="94e384cc" sha1="ec3a4e5b44526e317f8a6761f384dcb6f5786f7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -591,7 +591,7 @@ Undumped: Full Micro Games and Math Design tapes (we only have split dumps curre
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="3022">
-				<rom name="humbug assemble-disassemble (1983)(p. stark)[$4500-$4fff].cas" size="3022" crc="cc45db75" sha1="f9cca89d0a300966287b0727667abd9cf848093e"/>
+				<rom name="humbug assemble-disassemble (1983)(p. stark)[4500-4fff].cas" size="3022" crc="cc45db75" sha1="f9cca89d0a300966287b0727667abd9cf848093e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -603,7 +603,7 @@ Undumped: Full Micro Games and Math Design tapes (we only have split dumps curre
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="3026">
-				<rom name="humbug assemble-disassemble (1983)(p. stark)[$7500-$7fff].cas" size="3026" crc="6f224e73" sha1="33b18cd96f9a544473310451faba2209753dc11f"/>
+				<rom name="humbug assemble-disassemble (1983)(p. stark)[7500-7fff].cas" size="3026" crc="6f224e73" sha1="33b18cd96f9a544473310451faba2209753dc11f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1119,7 +1119,7 @@ Undumped: Full Micro Games and Math Design tapes (we only have split dumps curre
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="2720">
-				<rom name="minefield! (19xx)(reighard jr., kenneth - gerrie, jim).cas" size="2720" crc="b5a624aa" sha1="bc5269c0d801367566c0b65cc4d393d3ad0a1100"/>
+				<rom name="minefield (19xx)(reighard jr., kenneth - gerrie, jim).cas" size="2720" crc="b5a624aa" sha1="bc5269c0d801367566c0b65cc4d393d3ad0a1100"/>
 			</dataarea>
 		</part>
 	</software>

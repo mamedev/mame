@@ -2947,7 +2947,7 @@ f278 fff8 ftrapcc  l .          23:4
 	m_pc += 2;
 
 
-51c8 fff8 dbf      w .          01:12 7:14 2:6 34fc:4
+51c8 fff8 dbf      w .          0:12 7:14 1:10 2:6 34fc:4
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
@@ -2964,7 +2964,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-50c8 f0f8 dbcc     w .          01:12 7:14 234fc:6
+50c8 f0f8 dbcc     w .          0:12 7:14 1:10 234fc:6
 	if(M68KMAKE_NOT_CC) {
 		u32* r_dst = &DY();
 		u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);

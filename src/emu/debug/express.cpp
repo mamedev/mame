@@ -47,11 +47,6 @@
     CONSTANTS
 ***************************************************************************/
 
-#ifndef DEFAULT_BASE
-#define DEFAULT_BASE            16          // hex unless otherwise specified
-#endif
-
-
 // token.value values if token.is_operator()
 enum
 {
@@ -229,13 +224,13 @@ symbol_entry::~symbol_entry()
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
 	: symbol_entry(table, SMT_INTEGER, name, ""),
 		m_getter(ptr
-				? symbol_table::getter_func([ptr] (symbol_table &table) { return *ptr; })
-				: symbol_table::getter_func([this] (symbol_table &table) { return m_value; })),
+				? symbol_table::getter_func([ptr] () { return *ptr; })
+				: symbol_table::getter_func([this] () { return m_value; })),
 		m_setter((rw == symbol_table::READ_ONLY)
 				? symbol_table::setter_func(nullptr)
 				: ptr
-				? symbol_table::setter_func([ptr] (symbol_table &table, u64 value) { *ptr = value; })
-				: symbol_table::setter_func([this] (symbol_table &table, u64 value) { m_value = value; })),
+				? symbol_table::setter_func([ptr] (u64 value) { *ptr = value; })
+				: symbol_table::setter_func([this] (u64 value) { m_value = value; })),
 		m_value(0)
 {
 }
@@ -243,7 +238,7 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
 	: symbol_entry(table, SMT_INTEGER, name, ""),
-		m_getter([this] (symbol_table &table) { return m_value; }),
+		m_getter([this] () { return m_value; }),
 		m_setter(nullptr),
 		m_value(constval)
 {
@@ -275,7 +270,7 @@ bool integer_symbol_entry::is_lval() const
 
 u64 integer_symbol_entry::value() const
 {
-	return m_getter(m_table);
+	return m_getter();
 }
 
 
@@ -286,7 +281,7 @@ u64 integer_symbol_entry::value() const
 void integer_symbol_entry::set_value(u64 newvalue)
 {
 	if (m_setter != nullptr)
-		m_setter(m_table, newvalue);
+		m_setter(newvalue);
 	else
 		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
 }
@@ -350,7 +345,7 @@ u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
 	if (numparams > m_maxparams)
 		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.c_str(), m_maxparams);
-	return m_execute(m_table, numparams, paramlist);
+	return m_execute(numparams, paramlist);
 }
 
 
@@ -363,10 +358,8 @@ u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 //  symbol_table - constructor
 //-------------------------------------------------
 
-symbol_table::symbol_table(void *globalref, symbol_table *parent)
+symbol_table::symbol_table(symbol_table *parent)
 	: m_parent(parent),
-		m_globalref(globalref),
-		m_memory_param(nullptr),
 		m_memory_valid(nullptr),
 		m_memory_read(nullptr),
 		m_memory_write(nullptr)
@@ -378,9 +371,8 @@ symbol_table::symbol_table(void *globalref, symbol_table *parent)
 //  add - add a new u64 pointer symbol
 //-------------------------------------------------
 
-void symbol_table::configure_memory(void *param, valid_func valid, read_func read, write_func write)
+void symbol_table::configure_memory(valid_func valid, read_func read, write_func write)
 {
-	m_memory_param = param;
 	m_memory_valid = std::move(valid);
 	m_memory_read = std::move(read);
 	m_memory_write = std::move(write);
@@ -483,7 +475,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE)
 				return err;
 		}
@@ -501,9 +493,9 @@ u64 symbol_table::memory_value(const char *name, expression_space space, u32 off
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
-				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size, disable_se);
+				return symtable->m_memory_read(name, space, offset, size, disable_se);
 			return 0;
 		}
 	return 0;
@@ -520,9 +512,9 @@ void symbol_table::set_memory_value(const char *name, expression_space space, u3
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 		if (symtable->m_memory_valid != nullptr)
 		{
-			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
+			expression_error::error_code err = symtable->m_memory_valid(name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
-				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value, disable_se);
+				symtable->m_memory_write(name, space, offset, size, value, disable_se);
 			return;
 		}
 }
@@ -537,16 +529,29 @@ void symbol_table::set_memory_value(const char *name, expression_space space, u3
 //  parsed_expression - constructor
 //-------------------------------------------------
 
-parsed_expression::parsed_expression(symbol_table *symtable, const char *expression, u64 *result)
+parsed_expression::parsed_expression(symbol_table &symtable, const char *expression, int default_base)
 	: m_symtable(symtable)
+	, m_default_base(default_base)
 {
+	assert(default_base == 8 || default_base == 10 || default_base == 16);
+
 	// if we got an expression parse it
 	if (expression != nullptr)
 		parse(expression);
+}
 
-	// if we get a result pointer, execute it
-	if (result != nullptr)
-		*result = execute();
+
+//-------------------------------------------------
+//  parsed_expression - copy constructor
+//-------------------------------------------------
+
+parsed_expression::parsed_expression(const parsed_expression &src)
+	: m_symtable(src.m_symtable)
+	, m_default_base(src.m_default_base)
+	, m_original_string(src.m_original_string)
+{
+	if (!m_original_string.empty())
+		parse_string_into_tokens();
 }
 
 
@@ -576,6 +581,7 @@ void parsed_expression::parse(const char *expression)
 void parsed_expression::copy(const parsed_expression &src)
 {
 	m_symtable = src.m_symtable;
+	m_default_base = src.m_default_base;
 	m_original_string.assign(src.m_original_string);
 	if (!m_original_string.empty())
 		parse_string_into_tokens();
@@ -942,13 +948,12 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 			catch (expression_error const &err)
 			{
 				// this is really a hack, but 0B1234 could also hex depending on default base
-				if (expression_error::INVALID_NUMBER == err)
-					return parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::INVALID_NUMBER);
+				if (expression_error::INVALID_NUMBER == err && m_default_base == 16)
+					return parse_number(token, buffer.c_str(), m_default_base, expression_error::INVALID_NUMBER);
 				else
 					throw;
 			}
 
-		// TODO: for octal address spaces, treat 0123 as octal
 		default:
 			; // fall through
 		}
@@ -956,7 +961,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 
 	default:
 		// check for a symbol match
-		symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
+		symbol_entry *symbol = m_symtable.get().find_deep(buffer.c_str());
 		if (symbol != nullptr)
 		{
 			token.configure_symbol(*symbol);
@@ -971,7 +976,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		}
 
 		// attempt to parse as a number in the default base
-		parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+		parse_number(token, buffer.c_str(), m_default_base, expression_error::UNKNOWN_SYMBOL);
 	}
 }
 
@@ -1149,12 +1154,9 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	}
 
 	// validate the name
-	if (m_symtable != nullptr)
-	{
-		expression_error::error_code err = m_symtable->memory_valid(namestring, memspace);
-		if (err != expression_error::NONE)
-			throw expression_error(err, token.offset() + (string - startstring));
-	}
+	expression_error::error_code err = m_symtable.get().memory_valid(namestring, memspace);
+	if (err != expression_error::NONE)
+		throw expression_error(err, token.offset() + (string - startstring));
 
 	// configure the token
 	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring).set_memory_side_effects(disable_se);
@@ -1679,16 +1681,15 @@ parsed_expression::parse_token::parse_token(int offset)
 //  for a SYMBOL token
 //-------------------------------------------------
 
-u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
+u64 parsed_expression::parse_token::get_lval_value(symbol_table &table)
 {
 	// get the value of a symbol
 	if (is_symbol())
 		return m_symbol->value();
 
 	// or get the value from the memory callbacks
-	else if (is_memory() && table != nullptr) {
-		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effects());
-	}
+	else if (is_memory())
+		return table.memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effects());
 
 	return 0;
 }
@@ -1699,15 +1700,15 @@ u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 //  for a SYMBOL token
 //-------------------------------------------------
 
-inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, u64 value)
+inline void parsed_expression::parse_token::set_lval_value(symbol_table &table, u64 value)
 {
 	// set the value of a symbol
 	if (is_symbol())
 		m_symbol->set_value(value);
 
 	// or set the value via the memory callbacks
-	else if (is_memory() && table != nullptr)
-		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effects());
+	else if (is_memory())
+		table.set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effects());
 }
 
 

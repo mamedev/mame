@@ -377,17 +377,17 @@ void kaypro_10_keyboard_device::device_start()
 	save_item(NAME(m_bus));
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::p1_r)
+uint8_t kaypro_10_keyboard_device::p1_r()
 {
 	return m_matrix[m_bus & 0x0f]->read();
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
+uint8_t kaypro_10_keyboard_device::p2_r()
 {
 	return m_modifiers->read() | 0xf8U;
 }
 
-WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
+void kaypro_10_keyboard_device::p2_w(uint8_t data)
 {
 	if ((VERBOSE & LOG_TXD) && (0x0014U >= m_mcu->pc()))
 	{
@@ -416,12 +416,12 @@ READ_LINE_MEMBER(kaypro_10_keyboard_device::t1_r)
 	return m_txd ? 1 : 0;
 }
 
-READ8_MEMBER(kaypro_10_keyboard_device::bus_r)
+uint8_t kaypro_10_keyboard_device::bus_r()
 {
 	return m_bus;
 }
 
-WRITE8_MEMBER(kaypro_10_keyboard_device::bus_w)
+void kaypro_10_keyboard_device::bus_w(uint8_t data)
 {
 	if (BIT(m_bus ^ data, 4))
 		machine().output().set_value("led_caps_lock", BIT(data, 4));

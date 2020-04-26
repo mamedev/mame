@@ -117,7 +117,6 @@ namespace netlist
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", -1)
-	, m_is_timestep(false)
 	{
 		register_subalias("Q", m_RN.m_P);
 
@@ -145,7 +144,6 @@ namespace netlist
 		m_last_state = -1;
 		m_RN.reset();
 		m_RP.reset();
-		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
 		m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
 				logic_family()->low_offset_V(), nlconst::zero());
 		m_RP.set_G_V_I(G_OFF,
@@ -158,28 +156,27 @@ namespace netlist
 		const auto state = static_cast<int>(m_I());
 		if (state != m_last_state)
 		{
-			// We only need to update the net first if this is a time stepping net
-			if (m_is_timestep)
+			// RN, RP are connected ...
+			m_RN.change_state([this, &state]()
 			{
-				m_RN.update(); // RN, RP are connected ...
-			}
-			if (state)
-			{
-				m_RN.set_G_V_I(G_OFF,
-					nlconst::zero(),
-					nlconst::zero());
-				m_RP.set_G_V_I(plib::reciprocal(logic_family()->R_high()),
-						logic_family()->high_offset_V(), nlconst::zero());
-			}
-			else
-			{
-				m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
-						logic_family()->low_offset_V(), nlconst::zero());
-				m_RP.set_G_V_I(G_OFF,
-					nlconst::zero(),
-					nlconst::zero());
-			}
-			m_RN.solve_later(); // RN, RP are connected ...
+				if (state)
+				{
+
+					m_RN.set_G_V_I(G_OFF,
+						nlconst::zero(),
+						nlconst::zero());
+					m_RP.set_G_V_I(plib::reciprocal(logic_family()->R_high()),
+							logic_family()->high_offset_V(), nlconst::zero());
+				}
+				else
+				{
+					m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
+							logic_family()->low_offset_V(), nlconst::zero());
+					m_RP.set_G_V_I(G_OFF,
+						nlconst::zero(),
+						nlconst::zero());
+				}
+			});
 			m_last_state = state;
 		}
 	}

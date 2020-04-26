@@ -86,7 +86,7 @@ WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 {
 	if (data != m_noise_data) {
 		m_noise_data = data;
-		m_custom->noise_enable_w(space, offset, data);
+		m_custom->noise_enable_w(data);
 	}
 }
 

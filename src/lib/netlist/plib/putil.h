@@ -136,7 +136,7 @@ namespace plib
 
 		psource_t() noexcept = default;
 
-		COPYASSIGNMOVE(psource_t, delete)
+		PCOPYASSIGNMOVE(psource_t, delete)
 
 		virtual ~psource_t() noexcept = default;
 
@@ -159,7 +159,7 @@ namespace plib
 		: m_name(std::move(name)), m_str(std::move(str))
 		{}
 
-		COPYASSIGNMOVE(psource_str_t, delete)
+		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
 
 		typename TS::stream_ptr stream(const pstring &name) override
@@ -185,7 +185,7 @@ namespace plib
 
 		psource_collection_t() noexcept = default;
 
-		COPYASSIGNMOVE(psource_collection_t, delete)
+		PCOPYASSIGNMOVE(psource_collection_t, delete)
 		virtual ~psource_collection_t() noexcept = default;
 
 		void add_source(source_type &&src)
@@ -230,7 +230,7 @@ namespace plib
 
 	namespace util
 	{
-		pstring basename(const pstring &filename);
+		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
@@ -286,6 +286,19 @@ namespace plib
 	std::vector<std::string> psplit_r(const std::string &stri,
 			const std::string &token,
 			std::size_t maxsplit);
+
+	// ----------------------------------------------------------------------------------------
+	// simple hash
+	// ----------------------------------------------------------------------------------------
+
+	template <typename T>
+	std::size_t hash(const T *buf, std::size_t size)
+	{
+		std::size_t result = 5381;
+		for (const T* p = buf; p != buf + size; p++)
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p);
+		return result;
+	}
 
 	//============================================================
 	//  penum - strongly typed enumeration

@@ -79,6 +79,7 @@ void nmk16_state::video_init()
 
 	m_tilerambank = 0;
 
+	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nmk16_state::dma_callback),this));
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
@@ -285,9 +286,9 @@ void nmk16_state::get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code)
 	flipx = (attr & 0x100) >> 8;
 }
 
-void nmk16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void nmk16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src)
 {
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram_old2.get(), 0x1000 / 2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), src, 0x1000 / 2);
 }
 
 /***************************************************************************
@@ -349,7 +350,7 @@ u32 nmk16_state::screen_update_macross(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect);
 	bg_update(screen, bitmap, cliprect, 0);
 	tx_update(screen, bitmap, cliprect);
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
@@ -363,7 +364,7 @@ u32 nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bit
 
 	bg_update(screen, bitmap, cliprect, 0);
 	tx_update(screen, bitmap, cliprect);
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
@@ -373,7 +374,7 @@ u32 nmk16_state::screen_update_strahl(screen_device &screen, bitmap_ind16 &bitma
 	bg_update(screen, bitmap, cliprect, 0);
 	bg_update(screen, bitmap, cliprect, 1);
 	tx_update(screen, bitmap, cliprect);
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }
 
@@ -381,7 +382,7 @@ u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitma
 {
 	screen.priority().fill(0, cliprect);
 	bg_update(screen, bitmap, cliprect, 0);
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old.get()); // only a single buffer, verified
 	return 0;
 }
 
@@ -443,7 +444,7 @@ void afega_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 }
 
 void afega_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -454,7 +455,7 @@ void afega_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 }
 
 u32 afega_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen, bitmap, cliprect, 1, -0x100, +0x000, 0x0001);  return 0; }
@@ -472,6 +473,6 @@ u32 afega_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bit
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, m_spriteram_old2.get());
 	return 0;
 }

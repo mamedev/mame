@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
-/***************************************************************************
+/******************************************************************************
 
 Renegade
 (c)1986 Taito
@@ -18,7 +18,20 @@ NMI is used to refresh the sprites
 IRQ is used to handle coin inputs
 
 Known issues:
-- coin counter isn't working properly (interrupt related?)
+- Knockdown samples farts (coming from YM3526 DAC);
+- Static ADPCM sound, end trigger not understood.
+  Most likely ends when specific data format is encountered during playback
+  cfr. jantotsu.cpp;
+- Verify irq sources;
+- Unemulated partial update bg scrolling, which should effectively add layer
+  tearing at line ~12 according to the refs. Scrolling currently
+  triggers at line 6 with current timings so we are quite off.
+  Additionally scrolling updates every other frame so simply using partial
+  updates won't cope with it;
+- None of the refs has the top 8 pixels shown but 256x232 seems unlikely.
+  Verify what it shows on real HW, should be either garbage or vblank or
+  border color;
+- Verify if coin counter is really tied to $3807;
 
 Memory Map (Preliminary):
 
@@ -99,7 +112,7 @@ ROM
 $4000 - $7fff   bankswitched ROM
 $8000 - $ffff   ROM
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/renegade.h"
@@ -221,15 +234,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int scanline = param;
 
-	if (scanline == 112) // ???
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	else if(scanline == 240)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+	// vblank irq?
+	if (scanline == 240)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::coincounter_w)
+WRITE8_MEMBER(renegade_state::nmi_ack_w)
 {
-	//coin_counter_w(offset, data);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(renegade_state::irq_ack_w)
+{
+	if (data != 0xff)
+	{
+		// guess: trigger a 1->0 transition on irq ack
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
+	}
+	//m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -248,8 +271,8 @@ void renegade_state::renegade_nomcu_map(address_map &map)
 	map(0x3802, 0x3802).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* DIP2  various IO ports */
 	map(0x3803, 0x3803).portr("DSW1").w(FUNC(renegade_state::flipscreen_w));   /* DIP1 */
 	map(0x3805, 0x3805).nopr().w(FUNC(renegade_state::bankswitch_w));
-	map(0x3806, 0x3806).nopw(); // ?? watchdog
-	map(0x3807, 0x3807).w(FUNC(renegade_state::coincounter_w));
+	map(0x3806, 0x3806).w(FUNC(renegade_state::nmi_ack_w));
+	map(0x3807, 0x3807).w(FUNC(renegade_state::irq_ack_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom();
 }
@@ -269,7 +292,13 @@ void renegade_state::renegade_sound_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(renegade_state::adpcm_addr_w));
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0x3000, 0x3000).w(FUNC(renegade_state::adpcm_stop_w));
+//  map(0x2000, 0x7fff) read in service mode during sound test
 	map(0x8000, 0xffff).rom();
+}
+
+INPUT_CHANGED_MEMBER(renegade_state::coin_inserted)
+{
+	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -279,8 +308,8 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* attack left */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* jump */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Left Attack")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -289,10 +318,10 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)  /* attack left */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)  /* jump */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Left Attack")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
 
 	PORT_START("DSW2")  /* DIP2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
@@ -300,12 +329,11 @@ static INPUT_PORTS_START( renegade )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* attack right */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* attack right */
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(renegade_state, mcu_status_r)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Attack")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Attack")
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(renegade_state, mcu_status_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
 
 	PORT_START("DSW1")  /* DIP1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -321,7 +349,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x20, "Bonus" )                 PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "30k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
@@ -484,16 +512,13 @@ void renegade_state::renegade(machine_config &config)
 	TAITO68705_MCU(config, m_mcu, 12000000/4); // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)*2);  /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 0, 30*8-1);
-	screen.set_screen_update(FUNC(renegade_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12000000/2, 384, 0, 256, 272, 0, 240); // assume same as ddragon.cpp
+	m_screen->set_screen_update(FUNC(renegade_state::screen_update));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_renegade);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -684,7 +709,7 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

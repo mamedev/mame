@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.2" green="0.02" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.04" green="0.2" blue="0.02" /></disk>
+		<disk state="1"><color red="0.15" green="1.0" blue="0.1" /></disk>
+	</element>
+
+	<element name="text_1"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-0.4" right="9.6" top="-0.4" bottom="4.9" />
+
+		<bezel name="0.0" element="ledr"><bounds x="0" y="0" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.1" element="ledr"><bounds x="2" y="0" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.2" element="ledr"><bounds x="4" y="0" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.3" element="ledr"><bounds x="6" y="0" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.4" element="ledr"><bounds x="8" y="0" width="1.2" height="1.2" /></bezel>
+
+		<bezel name="0.5" element="ledg"><bounds x="0" y="2.37" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.6" element="ledg"><bounds x="2" y="2.37" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.7" element="ledg"><bounds x="4" y="2.37" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.8" element="ledg"><bounds x="6" y="2.37" width="1.2" height="1.2" /></bezel>
+		<bezel name="0.9" element="ledg"><bounds x="8" y="2.37" width="1.2" height="1.2" /></bezel>
+
+		<bezel element="text_1"><bounds x="0" y="1.2" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_2"><bounds x="2" y="1.2" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_3"><bounds x="4" y="1.2" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_4"><bounds x="6" y="1.2" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_5"><bounds x="8" y="1.2" width="1.2" height="1.1" /></bezel>
+
+		<bezel element="text_a"><bounds x="0" y="3.57" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_b"><bounds x="2" y="3.57" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_c"><bounds x="4" y="3.57" width="1.2" height="1.1" /></bezel>
+		<bezel element="text_d"><bounds x="6" y="3.57" width="1.2" height="1.1" /></bezel>
+
+	</view>
+</mamelayout>

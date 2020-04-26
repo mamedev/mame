@@ -423,7 +423,7 @@ void rungun_state::rng(machine_config &config)
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
-	m_k055673->set_config(K055673_LAYOUT_RNG, -8, -15);
+	m_k055673->set_config(K055673_LAYOUT_RNG, -8, 15);
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);
 

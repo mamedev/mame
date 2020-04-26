@@ -686,7 +686,7 @@ void avr8_device::op_cpc(uint16_t op)
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t rr = m_r[RR5(op)];
 	const uint8_t c = SREG & AVR8_SREG_MASK_C;
-	const uint8_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
 	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
 	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }
@@ -698,7 +698,7 @@ void avr8_device::op_sbc(uint16_t op)
 	const uint8_t c = SREG & AVR8_SREG_MASK_C;
 	const uint8_t res = rd - (rr + c);
 	m_r[RD5(op)] = res;
-	const uint8_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
 	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
 	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }
@@ -798,7 +798,7 @@ void avr8_device::op_sbci(uint16_t op)
 	const uint8_t c = SREG & AVR8_SREG_MASK_C;
 	const uint8_t res = rd - (rr + c);
 	m_r[16 + RD4(op)] = res;
-	const uint8_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
+	const uint32_t z = (SREG & AVR8_SREG_MASK_Z) ? (1 << 17) : 0;
 	SREG &= ~(AVR8_SREG_MASK_H | AVR8_SREG_MASK_V | AVR8_SREG_MASK_N | AVR8_SREG_MASK_S | AVR8_SREG_MASK_Z | AVR8_SREG_MASK_C);
 	SREG |= m_sbc_flag_cache[z | (c << 16) | (rd << 8) | rr];
 }

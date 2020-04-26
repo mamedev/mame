@@ -97,22 +97,22 @@ image_init_result fmt_icmem_device::call_create(int format_type, util::option_re
 }
 
 
-READ8_MEMBER(fmt_icmem_device::static_mem_read)
+uint8_t fmt_icmem_device::static_mem_read(offs_t offset)
 {
 	return m_memcard_ram[offset];
 }
 
-WRITE8_MEMBER(fmt_icmem_device::static_mem_write)
+void fmt_icmem_device::static_mem_write(offs_t offset, uint8_t data)
 {
 	m_memcard_ram[offset] = data;
 }
 
-READ8_MEMBER(fmt_icmem_device::mem_read)
+uint8_t fmt_icmem_device::mem_read(offs_t offset)
 {
 	return m_memcard_ram[(m_bank*0x100000) + offset];
 }
 
-WRITE8_MEMBER(fmt_icmem_device::mem_write)
+void fmt_icmem_device::mem_write(offs_t offset, uint8_t data)
 {
 	m_memcard_ram[(m_bank*0x100000) + offset] = data;
 }
@@ -123,7 +123,7 @@ WRITE8_MEMBER(fmt_icmem_device::mem_write)
 //  bit 3,4,5 - not memory card related (EEPROM and backup battery level)
 //  bit 6 - unknown
 //  bit 7 - 1 = card changed, flips back to 0 when read
-READ8_MEMBER(fmt_icmem_device::status_r)
+uint8_t fmt_icmem_device::status_r()
 {
 	uint8_t ret = 0x00;
 
@@ -144,7 +144,7 @@ READ8_MEMBER(fmt_icmem_device::status_r)
 // Attribute/Common memory select (0x491)
 //  bit 0: 0 = common memory, 1 = attribute memory (TODO)
 //  bit 7: 0 indicates that card is JEIDA v4 compliant
-READ8_MEMBER(fmt_icmem_device::bank_r)
+uint8_t fmt_icmem_device::bank_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(fmt_icmem_device::bank_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(fmt_icmem_device::bank_w)
+void fmt_icmem_device::bank_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

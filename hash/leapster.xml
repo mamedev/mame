@@ -905,7 +905,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<info name="serial" value="500-14005-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" />
+				<rom name="500-14005-A - Scooby Doo (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" />
 			</dataarea>
 		</part>
 	</software>
@@ -917,7 +917,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<info name="serial" value="500-12160-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12160-A - Scooby Doo! - Spooky Snacks! (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" />
+				<rom name="500-12160-A - Scooby Doo - Spooky Snacks (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" />
 			</dataarea>
 		</part>
 	</software>
@@ -1110,7 +1110,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<info name="serial" value="500-11204-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11204-A - Thomas and Friends - Calling all Engines! (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" />
+				<rom name="500-11204-A - Thomas and Friends - Calling all Engines (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" />
 			</dataarea>
 		</part>
 	</software>

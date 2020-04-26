@@ -35,7 +35,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 WRITE8_MEMBER(fastlane_state::k007121_registers_w)
 {
 	if (offset < 8)
-		m_k007121->ctrl_w(space, offset, data);
+		m_k007121->ctrl_w(offset, data);
 	else    /* scroll registers */
 		m_k007121_regs[offset] = data;
 }

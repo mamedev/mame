@@ -14,7 +14,9 @@
 //
 // Set to 0 to use a linearized diode model in the range exceeding
 // maximum dissipation. The intention is to have a faster
-// convergence but this yet not really is observable
+// convergence. On selected circuits (LM3900 trapezoidal) this is
+// observable and has a 10% impact.
+// FIXME: More research needed
 //
 
 #define USE_TEXTBOOK_DIODE  (1)
@@ -124,6 +126,76 @@ namespace analog
 		nl_fptype m_gmin;
 	};
 
+#if 1
+	// Constant model for constant capacitor model
+	// Backward Euler
+	// "Circuit simulation", page 274
+	struct generic_capacitor_const
+	{
+	public:
+		generic_capacitor_const(device_t &dev, const pstring &name)
+		: m_gmin(nlconst::zero())
+		{
+			plib::unused_var(dev, name);
+		}
+
+		// Returns { G, Ieq }
+		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
+		{
+			const nl_fptype h(plib::reciprocal(step));
+			const nl_fptype G(cap * h + m_gmin);
+			return { G, - G * v };
+		}
+		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+	private:
+		nl_fptype m_gmin;
+	};
+#else
+	// Constant model for constant capacitor model
+	// Trapezoidal
+	// "Circuit simulation", page 278
+	struct generic_capacitor_const
+	{
+	public:
+		generic_capacitor_const(device_t &dev, const pstring &name)
+		: m_gmin(nlconst::zero())
+		, m_vn(0)
+		, m_in(0)
+		, m_trn(0.0)
+		{
+			plib::unused_var(dev, name);
+		}
+
+		// Returns { G, Ieq }
+		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		{
+			const nl_fptype h(plib::reciprocal(step));
+			if (m_trn == 0.0)
+			{
+				const nl_fptype G(cap * h + m_gmin);
+				m_vn = v;
+				m_trn = h;
+				return { G, - G * v };
+			}
+			if (step < 1e-9)
+				printf("Help %e\n", step);
+			const nl_fptype Gn = nlconst::two() * cap * m_trn;
+			const nl_fptype inp1 = Gn * v - (m_in + Gn * m_vn);
+			const nl_fptype G(nlconst::two() * cap * h);
+			const nl_fptype Ieq(inp1 + G * v);
+			m_in = inp1;
+			m_vn = v;
+			m_trn = h;
+			return { G + m_gmin, -Ieq };
+		}
+		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+	private:
+		nl_fptype m_gmin;
+		nl_fptype m_vn;
+		nl_fptype m_in;
+		nl_fptype m_trn;
+	};
+#endif
 	// -----------------------------------------------------------------------------
 	// A generic diode model to be used in other devices (Diode, BJT ...)
 	// -----------------------------------------------------------------------------
@@ -155,9 +227,9 @@ namespace analog
 			  , nlconst::magic(1)
 			  , nlconst::magic(1e-15)
 			  , nlconst::magic(300.0));
-			m_name = name;
+			//m_name = name;
 		}
-		pstring m_name;
+		//pstring m_name;
 		// Basic math
 		//
 		// I(V) = f(V)

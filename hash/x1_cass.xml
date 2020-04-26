@@ -1102,7 +1102,7 @@ Titles, publishers and release dates taken from:
 		<year>1984?</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass" interface="x1_cass">
-			<dataarea name="side1" size="240004">
+			<dataarea name="side1" size="360004">
 				<rom name="hyper olympic '84 alt.tap" size="360004" crc="9eeb708b" sha1="b64040786430b0bec364f4af1b5fde108721033c"/>
 			</dataarea>
 		</part>

@@ -354,7 +354,7 @@ license:CC0
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7276">
-				<rom name="bombazd le ceausescut! (198x)(osmagyar software)(hu).cas" size="7276" crc="c6319041" sha1="cbb62a85c0bbc573dab43aee4c6e4a607dc883c6"/>
+				<rom name="bombazd le ceausescut (198x)(osmagyar software)(hu).cas" size="7276" crc="c6319041" sha1="cbb62a85c0bbc573dab43aee4c6e4a607dc883c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1182,7 +1182,7 @@ license:CC0
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26240">
-				<rom name="kalandozz velem! (198x)(-)(hu).cas" size="26240" crc="cf4a36fe" sha1="f7e16f36fdda6582a38e1d2dfe915577c30543d4"/>
+				<rom name="kalandozz velem (198x)(-)(hu).cas" size="26240" crc="cf4a36fe" sha1="f7e16f36fdda6582a38e1d2dfe915577c30543d4"/>
 			</dataarea>
 		</part>
 	</software>

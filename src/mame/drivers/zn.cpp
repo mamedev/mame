@@ -1858,7 +1858,7 @@ WRITE16_MEMBER(acclaim_zn_state::acpsx_10_w)
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
 WRITE16_MEMBER(nbajamex_state::sound_80_w)
 {
-	m_rax->data_w(space, 0, data, 0xffff);
+	m_rax->data_w(data);
 }
 
 READ16_MEMBER(nbajamex_state::sound_08_r)

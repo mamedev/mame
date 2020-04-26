@@ -1453,10 +1453,290 @@ void nec_disassembler::decode_opcode(std::ostream &stream, const NEC_I386_OPCODE
 
 handle_unknown:
 	util::stream_format(stream, "???");
+
+}
+offs_t nec_disassembler::dis80(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t flags = 0;
+	uint8_t op;
+	unsigned prevpc = pc;
+	switch (op = opcodes.r8(pc++))
+	{
+		case 0x00: util::stream_format(stream, "nop"); break;
+		case 0x01: util::stream_format(stream, "lxi  cw,$%04x", params.r16(pc)); pc+=2; break;
+		case 0x02: util::stream_format(stream, "stax cw"); break;
+		case 0x03: util::stream_format(stream, "inx  cw"); break;
+		case 0x04: util::stream_format(stream, "inr  ch"); break;
+		case 0x05: util::stream_format(stream, "dcr  ch"); break;
+		case 0x06: util::stream_format(stream, "mvi  ch,$%02x", params.r8(pc)); pc++; break;
+		case 0x07: util::stream_format(stream, "rlc"); break;
+		case 0x08: util::stream_format(stream, "nop"); break;
+		case 0x09: util::stream_format(stream, "dad  cw"); break;
+		case 0x0a: util::stream_format(stream, "ldax cw"); break;
+		case 0x0b: util::stream_format(stream, "dcx  cw"); break;
+		case 0x0c: util::stream_format(stream, "inr  cl"); break;
+		case 0x0d: util::stream_format(stream, "dcr  cl"); break;
+		case 0x0e: util::stream_format(stream, "mvi  cl,$%02x", params.r8(pc)); pc++; break;
+		case 0x0f: util::stream_format(stream, "rrc"); break;
+		case 0x10: util::stream_format(stream, "nop"); break;
+		case 0x11: util::stream_format(stream, "lxi  dw,$%04x", params.r16(pc)); pc+=2; break;
+		case 0x12: util::stream_format(stream, "stax dw"); break;
+		case 0x13: util::stream_format(stream, "inx  dw"); break;
+		case 0x14: util::stream_format(stream, "inr  dh"); break;
+		case 0x15: util::stream_format(stream, "dcr  dh"); break;
+		case 0x16: util::stream_format(stream, "mvi  dh,$%02x", params.r8(pc)); pc++; break;
+		case 0x17: util::stream_format(stream, "ral"); break;
+		case 0x18: util::stream_format(stream, "nop"); break;
+		case 0x19: util::stream_format(stream, "dad  dw"); break;
+		case 0x1a: util::stream_format(stream, "ldax dw"); break;
+		case 0x1b: util::stream_format(stream, "dcx  dw"); break;
+		case 0x1c: util::stream_format(stream, "inr  dl"); break;
+		case 0x1d: util::stream_format(stream, "dcr  dl"); break;
+		case 0x1e: util::stream_format(stream, "mvi  dl,$%02x", params.r8(pc)); pc++; break;
+		case 0x1f: util::stream_format(stream, "rar"); break;
+		case 0x20: util::stream_format(stream, "nop"); break;
+		case 0x21: util::stream_format(stream, "lxi  bw,$%04x", params.r16(pc)); pc+=2; break;
+		case 0x22: util::stream_format(stream, "shld $%04x", params.r16(pc)); pc+=2; break;
+		case 0x23: util::stream_format(stream, "inx  bw"); break;
+		case 0x24: util::stream_format(stream, "inr  bh"); break;
+		case 0x25: util::stream_format(stream, "dcr  bh"); break;
+		case 0x26: util::stream_format(stream, "mvi  bh,$%02x", params.r8(pc)); pc++; break;
+		case 0x27: util::stream_format(stream, "daa"); break;
+		case 0x28: util::stream_format(stream, "nop"); break;
+		case 0x29: util::stream_format(stream, "dad  bw"); break;
+		case 0x2a: util::stream_format(stream, "lhld $%04x", params.r16(pc)); pc+=2; break;
+		case 0x2b: util::stream_format(stream, "dcx  bw"); break;
+		case 0x2c: util::stream_format(stream, "inr  bl"); break;
+		case 0x2d: util::stream_format(stream, "dcr  bl"); break;
+		case 0x2e: util::stream_format(stream, "mvi  bl,$%02x", params.r8(pc)); pc++; break;
+		case 0x2f: util::stream_format(stream, "cma"); break;
+		case 0x30: util::stream_format(stream, "nop"); break;
+		case 0x31: util::stream_format(stream, "lxi  bp,$%04x", params.r16(pc)); pc+=2; break;
+		case 0x32: util::stream_format(stream, "stax $%04x", params.r16(pc)); pc+=2; break;
+		case 0x33: util::stream_format(stream, "inx  bp"); break;
+		case 0x34: util::stream_format(stream, "inr  m"); break;
+		case 0x35: util::stream_format(stream, "dcr  m"); break;
+		case 0x36: util::stream_format(stream, "mvi  m,$%02x", params.r8(pc)); pc++; break;
+		case 0x37: util::stream_format(stream, "stc"); break;
+		case 0x38: util::stream_format(stream, "nop"); break;
+		case 0x39: util::stream_format(stream, "dad  bp"); break;
+		case 0x3a: util::stream_format(stream, "ldax $%04x", params.r16(pc)); pc+=2; break;
+		case 0x3b: util::stream_format(stream, "dcx  bp"); break;
+		case 0x3c: util::stream_format(stream, "inr  al"); break;
+		case 0x3d: util::stream_format(stream, "dcr  al"); break;
+		case 0x3e: util::stream_format(stream, "mvi  al,$%02x", params.r8(pc)); pc++; break;
+		case 0x3f: util::stream_format(stream, "cmc"); break;
+		case 0x40: util::stream_format(stream, "mov  ch,ch"); break;
+		case 0x41: util::stream_format(stream, "mov  ch,cl"); break;
+		case 0x42: util::stream_format(stream, "mov  ch,dh"); break;
+		case 0x43: util::stream_format(stream, "mov  ch,dl"); break;
+		case 0x44: util::stream_format(stream, "mov  ch,bh"); break;
+		case 0x45: util::stream_format(stream, "mov  ch,bl"); break;
+		case 0x46: util::stream_format(stream, "mov  ch,m"); break;
+		case 0x47: util::stream_format(stream, "mov  ch,al"); break;
+		case 0x48: util::stream_format(stream, "mov  cl,ch"); break;
+		case 0x49: util::stream_format(stream, "mov  cl,cl"); break;
+		case 0x4a: util::stream_format(stream, "mov  cl,dh"); break;
+		case 0x4b: util::stream_format(stream, "mov  cl,dl"); break;
+		case 0x4c: util::stream_format(stream, "mov  cl,bh"); break;
+		case 0x4d: util::stream_format(stream, "mov  cl,bl"); break;
+		case 0x4e: util::stream_format(stream, "mov  cl,m"); break;
+		case 0x4f: util::stream_format(stream, "mov  cl,al"); break;
+		case 0x50: util::stream_format(stream, "mov  dh,ch"); break;
+		case 0x51: util::stream_format(stream, "mov  dh,cl"); break;
+		case 0x52: util::stream_format(stream, "mov  dh,dh"); break;
+		case 0x53: util::stream_format(stream, "mov  dh,dl"); break;
+		case 0x54: util::stream_format(stream, "mov  dh,bh"); break;
+		case 0x55: util::stream_format(stream, "mov  dh,bl"); break;
+		case 0x56: util::stream_format(stream, "mov  dh,m"); break;
+		case 0x57: util::stream_format(stream, "mov  dh,al"); break;
+		case 0x58: util::stream_format(stream, "mov  dl,ch"); break;
+		case 0x59: util::stream_format(stream, "mov  dl,cl"); break;
+		case 0x5a: util::stream_format(stream, "mov  dl,dh"); break;
+		case 0x5b: util::stream_format(stream, "mov  dl,dl"); break;
+		case 0x5c: util::stream_format(stream, "mov  dl,bh"); break;
+		case 0x5d: util::stream_format(stream, "mov  dl,bl"); break;
+		case 0x5e: util::stream_format(stream, "mov  dl,m"); break;
+		case 0x5f: util::stream_format(stream, "mov  dl,al"); break;
+		case 0x60: util::stream_format(stream, "mov  bh,ch"); break;
+		case 0x61: util::stream_format(stream, "mov  bh,cl"); break;
+		case 0x62: util::stream_format(stream, "mov  bh,dh"); break;
+		case 0x63: util::stream_format(stream, "mov  bh,dl"); break;
+		case 0x64: util::stream_format(stream, "mov  bh,bh"); break;
+		case 0x65: util::stream_format(stream, "mov  bh,bl"); break;
+		case 0x66: util::stream_format(stream, "mov  bh,m"); break;
+		case 0x67: util::stream_format(stream, "mov  bh,al"); break;
+		case 0x68: util::stream_format(stream, "mov  bl,ch"); break;
+		case 0x69: util::stream_format(stream, "mov  bl,cl"); break;
+		case 0x6a: util::stream_format(stream, "mov  bl,dh"); break;
+		case 0x6b: util::stream_format(stream, "mov  bl,dl"); break;
+		case 0x6c: util::stream_format(stream, "mov  bl,bh"); break;
+		case 0x6d: util::stream_format(stream, "mov  bl,bl"); break;
+		case 0x6e: util::stream_format(stream, "mov  bl,m"); break;
+		case 0x6f: util::stream_format(stream, "mov  bl,al"); break;
+		case 0x70: util::stream_format(stream, "mov  m,ch"); break;
+		case 0x71: util::stream_format(stream, "mov  m,cl"); break;
+		case 0x72: util::stream_format(stream, "mov  m,dh"); break;
+		case 0x73: util::stream_format(stream, "mov  m,dl"); break;
+		case 0x74: util::stream_format(stream, "mov  m,bh"); break;
+		case 0x75: util::stream_format(stream, "mov  m,bl"); break;
+		case 0x76: util::stream_format(stream, "hlt"); break;
+		case 0x77: util::stream_format(stream, "mov  m,al"); break;
+		case 0x78: util::stream_format(stream, "mov  al,ch"); break;
+		case 0x79: util::stream_format(stream, "mov  al,cl"); break;
+		case 0x7a: util::stream_format(stream, "mov  al,dh"); break;
+		case 0x7b: util::stream_format(stream, "mov  al,dl"); break;
+		case 0x7c: util::stream_format(stream, "mov  al,bh"); break;
+		case 0x7d: util::stream_format(stream, "mov  al,bl"); break;
+		case 0x7e: util::stream_format(stream, "mov  al,m"); break;
+		case 0x7f: util::stream_format(stream, "mov  al,al"); break;
+		case 0x80: util::stream_format(stream, "add  ch"); break;
+		case 0x81: util::stream_format(stream, "add  cl"); break;
+		case 0x82: util::stream_format(stream, "add  dh"); break;
+		case 0x83: util::stream_format(stream, "add  dl"); break;
+		case 0x84: util::stream_format(stream, "add  bh"); break;
+		case 0x85: util::stream_format(stream, "add  bl"); break;
+		case 0x86: util::stream_format(stream, "add  m"); break;
+		case 0x87: util::stream_format(stream, "add  al"); break;
+		case 0x88: util::stream_format(stream, "adc  ch"); break;
+		case 0x89: util::stream_format(stream, "adc  cl"); break;
+		case 0x8a: util::stream_format(stream, "adc  dh"); break;
+		case 0x8b: util::stream_format(stream, "adc  dl"); break;
+		case 0x8c: util::stream_format(stream, "adc  bh"); break;
+		case 0x8d: util::stream_format(stream, "adc  bl"); break;
+		case 0x8e: util::stream_format(stream, "adc  m"); break;
+		case 0x8f: util::stream_format(stream, "adc  al"); break;
+		case 0x90: util::stream_format(stream, "sub  ch"); break;
+		case 0x91: util::stream_format(stream, "sub  cl"); break;
+		case 0x92: util::stream_format(stream, "sub  dh"); break;
+		case 0x93: util::stream_format(stream, "sub  dl"); break;
+		case 0x94: util::stream_format(stream, "sub  bh"); break;
+		case 0x95: util::stream_format(stream, "sub  bl"); break;
+		case 0x96: util::stream_format(stream, "sub  m"); break;
+		case 0x97: util::stream_format(stream, "sub  al"); break;
+		case 0x98: util::stream_format(stream, "sbb  ch"); break;
+		case 0x99: util::stream_format(stream, "sbb  cl"); break;
+		case 0x9a: util::stream_format(stream, "sbb  dh"); break;
+		case 0x9b: util::stream_format(stream, "sbb  dl"); break;
+		case 0x9c: util::stream_format(stream, "sbb  bh"); break;
+		case 0x9d: util::stream_format(stream, "sbb  bl"); break;
+		case 0x9e: util::stream_format(stream, "sbb  m"); break;
+		case 0x9f: util::stream_format(stream, "sbb  al"); break;
+		case 0xa0: util::stream_format(stream, "ana  ch"); break;
+		case 0xa1: util::stream_format(stream, "ana  cl"); break;
+		case 0xa2: util::stream_format(stream, "ana  dh"); break;
+		case 0xa3: util::stream_format(stream, "ana  dl"); break;
+		case 0xa4: util::stream_format(stream, "ana  bh"); break;
+		case 0xa5: util::stream_format(stream, "ana  bl"); break;
+		case 0xa6: util::stream_format(stream, "ana  m"); break;
+		case 0xa7: util::stream_format(stream, "ana  al"); break;
+		case 0xa8: util::stream_format(stream, "xra  ch"); break;
+		case 0xa9: util::stream_format(stream, "xra  cl"); break;
+		case 0xaa: util::stream_format(stream, "xra  dh"); break;
+		case 0xab: util::stream_format(stream, "xra  dl"); break;
+		case 0xac: util::stream_format(stream, "xra  bh"); break;
+		case 0xad: util::stream_format(stream, "xra  bl"); break;
+		case 0xae: util::stream_format(stream, "xra  m"); break;
+		case 0xaf: util::stream_format(stream, "xra  al"); break;
+		case 0xb0: util::stream_format(stream, "ora  ch"); break;
+		case 0xb1: util::stream_format(stream, "ora  cl"); break;
+		case 0xb2: util::stream_format(stream, "ora  dh"); break;
+		case 0xb3: util::stream_format(stream, "ora  dl"); break;
+		case 0xb4: util::stream_format(stream, "ora  bh"); break;
+		case 0xb5: util::stream_format(stream, "ora  bl"); break;
+		case 0xb6: util::stream_format(stream, "ora  m"); break;
+		case 0xb7: util::stream_format(stream, "ora  al"); break;
+		case 0xb8: util::stream_format(stream, "cmp  ch"); break;
+		case 0xb9: util::stream_format(stream, "cmp  cl"); break;
+		case 0xba: util::stream_format(stream, "cmp  dh"); break;
+		case 0xbb: util::stream_format(stream, "cmp  dl"); break;
+		case 0xbc: util::stream_format(stream, "cmp  bh"); break;
+		case 0xbd: util::stream_format(stream, "cmp  bl"); break;
+		case 0xbe: util::stream_format(stream, "cmp  m"); break;
+		case 0xbf: util::stream_format(stream, "cmp  al"); break;
+		case 0xc0: util::stream_format(stream, "rnz"); flags = STEP_OUT; break;
+		case 0xc1: util::stream_format(stream, "pop  cw"); break;
+		case 0xc2: util::stream_format(stream, "jnz  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xc3: util::stream_format(stream, "jmp  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xc4: util::stream_format(stream, "cnz  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xc5: util::stream_format(stream, "push cw"); break;
+		case 0xc6: util::stream_format(stream, "adi  $%02x", params.r8(pc)); pc++; break;
+		case 0xc7: util::stream_format(stream, "rst  0"); flags = STEP_OVER; break;
+		case 0xc8: util::stream_format(stream, "rz"); flags = STEP_OUT; break;
+		case 0xc9: util::stream_format(stream, "ret"); flags = STEP_OUT; break;
+		case 0xca: util::stream_format(stream, "jz   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xcb: util::stream_format(stream, "jmp  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xcc: util::stream_format(stream, "cz   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xcd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xce: util::stream_format(stream, "aci  $%02x", params.r8(pc)); pc++; break;
+		case 0xcf: util::stream_format(stream, "rst  1"); flags = STEP_OVER; break;
+		case 0xd0: util::stream_format(stream, "rnc"); flags = STEP_OUT; break;
+		case 0xd1: util::stream_format(stream, "pop  dw"); break;
+		case 0xd2: util::stream_format(stream, "jnc  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xd3: util::stream_format(stream, "out  $%02x", params.r8(pc)); pc++; break;
+		case 0xd4: util::stream_format(stream, "cnc  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xd5: util::stream_format(stream, "push dw"); break;
+		case 0xd6: util::stream_format(stream, "sui  $%02x", params.r8(pc)); pc++; break;
+		case 0xd7: util::stream_format(stream, "rst  2"); flags = STEP_OVER; break;
+		case 0xd8: util::stream_format(stream, "rc"); flags = STEP_OUT; break;
+		case 0xd9: util::stream_format(stream, "shlx d (*)"); break;
+		case 0xda: util::stream_format(stream, "jc   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xdb: util::stream_format(stream, "in   $%02x", params.r8(pc)); pc++; break;
+		case 0xdc: util::stream_format(stream, "cc   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xdd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xde: util::stream_format(stream, "sbi  $%02x", params.r8(pc)); pc++; break;
+		case 0xdf: util::stream_format(stream, "rst  3"); flags = STEP_OVER; break;
+		case 0xe0: util::stream_format(stream, "rpo"); flags = STEP_OUT; break;
+		case 0xe1: util::stream_format(stream, "pop  bw"); break;
+		case 0xe2: util::stream_format(stream, "jpo  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xe3: util::stream_format(stream, "xthl"); break;
+		case 0xe4: util::stream_format(stream, "cpo  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xe5: util::stream_format(stream, "push bw"); break;
+		case 0xe6: util::stream_format(stream, "ani  $%02x", params.r8(pc)); pc++; break;
+		case 0xe7: util::stream_format(stream, "rst  4"); flags = STEP_OVER; break;
+		case 0xe8: util::stream_format(stream, "rpe"); flags = STEP_OUT;  break;
+		case 0xe9: util::stream_format(stream, "pchl"); break;
+		case 0xea: util::stream_format(stream, "jpe  $%04x", params.r16(pc)); pc+=2; break;
+		case 0xeb: util::stream_format(stream, "xchg"); break;
+		case 0xec: util::stream_format(stream, "cpe  $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xed:
+			switch (params.r8(pc))
+			{
+				case 0xed:
+					util::stream_format(stream, "calln $%02x", params.r8(++pc)); pc++; flags = STEP_OVER; break;
+				case 0xfd:
+					util::stream_format(stream, "retem $%02x", params.r8(pc)); pc++; flags = STEP_OUT; break;
+				default:
+					util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+			}
+			break;
+		case 0xee: util::stream_format(stream, "xri  $%02x", params.r8(pc)); pc++; break;
+		case 0xef: util::stream_format(stream, "rst  5"); flags = STEP_OVER; break;
+		case 0xf0: util::stream_format(stream, "rp"); flags = STEP_OUT; break;
+		case 0xf1: util::stream_format(stream, "pop  psw"); break;
+		case 0xf2: util::stream_format(stream, "jp   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xf3: util::stream_format(stream, "di"); break;
+		case 0xf4: util::stream_format(stream, "cp   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xf5: util::stream_format(stream, "push psw"); break;
+		case 0xf6: util::stream_format(stream, "ori  $%02x", params.r8(pc)); pc++; break;
+		case 0xf7: util::stream_format(stream, "rst  6"); flags = STEP_OVER; break;
+		case 0xf8: util::stream_format(stream, "rm"); flags = STEP_OUT; break;
+		case 0xf9: util::stream_format(stream, "sphl"); break;
+		case 0xfa: util::stream_format(stream, "jm   $%04x", params.r16(pc)); pc+=2; break;
+		case 0xfb: util::stream_format(stream, "ei"); break;
+		case 0xfc: util::stream_format(stream, "cm   $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xfd: util::stream_format(stream, "call $%04x", params.r16(pc)); pc+=2; flags = STEP_OVER; break;
+		case 0xfe: util::stream_format(stream, "cpi  $%02x", params.r8(pc)); pc++; break;
+		case 0xff: util::stream_format(stream, "rst  7"); flags = STEP_OVER; break;
+	}
+	return (pc - prevpc) | flags | SUPPORTED;
 }
 
 offs_t nec_disassembler::disassemble(std::ostream &stream, offs_t eip, const data_buffer &opcodes, const data_buffer &params)
 {
+	if(!(m_config->get_mode()))
+		return dis80(stream, eip, opcodes, params);
+
 	uint8_t op;
 
 	offs_t pc = eip;
@@ -1472,7 +1752,7 @@ offs_t nec_disassembler::disassemble(std::ostream &stream, offs_t eip, const dat
 	return (pc-eip) | m_dasm_flags | SUPPORTED;
 }
 
-nec_disassembler::nec_disassembler(const u8 *decryption_table) : m_decryption_table(decryption_table)
+nec_disassembler::nec_disassembler(config *conf, const u8 *decryption_table) : m_config(conf), m_decryption_table(decryption_table)
 {
 }
 

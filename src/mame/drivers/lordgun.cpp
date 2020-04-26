@@ -951,6 +951,9 @@ ROM_START( lordgun )
 
 	ROM_REGION( 0x080000, "oki", 0 ) // Samples
 	ROM_LOAD( "lordgun.100", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) )
+
+	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT )   // Default eeprom
+	ROM_LOAD( "eeprom", 0x00, 0x80, CRC(0dad0e43) SHA1(c216d1f19228e103b78e5acb30a66dab3804ac70) )
 ROM_END
 
 

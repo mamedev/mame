@@ -202,7 +202,7 @@ WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offs
 WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(offset), data); }
 WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(offset), data); }
 WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(decrypt_offset(offset), data); }
 
 
 
@@ -1537,8 +1537,8 @@ void segag80r_state::init_astrob()
 	m_background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 
 	/* install Astro Blaster sound board */
 	iospace.install_write_handler(0x3e, 0x3f, write8_delegate(*this, FUNC(segag80r_state::astrob_sound_w)));
@@ -1649,8 +1649,8 @@ void segag80r_state::init_pignewt()
 	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
 
 	/* install Universal sound board */
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usbsnd, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usbsnd, FUNC(usb_sound_device::data_w)));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usbsnd, FUNC(usb_sound_device::ram_r)));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usbsnd, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80r_state::usb_ram_w)));
 }
 

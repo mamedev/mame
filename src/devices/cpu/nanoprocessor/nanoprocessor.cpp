@@ -48,6 +48,7 @@ hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, 
 	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
 	m_dc_changed_func(*this),
 	m_read_dc_func(*this),
+	m_int_ack_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 11),
 	m_io_config("io", ENDIANNESS_BIG, 8, 4)
 {
@@ -94,6 +95,7 @@ void hp_nanoprocessor_device::device_start()
 
 	m_dc_changed_func.resolve_safe();
 	m_read_dc_func.resolve_safe(0xff);
+	m_int_ack_func.resolve_safe(0xff);
 }
 
 void hp_nanoprocessor_device::device_reset()
@@ -124,8 +126,9 @@ void hp_nanoprocessor_device::execute_run()
 		// outside of the NP, usually by ANDing the DC7 line with the interrupt
 		// request signal)
 		if (BIT(m_flags, NANO_I_BIT)) {
+			standard_irq_callback(0);
 			m_reg_ISR = m_reg_PA;
-			m_reg_PA = (uint16_t)(standard_irq_callback(0) & 0xff);
+			m_reg_PA = m_int_ack_func();
 			// Vector fetching takes 1 cycle
 			m_icount -= 1;
 			dc_clr(HP_NANO_IE_DC);

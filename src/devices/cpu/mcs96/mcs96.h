@@ -16,10 +16,6 @@
 class mcs96_device : public cpu_device {
 public:
 	enum {
-		EXINT_LINE = 1
-	};
-
-	enum {
 		MCS96_PC = 1,
 		MCS96_PSW,
 		MCS96_INT_PENDING,
@@ -57,9 +53,7 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
-	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

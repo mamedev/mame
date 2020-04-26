@@ -231,12 +231,12 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 	/* DMD data */
 	if(m_dmdtype2)
 	{
-		m_dmdtype2->data_w(space,offset,data);
+		m_dmdtype2->data_w(data);
 		logerror("DMD: Data write %02x\n", data);
 	}
 	else if(m_dmdtype1)
 	{
-		m_dmdtype1->data_w(space,offset,data);
+		m_dmdtype1->data_w(data);
 		logerror("DMD: Data write %02x\n", data);
 	}
 //  m_segment1 |= (data<<8);
@@ -251,9 +251,9 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 READ8_MEMBER( de_3_state::pia2c_pb_r )
 {
 	if(m_dmdtype1)
-		return m_dmdtype1->busy_r(space,offset);
+		return m_dmdtype1->busy_r();
 	if(m_dmdtype2)
-		return m_dmdtype2->busy_r(space,offset);
+		return m_dmdtype2->busy_r();
 	return 0;
 }
 
@@ -262,12 +262,12 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 	/* DMD ctrl */
 	if(m_dmdtype2)
 	{
-		m_dmdtype2->ctrl_w(space,offset,data);
+		m_dmdtype2->ctrl_w(data);
 		logerror("DMD: Control write %02x\n", data);
 	}
 	else if(m_dmdtype1)
 	{
-		m_dmdtype1->ctrl_w(space,offset,data);
+		m_dmdtype1->ctrl_w(data);
 		logerror("DMD: Control write %02x\n", data);
 	}
 
@@ -318,11 +318,11 @@ READ8_MEMBER( de_3_state::dmd_status_r )
 {
 	if(m_dmdtype1)
 	{
-		return m_dmdtype1->status_r(space,offset);
+		return m_dmdtype1->status_r();
 	}
 	else if(m_dmdtype2)
 	{
-		return m_dmdtype2->status_r(space,offset);
+		return m_dmdtype2->status_r();
 	}
 	return 0;
 }

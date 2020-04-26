@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Mike Harris, Aaron Giles
 /***************************************************************************
 
     Namco 51XX
@@ -18,7 +18,7 @@
     ANS = answer to main CPU
 
     The chip reads/writes the I/O ports when the /IRQ is pulled down.
-    Pin 21 determines whether a read or write should happen (1=R, 0=W).
+    Pin 41 determines whether a read or write should happen (1=R, 0=W).
 
                +------+
              EX|1   42|Vcc
@@ -61,262 +61,86 @@
 #include "screen.h"
 
 
-#define VERBOSE 0
-#include "logmacro.h"
-
-
-#define READ_PORT(num)           m_in[num](space, 0)
-#define WRITE_PORT(num, data)    m_out[num](space, 0, data)
-
-WRITE8_MEMBER( namco_51xx_device::write )
+WRITE_LINE_MEMBER( namco_51xx_device::reset ) // make active low in the name
 {
-	data &= 0x07;
+	// Reset line is active low.
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
 
-	LOG("%s: custom 51XX write %02x\n",machine().describe_context(),data);
+WRITE_LINE_MEMBER( namco_51xx_device::vblank )
+{
+	// The timer is active on falling edges.
+	m_cpu->clock_w(!state);
+}
 
-	if (m_coincred_mode)
-	{
-		switch (m_coincred_mode--)
-		{
-			case 4: m_coins_per_cred[0] = data; break;
-			case 3: m_creds_per_coin[0] = data; break;
-			case 2: m_coins_per_cred[1] = data; break;
-			case 1: m_creds_per_coin[1] = data; break;
-		}
-	}
+WRITE_LINE_MEMBER(namco_51xx_device::rw)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::rw_sync),this), state);
+}
+
+TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
+{
+	m_rw = param;
+}
+
+WRITE_LINE_MEMBER( namco_51xx_device::chip_select )
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::chip_select_sync),this), state);
+}
+
+TIMER_CALLBACK_MEMBER( namco_51xx_device::chip_select_sync )
+{
+	m_cpu->set_input_line(0, param);
+}
+
+uint8_t namco_51xx_device::read()
+{
+	return m_portO;
+}
+
+void namco_51xx_device::write(uint8_t data)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::write_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_51xx_device::write_sync )
+{
+	m_portO = param;
+}
+
+uint8_t namco_51xx_device::K_r()
+{
+	return (m_rw << 3) | (m_portO & 0x07);
+}
+
+uint8_t namco_51xx_device::R0_r()
+{
+	return m_in[0]();
+}
+
+uint8_t namco_51xx_device::R1_r()
+{
+	return m_in[1]();
+}
+
+uint8_t namco_51xx_device::R2_r()
+{
+	return m_in[2]();
+}
+
+uint8_t namco_51xx_device::R3_r()
+{
+	return m_in[3]();
+}
+
+void namco_51xx_device::O_w(uint8_t data)
+{
+	uint8_t out = (data & 0x0f);
+	if (data & 0x10)
+		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
-	{
-		switch (data)
-		{
-			case 0: // nop
-				break;
-
-			case 1: // set coinage
-				m_coincred_mode = 4;
-				/* this is a good time to reset the credits counter */
-				m_credits = 0;
-
-				{
-					/* kludge for a possible bug in Xevious */
-					static const game_driver *namcoio_51XX_driver = nullptr;
-					static int namcoio_51XX_kludge = 0;
-
-					/* Only compute namcoio_51XX_kludge when gamedrv changes */
-					if (namcoio_51XX_driver != &machine().system())
-					{
-						namcoio_51XX_driver = &machine().system();
-						if (strcmp(namcoio_51XX_driver->name, "xevious") == 0 ||
-							strcmp(namcoio_51XX_driver->parent, "xevious") == 0)
-							namcoio_51XX_kludge = 1;
-						else
-							namcoio_51XX_kludge = 0;
-					}
-
-					if (namcoio_51XX_kludge)
-					{
-						m_coincred_mode = 6;
-						m_remap_joy = 1;
-					}
-				}
-				break;
-
-			case 2: // go in "credits" mode and enable start buttons
-				m_mode = 1;
-				m_in_count = 0;
-				break;
-
-			case 3: // disable joystick remapping
-				m_remap_joy = 0;
-				break;
-
-			case 4: // enable joystick remapping
-				m_remap_joy = 1;
-				break;
-
-			case 5: // go in "switch" mode
-				m_mode = 0;
-				m_in_count = 0;
-				break;
-
-			default:
-				logerror("unknown 51XX command %02x\n",data);
-				break;
-		}
-	}
+		m_portO = (m_portO & 0xf0) | (out);
 }
-
-
-/* joystick input mapping
-
-  The joystick is parsed and a number corresponding to the direction is returned,
-  according to the following table:
-
-          0
-        7   1
-      6   8   2
-        5   3
-          4
-
-  The values for directions impossible to obtain on a joystick have not been
-  verified on Namco original hardware, but they are the same in all the bootlegs,
-  so we can assume they are right.
-*/
-static const int joy_map[16] =
-/*  LDRU, LDR, LDU,  LD, LRU, LR,  LU,    L, DRU,  DR,  DU,   D,  RU,   R,   U, center */
-{    0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
-
-
-READ8_MEMBER( namco_51xx_device::read )
-{
-	LOG("%s: custom 51XX read\n",machine().describe_context());
-
-	if (m_mode == 0) /* switch mode */
-	{
-		switch ((m_in_count++) % 3)
-		{
-			default:
-			case 0: return READ_PORT(0) | (READ_PORT(1) << 4);
-			case 1: return READ_PORT(2) | (READ_PORT(3) << 4);
-			case 2: return 0;   // nothing?
-		}
-	}
-	else    /* credits mode */
-	{
-		switch ((m_in_count++) % 3)
-		{
-			default:
-			case 0: // number of credits in BCD format
-				{
-					int in,toggle;
-
-					in = ~(READ_PORT(0) | (READ_PORT(1) << 4));
-					toggle = in ^ m_lastcoins;
-					m_lastcoins = in;
-
-					if (m_coins_per_cred[0] > 0)
-					{
-						if (m_credits >= 99)
-						{
-							WRITE_PORT(1,1);  // coin lockout
-						}
-						else
-						{
-							WRITE_PORT(1,0);  // coin lockout
-							/* check if the user inserted a coin */
-							if (toggle & in & 0x10)
-							{
-								m_coins[0]++;
-								WRITE_PORT(0,0x04);   // coin counter
-								WRITE_PORT(0,0x0c);
-								if (m_coins[0] >= m_coins_per_cred[0])
-								{
-									m_credits += m_creds_per_coin[0];
-									m_coins[0] -= m_coins_per_cred[0];
-								}
-							}
-							if (toggle & in & 0x20)
-							{
-								m_coins[1]++;
-								WRITE_PORT(0,0x08);   // coin counter
-								WRITE_PORT(0,0x0c);
-								if (m_coins[1] >= m_coins_per_cred[1])
-								{
-									m_credits += m_creds_per_coin[1];
-									m_coins[1] -= m_coins_per_cred[1];
-								}
-							}
-							if (toggle & in & 0x40)
-							{
-								m_credits++;
-							}
-						}
-					}
-					else m_credits = 100;    // free play
-
-					if (m_mode == 1)
-					{
-						// HACK: Just a way of deriving the lamp blink rate. Unclear if this is verified on actual hardware.
-						int on = (m_screen->frame_number() & 0x10) >> 4;
-
-						if (m_credits >= 2)
-							WRITE_PORT(0,0x0c | 3*on);    // lamps
-						else if (m_credits >= 1)
-							WRITE_PORT(0,0x0c | 2*on);    // lamps
-						else
-							WRITE_PORT(0,0x0c);   // lamps off
-
-						/* check for 1 player start button */
-						if (toggle & in & 0x04)
-						{
-							if (m_credits >= 1)
-							{
-								m_credits--;
-								m_mode = 2;
-								WRITE_PORT(0,0x0c);   // lamps off
-							}
-						}
-						/* check for 2 players start button */
-						else if (toggle & in & 0x08)
-						{
-							if (m_credits >= 2)
-							{
-								m_credits -= 2;
-								m_mode = 2;
-								WRITE_PORT( 0,0x0c);  // lamps off
-							}
-						}
-					}
-				}
-
-				if (~READ_PORT( 1) & 0x08)    /* check test mode switch */
-					return 0xbb;
-
-				return (m_credits / 10) * 16 + m_credits % 10;
-
-			case 1:
-				{
-					int joy = READ_PORT(2) & 0x0f;
-					int in,toggle;
-
-					in = ~READ_PORT(0);
-					toggle = in ^ m_lastbuttons;
-					m_lastbuttons = (m_lastbuttons & 2) | (in & 1);
-
-					/* remap joystick */
-					if (m_remap_joy) joy = joy_map[joy];
-
-					/* fire */
-					joy |= ((toggle & in & 0x01)^1) << 4;
-					joy |= ((in & 0x01)^1) << 5;
-
-					return joy;
-				}
-
-			case 2:
-				{
-					int joy = READ_PORT(3) & 0x0f;
-					int in,toggle;
-
-					in = ~READ_PORT(0);
-					toggle = in ^ m_lastbuttons;
-					m_lastbuttons = (m_lastbuttons & 1) | (in & 2);
-
-					/* remap joystick */
-					if (m_remap_joy) joy = joy_map[joy];
-
-					/* fire */
-					joy |= ((toggle & in & 0x02)^2) << 3;
-					joy |= ((in & 0x02)^2) << 4;
-
-					return joy;
-				}
-		}
-	}
-}
-
-
-
-
 
 /***************************************************************************
     DEVICE INTERFACE
@@ -332,14 +156,11 @@ DEFINE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device, "namco51", "Namco 51xx")
 namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_51XX, tag, owner, clock)
 	, m_cpu(*this, "mcu")
-	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_portO(0)
+	, m_rw(0)
 	, m_in(*this)
 	, m_out(*this)
-	, m_lastcoins(0)
-	, m_lastbuttons(0)
-	, m_mode(0)
-	, m_coincred_mode(0)
-	, m_remap_joy(0)
+	, m_lockout(*this)
 {
 }
 
@@ -353,35 +174,11 @@ void namco_51xx_device::device_start()
 	m_in.resolve_all_safe(0);
 
 	/* resolve our write callbacks */
-	m_out.resolve_all_safe();
+	m_out.resolve_safe();
+	m_lockout.resolve_safe();
 
-	save_item(NAME(m_lastcoins));
-	save_item(NAME(m_lastbuttons));
-	save_item(NAME(m_credits));
-	save_item(NAME(m_coins));
-	save_item(NAME(m_coins_per_cred));
-	save_item(NAME(m_creds_per_coin));
-	save_item(NAME(m_in_count));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_coincred_mode));
-	save_item(NAME(m_remap_joy));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void namco_51xx_device::device_reset()
-{
-	/* reset internal registers */
-	m_credits = 0;
-	m_coins[0] = 0;
-	m_coins_per_cred[0] = 1;
-	m_creds_per_coin[0] = 1;
-	m_coins[1] = 0;
-	m_coins_per_cred[1] = 1;
-	m_creds_per_coin[1] = 1;
-	m_in_count = 0;
+	save_item(NAME(m_portO));
+	save_item(NAME(m_rw));
 }
 
 //-------------------------------------------------
@@ -391,11 +188,12 @@ void namco_51xx_device::device_reset()
 void namco_51xx_device::device_add_mconfig(machine_config &config)
 {
 	MB8843(config, m_cpu, DERIVED_CLOCK(1,1));     /* parent clock, internally divided by 6 */
-//  m_cpu->read_k().set(FUNC(namco_51xx_device::namco_51xx_K_r));
-//  m_cpu->write_o().set(FUNC(namco_51xx_device::namco_51xx_O_w));
-//  m_cpu->read_r<0>().set(FUNC(namco_51xx_device::namco_51xx_R0_r));
-//  m_cpu->read_r<2>().set(FUNC(namco_51xx_device::namco_51xx_R2_r));
-	m_cpu->set_disable();
+	m_cpu->read_k().set(FUNC(namco_51xx_device::K_r));
+	m_cpu->read_r<0>().set(FUNC(namco_51xx_device::R0_r));
+	m_cpu->read_r<1>().set(FUNC(namco_51xx_device::R1_r));
+	m_cpu->read_r<2>().set(FUNC(namco_51xx_device::R2_r));
+	m_cpu->read_r<3>().set(FUNC(namco_51xx_device::R3_r));
+	m_cpu->write_o().set(FUNC(namco_51xx_device::O_w));
 }
 
 //-------------------------------------------------

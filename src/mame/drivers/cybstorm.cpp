@@ -225,7 +225,7 @@ GFXDECODE_END
 void cybstorm_state::round2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
+	M68EC020(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cybstorm_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -250,7 +250,7 @@ void cybstorm_state::round2(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(cybstorm_state::screen_update_cybstorm));
 }
 

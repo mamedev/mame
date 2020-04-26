@@ -300,11 +300,11 @@ namespace analog
 	NETLIB_UPDATE(QBJT_switch)
 	{
 		// FIXME: this should never be called
-		if (!m_RB.m_P.net().isRailNet())
+		if (!m_RB.m_P.net().is_rail_net())
 			m_RB.m_P.solve_now();   // Basis
-		else if (!m_RB.m_N.net().isRailNet())
+		else if (!m_RB.m_N.net().is_rail_net())
 			m_RB.m_N.solve_now();   // Emitter
-		else if (!m_RC.m_P.net().isRailNet())
+		else if (!m_RC.m_P.net().is_rail_net())
 			m_RC.m_P.solve_now();   // Collector
 	}
 
@@ -366,9 +366,9 @@ namespace analog
 	NETLIB_UPDATE(QBJT_EB)
 	{
 		// FIXME: this should never be called
-		if (!m_D_EB.m_P.net().isRailNet())
+		if (!m_D_EB.m_P.net().is_rail_net())
 			m_D_EB.m_P.solve_now();   // Basis
-		else if (!m_D_EB.m_N.net().isRailNet())
+		else if (!m_D_EB.m_N.net().is_rail_net())
 			m_D_EB.m_N.solve_now();   // Emitter
 		else
 			m_D_CB.m_N.solve_now();   // Collector
@@ -380,12 +380,12 @@ namespace analog
 		if (m_CJE)
 		{
 			m_CJE->reset();
-			m_CJE->m_C.setTo(m_model.m_CJE);
+			m_CJE->m_C.set(m_model.m_CJE);
 		}
 		if (m_CJC)
 		{
 			m_CJC->reset();
-			m_CJC->m_C.setTo(m_model.m_CJC);
+			m_CJC->m_C.set(m_model.m_CJC);
 		}
 
 	}

@@ -41,7 +41,7 @@ dpb7000_combiner_card_device::dpb7000_combiner_card_device(const machine_config 
 	, m_lum(*this)
 	, m_chr(*this)
 	, m_fsck_timer(nullptr)
-	, m_screen(*this, "screen")
+	//, m_screen(*this, "screen")
 	, m_mult_ge(*this, "mult_ge") // Lum I
 	, m_mult_gd(*this, "mult_gd") // Lum II
 	, m_mult_gc(*this, "mult_gc") // Chroma I
@@ -136,9 +136,9 @@ void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)
 	TMC28KU(config, m_mult_gb);
 	TMC28KU(config, m_mult_ga);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(DERIVED_CLOCK(1, 1), 910, 0, 640, 525, 0, 480);
-	m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
+	//SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(DERIVED_CLOCK(1, 1), 910, 0, 640, 525, 0, 480);
+	//m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
 }
 
 void dpb7000_combiner_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -199,21 +199,21 @@ void dpb7000_combiner_card_device::fsck_tick()
 	m_lum(m_lum_out);
 	m_chr(m_chr_out);
 
-	m_screen->update_now();
+	//m_screen->update_now();
 }
 
-uint32_t dpb7000_combiner_card_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+/*uint32_t dpb7000_combiner_card_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-		for (int x = cliprect.min_x; x <= cliprect.max_x && x < 256; x++)
-		{
-			*dest++ = 0xff000000 | (m_lum_out << 16) | (m_lum_out << 8) | m_lum_out;
-		}
-	}
-	return 0;
-}
+    for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+    {
+        uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+        for (int x = cliprect.min_x; x <= cliprect.max_x && x < 256; x++)
+        {
+            *dest++ = 0xff000000 | (m_lum_out << 16) | (m_lum_out << 8) | m_lum_out;
+        }
+    }
+    return 0;
+}*/
 
 void dpb7000_combiner_card_device::reg_w(uint16_t data)
 {

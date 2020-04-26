@@ -14,6 +14,7 @@
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
+#include "machine/timer.h"
 #include "video/atarirle.h"
 #include "tilemap.h"
 
@@ -39,10 +40,9 @@ public:
 	void atarigx2_0x400(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
+	void video_int_ack_w(uint32_t data = 0);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);
 	DECLARE_READ8_MEMBER(a2d_data_r);

@@ -119,12 +119,12 @@ void mie_device::device_reset()
 	memset(tbuf, 0, sizeof(tbuf));
 }
 
-READ8_MEMBER(mie_device::control_r)
+uint8_t mie_device::control_r(offs_t offset)
 {
 	return control >> (8*offset);
 }
 
-WRITE8_MEMBER(mie_device::control_w)
+void mie_device::control_w(offs_t offset, uint8_t data)
 {
 	uint32_t prev_control = control;
 	int shift = offset*8;
@@ -178,24 +178,24 @@ void mie_device::maple_w(const uint32_t *data, uint32_t in_size)
 	timer->adjust(attotime::from_usec(20));
 }
 
-READ8_MEMBER(mie_device::read_ff)
+uint8_t mie_device::read_ff()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(mie_device::read_00)
+uint8_t mie_device::read_00()
 {
 	return 0x00;
 }
 
-READ8_MEMBER(mie_device::read_78xx)
+uint8_t mie_device::read_78xx(offs_t offset)
 {
 	// Internal rom tests (7800) & 80 and jumps to 8010 if non-zero
 	// What we return is what a memdump sees on a naomi2 board
 	return offset & 4 ? 0xff : 0x00;
 }
 
-READ8_MEMBER(mie_device::gpio_r)
+uint8_t mie_device::gpio_r(offs_t offset)
 {
 	if(gpiodir & (1 << offset))
 		return gpio_port[offset] ? gpio_port[offset]->read() : 0xff;
@@ -203,59 +203,59 @@ READ8_MEMBER(mie_device::gpio_r)
 		return gpio_val[offset];
 }
 
-WRITE8_MEMBER(mie_device::gpio_w)
+void mie_device::gpio_w(offs_t offset, uint8_t data)
 {
 	gpio_val[offset] = data;
 	if(!(gpiodir & (1 << offset)) && gpio_port[offset])
 		gpio_port[offset]->write(data, 0xff);
 }
 
-READ8_MEMBER(mie_device::gpiodir_r)
+uint8_t mie_device::gpiodir_r()
 {
 	return gpiodir;
 }
 
-WRITE8_MEMBER(mie_device::gpiodir_w)
+void mie_device::gpiodir_w(uint8_t data)
 {
 	gpiodir = data;
 }
 
-READ8_MEMBER(mie_device::adc_r)
+uint8_t mie_device::adc_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(mie_device::adc_w)
+void mie_device::adc_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(mie_device::irq_enable_r)
+uint8_t mie_device::irq_enable_r()
 {
 	return irq_enable;
 }
 
-WRITE8_MEMBER(mie_device::irq_enable_w)
+void mie_device::irq_enable_w(uint8_t data)
 {
 	irq_enable = data;
 	recalc_irq();
 }
 
-READ8_MEMBER(mie_device::maple_irqlevel_r)
+uint8_t mie_device::maple_irqlevel_r()
 {
 	return maple_irqlevel;
 }
 
-WRITE8_MEMBER(mie_device::maple_irqlevel_w)
+void mie_device::maple_irqlevel_w(uint8_t data)
 {
 	maple_irqlevel = data;
 }
 
-READ8_MEMBER(mie_device::irq_pending_r)
+uint8_t mie_device::irq_pending_r()
 {
 	return irq_pending;
 }
 
-WRITE8_MEMBER(mie_device::irq_pending_w)
+void mie_device::irq_pending_w(uint8_t data)
 {
 	irq_pending = data;
 	recalc_irq();
@@ -289,28 +289,28 @@ void mie_device::raise_irq(int level)
 	}
 }
 
-READ8_MEMBER(mie_device::tbuf_r)
+uint8_t mie_device::tbuf_r(offs_t offset)
 {
 	return tbuf[offset >> 2] >> (8*(offset & 3));
 }
 
-WRITE8_MEMBER(mie_device::tbuf_w)
+void mie_device::tbuf_w(offs_t offset, uint8_t data)
 {
 	int shift = (offset & 3)*8;
 	tbuf[offset >> 2] = (tbuf[offset >> 2] & ~(255 << shift)) | (data << shift);
 }
 
-READ8_MEMBER(mie_device::lreg_r)
+uint8_t mie_device::lreg_r()
 {
 	return lreg;
 }
 
-WRITE8_MEMBER(mie_device::lreg_w)
+void mie_device::lreg_w(uint8_t data)
 {
 	lreg = data;
 }
 
-READ8_MEMBER(mie_device::jvs_r)
+uint8_t mie_device::jvs_r()
 {
 	if (jvs_lcr & 0x80)
 		return 0;
@@ -323,7 +323,7 @@ READ8_MEMBER(mie_device::jvs_r)
 	return buf[jvs_rpos++];
 }
 
-WRITE8_MEMBER(mie_device::jvs_w)
+void mie_device::jvs_w(uint8_t data)
 {
 	if (jvs_lcr & 0x80)
 		return;
@@ -331,12 +331,12 @@ WRITE8_MEMBER(mie_device::jvs_w)
 	jvs->push(data);
 }
 
-WRITE8_MEMBER(mie_device::jvs_dest_w)
+void mie_device::jvs_dest_w(uint8_t data)
 {
 	jvs_dest = data;
 }
 
-READ8_MEMBER(mie_device::jvs_status_r)
+uint8_t mie_device::jvs_status_r()
 {
 	// 01 = ready for reading
 	// 20 = ready for writing
@@ -347,7 +347,7 @@ READ8_MEMBER(mie_device::jvs_status_r)
 	return 0x60 | (jvs_rpos < size ? 1 : 0);
 }
 
-WRITE8_MEMBER(mie_device::jvs_control_w)
+void mie_device::jvs_control_w(uint8_t data)
 {
 	if((jvs_control & 1) && !(data & 1)) {
 		jvs->commit_encoded();
@@ -356,12 +356,12 @@ WRITE8_MEMBER(mie_device::jvs_control_w)
 	jvs_control = data;
 }
 
-WRITE8_MEMBER(mie_device::jvs_lcr_w)
+void mie_device::jvs_lcr_w(uint8_t data)
 {
 	jvs_lcr = data;
 }
 
-READ8_MEMBER(mie_device::jvs_sense_r)
+uint8_t mie_device::jvs_sense_r()
 {
 	return 0x8c | (jvs->get_address_set_line() ? 2 : 0) | (jvs->get_presence_line() ? 0 : 1);
 }

@@ -110,9 +110,9 @@ namespace solver
 			}
 		}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
-		std::pair<pstring, pstring> create_solver_code() override;
+		std::pair<pstring, pstring> create_solver_code(static_compile_target target) override;
 
 	private:
 
@@ -123,8 +123,7 @@ namespace solver
 		pstring static_compile_name();
 
 		mat_type mat;
-
-		plib::dynproc<void, FT * , FT * , FT * > m_proc;
+		plib::dynproc<void, FT *, nl_fptype *, nl_fptype *, nl_fptype *, nl_fptype ** > m_proc;
 
 	};
 
@@ -140,7 +139,45 @@ namespace solver
 		pstring fpsuffix(fp_constants<FT>::suffix());
 
 		for (std::size_t i = 0; i < mat.nz_num; i++)
-			strm("{1} m_A{2} = m_A[{3}];\n", fptype, i, i);
+			strm("{1} m_A{2}(0.0);\n", fptype, i, i);
+
+		for (std::size_t k = 0; k < iN; k++)
+		{
+			auto &net = this->m_terms[k];
+
+			// FIXME: gonn, gtn and Idr - which float types should they have?
+
+			//auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
+			//*tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
+			auto pd = this->m_mat_ptr[k][net.railstart()] - &this->mat.A[0];
+			pstring terms = plib::pfmt("m_A{1} = gt[{2}]")(pd, this->m_gtn.didx(k,0));
+			for (std::size_t i=1; i < net.count(); i++)
+				terms += plib::pfmt(" + gt[{1}]")(this->m_gtn.didx(k,i));
+
+			strm("\t{1};\n", terms);
+
+			//for (std::size_t i = 0; i < railstart; i++)
+			//  *tcr_r[i]       += static_cast<FT>(go[i]);
+
+			for (std::size_t i = 0; i < net.railstart(); i++)
+			{
+				auto p = this->m_mat_ptr[k][i] - &this->mat.A[0];
+				strm("\tm_A{1} = m_A{1} + go[{2}];\n", p, this->m_gonn.didx(k,i));
+			}
+
+			//auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<FT>::zero()));
+
+			terms = plib::pfmt("{1} RHS{2} = Idr[{3}]")(fptype, k, this->m_Idrn.didx(k,0));
+			for (std::size_t i=1; i < net.count(); i++)
+				terms += plib::pfmt(" + Idr[{1}]")(this->m_Idrn.didx(k,i));
+			//for (std::size_t i = railstart; i < term_count; i++)
+			//  RHS_t +=  (- go[i]) * *cnV[i];
+
+			for (std::size_t i = net.railstart(); i < net.count(); i++)
+				terms += plib::pfmt(" - go[{1}] * *cnV[{1}]")(this->m_gonn.didx(k,i), this->m_connected_net_Vn.didx(k,i));
+
+			strm("\t{1};\n", terms);
+		}
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
@@ -178,13 +215,13 @@ namespace solver
 						pj++; pii++;
 					}
 					//RHS[j] += f1 * RHS[i];
-					strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
+					strm("\tRHS{1} += f{2}_{3} * RHS{4};\n", j, i, j, i);
 				}
 			}
 		}
 
 		//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
-		strm("\tV[{1}] = RHS[{2}] / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
+		strm("\tV[{1}] = RHS{2} / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
 		for (std::size_t j = iN - 1; j-- > 0;)
 		{
 			strm("\t{1} tmp{2} = 0.0{3};\n", fptype, j, fpsuffix);
@@ -193,7 +230,7 @@ namespace solver
 			{
 				strm("\ttmp{1} += m_A{2} * V[{3}];\n", j, pk, mat.col_idx[pk]);
 			}
-			strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A{4};\n", j, j, j, mat.diag[j]);
+			strm("\tV[{1}] = (RHS{1} - tmp{1}) / m_A{4};\n", j, j, j, mat.diag[j]);
 		}
 	}
 
@@ -204,12 +241,12 @@ namespace solver
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
 		generate_code(w);
-		std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
-		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
+		//std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(plib::hash( t.str().c_str(), t.str().size() ))(mat.nz_num);
 	}
 
 	template <typename FT, int SIZE>
-	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code()
+	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code(static_compile_target target)
 	{
 		std::stringstream t;
 		t.imbue(std::locale::classic());
@@ -217,7 +254,14 @@ namespace solver
 		pstring name = static_compile_name();
 		pstring fptype(fp_constants<FT>::name());
 
-		strm.writeline(plib::pfmt("extern \"C\" void {1}({2} * __restrict m_A, {2} * __restrict RHS, {2} * __restrict V)\n")(name, fptype));
+		pstring extqual;
+		if (target == CXX_EXTERNAL_C)
+			extqual = "extern \"C\"";
+		else if (target == CXX_STATIC)
+			extqual = "static";
+		strm.writeline(plib::pfmt("{1} void {2}({3} * __restrict V, "
+			"{3} * __restrict go, {3} * __restrict gt, "
+			"{3} * __restrict Idr, {3} ** __restrict cnV)\n")(extqual, name, fptype));
 		strm.writeline("{\n");
 		generate_code(strm);
 		strm.writeline("}\n");
@@ -226,32 +270,29 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic()
 	{
-		// populate matrix
-		mat.set_scalar(plib::constants<FT>::zero());
-		this->fill_matrix_and_rhs();
-
-		// now solve it
-
 		if (m_proc.resolved())
 		{
-			m_proc(&mat.A[0], &this->m_RHS[0], &this->m_new_V[0]);
+			m_proc(&this->m_new_V[0],
+				this->m_gonn.data(), this->m_gtn.data(), this->m_Idrn.data(),
+				this->m_connected_net_Vn.data());
 		}
 		else
 		{
+			//  clear matrix
+			mat.set_scalar(plib::constants<FT>::zero());
+
+			// populate matrix
+			this->fill_matrix_and_rhs();
+
+			// now solve it
 			// parallel is slow -- very slow
 			// mat.gaussian_elimination_parallel(RHS);
 			mat.gaussian_elimination(this->m_RHS);
 			// backward substitution
 			mat.gaussian_back_substitution(this->m_new_V, this->m_RHS);
 		}
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

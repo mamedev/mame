@@ -7,7 +7,7 @@ SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
 
 Hardware notes:
-- 3850PK CPU at ~2.8MHz, 3853PK memory interface
+- 3850PK CPU at ~2.77MHz(averaged), 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
 - 4-digit 7seg panel, sensory chessboard
 
@@ -220,12 +220,12 @@ INPUT_PORTS_END
 void cp2000_state::cp2000(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2800000); // see driver notes
+	F8(config, m_maincpu, 2750000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2800000));
+	f3853_device &f3853(F3853(config, "f3853", 2750000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

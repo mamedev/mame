@@ -176,7 +176,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="65536">
-				<rom name="choplifter! (atari)(1987)(rx8096).rom" size="65536" crc="d426eccc" sha1="03600f288ecedaa61fe7976dfe32ce9a6fdfe03e" offset="0" /> <!-- Verified -->
+				<rom name="choplifter (atari)(1987)(rx8096).rom" size="65536" crc="d426eccc" sha1="03600f288ecedaa61fe7976dfe32ce9a6fdfe03e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -358,7 +358,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="65536">
-				<rom name="hardball! (atari)(1987)(rx8084).rom" size="65536" crc="bf0c6df2" sha1="8a8556b2398168a557bc04e37f1f3a26bc066147" offset="0" /> <!-- Verified -->
+				<rom name="hardball (atari)(1987)(rx8084).rom" size="65536" crc="bf0c6df2" sha1="8a8556b2398168a557bc04e37f1f3a26bc066147" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -485,7 +485,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="xegs" />
 			<dataarea name="rom" size="65536">
-				<rom name="rescue on fractalus! (atari)(1987)(rx8063).rom" size="65536" crc="1ca549ad" sha1="36bc00b2e4452855d0681c50cdec2403ffb2a6bb" offset="0" /> <!-- Verified -->
+				<rom name="rescue on fractalus (atari)(1987)(rx8063).rom" size="65536" crc="1ca549ad" sha1="36bc00b2e4452855d0681c50cdec2403ffb2a6bb" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

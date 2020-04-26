@@ -142,6 +142,9 @@ void pc8477a_device::map(address_map &map)
 
 void wd37c65c_device::map(address_map &map)
 {
+	// NOTE: this map only covers registers defined by CS.
+	// LDOR and LDCR must be mapped separately, since their addresses are
+	// defined only by external decoding circuits. LDIR (optional) is also separate.
 	map(0x0, 0x0).r(FUNC(wd37c65c_device::msr_r));
 	map(0x1, 0x1).rw(FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
 }

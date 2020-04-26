@@ -51,6 +51,7 @@ protected:
 
 private:
 	void firmware_map(address_map &map);
+	void secbuf_map(address_map &map);
 
 	enum rx01_state {
 		RX01_FILL,

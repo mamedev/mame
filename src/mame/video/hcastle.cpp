@@ -154,7 +154,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf1_control_w)
 	{
 		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	m_k007121_1->ctrl_w(space, offset, data);
+	m_k007121_1->ctrl_w(offset, data);
 }
 
 WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
@@ -170,7 +170,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 	{
 		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	m_k007121_2->ctrl_w(space, offset, data);
+	m_k007121_2->ctrl_w(offset, data);
 }
 
 /*****************************************************************************/

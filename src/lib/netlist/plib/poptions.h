@@ -25,7 +25,7 @@ namespace plib {
 		option_base(options &parent, const pstring &help);
 		virtual ~option_base() = default;
 
-		COPYASSIGNMOVE(option_base, delete)
+		PCOPYASSIGNMOVE(option_base, delete)
 
 		pstring help() const { return m_help; }
 	private:
@@ -217,12 +217,14 @@ namespace plib {
 		{}
 	};
 
-	class options : public nocopyassignmove
+	class options
 	{
 	public:
 
 		options();
 		explicit options(option **o);
+
+		PCOPYASSIGNMOVE(options, delete)
 
 		void register_option(option_base *opt);
 		int parse(int argc, char **argv);
@@ -234,7 +236,7 @@ namespace plib {
 
 	private:
 		static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-				unsigned firstline_indent);
+				unsigned firstline_indent, const pstring &line_end = "\n");
 
 		void check_consistency() noexcept(false);
 

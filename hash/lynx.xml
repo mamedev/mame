@@ -601,7 +601,7 @@ Known undumped prototypes:
 		<publisher>Digital Image</publisher>
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="marlboro go! (euro) (prototype).bin" size="262144" crc="c3fa0d4d" sha1="26b18b706359b093d0b1bbca4dba9cd2d73e0372" offset="000000" />
+				<rom name="marlboro go (euro) (prototype).bin" size="262144" crc="c3fa0d4d" sha1="26b18b706359b093d0b1bbca4dba9cd2d73e0372" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -58,7 +58,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="3 choume no tama - tama and friends - 3 choume obake panic!! (japan).bin" size="131072" crc="b61cd120" sha1="0982bcc82deb9c4db08e602a22a2bb4f31e7e6ae" />
+				<rom name="3 choume no tama - tama and friends - 3 choume obake panic (japan).bin" size="131072" crc="b61cd120" sha1="0982bcc82deb9c4db08e602a22a2bb4f31e7e6ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -2083,7 +2083,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="bikkuri nekketsu shinkiroku! - dokodemo kin medal (japan).bin" size="262144" crc="86d11d10" sha1="baecee2dfd915a41363fef736f81853822d5dfcd" />
+				<rom name="bikkuri nekketsu shinkiroku - dokodemo kin medal (japan).bin" size="262144" crc="86d11d10" sha1="baecee2dfd915a41363fef736f81853822d5dfcd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2360,7 +2360,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bo jackson 2 games in 1 - hit and run! (usa).bin" size="131072" crc="7edb78ab" sha1="cb360f44a398ff5cd3818b0e244ffdf7019d85c7" />
+				<rom name="bo jackson 2 games in 1 - hit and run (usa).bin" size="131072" crc="7edb78ab" sha1="cb360f44a398ff5cd3818b0e244ffdf7019d85c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2835,7 +2835,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="breakthru! (usa).bin" size="131072" crc="5b8f0df2" sha1="d9a49a71e6b554c2fccce08c446274e886225d50" />
+				<rom name="breakthru (usa).bin" size="131072" crc="5b8f0df2" sha1="d9a49a71e6b554c2fccce08c446274e886225d50" />
 			</dataarea>
 		</part>
 	</software>
@@ -5909,7 +5909,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="extra bases! (usa).bin" size="131072" crc="19608641" sha1="bf44f14a948e8816fb9deea229512d979cb42aec" />
+				<rom name="extra bases (usa).bin" size="131072" crc="19608641" sha1="bf44f14a948e8816fb9deea229512d979cb42aec" />
 			</dataarea>
 		</part>
 	</software>
@@ -6774,7 +6774,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="fushigi na blobby - princess blob o sukue! (japan).bin" size="65536" crc="3d0bac10" sha1="fcd6ac8a0ad6eb1f5d9e00c877747521541204de" />
+				<rom name="fushigi na blobby - princess blob o sukue (japan).bin" size="65536" crc="3d0bac10" sha1="fcd6ac8a0ad6eb1f5d9e00c877747521541204de" />
 			</dataarea>
 		</part>
 	</software>
@@ -7307,7 +7307,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="gb genjin land - viva! chikkun oukoku (japan).bin" size="262144" crc="b08bb116" sha1="6c7b6268e28281ae06fb621bf3cbbcbadc8e30e8" />
+				<rom name="gb genjin land - viva chikkun oukoku (japan).bin" size="262144" crc="b08bb116" sha1="6c7b6268e28281ae06fb621bf3cbbcbadc8e30e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -7630,7 +7630,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="go! go! hitchhike (japan).bin" size="524288" crc="845735de" sha1="6a35bc2967f25fda0626b7a00a2cacfec9c53278" />
+				<rom name="go go hitchhike (japan).bin" size="524288" crc="845735de" sha1="6a35bc2967f25fda0626b7a00a2cacfec9c53278" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7662,7 +7662,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="go! go! tank (proto).bin" size="65536" crc="6dcf5e7f" sha1="18bbee226858af45a81f7da1186938f53511ef73" />
+				<rom name="go go tank (proto).bin" size="65536" crc="6dcf5e7f" sha1="18bbee226858af45a81f7da1186938f53511ef73" />
 			</dataarea>
 		</part>
 	</software>
@@ -7678,7 +7678,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="go! go! tank (usa).bin" size="65536" crc="65dfabcb" sha1="7f3408c951a161f93394812d34f6d2534658b7d3" />
+				<rom name="go go tank (usa).bin" size="65536" crc="65dfabcb" sha1="7f3408c951a161f93394812d34f6d2534658b7d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -7691,7 +7691,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="goal! (europe).bin" size="131072" crc="533fa979" sha1="24fffa3db4153895546a346a38971b6946011679" />
+				<rom name="goal (europe).bin" size="131072" crc="533fa979" sha1="24fffa3db4153895546a346a38971b6946011679" />
 			</dataarea>
 		</part>
 	</software>
@@ -7704,7 +7704,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="goal! (usa).bin" size="131072" crc="00d4caf2" sha1="9bb15769b2674d41075b45256dbfffc18483fd84" />
+				<rom name="goal (usa).bin" size="131072" crc="00d4caf2" sha1="9bb15769b2674d41075b45256dbfffc18483fd84" />
 			</dataarea>
 		</part>
 	</software>
@@ -8775,7 +8775,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="hero shuugou!! pinball party (japan).bin" size="65536" crc="740552ed" sha1="c4f0428455c6a4772c2db7bab0132dca169e22c7" />
+				<rom name="hero shuugou pinball party (japan).bin" size="65536" crc="740552ed" sha1="c4f0428455c6a4772c2db7bab0132dca169e22c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -9538,7 +9538,7 @@ license:CC0
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="ippatsu gyakuten! dx bakenou (japan).bin" size="65536" crc="8f3e7f95" sha1="991efd117dcb30ddf111bb4f6e46bdda1c811417" />
+				<rom name="ippatsu gyakuten dx bakenou (japan).bin" size="65536" crc="8f3e7f95" sha1="991efd117dcb30ddf111bb4f6e46bdda1c811417" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9897,7 +9897,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy! (usa).bin" size="131072" crc="08725c79" sha1="d0bf6e71ddae1faff179309eaab554c2ae994de0" />
+				<rom name="jeopardy (usa).bin" size="131072" crc="08725c79" sha1="d0bf6e71ddae1faff179309eaab554c2ae994de0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9911,7 +9911,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy! - platinum edition (usa).bin" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
+				<rom name="jeopardy - platinum edition (usa).bin" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
 			</dataarea>
 		</part>
 	</software>
@@ -9924,7 +9924,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy! - sports edition (usa).bin" size="131072" crc="3b523216" sha1="ae534dcdeaa7138e1a0c775e0574c423a8c76dfb" />
+				<rom name="jeopardy - sports edition (usa).bin" size="131072" crc="3b523216" sha1="ae534dcdeaa7138e1a0c775e0574c423a8c76dfb" />
 			</dataarea>
 		</part>
 	</software>
@@ -9938,7 +9938,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jeopardy! - teen tournament (usa).bin" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
+				<rom name="jeopardy - teen tournament (usa).bin" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
 			</dataarea>
 		</part>
 	</software>
@@ -10394,7 +10394,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="kamen rider sd - hashire! mighty riders (japan).bin" size="131072" crc="71c804b3" sha1="03269715c9398659fa685830a6359caa3ffa3bbf" />
+				<rom name="kamen rider sd - hashire mighty riders (japan).bin" size="131072" crc="71c804b3" sha1="03269715c9398659fa685830a6359caa3ffa3bbf" />
 			</dataarea>
 		</part>
 	</software>
@@ -11066,7 +11066,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="kizuchida quiz da gen-san da! (japan).bin" size="262144" crc="74a52399" sha1="0729da81a62a1c30e34f5c3157de16fc014c52fe" />
+				<rom name="kizuchida quiz da gen-san da (japan).bin" size="262144" crc="74a52399" sha1="0729da81a62a1c30e34f5c3157de16fc014c52fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -11399,7 +11399,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="kuma no puutarou - takara sagashi da ooiri game battle! (japan).bin" size="262144" crc="f01d0b87" sha1="b986ce8e1a6a4a1b22e0db5bf03b8b028cce9057" />
+				<rom name="kuma no puutarou - takara sagashi da ooiri game battle (japan).bin" size="262144" crc="f01d0b87" sha1="b986ce8e1a6a4a1b22e0db5bf03b8b028cce9057" />
 			</dataarea>
 		</part>
 	</software>
@@ -11430,7 +11430,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="kunio-kun no jidaigeki dayo zenin shuugou! (japan).bin" size="262144" crc="229e9113" sha1="97ff2392f126b195ac8a1700a9a91aa364549dfd" />
+				<rom name="kunio-kun no jidaigeki dayo zenin shuugou (japan).bin" size="262144" crc="229e9113" sha1="97ff2392f126b195ac8a1700a9a91aa364549dfd" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11448,7 +11448,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="kuusou kagaku sekai gulliver boy - kuusou kagaku puzzle purittopon!! (japan).bin" size="262144" crc="fb291e78" sha1="1ba1abc4db088cfc57bc733634c5b02308d132f4" />
+				<rom name="kuusou kagaku sekai gulliver boy - kuusou kagaku puzzle purittopon (japan).bin" size="262144" crc="fb291e78" sha1="1ba1abc4db088cfc57bc733634c5b02308d132f4" />
 			</dataarea>
 		</part>
 	</software>
@@ -13617,7 +13617,7 @@ license:CC0
 		<info name="alt_title" value="もぐらでポン!" />
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="mogura de pon! (japan).bin" size="32768" crc="e1e3629f" sha1="3c6586f3d591cee7415ed76d92355a27ad42e1e3" />
+				<rom name="mogura de pon (japan).bin" size="32768" crc="e1e3629f" sha1="3c6586f3d591cee7415ed76d92355a27ad42e1e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -14051,7 +14051,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="montezuma's return! (europe) (en,fr,de,es,it).bin" size="262144" crc="e7ac155b" sha1="a6b90cc58aeb5b44ef674c503a55a58278b1b6fa" />
+				<rom name="montezuma's return (europe) (en,fr,de,es,it).bin" size="262144" crc="e7ac155b" sha1="a6b90cc58aeb5b44ef674c503a55a58278b1b6fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -14296,7 +14296,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="mr. do! (usa).bin" size="65536" crc="a1122fc0" sha1="1262a3119e7d7cb724863afa0ac467756f2fe611" />
+				<rom name="mr. do (usa).bin" size="65536" crc="a1122fc0" sha1="1262a3119e7d7cb724863afa0ac467756f2fe611" />
 			</dataarea>
 		</part>
 	</software>
@@ -14901,7 +14901,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="nekketsu! beach volley dayo kunio-kun (japan).bin" size="262144" crc="abfb84df" sha1="d3ad43c40c21d9825b4879dbf28ca58835da658a" />
+				<rom name="nekketsu beach volley dayo kunio-kun (japan).bin" size="262144" crc="abfb84df" sha1="d3ad43c40c21d9825b4879dbf28ca58835da658a" />
 			</dataarea>
 		</part>
 	</software>
@@ -15385,7 +15385,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="nihon daihyou team france de ganbare! - j.league supporter soccer (japan).bin" size="524288" crc="91e6bf74" sha1="1f038df0b742a2d76d49eaefe7b753ed0dea3767" />
+				<rom name="nihon daihyou team france de ganbare - j.league supporter soccer (japan).bin" size="524288" crc="91e6bf74" sha1="1f038df0b742a2d76d49eaefe7b753ed0dea3767" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -15700,7 +15700,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="oira jajamaru! sekai daibouken (japan).bin" size="131072" crc="2d08d27f" sha1="5e13eeb635b41589689fc1b495ee077125b7e8c1" />
+				<rom name="oira jajamaru sekai daibouken (japan).bin" size="131072" crc="2d08d27f" sha1="5e13eeb635b41589689fc1b495ee077125b7e8c1" />
 			</dataarea>
 		</part>
 	</software>
@@ -15838,7 +15838,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="osawagase! penguin boy (japan).bin" size="65536" crc="54913227" sha1="1cdcf9810e98ba04378b2d6b555654722cb0acf6" />
+				<rom name="osawagase penguin boy (japan).bin" size="65536" crc="54913227" sha1="1cdcf9810e98ba04378b2d6b555654722cb0acf6" />
 			</dataarea>
 		</part>
 	</software>
@@ -16590,7 +16590,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="parodius da! (japan).bin" size="262144" crc="1791e952" sha1="cfe0c6619a28ddd535214c8f8c446081c0ed8194" />
+				<rom name="parodius da (japan).bin" size="262144" crc="1791e952" sha1="cfe0c6619a28ddd535214c8f8c446081c0ed8194" />
 			</dataarea>
 		</part>
 	</software>
@@ -17845,7 +17845,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="pokonyan! - yume no daibouken (japan).bin" size="262144" crc="61c34232" sha1="c5706e26f1cc591cd1fe762ace097df868703480" />
+				<rom name="pokonyan - yume no daibouken (japan).bin" size="262144" crc="61c34232" sha1="c5706e26f1cc591cd1fe762ace097df868703480" />
 			</dataarea>
 		</part>
 	</software>
@@ -18119,7 +18119,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="pri pri - primitive princess! (japan).bin" size="65536" crc="55da3515" sha1="fea367a2fc321daeae59746ee2cb7ffafd51479a" />
+				<rom name="pri pri - primitive princess (japan).bin" size="65536" crc="55da3515" sha1="fea367a2fc321daeae59746ee2cb7ffafd51479a" />
 			</dataarea>
 		</part>
 	</software>
@@ -18678,7 +18678,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="quiz sekai wa show by shoubai!! (japan).bin" size="262144" crc="d8c33dcd" sha1="5e0004d7c87e49b3ed9e72cb292a967faad6ea6c" />
+				<rom name="quiz sekai wa show by shoubai (japan).bin" size="262144" crc="d8c33dcd" sha1="5e0004d7c87e49b3ed9e72cb292a967faad6ea6c" />
 			</dataarea>
 		</part>
 	</software>
@@ -18908,7 +18908,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="ranma 1-2 - kakugeki mondou!! (japan).bin" size="262144" crc="613e657a" sha1="57fd028fd44d6096967a3c80afd9e17c38c2513e" />
+				<rom name="ranma 1-2 - kakugeki mondou (japan).bin" size="262144" crc="613e657a" sha1="57fd028fd44d6096967a3c80afd9e17c38c2513e" />
 			</dataarea>
 		</part>
 	</software>
@@ -19004,7 +19004,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="red october o oe! (japan).bin" size="131072" crc="c2e7be35" sha1="48d5f02a126c32423569065f31d2c5695e39fd2f" />
+				<rom name="red october o oe (japan).bin" size="131072" crc="c2e7be35" sha1="48d5f02a126c32423569065f31d2c5695e39fd2f" />
 			</dataarea>
 		</part>
 	</software>
@@ -19033,7 +19033,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="ren &amp; stimpy show, the - veediots! (usa, europe).bin" size="262144" crc="504cbd1d" sha1="40e278161a0268f00dcae5b7f16ae390d0400937" />
+				<rom name="ren &amp; stimpy show, the - veediots (usa, europe).bin" size="262144" crc="504cbd1d" sha1="40e278161a0268f00dcae5b7f16ae390d0400937" />
 			</dataarea>
 		</part>
 	</software>
@@ -19366,7 +19366,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="rock'n! monster!! (japan).bin" size="524288" crc="630299c1" sha1="338070ed1ced15eaca02198ab32b9e82a92f77ee" />
+				<rom name="rock'n monster (japan).bin" size="524288" crc="630299c1" sha1="338070ed1ced15eaca02198ab32b9e82a92f77ee" />
 			</dataarea>
 		</part>
 	</software>
@@ -19724,7 +19724,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="sakigake!! otoko juku - meioutou kessen (japan).bin" size="131072" crc="2f0f7f63" sha1="c731f8be269d74748ae54fe5ce5faea89a825e0f" />
+				<rom name="sakigake otoko juku - meioutou kessen (japan).bin" size="131072" crc="2f0f7f63" sha1="c731f8be269d74748ae54fe5ce5faea89a825e0f" />
 			</dataarea>
 		</part>
 	</software>
@@ -20432,7 +20432,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="shippuu! iron leaguer (japan).bin" size="131072" crc="8e3c7e15" sha1="2555e4b9426ff90efd431d46be5371d3e0a6dabf" />
+				<rom name="shippuu iron leaguer (japan).bin" size="131072" crc="8e3c7e15" sha1="2555e4b9426ff90efd431d46be5371d3e0a6dabf" />
 			</dataarea>
 		</part>
 	</software>
@@ -21029,7 +21029,7 @@ license:CC0
 		<info name="alt_title" value="アミーダくん 阿弥陀 ~ Soreike! Amida-kun (Box?)" />
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="soreike! amida-kun (japan).bin" size="32768" crc="60128aa8" sha1="2b502583aa73cb72557589791dec7e28a2d29969" />
+				<rom name="soreike amida-kun (japan).bin" size="32768" crc="60128aa8" sha1="2b502583aa73cb72557589791dec7e28a2d29969" />
 			</dataarea>
 		</part>
 	</software>
@@ -21044,7 +21044,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="soreyuke! speedy gonzales (japan).bin" size="262144" crc="b2e6a1c5" sha1="306b85bec28fa6e4a47f9ccaa5384afd8547c7ea" />
+				<rom name="soreyuke speedy gonzales (japan).bin" size="262144" crc="b2e6a1c5" sha1="306b85bec28fa6e4a47f9ccaa5384afd8547c7ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -21059,7 +21059,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="soreyuke!! kid (japan).bin" size="131072" crc="2a4a2d2b" sha1="b3b46d61c49a22145ce57b881d355b86d5c5ecc1" />
+				<rom name="soreyuke kid (japan).bin" size="131072" crc="2a4a2d2b" sha1="b3b46d61c49a22145ce57b881d355b86d5c5ecc1" />
 			</dataarea>
 		</part>
 	</software>
@@ -21384,7 +21384,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="sports illustrated for kids - the ultimate triple dare! (usa).bin" size="262144" crc="f0d76d49" sha1="170a9b400e7db3270883dbb58704fc141053faa9" />
+				<rom name="sports illustrated for kids - the ultimate triple dare (usa).bin" size="262144" crc="f0d76d49" sha1="170a9b400e7db3270883dbb58704fc141053faa9" />
 			</dataarea>
 		</part>
 	</software>
@@ -21730,7 +21730,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="stop that roach! (usa).bin" size="131072" crc="86107477" sha1="b7265343bd77f966b31f871fd471559266e5fc82" />
+				<rom name="stop that roach (usa).bin" size="131072" crc="86107477" sha1="b7265343bd77f966b31f871fd471559266e5fc82" />
 			</dataarea>
 		</part>
 	</software>
@@ -23209,7 +23209,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="teke! teke! asmik-kun world (japan).bin" size="65536" crc="a817450d" sha1="389cc31472b87ec70e3ea6487f8ad9198887bb89" />
+				<rom name="teke teke asmik-kun world (japan).bin" size="65536" crc="a817450d" sha1="389cc31472b87ec70e3ea6487f8ad9198887bb89" />
 			</dataarea>
 		</part>
 	</software>
@@ -23244,7 +23244,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="tekkyu fight! - the great battle gaiden (japan).bin" size="131072" crc="b8da8eb5" sha1="06a6ab3ba59286772f915053cfcd6e1e873358b1" />
+				<rom name="tekkyu fight - the great battle gaiden (japan).bin" size="131072" crc="b8da8eb5" sha1="06a6ab3ba59286772f915053cfcd6e1e873358b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -23907,7 +23907,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="totsugeki! ponkotsu tank (japan).bin" size="131072" crc="9b5b7bff" sha1="2baabb0b3e846e31188388e43ef822a03c777ead" />
+				<rom name="totsugeki ponkotsu tank (japan).bin" size="131072" crc="9b5b7bff" sha1="2baabb0b3e846e31188388e43ef822a03c777ead" />
 			</dataarea>
 		</part>
 	</software>
@@ -23923,7 +23923,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="tottemo! luckyman (japan).bin" size="262144" crc="8f9e28ad" sha1="25e5e07b4945145f2681f0c991583335826c4f82" />
+				<rom name="tottemo luckyman (japan).bin" size="262144" crc="8f9e28ad" sha1="25e5e07b4945145f2681f0c991583335826c4f82" />
 			</dataarea>
 		</part>
 	</software>
@@ -24022,7 +24022,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="track meet - mezase! barcelona (japan).bin" size="131072" crc="48d37cd2" sha1="0f60ced77232215d86b9c4555caf9880cce008b7" />
+				<rom name="track meet - mezase barcelona (japan).bin" size="131072" crc="48d37cd2" sha1="0f60ced77232215d86b9c4555caf9880cce008b7" />
 			</dataarea>
 		</part>
 	</software>
@@ -24369,7 +24369,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="twinbee da!! (japan).bin" size="131072" crc="017fd6f5" sha1="8f1c54d2116118ba085b384a01ea0c410ad2deac" />
+				<rom name="twinbee da (japan).bin" size="131072" crc="017fd6f5" sha1="8f1c54d2116118ba085b384a01ea0c410ad2deac" />
 			</dataarea>
 		</part>
 	</software>
@@ -24664,7 +24664,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
-				<rom name="urusei yatsura - miss tomobiki o saguse! (japan).bin" size="262144" crc="56800c6b" sha1="f7ac15b9b38027ae473120748e9686c985a40e87" />
+				<rom name="urusei yatsura - miss tomobiki o saguse (japan).bin" size="262144" crc="56800c6b" sha1="f7ac15b9b38027ae473120748e9686c985a40e87" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -25789,7 +25789,7 @@ license:CC0
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="1048576">
-				<rom name="yu-gi-oh! duel monsters (japan).bin" size="1048576" crc="8875ec54" sha1="07ae4a6437f00f6af462bf84fd0ac1cf345c8365" />
+				<rom name="yu-gi-oh duel monsters (japan).bin" size="1048576" crc="8875ec54" sha1="07ae4a6437f00f6af462bf84fd0ac1cf345c8365" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -25978,7 +25978,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="zerd no densetsu 2 - xerd!! gishin no ryouiki (japan).bin" size="524288" crc="a197bdb7" sha1="cfa91da4120c6e1ee0f1f121d944d44532506cfa" />
+				<rom name="zerd no densetsu 2 - xerd gishin no ryouiki (japan).bin" size="524288" crc="a197bdb7" sha1="cfa91da4120c6e1ee0f1f121d944d44532506cfa" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ8_MEMBER(adpcm_reset_r);
+	DECLARE_READ8_MEMBER(sound_unk_r);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void init_pcktgal();

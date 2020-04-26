@@ -6,7 +6,6 @@
 
 ****************************************************************************/
 #include <stdio.h> // must be stdio.h and here otherwise issues with I64FMT in MINGW
-#include <cassert>
 
 #include "osdcore.h"
 #include "corefile.h"
@@ -15,17 +14,17 @@
 #include "avhuff.h"
 #include "bitmap.h"
 #include "md5.h"
-#include "sha1.h"
+#include "hashing.h"
 #include "vbiparse.h"
-#include <cstdarg>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-#include <cctype>
 
-#include <iostream>
 #include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <new>

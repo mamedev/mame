@@ -105,7 +105,7 @@ public:
 	bool crt_is_blanked() { return ((m_crtcregs[0] & 0x0200) == 0x0200); }
 	bool crt_active_vblank_irq();
 	void IntReq( int num );
-	int irq_callback();
+	uint8_t irq_callback();
 	bool irq_pending() { return m_intst; }
 	void write_line_tx(int port, uint8_t value);
 	template <int Port> auto tx_callback() { return write_tx[Port].bind(); }

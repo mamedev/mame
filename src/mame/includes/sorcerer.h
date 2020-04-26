@@ -67,8 +67,12 @@ public:
 		, m_floppy21(*this, "fdc2:1")
 		, m_floppy30(*this, "fdc3:0")
 		, m_floppy31(*this, "fdc3:1")
+		, m_floppy32(*this, "fdc3:2")
+		, m_floppy33(*this, "fdc3:3")
 		, m_floppy40(*this, "fdc4:0")
 		, m_floppy41(*this, "fdc4:1")
+		, m_floppy42(*this, "fdc4:2")
+		, m_floppy43(*this, "fdc4:3")
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
 		, m_iop_x(*this, "X.%u", 0)
@@ -159,8 +163,12 @@ private:
 	optional_device<floppy_connector> m_floppy21;
 	optional_device<floppy_connector> m_floppy30;
 	optional_device<floppy_connector> m_floppy31;
+	optional_device<floppy_connector> m_floppy32;
+	optional_device<floppy_connector> m_floppy33;
 	optional_device<floppy_connector> m_floppy40;
 	optional_device<floppy_connector> m_floppy41;
+	optional_device<floppy_connector> m_floppy42;
+	optional_device<floppy_connector> m_floppy43;
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	required_ioport_array<16> m_iop_x;

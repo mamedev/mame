@@ -51,7 +51,7 @@ READ8_MEMBER(namcos2_state::c116_r)
 		/* registers 6,7: unmapped? */
 		if (offset > 0x180b) return 0xff; // fix for finallap boot
 	}
-	return m_c116->read(space, offset, mem_mask);
+	return m_c116->read(offset);
 }
 
 /**************************************************************************/

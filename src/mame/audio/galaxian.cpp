@@ -431,12 +431,12 @@ void galaxian_sound_device::device_add_mconfig(machine_config &config)
  *************************************/
 
 /* IC 9J */
-WRITE8_MEMBER( galaxian_sound_device::pitch_w )
+void galaxian_sound_device::pitch_w(uint8_t data)
 {
 	m_discrete->write(GAL_INP_PITCH, data );
 }
 
-WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
+void galaxian_sound_device::lfo_freq_w(offs_t offset, uint8_t data)
 {
 	uint8_t lfo_val_new = (m_lfo_val & ~(1<<offset)) | ((data & 0x01) << offset);
 
@@ -447,28 +447,28 @@ WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
 	}
 }
 
-WRITE8_MEMBER( galaxian_sound_device::background_enable_w )
+void galaxian_sound_device::background_enable_w(offs_t offset, uint8_t data)
 {
 	m_discrete->write(NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
 }
 
-WRITE8_MEMBER( galaxian_sound_device::noise_enable_w )
+void galaxian_sound_device::noise_enable_w(uint8_t data)
 {
 	m_discrete->write(GAL_INP_HIT, data & 0x01);
 }
 
-WRITE8_MEMBER( galaxian_sound_device::vol_w )
+void galaxian_sound_device::vol_w(offs_t offset, uint8_t data)
 {
 	m_discrete->write(NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
 }
 
-WRITE8_MEMBER( galaxian_sound_device::fire_enable_w )
+void galaxian_sound_device::fire_enable_w(uint8_t data)
 {
 	m_discrete->write(GAL_INP_FIRE, data & 0x01);
 }
 
 /* FIXME: May be replaced by one call! */
-WRITE8_MEMBER( galaxian_sound_device::sound_w )
+void galaxian_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	data &= 0x01;
 	switch (offset & 7)
@@ -476,23 +476,23 @@ WRITE8_MEMBER( galaxian_sound_device::sound_w )
 		case 0:     /* FS1 (controls 555 timer at 8R) */
 		case 1:     /* FS2 (controls 555 timer at 8S) */
 		case 2:     /* FS3 (controls 555 timer at 8T) */
-			background_enable_w(space, offset, data);
+			background_enable_w(offset, data);
 			break;
 
 		case 3:     /* HIT */
-			noise_enable_w(space, 0, data);
+			noise_enable_w(data);
 			break;
 
 		case 4:     /* n/c */
 			break;
 
 		case 5:     /* FIRE */
-			fire_enable_w(space, 0, data);
+			fire_enable_w(data);
 			break;
 
 		case 6:     /* VOL1 */
 		case 7:     /* VOL2 */
-			vol_w(space, offset & 1, data);
+			vol_w(offset & 1, data);
 			break;
 	}
 }

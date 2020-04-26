@@ -494,7 +494,7 @@ READ8_MEMBER( msx2_state::msx_switched_r )
 
 	for (int i = 0; i < m_switched.size(); i++)
 	{
-		data &= m_switched[i]->switched_read(space, offset);
+		data &= m_switched[i]->switched_read(offset);
 	}
 
 	return data;
@@ -504,6 +504,6 @@ WRITE8_MEMBER( msx2_state::msx_switched_w )
 {
 	for (int i = 0; i < m_switched.size(); i++)
 	{
-		m_switched[i]->switched_write(space, offset, data);
+		m_switched[i]->switched_write(offset, data);
 	}
 }

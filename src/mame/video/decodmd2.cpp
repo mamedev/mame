@@ -14,29 +14,29 @@
 
 DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
 
-WRITE8_MEMBER( decodmd_type2_device::bank_w )
+void decodmd_type2_device::bank_w(uint8_t data)
 {
 	m_rombank1->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER( decodmd_type2_device::crtc_address_w )
+void decodmd_type2_device::crtc_address_w(uint8_t data)
 {
 	m_mc6845->address_w(data);
 	m_crtc_index = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::crtc_status_r )
+uint8_t decodmd_type2_device::crtc_status_r()
 {
 	return m_mc6845->register_r();
 }
 
-WRITE8_MEMBER( decodmd_type2_device::crtc_register_w )
+void decodmd_type2_device::crtc_register_w(uint8_t data)
 {
 	m_mc6845->register_w(data);
 	m_crtc_reg[m_crtc_index] = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::latch_r )
+uint8_t decodmd_type2_device::latch_r()
 {
 	// clear IRQ?
 	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
@@ -44,13 +44,13 @@ READ8_MEMBER( decodmd_type2_device::latch_r )
 	return m_command;
 }
 
-WRITE8_MEMBER( decodmd_type2_device::data_w )
+void decodmd_type2_device::data_w(uint8_t data)
 {
 	// set IRQ?
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::busy_r )
+uint8_t decodmd_type2_device::busy_r()
 {
 	uint8_t ret = 0x00;
 
@@ -63,7 +63,7 @@ READ8_MEMBER( decodmd_type2_device::busy_r )
 }
 
 
-WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
+void decodmd_type2_device::ctrl_w(uint8_t data)
 {
 	if(!(m_ctrl & 0x01) && (data & 0x01))
 	{
@@ -80,17 +80,17 @@ WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::ctrl_r )
+uint8_t decodmd_type2_device::ctrl_r()
 {
 	return m_ctrl;
 }
 
-READ8_MEMBER( decodmd_type2_device::status_r )
+uint8_t decodmd_type2_device::status_r()
 {
 	return m_status;
 }
 
-WRITE8_MEMBER( decodmd_type2_device::status_w )
+void decodmd_type2_device::status_w(uint8_t data)
 {
 	m_status = data & 0x0f;
 }

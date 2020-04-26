@@ -123,7 +123,7 @@ NEOP00060 Dokodemo Mahjong
 		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ!" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="samurai shodown! - pocket fighting series (japan, europe) (en,ja).bin" size="2097152" crc="32e4696a" sha1="2c6adfa69e7aeada7d4198b373436eee35b70d01" offset="000000" />
+				<rom name="samurai shodown - pocket fighting series (japan, europe) (en,ja).bin" size="2097152" crc="32e4696a" sha1="2c6adfa69e7aeada7d4198b373436eee35b70d01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@ NEOP00060 Dokodemo Mahjong
 		<info name="alt_title" value="連結パズル つなげてポンッ!" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="renketsu puzzle tsunagete pon! (japan).bin" size="524288" crc="ce09f534" sha1="cbe53b08d03ef684c08fc6ee28fca168a3d091a7" offset="000000" />
+				<rom name="renketsu puzzle tsunagete pon (japan).bin" size="524288" crc="ce09f534" sha1="cbe53b08d03ef684c08fc6ee28fca168a3d091a7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

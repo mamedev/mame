@@ -1561,11 +1561,12 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	bool have_override = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
-	if (m_manager.machine().options().override_artwork())
+	const char *const override_art = m_manager.machine().options().override_artwork();
+	if (override_art && *override_art)
 	{
-		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
+		if (load_layout_file(override_art, override_art))
 			have_override = true;
-		else if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+		else if (load_layout_file(override_art, "default"))
 			have_override = true;
 	}
 
@@ -1582,7 +1583,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			have_artwork = true;
 
 		// if a default view has been specified, use that as a fallback
-		if (system.default_layout != nullptr)
+		if (system.default_layout)
 			have_default |= load_layout_file(nullptr, *system.default_layout);
 		m_manager.machine().config().apply_default_layouts(
 				[this, &have_default] (device_t &dev, internal_layout const &layout)
@@ -1590,36 +1591,30 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 
 		// try to load another file based on the parent driver name
 		int cloneof = driver_list::clone(system);
-		if (cloneof != -1)
+		while (0 <= cloneof)
 		{
 			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
 				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
 			else
 				have_artwork = true;
+
+			// Check the parent of the parent to cover bios based artwork
+			const game_driver &parent(driver_list::driver(cloneof));
+			cloneof = driver_list::clone(parent);
 		}
 
-		// Check the parent of the parent to cover bios based artwork
-		if (cloneof != -1) {
-			const game_driver &clone(driver_list::driver(cloneof));
-			int cloneofclone = driver_list::clone(clone);
-			if (cloneofclone != -1 && cloneofclone != cloneof)
+		// Use fallback artwork if defined and no artwork has been found yet
+		if (!have_artwork)
+		{
+			const char *const fallback_art = m_manager.machine().options().fallback_artwork();
+			if (fallback_art && *fallback_art)
 			{
-				if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
-					have_artwork |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
+				if (!load_layout_file(fallback_art, fallback_art))
+					have_artwork |= load_layout_file(fallback_art, "default");
 				else
 					have_artwork = true;
 			}
 		}
-
-		// Use fallback artwork if defined and no artwork has been found yet
-		if (!have_artwork && m_manager.machine().options().fallback_artwork())
-		{
-			if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
-				have_artwork |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
-			else
-				have_artwork = true;
-		}
-
 	}
 
 	// local screen info to avoid repeated code
@@ -2041,6 +2036,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 	// attempt to open the file; bail if we can't
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
+	layoutfile.set_restrict_to_mediapath(1);
 	osd_file::error const filerr(layoutfile.open(fname));
 	if (filerr != osd_file::error::NONE)
 		return false;

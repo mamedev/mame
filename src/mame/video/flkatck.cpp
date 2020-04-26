@@ -105,7 +105,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 			break;
 	}
 
-	m_k007121->ctrl_w(space, offset, data);
+	m_k007121->ctrl_w(offset, data);
 }
 
 

@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(dsbz80_device::output_txd)
 	m_rxd_handler(state);
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
+void dsbz80_device::mpeg_trigger_w(uint8_t data)
 {
 	mp_state = data;
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
 	}
 }
 
-READ8_MEMBER(dsbz80_device::mpeg_pos_r)
+uint8_t dsbz80_device::mpeg_pos_r(offs_t offset)
 {
 	int mp_prg = mp_pos >> 3;
 
@@ -156,7 +156,7 @@ READ8_MEMBER(dsbz80_device::mpeg_pos_r)
    (song #16 is a good example)
 */
 
-WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
+void dsbz80_device::mpeg_start_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -193,7 +193,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
+void dsbz80_device::mpeg_end_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -222,12 +222,12 @@ WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_volume_w)
+void dsbz80_device::mpeg_volume_w(uint8_t data)
 {
 	mp_vol = 0x7f - data;
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_stereo_w)
+void dsbz80_device::mpeg_stereo_w(uint8_t data)
 {
 	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }

@@ -422,7 +422,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="touch down!! (19xx)(-).cin" size="8178" crc="e047d0fa" sha1="2b86fbebcd01af754b8c9cf08b20e1a8a6b513d7"/>
+				<rom name="touch down (19xx)(-).cin" size="8178" crc="e047d0fa" sha1="2b86fbebcd01af754b8c9cf08b20e1a8a6b513d7"/>
 			</dataarea>
 		</part>
 	</software>

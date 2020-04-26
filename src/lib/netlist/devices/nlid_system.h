@@ -463,9 +463,10 @@ namespace devices
 				const nl_fptype R = state ? m_RON() : m_ROFF();
 
 				// FIXME: We only need to update the net first if this is a time stepping net
-				m_R.solve_now();
-				m_R.set_R(R);
-				m_R.solve_later();
+				m_R.change_state([this, &R]()
+				{
+					m_R.set_R(R);
+				});
 			}
 		}
 

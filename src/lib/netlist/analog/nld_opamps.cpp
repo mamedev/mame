@@ -226,14 +226,14 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(opamp)
 	{
-		m_G1.m_RI.setTo(m_model.m_RI);
+		m_G1.m_RI.set(m_model.m_RI);
 
 		if (m_type == 1)
 		{
 			nl_fptype RO = m_model.m_RO;
 			nl_fptype G = m_model.m_UGF / m_model.m_FPF / RO;
 			m_RP.set_R(RO);
-			m_G1.m_G.setTo(G);
+			m_G1.m_G.set(G);
 		}
 		if (m_type == 3 || m_type == 2)
 		{
@@ -245,29 +245,29 @@ namespace netlist
 			if (m_model.m_SLEW / (nlconst::four() * nlconst::pi() * nlconst::magic(0.0258)) < m_model.m_UGF)
 				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
-			m_CP->m_C.setTo(CP);
+			m_CP->m_C.set(CP);
 			m_RP.set_R(RP);
-			m_G1.m_G.setTo(G);
+			m_G1.m_G.set(G);
 
 		}
 		if (m_type == 2)
 		{
-			m_EBUF->m_G.setTo(nlconst::one());
+			m_EBUF->m_G.set(nlconst::one());
 #if TEST_ALT_OUTPUT
-			m_EBUF->m_RO.setTo(0.001);
+			m_EBUF->m_RO.set(0.001);
 			m_RO->set_R(m_model.m_RO);
 #else
-			m_EBUF->m_RO.setTo(m_model.m_RO);
+			m_EBUF->m_RO.set(m_model.m_RO);
 #endif
 		}
 		if (m_type == 3)
 		{
-			m_EBUF->m_G.setTo(nlconst::one());
+			m_EBUF->m_G.set(nlconst::one());
 #if TEST_ALT_OUTPUT
-			m_EBUF->m_RO.setTo(0.001);
+			m_EBUF->m_RO.set(0.001);
 			m_RO->set_R(m_model.m_RO);
 #else
-			m_EBUF->m_RO.setTo(m_model.m_RO);
+			m_EBUF->m_RO.set(m_model.m_RO);
 #endif
 		}
 	}

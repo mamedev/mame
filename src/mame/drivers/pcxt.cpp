@@ -72,7 +72,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
-		m_bank(*this, "bank"){ }
+		m_bank(*this, "bank"),
+		m_cvsd(*this, "voice"),
+		m_samples(*this, "samples"){ }
 
 	void tetriskr(machine_config &config);
 	void filetto(machine_config &config);
@@ -83,7 +85,9 @@ private:
 	uint8_t m_port_b_data;
 	uint8_t m_status;
 	uint8_t m_clr_status;
-	uint8_t m_voice;
+	uint8_t m_voice, m_bit;
+	uint32_t m_vaddr;
+	emu_timer *m_sample;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
@@ -95,11 +99,16 @@ private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
+	DECLARE_WRITE8_MEMBER(voice_start_w);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
+	optional_device<hc55516_device> m_cvsd;
+	optional_memory_region m_samples;
 	void bank_map(address_map &map);
 	void filetto_io(address_map &map);
 	void filetto_map(address_map &map);
@@ -375,6 +384,15 @@ WRITE8_MEMBER(pcxt_state::fdc_dor_w)
 	m_mb->m_pic8259->ir6_w(1);
 }
 
+// TODO: um5100 device; the actual codec may be sightly different
+WRITE8_MEMBER(pcxt_state::voice_start_w)
+{
+	m_sample->adjust(attotime::zero, 0, attotime::from_hz(28000));
+	m_bit = 7;
+	m_vaddr = ((m_voice & 0xf / 5) | (BIT(m_voice, 4) << 2)) * 0x8000;
+	logerror("%x %x\n",m_voice,m_vaddr);
+}
+
 void pcxt_state::filetto_map(address_map &map)
 {
 	map(0xc0000, 0xcffff).m(m_bank, FUNC(address_map_bank_device::amap8));
@@ -391,7 +409,7 @@ void pcxt_state::filetto_io(address_map &map)
 	map(0x0201, 0x0201).portr("COIN"); //game port
 	map(0x0310, 0x0311).rw(FUNC(pcxt_state::disk_iobank_r), FUNC(pcxt_state::disk_iobank_w)); //Prototyping card
 	map(0x0312, 0x0312).portr("IN0"); //Prototyping card,read only
-	map(0x0313, 0x0313).lw8(NAME([this](u8 data) { logerror("play voice %x\n", m_voice); }));
+	map(0x0313, 0x0313).w(FUNC(pcxt_state::voice_start_w));
 	map(0x03f2, 0x03f2).w(FUNC(pcxt_state::fdc_dor_w));
 	map(0x03f4, 0x03f4).r(FUNC(pcxt_state::fdc765_status_r)); //765 Floppy Disk Controller (FDC) Status
 	map(0x03f5, 0x03f5).rw(FUNC(pcxt_state::fdc765_data_r), FUNC(pcxt_state::fdc765_data_w));//FDC Data
@@ -493,6 +511,26 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_cvsd->digit_w(BIT(m_samples->as_u8(m_vaddr), m_bit));
+	m_cvsd->clock_w(1);
+	m_cvsd->clock_w(0);
+	if (m_bit == 0)
+	{
+		m_vaddr++;
+		m_bit = 8;
+		if (!(m_vaddr % 0x8000))
+			m_sample->adjust(attotime::never);
+	}
+	m_bit--;
+}
+
+void pcxt_state::machine_start()
+{
+	m_sample = timer_alloc();
+}
+
 void pcxt_state::machine_reset()
 {
 	m_lastvalue = -1;
@@ -519,11 +557,11 @@ void pcxt_state::filetto(machine_config &config)
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
 
-	HC55516(config, "voice", 8000000/4).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
 
 	RAM(config, RAM_TAG).set_default_size("640K");
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 }
 
 void pcxt_state::tetriskr(machine_config &config)
@@ -560,8 +598,8 @@ ROM_START( filetto )
 	ROM_LOAD( "m3.u4", 0x30000, 0x10000, CRC(0c1e8a67) SHA1(f1b9280c65fcfcb5ec481cae48eb6f52d6cdbc9d) )
 
 	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms?
-	ROM_LOAD16_BYTE("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
-	ROM_LOAD16_BYTE("v2.u14",  0x00001, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
+	ROM_LOAD("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
+	ROM_LOAD("v2.u14",  0x20000, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
 ROM_END
 
 ROM_START( tetriskr )

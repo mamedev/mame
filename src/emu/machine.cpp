@@ -273,11 +273,11 @@ void running_machine::start()
 	// start recording movie if specified
 	const char *filename = options().mng_write();
 	if (filename[0] != 0)
-		m_video->begin_recording(filename, video_manager::MF_MNG);
+		m_video->begin_recording(filename, movie_recording::format::MNG);
 
 	filename = options().avi_write();
 	if (filename[0] != 0)
-		m_video->begin_recording(filename, video_manager::MF_AVI);
+		m_video->begin_recording(filename, movie_recording::format::AVI);
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();

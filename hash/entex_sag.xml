@@ -2,7 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+-->
 
+<!--
 Cartridges(MCU+ROM) for Entex Select-A-Game Machine, note that the manual and
 label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartridge"
 -->
@@ -13,8 +15,8 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 		<description>Baseball 4</description>
 		<year>1981</year>
 		<publisher>Entex</publisher>
-		<part name="cart" interface="sag_cart"> <!-- HD38800 MCU -->
-			<dataarea name="rom" size="0x2000">
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
 				<rom name="b-b5_hd38800a37" offset="0x0000" size="0x1000" crc="64852bd5" sha1="fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5" />
 				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
@@ -25,8 +27,8 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 		<description>Football 4</description>
 		<year>1981</year>
 		<publisher>Entex</publisher>
-		<part name="cart" interface="sag_cart"> <!-- TMS1670 MCU, die label TMS1400, MP7573 -->
-			<dataarea name="rom" size="0x1000">
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x1000"> <!-- TMS1670 MCU, die label TMS1400, MP7573 -->
 				<rom name="ftba_mp7573" size="0x1000" crc="b17dd9e3" sha1="9c9e7a56643233ef2adff7b68a6df19e6ca176c2" />
 			</dataarea>
 			<dataarea name="rom:mpla" size="867">
@@ -42,21 +44,21 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 		<description>Pinball</description>
 		<year>1981</year>
 		<publisher>Entex</publisher>
-		<part name="cart" interface="sag_cart"> <!-- HD38800 MCU -->
-			<dataarea name="rom" size="0x2000">
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
 				<rom name="pinb_hd38800a38" offset="0x0000" size="0x1000" crc="6e53a56b" sha1="13f057eab2e4cfbb3ef1247a041abff15ae727c9" />
 				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sinv2" supported="no"> <!-- bad dump -->
+	<software name="sinv2">
 		<description>Space Invader 2</description>
 		<year>1981</year>
 		<publisher>Entex</publisher>
-		<part name="cart" interface="sag_cart"> <!-- HD38800 MCU -->
-			<dataarea name="rom" size="0x2000">
-				<rom name="inv2_hd38800a31" offset="0x0000" size="0x1000" crc="29c8c100" sha1="41cd413065659c6d7d5b2408de2ca6d51c49629a" status="baddump" />
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
+				<rom name="inv2_hd38800a31" offset="0x0000" size="0x1000" crc="10e39521" sha1="41d86696e518ea071e75ed37d5dc63c0408c262e" />
 				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
 		</part>

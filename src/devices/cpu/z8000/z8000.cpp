@@ -27,28 +27,29 @@ DEFINE_DEVICE_TYPE(Z8002, z8002_device, "z8002", "Zilog Z8002")
 
 
 z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 8, 1)
+	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 1)
 {
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_io_config("I/O", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_io_config("I/O", ENDIANNESS_BIG, 16, 16, 0)
 	, m_opcodes_config("first word", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_stack_config("stack", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_sio_config("special I/O", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_sio_config("special I/O", ENDIANNESS_BIG, 16, 16, 0)
+	, m_iack_in(*this)
 	, m_mo_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
 
 
 z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 16, 2)
+	: z8002_device(mconfig, Z8001, tag, owner, clock, 23, 2)
 {
 }
 
@@ -225,7 +226,8 @@ uint32_t z8002_device::RDMEM_L(address_space &space, uint32_t addr)
 void z8002_device::WRMEM_B(address_space &space, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
-	space.write_byte(addr, value);
+	uint16_t value16 = value | (value << 8);
+	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
 void z8002_device::WRMEM_W(address_space &space, uint32_t addr, uint16_t value)
@@ -245,84 +247,33 @@ void z8002_device::WRMEM_L(address_space &space, uint32_t addr, uint32_t value)
 
 uint8_t z8002_device::RDPORT_B(int mode, uint16_t addr)
 {
-	if(mode == 0)
-	{
-		return m_io->read_byte(addr);
-	}
-	else
-	{
-		/* how to handle MMU reads? for now just do it */
-		return m_sio->read_byte(addr);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	return space.read_byte(addr);
 }
 
 uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
-	if(mode == 0)
-	{
-		// FIXME: this should perform a 16-bit big-endian word read
-		return m_io->read_byte((uint16_t)(addr)) +
-			(m_io->read_byte((uint16_t)(addr+1)) << 8);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	if (BIT(addr, 0))
+		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
 	else
-	{
-		/* how to handle MMU reads? */
-		return m_sio->read_word_unaligned((uint16_t)addr);
-	}
-}
-
-uint16_t z8001_device::RDPORT_W(int mode, uint16_t addr)
-{
-	if(mode == 0)
-	{
-		return m_io->read_word_unaligned((uint16_t)addr);
-	}
-	else
-	{
-		/* how to handle MMU reads? */
-		return m_sio->read_word_unaligned((uint16_t)addr);
-	}
+		return space.read_word(addr);
 }
 
 void z8002_device::WRPORT_B(int mode, uint16_t addr, uint8_t value)
 {
-	if(mode == 0)
-	{
-		m_io->write_byte(addr,value);
-	}
-	else
-	{
-		/* how to handle MMU writes? for now just do it */
-		m_sio->write_byte(addr,value);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	uint16_t value16 = value | (value << 8);
+	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
 void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
-	if(mode == 0)
-	{
-		// FIXME: this should perform a 16-bit big-endian word write
-		m_io->write_byte((uint16_t)(addr),value & 0xff);
-		m_io->write_byte((uint16_t)(addr+1),(value >> 8) & 0xff);
-	}
+	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	if (BIT(addr, 0))
+		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
 	else
-	{
-		/* how to handle MMU writes? */
-		m_sio->write_word_unaligned((uint16_t)addr, value);
-	}
-}
-
-void z8001_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
-{
-	if(mode == 0)
-	{
-		m_io->write_word_unaligned((uint16_t)addr, value);
-	}
-	else
-	{
-		/* how to handle MMU writes? */
-		m_sio->write_word_unaligned((uint16_t)addr, value);
-	}
+		space.write_word(addr, value, 0xffff);
 }
 
 void z8002_device::cycles(int cycles)
@@ -332,40 +283,6 @@ void z8002_device::cycles(int cycles)
 
 #include "z8000ops.hxx"
 #include "z8000tbl.hxx"
-
-void z8002_device::set_irq(int type)
-{
-	switch ((type >> 8) & 255)
-	{
-		case Z8000_EPU >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_TRAP >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_NMI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_SEGTRAP >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_NVI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_VI >> 8:
-			m_irq_req = type;
-			break;
-		case Z8000_SYSCALL >> 8:
-			LOG("Z8K SYSCALL $%02x\n", type & 0xff);
-			m_irq_req = type;
-			break;
-		default:
-			logerror("Z8000 invalid Cause_Interrupt %04x\n", type);
-			return;
-	}
-	/* set interrupt request flag, reset HALT flag */
-	m_irq_req = type & ~Z8000_HALT;
-}
 
 void z8002_device::PUSH_PC()
 {
@@ -386,6 +303,16 @@ uint32_t z8002_device::GET_PC(uint32_t VEC)
 uint32_t z8001_device::GET_PC(uint32_t VEC)
 {
 	return segmented_addr(RDMEM_L(*m_program, VEC + 4));
+}
+
+uint32_t z8002_device::get_reset_pc()
+{
+	return RDMEM_W(*m_program, 4);
+}
+
+uint32_t z8001_device::get_reset_pc()
+{
+	return segmented_addr(RDMEM_L(*m_program, 4));
 }
 
 uint16_t z8002_device::GET_FCW(uint32_t VEC)
@@ -423,25 +350,20 @@ void z8002_device::Interrupt()
 {
 	uint16_t fcw = m_fcw;
 
-	if (m_irq_req & Z8000_NVI)
+	if (m_irq_req & Z8000_RESET)
 	{
-		int type = standard_irq_callback(NVI_LINE);
-		set_irq(type | Z8000_NVI);
+		m_irq_req &= Z8000_NVI | Z8000_VI;
+		CHANGE_FCW(RDMEM_W(*m_program, 2)); /* get reset m_fcw */
+		m_pc = get_reset_pc(); /* get reset m_pc  */
 	}
-
-	if (m_irq_req & Z8000_VI)
-	{
-		int type = standard_irq_callback(VI_LINE);
-		set_irq(type | Z8000_VI);
-	}
-
+	else
 	/* trap ? */
 	if (m_irq_req & Z8000_EPU)
 	{
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(GET_FCW(EPU));
 		m_pc = GET_PC(EPU);
@@ -453,7 +375,7 @@ void z8002_device::Interrupt()
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(GET_FCW(TRAP));
 		m_pc = GET_PC(TRAP);
@@ -465,19 +387,22 @@ void z8002_device::Interrupt()
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, RDMEM_W(*m_program, m_ppc));  /* for internal traps, the 1st word of the instruction is pushed */
+		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
 		m_irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(GET_FCW(SYSCALL));
 		m_pc = GET_PC(SYSCALL);
-		LOG("Z8K syscall $%04x\n", m_pc);
+		LOG("Z8K syscall [$%02x/$%04x]\n", m_op[0] & 0xff, m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
 	{
+		//standard_irq_callback(SEGT_LINE);
+		m_irq_vec = m_iack_in[0](m_pc);
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(GET_FCW(SEGTRAP));
 		m_pc = GET_PC(SEGTRAP);
@@ -486,10 +411,14 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_NMI)
 	{
+		standard_irq_callback(NMI_LINE);
+		m_irq_vec = m_iack_in[1](m_pc);
+		m_halt = false;
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = RDMEM_W(*m_program, NMI);
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
@@ -499,10 +428,14 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
 	{
+		standard_irq_callback(NVI_LINE);
+		m_irq_vec = m_iack_in[2](m_pc);
+		m_halt = false;
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
@@ -511,26 +444,30 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
 	{
+		standard_irq_callback(VI_LINE);
+		m_irq_vec = m_iack_in[3](m_pc);
+		m_halt = false;
+
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_req);   /* save interrupt/trap type tag */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
 		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
-		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc);
+		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + 2 * (m_irq_vec & 0xff), m_fcw, m_pc);
 	}
 }
 
 uint32_t z8002_device::read_irq_vector()
 {
-	return RDMEM_W(*m_program, VEC00 + 2 * (m_irq_req & 0xff));
+	return RDMEM_W(*m_program, VEC00 + 2 * (m_irq_vec & 0xff));
 }
 
 
 uint32_t z8001_device::read_irq_vector()
 {
-	return segmented_addr(RDMEM_L(*m_program, VEC00 + 4 * (m_irq_req & 0xff)));
+	return segmented_addr(RDMEM_L(*m_program, VEC00 + 2 * (m_irq_vec & 0xff)));
 }
 
 
@@ -555,14 +492,13 @@ void z8002_device::clear_internal_state()
 
 void z8002_device::register_debug_state()
 {
-	state_add( Z8000_PC,      "PC",      m_pc      ).formatstr("%08X");
+	state_add( Z8000_PC,      "PC",      m_pc      ).mask(m_program->addrmask());
 	state_add( Z8000_NSPOFF,  "NSPOFF",  m_nspoff  ).formatstr("%04X");
 	state_add( Z8000_NSPSEG,  "NSPSEG",  m_nspseg  ).formatstr("%04X");
 	state_add( Z8000_FCW,     "FCW",     m_fcw     ).formatstr("%04X");
 	state_add( Z8000_PSAPOFF, "PSAPOFF", m_psapoff ).formatstr("%04X");
 	state_add( Z8000_PSAPSEG, "PSAPSEG", m_psapseg ).formatstr("%04X");
 	state_add( Z8000_REFRESH, "REFR",    m_refresh ).formatstr("%04X");
-	state_add( Z8000_IRQ_REQ, "IRQR",    m_irq_req ).formatstr("%04X");
 	state_add( Z8000_IRQ_VEC, "IRQV",    m_irq_vec ).formatstr("%04X");
 	state_add( Z8000_R0,      "R0",      RW(0)     ).formatstr("%04X");
 	state_add( Z8000_R1,      "R1",      RW(1)     ).formatstr("%04X");
@@ -631,8 +567,8 @@ void z8002_device::register_save_state()
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_mi));
+	save_item(NAME(m_halt));
 	save_item(NAME(m_icount));
-	save_item(NAME(m_vector_mult));
 }
 
 void z8002_device::init_spaces()
@@ -689,29 +625,16 @@ void z8002_device::device_start()
 	register_save_state();
 
 	set_icountptr(m_icount);
+	m_iack_in.resolve_all_safe(0xffff);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
 
-void z8001_device::device_reset()
-{
-	m_fcw = RDMEM_W(*m_program, 2); /* get reset m_fcw */
-	if(m_fcw & F_SEG)
-	{
-		m_pc = ((RDMEM_W(*m_program, 4) & 0x0700) << 8) | (RDMEM_W(*m_program, 6) & 0xffff); /* get reset m_pc  */
-	}
-	else
-	{
-		m_pc = RDMEM_W(*m_program, 4); /* get reset m_pc  */
-	}
-	m_ppc = m_pc;
-}
-
 void z8002_device::device_reset()
 {
-	m_fcw = RDMEM_W(*m_program, 2); /* get reset m_fcw */
-	m_pc = RDMEM_W(*m_program, 4); /* get reset m_pc  */
-	m_ppc = m_pc;
+	m_irq_req |= Z8000_RESET;
+	m_refresh &= 0x7fff;
+	m_halt = false;
 }
 
 z8002_device::~z8002_device()
@@ -729,7 +652,7 @@ void z8002_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
-		if (m_irq_req & Z8000_HALT)
+		if (m_halt)
 		{
 			m_icount = 0;
 		}
@@ -758,8 +681,7 @@ void z8002_device::execute_set_input(int irqline, int state)
 
 		if (state != CLEAR_LINE)
 		{
-			m_irq_req = Z8000_NMI;
-			m_irq_vec = NMI;
+			m_irq_req |= Z8000_NMI;
 		}
 	}
 	else if (irqline < 2)

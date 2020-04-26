@@ -88,7 +88,7 @@ void isa8_upd765_fdc_device::device_start()
 {
 	for(int i=0; i<4; i++) {
 		char name[2] = {static_cast<char>('0'+i), 0};
-		floppy_connector *conn = subdevice<floppy_connector>(name);
+		floppy_connector *conn = m_fdc->subdevice<floppy_connector>(name);
 		floppy[i] = conn ? conn->get_device() : nullptr;
 	}
 

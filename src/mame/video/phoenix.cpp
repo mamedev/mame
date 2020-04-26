@@ -284,7 +284,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 	m_pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	m_pleiads_custom->control_c_w(space, offset, data);
+	m_pleiads_custom->control_c_w(data);
 }
 
 

@@ -2,13 +2,19 @@
 // copyright-holders:hap
 /*
 
-  Hitachi HMCS40 MCU family cores
+Hitachi HMCS40 MCU family cores
 
-  References:
-  - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
-  - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
-  - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
-    (verified a while later after new documentation was found)
+References:
+- 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
+- 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
+- opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
+  (verified a while later after new documentation was found)
+
+TODO:
+- How the stack works, is probably m_stack_levels+1 program counters, and
+  an index pointing to the current program counter. Then push/pop simply
+  decrements/increments the index. The way it is implemented right now
+  behaves the same.
 
 */
 
@@ -207,8 +213,6 @@ void hmcs40_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
-
 	// resolve callbacks
 	m_read_r.resolve_all_safe(m_polarity & 0xf);
 	m_write_r.resolve_all_safe();
@@ -217,11 +221,13 @@ void hmcs40_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
+	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;
 	m_eint_line = 0;
 	m_halt = 0;
+	m_prescaler = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -250,7 +256,6 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_i));
 	save_item(NAME(m_eint_line));
 	save_item(NAME(m_halt));
-	save_item(NAME(m_timer_halted_remain));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -263,6 +268,7 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_c));
 	save_item(NAME(m_tc));
+	save_item(NAME(m_prescaler));
 	save_item(NAME(m_cf));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_iri));
@@ -306,9 +312,6 @@ void hmcs40_cpu_device::device_reset()
 	m_ie = 0;
 	m_iri = m_irt = 0;
 	m_if[0] = m_if[1] = m_tf = 1;
-
-	if (!m_halt && m_timer->remaining().is_never())
-		reset_prescaler();
 
 	// clear i/o
 	m_d = m_polarity;
@@ -453,7 +456,6 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 
 void hmcs40_cpu_device::do_interrupt()
 {
-	m_icount--;
 	push_stack();
 	m_ie = 0;
 
@@ -470,6 +472,8 @@ void hmcs40_cpu_device::do_interrupt()
 
 	standard_irq_callback(line);
 	m_prev_pc = m_pc;
+
+	cycle();
 }
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
@@ -479,14 +483,6 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 	// halt/unhalt mcu
 	if (line == HMCS40_INPUT_LINE_HLT && state != m_halt)
 	{
-		if (state)
-		{
-			m_timer_halted_remain = m_timer->remaining();
-			m_timer->reset();
-		}
-		else
-			m_timer->adjust(m_timer_halted_remain);
-
 		m_halt = state;
 		return;
 	}
@@ -512,20 +508,14 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 	m_int[line] = state;
 }
 
-void hmcs40_cpu_device::reset_prescaler()
+void hmcs40_cpu_device::cycle()
 {
-	// reset 6-bit timer prescaler
-	attotime base = attotime::from_ticks(4 * 64, unscaled_clock());
-	m_timer->adjust(base);
-}
+	m_icount--;
+	m_prescaler = (m_prescaler + 1) & 0x3f;
 
-TIMER_CALLBACK_MEMBER( hmcs40_cpu_device::simple_timer_cb )
-{
 	// timer prescaler overflow
-	if (!m_cf)
+	if (m_prescaler == 0 && !m_cf)
 		increment_tc();
-
-	reset_prescaler();
 }
 
 void hmcs40_cpu_device::increment_tc()
@@ -583,17 +573,12 @@ void hmcs40_cpu_device::execute_run()
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
-		{
 			do_interrupt();
-			if (m_icount <= 0)
-				break;
-		}
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);
-		m_icount--;
 		m_op = m_program->read_word(m_pc) & 0x3ff;
-		m_i = bitswap<8>(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR)
+		m_i = bitswap<4>(m_op,0,1,2,3); // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
 
 		// handle opcode
@@ -825,5 +810,7 @@ void hmcs40_cpu_device::execute_run()
 			default:
 				op_illegal(); break;
 		} /* big switch */
+
+		cycle();
 	}
 }

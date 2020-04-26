@@ -22,6 +22,7 @@ public:
 
 	void set_is_sudoku();
 	void set_is_pvmilfin();
+	void set_use_spritepages() { m_use_spritepages = true; };
 
 protected:
 	// device-level overrides
@@ -57,31 +58,32 @@ private:
 
 	// VIDEO
 	// tile bases
-	DECLARE_WRITE8_MEMBER(tile_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(tile_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(tile_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(tile_gfxbase_hi_r);
+	void tile_gfxbase_lo_w(uint8_t data);
+	void tile_gfxbase_hi_w(uint8_t data);
+	uint8_t tile_gfxbase_lo_r();
+	uint8_t tile_gfxbase_hi_r();
 	// sprite tile bases
-	DECLARE_WRITE8_MEMBER(sprite_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(sprite_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(sprite_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(sprite_gfxbase_hi_r);
+	void sprite_gfxbase_lo_w(uint8_t data);
+	void sprite_gfxbase_hi_w(uint8_t data);
+	uint8_t sprite_gfxbase_lo_r();
+	uint8_t sprite_gfxbase_hi_r();
 
-	DECLARE_READ8_MEMBER(elan_eu3a05_vidctrl_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_vidctrl_w);
+	uint8_t elan_eu3a05_vidctrl_r();
+	void elan_eu3a05_vidctrl_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(tile_scroll_r);
-	DECLARE_WRITE8_MEMBER(tile_scroll_w);
+	uint8_t tile_scroll_r(offs_t offset);
+	void tile_scroll_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(splitpos_r);
-	DECLARE_WRITE8_MEMBER(splitpos_w);
+	uint8_t splitpos_r(offs_t offset);
+	void splitpos_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(read_unmapped);
-	DECLARE_WRITE8_MEMBER(write_unmapped);
+	uint8_t read_unmapped(offs_t offset);
+	void write_unmapped(offs_t offset, uint8_t data);
 
 	int m_bytes_per_tile_entry;
 	int m_vrambase;
 	int m_spritebase;
+	bool m_use_spritepages;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)

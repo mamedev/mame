@@ -1165,7 +1165,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* sound reset? */
 			if (m_has_dcs)
 			{
-				m_dcs->reset_w(~newreg & 1);
+				m_dcs->reset_w(newreg & 1);
 			}
 			else if (m_has_cage)
 			{

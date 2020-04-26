@@ -79,22 +79,22 @@ void nscsi_s1410_device::scsi_command()
 			return;
 		}
 
-		scsi_data_in(2, 3);
+		scsi_data_out(2, 3);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_INIT_DRIVE_PARAMS:
-		scsi_data_in(2, 8);
+		scsi_data_out(2, 8);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_WRITE_SECTOR_BUFFER:
-		scsi_data_in(2, 512);
+		scsi_data_out(2, 512);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_READ_SECTOR_BUFFER:
-		scsi_data_out(2, 512);
+		scsi_data_in(2, 512);
 		scsi_status_complete(SS_GOOD);
 		break;
 

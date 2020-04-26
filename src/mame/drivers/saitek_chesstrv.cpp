@@ -17,6 +17,10 @@ SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
 it has the same MCU serial (SL90387). They added battery low voltage detection
 to it (rightmost digit DP lights up).
 
+TODO:
+- MCU frequency was actually measured ~3MHz, but this is much too slow when compared
+  to a video recording (of Novag Pocket Chess), need to reverify
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -191,11 +195,11 @@ INPUT_PORTS_END
 void chesstrv_state::chesstrv(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 3000000/2); // Fairchild 3870, measured ~3MHz
+	F8(config, m_maincpu, 4500000/2); // approximation
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesstrv_state::chesstrv_mem);
 	m_maincpu->set_addrmap(AS_IO, &chesstrv_state::chesstrv_io);
 
-	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	f38t56_device &psu(F38T56(config, "psu", 4500000/2));
 	psu.read_a().set(FUNC(chesstrv_state::ram_data_r));
 	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
@@ -219,7 +223,7 @@ void chesstrv_state::chesstrv(machine_config &config)
 
 ROM_START( chesstrv )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("3870-sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64) )
+	ROM_LOAD("sl90387", 0x0000, 0x0800, CRC(b76214d8) SHA1(7760903a64d9c513eb54c4787f535dabec62eb64) )
 ROM_END
 
 } // anonymous namespace

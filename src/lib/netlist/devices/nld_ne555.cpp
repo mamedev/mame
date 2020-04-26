@@ -196,13 +196,13 @@ namespace netlist
 
 		if (m_last_out && !out)
 		{
-			m_RDIS.update();
+			m_RDIS.solve_now();
 			m_OUT.push(m_R3.m_N());
 			m_RDIS.set_R(nlconst::magic(R_ON));
 		}
 		else if (!m_last_out && out)
 		{
-			m_RDIS.update();
+			m_RDIS.solve_now();
 			// FIXME: Should be delayed by 100ns
 			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(nlconst::magic(R_OFF));

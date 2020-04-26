@@ -153,19 +153,19 @@ void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 } /* set_tilemap_videoram */
 
 // 16 bit handlers
-WRITE16_MEMBER(namco_c123tmap_device::videoram16_w)
+void namco_c123tmap_device::videoram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset];
 	COMBINE_DATA(&newword);
 	set_tilemap_videoram(offset, newword);
 }
 
-READ16_MEMBER(namco_c123tmap_device::videoram16_r)
+uint16_t namco_c123tmap_device::videoram16_r(offs_t offset)
 {
 	return m_tilemapinfo.videoram[offset];
 }
 
-WRITE16_MEMBER(namco_c123tmap_device::control16_w)
+void namco_c123tmap_device::control16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_tilemapinfo.control[offset];
 	data = COMBINE_DATA(&m_tilemapinfo.control[offset]);
@@ -205,13 +205,13 @@ WRITE16_MEMBER(namco_c123tmap_device::control16_w)
 	}
 }
 
-READ16_MEMBER(namco_c123tmap_device::control16_r)
+uint16_t namco_c123tmap_device::control16_r(offs_t offset)
 {
 	return m_tilemapinfo.control[offset];
 }
 
 // 8 bit handlers
-WRITE8_MEMBER(namco_c123tmap_device::videoram8_w)
+void namco_c123tmap_device::videoram8_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset >> 1];
 	if (offset & 1)
@@ -222,12 +222,12 @@ WRITE8_MEMBER(namco_c123tmap_device::videoram8_w)
 	set_tilemap_videoram(offset >> 1, newword);
 }
 
-READ8_MEMBER(namco_c123tmap_device::videoram8_r)
+uint8_t namco_c123tmap_device::videoram8_r(offs_t offset)
 {
 	return m_tilemapinfo.videoram[offset >> 1] >> ((~offset & 1) << 3);
 }
 
-WRITE8_MEMBER(namco_c123tmap_device::control8_w)
+void namco_c123tmap_device::control8_w(offs_t offset, uint8_t data)
 {
 	if ((m_tilemapinfo.control[offset] & 0xff) == data)
 		return;
@@ -243,7 +243,7 @@ WRITE8_MEMBER(namco_c123tmap_device::control8_w)
 	}
 }
 
-READ8_MEMBER(namco_c123tmap_device::control8_r)
+uint8_t namco_c123tmap_device::control8_r(offs_t offset)
 {
 	return m_tilemapinfo.control[offset] & 0xff;
 }

@@ -29,9 +29,9 @@ private:
 	bool m_t0;
 	devcb_write_line m_out_tx_handler;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
+	uint8_t bus_r();
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t0_r );
 };
 

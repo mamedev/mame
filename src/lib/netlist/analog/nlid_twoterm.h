@@ -86,9 +86,17 @@ namespace analog
 
 		NETLIB_UPDATEI();
 
-		void solve_now();
+		solver::matrix_solver_t *solver() const noexcept;
 
-		void solve_later(netlist_time delay = netlist_time::quantum()) noexcept;
+		void solve_now() const;
+
+		template <typename F>
+		void change_state(F f, netlist_time delay = netlist_time::quantum())
+		{
+			auto *solv(solver());
+			if (solv)
+				solv->change_state(f, delay);
+		}
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
 		{
@@ -168,9 +176,10 @@ namespace analog
 		NETLIB_UPDATE_PARAMI()
 		{
 			// FIXME: We only need to update the net first if this is a time stepping net
-			solve_now();
-			set_R(std::max(m_R(), exec().gmin()));
-			solve_later();
+			change_state([this]()
+			{
+				set_R(std::max(m_R(), exec().gmin()));
+			});
 		}
 
 	private:
@@ -245,7 +254,44 @@ namespace analog
 	// -----------------------------------------------------------------------------
 	// nld_C
 	// -----------------------------------------------------------------------------
+#if 1
+	NETLIB_OBJECT_DERIVED(C, twoterm)
+	{
+	public:
+		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+		, m_C(*this, "C", nlconst::magic(1e-6))
+		, m_cap(*this, "m_cap")
+		{
+		}
 
+		NETLIB_IS_TIMESTEP(true)
+		NETLIB_TIMESTEPI()
+		{
+			// G, Ieq
+			const auto res(m_cap.timestep(m_C(), deltaV(), step));
+			const nl_fptype G = res.first;
+			const nl_fptype I = res.second;
+			set_mat( G, -G, -I,
+					-G,  G,  I);
+		}
+
+		NETLIB_RESETI()
+		{
+			m_cap.setparams(exec().gmin());
+		}
+
+		param_fp_t m_C;
+	protected:
+		//NETLIB_UPDATEI();
+		//FIXME: should be able to change
+		NETLIB_UPDATE_PARAMI() { }
+
+	private:
+		generic_capacitor_const m_cap;
+	};
+
+#else
+	// Code preserved as a basis for a current/voltage controlled capacitor
 	NETLIB_OBJECT_DERIVED(C, twoterm)
 	{
 	public:
@@ -292,7 +338,7 @@ namespace analog
 		//generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap;
 		generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
 	};
-
+#endif
 	// -----------------------------------------------------------------------------
 	// nld_L
 	// -----------------------------------------------------------------------------
@@ -426,7 +472,6 @@ namespace analog
 		}
 
 	protected:
-		// NETLIB_UPDATEI() {   NETLIB_NAME(twoterm)::update(time); }
 
 		NETLIB_RESETI()
 		{
@@ -476,7 +521,6 @@ namespace analog
 
 	protected:
 
-		//NETLIB_UPDATEI() { NETLIB_NAME(twoterm)::update(time); }
 		NETLIB_RESETI()
 		{
 			NETLIB_NAME(twoterm)::reset();
@@ -489,11 +533,12 @@ namespace analog
 		{
 			// FIXME: We only need to update the net first if this is a time stepping net
 			//FIXME: works only for CS without function
-			solve_now();
-			const auto zero(nlconst::zero());
-			set_mat(zero, zero, -m_I(),
-					zero, zero,  m_I());
-			solve_later();
+			change_state([this]()
+			{
+				const auto zero(nlconst::zero());
+				set_mat(zero, zero, -m_I(),
+						zero, zero,  m_I());
+			});
 		}
 
 	private:

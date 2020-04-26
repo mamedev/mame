@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_device::m2_w )
 //  kb_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
+uint8_t pc1512_keyboard_device::kb_bus_r()
 {
 	/*
 
@@ -361,7 +361,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
+void pc1512_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -386,7 +386,7 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
+uint8_t pc1512_keyboard_device::kb_p2_r()
 {
 	/*
 
@@ -416,7 +416,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
+void pc1512_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

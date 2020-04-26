@@ -652,7 +652,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="blitz! (intelligent software) (richard lang) (1985) (mo5).fd" size="327680" crc="b0b511eb" sha1="8d5719509cb159a38754c85d28f21033a1e455f1"/>
+				<rom name="blitz (intelligent software) (richard lang) (1985) (mo5).fd" size="327680" crc="b0b511eb" sha1="8d5719509cb159a38754c85d28f21033a1e455f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -664,7 +664,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="163840">
-				<rom name="blitz! (1985)(to tek)(fr)[3.5'', bootable].fd" size="163840" crc="20e73a19" sha1="2bdc70be628878b46ef0afd6ca753c74ee051777"/>
+				<rom name="blitz (1985)(to tek)(fr)[3.5'', bootable].fd" size="163840" crc="20e73a19" sha1="2bdc70be628878b46ef0afd6ca753c74ee051777"/>
 			</dataarea>
 		</part>
 	</software>

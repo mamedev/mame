@@ -318,7 +318,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 {
 	k007121_device *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
-	k007121->ctrl_w(space, offset, data);
+	k007121->ctrl_w(offset, data);
 
 	if (offset == 7)
 	{
