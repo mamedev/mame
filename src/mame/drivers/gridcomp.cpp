@@ -20,7 +20,7 @@
     - Intel 7220 Bubble Memory Controller
         - 7110 Magnetic Bubble Memory modules and support chips
     - (unknown) - EAROM for machine ID
-    - (unknown) - Real-Time Clock
+    - MM58174AN - Real-Time Clock
     - (custom DMA logic)
     - Intel 8741 - keyboard MCU
     - Intel 8274 - UART
@@ -29,36 +29,37 @@
         - MK5089N - DTMF generator
         - ...
 
+	high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
+
+	differences between models:
+	- Compass 110x do not have GRiDROM slots.
+	- Compass II (112x, 113x) have 4 of them.
+	- Compass II 113x have 512x256 screen size
+	- Compass 11x9 have 512K ram
+	- Compass II have DMA addresses different from Compass 110x
+
     to do:
 
-    - confirm differences between models except screen size
-        - Compass 110x do not have GRiDROM slots.
-        - Compass II (112x, 113x) have 4 of them.
     - keyboard: decode and add the rest of keycodes
+	    keycode table can be found here on page A-2:
+	    http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
     - EAROM, RTC
-    - serial port, modem (incl. DTMF generator)
-    - TMS9914 chip driver (incl. DMA)
-    - GPIB storage devices (floppy, hard disk)
+    - serial port (incomplete), modem (incl. DTMF generator)
+	- proper custom DMA logic timing
+	- implement units other than 1101
 
     missing dumps:
 
-    - BIOS from models other than 1139 and late 1101 revision
+    - BIOS from models other than 1139 and late 1101 revision (the latter one is detected as 1108 in VERIFYPROM utility)
     - GRiDROM's
     - keyboard MCU
     - external floppy and hard disk (2101, 2102)
 
     to boot CCOS 3.0.1:
-    - pad binary image (not .imd) to 384K
-    - attach it as -memcard
-    - use grid1129 with 'patched' ROM
-    - start with -debug and add breakpoints:
-
-    # bubble memory driver
-    bp ff27a,1,{ax=ax*2;go}
-    # boot loader
-    bp 20618,1,{temp0=214A8;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
-    # CCOS kernel
-    bp 0661a,1,{temp0=0f964;do w@(temp0+7)=120;do w@(temp0+9)=121;go}
+	- convert GRIDOS.IMD to IMG format
+    - create zero-filled 384K bubble memory image and attach it as -memcard
+	- attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
+    - use grid1101 with 'ccos' ROM
 
 ***************************************************************************/
 
@@ -614,7 +615,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_IS_SKELETON )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN )
 COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
 COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )

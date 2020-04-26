@@ -4,6 +4,9 @@
 
     GRiD 2102 Portable Floppy emulation
 
+    http://deltacxx.insomnia247.nl/gridcompass/disk_info.txt for some protocol info
+    http://deltacxx.insomnia247.nl/gridcompass/fdd_boards.jpg for floppy drive boards photo
+
 **********************************************************************/
 
 #include "grid2102.h"
