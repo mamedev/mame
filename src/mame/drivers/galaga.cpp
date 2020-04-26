@@ -1753,11 +1753,17 @@ void galaga_state::galagab(machine_config &config)
 	config.device_remove("06xx");
 	config.device_remove("54xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	misclatch->q_out_cb<3>().set_nop();  // 54xx reset line
+	// galaga has the custom chips on this line, so just set the resets this
+	// board has
+	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch->q_out_cb<3>().append_inputline("sub3", INPUT_LINE_RESET).invert();
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
@@ -1860,7 +1866,10 @@ void battles_state::battles(machine_config &config)
 	config.device_remove("54xx");
 	config.device_remove("06xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	misclatch->q_out_cb<3>().set_nop();  // 54xx reset line
+	// xevious has the custom chips on this line, so just set the resets
+	// this board has
+	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
+	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
