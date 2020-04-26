@@ -80,20 +80,20 @@ WRITE16_MEMBER( i80130_device::io_w )
 //  ROM( i80130 )
 //-------------------------------------------------
 
-ROM_START( i80130 )
-	ROM_REGION16_LE( 0x4000, "rom", 0 )
-	ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
-ROM_END
+//ROM_START( i80130 )
+//	ROM_REGION16_LE( 0x4000, "rom", 0 )
+//	ROM_LOAD( "80130", 0x0000, 0x4000, NO_DUMP )
+//ROM_END
 
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *i80130_device::device_rom_region() const
-{
-	return ROM_NAME( i80130 );
-}
+//const tiny_rom_entry *i80130_device::device_rom_region() const
+//{
+//	return ROM_NAME( i80130 );
+//}
 
 
 //-------------------------------------------------
