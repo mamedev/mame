@@ -51,7 +51,7 @@
 		
     PWB405270B I/O board (Joystick pod board). H8/3644 based JVS I/O board found in Windy II cabs for later games that support JVS controls.
     ----------------------------------
-        Hitachi H8/3644 Microcontroller. Unknown clock speed
+        Hitachi H8/3644 Microcontroller with a 7.3782MHz crystal
 
     GY676-PWB(F) LAN Board
     ----------------------
@@ -59,9 +59,9 @@
         Xilinx XC5204 FPGA
         Konami K001604 (2D tilemaps + 2x ROZ)
         Bt121KPC80 RAMDAC
-*/
 
-/*
+
+
     check_color_buffer(): 0, 0
         gfxfifo_exec: ram write 00100: 00000800
         gfxfifo_exec: ram write 00104: 00000000
@@ -493,7 +493,7 @@ private:
 };
 
 
-/* Cobra JVS Device class */
+// Cobra JVS Device class
 
 class cobra_jvs : public jvs_device
 {
@@ -691,7 +691,7 @@ void cobra_jvs_host::write(uint8_t data, const uint8_t *&rec_data, uint32_t &rec
 }
 
 
-/* Cobra driver class */
+// Cobra driver class
 
 class cobra_state : public driver_device
 {
@@ -1087,7 +1087,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 	int x1 = v1.x;
 	int y1 = v1.y;
 
-	uint32_t color = 0xffffffff;      // TODO: where does the color come from?
+	uint32_t color = 0xffffffff; // TODO: where does the color come from?
 
 	if (v1.x < visarea.min_x || v1.x > visarea.max_x ||
 		v1.y < visarea.min_y || v1.y > visarea.max_y ||
@@ -1645,13 +1645,13 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 				uint32_t *sub_ram = (uint32_t*)m_sub_ram;
 				uint32_t *gfx_ram = (uint32_t*)(uint64_t*)m_gfx_ram0;
 
-				main_ram[(0x0005ac^4) / 4] = 0x60000000;        // skip IRQ fail
-				main_ram[(0x001ec4^4) / 4] = 0x60000000;        // waiting for IRQ?
-				main_ram[(0x001f00^4) / 4] = 0x60000000;        // waiting for IRQ?
+				main_ram[(0x0005ac^4) / 4] = 0x60000000; // skip IRQ fail
+				main_ram[(0x001ec4^4) / 4] = 0x60000000; // waiting for IRQ?
+				main_ram[(0x001f00^4) / 4] = 0x60000000; // waiting for IRQ?
 
-				sub_ram[0x568 / 4] = 0x60000000;                // skip IRQ fail
+				sub_ram[0x568 / 4] = 0x60000000; // skip IRQ fail
 
-				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
+				gfx_ram[(0x38632c^4) / 4] = 0x38600000; // skip check_one_scene()
 			}
 			// racjamdx
 			else if (strcmp(machine().system().name, "racjamdx") == 0)
@@ -1899,7 +1899,7 @@ READ32_MEMBER(cobra_state::sub_config_r)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (0x2) << 8;        // if bit 0x2 is zero, maskrom boot
+		r |= (0x2) << 8; // if bit 0x2 is zero, maskrom boot
 	}
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2046,26 +2046,26 @@ WRITE8_MEMBER(cobra_state::sub_jvs_w)
 
 void cobra_state::cobra_sub_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share("sub_ram");                       // Main RAM
-	map(0x70000000, 0x7003ffff).rw(FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w));         // Double buffered shared RAM between Main and Sub
-//  map(0x78000000, 0x780000ff).noprw();                                           // SCSI controller (unused)
+	map(0x00000000, 0x003fffff).ram().share("sub_ram"); // Main RAM
+	map(0x70000000, 0x7003ffff).rw(FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w)); // Double buffered shared RAM between Main and Sub
+//  map(0x78000000, 0x780000ff).noprw(); // SCSI controller (unused)
 	map(0x78040000, 0x7804ffff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
 	map(0x78080000, 0x7808000f).rw(FUNC(cobra_state::sub_ata0_r), FUNC(cobra_state::sub_ata0_w));
 	map(0x780c0010, 0x780c001f).rw(FUNC(cobra_state::sub_ata1_r), FUNC(cobra_state::sub_ata1_w));
-	map(0x78200000, 0x782000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));              // PSAC registers
-	map(0x78210000, 0x78217fff).ram().w(FUNC(cobra_state::sub_psac_palette_w)).share("paletteram");                      // PSAC palette RAM
-	map(0x78220000, 0x7823ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));            // PSAC tile RAM
-	map(0x78240000, 0x7827ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));            // PSAC character RAM
-	map(0x78280000, 0x7828000f).noprw();                                           // ???
-	map(0x78300000, 0x7830000f).rw(FUNC(cobra_state::sub_psac2_r), FUNC(cobra_state::sub_psac2_w));           // PSAC
+	map(0x78200000, 0x782000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w)); // PSAC registers
+	map(0x78210000, 0x78217fff).ram().w(FUNC(cobra_state::sub_psac_palette_w)).share("paletteram"); // PSAC palette RAM
+	map(0x78220000, 0x7823ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w)); // PSAC tile RAM
+	map(0x78240000, 0x7827ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w)); // PSAC character RAM
+	map(0x78280000, 0x7828000f).noprw(); // ???
+	map(0x78300000, 0x7830000f).rw(FUNC(cobra_state::sub_psac2_r), FUNC(cobra_state::sub_psac2_w)); // PSAC
 	map(0x7e000000, 0x7e000003).rw(FUNC(cobra_state::sub_unk7e_r), FUNC(cobra_state::sub_debug_w));
-	map(0x7e040000, 0x7e041fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));    /* M48T58Y RTC/NVRAM */
-	map(0x7e180000, 0x7e180003).rw(FUNC(cobra_state::sub_unk1_r), FUNC(cobra_state::sub_unk1_w));             // TMS57002?
+	map(0x7e040000, 0x7e041fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)); // M48T58Y RTC/NVRAM
+	map(0x7e180000, 0x7e180003).rw(FUNC(cobra_state::sub_unk1_r), FUNC(cobra_state::sub_unk1_w)); // TMS57002
 	map(0x7e200000, 0x7e200003).rw(FUNC(cobra_state::sub_config_r), FUNC(cobra_state::sub_config_w));
-	map(0x7e280000, 0x7e28ffff).noprw();                                           // LANC
-	map(0x7e300000, 0x7e30ffff).noprw();                                           // LANC
+	map(0x7e280000, 0x7e28ffff).noprw(); // LANC
+	map(0x7e300000, 0x7e30ffff).noprw(); // LANC
 	map(0x7e380000, 0x7e380003).rw(FUNC(cobra_state::sub_mainbd_r), FUNC(cobra_state::sub_mainbd_w));
-	map(0x7ff80000, 0x7fffffff).rom().region("user2", 0);                     /* Boot ROM */
+	map(0x7ff80000, 0x7fffffff).rom().region("user2", 0); // Boot ROM
 }
 
 
@@ -2157,7 +2157,7 @@ uint32_t cobra_renderer::gfx_read_gram(uint32_t address)
 
 	switch ((address >> 16) & 0xf)
 	{
-		case 0xc:       // 0xCxxxx
+		case 0xc: // 0xCxxxx
 		{
 			if ((address >= 0xc0c00 && address < 0xc1000) ||
 				(address >= 0xc4c00 && address < 0xc5000) ||
@@ -2182,7 +2182,7 @@ void cobra_renderer::gfx_write_gram(uint32_t address, uint32_t mask, uint32_t da
 {
 	switch ((address >> 16) & 0xf)
 	{
-		case 0x4:       // 0x4xxxx
+		case 0x4: // 0x4xxxx
 		{
 			if (address == 0x40fff)
 			{
@@ -2191,7 +2191,7 @@ void cobra_renderer::gfx_write_gram(uint32_t address, uint32_t mask, uint32_t da
 			break;
 		}
 
-		case 0xc:       // 0xCxxxx
+		case 0xc: // 0xCxxxx
 		{
 			switch (address & 0xffff)
 			{
@@ -2452,34 +2452,34 @@ void cobra_renderer::gfx_fifo_exec()
 					w = 1.0f;
 
 					uint64_t in[4];
-					if (w2 & 0x40000000)        // line flags
+					if (w2 & 0x40000000) // line flags
 					{
 						fifo_in->pop(nullptr, &in[0]);
 					}
 
-					if (w2 & 0x20000000)        // unknown float (0.0f ... 1.0f)
+					if (w2 & 0x20000000) // unknown float (0.0f ... 1.0f)
 					{
 						fifo_in->pop(nullptr, &in[1]);
 					}
 
-					fifo_in->pop(nullptr, &x);                     // X coord
-					fifo_in->pop(nullptr, &y);                     // Y coord
-					fifo_in->pop(nullptr, &in[2]);                 // coord?
-					fifo_in->pop(nullptr, &z);                     // Z coord
+					fifo_in->pop(nullptr, &x); // X coord
+					fifo_in->pop(nullptr, &y); // Y coord
+					fifo_in->pop(nullptr, &in[2]); // coord?
+					fifo_in->pop(nullptr, &z); // Z coord
 
-					if (w2 & 0x00200000)        // texture coords
+					if (w2 & 0x00200000) // texture coords
 					{
-						fifo_in->pop(nullptr, &w);                 // W coord (1 / Z)
+						fifo_in->pop(nullptr, &w); // W coord (1 / Z)
 						fifo_in->pop(nullptr, &vert[i].p[POLY_U]); // U/Z coord
 						fifo_in->pop(nullptr, &vert[i].p[POLY_V]); // V/Z coord
 					}
 
-					fifo_in->pop(nullptr, &a);                     // Gouraud Color Alpha
-					fifo_in->pop(nullptr, &r);                     // Gouraud Color R
-					fifo_in->pop(nullptr, &g);                     // Gouraud Color G
-					fifo_in->pop(nullptr, &b);                     // Gouraud Color B
+					fifo_in->pop(nullptr, &a); // Gouraud Color Alpha
+					fifo_in->pop(nullptr, &r); // Gouraud Color R
+					fifo_in->pop(nullptr, &g); // Gouraud Color G
+					fifo_in->pop(nullptr, &b); // Gouraud Color B
 
-					if (w2 & 0x00000001)        // unknown float (0.0f ... 1.0f)
+					if (w2 & 0x00000001) // unknown float (0.0f ... 1.0f)
 					{
 						fifo_in->pop(nullptr, &in[3]);
 					}
@@ -2544,7 +2544,7 @@ void cobra_renderer::gfx_fifo_exec()
 				// render
 				switch ((w1 >> 24) & 0xf)
 				{
-					case 0x0:           // triangles
+					case 0x0: // triangles
 					{
 						if (w2 & 0x00200000)
 						{
@@ -2565,7 +2565,7 @@ void cobra_renderer::gfx_fifo_exec()
 						break;
 					}
 
-					case 0x2:           // points
+					case 0x2: // points
 					{
 						for (int i=0; i < units; i++)
 						{
@@ -2574,16 +2574,16 @@ void cobra_renderer::gfx_fifo_exec()
 						break;
 					}
 
-					case 0x3:           // lines
+					case 0x3: // lines
 					{
-						if ((units & 1) == 0)       // batches of lines
+						if ((units & 1) == 0) // batches of lines
 						{
 							for (i=0; i < units; i+=2)
 							{
 								draw_line(visarea, vert[i], vert[i+1]);
 							}
 						}
-						else                        // line strip
+						else // line strip
 						{
 							printf("GFX: linestrip %08X, %08X\n", w1, w2);
 						}
@@ -3001,7 +3001,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 
 		r |= (uint64_t) 0x7f << 40;
 	}
-	if (ACCESSING_BITS_24_31)           // this register returns FIFO number during check_fifo (see below)
+	if (ACCESSING_BITS_24_31) // this register returns FIFO number during check_fifo (see below)
 	{
 		r |= (m_gfx_unknown_v1 & 3) << 24;
 	}
@@ -3084,7 +3084,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 		m_gfx_unk_status &= ~0x400;
 	}
-	else if (data != 0x00a0000110520200U)       // mbuslib_regread()
+	else if (data != 0x00a0000110520200U) // mbuslib_regread()
 	{
 		// prc_read always expects a value...
 
@@ -3158,9 +3158,9 @@ void cobra_state::cobra_gfx_map(address_map &map)
 	map(0x10000000, 0x100007ff).w(FUNC(cobra_state::gfx_fifo0_w));
 	map(0x18000000, 0x180007ff).w(FUNC(cobra_state::gfx_fifo1_w));
 	map(0x1e000000, 0x1e0007ff).w(FUNC(cobra_state::gfx_fifo2_w));
-	map(0x20000000, 0x20000007).w(FUNC(cobra_state::gfx_buf_w));                            // this might really map to 0x1e000000, depending on the pagetable
+	map(0x20000000, 0x20000007).w(FUNC(cobra_state::gfx_buf_w)); // this might really map to 0x1e000000, depending on the pagetable
 	map(0x7f000000, 0x7f00ffff).ram().share("pagetable");
-	map(0xfff00000, 0xfff7ffff).rom().region("user3", 0);                   /* Boot ROM */
+	map(0xfff00000, 0xfff7ffff).rom().region("user3", 0); // Boot ROM
 	map(0xfff80000, 0xfff80007).w(FUNC(cobra_state::gfx_debug_state_w));
 	map(0xffff0000, 0xffff0007).rw(FUNC(cobra_state::gfx_unk1_r), FUNC(cobra_state::gfx_unk1_w));
 	map(0xffff0010, 0xffff001f).r(FUNC(cobra_state::gfx_fifo_r));
@@ -3180,9 +3180,9 @@ INPUT_CHANGED_MEMBER(cobra_state::coin_inserted)
 	}
 }
 
-INPUT_PORTS_START( cobra )
+INPUT_PORTS_START( bujutsu )
 	PORT_START("TEST")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH)            /* Test Button */
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH) // Test Button
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -3228,8 +3228,12 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 0)//PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 0) //PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 1) //PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( racjamdx )
+
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
@@ -3256,7 +3260,7 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 
 void cobra_state::machine_start()
 {
-	/* configure fast RAM regions for DRC */
+	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_main_ram);
 
 	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_sub_ram);
@@ -3273,8 +3277,8 @@ void cobra_state::machine_reset()
 	uint16_t *identify_device = hdd->identify_device_buffer();
 
 	// Cobra expects these settings or the BIOS fails
-	identify_device[51] = 0x0200;        /* 51: PIO data transfer cycle timing mode */
-	identify_device[67] = 0x01e0;        /* 67: minimum PIO transfer cycle time without flow control */
+	identify_device[51] = 0x0200; // 51: PIO data transfer cycle timing mode
+	identify_device[67] = 0x01e0; // 67: minimum PIO transfer cycle time without flow control
 
 	m_renderer->gfx_reset();
 
@@ -3288,17 +3292,17 @@ void cobra_state::machine_reset()
 
 void cobra_state::cobra(machine_config &config)
 {
-	/* basic machine hardware */
-	PPC603(config, m_maincpu, 100000000);      /* 603EV, 100? MHz */
-	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	// basic machine hardware
+	PPC603(config, m_maincpu, 100000000); // 603EV, 100? MHz
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); // Multiplier 1.5, Bus = 66MHz, Core = 100MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cobra_state::cobra_vblank));
 
-	PPC403GA(config, m_subcpu, 32000000);      /* 403GA, 33? MHz */
+	PPC403GA(config, m_subcpu, 32000000); // 403GA, 33? MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_sub_map);
 
-	PPC604(config, m_gfxcpu, 100000000);       /* 604, 100? MHz */
-	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	PPC604(config, m_gfxcpu, 100000000); // 604, 100? MHz
+	m_gfxcpu->set_bus_frequency(XTAL(66'666'700)); // Multiplier 1.5, Bus = 66MHz, Core = 100MHz
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
 	config.set_maximum_quantum(attotime::from_hz(15005));
@@ -3309,7 +3313,7 @@ void cobra_state::cobra(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));
 
-	/* video hardware */
+	// video hardware
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -3336,7 +3340,7 @@ void cobra_state::bujutsu(machine_config &config)
 {
 	cobra(config);
 	
-	COBRA_JVS_HOST(config, m_jvs_host, 4000000); //fixme: add the H8/3644 for proper inputs
+	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
 	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
@@ -3344,11 +3348,13 @@ void cobra_state::bujutsu(machine_config &config)
 
 void cobra_state::racjamdx(machine_config &config)
 {
+	cobra(config);
+	
 	K001604(config, m_k001604, 0);
 	m_k001604->set_layer_size(0);
 	m_k001604->set_roz_size(1);
-	m_k001604->set_txt_mem_offset(0);  // correct?
-	m_k001604->set_roz_mem_offset(0);  // correct?
+	m_k001604->set_txt_mem_offset(0); // correct?
+	m_k001604->set_roz_mem_offset(0); // correct?
 	m_k001604->set_palette(m_palette);
 }
 
@@ -3408,7 +3414,7 @@ void cobra_state::init_cobra()
 
 	// setup fake pagetable until we figure out what really maps there...
 	//m_gfx_pagetable[0x80 / 8] = 0x800001001e0001a8U;
-	m_gfx_pagetable[0x80 / 8] = 0x80000100200001a8U;        // should this map to 0x1e000000?
+	m_gfx_pagetable[0x80 / 8] = 0x80000100200001a8U; // should this map to 0x1e000000?
 }
 
 void cobra_state::init_bujutsu()
@@ -3419,7 +3425,7 @@ void cobra_state::init_bujutsu()
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
-		rom[0x62094 / 4] = 0x60000000;          // skip hardcheck()...
+		rom[0x62094 / 4] = 0x60000000; // skip hardcheck()...
 	}
 
 
@@ -3430,7 +3436,7 @@ void cobra_state::init_bujutsu()
 
 		uint32_t *rom = (uint32_t*)memregion("user3")->base();
 
-		rom[(0x022d4^4) / 4] = 0x60000000;      // skip init_raster() for now ...
+		rom[(0x022d4^4) / 4] = 0x60000000; // skip init_raster() for now ...
 
 		// calculate the checksum of the patched rom...
 		for (i=0; i < 0x20000/4; i++)
@@ -3450,20 +3456,20 @@ void cobra_state::init_bujutsu()
 	// fill in M48T58 data for now...
 	{
 		uint8_t *rom = (uint8_t*)memregion("m48t58")->base();
-		rom[0x00] = 0x47;       // G
-		rom[0x01] = 0x4e;       // N        // N = 2-player, Q = 1-player?
-		rom[0x02] = 0x36;       // 6
-		rom[0x03] = 0x34;       // 4
-		rom[0x04] = 0x35;       // 5
+		rom[0x00] = 0x47; // G
+		rom[0x01] = 0x4e; // N (N = 2-player, Q = 1-player?)
+		rom[0x02] = 0x36; // 6
+		rom[0x03] = 0x34; // 4
+		rom[0x04] = 0x35; // 5
 		rom[0x05] = 0x00;
 		rom[0x06] = 0x00;
 		rom[0x07] = 0x00;
 
 		rom[0x08] = 0x00;
 		rom[0x09] = 0x00;
-		rom[0x0a] = 0x4a;       // J
-		rom[0x0b] = 0x41;       // A
-		rom[0x0c] = 0x41;       // A
+		rom[0x0a] = 0x4a; // J
+		rom[0x0b] = 0x41; // A
+		rom[0x0c] = 0x41; // A
 		rom[0x0d] = 0x00;
 
 		// calculate checksum
@@ -3501,8 +3507,8 @@ void cobra_state::init_racjamdx()
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
-		rom[0x62094 / 4] = 0x60000000;          // skip hardcheck()...
-		rom[0x62ddc / 4] = 0x60000000;          // skip lanc_hardcheck()
+		rom[0x62094 / 4] = 0x60000000; // skip hardcheck()...
+		rom[0x62ddc / 4] = 0x60000000; // skip lanc_hardcheck()
 
 
 		// calculate the checksum of the patched rom...
@@ -3526,9 +3532,9 @@ void cobra_state::init_racjamdx()
 
 		uint32_t *rom = (uint32_t*)memregion("user3")->base();
 
-		rom[(0x02448^4) / 4] = 0x60000000;      // skip init_raster() for now ...
+		rom[(0x02448^4) / 4] = 0x60000000; // skip init_raster() for now ...
 
-		rom[(0x02438^4) / 4] = 0x60000000;      // awfully long delay loop (5000000 * 166)
+		rom[(0x02438^4) / 4] = 0x60000000; // awfully long delay loop (5000000 * 166)
 
 		// calculate the checksum of the patched rom...
 		for (int i = 0; i < 0x20000/4; i++)
@@ -3587,13 +3593,13 @@ void cobra_state::init_racjamdx()
 /*****************************************************************************/
 
 ROM_START(bujutsu)
-	ROM_REGION64_BE(0x80000, "user1", 0)        /* Main CPU program (PPC603) */
+	ROM_REGION64_BE(0x80000, "user1", 0) // Main CPU program (PPC603)
 	ROM_LOAD("645a01.33d", 0x00000, 0x80000, CRC(cb1a8683) SHA1(77b7dece84dc17e9d63242347b7202e879b9a10e) )
 
-	ROM_REGION32_BE(0x80000, "user2", 0)        /* Sub CPU program (PPC403) */
+	ROM_REGION32_BE(0x80000, "user2", 0) // Sub CPU program (PPC403)
 	ROM_LOAD("645a02.24r", 0x00000, 0x80000, CRC(7d1c31bd) SHA1(94907c4068a488a74b2fa9a486c832d380c5b184) )
 
-	ROM_REGION64_BE(0x80000, "user3", 0)        /* Gfx CPU program (PPC604) */
+	ROM_REGION64_BE(0x80000, "user3", 0) // Gfx CPU program (PPC604)
 	ROM_LOAD("645a03.u17", 0x00000, 0x80000, CRC(086abd0b) SHA1(24df439eb9828ed3842f43f5f4014a3fc746e1e3) )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
@@ -3606,13 +3612,13 @@ ROM_START(bujutsu)
 ROM_END
 
 ROM_START(racjamdx)
-	ROM_REGION64_BE(0x80000, "user1", 0)        /* Main CPU program (PPC603) */
+	ROM_REGION64_BE(0x80000, "user1", 0) // Main CPU program (PPC603)
 	ROM_LOAD( "676a01.33d", 0x000000, 0x080000, CRC(1e6238f1) SHA1(d55949d98e9e290ceb8c018ed60ca090ec16c9dd) )
 
-	ROM_REGION32_BE(0x80000, "user2", 0)        /* Sub CPU program (PPC403) */
+	ROM_REGION32_BE(0x80000, "user2", 0) // Sub CPU program (PPC403)
 	ROM_LOAD( "676a02.24r", 0x000000, 0x080000, CRC(371978ed) SHA1(c83f0cf04204212db00588df91b32122f37900f8) )
 
-	ROM_REGION64_BE(0x80000, "user3", 0)        /* Gfx CPU program (PPC604) */
+	ROM_REGION64_BE(0x80000, "user3", 0) // Gfx CPU program (PPC604)
 	ROM_LOAD( "676a03.u17", 0x000000, 0x080000, CRC(66f77cbd) SHA1(f1c7e50dbbfcc27ac011cbbb8ad2fd376c2e9056) )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
@@ -3626,5 +3632,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu,  0, bujutsu, cobra,  cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_CONTROLS ) //requires an H8/3644 for proper controls
-GAME( 1997, racjamdx, 0, racjamdx, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )
+GAME( 1997, bujutsu,  0, bujutsu,  bujutsu,  cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, racjamdx, 0, racjamdx, racjamdx, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )
