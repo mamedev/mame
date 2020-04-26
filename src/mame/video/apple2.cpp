@@ -1245,7 +1245,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 1:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1255,7 +1255,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 2:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -1265,7 +1265,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 3:
-					w >>= 7;
+					w >>= 6;
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
