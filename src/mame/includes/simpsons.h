@@ -32,6 +32,7 @@ private:
 	enum
 	{
 		TIMER_NMI,
+		TIMER_DMASTART,
 		TIMER_DMAEND
 	};
 
