@@ -351,13 +351,13 @@ namespace devices
 		, m_p_ROUT(*this, "ROUT", nlconst::magic(50.0))
 
 		{
-			register_subalias("I", m_RIN.m_P);
-			register_subalias("G", m_RIN.m_N);
-			connect(m_I, m_RIN.m_P);
+			register_subalias("I", m_RIN.P());
+			register_subalias("G", m_RIN.N());
+			connect(m_I, m_RIN.P());
 
-			register_subalias("_OP", m_ROUT.m_P);
-			register_subalias("Q", m_ROUT.m_N);
-			connect(m_Q, m_ROUT.m_P);
+			register_subalias("_OP", m_ROUT.P());
+			register_subalias("Q", m_ROUT.N());
+			connect(m_Q, m_ROUT.P());
 		}
 
 		NETLIB_RESETI()
@@ -444,8 +444,8 @@ namespace devices
 		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
 		, m_last_state(*this, "m_last_state", 0)
 		{
-			register_subalias("1", m_R.m_P);
-			register_subalias("2", m_R.m_N);
+			register_subalias("1", m_R.P());
+			register_subalias("2", m_R.N());
 		}
 
 		NETLIB_RESETI()

@@ -34,6 +34,9 @@ class tool_app_t : public plib::app
 public:
 	tool_app_t() :
 		plib::app(),
+		m_warnings(0),
+		m_errors(0),
+
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader"}), "run|validate|convert|listdevices|static|header|docheader"),
 		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
@@ -83,12 +86,27 @@ public:
 		opt_ex3(*this,     "nltool --cmd=header --tab-width=8 --line-width=80",
 				"Create the header file needed for including netlists as code."),
 		opt_ex4(*this,     "nltool --cmd static --output src/lib/netlist/generated/static_solvers.cpp src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp",
-				"Create static solvers for the MAME project."),
-
-		m_warnings(0),
-		m_errors(0)
+				"Create static solvers for the MAME project.")
 		{}
+public:
+	int execute() override;
+	pstring usage() override;
 
+	template<typename... ARGS>
+	void poutprefix(const pstring &prefix, const pstring &fmt, ARGS&&... args)
+	{
+		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
+		auto lines(plib::psplit(res, "\n", false));
+		if (lines.empty())
+			pout(prefix + "\n");
+		else
+			for (auto &l : lines)
+				pout(prefix + l + "\n");
+	}
+
+	int m_warnings;
+	int m_errors;
+private:
 	plib::option_group  opt_grp1;
 	plib::option_str_limit<unsigned> opt_cmd;
 	plib::option_vec    opt_includes;
@@ -131,24 +149,6 @@ public:
 	plib::option_example opt_ex3;
 	plib::option_example opt_ex4;
 
-	int execute() override;
-	pstring usage() override;
-
-	template<typename... ARGS>
-	void poutprefix(const pstring &prefix, const pstring &fmt, ARGS&&... args)
-	{
-		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
-		auto lines(plib::psplit(res, "\n", false));
-		if (lines.empty())
-			pout(prefix + "\n");
-		else
-			for (auto &l : lines)
-				pout(prefix + l + "\n");
-	}
-
-	int m_warnings;
-	int m_errors;
-private:
 	void run();
 	void validate();
 	void convert();
@@ -209,35 +209,36 @@ private:
 class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
-	explicit netlist_tool_callbacks_t(tool_app_t &app)
-	: m_app(app)
+	explicit netlist_tool_callbacks_t(tool_app_t &app, pstring boostlib)
+	: m_app(app), m_boostlib(boostlib)
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
 
 	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const override
 	{
-		if (m_app.opt_boostlib() == "builtin")
+		if (m_boostlib == "builtin")
 			return plib::make_unique<plib::dynlib_static>(nl_static_solver_syms);
-		if (m_app.opt_boostlib() == "generic")
+		if (m_boostlib == "generic")
 			return plib::make_unique<plib::dynlib_static>(nullptr);
 		if (NL_DISABLE_DYNAMIC_LOAD)
 			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
 
 		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return plib::make_unique<plib::dynlib>(m_app.opt_boostlib());
+		return plib::make_unique<plib::dynlib>(m_boostlib);
 	}
 
 private:
 	tool_app_t &m_app;
+	pstring    m_boostlib;
 };
 
 class netlist_tool_t : public netlist::netlist_state_t
 {
 public:
 
-	netlist_tool_t(tool_app_t &app, const pstring &aname)
-	: netlist::netlist_state_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
+	netlist_tool_t(tool_app_t &app, const pstring &aname, const pstring &boostlib)
+	: netlist::netlist_state_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app, boostlib))
 	{
 	}
 
@@ -421,7 +422,7 @@ void tool_app_t::run()
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: run needs exactly one file");
 
-	netlist_tool_t nt(*this, "netlist");
+	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	{
 		auto t_guard(t.guard());
@@ -511,7 +512,7 @@ void tool_app_t::run()
 
 void tool_app_t::validate()
 {
-	netlist_tool_t nt(*this, "netlist");
+	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: validate needs exactly one file");
@@ -555,7 +556,7 @@ void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 {
 	try
 	{
-		netlist_tool_t nt(*this, "netlist");
+		netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 		nt.log().verbose.set_enabled(false);
 		nt.log().info.set_enabled(false);
@@ -855,7 +856,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 
 void tool_app_t::create_header()
 {
-	netlist_tool_t nt(*this, "netlist");
+	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -896,7 +897,7 @@ void tool_app_t::create_header()
 
 void tool_app_t::create_docheader()
 {
-	netlist_tool_t nt(*this, "netlist");
+	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -1017,7 +1018,7 @@ void tool_app_t::create_docheader()
 
 void tool_app_t::listdevices()
 {
-	netlist_tool_t nt(*this, "netlist");
+	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);

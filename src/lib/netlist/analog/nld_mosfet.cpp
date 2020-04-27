@@ -208,14 +208,14 @@ namespace analog
 		, m_Vgs(*this, "m_Vgs", nlconst::zero())
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
 	{
-			register_subalias("S", m_SG.m_P);   // Source
-			register_subalias("G", m_SG.m_N);   // Gate
+			register_subalias("S", m_SG.P());   // Source
+			register_subalias("G", m_SG.N());   // Gate
 
-			register_subalias("D", m_DG.m_P);   // Drain
+			register_subalias("D", m_DG.P());   // Drain
 
-			connect(m_SG.m_P, m_SD.m_P);
-			connect(m_SG.m_N, m_DG.m_N);
-			connect(m_DG.m_P, m_SD.m_N);
+			connect(m_SG.P(), m_SD.P());
+			connect(m_SG.N(), m_DG.N());
+			connect(m_DG.P(), m_SD.N());
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
 			m_polarity = nlconst::magic((qtype() == FET_NMOS) ? 1.0 : -1.0);
@@ -431,12 +431,12 @@ namespace analog
 	NETLIB_UPDATE(MOSFET)
 	{
 		// FIXME: This should never be called
-		if (!m_SG.m_P.net().is_rail_net())
-			m_SG.m_P.solve_now();   // Basis
-		else if (!m_SG.m_N.net().is_rail_net())
-			m_SG.m_N.solve_now();   // Emitter
+		if (!m_SG.P().net().is_rail_net())
+			m_SG.P().solve_now();   // Basis
+		else if (!m_SG.N().net().is_rail_net())
+			m_SG.N().solve_now();   // Emitter
 		else
-			m_DG.m_N.solve_now();   // Collector
+			m_DG.N().solve_now();   // Collector
 	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)

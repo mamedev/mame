@@ -517,6 +517,8 @@ namespace netlist
 			, m_netlist(nl)
 			{ }
 
+			~netlist_object_t() = default;
+
 			PCOPYASSIGNMOVE(netlist_object_t, delete)
 
 			netlist_state_t & state() noexcept;
@@ -1094,7 +1096,7 @@ namespace netlist
 		template<class C, typename... Args>
 		void create_and_register_subdevice(const pstring &name, unique_pool_ptr<C> &dev, Args&&... args);
 
-		void register_subalias(const pstring &name, detail::core_terminal_t &term);
+		void register_subalias(const pstring &name, const detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);

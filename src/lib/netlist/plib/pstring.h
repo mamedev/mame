@@ -286,7 +286,7 @@ struct putf8_traits
 		if ((*p1 & 0xF8) == 0xF0) // NOLINT
 			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0)); // NOLINT
 
-		return 0xFFFD; // unicode-replacement character
+		return 0xFFFD; // NOLINT: unicode-replacement character
 	}
 
 	static void encode(const code_t c, string_type &s)
@@ -369,7 +369,7 @@ struct putf16_traits
 	static void encode(code_t c, string_type &s) noexcept
 	{
 		auto cu = static_cast<uint32_t>(c);
-		if (c > 0xffff)
+		if (c > 0xffff) // NOLINT
 		{ //make a surrogate pair
 			uint32_t t = ((cu - 0x10000) >> 10) + 0xd800; // NOLINT
 			cu = (cu & 0x3ff) + 0xdc00; // NOLINT
@@ -456,7 +456,7 @@ struct pwchar_traits
 		if (sizeof(wchar_t) == 2)
 		{
 			auto cu = static_cast<uint32_t>(c);
-			if (c > 0xffff)
+			if (c > 0xffff) // NOLINT
 			{ //make a surrogate pair
 				uint32_t t = ((cu - 0x10000) >> 10) + 0xd800; // NOLINT
 				cu = (cu & 0x3ff) + 0xdc00; // NOLINT
@@ -511,9 +511,9 @@ namespace std
 		result_type operator()(const argument_type & s) const
 		{
 			const typename argument_type::mem_t *string = s.c_str();
-			result_type result = 5381;
+			result_type result = 5381; // NOLINT
 			for (typename argument_type::mem_t c = *string; c != 0; c = *string++)
-				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c);
+				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c); // NOLINT
 			return result;
 		}
 	};

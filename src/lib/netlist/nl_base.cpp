@@ -603,7 +603,7 @@ namespace netlist
 	{
 	}
 
-	void device_t::register_subalias(const pstring &name, detail::core_terminal_t &term)
+	void device_t::register_subalias(const pstring &name, const detail::core_terminal_t &term)
 	{
 		pstring alias = this->name() + "." + name;
 

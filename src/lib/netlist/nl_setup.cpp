@@ -1145,15 +1145,15 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
-		case 'M': factor = nlconst::magic(1e6); break;
+		case 'M': factor = nlconst::magic(1e6); break; // NO_LINT
 		case 'k':
-		case 'K': factor = nlconst::magic(1e3); break;
-		case 'm': factor = nlconst::magic(1e-3); break;
-		case 'u': factor = nlconst::magic(1e-6); break;
-		case 'n': factor = nlconst::magic(1e-9); break;
-		case 'p': factor = nlconst::magic(1e-12); break;
-		case 'f': factor = nlconst::magic(1e-15); break;
-		case 'a': factor = nlconst::magic(1e-18); break;
+		case 'K': factor = nlconst::magic(1e3); break; // NO_LINT
+		case 'm': factor = nlconst::magic(1e-3); break; // NO_LINT
+		case 'u': factor = nlconst::magic(1e-6); break; // NO_LINT
+		case 'n': factor = nlconst::magic(1e-9); break; // NO_LINT
+		case 'p': factor = nlconst::magic(1e-12); break; // NO_LINT
+		case 'f': factor = nlconst::magic(1e-15); break; // NO_LINT
+		case 'a': factor = nlconst::magic(1e-18); break; // NO_LINT
 		default:
 			if (*p < '0' || *p > '9')
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
@@ -1335,12 +1335,12 @@ void setup_t::prepare_to_run()
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
-		if (t->m_N.net().is_rail_net() && t->m_P.net().is_rail_net())
+		if (t->N().net().is_rail_net() && t->P().net().is_rail_net())
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-				t->name(), t->m_N.net().name(), t->m_P.net().name()));
-			t->m_N.net().remove_terminal(t->m_N);
-			t->m_P.net().remove_terminal(t->m_P);
+				t->name(), t->N().net().name(), t->P().net().name()));
+			t->N().net().remove_terminal(t->N());
+			t->P().net().remove_terminal(t->P());
 			m_nlstate.remove_device(t);
 		}
 	}
