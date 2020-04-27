@@ -16,7 +16,6 @@ public:
 	gscpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_bank(*this, "bank")
 		, m_ram(*this, "ram")
 		, m_ide(*this, "ide")
 		, m_sio(*this, "sio")
@@ -24,9 +23,9 @@ public:
 
 	void gscpm(machine_config &config);
 
-private:
+protected:
 	void machine_reset() override;
-	void machine_start() override;
+
 	void gscpm_mem(address_map &map);
 	void gscpm_io(address_map &map);
 
@@ -35,10 +34,9 @@ private:
 	READ8_MEMBER( sio_r );
 	WRITE8_MEMBER( sio_w );
 
-	WRITE8_MEMBER( bank_switch_w );
+	WRITE8_MEMBER( switch_to_ram_w );
 
 	required_device<z80_device> m_maincpu;
-	required_memory_bank m_bank;
 	required_device<ram_device> m_ram;
 	required_device<ata_interface_device> m_ide;
 	required_device<z80sio_device> m_sio;
@@ -46,7 +44,8 @@ private:
 
 void gscpm_state::gscpm_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw("bank");
+	//map(0x0000, 0x3fff).rom("maincpu");  // This is ROM after reset, and RAM is switched in when CP/M is booted
+	                                       // (will install handlers dynamically)
 	map(0x4000, 0xffff).ram();
 }
 
@@ -56,7 +55,7 @@ void gscpm_state::gscpm_io(address_map &map)
 	map.unmap_value_high(); // unmapped addresses return 0xff
 	map(0x00, 0x07).rw(FUNC(gscpm_state::sio_r), FUNC(gscpm_state::sio_w));
 	map(0x10, 0x17).rw(FUNC(gscpm_state::cflash_r), FUNC(gscpm_state::cflash_w)); // compact flash
-	map(0x38, 0x3f).w(FUNC(gscpm_state::bank_switch_w));
+	map(0x38, 0x3f).w(FUNC(gscpm_state::switch_to_ram_w));
 }
 
 READ8_MEMBER( gscpm_state::cflash_r )
@@ -108,22 +107,19 @@ WRITE8_MEMBER( gscpm_state::sio_w )
 	}
 }
 
-WRITE8_MEMBER( gscpm_state::bank_switch_w )
+WRITE8_MEMBER( gscpm_state::switch_to_ram_w )
 {
-	m_bank->set_entry(1); // RAM
-}
-
-void gscpm_state::machine_start()
-{
-	driver_device::machine_start();
-	m_bank->configure_entry(0, memregion("maincpu")->base());
-	m_bank->configure_entry(1, m_ram->pointer());
+	// Install the RAM handler here
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff); // Unmap the ROM handler
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x3fff, m_ram->pointer());
 }
 
 void gscpm_state::machine_reset()
 {
 	driver_device::machine_reset();
-	m_bank->set_entry(0); // ROM
+	// Install the ROM handler here
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff);  // Unmap RAM handler if being rebooted
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x3fff, memregion("maincpu")->base());
 }
 
 // This is here only to configure our terminal for interactive use
@@ -151,7 +147,7 @@ void gscpm_state::gscpm(machine_config &config)
 	m_maincpu->set_daisy_config(gscpm_daisy_chain);
 
 	/* compact flash hard drive */
-	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", "hdd", false);
+	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
 
 	RAM(config, m_ram).set_default_size("16K"); // This shadows the ROM
 
