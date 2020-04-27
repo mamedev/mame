@@ -6,6 +6,16 @@
 #
 ###########################################################################
 
+#
+# Notes:
+#    These should go into some compile.md
+#
+#    On mingw, graphviz is needed for documentation
+#      pacman -S mingw-w64-x86_64-graphviz
+#
+# 
+#
+
 SRC = ..
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
@@ -41,8 +51,12 @@ TIDY_SOURCES = $(SOURCES)
 
 ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
+EXESUFFIX = .exe
+DOXYGEN = doxygen.exe
 else
 OBJ = obj/nix
+EXESUFFIX :=
+DOXYGEN = @./doxygen
 endif
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
@@ -57,10 +71,9 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-DOXYGEN = @./doxygen
 CLANG_TIDY = clang-tidy-10
 
-TARGETS = nltool nlwav
+TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
@@ -212,11 +225,11 @@ clean:
 # nltool
 #-------------------------------------------------
 
-nltool: $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
+nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav: $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
+nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
@@ -276,8 +289,8 @@ mingw:
 #
 
 
-doc: nltool
-	./nltool -c docheader > ../documentation/devsyn.dox.h
+doc: nltool$(EXESUFFIX)
+	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
 docw: 
