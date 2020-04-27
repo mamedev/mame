@@ -459,7 +459,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
-  MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/lib/netlist",
 }
 
 defines {
@@ -471,13 +471,13 @@ files {
 }
 
 configuration { "mingw*" }
-  linkoptions{
-	"-municode",
-  }
+	linkoptions{
+		"-municode",
+	}
 configuration { "vs*" }
-  flags {
-	"Unicode",
-  }
+	flags {
+		"Unicode",
+	}
 
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
@@ -508,7 +508,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
-  MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/lib/netlist",
 }
 
 files {
@@ -516,13 +516,13 @@ files {
 }
 
 configuration { "mingw*" }
-  linkoptions{
-	"-municode",
-  }
+	linkoptions{
+		"-municode",
+	}
 configuration { "vs*" }
-  flags {
-	"Unicode",
-  }
+	flags {
+		"Unicode",
+	}
 
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
