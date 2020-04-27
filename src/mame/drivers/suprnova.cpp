@@ -154,7 +154,6 @@ NEP-16
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -751,45 +750,20 @@ void skns_state::skns_map(address_map &map)
 
 /***** GFX DECODE *****/
 
-static const gfx_layout skns_tilemap_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-		8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	16*16*8
-};
-
-static const gfx_layout skns_4bpptilemap_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3  },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-		9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*16*4
-};
-
 static GFXDECODE_START( skns_bg )
 	/* "spritegen" is sprites, RLE encoded */
-	GFXDECODE_ENTRY( "gfx2", 0, skns_tilemap_layout, 0x000, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, skns_tilemap_layout, 0x000, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, skns_4bpptilemap_layout, 0x000, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, skns_4bpptilemap_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x8_raw, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x8_raw, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_packed_lsb, 0x000, 128 )
 GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
+// XTALs : 28.636MHz, 33.3333MHz, 21.504MHz
 void skns_state::skns(machine_config &config)
 {
-	SH2(config, m_maincpu, 28638000);
+	SH2(config, m_maincpu, XTAL(28'636'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &skns_state::skns_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(skns_state::irq), "screen", 0, 1);
@@ -805,28 +779,28 @@ void skns_state::skns(machine_config &config)
 	int11_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_msec(8));
 	int11_timer.config_param(11);
 	timer_device &int9_timer(TIMER(config, "int9_timer"));
-	int9_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_hz(28638000/1824));
+	int9_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_hz(XTAL(28'636'000)/1824));
 	int9_timer.config_param(9);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_refresh_hz(59.5971); // measured by Guru
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(340,262);
-	screen.set_visarea(0,319,0,239);
-	screen.set_screen_update(FUNC(skns_state::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(59.5971); // measured by Guru
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(340,262);
+	m_screen->set_visarea(0,319,0,239);
+	m_screen->set_screen_update(FUNC(skns_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(skns_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
 	SKNS_SPRITE(config, m_spritegen, 0);
 
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 33333333 / 2));
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'333'333) / 2));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

@@ -807,7 +807,7 @@ void gaiden_state::raiga(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
 
 	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_raiga));
-	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->screen_vblank().set(FUNC(gaiden_state::screen_vblank_raiga));
 }
 
 void gaiden_state::drgnbowl(machine_config &config)

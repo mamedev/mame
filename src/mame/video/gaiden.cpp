@@ -326,9 +326,6 @@ uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &
 
 	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, &m_tile_bitmap_tx, &m_sprite_bitmap);
 
-	// raiga sprite has 2 frame lags
-	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(3), cliprect, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
 	return 0;
 }
 
@@ -341,4 +338,17 @@ uint32_t gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind1
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 	drgnbowl_draw_sprites(screen, bitmap, cliprect);
 	return 0;
+}
+
+WRITE_LINE_MEMBER(gaiden_state::screen_vblank_raiga)
+{
+	if (state)
+	{
+		const rectangle visarea = m_screen->visible_area();
+		// raiga sprite has 2 frame lags
+		m_sprite_bitmap.fill(0, visarea);
+		m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(3), visarea, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
+
+		m_spriteram->copy();
+	}
 }
