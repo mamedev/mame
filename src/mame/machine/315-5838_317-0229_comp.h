@@ -16,11 +16,11 @@ public:
 	// construction/destruction
 	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(data_r);
+	uint16_t data_r();
 
-	DECLARE_WRITE32_MEMBER(data_w_doa);
-	DECLARE_WRITE32_MEMBER(data_w);
-	DECLARE_WRITE32_MEMBER(srcaddr_w);
+	void data_w_doa(uint32_t data, uint32_t mem_mask = ~0);
+	void data_w(uint32_t data, uint32_t mem_mask = ~0);
+	void srcaddr_w(uint32_t data, uint32_t mem_mask = ~0);
 
 	void debug_helper(int id);
 

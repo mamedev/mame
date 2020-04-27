@@ -21,8 +21,8 @@ private:
 	u16        m_asic3_hold;
 
 	void asic3_compute_hold(int,int);
-	DECLARE_READ16_MEMBER( pgm_asic3_r );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
+	u16 pgm_asic3_r();
+	void pgm_asic3_w(offs_t offset, u16 data);
 };
 
 INPUT_PORTS_EXTERN( orlegend );

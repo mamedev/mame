@@ -111,12 +111,12 @@ void tdc1008_device::device_reset()
 	m_p_out.u = 0;
 }
 
-WRITE8_MEMBER(tdc1008_device::x_w)
+void tdc1008_device::x_w(uint8_t data)
 {
 	m_x_in = data;
 }
 
-WRITE8_MEMBER(tdc1008_device::y_w)
+void tdc1008_device::y_w(uint8_t data)
 {
 	m_y_in = data;
 }
@@ -142,28 +142,28 @@ WRITE_LINE_MEMBER(tdc1008_device::tsl_w)
 		m_p_out.u = (m_p_out.u & 0x7ff00) | m_lsp_in;
 }
 
-WRITE8_MEMBER(tdc1008_device::xtp_w)
+void tdc1008_device::xtp_w(uint8_t data)
 {
 	m_xtp_in = data;
 	if (m_prel && m_tsx)
 		m_p_out.u = (m_p_out.u & 0x0ffff) | (m_xtp_in << 16);
 }
 
-WRITE8_MEMBER(tdc1008_device::msp_w)
+void tdc1008_device::msp_w(uint8_t data)
 {
 	m_msp_in = data;
 	if (m_prel && m_tsm)
 		m_p_out.u = (m_p_out.u & 0x700ff) | (m_msp_in << 8);
 }
 
-WRITE8_MEMBER(tdc1008_device::lsp_w)
+void tdc1008_device::lsp_w(uint8_t data)
 {
 	m_lsp_in = data;
 	if (m_prel && m_tsl)
 		m_p_out.u = (m_p_out.u & 0x7ff00) | m_lsp_in;
 }
 
-WRITE32_MEMBER(tdc1008_device::output_w)
+void tdc1008_device::output_w(uint32_t data)
 {
 	m_p_in = data;
 }
