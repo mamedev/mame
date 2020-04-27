@@ -66,6 +66,8 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+#include "softlist.h"
+
 class pi4d2x_state : public driver_device
 {
 public:
@@ -81,6 +83,7 @@ public:
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 1U)
 		, m_gfx(*this, "gfx")
+		, m_softlist(*this, "softlist")
 		, m_leds(*this, "led%u", 0U)
 	{
 	}
@@ -102,6 +105,7 @@ private:
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<sgi_gr1_device> m_gfx;
+	required_device<software_list_device> m_softlist;
 
 	enum leds : unsigned
 	{
@@ -764,6 +768,8 @@ void pi4d2x_state::common(machine_config &config)
 	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();
 
 	// TODO: vme slot, cpu interrupt 0
+
+	SOFTWARE_LIST(config, m_softlist).set_original("sgi_mips");
 }
 
 void pi4d3x_state::common(machine_config &config)
