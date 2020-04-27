@@ -12312,9 +12312,9 @@ rolcrush                        // (c) 1999 Trust
 rolcrusha                       // (c) 1999 SemiCom
 
 @source:drgnmst.cpp
-drgnmst                         // (c) 1994
-drgnmst2                        // (c) 1994
-mastfury
+drgnmst                         // (c) 1994 Unico
+drgnmst2                        // (c) 1994 Unico
+mastfury                        // (c) 1996 Unico + Game-Tech
 
 
 @source:dribling.cpp
@@ -15170,7 +15170,7 @@ goodejana                       // (c) 1991 Seibu/Tecmo
 totmejan                        // (c) 1991 Seibu/Tecmo
 
 @source:goori.cpp
-goori
+goori                           // (c) 1999 Unico
 
 @source:gotcha.cpp
 gotcha                          // (c) 1997 Dongsung + "presented by Para"
