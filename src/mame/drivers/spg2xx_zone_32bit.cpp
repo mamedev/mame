@@ -781,7 +781,9 @@ ROM_END
 
 ROM_START( m505neo )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	// 1st and 2nd half are identical apart from one byte.  Likely used double capacity ROM and only wired up half of it because ROM had a problem?
+	// 1st and 2nd half are identical apart from one bit.  Likely used double capacity ROM and only wired up half of it because ROM had a problem?
+	// the data segment in question is identical to one in oplayer and suggests the first half of the ROM here is correct with the bit being set
+	// incorrectly in the 2nd half of the ROM.
 	ROM_LOAD16_WORD_SWAP( "m505arcadeneo.u2", 0x0000000, 0x4000000, CRC(b72bdbe1) SHA1(263b60148980ac1f82546e2449b1dd938b7b827c) )
 	ROM_IGNORE(0x4000000)
 ROM_END
@@ -845,9 +847,8 @@ void oplayer_100in1_state::init_m505neo()
 	}
 
 	// TODO: remove these hacks
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 	// port a checks when starting the system
-	rom[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot		
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot		
 }
 
 
