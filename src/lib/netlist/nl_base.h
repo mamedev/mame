@@ -1449,13 +1449,14 @@ namespace netlist
 		{
 			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + "." + stname);
 		}
+
 		template<typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
 			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
-		detail::net_t *find_net(const pstring &name) const;
+		// FIXME: only used by queue_t save state
 		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
@@ -1577,6 +1578,8 @@ namespace netlist
 	private:
 
 		void reset();
+		detail::net_t *find_net(const pstring &name) const; // FIXME: stale
+
 		nlmempool                           m_pool; // must be deleted last!
 
 		pstring                             m_name;
