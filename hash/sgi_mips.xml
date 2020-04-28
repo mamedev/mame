@@ -3,18 +3,56 @@
 <!--
 license:CC0
 -->
-<softwarelist name="sgi_mips" description="SGI MIPS/IRIX software">
+<softwarelist name="sgi_mips" description="Sgi MIPS/IRIX software">
+
+	<software name="desktopse_1_0">
+		<description>Desktop Special Edition 1.0 for Support Customers</description>
+		<year>1995</year> <!-- 9/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0441-001. Dumped with Plextor, without C2 errors -->
+				<disk name="Desktop_Special_Edition_1_0_for_Support_Customers" sha1="66141b941c4789cf3b91620e871fd344862dafa0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="eurlang_1_3">
+		<description>European Languaje Module 1.3</description>
+		<year>1995</year> <!-- 2/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.3" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0241-003. Dumped with Plextor, without C2 errors -->
+				<disk name="European_Languaje_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freeware_2_0">
+		<description>Freeware 2.0 - Unsupported Software compatible with IRIX 6.2 and later</description>
+		<year>1996</year> <!-- 04/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="2.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0543-001. Dumped with Plextor, without C2 errors -->
+				<disk name="Freeware_2_0_Unsupported_Software_compatible_with_IRIX_6_2_and_later" sha1="0bcaee07cc0d0c47646fa4639ae5231efc7fc6e0" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="irix53">
 		<description>IRIX 5.3</description>
-		<year>1994</year>
+		<year>1994</year> <!-- 11/94 -->
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0119-006 -->
-				<disk name="irix_5_3" sha1="22ca132daa8446f95c2a8f34258b320e0d7201a1" />
+				<!-- P/N: 812-0119-006. Dumped with Plextor, without C2 errors -->
+				<disk name="irix_5_3" sha1="98e9439cd50fb28583063d980b2f19953b87f855" />
 			</diskarea>
 		</part>
 	</software>
@@ -23,7 +61,6 @@ license:CC0
 		<description>IRIX 5.3 for Indy R4400 175MHz</description>
 		<year>1994</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
@@ -37,7 +74,6 @@ license:CC0
 		<description>IRIX 6.2</description>
 		<year>1996</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom1" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
@@ -58,7 +94,6 @@ license:CC0
 		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
 		<year>1996</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom1" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
@@ -192,7 +227,6 @@ license:CC0
 		<description>Hot Mix 18</description>
 		<year>1997</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
@@ -206,12 +240,111 @@ license:CC0
 		<description>Hot Mix 19</description>
 		<year>1998</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<!-- P/N: 009-0783-008 -->
 				<disk name="hot_mix_19" sha1="37d5f6e7324f0cf9ebde4a65bae06ee3b562c96d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="i63apps_08_97">
+		<description>IRIX 6.3 Applications August_1997</description>
+		<year>1997</year> <!-- 08/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0599-003. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_3_Applications_August_1997" sha1="f5563dab406d4751ab52ef10a2cf97bf33750bf0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="i6364patch_10_97">
+		<description>IRIX 6.3 and 6.4 Recommended/Required Patches October 1997</description>
+		<year>1997</year> <!-- 10/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0688-007. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_3_and_6_4_Recommended_Required_Patches_October_1997" sha1="79e5e5d94d9f0887b5ed2f9ee48c1fb4bbcc0d5d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nfs_5_3">
+		<description>Network File System 5.3</description>
+		<year>1994</year> <!-- 11/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="5.3" />
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0128-005. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="Network_File_System_5_3" sha1="f31d02963961f1e3c687af0674c8d9a857daa4ee" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="o2demos_1_1_1">
+		<description>O2 Demos 1.1.1 for IRIX 6.3 including R10000</description>
+		<year>1997</year> <!-- 07/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.1.1" />
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0646-003. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="O2_Demos_1_1_1_for_IRIX_6_3_including_R10000" sha1="2a9331a5646e8cd8aab7475da374fa14192b6066" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="o2i63patch_8_97">
+		<description>O2 IRIX 6.3 Recommended/Required Patches August 1997</description>
+		<year>1997</year> <!-- 08/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0637-005. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="O2_IRIX_6_3_Recommended_Required_Patches_August_1997" sha1="8befb7c4ab10abc41caf5cbf3e7fb385601155e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onc3nfs_2">
+		<description>ONC3/NFS Version 2, for IRIX 6.2, 6.3 and 6.4</description>
+		<year>1997</year> <!-- 02/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="2" />
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0305-009. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="ONC3_NFS_Version_2_for_IRIX_6_2_6_3_and_6_4" sha1="29567c0545c2d7698d35e6f3a23d4ec1a8b9f129" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_sg0000466">
+		<description>Patch SG0000466</description>
+		<year>1995</year> <!-- 4/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0355-001. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="Patch_SG0000466" sha1="830782ab34d8e6b1014e1d9af59c345819f92041" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="softwin95_4_0">
+		<description>Insignia SoftWindows 95 4.0 for IRIX 6.3 and 6.4</description>
+		<year>1997</year> <!-- 08/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="4.0" />
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0690-001. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="Insignia_SoftWindows_95_4_0_for_IRIX_6_3_and_6_4" sha1="59419295ccceb168b58408f8ed62f50d14d27c52" />
 			</diskarea>
 		</part>
 	</software>
