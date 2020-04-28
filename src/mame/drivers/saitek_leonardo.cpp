@@ -162,8 +162,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,     0,  leo,    leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1986, leonardoa, 0,     0,  leo,    leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    CMP MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, leonardo,  0,        0,  leo,    leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1986, leonardoa, leonardo, 0,  leo,    leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1988, galileo,   0,     0,  leo,    leo,  leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, galileo,   0,        0,  leo,    leo,  leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
