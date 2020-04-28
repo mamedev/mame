@@ -5,6 +5,60 @@ license:CC0
 -->
 <softwarelist name="sgi_mips" description="Sgi MIPS/IRIX software">
 
+	<!-- Apps and utilities -->
+
+	<software name="cde_4_3">
+		<description>Common Desktop Environment 4.3</description>
+		<year>1998</year> <!-- 12/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0898-001-->
+				<disk name="common_desktop_environment_4_3" sha1="5d365a5dbaef2a2a2303136325a2bf27340ad267" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cosmo_1_1_1">
+		<description>Cosmo Compress 1.1.1</description>
+		<year>1994</year> <!-- 11/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0310-002 -->
+				<disk name="cosmo_compress_1_1_1" sha1="155b5a7df796ca60db44a9af32977fd0cde25fa0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dba_3_0">
+		<description>Database Accelerator 3.0</description>
+		<year>1998</year> <!-- 7/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0776-001 -->
+				<disk name="database_accelerator_3_0" sha1="5485a93d19ae3e42bbe48e07ad35b0900eb6f38e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="deskse_1_1">
+		<description>Desktop Special Edition 1.1</description>
+		<year>1995</year> <!-- 11/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 813-0410-002 -->
+				<disk name="desktop_special_edition_1_1" sha1="4f740d11eb60da5fadcd4a3003aca88ff81d7ae3" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="desktopse_1_0">
 		<description>Desktop Special Edition 1.0 for Support Customers</description>
 		<year>1995</year> <!-- 9/95 -->
@@ -14,6 +68,19 @@ license:CC0
 			<diskarea name="cdrom">
 				<!-- P/N: 812-0441-001. Dumped with Plextor, without C2 errors -->
 				<disk name="Desktop_Special_Edition_1_0_for_Support_Customers" sha1="66141b941c4789cf3b91620e871fd344862dafa0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="enldsm_1_1">
+		<description>ENlightenDSM 1.1 for UNIX and NT</description>
+		<year>1998</year> <!-- 7/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0739-003 -->
+				<disk name="enlightendsm_1_1" sha1="22dc0a8c6b3a5a30606dd58ad13093c47abd342f" />
 			</diskarea>
 		</part>
 	</software>
@@ -57,24 +124,18 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="freeware_1_05_00">
-		<description>Freeware Part 1 of 2 May 2000</description>
+	<software name="freeware_05_00">
+		<description>Freeware May 2000</description>
 		<year>2000</year> <!-- 05/00 -->
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<!-- P/N: 812-0773-008 -->
 				<disk name="freeware_part_1_of_2_may_2000" sha1="9b27202272b00c48b7257a7f0ad46f5a8cfaeb1b" />
 			</diskarea>
 		</part>
-	</software>
-
-	<software name="freeware_2_05_00">
-		<description>Freeware Part 2 of 2 May 2000</description>
-		<year>2000</year> <!-- 05/00 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom2" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<!-- P/N: 812-0964-008 -->
@@ -83,257 +144,65 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="irix52">
-		<description>IRIX 5.2</description>
-		<year>1994</year> <!-- 05/94 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: BitSavers -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0119-005 -->
-				<disk name="irix_5_2" sha1="455b49a0707cb8b9dbd41263177aa65acd8f9014" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="irix52a" cloneof="irix52">
-		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
-		<year>1994</year> <!-- 08/94 -->
+	<software name="gauntlet_4_1_i">
+		<description>Gauntlet 4.1 INTERNATIONAL for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year> <!-- 8/98 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0279-003 -->
-				<disk name="irix_5_2_for_indy_r4600sc_xz_and_presenter" sha1="5f81496d2291e80d8d0bd5b0c470725fc6214ab4" />
+				<!-- P/N: 812-0821-001 -->
+				<disk name="gauntlet_4_1_international" sha1="ef75e8aa98c58d0e47efe9d6c27bfbdb6aae5563" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="irix53">
-		<description>IRIX 5.3</description>
-		<year>1994</year> <!-- 11/94 -->
+	<software name="idemos_6_2">
+		<description>IMPACT Demos CD 6.2</description>
+		<year>1996</year> <!-- 03/96 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0119-006. Dumped with Plextor, without C2 errors -->
-				<disk name="irix_5_3" sha1="98e9439cd50fb28583063d980b2f19953b87f855" />
+				<!-- P/N: 812-0527-001 -->
+				<disk name="impact_demos_cd_6_2" sha1="7c8bda4a31698518a930d47d9249074bce551084" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="irix53a" cloneof="irix53">
-		<description>IRIX 5.3 for Indy R4400 175MHz</description>
-		<year>1994</year>
+	<software name="idmedia_2_1">
+		<description>IMPACT Digital Media 2.1</description>
+		<year>1996</year> <!-- 03/96 -->
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: BitSavers -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0336-001 -->
-				<disk name="irix_5_3_for_indy_r4400_175mhz" sha1="dcc05e3637e4ab20c4fceb43bded2f1f2bd64518" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="irix62">
-		<description>IRIX 6.2</description>
-		<year>1996</year>
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom1" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0469-001 -->
-				<disk name="irix_6_2_part_1_of_2" sha1="714ad598cde6a48132005e4728e7e7d18fdbbb1b" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0470-001 -->
-				<disk name="irix_6_2_part_2_of_2" sha1="521a97cadc91f3380245b59e65ca0f7ad113193f" />
-			</diskarea>
-		</part>
-	</software>
-	
-	<software name="irix62a" cloneof="irix62">
-		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
-		<year>1996</year>
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom1" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0469-002 -->
-				<disk name="irix_6_2_with_indigo_impact_10000_part_1_of_2" sha1="b96f6a259717f17dce0b94ca25f90a7627884c8d" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0470-002 -->
-				<disk name="irix_6_2_with_indigo_impact_10000_part_2_of_2" sha1="4415d90fb313e0c70949dedae17e075035aeced8" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="apps62aug96">
-		<description>IRIX 6.2 Applications August 1996</description>
-		<year>1996</year>
-		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0542-002 -->
-				<disk name="irix_6_2_applications_august_1996" sha1="f0d844608715403cd59b7cc99ad8b5bb93a1396c" />
+				<!-- P/N: 812-0526-002 -->
+				<disk name="impact_digital_media_2_1" sha1="f83d3a881087dad31d1b6bc0eda2e013aa9e5496" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="indizone2">
-		<description>IndiZone^2</description>
-		<year>1994</year>
-		<publisher>Silicon Graphics</publisher>
-		<info name="version" value="1.0" />
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8111-001 -->
-				<disk name="indizone_2" sha1="f48a7809271c3279d4d7791937e4fb28fc1e7033" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="indizone3">
-		<description>IndiZone^3</description>
-		<year>1995</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8111-003 -->
-				<disk name="indizone_3" sha1="16b006b8423457262d1e709d0c7f410901bd7d8b" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix4">
-		<description>Hot Mix 4</description>
-		<year>1993</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: archive.org -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8101-004 -->
-				<disk name="hot_mix_4" sha1="02568e80964b4954ff58b690e6471570a4142614" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix8">
-		<description>Hot Mix Volume 8</description>
-		<year>1994</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: unknown -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8101-008 -->
-				<disk name="hot_mix_volume_8" sha1="ee725db3a52ff482e03b7806889763619f584859" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix11">
-		<description>Hot Mix Volume 11</description>
-		<year>1994</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8101-011 -->
-				<disk name="hot_mix_volume_11" sha1="ee725db3a52ff482e03b7806889763619f584859" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix12">
-		<description>Hot Mix Volume 12</description>
-		<year>1994</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-8101-012 -->
-				<disk name="hot_mix_volume_12" sha1="ee725db3a52ff482e03b7806889763619f584859" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix17">
-		<description>Hot Mix Volume 17</description>
-		<year>1997</year>
-		<publisher>Silicon Graphics</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 009-0783-006 -->
-				<disk name="hot_mix_volume_17" sha1="38556d496390edf9232cae0a10701452c5b07c67" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix18">
-		<description>Hot Mix 18</description>
-		<year>1997</year>
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: BitSavers -->
-			<diskarea name="cdrom">
-				<!-- P/N: 009-0783-007 -->
-				<disk name="hot_mix_18" sha1="cee0ea521f66d876d4b6a43f92567b1634159956" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="hotmix19">
-		<description>Hot Mix 19</description>
+	<software name="ideas_6">
+		<description>I-DEAS Master Series Release 6</description>
 		<year>1998</year>
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: BitSavers -->
+		<publisher>SDRC</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 009-0783-008 -->
-				<disk name="hot_mix_19" sha1="37d5f6e7324f0cf9ebde4a65bae06ee3b562c96d" />
+				<disk name="i_deas_master_series_volume_1" sha1="ca8d9c1d4c9370766e373289afdd2e90f810b613" />
 			</diskarea>
 		</part>
-	</software>
-
-	<software name="i63apps_08_97">
-		<description>IRIX 6.3 Applications August_1997</description>
-		<year>1997</year> <!-- 08/97 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- P/N: 812-0599-003. Dumped with Plextor, without C2 errors -->
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="IRIX_6_3_Applications_August_1997" sha1="f5563dab406d4751ab52ef10a2cf97bf33750bf0" />
+				<disk name="i_deas_master_series_volume_2" sha1="7ca9c238dbbdff5eb27c02ad1c4121e210eb4e0e" />
 			</diskarea>
 		</part>
-	</software>
-
-	<software name="i6364patch_10_97">
-		<description>IRIX 6.3 and 6.4 Recommended/Required Patches October 1997</description>
-		<year>1997</year> <!-- 10/97 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- P/N: 812-0688-007. Dumped with Plextor, without C2 errors -->
+		<part name="cdrom3" interface="cdrom">
+			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="IRIX_6_3_and_6_4_Recommended_Required_Patches_October_1997" sha1="79e5e5d94d9f0887b5ed2f9ee48c1fb4bbcc0d5d" />
+				<disk name="i_deas_master_series_volume_3" sha1="97e556c28857ab0cb9b23c543ccd10c882bc58d2" />
 			</diskarea>
 		</part>
 	</software>
@@ -364,18 +233,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="o2i63patch_8_97">
-		<description>O2 IRIX 6.3 Recommended/Required Patches August 1997</description>
-		<year>1997</year> <!-- 08/97 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- P/N: 812-0637-005. Dumped with Plextor, without C2 errors -->
-			<diskarea name="cdrom">
-				<disk name="O2_IRIX_6_3_Recommended_Required_Patches_August_1997" sha1="8befb7c4ab10abc41caf5cbf3e7fb385601155e4" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="onc3nfs_2">
 		<description>ONC3/NFS Version 2, for IRIX 6.2, 6.3 and 6.4</description>
 		<year>1997</year> <!-- 02/97 -->
@@ -385,18 +242,6 @@ license:CC0
 			<!-- P/N: 812-0305-009. Dumped with Plextor, without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="ONC3_NFS_Version_2_for_IRIX_6_2_6_3_and_6_4" sha1="29567c0545c2d7698d35e6f3a23d4ec1a8b9f129" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="patch_sg0000466">
-		<description>Patch SG0000466</description>
-		<year>1995</year> <!-- 4/95 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- P/N: 812-0355-001. Dumped with Plextor, without C2 errors -->
-			<diskarea name="cdrom">
-				<disk name="Patch_SG0000466" sha1="830782ab34d8e6b1014e1d9af59c345819f92041" />
 			</diskarea>
 		</part>
 	</software>
@@ -415,7 +260,7 @@ license:CC0
 	</software>
 
 	<software name="softwin95_5_0">
-		<description>SoftWindows 95 5.0 for IRIX 6.5</description>
+		<description>Insignia SoftWindows 95 5.0 for IRIX 6.5</description>
 		<year>1998</year> <!-- 06/98 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -427,131 +272,327 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cde43">
-		<description>Common Desktop Environment 4.3</description>
-		<year>1998</year> <!-- 12/98 -->
+	<!-- Hot Mix -->
+
+	<software name="hotmix_4">
+		<description>Hot Mix 4</description>
+		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
+
 		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
+			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0898-001-->
-				<disk name="common_desktop_environment_4_3" sha1="5d365a5dbaef2a2a2303136325a2bf27340ad267" />
+				<!-- P/N: 812-8101-004 -->
+				<disk name="hot_mix_4" sha1="02568e80964b4954ff58b690e6471570a4142614" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="cosmo111">
-		<description>Cosmo Compress 1.1.1</description>
+	<software name="hotmix_8">
+		<description>Hot Mix Volume 8</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-8101-008 -->
+				<disk name="hot_mix_volume_8" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_11">
+		<description>Hot Mix Volume 11</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-8101-011 -->
+				<disk name="hot_mix_volume_11" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_12">
+		<description>Hot Mix Volume 12</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-8101-012 -->
+				<disk name="hot_mix_volume_12" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_17">
+		<description>Hot Mix Volume 17</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 009-0783-006 -->
+				<disk name="hot_mix_volume_17" sha1="38556d496390edf9232cae0a10701452c5b07c67" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_18">
+		<description>Hot Mix 18</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<!-- P/N: 009-0783-007 -->
+				<disk name="hot_mix_18" sha1="cee0ea521f66d876d4b6a43f92567b1634159956" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Different P/N -->
+	<software name="hotmix_18_a" cloneof="hotmix_18">
+		<description>Hot Mix 18 - Explore Tools and Technologies for Silicon Graphics</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0544-007 -->
+				<disk name="Hot_Mix_18_Explore_Tools_and_Technologies_for_Silicon_Graphics" sha1="fc697b2c6b518ef2f760b8196f0884d8abd32900" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hotmix_19">
+		<description>Hot Mix 19</description>
+		<year>1998</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<!-- P/N: 009-0783-008 -->
+				<disk name="hot_mix_19" sha1="37d5f6e7324f0cf9ebde4a65bae06ee3b562c96d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- IndyZone -->
+
+	<software name="indizone_2">
+		<description>IndiZone^2</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<info name="version" value="1.0" />
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-8111-001 -->
+				<disk name="indizone_2" sha1="f48a7809271c3279d4d7791937e4fb28fc1e7033" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="indizone_3">
+		<description>IndiZone^3</description>
+		<year>1995</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-8111-003 -->
+				<disk name="indizone_3" sha1="16b006b8423457262d1e709d0c7f410901bd7d8b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- SupportFolio -->
+
+	<software name="sfolio_5_96">
+		<description>SupportFolio 5/96</description>
+		<year>1996</year> <!-- 5/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0508-001. Dumped with Plextor, without C2 errors -->
+				<disk name="SupportFolio_Information_Resources_5_96" sha1="0bc454826a392016d94ad5ac958b54c341780237" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0515-001. Dumped with Plextor, without C2 errors -->
+				<disk name="SupportFolio_IRIX_Patches_5_96" sha1="4b5a4ca28466bbbde48268c1a1aae3cb352be3f5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- IRIX Applications (loose CDs not bundled with an IRIX) -->
+
+	<software name="apps_6_2_aug_96">
+		<description>IRIX 6.2 Applications August 1996</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0542-002 -->
+				<disk name="irix_6_2_applications_august_1996" sha1="f0d844608715403cd59b7cc99ad8b5bb93a1396c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="apps_6_3_aug_97">
+		<description>IRIX 6.3 Applications August_1997</description>
+		<year>1997</year> <!-- 08/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0599-003. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_3_Applications_August_1997" sha1="f5563dab406d4751ab52ef10a2cf97bf33750bf0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- IRIX patches (loose CDs) -->
+
+	<software name="patch_sg0000466">
+		<description>Patch SG0000466</description>
+		<year>1995</year> <!-- 4/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0355-001. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="Patch_SG0000466" sha1="830782ab34d8e6b1014e1d9af59c345819f92041" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_6_3_6_4_oct_97">
+		<description>IRIX 6.3 and 6.4 Recommended/Required Patches October 1997</description>
+		<year>1997</year> <!-- 10/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0688-007. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_3_and_6_4_Recommended_Required_Patches_October_1997" sha1="79e5e5d94d9f0887b5ed2f9ee48c1fb4bbcc0d5d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_o2_6_3_aug_97">
+		<description>O2 IRIX 6.3 Recommended/Required Patches August 1997</description>
+		<year>1997</year> <!-- 08/97 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- P/N: 812-0637-005. Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="O2_IRIX_6_3_Recommended_Required_Patches_August_1997" sha1="8befb7c4ab10abc41caf5cbf3e7fb385601155e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- IRIX Operating System images -->
+
+	<software name="irix_5_2">
+		<description>IRIX 5.2</description>
+		<year>1994</year> <!-- 05/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: BitSavers -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0119-005 -->
+				<disk name="irix_5_2" sha1="455b49a0707cb8b9dbd41263177aa65acd8f9014" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_a" cloneof="irix52">
+		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
+		<year>1994</year> <!-- 08/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0279-003 -->
+				<disk name="irix_5_2_for_indy_r4600sc_xz_and_presenter" sha1="5f81496d2291e80d8d0bd5b0c470725fc6214ab4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_3">
+		<description>IRIX 5.3</description>
 		<year>1994</year> <!-- 11/94 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0310-002 -->
-				<disk name="cosmo_compress_1_1_1" sha1="155b5a7df796ca60db44a9af32977fd0cde25fa0" />
+				<!-- P/N: 812-0119-006. Dumped with Plextor, without C2 errors -->
+				<disk name="irix_5_3" sha1="98e9439cd50fb28583063d980b2f19953b87f855" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="dba30">
-		<description>Database Accelerator 3.0</description>
-		<year>1998</year> <!-- 7/98 -->
+	<software name="irix_5_3_a" cloneof="irix53">
+		<description>IRIX 5.3 for Indy R4400 175MHz</description>
+		<year>1994</year>
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
+			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
-				<!-- P/N: 812-0776-001 -->
-				<disk name="database_accelerator_3_0" sha1="5485a93d19ae3e42bbe48e07ad35b0900eb6f38e" />
+				<!-- P/N: 812-0336-001 -->
+				<disk name="irix_5_3_for_indy_r4400_175mhz" sha1="dcc05e3637e4ab20c4fceb43bded2f1f2bd64518" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="deskse11">
-		<description>Desktop Special Edition 1.1</description>
-		<year>1995</year> <!-- 11/95 -->
+	<software name="irix_6_2">
+		<description>IRIX 6.2</description>
+		<year>1996</year>
 		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 813-0410-002 -->
-				<disk name="desktop_special_edition_1_1" sha1="4f740d11eb60da5fadcd4a3003aca88ff81d7ae3" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="enldsm11">
-		<description>ENlightenDSM 1.1 for UNIX and NT</description>
-		<year>1998</year> <!-- 7/98 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0739-003 -->
-				<disk name="enlightendsm_1_1" sha1="22dc0a8c6b3a5a30606dd58ad13093c47abd342f" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="gauntlet41i">
-		<description>Gauntlet 4.1 INTERNATIONAL for IRIX 6.2, 6.3, 6.4 and 6.5</description>
-		<year>1998</year> <!-- 8/98 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0821-001 -->
-				<disk name="gauntlet_4_1_international" sha1="ef75e8aa98c58d0e47efe9d6c27bfbdb6aae5563" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="idemos62">
-		<description>IMPACT Demos CD 6.2</description>
-		<year>1996</year> <!-- 03/96 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0527-001 -->
-				<disk name="impact_demos_cd_6_2" sha1="7c8bda4a31698518a930d47d9249074bce551084" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="idmedia21">
-		<description>IMPACT Digital Media 2.1</description>
-		<year>1996</year> <!-- 03/96 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<!-- P/N: 812-0526-002 -->
-				<disk name="impact_digital_media_2_1" sha1="f83d3a881087dad31d1b6bc0eda2e013aa9e5496" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="ideas6">
-		<description>I-DEAS Master Series Release 6</description>
-		<year>1998</year>
-		<publisher>SDRC</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="i_deas_master_series_volume_1" sha1="ca8d9c1d4c9370766e373289afdd2e90f810b613" />
+				<!-- P/N: 812-0469-001 -->
+				<disk name="irix_6_2_part_1_of_2" sha1="714ad598cde6a48132005e4728e7e7d18fdbbb1b" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="i_deas_master_series_volume_2" sha1="7ca9c238dbbdff5eb27c02ad1c4121e210eb4e0e" />
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<disk name="i_deas_master_series_volume_3" sha1="97e556c28857ab0cb9b23c543ccd10c882bc58d2" />
+				<!-- P/N: 812-0470-001 -->
+				<disk name="irix_6_2_part_2_of_2" sha1="521a97cadc91f3380245b59e65ca0f7ad113193f" />
 			</diskarea>
 		</part>
 	</software>
+	
+	<software name="irix_6_2_a" cloneof="irix62">
+		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0469-002 -->
+				<disk name="irix_6_2_with_indigo_impact_10000_part_1_of_2" sha1="b96f6a259717f17dce0b94ca25f90a7627884c8d" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0470-002 -->
+				<disk name="irix_6_2_with_indigo_impact_10000_part_2_of_2" sha1="4415d90fb313e0c70949dedae17e075035aeced8" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
