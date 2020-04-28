@@ -225,7 +225,7 @@ namespace plib {
 
 		T* allocate(std::size_t n)
 		{
-			return reinterpret_cast<T *>(m_a.allocate(ALIGN, sizeof(T) * n));
+			return reinterpret_cast<T *>(m_a.allocate(ALIGN, sizeof(T) * n)); //NOLINT
 		}
 
 		void deallocate(T* p, std::size_t n) noexcept

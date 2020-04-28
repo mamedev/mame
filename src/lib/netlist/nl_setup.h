@@ -438,7 +438,7 @@ namespace netlist
 		// helpers
 		static pstring termtype_as_str(detail::core_terminal_t &in);
 
-		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
+		devices::nld_base_proxy *get_d_a_proxy(const detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
@@ -448,7 +448,7 @@ namespace netlist
 		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
-		std::unordered_map<detail::core_terminal_t *,
+		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>              m_proxies;
 
 		unsigned m_proxy_cnt;

@@ -264,9 +264,9 @@ namespace netlist
 		virtual ~logic_family_desc_t() noexcept = default;
 
 		virtual unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_output_t *proxied) const = 0;
+				const logic_output_t *proxied) const = 0;
 		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_input_t *proxied) const = 0;
+				const logic_input_t *proxied) const = 0;
 
 		nl_fptype low_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
 		nl_fptype high_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_high_thresh_PCNT; }
@@ -468,9 +468,7 @@ namespace netlist
 		/// \brief The base class for netlist devices, terminals and parameters.
 		///
 		///  This class serves as the base class for all device, terminal and
-		///  objects. It provides new and delete operators to support e.g. pooled
-		///  memory allocation to enhance locality. Please refer to \ref NL_USE_MEMPOOL as
-		///  well.
+		///  objects.
 
 		class object_t
 		{
@@ -621,8 +619,7 @@ namespace netlist
 			void clear_net() noexcept { m_net = nullptr; }
 			bool has_net() const noexcept { return (m_net != nullptr); }
 
-			const net_t & net() const noexcept { return *m_net;}
-			net_t & net() noexcept { return *m_net;}
+			net_t & net() const noexcept { return *m_net;}
 
 			bool is_logic() const noexcept;
 			bool is_logic_input() const noexcept;
@@ -838,7 +835,7 @@ namespace netlist
 			}
 		}
 
-		void solve_now();
+		void solve_now() const;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 

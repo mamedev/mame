@@ -186,7 +186,6 @@ namespace analog
 		//NETLIB_UPDATEI() { }
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(twoterm)::reset();
 			set_R(std::max(m_R(), exec().gmin()));
 		}
 

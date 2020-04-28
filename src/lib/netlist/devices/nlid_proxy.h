@@ -27,7 +27,7 @@ namespace devices
 	{
 	public:
 		nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_t *inout_proxied);
+				const logic_t *inout_proxied);
 
 		// only used during setup
 		virtual detail::core_terminal_t &proxy_term() noexcept = 0;
@@ -51,7 +51,7 @@ namespace devices
 
 	protected:
 		nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_input_t *in_proxied);
+				const logic_input_t *in_proxied);
 
 	};
 
@@ -59,7 +59,7 @@ namespace devices
 	{
 	public:
 		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_input_t *in_proxied);
+			const logic_input_t *in_proxied);
 
 		logic_output_t &out() noexcept override { return m_Q; }
 
@@ -89,7 +89,7 @@ namespace devices
 
 	protected:
 		nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_output_t *out_proxied);
+				const logic_output_t *out_proxied);
 
 	};
 
@@ -97,7 +97,7 @@ namespace devices
 	{
 	public:
 		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_output_t *out_proxied);
+			const logic_output_t *out_proxied);
 
 		logic_input_t &in() noexcept override { return m_I; }
 

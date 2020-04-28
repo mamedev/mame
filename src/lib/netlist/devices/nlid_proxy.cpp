@@ -18,7 +18,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
-		logic_t *inout_proxied)
+		const logic_t *inout_proxied)
 		: device_t(anetlist, name)
 		, m_tp(nullptr)
 		, m_tn(nullptr)
@@ -69,12 +69,12 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_input_t *in_proxied)
+			const logic_input_t *in_proxied)
 	: nld_base_proxy(anetlist, name, in_proxied)
 	{
 	}
 
-	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *in_proxied)
 	: nld_base_a_to_d_proxy(anetlist, name, in_proxied)
 	, m_Q(*this, "Q")
 	, m_I(*this, "I")
@@ -106,12 +106,12 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_output_t *out_proxied)
+			const logic_output_t *out_proxied)
 	: nld_base_proxy(anetlist, name, out_proxied)
 	{
 	}
 
-	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied)
+	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied)
 	, m_I(*this, "I")
 	, m_RP(*this, "RP")

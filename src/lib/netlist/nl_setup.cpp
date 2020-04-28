@@ -577,11 +577,11 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	return (ret == m_params.end() ? nullptr : ret->second.param());
 }
 
-devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
+devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
-	auto &out_cast = static_cast<logic_output_t &>(out);
+	const auto &out_cast = static_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
 
 	if (iter_proxy != m_proxies.end())
@@ -622,7 +622,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
 	nl_assert(inp.is_logic());
 
-	auto &incast = dynamic_cast<logic_input_t &>(inp);
+	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
 
 	auto iter_proxy(m_proxies.find(&inp));
 
@@ -668,7 +668,7 @@ detail::core_terminal_t &setup_t::resolve_proxy(detail::core_terminal_t &term)
 {
 	if (term.is_logic())
 	{
-		auto &out = dynamic_cast<logic_t &>(term);
+		const auto &out = dynamic_cast<const logic_t &>(term);
 		auto iter_proxy(m_proxies.find(&out));
 		if (iter_proxy != m_proxies.end())
 			return iter_proxy->second->proxy_term();
@@ -777,7 +777,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 	}
 }
 
-void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
+void setup_t::connect_terminals(detail::core_terminal_t &t1,detail::core_terminal_t &t2)
 {
 	if (t1.has_net() && t2.has_net())
 	{
@@ -1145,15 +1145,15 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
-		case 'M': factor = nlconst::magic(1e6); break; // NO_LINT
+		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
 		case 'k':
-		case 'K': factor = nlconst::magic(1e3); break; // NO_LINT
-		case 'm': factor = nlconst::magic(1e-3); break; // NO_LINT
-		case 'u': factor = nlconst::magic(1e-6); break; // NO_LINT
-		case 'n': factor = nlconst::magic(1e-9); break; // NO_LINT
-		case 'p': factor = nlconst::magic(1e-12); break; // NO_LINT
-		case 'f': factor = nlconst::magic(1e-15); break; // NO_LINT
-		case 'a': factor = nlconst::magic(1e-18); break; // NO_LINT
+		case 'K': factor = nlconst::magic(1e3); break; // NOLINT
+		case 'm': factor = nlconst::magic(1e-3); break; // NOLINT
+		case 'u': factor = nlconst::magic(1e-6); break; // NOLINT
+		case 'n': factor = nlconst::magic(1e-9); break; // NOLINT
+		case 'p': factor = nlconst::magic(1e-12); break; // NOLINT
+		case 'f': factor = nlconst::magic(1e-15); break; // NOLINT
+		case 'a': factor = nlconst::magic(1e-18); break; // NOLINT
 		default:
 			if (*p < '0' || *p > '9')
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
@@ -1174,16 +1174,16 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 public:
 	logic_family_std_proxy_t() = default;
 	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override;
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+			const pstring &name, const logic_output_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
 };
 
 unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
-		const pstring &name, logic_output_t *proxied) const
+		const pstring &name, const logic_output_t *proxied) const
 {
 	return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
 {
 	return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
