@@ -145,6 +145,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP  MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, renaissa,  0,     0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1989, renaissaa, 0,     0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    CMP  MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1989, renaissa,  0,        0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, renaissaa, renaissa, 0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
