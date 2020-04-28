@@ -630,18 +630,6 @@ namespace netlist
 		state().setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 	}
 
-	// FIXME: this is only used by solver code since matrix solvers are started in
-	//        post_start.
-	void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
-	{
-		if (!state().setup().connect(t1, t2))
-		{
-			log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-		}
-	}
-
-
 	// -----------------------------------------------------------------------------
 	// family_setter_t
 	// -----------------------------------------------------------------------------

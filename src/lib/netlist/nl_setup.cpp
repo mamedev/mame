@@ -1036,16 +1036,6 @@ void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 	}
 }
 
-log_type &setup_t::log()
-{
-	return m_nlstate.log();
-}
-const log_type &setup_t::log() const
-{
-	return m_nlstate.log();
-}
-
-
 // ----------------------------------------------------------------------------------------
 // Models
 // ----------------------------------------------------------------------------------------
@@ -1339,8 +1329,8 @@ void setup_t::prepare_to_run()
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
 				t->name(), t->N().net().name(), t->P().net().name()));
-			t->N().net().remove_terminal(t->N());
-			t->P().net().remove_terminal(t->P());
+			t->setup_N().net().remove_terminal(t->setup_N());
+			t->setup_P().net().remove_terminal(t->setup_P());
 			m_nlstate.remove_device(t);
 		}
 	}

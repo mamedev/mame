@@ -51,7 +51,11 @@ namespace solver
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
-		connect_post_start(m_fb_sync, m_Q_sync);
+		if (!anetlist.setup().connect(m_fb_sync, m_Q_sync))
+		{
+			log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+		}
 		setup_base(nets);
 
 		// now setup the matrix

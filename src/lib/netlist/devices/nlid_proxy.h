@@ -103,7 +103,7 @@ namespace devices
 
 		detail::core_terminal_t &proxy_term() noexcept override
 		{
-			return m_RN.P();
+			return m_RN.setup_P();
 		}
 
 	protected:

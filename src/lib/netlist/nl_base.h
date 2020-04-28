@@ -1098,7 +1098,6 @@ namespace netlist
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
-		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2) noexcept(false);
 	protected:
 
 		NETLIB_UPDATEI() { }

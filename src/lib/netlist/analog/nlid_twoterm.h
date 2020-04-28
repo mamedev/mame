@@ -89,7 +89,7 @@ namespace analog
 		void solve_now() const;
 
 		template <typename F>
-		void change_state(F f, netlist_time delay = netlist_time::quantum())
+		void change_state(F f, netlist_time delay = netlist_time::quantum()) const
 		{
 			auto *solv(solver());
 			if (solv)
@@ -126,21 +126,37 @@ namespace analog
 			m_N.set_go_gt_I(a21, a22, rhs2);
 		}
 
-		/// \brief Get a reference to the m_P terminal
+		/// \brief Get a const reference to the m_P terminal
 		///
 		/// This is typically called during initialization to connect
 		/// terminals.
 		///
 		/// \returns Reference to m_P terminal.
-		terminal_t &P() noexcept { return m_P; }
+		const terminal_t &P() const noexcept { return m_P; }
 
-		/// \brief Get a reference to the m_N terminal
+		/// \brief Get a const reference to the m_N terminal
 		///
 		/// This is typically called during initialization to connect
 		/// terminals.
 		///
 		/// \returns Reference to m_N terminal.
-		terminal_t &N() noexcept { return m_N; }
+		const terminal_t &N() const noexcept { return m_N; }
+
+		/// \brief Get a reference to the m_P terminal
+		///
+		/// This call is only allowed from the core. Device code should never
+		/// need to call this.
+		///
+		/// \returns Reference to m_P terminal.
+		terminal_t &setup_P() noexcept { return m_P; }
+
+		/// \brief Get a reference to the m_N terminal
+		///
+		/// This call is only allowed from the core. Device code should never
+		/// need to call this.
+		///
+		/// \returns Reference to m_P terminal.
+		terminal_t &setup_N() noexcept { return m_N; }
 
 	private:
 		terminal_t m_P;
