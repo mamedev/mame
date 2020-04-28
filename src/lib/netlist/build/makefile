@@ -10,10 +10,14 @@
 # Notes:
 #    These should go into some compile.md
 #
-#    On mingw, graphviz is needed for documentation
-#      pacman -S mingw-w64-x86_64-graphviz
+#    Mingw notes:
 #
-# 
+#		graphviz is needed for documentation
+#      		pacman -S mingw-w64-x86_64-graphviz
+#
+#       Please build documentation using
+#           make mingw PARAMS=doc
+#     
 #
 
 SRC = ..
@@ -53,10 +57,12 @@ ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
 EXESUFFIX = .exe
 DOXYGEN = doxygen.exe
+HOSTARCH = WINDOWS
 else
 OBJ = obj/nix
 EXESUFFIX :=
 DOXYGEN = @./doxygen
+HOSTARCH = NIX
 endif
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
@@ -72,6 +78,14 @@ LD = @g++
 MD = @mkdir
 RM = @rm
 CLANG_TIDY = clang-tidy-10
+
+ifndef FAST
+FAST=1
+endif
+
+ifeq ($(FAST),1)
+CFLAGS += -DNL_USE_ACADEMIC_SOLVERS=0
+endif 
 
 TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
@@ -293,9 +307,6 @@ doc: nltool$(EXESUFFIX)
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
-docw: 
-	$(DOXYGEN) doxygen.conf
-	
 #-------------------------------------------------
 # depends
 #-------------------------------------------------
