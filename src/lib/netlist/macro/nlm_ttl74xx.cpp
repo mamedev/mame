@@ -122,6 +122,37 @@ static NETLIST_START(TTL_7404_DIP)
 NETLIST_END()
 
 /*
+ *   DM7406: Hex Inverting Buffers with
+ *           High Voltage Open-Collector Outputs
+ *
+ *  Naming conventions follow Fairchild Semiconductor datasheet
+ *
+ */
+
+static NETLIST_START(TTL_7406_DIP)
+	TTL_7406_GATE(A)
+	TTL_7406_GATE(B)
+	TTL_7406_GATE(C)
+	TTL_7406_GATE(D)
+	TTL_7406_GATE(E)
+	TTL_7406_GATE(F)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.Y,  /*    Y1 |2           13| A6   */ F.A,
+		B.A,  /*    A2 |3           12| Y6   */ F.Y,
+		B.Y,  /*    Y2 |4    7406   11| A5   */ E.A,
+		C.A,  /*    A3 |5           10| Y5   */ E.Y,
+		C.Y,  /*    Y3 |6            9| A4   */ D.A,
+		A.GND,/*   GND |7            8| Y4   */ D.Y
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM7408: Quad 2-Input AND Gates
  *
  *
@@ -946,6 +977,14 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_7406_GATE, 1, 1, "")
+		TT_HEAD("A|Y ")
+		TT_LINE("0|1|15")
+		TT_LINE("1|0|23")
+		/* Open Collector */
+		TT_FAMILY("74XXOC")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_7408_GATE, 2, 1, "")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|0|15")
@@ -1370,6 +1409,7 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
 	LOCAL_LIB_ENTRY(TTL_7402_DIP)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
+	LOCAL_LIB_ENTRY(TTL_7406_DIP)
 	LOCAL_LIB_ENTRY(TTL_7408_DIP)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
 	LOCAL_LIB_ENTRY(TTL_7411_DIP)
