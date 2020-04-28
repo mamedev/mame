@@ -1005,8 +1005,8 @@ void tms9914_device::update_fsm()
 		} else {
 			switch (m_c_state) {
 			case FSM_C_CIDS:
-				// sic | rqc -> CADS
-				if (!controller_reset() && m_sic && m_c_state == FSM_C_CIDS) {
+				// See also sic & rqc aux commands
+				if (m_sic) {
 					m_c_state = FSM_C_CADS;
 				}
 				break;
