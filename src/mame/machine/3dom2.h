@@ -142,16 +142,6 @@ public:
 	DECLARE_READ32_MEMBER( cpu_id_r );
 	DECLARE_WRITE32_MEMBER( cpu_id_w );
 
-	READ8_MEMBER( read_bus )
-	{
-		return read_bus8(offset);
-	}
-
-	WRITE8_MEMBER( write_bus )
-	{
-		write_bus8(offset, data);
-	}
-
 	uint8_t read_bus8(offs_t offset);
 	uint16_t read_bus16(offs_t offset);
 	uint32_t read_bus32(offs_t offset);

@@ -36,9 +36,9 @@
  *
  *************************************/
 
-void xybots_state::update_interrupts()
+void xybots_state::video_int_ack_w(uint16_t data)
 {
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
@@ -178,7 +178,7 @@ GFXDECODE_END
 void xybots_state::xybots(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
 	SLAPSTIC(config, "slapstic", 107, true);
@@ -201,10 +201,10 @@ void xybots_state::xybots(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(xybots_state::screen_update_xybots));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(xybots_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

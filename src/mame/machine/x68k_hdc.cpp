@@ -74,7 +74,7 @@ image_init_result x68k_hdc_image_device::call_create(int format_type, util::opti
 	return image_init_result::PASS;
 }
 
-WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
+void x68k_hdc_image_device::hdc_w(offs_t offset, u16 data)
 {
 	unsigned int lba = 0;
 	std::vector<char> blk;
@@ -302,7 +302,7 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 //  logerror("SASI: write to HDC, offset %04x, data %04x\n",offset,data);
 }
 
-READ16_MEMBER( x68k_hdc_image_device::hdc_r )
+u16 x68k_hdc_image_device::hdc_r(offs_t offset)
 {
 	int retval = 0xff;
 

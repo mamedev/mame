@@ -35,7 +35,7 @@ protected:
 	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	
+
 	virtual DECLARE_READ8_MEMBER(in0_r);
 	virtual DECLARE_READ8_MEMBER(in1_r);
 	virtual DECLARE_WRITE8_MEMBER(in0_w);

@@ -51,12 +51,12 @@ public:
 
 	void late_setup();
 
-	DECLARE_WRITE8_MEMBER(bram_w);
-	DECLARE_WRITE8_MEMBER(intf_w);
-	DECLARE_WRITE8_MEMBER(acard_w);
-	DECLARE_READ8_MEMBER(bram_r);
-	DECLARE_READ8_MEMBER(intf_r);
-	DECLARE_READ8_MEMBER(acard_r);
+	void bram_w(offs_t offset, uint8_t data);
+	void intf_w(offs_t offset, uint8_t data);
+	void acard_w(offs_t offset, uint8_t data);
+	uint8_t bram_r(offs_t offset);
+	uint8_t intf_r(offs_t offset);
+	uint8_t acard_r(offs_t offset);
 
 protected:
 	// device-level overrides
@@ -68,30 +68,30 @@ protected:
 private:
 	const address_space_config m_space_config;
 
-	DECLARE_READ8_MEMBER(cdc_status_r);
-	DECLARE_WRITE8_MEMBER(cdc_status_w);
-	DECLARE_READ8_MEMBER(cdc_reset_r);
-	DECLARE_WRITE8_MEMBER(cdc_reset_w);
-	DECLARE_READ8_MEMBER(irq_mask_r);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_READ8_MEMBER(irq_status_r);
-	DECLARE_READ8_MEMBER(cdc_data_r);
-	DECLARE_WRITE8_MEMBER(cdc_data_w);
-	DECLARE_READ8_MEMBER(bram_status_r);
-	DECLARE_WRITE8_MEMBER(bram_unlock_w);
-	DECLARE_READ8_MEMBER(cdda_data_r);
-	DECLARE_READ8_MEMBER(cd_data_r);
-	DECLARE_READ8_MEMBER(adpcm_dma_control_r);
-	DECLARE_WRITE8_MEMBER(adpcm_dma_control_w);
-	DECLARE_READ8_MEMBER(adpcm_status_r);
-	DECLARE_READ8_MEMBER(adpcm_data_r);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(adpcm_address_lo_w);
-	DECLARE_WRITE8_MEMBER(adpcm_address_hi_w);
-	DECLARE_READ8_MEMBER(adpcm_address_control_r);
-	DECLARE_WRITE8_MEMBER(adpcm_address_control_w);
-	DECLARE_WRITE8_MEMBER(adpcm_playback_rate_w);
-	DECLARE_WRITE8_MEMBER(fade_register_w);
+	uint8_t cdc_status_r();
+	void cdc_status_w(uint8_t data);
+	uint8_t cdc_reset_r();
+	void cdc_reset_w(uint8_t data);
+	uint8_t irq_mask_r();
+	void irq_mask_w(uint8_t data);
+	uint8_t irq_status_r();
+	uint8_t cdc_data_r();
+	void cdc_data_w(uint8_t data);
+	uint8_t bram_status_r();
+	void bram_unlock_w(uint8_t data);
+	uint8_t cdda_data_r(offs_t offset);
+	uint8_t cd_data_r();
+	uint8_t adpcm_dma_control_r();
+	void adpcm_dma_control_w(uint8_t data);
+	uint8_t adpcm_status_r();
+	uint8_t adpcm_data_r();
+	void adpcm_data_w(uint8_t data);
+	void adpcm_address_lo_w(uint8_t data);
+	void adpcm_address_hi_w(uint8_t data);
+	uint8_t adpcm_address_control_r();
+	void adpcm_address_control_w(uint8_t data);
+	void adpcm_playback_rate_w(uint8_t data);
+	void fade_register_w(uint8_t data);
 
 	uint8_t m_reset_reg;
 	uint8_t m_irq_mask;

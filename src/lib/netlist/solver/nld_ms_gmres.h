@@ -106,7 +106,7 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_terms[k].template getV<float_type>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 		}
 
 		const auto accuracy(static_cast<float_type>(this->m_params.m_accuracy));

@@ -28,7 +28,6 @@ namespace netlist
 		, m_Q(*this, "_Q")
 		, m_inc(netlist_time::from_hz(24000 * 2))
 		, m_shift(*this, "m_shift", 0)
-		, m_is_timestep(false)
 		{
 			connect(m_feedback, m_Q);
 
@@ -57,9 +56,6 @@ namespace netlist
 
 		/* state */
 		state_var_u32 m_shift;
-
-		/* cache */
-		bool m_is_timestep;
 	};
 
 	NETLIB_RESET(MM5837_dip)
@@ -74,7 +70,6 @@ namespace netlist
 			log().warning(MW_FREQUENCY_OUTSIDE_OF_SPECS_1(m_FREQ()));
 
 		m_shift = 0x1ffff;
-		m_is_timestep = (m_RV.m_P.net().solver()->timestep_device_count() > 0);
 	}
 
 	NETLIB_UPDATE_PARAM(MM5837_dip)
@@ -104,11 +99,10 @@ namespace netlist
 			const nl_fptype R = state ? m_R_HIGH : m_R_LOW;
 			const nl_fptype V = state ? m_VDD() : m_VSS();
 
-			// We only need to update the net first if this is a time stepping net
-			if (m_is_timestep)
-				m_RV.update();
-			m_RV.set_G_V_I(plib::reciprocal(R), V, nlconst::zero());
-			m_RV.solve_later(NLTIME_FROM_NS(1));
+			m_RV.change_state([this, &R, &V]()
+			{
+				m_RV.set_G_V_I(plib::reciprocal(R), V, nlconst::zero());
+			});
 		}
 
 	}

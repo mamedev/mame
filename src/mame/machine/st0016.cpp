@@ -12,24 +12,24 @@
 
 DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
-void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
+void st0016_cpu_device::cpu_internal_map(address_map &map)
 {
-	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::st0016_sprite_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite_ram_w));
-	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
-	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(FUNC(st0016_cpu_device::st0016_palette_ram_w));
-	map(0xec00, 0xec1f).r(FUNC(st0016_cpu_device::st0016_character_ram_r)).w(FUNC(st0016_cpu_device::st0016_character_ram_w));
+	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::sprite_ram_r)).w(FUNC(st0016_cpu_device::sprite_ram_w));
+	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::sprite2_ram_r)).w(FUNC(st0016_cpu_device::sprite2_ram_w));
+	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::palette_ram_r)).w(FUNC(st0016_cpu_device::palette_ram_w));
+	map(0xec00, 0xec1f).r(FUNC(st0016_cpu_device::character_ram_r)).w(FUNC(st0016_cpu_device::character_ram_w));
 	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::snd_r), FUNC(st0016_device::snd_w)); /* sound regs 8 x $20 bytes, see notes */
 }
 
 
-void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
+void st0016_cpu_device::cpu_internal_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xbf).r(FUNC(st0016_cpu_device::st0016_vregs_r)).w(FUNC(st0016_cpu_device::st0016_vregs_w)); /* video/crt regs ? */
-	map(0xe2, 0xe2).w(FUNC(st0016_cpu_device::st0016_sprite_bank_w));
-	map(0xe3, 0xe4).w(FUNC(st0016_cpu_device::st0016_character_bank_w));
-	map(0xe5, 0xe5).w(FUNC(st0016_cpu_device::st0016_palette_bank_w));
-	map(0xf0, 0xf0).r(FUNC(st0016_cpu_device::st0016_dma_r));
+	map(0x00, 0xbf).r(FUNC(st0016_cpu_device::vregs_r)).w(FUNC(st0016_cpu_device::vregs_w)); /* video/crt regs ? */
+	map(0xe2, 0xe2).w(FUNC(st0016_cpu_device::sprite_bank_w));
+	map(0xe3, 0xe4).w(FUNC(st0016_cpu_device::character_bank_w));
+	map(0xe5, 0xe5).w(FUNC(st0016_cpu_device::palette_bank_w));
+	map(0xf0, 0xf0).r(FUNC(st0016_cpu_device::dma_r));
 }
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
@@ -37,21 +37,21 @@ void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, ST0016_CPU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "palette")
-	, st0016_spr_bank(0)
-	, st0016_spr2_bank(0)
-	, st0016_pal_bank(0)
-	, st0016_char_bank(0)
+	, spr_bank(0)
+	, spr2_bank(0)
+	, pal_bank(0)
+	, char_bank(0)
 	, spr_dx(0)
 	, spr_dy(0)
-	, st0016_ramgfx(0)
-	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_io_map), this))
-	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_map), this))
+	, ramgfx(0)
+	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_io_map), this))
+	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_map), this))
 	, m_screen(*this, ":screen")
 	, m_rom(*this, DEVICE_SELF)
 	, m_dma_offs_cb(*this)
 	, m_game_flag(-1)
 {
-	std::fill(std::begin(st0016_vregs), std::end(st0016_vregs), 0);
+	std::fill(std::begin(vregs), std::end(vregs), 0);
 }
 
 
@@ -115,7 +115,7 @@ void st0016_cpu_device::device_reset()
 	}
 }
 
-READ8_MEMBER(st0016_cpu_device::soundram_read)
+uint8_t st0016_cpu_device::soundram_read(offs_t offset)
 {
 	return m_charram[offset];
 }
@@ -146,28 +146,28 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_bank_w)
+void st0016_cpu_device::sprite_bank_w(uint8_t data)
 {
 /*
     76543210
         xxxx - spriteram  bank1
     xxxx     - spriteram  bank2
 */
-	st0016_spr_bank=data&SPR_BANK_MASK;
-	st0016_spr2_bank=(data>>4)&SPR_BANK_MASK;
+	spr_bank=data&SPR_BANK_MASK;
+	spr2_bank=(data>>4)&SPR_BANK_MASK;
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_palette_bank_w)
+void st0016_cpu_device::palette_bank_w(uint8_t data)
 {
 /*
     76543210
           xx - palram  bank
     xxxxxx   - unknown/unused
 */
-	st0016_pal_bank=data&PAL_BANK_MASK;
+	pal_bank=data&PAL_BANK_MASK;
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
+void st0016_cpu_device::character_bank_w(offs_t offset, uint8_t data)
 {
 /*
     fedcba9876543210
@@ -175,62 +175,62 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
 */
 
 	if(offset&1)
-		st0016_char_bank=(st0016_char_bank&0xff)|(data<<8);
+		char_bank=(char_bank&0xff)|(data<<8);
 	else
-		st0016_char_bank=(st0016_char_bank&0xff00)|data;
+		char_bank=(char_bank&0xff00)|data;
 
-	st0016_char_bank&=CHAR_BANK_MASK;
+	char_bank&=CHAR_BANK_MASK;
 }
 
 
-READ8_MEMBER(st0016_cpu_device::st0016_sprite_ram_r)
+uint8_t st0016_cpu_device::sprite_ram_r(offs_t offset)
 {
-	return st0016_spriteram[SPR_BANK_SIZE*st0016_spr_bank+offset];
+	return spriteram[SPR_BANK_SIZE*spr_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_ram_w)
+void st0016_cpu_device::sprite_ram_w(offs_t offset, uint8_t data)
 {
-	st0016_spriteram[SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
+	spriteram[SPR_BANK_SIZE*spr_bank+offset]=data;
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_r)
+uint8_t st0016_cpu_device::sprite2_ram_r(offs_t offset)
 {
-	return st0016_spriteram[SPR_BANK_SIZE*st0016_spr2_bank+offset];
+	return spriteram[SPR_BANK_SIZE*spr2_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_w)
+void st0016_cpu_device::sprite2_ram_w(offs_t offset, uint8_t data)
 {
-	st0016_spriteram[SPR_BANK_SIZE*st0016_spr2_bank+offset]=data;
+	spriteram[SPR_BANK_SIZE*spr2_bank+offset]=data;
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_palette_ram_r)
+uint8_t st0016_cpu_device::palette_ram_r(offs_t offset)
 {
-	return st0016_paletteram[PAL_BANK_SIZE*st0016_pal_bank+offset];
+	return paletteram[PAL_BANK_SIZE*pal_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
+void st0016_cpu_device::palette_ram_w(offs_t offset, uint8_t data)
 {
-	int color=(PAL_BANK_SIZE*st0016_pal_bank+offset)/2;
+	int color=(PAL_BANK_SIZE*pal_bank+offset)/2;
 	int val;
-	st0016_paletteram[PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
-	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
+	paletteram[PAL_BANK_SIZE*pal_bank+offset]=data;
+	val=paletteram[color*2]+(paletteram[color*2+1]<<8);
 	if(!color)
 		palette().set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
 	palette().set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
+uint8_t st0016_cpu_device::character_ram_r(offs_t offset)
 {
-	return m_charram[CHAR_BANK_SIZE*st0016_char_bank+offset];
+	return m_charram[CHAR_BANK_SIZE*char_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
+void st0016_cpu_device::character_ram_w(offs_t offset, uint8_t data)
 {
-	m_charram[CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
+	m_charram[CHAR_BANK_SIZE*char_bank+offset]=data;
+	gfx(ramgfx)->mark_dirty(char_bank);
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
+uint8_t st0016_cpu_device::vregs_r(offs_t offset)
 {
 	/*
 	    $0, $1 = max scanline(including vblank)/timer? ($3e7)
@@ -255,10 +255,10 @@ READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
 			return machine().rand();
 	}
 
-	return st0016_vregs[offset];
+	return vregs[offset];
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_dma_r)
+uint8_t st0016_cpu_device::dma_r()
 {
 	/* bits 0 and 1 = 0 -> DMA transfer complete */
 	if(ismacs())
@@ -268,7 +268,7 @@ READ8_MEMBER(st0016_cpu_device::st0016_dma_r)
 }
 
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
+void st0016_cpu_device::vregs_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -298,12 +298,12 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 
 	*/
 
-	st0016_vregs[offset]=data;
+	vregs[offset]=data;
 	if(offset==0xa8 && (data&0x20))
 	{
-		uint32_t srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
-		uint32_t dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
-		uint32_t length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
+		uint32_t srcadr=(vregs[0xa0]|(vregs[0xa1]<<8)|(vregs[0xa2]<<16))<<1;
+		uint32_t dstadr=(vregs[0xa3]|(vregs[0xa4]<<8)|(vregs[0xa5]<<16))<<1;
+		uint32_t length=((vregs[0xa6]|(vregs[0xa7]<<8)|((vregs[0xa8]&0x1f)<<16))+1)<<1;
 
 
 		uint32_t srclen = (m_rom->bytes());
@@ -318,8 +318,8 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 		{
 			if( srcadr < srclen && (dstadr < MAX_CHAR_BANK*CHAR_BANK_SIZE))
 			{
-				st0016_char_bank=dstadr>>5;
-				st0016_character_ram_w(space,dstadr&0x1f,mem[srcadr]);
+				char_bank=dstadr>>5;
+				character_ram_w(dstadr&0x1f,mem[srcadr]);
 				srcadr++;
 				dstadr++;
 				length--;
@@ -385,21 +385,21 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 	*/
 
-	gfx_element *gfx = this->gfx(st0016_ramgfx);
+	gfx_element *gfx = this->gfx(ramgfx);
 	int i, j, lx, ly, x, y, code, offset, length, sx, sy, color, flipx, flipy, scrollx, scrolly/*,plx,ply*/;
 
 
 	for (i = 0; i < SPR_BANK_SIZE*MAX_SPR_BANK; i += 8)
 	{
-		x = st0016_spriteram[i + 4] + ((st0016_spriteram[i + 5] & 3) << 8);
-		y = st0016_spriteram[i + 6] + ((st0016_spriteram[i + 7] & 3) << 8);
+		x = spriteram[i + 4] + ((spriteram[i + 5] & 3) << 8);
+		y = spriteram[i + 6] + ((spriteram[i + 7] & 3) << 8);
 
-		int use_sizes = (st0016_spriteram[i + 1] & 0x10);
-		int globalx = (st0016_spriteram[i + 5] & 0x0c)>>2;
-		int globaly = (st0016_spriteram[i + 7] & 0x0c)>>2;
+		int use_sizes = (spriteram[i + 1] & 0x10);
+		int globalx = (spriteram[i + 5] & 0x0c)>>2;
+		int globaly = (spriteram[i + 7] & 0x0c)>>2;
 
-		scrollx = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
-		scrolly = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
+		scrollx = (vregs[(((spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * vregs[(((spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
+		scrolly = (vregs[(((spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * vregs[(((spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
 
 		if (!ismacs())
 		{
@@ -427,24 +427,24 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			y += 0x20;
 		}
 
-		if (st0016_spriteram[i + 3] & 0x80) /* end of list */
+		if (spriteram[i + 3] & 0x80) /* end of list */
 			break;
 
-		offset = st0016_spriteram[i + 2] + 256 * (st0016_spriteram[i + 3]);
+		offset = spriteram[i + 2] + 256 * (spriteram[i + 3]);
 		offset <<= 3;
 
-		length = st0016_spriteram[i + 0] + 1 + 256 * (st0016_spriteram[i + 1] & 1);
+		length = spriteram[i + 0] + 1 + 256 * (spriteram[i + 1] & 1);
 
-		//plx=(st0016_spriteram[i+5]>>2)&0x3;
-		//ply=(st0016_spriteram[i+7]>>2)&0x3;
+		//plx=(spriteram[i+5]>>2)&0x3;
+		//ply=(spriteram[i+7]>>2)&0x3;
 
 		if (offset < SPR_BANK_SIZE*MAX_SPR_BANK)
 		{
 			for (j = 0; j < length; j++)
 			{
-				code = st0016_spriteram[offset] + 256 * st0016_spriteram[offset + 1];
-				sx = st0016_spriteram[offset + 4] + ((st0016_spriteram[offset + 5] & 1) << 8);
-				sy = st0016_spriteram[offset + 6] + ((st0016_spriteram[offset + 7] & 1) << 8);
+				code = spriteram[offset] + 256 * spriteram[offset + 1];
+				sx = spriteram[offset + 4] + ((spriteram[offset + 5] & 1) << 8);
+				sy = spriteram[offset + 6] + ((spriteram[offset + 7] & 1) << 8);
 
 				if (ismacs() && !ismacs1())
 				{
@@ -458,12 +458,12 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 				sx += x;
 				sy += y;
-				color = st0016_spriteram[offset + 2] & 0x3f;
+				color = spriteram[offset + 2] & 0x3f;
 
 				if (use_sizes)
 				{
-					lx = (st0016_spriteram[offset + 5] >> 2) & 3;
-					ly = (st0016_spriteram[offset + 7] >> 2) & 3;
+					lx = (spriteram[offset + 5] >> 2) & 3;
+					ly = (spriteram[offset + 7] >> 2) & 3;
 				}
 				else
 				{
@@ -480,8 +480,8 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				    }
 				    */
 
-				flipx = st0016_spriteram[offset + 3] & 0x80;
-				flipy = st0016_spriteram[offset + 3] & 0x40;
+				flipx = spriteram[offset + 3] & 0x80;
+				flipy = spriteram[offset + 3] & 0x40;
 
 				if (ismacs())
 					sy -= (1 << ly) * 8;
@@ -527,7 +527,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 								if (cliprect.contains(drawxpos, drawypos))
 								{
-									if (st0016_spriteram[offset + 5] & 0x40)
+									if (spriteram[offset + 5] & 0x40)
 									{
 										destline[drawxpos] = (destline[drawxpos] | pixdata << 4) & 0x3ff;
 									}
@@ -564,18 +564,18 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 }
 
 
-void st0016_cpu_device::st0016_save_init()
+void st0016_cpu_device::save_init()
 {
-	save_item(NAME(st0016_spr_bank));
-	save_item(NAME(st0016_spr2_bank));
-	save_item(NAME(st0016_pal_bank));
-	save_item(NAME(st0016_char_bank));
+	save_item(NAME(spr_bank));
+	save_item(NAME(spr2_bank));
+	save_item(NAME(pal_bank));
+	save_item(NAME(char_bank));
 	save_item(NAME(m_dma_offset));
-	//save_item(NAME(st0016_rom_bank));
-	save_item(NAME(st0016_vregs));
+	//save_item(NAME(rom_bank));
+	save_item(NAME(vregs));
 	save_pointer(NAME(m_charram), MAX_CHAR_BANK*CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram), MAX_PAL_BANK*PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram), MAX_SPR_BANK*SPR_BANK_SIZE);
+	save_pointer(NAME(paletteram), MAX_PAL_BANK*PAL_BANK_SIZE);
+	save_pointer(NAME(spriteram), MAX_SPR_BANK*SPR_BANK_SIZE);
 }
 
 
@@ -585,8 +585,8 @@ void st0016_cpu_device::startup()
 
 	m_dma_offset = 0;
 	m_charram=make_unique_clear<uint8_t[]>(MAX_CHAR_BANK*CHAR_BANK_SIZE);
-	st0016_spriteram=make_unique_clear<uint8_t[]>(MAX_SPR_BANK*SPR_BANK_SIZE);
-	st0016_paletteram=make_unique_clear<uint8_t[]>(MAX_PAL_BANK*PAL_BANK_SIZE);
+	spriteram=make_unique_clear<uint8_t[]>(MAX_SPR_BANK*SPR_BANK_SIZE);
+	paletteram=make_unique_clear<uint8_t[]>(MAX_PAL_BANK*PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -597,36 +597,36 @@ void st0016_cpu_device::startup()
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	set_gfx(gfx_index, std::make_unique<gfx_element>(&palette(), charlayout, m_charram.get(), 0, 0x40, 0));
-	st0016_ramgfx = gfx_index;
+	ramgfx = gfx_index;
 
 	spr_dx=0;
 	spr_dy=0;
 
-	st0016_save_init();
+	save_init();
 }
 
 
 void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	gfx_element *gfx = this->gfx(st0016_ramgfx);
+	gfx_element *gfx = this->gfx(ramgfx);
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
 	for (j = 0; j < 0x40; j += 8)
 	{
-		if (st0016_vregs[j + 1] && ((priority && (st0016_vregs[j + 3] == 0xff)) || ((!priority) && (st0016_vregs[j + 3] != 0xff))))
+		if (vregs[j + 1] && ((priority && (vregs[j + 3] == 0xff)) || ((!priority) && (vregs[j + 3] != 0xff))))
 		{
 			int x, y, code, color, flipx, flipy;
-			int i = st0016_vregs[j + 1] * 0x1000;
+			int i = vregs[j + 1] * 0x1000;
 
 			for (x = 0; x < 32 * 2; x++)
 			{
 				for (y = 0; y < 8 * 4; y++)
 				{
-					code = st0016_spriteram[i] + 256 * st0016_spriteram[i + 1];
-					color = st0016_spriteram[i + 2] & 0x3f;
+					code = spriteram[i] + 256 * spriteram[i + 1];
+					color = spriteram[i + 2] & 0x3f;
 
-					flipx = st0016_spriteram[i + 3] & 0x80;
-					flipy = st0016_spriteram[i + 3] & 0x40;
+					flipx = spriteram[i + 3] & 0x80;
+					flipy = spriteram[i + 3] & 0x40;
 
 					if (priority)
 					{
@@ -643,7 +643,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 						int ypos, xpos;
 						const uint8_t *srcgfx;
 						int gfxoffs;
-						ypos = y * 8 + spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
+						ypos = y * 8 + spr_dy;//+((vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
 						xpos = x * 8 + spr_dx;
 						gfxoffs = 0;
 						srcgfx = gfx->get_data(code);
@@ -670,7 +670,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 
 								if (cliprect.contains(drawxpos, drawypos))
 								{
-									if (st0016_vregs[j + 7] == 0x12)
+									if (vregs[j + 7] == 0x12)
 										destline[drawxpos] = (destline[drawxpos] | (pixdata << 4)) & 0x3ff;
 									else
 									{
@@ -705,7 +705,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-void st0016_cpu_device::st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void st0016_cpu_device::draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_bgmap(bitmap,cliprect,0);
 	draw_sprites(bitmap,cliprect);
@@ -719,17 +719,17 @@ uint32_t st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");
-		fwrite(st0016_spriteram.get(),1,0x1000*MAX_SPR_BANK,p);
+		fwrite(spriteram.get(),1,0x1000*MAX_SPR_BANK,p);
 		fclose(p);
 
 		p=fopen("vram.txt","wt");
 		for(h=0;h<0xc0;h++)
-			fprintf(p,"VREG %.4x - %.4x\n",h,st0016_vregs[h]);
+			fprintf(p,"VREG %.4x - %.4x\n",h,vregs[h]);
 		for(h=0;h<0x1000*MAX_SPR_BANK;h+=8)
 		{
 			fprintf(p,"%.4x - %.4x - ",h,h>>3);
 			for(j=0;j<8;j++)
-				fprintf(p,"%.2x ",st0016_spriteram[h+j]);
+				fprintf(p,"%.2x ",spriteram[h+j]);
 			fprintf(p,"\n");
 		}
 		fclose(p);
@@ -737,6 +737,6 @@ uint32_t st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, 
 #endif
 
 	bitmap.fill(UNUSED_PEN, cliprect);
-	st0016_draw_screen(screen, bitmap, cliprect);
+	draw_screen(screen, bitmap, cliprect);
 	return 0;
 }

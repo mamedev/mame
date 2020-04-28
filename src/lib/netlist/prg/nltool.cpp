@@ -374,13 +374,13 @@ struct input_t
 			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
-				static_cast<netlist::param_fp_t*>(m_param)->setTo(m_value);
+				static_cast<netlist::param_fp_t*>(m_param)->set(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(m_param)->setTo(static_cast<int>(m_value));
+				static_cast<netlist::param_int_t*>(m_param)->set(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
+				static_cast<netlist::param_logic_t*>(m_param)->set(static_cast<bool>(m_value));
 				break;
 		}
 	}

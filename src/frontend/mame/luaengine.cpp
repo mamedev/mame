@@ -207,17 +207,87 @@ namespace sol
 }
 
 
+namespace
+{
+	// ======================> enum_parser
+	template<typename T, size_t SIZE>
+	class enum_parser
+	{
+	public:
+		constexpr enum_parser(std::initializer_list<std::pair<const char *, T>> values)
+		{
+			if (values.size() != SIZE)
+				throw false && "size template argument incorrectly specified";
+			std::copy(values.begin(), values.end(), m_map.begin());
+		}
+
+		T operator()(const char *text) const
+		{
+			auto iter = std::find_if(
+				m_map.begin() + 1,
+				m_map.end(),
+				[text](const auto &x) { return !strcmp(text, x.first); });
+			if (iter == m_map.end())
+				iter = m_map.begin();
+			return iter->second;
+		}
+
+		T operator()(const std::string &text) const
+		{
+			return (*this)(text.c_str());
+		}
+
+	private:
+		std::array<std::pair<const char *, T>, SIZE>	m_map;
+	};
+};
+
+
+static const enum_parser<input_seq_type, 3> s_seq_type_parser =
+{
+	{ "standard", SEQ_TYPE_STANDARD },
+	{ "increment", SEQ_TYPE_INCREMENT },
+	{ "decrement", SEQ_TYPE_DECREMENT },
+};
+
+
+static const enum_parser<movie_recording::format, 2> s_movie_recording_format_parser =
+{
+	{ "avi", movie_recording::format::AVI },
+	{ "mng", movie_recording::format::MNG }
+};
+
+
+static const enum_parser<read_or_write, 4> s_read_or_write_parser =
+{
+	{ "r", read_or_write::READ },
+	{ "w", read_or_write::WRITE },
+	{ "rw", read_or_write::READWRITE },
+	{ "wr", read_or_write::READWRITE }
+};
+
+
+static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser =
+{
+	{ "left", ui::text_layout::LEFT },
+	{ "right", ui::text_layout::RIGHT },
+	{ "center", ui::text_layout::CENTER },
+};
+
+
 //-------------------------------------------------
-// parse_seq_type - parses a string into an input_seq_type
+//  process_snapshot_filename - processes a snapshot
+//  filename
 //-------------------------------------------------
 
-static input_seq_type parse_seq_type(const std::string &s)
+static std::string process_snapshot_filename(running_machine &machine, const char *s)
 {
-	input_seq_type result = SEQ_TYPE_STANDARD;
-	if (s == "increment")
-		result = SEQ_TYPE_INCREMENT;
-	else if (s == "decrement")
-		result = SEQ_TYPE_DECREMENT;
+	std::string result(s);
+	if (!osd_is_absolute_path(s))
+	{
+		strreplace(result, "/", PATH_SEPARATOR);
+		strreplace(result, "%g", machine.basename());
+	}
 	return result;
 }
 
@@ -1578,11 +1648,7 @@ void lua_engine::initialize()
 			return table;
 		});
 	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-			read_or_write wptype = read_or_write::READ;
-			if(type == "w")
-				wptype = read_or_write::WRITE;
-			else if((type == "rw") || (type == "wr"))
-				wptype = read_or_write::READWRITE;
+			read_or_write wptype = s_read_or_write_parser(type);
 			return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
 		});
 	device_debug_type.set("wpclr", &device_debug::watchpoint_clear);
@@ -2000,22 +2066,22 @@ void lua_engine::initialize()
 	auto ioport_field_type = sol().registry().create_simple_usertype<ioport_field>("new", sol::no_constructor);
 	ioport_field_type.set("set_value", &ioport_field::set_value);
 	ioport_field_type.set("set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
 			f.set_user_settings(settings);
 		});
 	ioport_field_type.set("input_seq", [](ioport_field &f, const std::string &seq_type_string) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			return sol::make_user(f.seq(seq_type));
 		});
 	ioport_field_type.set("set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			f.set_defseq(seq_type, seq);
 		});
 	ioport_field_type.set("default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
-			input_seq_type seq_type = parse_seq_type(seq_type_string);
+			input_seq_type seq_type = s_seq_type_parser(seq_type_string);
 			return sol::make_user(f.defseq(seq_type));
 		});
 	ioport_field_type.set("keyboard_codes", [this](ioport_field &f, int which) {
@@ -2107,7 +2173,7 @@ void lua_engine::initialize()
  *
  * manager:machine():video()
  *
- * video:begin_recording([opt] filename) - start AVI recording to filename if given or default
+ * video:begin_recording([opt] filename, [opt] format) - start AVI recording to filename if given or default
  * video:end_recording() - stop AVI recording
  * video:is_recording() - get recording status
  * video:snapshot() - save shot of all screens
@@ -2125,20 +2191,25 @@ void lua_engine::initialize()
 
 	auto video_type = sol().registry().create_simple_usertype<video_manager>("new", sol::no_constructor);
 	video_type.set("begin_recording", sol::overload(
-		[this](video_manager &vm, const char *filename) {
-			std::string fn = filename;
-			strreplace(fn, "/", PATH_SEPARATOR);
-			strreplace(fn, "%g", machine().basename());
-			vm.begin_recording(fn.c_str(), video_manager::MF_AVI);
+		[this](video_manager &vm, const char *filename, const char *format_string) {
+			std::string fn = process_snapshot_filename(machine(), filename);
+			movie_recording::format format = s_movie_recording_format_parser(format_string);
+			vm.begin_recording(fn.c_str(), format);
 		},
-		[](video_manager &vm) { vm.begin_recording(nullptr, video_manager::MF_AVI); }));
+		[this](video_manager &vm, const char *filename) {
+			std::string fn = process_snapshot_filename(machine(), filename);
+			vm.begin_recording(fn.c_str(), movie_recording::format::AVI);
+		},
+		[](video_manager &vm) {
+			vm.begin_recording(nullptr, movie_recording::format::AVI);
+		}));
 	video_type.set("end_recording", [this](video_manager &vm) {
 			if(!vm.is_recording())
 			{
 				machine().logerror("[luaengine] No active recording to stop\n");
 				return;
 			}
-			vm.end_recording(video_manager::MF_AVI);
+			vm.end_recording();
 		});
 	video_type.set("snapshot", &video_manager::save_active_screen_snapshots);
 	video_type.set("is_recording", &video_manager::is_recording);
@@ -2527,11 +2598,7 @@ void lua_engine::initialize()
 			}
 			else if(xobj.is<const char *>())
 			{
-				std::string just_str = xobj.as<const char *>();
-				if(just_str == "right")
-					justify = ui::text_layout::RIGHT;
-				else if(just_str == "center")
-					justify = ui::text_layout::CENTER;
+				justify = s_text_justify_parser(xobj.as<const char *>());
 			}
 			else
 			{
@@ -2580,13 +2647,8 @@ void lua_engine::initialize()
 			if (filename.is<const char *>())
 			{
 				// a filename was specified; if it isn't absolute postprocess it
-				snapstr = filename.as<const char *>();
+				snapstr = process_snapshot_filename(machine(), filename.as<const char *>());
 				is_absolute_path = osd_is_absolute_path(snapstr);
-				if (!is_absolute_path)
-				{
-					strreplace(snapstr, "/", PATH_SEPARATOR);
-					strreplace(snapstr, "%g", machine().basename());
-				}
 			}
 
 			// open the file

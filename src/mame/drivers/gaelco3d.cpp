@@ -262,7 +262,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 		/* bit 0 is clock */
 		/* bit 1 active */
 		result &= ~uint32_t(gaelco_serial_device::EXT_STATUS_MASK);
-		result |= m_serial->status_r(space, 0);
+		result |= m_serial->status_r();
 	}
 
 	if (m_eeprom->do_read())

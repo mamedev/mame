@@ -15,7 +15,7 @@ class timeplt_audio_device : public device_t, public device_sound_interface
 public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
 
-	DECLARE_WRITE8_MEMBER(sound_data_w);
+	void sound_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE_LINE_MEMBER(mute_w);
 
@@ -29,8 +29,8 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	DECLARE_WRITE8_MEMBER(filter_w);
-	DECLARE_READ8_MEMBER(portB_r);
+	void filter_w(offs_t offset, uint8_t data);
+	uint8_t portB_r();
 
 	void timeplt_sound_map(address_map &map);
 

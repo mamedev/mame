@@ -121,20 +121,26 @@ namespace devices
 		{
 			case solver::matrix_type_e::MAT_CR:
 				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::SOR_MAT:
-				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::MAT:
 				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#if (NL_USE_ACADEMIC_SOLVERS)
+			case solver::matrix_type_e::GMRES:
+				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SOR:
+				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SOR_MAT:
+				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::SM:
 				// Sherman-Morrison Formula
 				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::W:
 				// Woodbury Formula
 				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::SOR:
-				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case solver::matrix_type_e::GMRES:
-				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#else
+			default:
+				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(m_params.m_method().name(), "MAT_CR"));
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+#endif
 		}
 		return plib::unique_ptr<solver::matrix_solver_t>();
 	}
@@ -177,30 +183,27 @@ namespace devices
 				{
 					return create_solver<FT, -16>(net_count, sname, nets);
 				}
-				else if (net_count <= 32)
+				if (net_count <= 32)
 				{
 					return create_solver<FT, -32>(net_count, sname, nets);
 				}
-				else if (net_count <= 64)
+				if (net_count <= 64)
 				{
 					return create_solver<FT, -64>(net_count, sname, nets);
 				}
-				else if (net_count <= 128)
+				if (net_count <= 128)
 				{
 					return create_solver<FT, -128>(net_count, sname, nets);
 				}
-				else if (net_count <= 256)
+				if (net_count <= 256)
 				{
 					return create_solver<FT, -256>(net_count, sname, nets);
 				}
-				else if (net_count <= 512)
+				if (net_count <= 512)
 				{
 					return create_solver<FT, -512>(net_count, sname, nets);
 				}
-				else
-				{
-					return create_solver<FT, 0>(net_count, sname, nets);
-				}
+				return create_solver<FT, 0>(net_count, sname, nets);
 				break;
 		}
 	}
@@ -212,7 +215,7 @@ namespace devices
 			for (auto & net : netlist.nets())
 			{
 				netlist.log().verbose("processing {1}", net->name());
-				if (!net->isRailNet() && net->num_cons() > 0)
+				if (!net->is_rail_net() && net->has_connections())
 				{
 					netlist.log().verbose("   ==> not a rail net");
 					// Must be an analog net
@@ -236,7 +239,7 @@ namespace devices
 		bool already_processed(const analog_net_t &n) const
 		{
 			// no need to process rail nets - these are known variables
-			if (n.isRailNet())
+			if (n.is_rail_net())
 				return true;
 			// if it's already processed - no need to continue
 			for (const auto & grp : groups)
@@ -248,7 +251,7 @@ namespace devices
 		bool check_if_processed_and_join(const analog_net_t &n)
 		{
 			// no need to process rail nets - these are known variables
-			if (n.isRailNet())
+			if (n.is_rail_net())
 				return true;
 			// First check if it is in a previous group.
 			// In this case we need to merge this group into the current group
@@ -276,23 +279,24 @@ namespace devices
 		{
 			// ignore empty nets. FIXME: print a warning message
 			netlist.log().verbose("Net {}", n.name());
-			if (n.num_cons() == 0)
-				return;
-			// add the net
-			groupspre.back().push_back(&n);
-			// process all terminals connected to this net
-			for (auto &term : n.core_terms())
+			if (n.has_connections())
 			{
-				netlist.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
-				// only process analog terminals
-				if (term->is_type(detail::terminal_type::TERMINAL))
+				// add the net
+				groupspre.back().push_back(&n);
+				// process all terminals connected to this net
+				for (auto &term : n.core_terms())
 				{
-					auto *pt = static_cast<terminal_t *>(term);
-					// check the connected terminal
-					analog_net_t &connected_net = netlist.setup().get_connected_terminal(*pt)->net();
-					netlist.log().verbose("  Connected net {}", connected_net.name());
-					if (!check_if_processed_and_join(connected_net))
-						process_net(netlist, connected_net);
+					netlist.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
+					// only process analog terminals
+					if (term->is_type(detail::terminal_type::TERMINAL))
+					{
+						auto *pt = static_cast<terminal_t *>(term);
+						// check the connected terminal
+						analog_net_t &connected_net = netlist.setup().get_connected_terminal(*pt)->net();
+						netlist.log().verbose("  Connected net {}", connected_net.name());
+						if (!check_if_processed_and_join(connected_net))
+							process_net(netlist, connected_net);
+					}
 				}
 			}
 		}
@@ -322,6 +326,7 @@ namespace devices
 #if (NL_USE_FLOAT_MATRIX)
 					ms = create_solvers<float>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;
@@ -332,13 +337,15 @@ namespace devices
 #if (NL_USE_LONG_DOUBLE_MATRIX)
 					ms = create_solvers<long double>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;
-				case solver::matrix_fp_type_e::FLOAT128:
+				case solver::matrix_fp_type_e::FLOATQ128:
 #if (NL_USE_FLOAT128)
-					ms = create_solvers<__float128>(sname, grp);
+					ms = create_solvers<FLOAT128>(sname, grp);
 #else
+					log().info("FPTYPE {1} not supported. Using DOUBLE", m_params.m_fp_type().name());
 					ms = create_solvers<double>(sname, grp);
 #endif
 					break;

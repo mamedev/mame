@@ -38,24 +38,19 @@
  *
  *************************************/
 
-void klax_state::update_interrupts()
+TIMER_DEVICE_CALLBACK_MEMBER(klax_state::scanline_update)
 {
-	m_maincpu->set_input_line(4, m_video_int_state || m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
+	int scanline = param;
 
-
-void klax_state::scanline_update(screen_device &screen, int scanline)
-{
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !m_screen->vblank() && !(m_p1->read() & 0x800))
-		scanline_int_write_line(1);
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
 
 void klax_state::interrupt_ack_w(u16 data)
 {
-	scanline_int_ack_w();
-	video_int_ack_w();
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
@@ -67,8 +62,6 @@ void klax_state::interrupt_ack_w(u16 data)
 
 void klax_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 32);
 }
 
 
@@ -194,8 +187,10 @@ GFXDECODE_END
 void klax_state::klax(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(klax_state::scanline_update), m_screen, 0, 32);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -215,15 +210,15 @@ void klax_state::klax(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(klax_state::screen_update));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(klax_state::video_int_write_line));
+	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", ATARI_CLOCK_14MHz/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, "oki", 14.318181_MHz_XTAL/4/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void klax_state::bootleg_sound_map(address_map &map)

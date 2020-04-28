@@ -771,11 +771,11 @@ uint64_t z8002_device::DIVL(uint64_t dest, uint32_t value)
 		remainder = dest % value;
 		if (qsign) result = -result;
 		if (rsign) remainder = -remainder;
-		if ((int64_t)result < -0x80000000 || (int64_t)result > 0x7fffffff)
+		if ((int64_t)result < -0x80000000LL || (int64_t)result > 0x7fffffff)
 		{
 			int64_t temp = (int64_t)result >> 1;
 			SET_V;
-			if (temp >= -0x80000000 && temp <= 0x7fffffff)
+			if (temp >= -0x80000000LL && temp <= 0x7fffffff)
 			{
 				result = (temp < 0) ? -1 : 0;
 				CHK_XXXL_ZS;
@@ -5362,7 +5362,7 @@ void z8002_device::Z9D_imm8()
 void z8002_device::Z9E_0000_cccc()
 {
 	GET_CCC(OP0,NIB3);
-	if (get_segmented_mode())
+	if (get_segmented_mode()) {
 		switch (cc) {
 			case  0: if (CC0) set_pc(segmented_addr(POPL(SP))); break;
 			case  1: if (CC1) set_pc(segmented_addr(POPL(SP))); break;
@@ -5381,7 +5381,8 @@ void z8002_device::Z9E_0000_cccc()
 			case 14: if (CCE) set_pc(segmented_addr(POPL(SP))); break;
 			case 15: if (CCF) set_pc(segmented_addr(POPL(SP))); break;
 		}
-	else
+	}
+	else {
 		switch (cc) {
 			case  0: if (CC0) set_pc(POPW(SP)); break;
 			case  1: if (CC1) set_pc(POPW(SP)); break;
@@ -5400,6 +5401,7 @@ void z8002_device::Z9E_0000_cccc()
 			case 14: if (CCE) set_pc(POPW(SP)); break;
 			case 15: if (CCF) set_pc(POPW(SP)); break;
 		}
+	}
 }
 
 /******************************************

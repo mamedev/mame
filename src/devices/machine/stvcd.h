@@ -11,7 +11,9 @@
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t, public device_mixer_interface
+class stvcd_device : public device_t,
+					 public device_mixer_interface,
+					 public device_memory_interface
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
@@ -31,8 +33,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
+	const address_space_config      m_space_config;
+
+	void io_regs(address_map &map);
+
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
 
@@ -119,11 +126,6 @@ private:
 	void cd_defragblocks(partitionT *part);
 	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
 
-	uint16_t cd_readWord(uint32_t addr);
-	void cd_writeWord(uint32_t addr, uint16_t data);
-	uint32_t cd_readLong(uint32_t addr);
-	void cd_writeLong(uint32_t addr, uint32_t data);
-
 	void cd_readTOC();
 	void cd_readblock(uint32_t fad, uint8_t *dat);
 	void cd_playdata();
@@ -192,7 +194,8 @@ private:
 	required_device<timer_device> m_sector_timer;
 	required_device<timer_device> m_sh1_timer;
 	required_device<cdda_device> m_cdda;
-	
+
+	// CDC commands
 	// 0x00
 	void cmd_get_status();
 	void cmd_get_hw_info();
@@ -251,6 +254,26 @@ private:
 	void cmd_check_copy_protection();
 	void cmd_get_disc_region();
 	void cmd_get_mpeg_card_boot_rom();
+
+	// comms
+	DECLARE_READ32_MEMBER(datatrns_r);
+	DECLARE_WRITE32_MEMBER(datatrns_w);
+	inline u32 dataxfer_long_r();
+	inline u16 dataxfer_word_r();
+	inline void dataxfer_long_w(u32 data);
+	DECLARE_READ16_MEMBER(cr1_r);
+	DECLARE_READ16_MEMBER(cr2_r);
+	DECLARE_READ16_MEMBER(cr3_r);
+	DECLARE_READ16_MEMBER(cr4_r);
+	DECLARE_WRITE16_MEMBER(cr1_w);
+	DECLARE_WRITE16_MEMBER(cr2_w);
+	DECLARE_WRITE16_MEMBER(cr3_w);
+	DECLARE_WRITE16_MEMBER(cr4_w);
+
+	DECLARE_READ16_MEMBER(hirq_r);
+	DECLARE_WRITE16_MEMBER(hirq_w);
+	DECLARE_READ16_MEMBER(hirqmask_r);
+	DECLARE_WRITE16_MEMBER(hirqmask_w);
 };
 
 // device type definition

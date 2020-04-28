@@ -123,7 +123,7 @@ public:
 	//    to a #device_t and a const reference to an #internal_layout.
 	template <typename T> void apply_default_layouts(T &&op) const
 	{
-		for (std::pair<char const *, internal_layout const *> const &lay : m_default_layouts)
+		for (std::pair<char const *const, internal_layout const *> const &lay : m_default_layouts)
 			op(*device(lay.first), *lay.second);
 	}
 

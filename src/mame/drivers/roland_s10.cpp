@@ -238,7 +238,7 @@ void roland_s10_state::s10(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s10_state::lcd_pixel_update));
-	m_lcdc->set_busy_factor(0.005);
+	m_lcdc->set_busy_factor(0.005f);
 
 	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 

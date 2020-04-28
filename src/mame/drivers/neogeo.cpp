@@ -1065,7 +1065,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 	uint16_t ret;
 
 	if (m_memcard->present())
-		ret = m_memcard->read(space, offset) | 0xff00;
+		ret = m_memcard->read(offset) | 0xff00;
 	else
 		ret = 0xffff;
 
@@ -1080,7 +1080,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_memcard->present())
-				m_memcard->write(space, offset, data);
+				m_memcard->write(offset, data);
 	}
 }
 
@@ -11054,7 +11054,7 @@ ROM_END
 
 /* clear cart, orange pcbs
    prog board: no v encryption, uses a plcc epm7096lc84-15 for pcm, 16-bit v roms decoded by 2x 74hc245
-   cha board: no c/m encryption, uses a soic palce16v8 for zmc, 5x 74hc273a for neo-273, 6x so44 m59pw064 64Mbit + 2x dip lh28f160 16MBit flash roms for gfx 
+   cha board: no c/m encryption, uses a soic palce16v8 for zmc, 5x 74hc273a for neo-273, 6x so44 m59pw064 64Mbit + 2x dip lh28f160 16MBit flash roms for gfx
    all roms are erasable flash chips, mixture of 5v and 3.3v
    produced sometime after early 2004 (going by youngest ic date code) */
 ROM_START( mslug5b )

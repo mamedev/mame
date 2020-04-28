@@ -36,7 +36,7 @@
                  same chipset used in Mogis M320, but uses more advanced feature set.
 
   (more)
-  
+
 
 
   todo (VT03):
@@ -764,8 +764,8 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
      used for MMC3/other mapper compatibility
      some consoles have scrambled registers for crude copy protection
 
-	is this always there with VT based games? it maps where mappers would be on a NES cartridge
-	but then seems to be able to alter internal state of extended PPU registers, which is awkward
+    is this always there with VT based games? it maps where mappers would be on a NES cartridge
+    but then seems to be able to alter internal state of extended PPU registers, which is awkward
 */
 
 void nes_vt_soc_device::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
@@ -985,12 +985,13 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		length -= 1;
 		src_addr += 1;
 	}
-	else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	{
-		// Legacy mode for DGUN-2573 compat
-		m_ppu->set_vram_dest(0x3F00);
-		m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	}
+	//TODO (always false)
+	//else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	//{
+	//  // Legacy mode for DGUN-2573 compat
+	//  m_ppu->set_vram_dest(0x3F00);
+	//  m_ppu->set_palette_mode(PAL_MODE_VT0x);
+	//}
 
 	for (int i = 0; i < length; i++)
 	{
@@ -1138,7 +1139,7 @@ void nes_vt_soc_device::nes_vt_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 
-	
+
 	map(0x4014, 0x4014).r(FUNC(nes_vt_soc_device::psg1_4014_r)).w(FUNC(nes_vt_soc_device::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_soc_device::psg1_4015_r), FUNC(nes_vt_soc_device::psg1_4015_w)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_soc_device::in0_r), FUNC(nes_vt_soc_device::in0_w));
@@ -1159,7 +1160,7 @@ void nes_vt_soc_device::nes_vt_map(address_map &map)
 	map(0x4119, 0x4119).r(FUNC(nes_vt_soc_device::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
-	
+
 
 	map(0x8000, 0xffff).rw(FUNC(nes_vt_soc_device::external_space_read), FUNC(nes_vt_soc_device::external_space_write));
 	map(0x6000, 0x7fff).ram();
@@ -1287,8 +1288,8 @@ void nes_vt_soc_4kram_device::nes_vt_4k_ram_map(address_map &map)
 	nes_vt_soc_device::nes_vt_map(map);
 	map(0x0800, 0x0fff).ram();
 
-//	map(0x412c, 0x412c).rw(FUNC(nes_vt_soc_4kram_device::vtfp_412c_r, FUNC(nes_vt_soc_4kram_device::vtfp_412c_extbank_w)); // GPIO
-//	map(0x412d, 0x412d).r(FUNC(nes_vt_soc_4kram_device::vtfp_412d_r)); // GPIO
+//  map(0x412c, 0x412c).rw(FUNC(nes_vt_soc_4kram_device::vtfp_412c_r, FUNC(nes_vt_soc_4kram_device::vtfp_412c_extbank_w)); // GPIO
+//  map(0x412d, 0x412d).r(FUNC(nes_vt_soc_4kram_device::vtfp_412d_r)); // GPIO
 
 }
 
@@ -1516,7 +1517,7 @@ void nes_vt_soc_4kram_fp_device::nes_vt_fp_map(address_map &map)
 
 	map(0x4242, 0x4242).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4242_w));
 
-	map(0x4a00, 0x4a00).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4a00_w));	
+	map(0x4a00, 0x4a00).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4a00_w));
 }
 
 void nes_vt_soc_4kram_fp_pal_device::device_add_mconfig(machine_config& config)

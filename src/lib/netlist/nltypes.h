@@ -52,7 +52,7 @@ namespace netlist
 		callbacks_t() = default;
 		virtual ~callbacks_t() = default;
 
-		COPYASSIGNMOVE(callbacks_t, default)
+		PCOPYASSIGNMOVE(callbacks_t, default)
 
 		/// \brief logging callback.
 		///

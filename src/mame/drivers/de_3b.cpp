@@ -155,25 +155,25 @@ WRITE8_MEMBER( de_3b_state::sound_w )
 
 READ8_MEMBER( de_3b_state::dmd_status_r )
 {
-	return m_dmdtype3->status_r(space,offset);
+	return m_dmdtype3->status_r();
 }
 
 WRITE8_MEMBER( de_3b_state::pia2c_pa_w )
 {
 	/* DMD data */
-	m_dmdtype3->data_w(space,offset,data);
+	m_dmdtype3->data_w(data);
 	logerror("DMD: Data write %02x\n", data);
 }
 
 READ8_MEMBER( de_3b_state::pia2c_pb_r )
 {
-	return m_dmdtype3->busy_r(space,offset);
+	return m_dmdtype3->busy_r();
 }
 
 WRITE8_MEMBER( de_3b_state::pia2c_pb_w )
 {
 	/* DMD ctrl */
-	m_dmdtype3->ctrl_w(space,offset,data);
+	m_dmdtype3->ctrl_w(data);
 	logerror("DMD: Control write %02x\n", data);
 }
 READ8_MEMBER(de_3b_state::display_r)

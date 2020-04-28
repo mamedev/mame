@@ -398,7 +398,7 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( vboysnd_device::read )
+uint8_t vboysnd_device::read(offs_t offset)
 {
 	m_stream->update();
 	return m_aram[offset];
@@ -408,7 +408,7 @@ READ8_MEMBER( vboysnd_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( vboysnd_device::write )
+void vboysnd_device::write(offs_t offset, uint8_t data)
 {
 	int freq, i;
 //    int waveAddr;

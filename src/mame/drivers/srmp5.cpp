@@ -624,7 +624,7 @@ ROM_END
 
 void srmp5_state::init_srmp5()
 {
-	m_soundcpu->set_st0016_game_flag(9);
+	m_soundcpu->set_game_flag(9);
 
 	m_tileram = std::make_unique<uint16_t[]>(0x100000/2);
 	m_sprram  = std::make_unique<uint16_t[]>(0x080000/2);

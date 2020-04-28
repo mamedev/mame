@@ -53,7 +53,7 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile);
 		virtual ~element_t() = default;
 
-		COPYASSIGNMOVE(element_t, default)
+		PCOPYASSIGNMOVE(element_t, default)
 
 		virtual unique_pool_ptr<device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
@@ -109,7 +109,7 @@ namespace factory {
 		explicit list_t(log_type &alog);
 		~list_t() = default;
 
-		COPYASSIGNMOVE(list_t, delete)
+		PCOPYASSIGNMOVE(list_t, delete)
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,

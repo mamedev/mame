@@ -155,10 +155,10 @@ READ8_MEMBER( battles_state::input_port_r )
 	switch ( offset )
 	{
 		default:
-		case 0: return ~bitswap<8>(ioport("IN0H")->read(),7,6,5,4,2,3,1,0);
-		case 1: return ~ioport("IN1L")->read();
-		case 2: return ~ioport("IN1H")->read();
-		case 3: return ~ioport("IN0L")->read();
+		case 0: return ~bitswap<8>(ioport("IN1")->read(),2,3,1,0,6,7,5,4);
+		case 1: return ~ioport("IN0")->read() & 15;
+		case 2: return ~ioport("IN0")->read() >> 4;
+		case 3: return ~ioport("IN1")->read() & 15;
 	}
 }
 

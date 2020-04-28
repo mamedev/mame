@@ -184,6 +184,8 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_irq_enabled(0),
 	m_romsubbank(0),
 	m_scrollctrl(0),
+	m_dx(0),
+	m_dy(0),
 	m_char_rom(*this, DEVICE_SELF),
 	m_k052109_cb(*this),
 	m_irq_handler(*this),
@@ -248,8 +250,12 @@ void k052109_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_tilemap[1]->set_scrolldx(6, 6);
-	m_tilemap[2]->set_scrolldx(6, 6);
+	m_tilemap[0]->set_scrolldx(m_dx, m_dx);
+	m_tilemap[1]->set_scrolldx(m_dx+6, m_dx+6);
+	m_tilemap[2]->set_scrolldx(m_dx+6, m_dx+6);
+	m_tilemap[0]->set_scrolldy(m_dy, m_dy);
+	m_tilemap[1]->set_scrolldy(m_dy, m_dy);
+	m_tilemap[2]->set_scrolldy(m_dy, m_dy);
 
 	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
@@ -293,6 +299,12 @@ void k052109_device::device_post_load()
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
+
+void k052109_device::set_xy_offset(int dx, int dy)
+{
+	m_dx = dx;
+	m_dy = dy;
+}
 
 void k052109_device::vblank_callback(screen_device &screen, bool state)
 {

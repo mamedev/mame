@@ -1248,6 +1248,8 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.h",
+		MAME_DIR .. "src/devices/bus/ieee488/grid2102.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/grid2102.h",
 	}
 
 	dependency {

@@ -134,7 +134,7 @@ private:
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
 	DECLARE_VIDEO_START(raiga);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_raiga);
 	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

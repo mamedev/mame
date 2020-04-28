@@ -193,6 +193,7 @@ ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
 cxg_dominator.cpp
+cxg_scptchess.cpp
 cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
@@ -503,6 +504,7 @@ mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 mdisk.cpp
+mdt60.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd1.cpp
@@ -791,8 +793,11 @@ saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
+saitek_exchess.cpp
+saitek_leonardo.cpp
 saitek_mark5.cpp
 saitek_prschess.cpp
+saitek_renaissance.cpp
 saitek_risc2500.cpp
 saitek_schess.cpp
 saitek_ssystem3.cpp

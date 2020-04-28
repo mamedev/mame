@@ -142,7 +142,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
-	m_lcdc->set_busy_factor(0.005);
+	m_lcdc->set_busy_factor(0.005f);
 }
 
 void alphajuno_state::ajuno2(machine_config &config)
@@ -181,7 +181,7 @@ void alphajuno_state::mks50(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
-	m_lcdc->set_busy_factor(0.05);
+	m_lcdc->set_busy_factor(0.05f);
 }
 
 // Original EPROM labels specify major and minor revisions with punch grids; "U" (update?) tag is separate.

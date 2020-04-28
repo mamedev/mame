@@ -87,6 +87,9 @@ public:
 	// Tap into fetched opcodes
 	auto opcode_cb() { return m_opcode_func.bind(); }
 
+	// Acknowledge interrupts
+	auto int_cb() { return m_int_func.bind(); }
+
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
@@ -159,6 +162,7 @@ protected:
 	uint8_t m_last_pa;
 	devcb_write16 m_opcode_func;
 	devcb_write8 m_stm_func;
+	devcb_read8 m_int_func;
 
 	int m_icount;
 	uint32_t m_addr_mask;

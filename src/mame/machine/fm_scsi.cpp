@@ -415,7 +415,7 @@ void fmscsi_device::fmscsi_control_w(uint8_t data)
 	logerror("FMSCSI: control write %02x\n",data);
 }
 
-READ8_MEMBER( fmscsi_device::fmscsi_r )
+uint8_t fmscsi_device::fmscsi_r(offs_t offset)
 {
 	switch(offset & 0x03)
 	{
@@ -431,7 +431,7 @@ READ8_MEMBER( fmscsi_device::fmscsi_r )
 	return 0;
 }
 
-WRITE8_MEMBER( fmscsi_device::fmscsi_w )
+void fmscsi_device::fmscsi_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 0x03)
 	{

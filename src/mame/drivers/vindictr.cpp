@@ -35,16 +35,20 @@
  *
  *************************************/
 
-void vindictr_state::update_interrupts()
+void vindictr_state::scanline_interrupt()
 {
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+}
+
+
+void vindictr_state::scanline_int_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 
 void vindictr_state::machine_reset()
 {
-	atarigen_state::machine_reset();
-	scanline_timer_reset(*m_screen, 8);
 }
 
 
@@ -185,8 +189,10 @@ GFXDECODE_END
 void vindictr_state::vindictr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	M68010(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vindictr_state::main_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(vindictr_state::scanline_update), m_screen, 0, 8);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -206,7 +212,7 @@ void vindictr_state::vindictr(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vindictr_state::screen_update_vindictr));
 	m_screen->set_palette(m_palette);
 

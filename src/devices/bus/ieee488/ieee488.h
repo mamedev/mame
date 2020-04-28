@@ -15,6 +15,7 @@
 void cbm_ieee488_devices(device_slot_interface &device);
 void hp_ieee488_devices(device_slot_interface &device);
 void remote488_devices(device_slot_interface &device);
+void grid_ieee488_devices(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
 DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)

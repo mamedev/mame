@@ -717,6 +717,7 @@ void timex_state::ts2068(machine_config &config)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
+	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
@@ -749,6 +750,9 @@ void timex_state::tc2048(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("48K");
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 }
 
 

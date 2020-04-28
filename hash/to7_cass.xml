@@ -7442,7 +7442,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="6152">
-				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard) (1984) (to7).k7" size="6152" crc="3abe21c9" sha1="d1e86650f8d9ac2d928097c29e668729c73fa0bd"/>
+				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard).k7" size="6152" crc="3abe21c9" sha1="d1e86650f8d9ac2d928097c29e668729c73fa0bd"/>
 			</dataarea>
 		</part>
 	</software>

@@ -1,5 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller,Ernesto Corvi
+/**********************************************************************
+             ____   ____
+     AD0  1 |*   \_/    | 48 AD8
+     AD9  2 |           | 47 SN6              ____   ____
+    AD10  3 |           | 46 SN5      AD9  1 |*   \_/    | 40 AD0
+    AD11  4 |           | 45 AD7     AD10  2 |           | 39 AD8
+    AD12  5 |           | 44 AD6     AD11  3 |           | 38 AD7
+    AD13  6 |           | 43 AD4     AD12  4 |           | 37 AD6
+   _STOP  7 |           | 42 SN4     AD13  5 |           | 36 AD4
+     _Mi  8 |           | 41 AD5    _STOP  6 |           | 35 AD5
+    AD15  9 |           | 40 AD3      _Mi  7 |           | 34 AD3
+    AD14 10 |           | 39 AD2     AD15  8 |           | 33 AD2
+     +5V 11 |           | 38 AD1     AD14  9 |           | 32 AD1
+     _VI 12 |           | 37 SN2      +5V 10 |           | 31 GND
+    _NVI 13 |   Z8001   | 36 GND      _VI 11 |   Z8002   | 30 CLOCK
+   _SEGT 14 |           | 35 CLOCK   _NVI 12 |           | 29 _AS
+    _NMI 15 |           | 34 _AS     _NMI 13 |           | 28 RSVD
+  _RESET 16 |           | 33 RSVD  _RESET 14 |           | 27 B/_W
+     _Mo 17 |           | 32 B/_W     _Mo 15 |           | 26 N/_S
+   _MREQ 18 |           | 31 N/_S   _MREQ 16 |           | 25 R/_W
+     _DS 19 |           | 30 R/_W     _DS 17 |           | 24 _BUSACK
+     ST3 20 |           | 29 _BUSACK  ST3 18 |           | 23 _WAIT
+     ST2 21 |           | 28 _WAIT    ST2 19 |           | 22 _BUSREQ
+     ST1 22 |           | 27 _BUSREQ  ST1 20 |___________| 21 ST0
+     ST0 23 |           | 26 SN0
+     SN3 24 |___________| 25 SN1
+
+**********************************************************************/
+
 #ifndef MAME_CPU_Z8000_Z8000_H
 #define MAME_CPU_Z8000_Z8000_H
 

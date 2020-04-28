@@ -303,7 +303,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( pc9801_kbd_device::rx_r )
+uint8_t pc9801_kbd_device::rx_r(offs_t offset)
 {
 	m_write_irq(CLEAR_LINE);
 	if(!offset)
@@ -314,7 +314,7 @@ READ8_MEMBER( pc9801_kbd_device::rx_r )
 	return 1 | 4 | (m_key_avail ? 2 : 0);
 }
 
-WRITE8_MEMBER( pc9801_kbd_device::tx_w )
+void pc9801_kbd_device::tx_w(uint8_t data)
 {
 	m_keyb_rx = data;
 }

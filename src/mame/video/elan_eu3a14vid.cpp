@@ -856,13 +856,13 @@ void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		}
 	}
 }
-READ8_MEMBER(elan_eu3a14vid_device::read_unmapped)
+uint8_t elan_eu3a14vid_device::read_unmapped(offs_t offset)
 {
 	logerror("%s: elan_eu3a14vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a14vid_device::write_unmapped)
+void elan_eu3a14vid_device::write_unmapped(offs_t offset, uint8_t data)
 {
 	logerror("%s: elan_eu3a14vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }

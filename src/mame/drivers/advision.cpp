@@ -95,7 +95,7 @@ void advision_state::advision(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart").set_must_be_loaded(true);
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("advision");

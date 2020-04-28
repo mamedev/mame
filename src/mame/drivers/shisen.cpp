@@ -197,12 +197,12 @@ GFXDECODE_END
 void shisen_state::shisen(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);   /* 6 MHz ? */
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL );   /* Verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &shisen_state::shisen_map);
 	m_maincpu->set_addrmap(AS_IO, &shisen_state::shisen_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shisen_state::irq0_line_hold));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 3579645));
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL ));   /* Verified on PCB */
 	soundcpu.set_addrmap(AS_PROGRAM, &shisen_state::shisen_sound_map);
 	soundcpu.set_addrmap(AS_IO, &shisen_state::shisen_sound_io_map);
 	soundcpu.set_periodic_int(FUNC(shisen_state::nmi_line_pulse), attotime::from_hz(128*55));  /* clocked by V1? (Vigilante) */
@@ -234,7 +234,7 @@ void shisen_state::shisen(machine_config &config)
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL ));   /* Verified on PCB */
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(0, "lspeaker", 0.5);
 	ymsnd.add_route(1, "rspeaker", 0.5);
@@ -255,36 +255,41 @@ void shisen_state::shisen(machine_config &config)
 
 ROM_START( sichuan2 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k+128k for main CPU */
-	ROM_LOAD( "ic06.06",      0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
-	ROM_RELOAD(               0x10000, 0x10000 )
-	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
+	ROM_LOAD( "6.11d",     0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
+	ROM_RELOAD(            0x10000, 0x10000 )
+	ROM_LOAD( "7.11c",     0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
+	ROM_LOAD( "1.2c",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "ic08.04",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
-	ROM_LOAD( "ic09.05",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
-	ROM_LOAD( "ic12.08",      0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
-	ROM_LOAD( "ic13.09",      0x30000, 0x10000, CRC(3feff3f2) SHA1(2e87e4fb158379486de5d13feff5bf1965690e14) )
-	ROM_LOAD( "ic14.10",      0x40000, 0x10000, CRC(b76a517d) SHA1(6dcab31ecc127c2fdc6912802cddfa62161d83a2) )
-	ROM_LOAD( "ic15.11",      0x50000, 0x10000, CRC(8ff5ee7a) SHA1(c8f4d374a43fcc818378c4e73af2c03238a93ad0) )
-	ROM_LOAD( "ic16.12",      0x60000, 0x10000, CRC(64e5d837) SHA1(030f9704dfdb06cd3ac583b857ce9239e1409f60) )
-	ROM_LOAD( "ic17.13",      0x70000, 0x10000, CRC(02c1b2c4) SHA1(6e4fe801189766559859eb0d628f3ae65c05ad16) )
-	ROM_LOAD( "ic18.14",      0x80000, 0x10000, CRC(f5a8370e) SHA1(b270af116ee15b5de048fc218215bf91a2ce6b46) )
-	ROM_LOAD( "ic19.15",      0x90000, 0x10000, CRC(7a9b7671) SHA1(ddb9b412b494f2f259c56a163e5511353cf4ebb5) )
-	ROM_LOAD( "ic20.16",      0xa0000, 0x10000, CRC(7fb396ad) SHA1(b245bb9a6a4c1ec518906c59c3a3da5e412369ab) )
-	ROM_LOAD( "ic21.17",      0xb0000, 0x10000, CRC(fb83c652) SHA1(3d124e5c751732e8055bbb7b6853b6e64435a85d) )
-	ROM_LOAD( "ic22.18",      0xc0000, 0x10000, CRC(d8b689e9) SHA1(14db7ba2246f12db9b6b5b4dcb4a648e4a65ace4) )
-	ROM_LOAD( "ic23.19",      0xd0000, 0x10000, CRC(e6611947) SHA1(9267dad097b318174706d51fb94d613208b04f60) )
-	ROM_LOAD( "ic10.06",      0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
-	ROM_LOAD( "ic11.07",      0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
+	ROM_LOAD( "8.3j",      0x00000, 0x10000, CRC(1c0e221c) SHA1(87561f7dabf25309be784e797ac237aa3956ea1c) )
+	ROM_LOAD( "9.4j",      0x10000, 0x10000, CRC(8a7d8284) SHA1(56b5d352b506c5bfab24102b11c877dd28c8ad36) )
+	ROM_LOAD( "12.1l",     0x20000, 0x10000, CRC(48e1d043) SHA1(4fbd409aff593c0b27fc58c218a470adf48ee0b7) )
+	ROM_LOAD( "13.2l",     0x30000, 0x10000, CRC(3feff3f2) SHA1(2e87e4fb158379486de5d13feff5bf1965690e14) )
+	ROM_LOAD( "14.3l",     0x40000, 0x10000, CRC(b76a517d) SHA1(6dcab31ecc127c2fdc6912802cddfa62161d83a2) )
+	ROM_LOAD( "15.5l",     0x50000, 0x10000, CRC(8ff5ee7a) SHA1(c8f4d374a43fcc818378c4e73af2c03238a93ad0) )
+	ROM_LOAD( "16.6l",     0x60000, 0x10000, CRC(64e5d837) SHA1(030f9704dfdb06cd3ac583b857ce9239e1409f60) )
+	ROM_LOAD( "17.7l",     0x70000, 0x10000, CRC(02c1b2c4) SHA1(6e4fe801189766559859eb0d628f3ae65c05ad16) )
+	ROM_LOAD( "18.8l",     0x80000, 0x10000, CRC(f5a8370e) SHA1(b270af116ee15b5de048fc218215bf91a2ce6b46) )
+	ROM_LOAD( "19.10l",    0x90000, 0x10000, CRC(7a9b7671) SHA1(ddb9b412b494f2f259c56a163e5511353cf4ebb5) )
+	ROM_LOAD( "20.11l",    0xa0000, 0x10000, CRC(7fb396ad) SHA1(b245bb9a6a4c1ec518906c59c3a3da5e412369ab) )
+	ROM_LOAD( "21.12l",    0xb0000, 0x10000, CRC(fb83c652) SHA1(3d124e5c751732e8055bbb7b6853b6e64435a85d) )
+	ROM_LOAD( "22.13l",    0xc0000, 0x10000, CRC(d8b689e9) SHA1(14db7ba2246f12db9b6b5b4dcb4a648e4a65ace4) )
+	ROM_LOAD( "23.14l",    0xd0000, 0x10000, CRC(e6611947) SHA1(9267dad097b318174706d51fb94d613208b04f60) )
+	ROM_LOAD( "11.6j",     0xe0000, 0x10000, CRC(473b349a) SHA1(9f5d08e07c8175bc7ec3854499177af2c398bd76) )
+	ROM_LOAD( "10.5j",     0xf0000, 0x10000, CRC(d9a60285) SHA1(f8ef211e022e9c8ea25f6d8fb16266867656a591) )
 
 	ROM_REGION( 0x40000, "m72", 0 ) /* samples */
-	ROM_LOAD( "ic02.02",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
-	ROM_LOAD( "ic03.03",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
-	ROM_LOAD( "ic04.04",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
-	ROM_LOAD( "ic05.05",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
+	ROM_LOAD( "2.7b",      0x00000, 0x10000, CRC(92f0093d) SHA1(530b924aa991283045577d03524dfc7eacf1be49) )
+	ROM_LOAD( "3.6c",      0x10000, 0x10000, CRC(116a049c) SHA1(656c0d1d7f945c5f5637892721a58421b682fd01) )
+	ROM_LOAD( "4.7c",      0x20000, 0x10000, CRC(6840692b) SHA1(f6f7b063ecf7206e172843515be38376f8845b42) )
+	ROM_LOAD( "5.9c",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "1.1f",  0x000, 0x104, NO_DUMP ) // TIBPAL16R4
+	ROM_LOAD( "2.6e",  0x200, 0x104, NO_DUMP ) // TIBPAL16L8
+	ROM_LOAD( "3.14f", 0x400, 0x104, NO_DUMP ) // TIBPAL16L8
 ROM_END
 
 ROM_START( sichuan2a )

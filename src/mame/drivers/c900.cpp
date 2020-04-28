@@ -74,14 +74,14 @@ void c900_state::sound_pb_w(u8 data)
 
 void c900_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rom().region("roms", 0);
+	map(0x000000, 0x007fff).rom().region("roms", 0);
 }
 
 void c900_state::data_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rom().region("roms", 0);
-	map(0x08000, 0x6ffff).ram();
-	map(0xf0000, 0xf1fff).ram();
+	map(0x000000, 0x007fff).rom().region("roms", 0);
+	map(0x008000, 0x06ffff).ram();
+	map(0x3f0000, 0x3f1fff).ram();
 }
 
 void c900_state::io_map(address_map &map)

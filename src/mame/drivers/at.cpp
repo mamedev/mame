@@ -316,7 +316,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_portb_r )
 {
-	uint8_t data = m_mb->portb_r(space, offset);
+	uint8_t data = m_mb->portb_r();
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data = (data & ~0x10) | ((machine().time().as_ticks(66291) & 1) ? 0x10 : 0);
 
@@ -963,11 +963,11 @@ void at_state::pg750(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
 	rtc.set_century_index(0x32);
-	
+
 	// on-board devices
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_dual_1440K); // FIXME: deteremine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
@@ -979,7 +979,7 @@ void at_state::pg750(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
-	
+
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("3712K");
 }
@@ -2154,7 +2154,7 @@ ROM_END
 // Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
 // Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
 // EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
-// CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix 
+// CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix
 // Connectors: Keyboard, Printer, Serial, Floppy (can use the same external floppy disk drives as the EuroXT), EGA monitor
 // OSC: 34.0000, 19.2000MHz, 24.0000, 16.000MHz
 // BUS: proprietary connectors, ISA riser (ISA8x1, ISA16x1), BIOS can set CPU and BUS speed up to 12MHz
@@ -2166,11 +2166,11 @@ ROM_START( euroat )
 	ROMX_LOAD( "euro_at_v201a_l.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "euro_at_v201a_h.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(0) )
 	// EGA ROM dump missing
-	
+
 	ROM_SYSTEM_BIOS( 1, "v203", "V2.03" )
 	ROMX_LOAD( "80286at_bioslow_schneider_ag_id50444_v2.03.bin", 0x10000, 0x8000, CRC(de356110) SHA1(6bed59a756afa0b6181187d202b325e35afadd55), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "80286at_bioshigh_schneider_ag_id50445_v2.03.bin", 0x10001, 0x8000, CRC(c4c9c840) SHA1(09deaa659191075b6ccc58403979d61bdf990dcd), ROM_SKIP(1) | ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x10000, "vga", 0 )
 	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
 ROM_END
@@ -3586,7 +3586,7 @@ ROM_END
 // ISA16: 7
 // on board: V24/Mouse, V24/Modem, Printer
 ROM_START( pg750 )
-    ROM_REGION32_LE( 0x20000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	// 0: Phoenix 80386 ROM BIOS PLUS Version 1.10 14 / SIEMENS PG-750
 	// Time-of-day clock stopped
 	// EGA/TIGA Graphics System "Highgraph II"
@@ -4987,21 +4987,21 @@ ROM_END
 //**************************************************************************
 
 // NCR Class 3433 - CPU: 486SX/DX 25/33, coprocessor socket provided - Chipset: NCR WPD CLEMSON 006-2001325 CQO1842 9209N
-// LSI LOGIC L1A5840 006-2000654B NAR 9212Delta WG35494 GERMANY, NCR 006-2001895 WPD FALCON E CQO 2291 9218N, 
+// LSI LOGIC L1A5840 006-2000654B NAR 9212Delta WG35494 GERMANY, NCR 006-2001895 WPD FALCON E CQO 2291 9218N,
 // WD58C65JM, VLSI 9210AV 211411 VGA8203C4570 NCR PB 006-2001329, Dallas DS1387
 // OSC: 16.000000MHz, 1.8432MHz,  65.00000MHz, 25.175/26.322, 36.000000MHz, 50.000000MHz, 14.31818MHz, 66.66600MHz
 // on board VGA: NCR 77C22 VGA-2 609-3400639 CQO1570 9210R, 8xMCM514245AJ70
 // Slots: 4xMCA, 3x32-bit external memory card, 1xSCSI host adapter - ports: PS/2 mouse, keyboard, 2xserial, parallel, floppy
 ROM_START( ncr3433 )
-    ROM_REGION32_LE( 0x20000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	// 0: NCR ROM BIOS Version 82.01.00 (3433, 3434, 3432, 3437)
 	ROM_SYSTEM_BIOS(0, "82.01.00", "82.01.00")
 	ROMX_LOAD( "rbios206.bin", 0x00000, 0x20000, CRC(06e77547) SHA1(41c517b284ed6335024c2b8398504cf3eb8a09e1), ROM_BIOS(0) )
 	// 1: NCR ROM BIOS Version 83.01.00 (3433, 3434, 3432, 3437)
 	ROM_SYSTEM_BIOS(1, "83.01.00", "83.01.00")
 	ROMX_LOAD( "rbios1.bin", 0x00000, 0x20000, CRC(cf793ce9) SHA1(69d531d14a86bdada8940ba2466515ebcd870d0d), ROM_BIOS(1) )
-	
-	ROM_REGION( 0x0800, "keyboard", 0 ) 
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "i8742_150-0008390_vers_3.1.bin", 0x000, 0x800, CRC(1bf17f29) SHA1(031ea1bb40756e3e5a1f01b01a53cc3a7c074338) )
 ROM_END
 

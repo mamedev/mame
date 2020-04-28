@@ -206,14 +206,14 @@ void dw_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER( dw_keyboard_device::p1_w )
+void dw_keyboard_device::p1_w(uint8_t data)
 {
 	m_drive = data;
 
 	LOGDBG("p1 <- %02x = drive %04x\n", data, m_drive);
 }
 
-WRITE8_MEMBER( dw_keyboard_device::p2_w )
+void dw_keyboard_device::p2_w(uint8_t data)
 {
 	if (BIT(m_p2 ^ data, 3) && BIT(data, 3)) {
 		m_sense = data & 7;
@@ -225,7 +225,7 @@ WRITE8_MEMBER( dw_keyboard_device::p2_w )
 	LOGDBG("p2 <- %02x = drive %04x sense row %d\n", data, m_drive, data & 7);
 }
 
-READ8_MEMBER( dw_keyboard_device::p2_r )
+uint8_t dw_keyboard_device::p2_r()
 {
 	uint8_t data = m_p2;
 
@@ -248,7 +248,7 @@ READ_LINE_MEMBER( dw_keyboard_device::t1_r )
 	return m_keylatch;
 }
 
-WRITE8_MEMBER( dw_keyboard_device::bus_w )
+void dw_keyboard_device::bus_w(uint8_t data)
 {
 	int i, sense = 0;
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER( dw_keyboard_device::bus_w )
 	}
 }
 
-READ8_MEMBER( dw_keyboard_device::bus_r )
+uint8_t dw_keyboard_device::bus_r()
 {
 	return m_bus;
 }

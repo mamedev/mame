@@ -570,7 +570,7 @@ inline int pleiads_sound_device::noise(int samplerate)
 	return sum / 2;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_a_w )
+void pleiads_sound_device::control_a_w(uint8_t data)
 {
 	if (data == m_sound_latch_a)
 		return;
@@ -581,7 +581,7 @@ WRITE8_MEMBER( pleiads_sound_device::control_a_w )
 	m_sound_latch_a = data;
 }
 
-WRITE8_MEMBER( pleiads_sound_device::control_b_w )
+void pleiads_sound_device::control_b_w(uint8_t data)
 {
 	/*
 	 * pitch selects one of 4 possible clock inputs
@@ -606,7 +606,7 @@ WRITE8_MEMBER( pleiads_sound_device::control_b_w )
 }
 
 /* two bits (4 + 5) from the videoreg_w latch go here */
-WRITE8_MEMBER( pleiads_sound_device::control_c_w )
+void pleiads_sound_device::control_c_w(uint8_t data)
 {
 	if (data == m_sound_latch_c)
 		return;

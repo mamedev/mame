@@ -120,6 +120,7 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	uint16_t viack_r();
+	uint16_t nviack_r();
 };
 
 
@@ -226,8 +227,7 @@ WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 
 WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 {
-	/* Using HOLD_LINE is not completely correct:
-	 * The output of the 8253 is connected to a 74LS74 flop chip.
+	/* The output of the 8253 is connected to a 74LS74 flop chip.
 	 * The output of the flop chip is connected to NVI CPU input.
 	 * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
 	 * outputs to detect an interrupt acknowledge transaction.
@@ -236,7 +236,8 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 */
 	if(m_apb)
 		m_apb->nvi_w(state);
-	m_maincpu->set_input_line(z8001_device::NVI_LINE, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	if(state)
+		m_maincpu->set_input_line(z8001_device::NVI_LINE, ASSERT_LINE);
 }
 
 
@@ -719,11 +720,9 @@ void m20_state::m20_io(address_map &map)
 
 	map(0x80, 0x87).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	map(0xa1, 0xa1).rw(m_kbdi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa3, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
-	map(0xc1, 0xc1).rw(m_ttyi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc3, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 
 	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
@@ -735,6 +734,12 @@ void m20_state::m20_io(address_map &map)
 uint16_t m20_state::viack_r()
 {
 	return m_i8259->acknowledge()<<1;
+}
+
+uint16_t m20_state::nviack_r()
+{
+	m_maincpu->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
+	return 0xffff;
 }
 
 WRITE_LINE_MEMBER(m20_state::int_w)
@@ -794,6 +799,7 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
 	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
 	m_maincpu->viack().set(FUNC(m20_state::viack_r));
+	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 

@@ -211,7 +211,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return m_io->read(space, offset) | (m_mapper->open_bus_r() & 0xff00);
+			return m_io->read(offset) | (m_mapper->open_bus_r() & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
@@ -237,7 +237,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 		case 0x1000/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_io->write(space, offset, data);
+				m_io->write(offset, data);
 				return;
 			}
 			break;

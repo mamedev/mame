@@ -138,7 +138,7 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 }
 
 
-WRITE32_MEMBER( cps3_sound_device::cps3_sound_w )
+void cps3_sound_device::sound_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_stream->update();
 
@@ -171,7 +171,7 @@ WRITE32_MEMBER( cps3_sound_device::cps3_sound_w )
 }
 
 
-READ32_MEMBER( cps3_sound_device::cps3_sound_r )
+uint32_t cps3_sound_device::sound_r(offs_t offset, uint32_t mem_mask)
 {
 	m_stream->update();
 

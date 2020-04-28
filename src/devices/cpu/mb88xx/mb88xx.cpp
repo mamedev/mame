@@ -368,13 +368,13 @@ int mb88_cpu_device::pla( int inA, int inB )
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
-	/* on falling edge trigger interrupt */
-	if ( (m_pio & 0x04) && m_nf && state == CLEAR_LINE )
+	/* on rising edge trigger interrupt */
+	if ( (m_pio & 0x04) && !m_nf && state == ASSERT_LINE )
 	{
 		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
 
-	m_nf = (state != CLEAR_LINE) ? 1 : 0;
+	m_nf = state == ASSERT_LINE;
 }
 
 void mb88_cpu_device::update_pio_enable( uint8_t newpio )

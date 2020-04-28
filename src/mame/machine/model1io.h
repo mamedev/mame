@@ -51,17 +51,17 @@ private:
 	required_ioport m_buttons;
 	required_ioport_array<3> m_dsw;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(io_pa_w);
-	DECLARE_READ8_MEMBER(io_pb_r);
-	DECLARE_READ8_MEMBER(io_pc_r);
-	DECLARE_READ8_MEMBER(io_pd_r);
-	DECLARE_READ8_MEMBER(io_pe_r);
-	DECLARE_WRITE8_MEMBER(io_pe_w);
-	DECLARE_WRITE8_MEMBER(io_pf_w);
-	DECLARE_READ8_MEMBER(io_pg_r);
+	void io_pa_w(uint8_t data);
+	uint8_t io_pb_r();
+	uint8_t io_pc_r();
+	uint8_t io_pd_r();
+	uint8_t io_pe_r();
+	void io_pe_w(uint8_t data);
+	void io_pf_w(uint8_t data);
+	uint8_t io_pg_r();
 
 	ioport_value analog0_r();
 	ioport_value analog1_r();

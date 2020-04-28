@@ -5,10 +5,15 @@
  * Sony NEWS R3000 systems.
  *
  * Sources:
+ *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
  *
- * TODO
- *   - graphics
+ * TODO:
+ *   - lcd controller
+ *   - screen params
+ *   - floppy density/eject
+ *   - centronics port
  *   - sound
+ *   - other models, including slots/cards
  */
 
 #include "emu.h"
@@ -151,8 +156,9 @@ protected:
 	u16 m_intst;
 	u8 m_debug;
 
-	static unsigned const NUM_INT = 4;
-	bool m_int_state[NUM_INT];
+	bool m_int_state[4];
+	bool m_lcd_enable;
+	bool m_lcd_dim;
 };
 
 FLOPPY_FORMATS_MEMBER(news_r3k_state::floppy_formats)
@@ -164,11 +170,21 @@ void news_r3k_state::machine_start()
 	m_led.resolve();
 
 	m_net_ram = std::make_unique<u16[]>(8192);
+	save_pointer(NAME(m_net_ram), 8192);
+
+	save_item(NAME(m_inten));
+	save_item(NAME(m_intst));
+	save_item(NAME(m_debug));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_lcd_enable));
+	save_item(NAME(m_lcd_dim));
 
 	m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r3k_state::itimer), this));
 
 	for (bool &int_state : m_int_state)
 		int_state = false;
+	m_lcd_enable = false;
+	m_lcd_dim = false;
 }
 
 void news_r3k_state::machine_reset()
@@ -189,36 +205,22 @@ void news_r3k_state::init_common()
 
 void news_r3k_state::cpu_map(address_map &map)
 {
-	map(0x08000000, 0x080fffff).ram().share("vram");
+	map.unmap_value_high();
 
-	// FIXME: silence a lot of unhandled graphics addresses
-	map(0x187702b0, 0x187702b3).nopw().umask32(0xffff);
-	map(0x187c0000, 0x187c0003).nopw(); // palette?
-	map(0x187e0000, 0x187e000f).nopw(); // lcdc?
-	map(0x18f702b0, 0x18f702b3).nopw().umask32(0xffff);
-	map(0x18fc0000, 0x18fc0003).nopw(); // palette?
-	map(0x18fe0000, 0x18fe0003).nopw(); // lcdc?
+	map(0x10000000, 0x101fffff).rom().region("krom", 0);
+	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
+	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
+	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
 
-	// respond to absent hardware probes
-	// 0x18500000 lcdc?
-	map(0x18600000, 0x186fffff).r(FUNC(news_r3k_state::bus_error)); // ??
-	map(0x18780000, 0x18780003).r(FUNC(news_r3k_state::bus_error)); // nwb-225
-	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance (ram at 18c20000, id at 18c38000)
-	map(0x18c40000, 0x18c40003).r(FUNC(news_r3k_state::bus_error)); // second scc
-	map(0x18c40004, 0x18c40007).r(FUNC(news_r3k_state::bus_error)); // third scc
-	//map(0x18c40100, 0x18c40118); // scc #1-#4 port/status
-	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance (ram at 18c60000, id at 18c78000)
-	map(0x18e00000, 0x18e00003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 crt
-	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 ctrl
+	map(0x18000000, 0x18ffffff).r(FUNC(news_r3k_state::bus_error));
 
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
-	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
-	// 1fc40007 // powreb?
+	//map(0x1fc40004, 0x1fc40007).w().umask32(0xff); ??
+	// 1fc40007 // power/reboot/PARK?
 	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
 	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
 	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
 	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
-
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
@@ -238,7 +240,7 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
 	map(0x1ff40000, 0x1ff407ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
-	map(0x1ff50000, 0x1ff50003).r(FUNC(news_r3k_state::bus_error)); // lfbm?
+	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
 	map(0x1ff80000, 0x1ff80003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 	map(0x1ffc0000, 0x1ffc3fff).lrw16(
 		[this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
@@ -277,18 +279,22 @@ INPUT_PORTS_END
 
 u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-	u32 *pixel_pointer = m_vram;
+	if (!m_lcd_enable)
+		return 0;
+
+	rgb_t const black = rgb_t::black();
+	rgb_t const white = m_lcd_dim ? rgb_t(191, 191, 191) : rgb_t::white();
+
+	u32 const *pixel_pointer = m_vram;
 
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
 		{
 			u32 const pixel_data = *pixel_pointer++;
 
-			bitmap.pix(y, x + 0) = u8(pixel_data >> 24) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix(y, x + 1) = u8(pixel_data >> 16) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix(y, x + 2) = u8(pixel_data >> 8) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix(y, x + 3) = u8(pixel_data >> 0) ? rgb_t::white() : rgb_t::black();
+			for (unsigned i = 0; i < 32; i++)
+				bitmap.pix(y, x + i) = BIT(pixel_data, 31 - i) ? black : white;
 		}
 	}
 
@@ -327,7 +333,7 @@ void news_r3k_state::int_check()
 	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
 	static u16 const int_mask[] = { 0x001f, 0x00e0, 0x1f00, 0xe000 };
 
-	for (unsigned i = 0; i < NUM_INT; i++)
+	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
 	{
 		bool const int_state = m_intst & m_inten & int_mask[i];
 
@@ -477,15 +483,8 @@ void news_r3k_state::common(machine_config &config)
 			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
 		});
 
-	/*
-	 * FIXME: the screen is supposed to be an 1120x780 monochrome (black/white)
-	 * LCD, with an HD64646FS LCD controller. The boot prom is happy if we just
-	 * ignore the LCDC and pretend the screen is 1024 pixels wide. NEWS-OS
-	 * should detect LCD-MONO 1120x780 1 plane; X server changes mode but probe
-	 * and mode change method isn't understood yet.
-	 */
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(47185920, 1024, 0, 1024, 768, 0, 768);
+	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
 	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
 
 	NEWS_HID_HLE(config, m_hid);
@@ -502,6 +501,11 @@ ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
 	ROMX_LOAD("mpu-16__ver.2.0a__1990_sony.ic64", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+
+	// 2 x MB834200A-20 (4Mb mask ROM)
+	ROM_REGION32_BE(0x200000, "krom", ROMREGION_ERASEFF)
+	ROM_LOAD64_WORD("051_aa.ic109", 0x00000, 0x80000, CRC(1411cbcb) SHA1(793394cd3919034f85bfb015d6d3c504f83b6626))
+	ROM_LOAD64_WORD("052_aa.ic110", 0x00004, 0x80000, CRC(df0f39da) SHA1(076881da022a3fe6731de0ead217285293c25dc7))
 
 	/*
 	 * This is probably a 4-bit device: only the low 4 bits in each location
@@ -520,4 +524,4 @@ ROM_START(nws3260)
 ROM_END
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)

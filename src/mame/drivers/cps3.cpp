@@ -2150,7 +2150,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x040c0094, 0x040c009b).w(FUNC(cps3_state::characterdma_w));
 	map(0x040c00a0, 0x040c00af).w(FUNC(cps3_state::palettedma_w));
 
-	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
+	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::sound_r), FUNC(cps3_sound_device::sound_w));
 
 	map(0x04100000, 0x041fffff).rw(FUNC(cps3_state::cram_data_r), FUNC(cps3_state::cram_data_w));
 	map(0x04200000, 0x043fffff).rw(FUNC(cps3_state::gfxflash_r), FUNC(cps3_state::gfxflash_w)); // GFX Flash ROMS

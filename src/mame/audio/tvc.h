@@ -26,7 +26,7 @@ public:
 
 	auto sndint_wr_callback() { return m_write_sndint.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 	void reset_divider();
 
 protected:

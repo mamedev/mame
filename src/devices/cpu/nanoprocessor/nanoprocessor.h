@@ -72,6 +72,9 @@ public:
 	// All lines that are not in input are to be reported at "1"
 	auto read_dc() { return m_read_dc_func.bind(); }
 
+	// Callback to fetch interrupt vector
+	auto int_ack() { return m_int_ack_func.bind(); }
+
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	// 3 cycles is for int. acknowledge + 1 instruction
@@ -95,6 +98,8 @@ private:
 
 	devcb_write8 m_dc_changed_func;
 	devcb_read8 m_read_dc_func;
+	devcb_read8 m_int_ack_func;
+
 	int m_icount;
 
 	// State of processor

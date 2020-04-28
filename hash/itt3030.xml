@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+This is a sample of what's out there.
+
+The computer is marked as not working, so to load a disk you need to tap B slowly until the cursor appears.
+After the disk boots, entering rubbish can lock up the machine. The keyboard is somewhat unusual.
+To backspace, press F9. The shift key doesn't work, so to shift, hit capslock, hit the shifted key, then capslock to go back to normal.
+Example, to get a ':', capslock, press . then capslock again.
+
+-->
+
+<softwarelist name="itt3030" description="ITT 3030 disk images">
+
+	<software name="master">
+		<description>Master boot disk</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409420">
+				<rom name="3030MAST.TD0" size="409420" crc="342fb02c" sha1="e54491bfa64c1c8dded1508a39a9623139780bb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system">
+		<description>System boot disk</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="After booting, enter A: to use the disk" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="491220">
+				<rom name="3030SYS.TD0" size="491220" crc="fe111b60" sha1="e41bc33e3f7beca5d4f7f4510e5598f91faa2100"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

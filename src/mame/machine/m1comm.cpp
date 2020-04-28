@@ -198,12 +198,12 @@ WRITE_LINE_MEMBER(m1comm_device::dma_hreq_w)
 	m_dma->hack_w(state);
 }
 
-READ8_MEMBER(m1comm_device::dma_mem_r)
+uint8_t m1comm_device::dma_mem_r(offs_t offset)
 {
 	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(m1comm_device::dma_mem_w)
+void m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
 }
@@ -213,42 +213,42 @@ WRITE_LINE_MEMBER(m1comm_device::dlc_int7_w)
 	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
-READ8_MEMBER(m1comm_device::syn_r)
+uint8_t m1comm_device::syn_r()
 {
 	return m_syn | 0xfc;
 }
 
-WRITE8_MEMBER(m1comm_device::syn_w)
+void m1comm_device::syn_w(uint8_t data)
 {
 	m_syn = data & 0x03;
 }
 
-READ8_MEMBER(m1comm_device::zfg_r)
+uint8_t m1comm_device::zfg_r()
 {
 	return m_zfg | (~m_fg << 7) | 0x7e;
 }
 
-WRITE8_MEMBER(m1comm_device::zfg_w)
+void m1comm_device::zfg_w(uint8_t data)
 {
 	m_zfg = data & 0x01;
 }
 
-READ8_MEMBER(m1comm_device::share_r)
+uint8_t m1comm_device::share_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-WRITE8_MEMBER(m1comm_device::share_w)
+void m1comm_device::share_w(offs_t offset, uint8_t data)
 {
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(m1comm_device::cn_r)
+uint8_t m1comm_device::cn_r()
 {
 	return m_cn | 0xfe;
 }
 
-WRITE8_MEMBER(m1comm_device::cn_w)
+void m1comm_device::cn_w(uint8_t data)
 {
 	m_cn = data & 0x01;
 
@@ -285,12 +285,12 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 #endif
 }
 
-READ8_MEMBER(m1comm_device::fg_r)
+uint8_t m1comm_device::fg_r()
 {
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-WRITE8_MEMBER(m1comm_device::fg_w)
+void m1comm_device::fg_w(uint8_t data)
 {
 	if (!m_cn)
 		return;

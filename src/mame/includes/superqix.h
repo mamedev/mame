@@ -63,11 +63,11 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_fg_bitmap[2];
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_READ8_MEMBER(nmi_ack_r);
-	DECLARE_WRITE8_MEMBER(superqix_videoram_w);
-	DECLARE_WRITE8_MEMBER(superqix_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
-	DECLARE_WRITE8_MEMBER(superqix_0410_w);
+	uint8_t nmi_ack_r();
+	void superqix_videoram_w(offs_t offset, uint8_t data);
+	void superqix_bitmapram_w(offs_t offset, uint8_t data);
+	void superqix_bitmapram2_w(offs_t offset, uint8_t data);
+	void superqix_0410_w(uint8_t data);
 
 	DECLARE_VIDEO_START(superqix);
 	static rgb_t BBGGRRII(uint32_t raw);
@@ -109,20 +109,19 @@ private:
 	uint8_t m_port2_raw;
 	uint8_t m_bl_port3_out;
 
-	DECLARE_READ8_MEMBER(z80_semaphore_assert_r);
-	DECLARE_WRITE8_MEMBER(bootleg_mcu_port1_w);
+	uint8_t z80_semaphore_assert_r();
+	void bootleg_mcu_port1_w(uint8_t data);
 	void mcu_port2_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
-	DECLARE_READ8_MEMBER(mcu_port3_r);
-	DECLARE_READ8_MEMBER(bootleg_mcu_port3_r);
-	DECLARE_WRITE8_MEMBER(bootleg_mcu_port3_w);
-	DECLARE_WRITE8_MEMBER(z80_ay1_sync_address_w);
-	DECLARE_READ8_MEMBER(z80_ay2_iob_r);
-	DECLARE_WRITE8_MEMBER(z80_ay2_iob_w);
-	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
-	DECLARE_READ8_MEMBER(bootleg_in0_r);
+	void mcu_port3_w(u8 data);
+	uint8_t mcu_port3_r();
+	uint8_t bootleg_mcu_port3_r();
+	void bootleg_mcu_port3_w(uint8_t data);
+	void z80_ay1_sync_address_w(uint8_t data);
+	uint8_t z80_ay2_iob_r();
+	void z80_ay2_iob_w(uint8_t data);
+	void bootleg_flipscreen_w(uint8_t data);
+	uint8_t bootleg_in0_r();
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
-	DECLARE_MACHINE_START(superqix);
 	DECLARE_MACHINE_RESET(superqix);
 
 	void sqix_port_map(address_map &map);
@@ -159,6 +158,7 @@ public:
 	}
 
 	void pbillian(machine_config &config);
+	void pbillianb(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
 
@@ -167,14 +167,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(hotsmash_68705_porta_r);
-	DECLARE_WRITE8_MEMBER(hotsmash_68705_portb_w);
-	DECLARE_WRITE8_MEMBER(hotsmash_68705_portc_w);
-	DECLARE_WRITE8_MEMBER(hotsmash_z80_mcu_w);
-	DECLARE_READ8_MEMBER(hotsmash_z80_mcu_r);
+	u8 hotsmash_68705_porta_r();
+	void hotsmash_68705_portb_w(u8 data);
+	void hotsmash_68705_portc_w(u8 data);
+	void hotsmash_z80_mcu_w(u8 data);
+	u8 hotsmash_z80_mcu_r();
 
-	DECLARE_WRITE8_MEMBER(pbillian_sample_trigger_w);
-	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
+	void pbillian_sample_trigger_w(u8 data);
+	void pbillian_0410_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -182,12 +182,10 @@ private:
 
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 
-	DECLARE_MACHINE_START(pbillian);
-	DECLARE_VIDEO_START(pbillian);
-
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pbillian_port_map(address_map &map);
+	void pbillianb_port_map(address_map &map);
 
 	virtual void machine_init_common() override;
 
@@ -196,7 +194,7 @@ private:
 	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_ioport_array<2>         m_dsw;
-	required_ioport_array<2>         m_dials;
+	optional_ioport_array<2>         m_dials;
 	optional_ioport_array<2>         m_plungers;
 	optional_ioport_array<2>         m_launchbtns;
 	optional_device<samples_device>  m_samples;

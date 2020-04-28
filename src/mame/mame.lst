@@ -1482,13 +1482,13 @@ arcadia                         // Emerson Arcadia 2001
 bndarc                          // Bandai Arcadia
 dynavisn                        // Dynavision
 ekusera                         // Ekusera
+giglnrdo                        // Leonardo
 hanihac                         // Hanimex Home Arcade Centre
 hmg2650                         // Hanimex HMG-2650
 intervsn                        // Intervision 2001
 intmpt03                        // Intelligent Game MPT-03
 itmcmtp3                        // ITMC MPT-03
 ixl2000                         // Intercord XL 2000 System
-leonardo                        // Leonardo
 lvision                         // Leisure-Vision
 mratlus                         // Mr. Altus Tele Brain
 orbituvi                        // UVI Compu-Game
@@ -10389,16 +10389,16 @@ cninja1                         // MAG (c) 1991 Data East Corporation (World)
 cninjabl                        // bootleg
 cninjabl2                       // bootleg
 cninjau                         // MAG (c) 1991 Data East Corporation (US)
-deathbrd                        // MAF (c) 1992 Data East Corporation (Japan)
+deathbrd                        // MAF (c) 1991 Data East Corporation (Japan)
 edrandy                         // MAD (c) 1990 Data East Corporation (World)
 edrandy1                        // MAD (c) 1990 Data East Corporation (World)
 edrandy2                        // MAD (c) 1990 Data East Corporation (World)
 edrandyj                        // MAD (c) 1990 Data East Corporation (Japan)
 joemac                          // MAG (c) 1991 Data East Corporation (Japan)
-mutantf                         // MAF (c) 1992 Data East Corporation (World)
-mutantf2                        // MAF (c) 1992 Data East Corporation (World)
-mutantf3                        // MAF (c) 1992 Data East Corporation (World)
-mutantf4                        // MAF (c) 1992 Data East Corporation (World)
+mutantf                         // MAF (c) 1991 Data East Corporation (World)
+mutantf2                        // MAF (c) 1991 Data East Corporation (World)
+mutantf3                        // MAF (c) 1991 Data East Corporation (World)
+mutantf4                        // MAF (c) 1991 Data East Corporation (World)
 robocop2                        // MAH (c) 1991 Data East Corporation (World)
 robocop2j                       // MAH (c) 1991 Data East Corporation (Japan)
 robocop2u                       // MAH (c) 1991 Data East Corporation (US)
@@ -11414,6 +11414,10 @@ ch2001
 @source:cxg_dominator.cpp
 sdtor
 
+@source:cxg_scptchess.cpp
+prtchess
+scptchess
+
 @source:cxg_sphinx40.cpp
 sphinx40
 
@@ -12308,8 +12312,10 @@ rolcrush                        // (c) 1999 Trust
 rolcrusha                       // (c) 1999 SemiCom
 
 @source:drgnmst.cpp
-drgnmst                         // (c) 1994
-drgnmst2                        // (c) 1994
+drgnmst                         // (c) 1994 Unico
+drgnmst2                        // (c) 1994 Unico
+mastfury                        // (c) 1996 Unico + Game-Tech
+
 
 @source:dribling.cpp
 dribling                        // (c) 1983 Model Racing
@@ -13417,6 +13423,7 @@ sf2m9                           // bootleg
 sgyxz                           // bootleg (All-In Electronics)
 varthb                          // bootleg
 wofabl                          // bootleg
+wofr1bl                         // bootleg
 
 @source:feversoc.cpp
 feversoc                        // (c) 2004
@@ -13432,6 +13439,7 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 feleg                           //
 
 @source:fidel_card.cpp
+bridgec
 bridgec3
 bridgeca
 gincribc
@@ -14049,6 +14057,7 @@ galaxiant                       // (c) Taito
 galaxrcgg                       // bootleg (Recreativos Covadonga)
 galaxrf                         // bootleg (Recreativos Franco)
 galaxrfgg                       // bootleg (Recreativos Franco)
+galaxyx                         // bootleg
 galemp                          // (c) Taito do Brasil
 galturbo                        // hack
 ghostmun                        //
@@ -15160,6 +15169,9 @@ goodejan                        // (c) 1991 Seibu/Tecmo
 goodejana                       // (c) 1991 Seibu/Tecmo
 totmejan                        // (c) 1991 Seibu/Tecmo
 
+@source:goori.cpp
+goori                           // (c) 1999 Unico
+
 @source:gotcha.cpp
 gotcha                          // (c) 1997 Dongsung + "presented by Para"
 ppchamp                         // (c) 1997 Dongsung + "presented by Para"
@@ -15552,6 +15564,7 @@ gunsmokej                       // 11/1985 (c) 1985 (Japan)
 gunsmokeu                       // 11/1985 (c) 1985 + Romstar (US)
 gunsmokeua                      // 11/1985 (c) 1985 (US)
 gunsmokeub                      // 11/1985 (c) 1985 (US)
+gunsmokeg                       //
 
 @source:gyruss.cpp
 gyruss                          // GX347 (c) 1983
@@ -15730,6 +15743,7 @@ cmspacmn                        // Coleco
 cpacman                         // Coleco
 cpacmanr1                       // Coleco (rev 1)
 egalaxn2                        // Entex
+einvader2                       // Entex
 epacman2                        // Entex
 epacman2r                       // Entex
 estargte                        // Entex
@@ -16244,6 +16258,8 @@ hpz80unk                        //
 @source:hp80.cpp
 hp85                            //
 hp86b                           //
+hp86b_001                       //
+hp86b_004                       //
 
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
@@ -18804,6 +18820,7 @@ k2000                           // (c) 1990 Kurzweil Music Systems
 ksayakyu                        // ??? (c) 1985 Taito Corporation
 
 @source:ksys573.cpp
+animechmp                       // 2000 - Anime Champ (GCA07 VER. JAA)
 bassang2                        // 1998 - Bass Angler 2 (GE865 VER. JAA)
 bassangl                        // 1998 - Bass Angler (GE765 VER. JAA)
 cr589fw                         // 1999 - CR-589 Firmware (700B04)
@@ -18873,6 +18890,7 @@ fghtmn                          // 2000 - Fighting Mania (QG918 VER. EAA)
 fghtmna                         // 2000 - Fighting Mania (QG918 VER. AAA)
 fghtmnk                         // 2000 - Fighting Mania (QG918 VER. KAA)
 fghtmnu                         // 2000 - Fighting Mania (QG918 VER. IAA)
+gbbchmp                         // 2002 - Great Bishi Bashi Champ (GBA48 VER. JAB)
 gchgchmp                        // 1999 - Gachaga Champ (GE877 VER. JAB)
 gtfrk10m                        // 2003 - Guitar Freaks 10th Mix (G*D10 VER. JAB)
 gtfrk10ma                       // 2003 - Guitar Freaks 10th Mix (G*D10 VER. JAA)
@@ -19167,7 +19185,8 @@ eggventr7                       // (c) 1997 The Game Room
 eggventr8                       // (c) 1997 The Game Room
 eggventra                       // (c) 1997 The Game Room (Allied Leisure license)
 eggventrd                       // (c) 1997 The Game Room
-franticf                        // (c) 1996 The Game Room
+franticf                        // (c) 1998 ICE (Innovative Concepts in Entertainment, Inc.)
+franticfa                       // (c) 1996 The Game Room
 lethalj                         // (c) 1996 The Game Room
 ripribit                        // (c) 1997 LAI Games
 ripribita                       // (c) 1997 LAI Games
@@ -21850,6 +21869,10 @@ xenophob                        // (c) 1987
 @source:mdisk.cpp
 mdisk                           // (c) 198? mupid Computer Ges.m.b.H.
 fl100                           // (c) 198? Grundig
+
+@source:mdt60.cpp
+mdt60                           //
+z22                             //
 
 @source:meadows.cpp
 bowl3d                          // [1978?]
@@ -35116,6 +35139,14 @@ cp2000                          //
 @source:saitek_delta1.cpp
 ccdelta1                        //
 
+@source:saitek_exchess.cpp
+exchess
+
+@source:saitek_leonardo.cpp
+galileo
+leonardo
+leonardoa
+
 @source:saitek_mark5.cpp
 ccmk5
 ccmk6
@@ -35123,10 +35154,14 @@ ccmk6
 @source:saitek_prschess.cpp
 prschess
 
+@source:saitek_renaissance.cpp
+renaissa
+renaissaa
+
 @source:saitek_risc2500.cpp
+montreux                        //
 risc2500                        //
 risc2500a                       //
-montreux                        //
 
 @source:saitek_schess.cpp
 schess
@@ -37313,6 +37348,8 @@ ablkickb
 lxspidaj
 guitarfv
 guitarss
+guitarssa
+tmntbftc
 gssytts
 jjstrip
 vtechtvs
@@ -37438,6 +37475,7 @@ lx_jg7415                       //
 mywicodx                        //
 zon32bit                        // Zone 32-bit
 oplayer
+dnv200fs
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
@@ -38099,6 +38137,7 @@ kuzmich
 @source:superqix.cpp
 hotsmash                        // B18 (c) 1987 Taito
 pbillian                        // (c) 1986 Taito
+pbillianb                       // bootleg
 perestro                        // (c) 1994 Promat
 perestrof                       // (c) 1993 Promat / Fuuki
 sqix                            // B03 1987
@@ -39372,6 +39411,7 @@ tm5k                            // (c) 1998 Midway Games
 tm5ka                           // (c) 1998 Midway Games
 tm5kca                          // (c) 1998 Midway Games
 tm5kmn                          // (c) 1998 Midway Games
+tm5kuk                          // (c) 1998 Midway Games
 tm7k                            // (c) 1999 Midway Games
 tm7ka                           // (c) 1999 Midway Games
 tm7kde                          // (c) 1999 Midway Games
@@ -39724,7 +39764,8 @@ gekpurya                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji A
 gekpuryb                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev B)
 mkartag2                        // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A)
 mkartag2a                       // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)
-mkartagp                        // 2005.12 Mario Kart Arcade GP (MKA2 Ver.B)
+mkartagp                        // 2005.12 Mario Kart Arcade GP (MKA1 Ver.B)
+mkartagpc                       // 2006.07 Mario Kart Arcade GP (MKA1 Ver.C, update)
 tcfboxa                         // 2006.?? Firmware Update For Compact Flash Box (Rev A)
 tfupdate                        // 2004.?? Triforce GDROM Boot Update
 triforce                        // 2002.?? Triforce BIOS

@@ -29,8 +29,8 @@ public:
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
+	void m1_snd_mpcm_bnk1_w(uint16_t data);
+	void m1_snd_mpcm_bnk2_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
 

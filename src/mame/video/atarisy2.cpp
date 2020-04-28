@@ -77,13 +77,13 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::video_start()
 {
-	/* reset the statics */
+	// reset the statics
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
 	m_vrambank->set_bank(0);
 
-	/* save states */
+	// save states
 	save_item(NAME(m_playfield_tile_bank));
 }
 
@@ -239,13 +239,13 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
 
-	/* draw the playfield */
+	// draw the playfield
 	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_playfield_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 	m_playfield_tilemap->draw(screen, bitmap, cliprect, 2, 2);
 	m_playfield_tilemap->draw(screen, bitmap, cliprect, 3, 3);
 
-	/* draw and merge the MO */
+	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
@@ -258,21 +258,21 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
-					/* high priority PF? */
+					// high priority PF?
 					if ((mopriority + pri[x]) & 2)
 					{
-						/* only gets priority if PF pen is less than 8 */
+						// only gets priority if PF pen is less than 8
 						if (!(pf[x] & 0x08))
 							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 					}
 
-					/* low priority */
+					// low priority
 					else
 						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 				}
 		}
 
-	/* add the alpha on top */
+	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

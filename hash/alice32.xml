@@ -758,7 +758,7 @@ TODO: split Alice 4k tapes into their own softlist
 
 		<part name="cass1" interface="mc10_cass">
 			<dataarea name="cass" size="6333">
-				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard) (1984) (alice).k7" size="6333" crc="a0f3602f" sha1="920fd70c41242c2cbcae59fd864bad00685392ea"/>
+				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard).k7" size="6333" crc="a0f3602f" sha1="920fd70c41242c2cbcae59fd864bad00685392ea"/>
 			</dataarea>
 		</part>
 	</software>

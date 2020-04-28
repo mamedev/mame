@@ -825,8 +825,8 @@ READ32_MEMBER(stv_state::decathlt_prot_r)
 	}
 
 	uint32 ret = 0;
-	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
-	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
+	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r()<<16);
+	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r();
 	return ret;
 }
 
@@ -840,11 +840,11 @@ WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
 
 	if ((offs & 0x7fffff) == 0x7FFFF0)
 	{
-		m_5838crypt->srcaddr_w(space, offset, data, mem_mask);
+		m_5838crypt->srcaddr_w(data, mem_mask);
 	}
 	else if ((offs & 0x7fffff) == 0x7FFFF4)
 	{
-		m_5838crypt->data_w(space, offset, data, mem_mask);
+		m_5838crypt->data_w(data, mem_mask);
 	}
 }
 
@@ -1135,7 +1135,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 {
 	// FIXME
 	if(ACCESSING_BITS_16_31)
-		m_rax->data_w(space, 0, data >> 16, 0x0000ffff);
+		m_rax->data_w(data >> 16);
 	if(ACCESSING_BITS_0_15)
 		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }

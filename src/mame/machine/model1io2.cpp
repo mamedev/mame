@@ -290,50 +290,50 @@ HD44780_PIXEL_UPDATE( model1io2_device::lcd_pixel_update )
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( model1io2_device::io_r )
+uint8_t model1io2_device::io_r(offs_t offset)
 {
 	return m_read_cb(offset);
 }
 
-WRITE8_MEMBER( model1io2_device::io_w )
+void model1io2_device::io_w(offs_t offset, uint8_t data)
 {
 	m_write_cb(offset, data, 0xff);
 }
 
-READ8_MEMBER( model1io2_device::io_pa_r )
+uint8_t model1io2_device::io_pa_r()
 {
 	return m_in_cb[0](0);
 }
 
-READ8_MEMBER( model1io2_device::io_pb_r )
+uint8_t model1io2_device::io_pb_r()
 {
 	return m_in_cb[1](0);
 }
 
-READ8_MEMBER( model1io2_device::io_pc_r )
+uint8_t model1io2_device::io_pc_r()
 {
 	return m_in_cb[2](0);
 }
 
-WRITE8_MEMBER( model1io2_device::io_pd_w )
+void model1io2_device::io_pd_w(uint8_t data)
 {
 	m_output_cb(data);
 }
 
-READ8_MEMBER( model1io2_device::io_pe_r )
+uint8_t model1io2_device::io_pe_r()
 {
 	// cn6
 	return m_drive_read_cb(0);
 }
 
-WRITE8_MEMBER( model1io2_device::io_pe_w )
+void model1io2_device::io_pe_w(uint8_t data)
 {
 	// cn6
 	m_lcd_data = data;
 	m_drive_write_cb(data);
 }
 
-WRITE8_MEMBER( model1io2_device::io_pf_w )
+void model1io2_device::io_pf_w(uint8_t data)
 {
 	// 7-------  eeprom pe
 	// -6------  eeprom di
@@ -352,7 +352,7 @@ WRITE8_MEMBER( model1io2_device::io_pf_w )
 		m_lcd->write(BIT(data, 0), m_lcd_data);
 }
 
-WRITE8_MEMBER( model1io2_device::io_pg_w )
+void model1io2_device::io_pg_w(uint8_t data)
 {
 	// 7-------  watchdog
 	// -6------  control panel switch
@@ -389,7 +389,7 @@ ioport_value model1io2_device::analog3_r()
 //  FGPA (Virtua Cop)
 //**************************************************************************
 
-READ8_MEMBER( model1io2_device::fpga_r )
+uint8_t model1io2_device::fpga_r(offs_t offset)
 {
 	// fpga upload not finished yet?
 	if (m_fpga_counter < 0x1400)
@@ -434,7 +434,7 @@ READ8_MEMBER( model1io2_device::fpga_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( model1io2_device::fpga_w )
+void model1io2_device::fpga_w(uint8_t data)
 {
 	// fpga data uploaded here (vcop)
 	m_fpga_counter++;

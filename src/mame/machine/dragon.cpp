@@ -68,46 +68,30 @@ void dragon_state::pia1_pa_changed(uint8_t data)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ff00_read
+//  device_start
 //-------------------------------------------------
 
-READ8_MEMBER( dragon64_state::ff00_read )
+void dragon64_state::device_start()
 {
-	uint8_t result = 0x00;
+	dragon_state::device_start();
 
-	switch(offset & 0x07)
-	{
-		case 0: case 1: case 2: case 3:
-			result = dragon_state::ff00_read(space, offset, mem_mask);
-			break;
-
-		case 4: case 5: case 6: case 7:
-			result = m_acia->read(offset);
-			break;
-	}
-	return result;
+	uint8_t *rom = memregion("maincpu")->base();
+	m_rombank[0]->configure_entries(0, 2, &rom[0x0000], 0x8000);
+	m_rombank[1]->configure_entries(0, 2, &rom[0x2000], 0x8000);
 }
 
 
-
 //-------------------------------------------------
-//  ff00_write
+//  device_reset
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon64_state::ff00_write )
+void dragon64_state::device_reset()
 {
-	switch(offset & 0x07)
-	{
-		case 0: case 1: case 2: case 3:
-			dragon_state::ff00_write(space, offset, data, mem_mask);
-			break;
+	dragon_state::device_reset();
 
-		case 4: case 5: case 6: case 7:
-			m_acia->write(offset, data);
-			break;
-	}
+	m_rombank[0]->set_entry(0);
+	m_rombank[1]->set_entry(0);
 }
-
 
 
 //-------------------------------------------------
@@ -146,11 +130,11 @@ void dragon64_state::pia1_pb_changed(uint8_t data)
 
 void dragon64_state::page_rom(bool romswitch)
 {
-	offs_t offset = romswitch
-		? 0x0000    // This is the 32k mode basic(64)/boot rom(alpha)
-		: 0x8000;   // This is the 64k mode basic(64)/basic rom(alpha)
-	sam().set_bank_offset(1, offset);      // 0x8000-0x9FFF
-	sam().set_bank_offset(2, offset);      // 0xA000-0xBFFF
+	int bank = romswitch
+		? 0    // This is the 32k mode basic(64)/boot rom(alpha)
+		: 1;   // This is the 64k mode basic(64)/basic rom(alpha)
+	m_rombank[0]->set_entry(bank);      // 0x8000-0x9FFF
+	m_rombank[1]->set_entry(bank);      // 0xA000-0xBFFF
 }
 
 
@@ -168,7 +152,7 @@ void dragon64_state::page_rom(bool romswitch)
 //  The display is blanking during a horizontal or vertical retrace period.
 //-------------------------------------------------
 
-READ8_MEMBER(d64plus_state::d64plus_6845_disp_r)
+uint8_t d64plus_state::d64plus_6845_disp_r()
 {
 	return m_crtc->de_r() ? 0xff : 0xfe;
 }
@@ -178,14 +162,14 @@ READ8_MEMBER(d64plus_state::d64plus_6845_disp_r)
 //  d64plus_bank_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(d64plus_state::d64plus_bank_w)
+void d64plus_state::d64plus_bank_w(uint8_t data)
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	switch (data & 0x06)
 	{
 	case 0:  // Standard Dragon 32 Dynamic bank
 		space.install_write_bank(0x0000, 0x7fff, "bank0000_w");
 		space.install_read_bank(0x0000, 0x7fff, "bank0000_r");
-		sam().set_bank_offset(0, 0x0000);
 		break;
 	case 2:  // First extra 32K bank (A)
 		space.install_ram(0x0000, 0x7fff, m_plus_ram + 0x0000);
@@ -233,12 +217,12 @@ MC6845_UPDATE_ROW(d64plus_state::crtc_update_row)
 
 void d64plus_state::device_start()
 {
-	dragon_state::device_start();
+	dragon64_state::device_start();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0xffe0, 0xffe0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	space.install_readwrite_handler(0xffe1, 0xffe1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
-	space.install_readwrite_handler(0xffe2, 0xffe2, read8_delegate(*this, FUNC(d64plus_state::d64plus_6845_disp_r)), write8_delegate(*this, FUNC(d64plus_state::d64plus_bank_w)));
+	space.install_readwrite_handler(0xffe2, 0xffe2, read8smo_delegate(*this, FUNC(d64plus_state::d64plus_6845_disp_r)), write8smo_delegate(*this, FUNC(d64plus_state::d64plus_bank_w)));
 
 	// allocate memory
 	m_plus_ram.allocate(0x10000);
@@ -252,5 +236,5 @@ void d64plus_state::device_start()
 
 void d64plus_state::device_reset()
 {
-	dragon_state::device_reset();
+	dragon64_state::device_reset();
 }

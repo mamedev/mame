@@ -192,7 +192,7 @@ private:
 
 	DECLARE_READ16_MEMBER(hp64k_rear_sw_r);
 
-	IRQ_CALLBACK_MEMBER(hp64k_irq_callback);
+	uint8_t int_cb(offs_t offset);
 	void hp64k_update_irl(void);
 	DECLARE_WRITE16_MEMBER(hp64k_irl_mask_w);
 
@@ -527,12 +527,12 @@ READ16_MEMBER(hp64k_state::hp64k_rear_sw_r)
 		return m_rear_panel_sw->read() | 0x0020;
 }
 
-IRQ_CALLBACK_MEMBER(hp64k_state::hp64k_irq_callback)
+uint8_t hp64k_state::int_cb(offs_t offset)
 {
-		if (irqline == HPHYBRID_IRL) {
-				return 0xff00 | (m_irl_mask & m_irl_pending);
+		if (offset == 0) {
+				return (m_irl_mask & m_irl_pending);
 		} else {
-				return ~0;
+				return 0xff;
 		}
 }
 
@@ -1382,7 +1382,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_cpu->set_relative_mode(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp64k_state::cpu_mem_map);
 	m_cpu->set_addrmap(AS_IO, &hp64k_state::cpu_io_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
+	m_cpu->int_cb().set(FUNC(hp64k_state::int_cb));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
 	TIMER(config, "kb_timer").configure_periodic(FUNC(hp64k_state::hp64k_kb_scan), attotime::from_hz(100));

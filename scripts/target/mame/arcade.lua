@@ -1041,6 +1041,8 @@ files {
 	MAME_DIR .. "src/mame/video/equites.cpp",
 	MAME_DIR .. "src/mame/drivers/meijinsn.cpp",
 	MAME_DIR .. "src/mame/drivers/shougi.cpp",
+	MAME_DIR .. "src/mame/audio/ad_sound.cpp",
+	MAME_DIR .. "src/mame/audio/ad_sound.h",
 	MAME_DIR .. "src/mame/machine/alpha8201.cpp",
 	MAME_DIR .. "src/mame/machine/alpha8201.h",
 	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
@@ -1179,7 +1181,6 @@ files {
 	MAME_DIR .. "src/mame/video/copsnrob.cpp",
 	MAME_DIR .. "src/mame/drivers/cyberbal.cpp",
 	MAME_DIR .. "src/mame/includes/cyberbal.h",
-	MAME_DIR .. "src/mame/audio/cyberbal.cpp",
 	MAME_DIR .. "src/mame/video/cyberbal.cpp",
 	MAME_DIR .. "src/mame/drivers/cybstorm.cpp",
 	MAME_DIR .. "src/mame/includes/cybstorm.h",
@@ -1357,6 +1358,8 @@ files {
 	MAME_DIR .. "src/mame/machine/asic65.h",
 	MAME_DIR .. "src/mame/machine/atarigen.cpp",
 	MAME_DIR .. "src/mame/machine/atarigen.h",
+	MAME_DIR .. "src/mame/machine/atariscom.cpp",
+	MAME_DIR .. "src/mame/machine/atariscom.h",
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",
 	MAME_DIR .. "src/mame/machine/mathbox.h",
 	MAME_DIR .. "src/mame/machine/slapstic.cpp",
@@ -1364,6 +1367,8 @@ files {
 	MAME_DIR .. "src/mame/machine/atarixga.h",
 	MAME_DIR .. "src/mame/audio/atarijsa.cpp",
 	MAME_DIR .. "src/mame/audio/atarijsa.h",
+	MAME_DIR .. "src/mame/audio/atarisac.cpp",
+	MAME_DIR .. "src/mame/audio/atarisac.h",
 	MAME_DIR .. "src/mame/audio/cage.cpp",
 	MAME_DIR .. "src/mame/audio/cage.h",
 	MAME_DIR .. "src/mame/audio/redbaron.cpp",
@@ -4325,6 +4330,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/unico.cpp",
 	MAME_DIR .. "src/mame/includes/unico.h",
 	MAME_DIR .. "src/mame/video/unico.cpp",
+	MAME_DIR .. "src/mame/drivers/goori.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "univers")

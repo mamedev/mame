@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_out_w)
 //  key_scan_w - handle scan counter outputs
 //-------------------------------------------------
 
-WRITE8_MEMBER(vt100_keyboard_device::key_scan_w)
+void vt100_keyboard_device::key_scan_w(u8 data)
 {
 	if (BIT(data, 0))
 	{

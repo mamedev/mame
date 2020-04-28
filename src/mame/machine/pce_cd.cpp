@@ -1015,7 +1015,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	}
 }
 
-WRITE8_MEMBER(pce_cd_device::bram_w)
+void pce_cd_device::bram_w(offs_t offset, uint8_t data)
 {
 	if (!m_bram_locked)
 	{
@@ -1023,7 +1023,7 @@ WRITE8_MEMBER(pce_cd_device::bram_w)
 	}
 }
 
-READ8_MEMBER(pce_cd_device::bram_r)
+uint8_t pce_cd_device::bram_r(offs_t offset)
 {
 	return m_bram[(offset & (PCE_BRAM_SIZE - 1)) + m_bram_locked * PCE_BRAM_SIZE];
 }
@@ -1121,7 +1121,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 // -x-- ---- request signal
 // ---x ---- cd signal
 // ---- x--- i/o signal
-READ8_MEMBER(pce_cd_device::cdc_status_r)
+uint8_t pce_cd_device::cdc_status_r()
 {
 	uint8_t res = (m_cdc_status & 7);
 	res |= m_scsi_BSY ? 0x80 : 0;
@@ -1132,7 +1132,7 @@ READ8_MEMBER(pce_cd_device::cdc_status_r)
 	return res;
 }
 
-WRITE8_MEMBER(pce_cd_device::cdc_status_w)
+void pce_cd_device::cdc_status_w(uint8_t data)
 {
 	/* select device (which bits??) */
 	m_scsi_SEL = 1;
@@ -1145,12 +1145,12 @@ WRITE8_MEMBER(pce_cd_device::cdc_status_w)
 }
 
 // CD Interface Register 0x01 - CDC command / status / data
-READ8_MEMBER(pce_cd_device::cdc_data_r)
+uint8_t pce_cd_device::cdc_data_r()
 {
 	return m_cdc_data;
 }
 
-WRITE8_MEMBER(pce_cd_device::cdc_data_w)
+void pce_cd_device::cdc_data_w(uint8_t data)
 {
 	m_cdc_data = data;
 }
@@ -1163,12 +1163,12 @@ WRITE8_MEMBER(pce_cd_device::cdc_data_w)
 // ---x ---- BRAM irq?
 // ---- x--- ADPCM FULL irq
 // ---- -x-- ADPCM HALF irq
-READ8_MEMBER(pce_cd_device::irq_mask_r)
+uint8_t pce_cd_device::irq_mask_r()
 {
 	return m_irq_mask;
 }
 
-WRITE8_MEMBER(pce_cd_device::irq_mask_w)
+void pce_cd_device::irq_mask_w(uint8_t data)
 {
 	m_scsi_ACK = data & 0x80;
 	m_irq_mask = data;
@@ -1182,7 +1182,7 @@ WRITE8_MEMBER(pce_cd_device::irq_mask_w)
 // ---- x--- ADPCM 2
 // ---- -x-- ADPCM 1
 // ---- --x- CDDA left/right speaker select
-READ8_MEMBER(pce_cd_device::irq_status_r)
+uint8_t pce_cd_device::irq_status_r()
 {
 	uint8_t res = m_irq_status & 0x6e;
 	// a read here locks the BRAM
@@ -1195,12 +1195,12 @@ READ8_MEMBER(pce_cd_device::irq_status_r)
 
 // CD Interface Register 0x04 - CD reset
 // ---- --x- to SCSI RST
-READ8_MEMBER(pce_cd_device::cdc_reset_r)
+uint8_t pce_cd_device::cdc_reset_r()
 {
 	return m_reset_reg;
 }
 
-WRITE8_MEMBER(pce_cd_device::cdc_reset_w)
+void pce_cd_device::cdc_reset_w(uint8_t data)
 {
 	m_scsi_RST = data & 0x02;
 	m_reset_reg = data;
@@ -1209,7 +1209,7 @@ WRITE8_MEMBER(pce_cd_device::cdc_reset_w)
 // CD Interface Register 0x05 - CD-DA Volume low 8-bit port
 // CD Interface Register 0x06 - CD-DA Volume high 8-bit port
 // TODO: port 5 also converts?
-READ8_MEMBER(pce_cd_device::cdda_data_r)
+uint8_t pce_cd_device::cdda_data_r(offs_t offset)
 {
 	uint8_t port_shift = offset ? 0 : 8;
 
@@ -1218,13 +1218,13 @@ READ8_MEMBER(pce_cd_device::cdda_data_r)
 
 // CD Interface Register 0x07 - BRAM unlock / CD status
 // x--- ---- Enables BRAM
-READ8_MEMBER(pce_cd_device::bram_status_r)
+uint8_t pce_cd_device::bram_status_r()
 {
 	uint8_t res = (m_bram_locked ? (m_bram_status & 0x7f) : (m_bram_status | 0x80));
 	return res;
 }
 
-WRITE8_MEMBER(pce_cd_device::bram_unlock_w)
+void pce_cd_device::bram_unlock_w(uint8_t data)
 {
 	if (data & 0x80)
 		m_bram_locked = 0;
@@ -1232,40 +1232,40 @@ WRITE8_MEMBER(pce_cd_device::bram_unlock_w)
 }
 
 // CD Interface Register 0x08 - CD data (R) / ADPCM address low (W)
-READ8_MEMBER(pce_cd_device::cd_data_r)
+uint8_t pce_cd_device::cd_data_r()
 {
 	return get_cd_data_byte();
 }
 
-WRITE8_MEMBER(pce_cd_device::adpcm_address_lo_w)
+void pce_cd_device::adpcm_address_lo_w(uint8_t data)
 {
 	m_adpcm_latch_address = (data & 0xff) | (m_adpcm_latch_address & 0xff00);
 }
 
 // CD Interface Register 0x09 - ADPCM address high (W)
-WRITE8_MEMBER(pce_cd_device::adpcm_address_hi_w)
+void pce_cd_device::adpcm_address_hi_w(uint8_t data)
 {
 	m_adpcm_latch_address = (data << 8) | (m_adpcm_latch_address & 0xff);
 }
 
 // CD interface Register 0x0a - ADPCM RAM data port
-READ8_MEMBER(pce_cd_device::adpcm_data_r)
+uint8_t pce_cd_device::adpcm_data_r()
 {
 	return get_adpcm_ram_byte();
 }
 
-WRITE8_MEMBER(pce_cd_device::adpcm_data_w)
+void pce_cd_device::adpcm_data_w(uint8_t data)
 {
 	set_adpcm_ram_byte(data);
 }
 
 // CD interface Register 0x0b - ADPCM DMA control
-READ8_MEMBER(pce_cd_device::adpcm_dma_control_r)
+uint8_t pce_cd_device::adpcm_dma_control_r()
 {
 	return m_adpcm_dma_reg;
 }
 
-WRITE8_MEMBER(pce_cd_device::adpcm_dma_control_w)
+void pce_cd_device::adpcm_dma_control_w(uint8_t data)
 {
 	if (data & 3)
 	{
@@ -1280,7 +1280,7 @@ WRITE8_MEMBER(pce_cd_device::adpcm_dma_control_w)
 // ---- x--- ADPCM playback (0) stopped (1) currently playing
 // ---- -x-- pending ADPCM data write
 // ---- ---x ADPCM playback (1) stopped (0) currently playing
-READ8_MEMBER(pce_cd_device::adpcm_status_r)
+uint8_t pce_cd_device::adpcm_status_r()
 {
 	return m_adpcm_status;
 }
@@ -1292,14 +1292,14 @@ READ8_MEMBER(pce_cd_device::adpcm_status_r)
 // ---x ---- ADPCM set length
 // ---- x--- ADPCM set read address
 // ---- --xx ADPCM set write address
-// TODO: some games reads bit 5 and wants it to be low otherwise they hangs,
+// TODO: some games read bit 5 and want it to be low otherwise they hang,
 //       how that can cope with "repeat"?
-READ8_MEMBER(pce_cd_device::adpcm_address_control_r)
+uint8_t pce_cd_device::adpcm_address_control_r()
 {
 	return m_adpcm_control;
 }
 
-WRITE8_MEMBER(pce_cd_device::adpcm_address_control_w)
+void pce_cd_device::adpcm_address_control_w(uint8_t data)
 {
 	if ((m_adpcm_control & 0x80) && !(data & 0x80)) // ADPCM reset
 	{
@@ -1353,7 +1353,7 @@ WRITE8_MEMBER(pce_cd_device::adpcm_address_control_w)
 }
 
 // CD Interface Register 0x0e - ADPCM playback rate
-WRITE8_MEMBER(pce_cd_device::adpcm_playback_rate_w)
+void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
 {
 	m_adpcm_clock_divider = 0x10 - (data & 0x0f);
 	m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
@@ -1369,7 +1369,7 @@ WRITE8_MEMBER(pce_cd_device::adpcm_playback_rate_w)
 // 0x0c CD-DA fade-out (short) ADPCM fade-in
 // 0x0d CD-DA fade-out (short)
 // 0x0e ADPCM fade-out (short)
-WRITE8_MEMBER(pce_cd_device::fade_register_w)
+void pce_cd_device::fade_register_w(uint8_t data)
 {
 	// TODO: timers needs HW tests
 	if (m_fade_reg != data)
@@ -1495,7 +1495,7 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
  */
 // TODO: more stuff actually belongs to the whole CD interface,
 //       cfr. pce_cd_intf_r/w in drivers/pce.cpp
-READ8_MEMBER(pce_cd_device::intf_r)
+uint8_t pce_cd_device::intf_r(offs_t offset)
 {
 	//logerror("%s: read from CD interface offset %02X\n", machine().describe_context(), offset );
 
@@ -1503,7 +1503,7 @@ READ8_MEMBER(pce_cd_device::intf_r)
 	return io_space.read_byte(offset & 0xf);
 }
 
-WRITE8_MEMBER(pce_cd_device::intf_w)
+void pce_cd_device::intf_w(offs_t offset, uint8_t data)
 {
 	//logerror("%s write to CD interface offset %02X, data %02X\n", machine().describe_context(), offset, data);
 
@@ -1517,7 +1517,7 @@ PC Engine Arcade Card emulation
 
 */
 
-READ8_MEMBER(pce_cd_device::acard_r)
+uint8_t pce_cd_device::acard_r(offs_t offset)
 {
 	uint8_t r_num;
 
@@ -1578,7 +1578,7 @@ READ8_MEMBER(pce_cd_device::acard_r)
 	}
 }
 
-WRITE8_MEMBER(pce_cd_device::acard_w)
+void pce_cd_device::acard_w(offs_t offset, uint8_t data)
 {
 	uint8_t w_num;
 

@@ -707,7 +707,7 @@ static const struct gfx_range mapper_TK24B1_table[] =
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x5fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x6000, 0x7fff, 0 },
-	
+
 	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },
 	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 1 },
 	{ 0 }
@@ -951,7 +951,7 @@ static const struct gfx_range mapper_MS22B_table[] =
 
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
-	
+
 	{ GFXTYPE_SCROLL1, 0x4000, 0x4fff, 1 },
 	{ GFXTYPE_SCROLL2, 0x5000, 0x6fff, 1 },
 	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 1 },
@@ -969,8 +969,8 @@ static const struct gfx_range mapper_CK24B_table[] =
 	// bank 0 = pin 16 (ROMs 1,3,5,7)
 	// pins 12,14 allow to populate the 8-bit ROM sockets instead of the 16-bit ones:
 	// pin 12 (ROMs 10,12,14,16,20,22,24,26) = sprites 0000-2fff, scroll1 3000-3fff
-	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = scroll2 4000-6fff, scroll3 7000-7fff  
-	
+	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = scroll2 4000-6fff, scroll3 7000-7fff
+
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
@@ -992,7 +992,7 @@ static const struct gfx_range mapper_CK22B_table[] =
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
-	
+
 	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 1 },
 	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 1 },
 	{ 0 }
@@ -1331,7 +1331,7 @@ static const struct gfx_range mapper_Q522B_table[] =
 
 	/* type                              start    end      bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x00000, 0x03fff, 0 },
-	
+
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x04000, 0x06fff, 1 },
 	{ GFXTYPE_SCROLL3,                   0x07000, 0x077ff, 1 },
 	{ GFXTYPE_SCROLL1,                   0x07800, 0x07fff, 1 },
@@ -1650,7 +1650,7 @@ static const struct gfx_range mapper_KNM10B_table[] =
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
 	// bank2 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
-	
+
 	/* type             start    end      bank */
 	{ GFXTYPE_SPRITES , 0x00000, 0x07fff, 0 },
 	{ GFXTYPE_SPRITES , 0x08000, 0x0ffff, 1 },
@@ -1876,6 +1876,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wofj",        CPS_B_21_QS1, mapper_TK263B },
 	{"wofhfh",      CPS_B_21_DEF, mapper_TK263B, 0x36 },    /* Chinese bootleg */
 	{"wofpic",      CPS_B_21_DEF, mapper_TK263B, 0x36 },
+	{"wofr1bl",     CPS_B_21_DEF, mapper_TK263B, 0x36 },
 	{"dino",        CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinou",       CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinoj",       CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
@@ -1916,7 +1917,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
-	
+
 	/* CPS Changer */
 
 	{"sfach",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped

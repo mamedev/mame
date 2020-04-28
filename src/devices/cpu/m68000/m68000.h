@@ -128,9 +128,6 @@ protected:
 	static void m68ki_set_one(unsigned short opcode, u16 state, const opcode_handler_struct &s);
 	static void m68ki_build_opcode_table(void);
 
-	void presave();
-	void postload();
-
 	void clear_all(void);
 
 	// device_disasm_interface overrides
@@ -148,6 +145,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

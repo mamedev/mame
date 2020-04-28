@@ -147,13 +147,13 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 {
 	switch(offset & 0x000f) {
 	case 0x04:
-		m_sound->set_volume(space, offset, data);
+		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
-		m_sound->set_volume(space, offset, data);
+		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
 		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
 		break;

@@ -1696,9 +1696,19 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 C
 
 void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
 {
-	isa8_cga_device::device_add_mconfig(config);
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
+	screen.set_screen_update(FUNC(isa8_cga_m24_device::screen_update));
 
-	subdevice<screen_device>(CGA_SCREEN_NAME)->set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
+	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
+
+	HD6845S(config, m_crtc, XTAL(14'318'181)/16);
+	m_crtc->set_screen(nullptr);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(isa8_cga_m24_device::crtc_update_row));
+	m_crtc->out_hsync_callback().set(FUNC(isa8_cga_m24_device::hsync_changed));
+	m_crtc->out_vsync_callback().set(FUNC(isa8_cga_m24_device::vsync_changed));
 	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure));
 }
 

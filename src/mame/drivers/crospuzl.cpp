@@ -76,8 +76,6 @@ private:
 	DECLARE_WRITE8_MEMBER(FlashCmd_w);
 	DECLARE_WRITE8_MEMBER(FlashAddr_w);
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void crospuzl_mem(address_map &map);
@@ -92,11 +90,6 @@ private:
 	DECLARE_READ32_MEMBER(PIOedat_r);
 };
 
-
-IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
 
 READ32_MEMBER(crospuzl_state::PIOedat_r)
 {
@@ -364,7 +357,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::crospuzl_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(crospuzl_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

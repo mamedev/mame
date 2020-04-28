@@ -403,7 +403,7 @@ uint32_t upd65031_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd65031_device::read )
+uint8_t upd65031_device::read(offs_t offset)
 {
 	uint8_t port = offset & 0xff;
 
@@ -469,7 +469,7 @@ READ8_MEMBER( upd65031_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd65031_device::write )
+void upd65031_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t port = offset & 0xff;
 

@@ -3,25 +3,25 @@
 <!-- license:CC0 -->
 
 <!--
-	Missing carts:
+    Missing carts:
 
-500-13288-A	DIDJi Racing -  Tiki Tropics
-500-13289-A	Super Chicks - Make friends. Shop. Save the world
-		Tinker Bell and The Lost Treasure
-500-13286-C	Sonic The Hedgehog
-		Nancy Drew
-		Foster's Home for Imaginary Friends
-		Wolverine and the X-Men
-		Neopets - Quizara's Curse
-		Hannah Montana
-		High School Musical
-		Mitchell Van Morgan
-		Star Wars - Jedi Trials
+500-13288-A DIDJi Racing -  Tiki Tropics
+500-13289-A Super Chicks - Make friends. Shop. Save the world
+        Tinker Bell and The Lost Treasure
+500-13286-C Sonic The Hedgehog
+        Nancy Drew
+        Foster's Home for Imaginary Friends
+        Wolverine and the X-Men
+        Neopets - Quizara's Curse
+        Hannah Montana
+        High School Musical
+        Mitchell Van Morgan
+        Star Wars - Jedi Trials
 -->
 
 <softwarelist name="leapfrog_didj_cart" description="LeapFrog Didj Cartridges">
 	<!-- NAND ROMs, dumps not yet verified as good, although they do contain a filesystem -->
-	
+
 	<software name="andinvasn" supported="no">
 		<description>Nicktoon Android Invasion (USA)</description>
 		<year>2008</year>
@@ -35,7 +35,7 @@
 	</software>
 
 	<software name="indjones" supported="no">
-		<description>Inidiana Jones (USA)</description>
+		<description>Indiana Jones (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13304-A"/>
@@ -47,7 +47,7 @@
 	</software>
 
 	<software name="spbobfifo" supported="no">
-		<description>Nickelodeon Spongebob Squarepants - Fist of Foam (USA)</description>
+		<description>Nickelodeon Spongebob Squarepants - Fists of Foam (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13291-B"/>

@@ -635,7 +635,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 	m_cpu->set_rw_cycles(6 , 6);
 	m_cpu->set_relative_mode(false);
 	m_cpu->set_addrmap(AS_IO , &hp9825_state::cpu_io_map);
-	m_cpu->set_irq_acknowledge_callback("io_sys" , FUNC(hp98x5_io_sys_device::irq_callback));
+	m_cpu->int_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_cpu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	// Needed when 98035 RTC module is connected or time advances at about 1/4 the correct speed (NP misses a lot of 1kHz interrupts)

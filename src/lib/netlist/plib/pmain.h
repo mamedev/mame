@@ -35,7 +35,7 @@ namespace plib {
 	public:
 		app();
 
-		COPYASSIGNMOVE(app, delete)
+		PCOPYASSIGNMOVE(app, delete)
 
 		virtual ~app() = default;
 

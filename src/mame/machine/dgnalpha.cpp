@@ -76,7 +76,7 @@ keeping track of it in a variable in the driver.
 
 void dragon_alpha_state::device_start(void)
 {
-	dragon_state::device_start();
+	dragon64_state::device_start();
 }
 
 
@@ -87,7 +87,7 @@ void dragon_alpha_state::device_start(void)
 
 void dragon_alpha_state::device_reset(void)
 {
-	dragon_state::device_reset();
+	dragon64_state::device_reset();
 }
 
 
@@ -115,90 +115,6 @@ void dragon_alpha_state::modem_w(offs_t offset, uint8_t data)
 {
 }
 
-
-
-/***************************************************************************
-  PIA1
-***************************************************************************/
-
-//-------------------------------------------------
-//  ff20_read
-//-------------------------------------------------
-
-READ8_MEMBER( dragon_alpha_state::ff20_read )
-{
-	uint8_t result = 0x00;
-
-	switch(offset & 0x0f)
-	{
-		case 0: case 1: case 2: case 3:
-			result = dragon_state::ff20_read(space, offset, mem_mask);
-			break;
-
-		case 4: case 5: case 6: case 7:
-			result = m_pia_2->read(offset);
-			break;
-
-		case 8: case 9: case 10: case 11:
-			result = modem_r(offset);
-			break;
-
-		case 12:
-			result = m_fdc->data_r();
-			break;
-
-		case 13:
-			result = m_fdc->sector_r();
-			break;
-
-		case 14:
-			result = m_fdc->track_r();
-			break;
-
-		case 15:
-			result = m_fdc->status_r();
-			break;
-	}
-
-	return result;
-}
-
-
-
-//-------------------------------------------------
-//  ff20_write
-//-------------------------------------------------
-
-WRITE8_MEMBER( dragon_alpha_state::ff20_write )
-{
-	switch(offset & 0x0f)
-	{
-		case 0: case 1: case 2: case 3:
-			dragon_state::ff20_write(space, offset, data, mem_mask);
-			break;
-
-		case 4: case 5: case 6: case 7:
-			m_pia_2->write(offset, data);
-			break;
-
-		case 8: case 9: case 10: case 11:
-			modem_w(offset, data);
-			break;
-
-		case 12:
-			m_fdc->data_w(data);
-			break;
-		case 13:
-			m_fdc->sector_w(data);
-			break;
-		case 14:
-			m_fdc->track_w(data);
-			break;
-		case 15:
-			m_fdc->cmd_w(data);
-			break;
-	}
-}
 
 
 /***************************************************************************

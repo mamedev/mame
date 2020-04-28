@@ -568,12 +568,12 @@ WRITE8_MEMBER(berzerk_state::audio_w)
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		m_custom->sfxctrl_w(space, data >> 6, data);
+		m_custom->sfxctrl_w(data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		m_custom->sh6840_w(space, offset, data);
+		m_custom->sh6840_w(offset, data);
 		break;
 	}
 }
@@ -592,7 +592,7 @@ READ8_MEMBER(berzerk_state::audio_r)
 		return 0;
 	/* everything else reads from the 6840 */
 	default:
-		return m_custom->sh6840_r(space, offset);
+		return m_custom->sh6840_r(offset);
 	}
 }
 

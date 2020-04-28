@@ -32,12 +32,14 @@ public:
 	void sf2m1(machine_config &config);
 	void sgyxz(machine_config &config);
 	void wofabl(machine_config &config);
+	void wofr1bl(machine_config &config);
 	void varthb(machine_config &config);
 
 	void init_cawingbl();
 	void init_kodb();
 	void init_mtwinsb();
 	void init_sf2m1();
+	void init_wofr1bl();
 
 protected:
 	DECLARE_MACHINE_START(fcrash);
@@ -49,6 +51,7 @@ protected:
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
 	DECLARE_MACHINE_RESET(sgyxz);
+	DECLARE_MACHINE_START(wofr1bl);
 
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
@@ -63,6 +66,9 @@ protected:
 	DECLARE_WRITE16_MEMBER(varthb_layer_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer2_w);
 	DECLARE_READ16_MEMBER(sgyxz_dsw_r);
+	DECLARE_WRITE16_MEMBER(wofr1bl_layer_w);
+	DECLARE_WRITE16_MEMBER(wofr1bl_layer2_w);
+	DECLARE_WRITE16_MEMBER(wofr1bl_spr_base_w);
 
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
@@ -76,6 +82,7 @@ protected:
 	void sf2m1_map(address_map &map);
 	void sgyxz_map(address_map &map);
 	void wofabl_map(address_map &map);
+	void wofr1bl_map(address_map &map);
 	void varthb_map(address_map &map);
 
 	void fcrash_sound_map(address_map &map);
@@ -106,7 +113,7 @@ protected:
 	optional_device<msm5205_device> m_msm_2;
 
 	optional_memory_bank m_okibank;
-	
+
 	optional_ioport_array<3> m_sgyxz_dsw;
 };
 
