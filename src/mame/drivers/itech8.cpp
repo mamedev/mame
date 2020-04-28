@@ -14,6 +14,7 @@
         * Grudge Match
         * Golden Tee Golf [4 sets]
         * Golden Tee Golf II [3 sets]
+        * Golden Par Golf [2 sets]
         * Slick Shot [3 sets]
         * Dyno-Bop
         * Arlington Horse Racing [2 sets]
@@ -2606,20 +2607,40 @@ ROM_START( ninclown )
 ROM_END
 
 
-ROM_START( gpgolf )
+ROM_START( gpgolf ) /* P/N 1047 REV. 1 main board + P/N 1038 REV2 sound board */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gpgv1_1.bin", 0x00000, 0x10000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
+	ROM_LOAD( "gpgv1_1.bin", 0x00000, 0x10000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version 1.1 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sndv1.u27", 0x08000, 0x8000, CRC(55734876) SHA1(eb5ef816acbc6e35642749e38a2908b7ba359b9d) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom00.bin", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
-	ROM_LOAD( "grom01.bin", 0x40000, 0x40000, CRC(b7fe172d) SHA1(1ad0f3ce0f240ac1a23c0c5bdd9f99ec81bc14f1) )
-	ROM_LOAD( "grom02.bin", 0x80000, 0x40000, CRC(aebe6c45) SHA1(15e64fcb36cb1064988ee5cd45699d501a6e7f01) )
+	ROM_LOAD( "grom00.grom0", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
+	ROM_LOAD( "grom01.grom1", 0x40000, 0x40000, CRC(b7fe172d) SHA1(1ad0f3ce0f240ac1a23c0c5bdd9f99ec81bc14f1) )
+	ROM_LOAD( "grom02.grom2", 0x80000, 0x40000, CRC(aebe6c45) SHA1(15e64fcb36cb1064988ee5cd45699d501a6e7f01) )
+	/* GROM3 not socketted or populated */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom00.bin", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
+	ROM_LOAD( "srom00.srom0", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) )
+ROM_END
+
+
+ROM_START( gpgolfa ) /* P/N 1047 REV. 1 main board + P/N 1038 REV2 sound board */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gpar.bin.u5", 0x00000, 0x10000, CRC(bcb030b0) SHA1(6fbe0ccd50c3769050d86e2376950fd06ce2abdc) ) /* Joystick version 1.0 - handwritten label */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "golf_sound_12-19-91_v.96.u27", 0x00000, 0x10000, CRC(f46b4300) SHA1(7be1878b72c55fb83b2cae3b79b1f65fe8825b4a) ) /* 27C512 with the first 0x8000 as 0xFF fill - handwritten label  GOLF SOUND  12/19/91  V.96 */
+//	ROM_LOAD( "golf_sound.u27", 0x08000, 0x8000, CRC(3183d7f3) SHA1(482411947aa3074cec7d4491f6ee64785894d27c) ) /* Different than sndv1.u27 */
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "grom00.grom0", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
+	ROM_LOAD( "grom01.grom1", 0x40000, 0x40000, CRC(b7fe172d) SHA1(1ad0f3ce0f240ac1a23c0c5bdd9f99ec81bc14f1) )
+	ROM_LOAD( "grom02.grom2", 0x80000, 0x40000, CRC(aebe6c45) SHA1(15e64fcb36cb1064988ee5cd45699d501a6e7f01) )
+	/* GROM3 not socketted or populated */
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "golf_speech_12-19-91_v.96.srom0", 0x00000, 0x20000, CRC(4dd4db42) SHA1(0dffb51e8de36d8747f443fd65fe9927815eaff0) ) /* == srom00.srom0 - handwritten label  GOLF SPEECh  12/19/91  V.96 */
 ROM_END
 
 
@@ -2765,5 +2786,6 @@ GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, em
 GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 ) /* Seems to stall during Demo Mode?? */
+GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.0)", 0 ) /* Seems to stall during Demo Mode?? */
 GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
