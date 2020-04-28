@@ -172,11 +172,6 @@ private:
 };
 
 static NETLIST_START(dummy)
-	// Standard stuff
-
-	CLOCK(clk, 1000) // 1000 Hz
-	SOLVER(Solver, 48000)
-
 NETLIST_END()
 
 // **************************************************************************
