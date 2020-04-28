@@ -504,6 +504,7 @@ mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 mdisk.cpp
+mdt60.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd1.cpp

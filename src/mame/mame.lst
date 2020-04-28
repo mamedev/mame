@@ -21870,6 +21870,10 @@ xenophob                        // (c) 1987
 mdisk                           // (c) 198? mupid Computer Ges.m.b.H.
 fl100                           // (c) 198? Grundig
 
+@source:mdt60.cpp
+mdt60                           //
+z22                             //
+
 @source:meadows.cpp
 bowl3d                          // [1978?]
 deadeye                         // [1978?]
