@@ -1374,13 +1374,13 @@ GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_show
 GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, init_showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         MACHINE_SUPPORTS_SAVE )
 GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  magibomb,  0,        speeddrp, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no gfx dumps, less complex looking encryption
+GAME( 200?,  magibomb,  0,        speeddrp, skilldrp, astrocorp_state, init_magibomb, ROT0, "Astro Corp.",        "Magic Bomb (Ver. BR4.4)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one bad program ROM, no gfx dumps, less complex looking encryption
 
 // Encrypted games (not working):
 GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                        MACHINE_NOT_WORKING )
 GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, init_astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", MACHINE_NOT_WORKING )
-GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",            MACHINE_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",            MACHINE_NOT_WORKING )
-GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   MACHINE_NOT_WORKING )
+GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (Feb 23 2006)",      MACHINE_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (May 11 2006)",      MACHINE_NOT_WORKING )
+GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   MACHINE_NOT_WORKING ) // based on a Mar 10 2005 version
 GAME( 2005?, zoo,       0,        showhand, showhand, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",               MACHINE_NOT_WORKING )
 GAME( 2007?, westvent,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",   MACHINE_NOT_WORKING )
