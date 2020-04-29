@@ -477,7 +477,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="patch_6_3_6_4_oct_97">
+	<software name="patch_oct_97">
 		<description>IRIX 6.3 and 6.4 Recommended/Required Patches October 1997</description>
 		<year>1997</year> <!-- 10/97 -->
 		<publisher>Silicon Graphics</publisher>
@@ -489,7 +489,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="patch_o2_6_3_aug_97">
+	<software name="patch_aug_97">
 		<description>O2 IRIX 6.3 Recommended/Required Patches August 1997</description>
 		<year>1997</year> <!-- 08/97 -->
 		<publisher>Silicon Graphics</publisher>
@@ -516,7 +516,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="irix_5_2_a" cloneof="irix52">
+	<software name="irix_5_2_a" cloneof="irix_5_2">
 		<description>IRIX 5.2 for Indy R4600SC/XZ and Presenter</description>
 		<year>1994</year> <!-- 08/94 -->
 		<publisher>Silicon Graphics</publisher>
@@ -542,7 +542,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="irix_5_3_a" cloneof="irix53">
+	<software name="irix_5_3_a" cloneof="irix_5_3">
 		<description>IRIX 5.3 for Indy R4400 175MHz</description>
 		<year>1994</year>
 		<publisher>Silicon Graphics</publisher>
@@ -575,7 +575,7 @@ license:CC0
 		</part>
 	</software>
 	
-	<software name="irix_6_2_a" cloneof="irix62">
+	<software name="irix_6_2_a" cloneof="irix_6_2">
 		<description>IRIX 6.2 with Indigo IMPACT 10000</description>
 		<year>1996</year>
 		<publisher>Silicon Graphics</publisher>
