@@ -531,6 +531,7 @@ private:
 	void jamma_jvs_cmd_exec();
 	void hornet_map(address_map &map);
 	void terabrst_map(address_map &map);
+	void sscope_map(address_map &map);
 	void sscope2_map(address_map &map);
 	void gn680_memmap(address_map &map);
 	void sharc0_map(address_map &map);
@@ -841,6 +842,11 @@ void hornet_state::terabrst_map(address_map &map)
 {
 	hornet_map(map);
 	map(0x74080000, 0x7408000f).rw(FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
+}
+
+void hornet_state::sscope_map(address_map &map) // TODO: Second ADC address mapping
+{
+	hornet_map(map);
 }
 
 void hornet_state::sscope2_map(address_map &map)
@@ -1253,6 +1259,8 @@ void hornet_state::terabrst(machine_config &config)
 void hornet_state::sscope(machine_config &config)
 {
 	hornet(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::sscope_map);
 
 	ADSP21062(config, m_dsp2, XTAL(36'000'000));
 	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
