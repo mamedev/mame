@@ -8,8 +8,8 @@
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
+#include "bus/z29_kbd/keyboard.h"
 #include "cpu/mcs51/mcs51.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
 #include "screen.h"
@@ -20,11 +20,14 @@ public:
 	z29_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_keyboard(*this, "keyboard")
 		, m_crtc(*this, "crtc%u", 1U)
 		, m_nvram(*this, "nvram")
 		, m_charmem(*this, "charmem")
 		, m_attrmem(*this, "attrmem")
 		, m_chargen(*this, "chargen")
+		, m_dmatype(true)
+		, m_keyin(true)
 	{
 	}
 
@@ -34,8 +37,10 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(keyin_w);
+	u8 p1_r();
 	void p3_w(u8 data);
-	DECLARE_READ8_MEMBER(bs_24k_r);
+	u8 bs_24k_r(offs_t offset);
 	void crtc_w(offs_t offset, u8 data);
 	void latch_12k_w(u8 data);
 
@@ -43,6 +48,7 @@ private:
 	void ext_map(address_map &map);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<z29_keyboard_port_device> m_keyboard;
 	required_device_array<i8276_device, 2> m_crtc;
 	required_device<x2210_device> m_nvram;
 
@@ -51,11 +57,23 @@ private:
 	required_region_ptr<u8> m_chargen;
 
 	bool m_dmatype;
+	bool m_keyin;
 };
 
 void z29_state::machine_start()
 {
 	save_item(NAME(m_dmatype));
+	save_item(NAME(m_keyin));
+}
+
+WRITE_LINE_MEMBER(z29_state::keyin_w)
+{
+	m_keyin = state;
+}
+
+u8 z29_state::p1_r()
+{
+	return m_keyin ? 0xfd : 0xff;
 }
 
 void z29_state::p3_w(u8 data)
@@ -63,7 +81,7 @@ void z29_state::p3_w(u8 data)
 	m_dmatype = BIT(data, 4);
 }
 
-READ8_MEMBER(z29_state::bs_24k_r)
+u8 z29_state::bs_24k_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -122,10 +140,15 @@ void z29_state::z29(machine_config &config)
 	I8031(config, m_maincpu, 14.784_MHz_XTAL / 2); // Intel P8031AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &z29_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &z29_state::ext_map);
-	m_maincpu->port_in_cb<1>().set_constant(0xfd); // hack around keyboard not working
+	m_maincpu->port_in_cb<1>().set(FUNC(z29_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(m_keyboard, FUNC(z29_keyboard_port_device::keyout_w)).bit(0).invert();
 	m_maincpu->port_out_cb<3>().set(FUNC(z29_state::p3_w));
 
 	X2210(config, m_nvram);
+
+	Z29_KEYBOARD(config, m_keyboard, z29_keyboards, /*"heath"*/ "md");
+	m_keyboard->keyin_callback().set(FUNC(z29_state::keyin_w));
+	m_keyboard->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET).invert();
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14.784_MHz_XTAL, 880, 0, 640, 280, 0, 250);
@@ -136,8 +159,6 @@ void z29_state::z29(machine_config &config)
 	m_crtc[0]->irq_wr_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
 
 	I8276(config, m_crtc[1], 14.784_MHz_XTAL / 8).set_character_width(8);
-
-	I8021(config, "kbdmcu", 3.579545_MHz_XTAL).set_disable();
 }
 
 
@@ -148,9 +169,6 @@ ROM_START(z29) // All EPROMs on 85-2835-1 terminal board are HN482732AG-30
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u429.bin", 0x0000, 0x1000, CRC(5e3bc5bf) SHA1(18d73e3d74a9768bee8b063ea45891f955558ae7))
-
-	ROM_REGION(0x400, "kbdmcu", 0)
-	ROM_LOAD("444-100.bin", 0x000, 0x400, NO_DUMP)
 ROM_END
 
 

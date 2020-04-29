@@ -21873,7 +21873,6 @@ fl100                           // (c) 198? Grundig
 
 @source:mdt60.cpp
 mdt60                           //
-z22                             //
 
 @source:meadows.cpp
 bowl3d                          // [1978?]
@@ -41791,6 +41790,9 @@ z1013a2                         //
 z1013k69                        //
 z1013k76                        //
 z1013s60                        //
+
+@source:z22.cpp
+z22                             //
 
 @source:z29.cpp
 z29                             //

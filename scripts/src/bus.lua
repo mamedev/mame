@@ -2200,6 +2200,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/z29_kbd/keyboard.h,BUSES["Z29_KBD"] = true
+---------------------------------------------------
+
+if (BUSES["Z29_KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/z29_kbd/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/z29_kbd/keyboard.h",
+		MAME_DIR .. "src/devices/bus/z29_kbd/he191_3425.cpp",
+		MAME_DIR .. "src/devices/bus/z29_kbd/he191_3425.h",
+		MAME_DIR .. "src/devices/bus/z29_kbd/md_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/z29_kbd/md_kbd.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/z88/z88.h,BUSES["Z88"] = true
 ---------------------------------------------------
 

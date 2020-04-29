@@ -918,6 +918,7 @@ BUSES["VTECH_MEMEXP"] = true
 BUSES["WANGPC"] = true
 BUSES["WSWAN"] = true
 BUSES["X68K"] = true
+BUSES["Z29_KBD"] = true
 BUSES["Z88"] = true
 BUSES["ZORRO"] = true
 
@@ -4179,6 +4180,7 @@ createMESSProjects(_target, _subtarget, "zenith")
 files {
 	MAME_DIR .. "src/mame/drivers/mdt60.cpp",
 	MAME_DIR .. "src/mame/drivers/z100.cpp",
+	MAME_DIR .. "src/mame/drivers/z22.cpp",
 	MAME_DIR .. "src/mame/drivers/z29.cpp",
 }
 
