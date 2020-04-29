@@ -1396,8 +1396,16 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19990205"/>
 		<info name="alt_title" value="牧場物語2"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NYWJ-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="bokujou monogatari 2 (japan).bin" size="16777216" crc="0837b349" sha1="e12e5f2fce0f27c52be2c7454b21d9b538ea2ee5" />
+				<rom name="nus-nywj-0.u1" size="16777216" crc="0837b349" sha1="e12e5f2fce0f27c52be2c7454b21d9b538ea2ee5" />
 			</dataarea>
 		</part>
 	</software>
@@ -2976,8 +2984,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="20000728"/>
 		<info name="alt_title" value="ドラえもん3 のび太の町SOS!"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-N3DJ-0]" />
+			<feature name="u2" value="U2 [BK16D]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="doraemon 3 - nobita no machi sos (japan).bin" size="16777216" crc="0b3ad913" sha1="a567aa96860525963f9dafa256036c0df5f66909" />
+				<rom name="nus-n3dj-0.u1" size="16777216" crc="0b3ad913" sha1="a567aa96860525963f9dafa256036c0df5f66909" />
 			</dataarea>
 		</part>
 	</software>
@@ -5602,8 +5616,16 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NJ5J-1]" />
+			<feature name="u2" value="U2 [LH52V246AD]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="jikkyou powerful pro yakyuu 5 (japan) (rev a).bin" size="16777216" crc="a25d1427" sha1="483e455584f8fd4a4ad002d9718695d3a11cbfc6" />
+				<rom name="nus-nj5j-1.u1" size="16777216" crc="a25d1427" sha1="483e455584f8fd4a4ad002d9718695d3a11cbfc6" />
 			</dataarea>
 		</part>
 	</software>
@@ -5658,8 +5680,16 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="実況パワフルプロ野球6"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NP6J-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [BU9811]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="jikkyou powerful pro yakyuu 6 (japan).bin" size="16777216" crc="a54e4397" sha1="ae89aa2cd42aa841984c3e9ee2e3aada1148bf2d" />
+				<rom name="nus-np6j-0.u1" size="16777216" crc="a54e4397" sha1="ae89aa2cd42aa841984c3e9ee2e3aada1148bf2d" />
 			</dataarea>
 		</part>
 	</software>
@@ -5924,8 +5954,14 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19981023"/>
 		<info name="alt_title" value="キラッと解決! 64探偵団"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-N64J-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="kiratto kaiketsu 64 tanteidan (japan).bin" size="12582912" crc="9fc8a30c" sha1="c6b8349a834853501397225e29d2a7decedd07f1" />
+				<rom name="nus-n64j-0.u1" size="12582912" crc="9fc8a30c" sha1="c6b8349a834853501397225e29d2a7decedd07f1" />
 			</dataarea>
 		</part>
 	</software>
@@ -10781,10 +10817,18 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NT3J-JPN"/>
 		<info name="release" value="19981226"/>
-		<info name="alt_title" value="新日本プロレス 闘魂炎導2 the next generation"/>
+		<info name="alt_title" value="新日本プロレス 闘魂炎導2 the néxt genération"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NT3J-0]" />
+			<feature name="u2" value="U2 [LH52V246AD]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="shin nihon pro wrestling toukon road 2 - the next generation (japan).bin" size="33554432" crc="be0fc7e8" sha1="15b9c28584a26b60e5a2a231e5ba2897e831e8f8" />
+				<rom name="nus-nt3j-0.u1" size="33554432" crc="be0fc7e8" sha1="15b9c28584a26b60e5a2a231e5ba2897e831e8f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -12584,8 +12628,14 @@ clips onto the player's ear.
 		<info name="release" value="19991001"/>
 		<info name="alt_title" value="トランスフォーマー ビーストウォーズ メタルス 64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NTBJ-0]" />
+			<feature name="u2" value="U2 [BKD4-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="transformers - beast wars metals 64 (japan).bin" size="12582912" crc="5e972b7d" sha1="da8e453dbbd57ac3b207b44b4621ea8897141bb6" />
+				<rom name="nus-ntbj-0.u1" size="12582912" crc="5e972b7d" sha1="da8e453dbbd57ac3b207b44b4621ea8897141bb6" />
 			</dataarea>
 		</part>
 	</software>
@@ -14308,8 +14358,14 @@ clips onto the player's ear.
 		<info name="release" value="20000427"/>
 		<info name="alt_title" value="ゼルダの伝説 ムジュラの仮面"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NZSJ-1]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6105A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="zelda no densetsu - mujura no kamen (japan) (rev a).bin" size="33554432" crc="2de56c55" sha1="666fad106735135c1a3471ef1b967c396f949ad9" />
+				<rom name="nus-nzsj-1.u1" size="33554432" crc="2de56c55" sha1="666fad106735135c1a3471ef1b967c396f949ad9" />
 			</dataarea>
 		</part>
 	</software>
