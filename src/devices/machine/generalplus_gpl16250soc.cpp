@@ -4,10 +4,13 @@
 
   SunPlus "GCM394" (based on die pictures)
 
+  Note, these are all the same chip but in different configurations so
+  should be tidied up and made to use callbacks
+
 **********************************************************************/
 
 #include "emu.h"
-#include "sunplus_gcm394.h"
+#include "generalplus_gpl16250soc.h"
 
 
 #define LOG_GCM394_SPI            (1U << 5)
@@ -20,14 +23,14 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "SunPlus GCM394 System-on-a-Chip")
+DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "GeneralPlus GPL16250 System-on-a-Chip")
 
 sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
 {
 }
 
-DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPAC800 System-on-a-Chip")
+DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPL16250 System-on-a-Chip (with NAND handling)")
 
 generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
@@ -35,7 +38,7 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 }
 
 
-DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus unSP20 SPI-based SoC")
+DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL16250 (with SPI handling)")
 
 generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))

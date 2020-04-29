@@ -14667,6 +14667,48 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:generalplus_gpl16250_mobigo.cpp
+mobigo
+mobigos
+mobigo2
+
+@source:generalplus_gpl16250_nand.cpp
+wlsair60                        // Wireless Air 60
+jak_car2
+jak_gtg
+jak_sspop
+jak_hmhsm
+jak_umdf
+jak_duck
+jak_swc
+jak_wdzh
+jak_wdbg
+jak_tsm
+vbaby
+mgtfit
+beambox
+
+@source:generalplus_gpl16250_rom.cpp
+smartfp                         // Smart Fit Park
+smartfps
+gormiti
+tkmag220                        //
+
+@source:generalplus_gpl16250_romram.cpp
+paccon
+lazertag
+jak_s500
+jak_smwm
+jak_pf
+jak_prft
+jak_tink
+jak_totm
+jak_ths
+wrlshunt                        // Wireless: Hunting Video Game System
+
+@source:generalplus_gpl16250_spi.cpp
+bkrankp
+
 @source:generalplus_gpl32612.cpp
 jak_swbstrik
 jak_tmnthp
@@ -38052,42 +38094,6 @@ srangern                        // (c) 1988 SunA (NOVA License)
 srangero                        // (c) 1988
 srangerw                        // (c) 1988 SunA (WDK License)
 starfigh                        // (c) 1990 SunA
-
-@source:sunplus_unsp20soc.cpp
-paccon
-lazertag
-jak_s500
-jak_smwm
-jak_pf
-jak_prft
-jak_tink
-jak_totm
-jak_ths
-smartfp                         // Smart Fit Park
-smartfps
-gormiti
-wlsair60                        // Wireless Air 60
-wrlshunt                        // Wireless: Hunting Video Game System
-tkmag220                        //
-jak_car2
-jak_gtg
-jak_sspop
-jak_hmhsm
-jak_umdf
-jak_duck
-jak_swc
-jak_wdzh
-jak_wdbg
-jak_tsm
-vbaby
-mgtfit
-beambox
-bkrankp
-
-@source:sunplus_unsp20soc_mobigo.cpp
-mobigo
-mobigos
-mobigo2
 
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
