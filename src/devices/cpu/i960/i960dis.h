@@ -22,7 +22,7 @@ private:
 	};
 
 	static const mnemonic_t mnemonic[256];
-	static const mnemonic_t mnem_reg[100];
+	static const mnemonic_t mnem_reg[111];
 	static const char *const constnames[32];
 	static const char *const regnames[32];
 
