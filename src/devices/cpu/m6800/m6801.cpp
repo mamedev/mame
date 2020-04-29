@@ -83,7 +83,7 @@ enum
 #define TAKE_TOI enter_interrupt("take TOI\n",0xfff2)
 #define TAKE_SCI enter_interrupt("take SCI\n",0xfff0)
 
-/* mnemonicos for the Timer Control and Status Register bits */
+/* mnemonics for the Timer Control and Status Register bits */
 #define TCSR_OLVL 0x01
 #define TCSR_IEDG 0x02
 #define TCSR_ETOI 0x04
@@ -1092,7 +1092,7 @@ void hd6301x_cpu_device::write_port2()
 
 /*
     if change_pc() direccted these areas ,Call hd63701_trap_pc().
-    'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timming.
+    'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
     mode 0,1,2,4,6 : $0000-$001f
     mode 5         : $0000-$001f,$0200-$efff
     mode 7         : $0000-$001f,$0100-$efff

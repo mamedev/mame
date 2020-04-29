@@ -10,7 +10,7 @@ Hardware notes:
 - 256 bytes RAM(2*2112-1)
 - 8-digit 7seg led panel
 
-Two versions exists, a blue one(seen with SC80265P) and a brown one(seen with
+Two versions exist, a blue one(seen with SC80265P) and a brown one(seen with
 either MCU). The one emulated here is from a brown version with the SC80265P.
 Motorola SC80265P is a 3870 clone, it's assumed that the program is the same
 as SL90259.
