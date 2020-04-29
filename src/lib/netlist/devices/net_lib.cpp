@@ -149,6 +149,8 @@ namespace devices
 		//ENTRY(4066,                 CD_4066,              "+A,B")
 		LIB_ENTRY(NE555)
 		LIB_ENTRY(NE555_dip)
+		LIB_ENTRY(NE566)
+		LIB_ENTRY(NE566_dip)
 		LIB_ENTRY(MC1455P)
 		LIB_ENTRY(MC1455P_dip)
 		LIB_ENTRY(TMS4800)

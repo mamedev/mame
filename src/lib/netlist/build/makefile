@@ -17,7 +17,7 @@
 #
 #       Please build documentation using
 #           make mingw PARAMS=doc
-#     
+#
 #
 
 SRC = ..
@@ -27,7 +27,7 @@ TIDY_DB = ../compile_commands.json
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
 TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
@@ -40,8 +40,8 @@ TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size
 
-space := 
-space += 
+space :=
+space +=
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
 TIDY_SOURCES = $(SOURCES)
 
@@ -85,7 +85,7 @@ endif
 
 ifeq ($(FAST),1)
 CFLAGS += -DNL_USE_ACADEMIC_SOLVERS=0
-endif 
+endif
 
 TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
@@ -175,6 +175,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
+	$(NLOBJ)/devices/nld_ne566.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
 	$(NLOBJ)/devices/nld_tristate.o \
 	$(NLOBJ)/devices/nld_schmitt.o \
@@ -193,7 +194,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 	$(NLOBJ)/generated/static_solvers.o \
-	
+
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
 	$(VSBUILD/netlistlib.vcxproj.user \
@@ -262,10 +263,10 @@ maketree: $(sort $(OBJDIRS))
 
 .PHONY: clang clang-5 mingw doc native
 
-native: 
+native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
-gcc9: 
+gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
@@ -286,15 +287,15 @@ tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
-# -Wweak-template-vtables 
+# -Wweak-template-vtables
 #
 # These have to be given:
-# -Wno-missing-variable-declarations : Device factory code, on purpose 
+# -Wno-missing-variable-declarations : Device factory code, on purpose
 
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
 		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
-		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS) 
+		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS)
 
 #
 # FIXME: Unicode
