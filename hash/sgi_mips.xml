@@ -207,6 +207,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="iperf_2_0">
+		<description>IRIS PERFORMER 2.0</description>
+		<year>1995</year> <!-- 12/95 -->
+		<publisher>Silicon Graphics</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0126-004	 -->
+				<disk name="iris_performer_2_0" sha1="ecd4481a972a607c908da3416c4fc862243c9ecf" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="nfs_5_3">
 		<description>Network File System 5.3</description>
 		<year>1994</year> <!-- 11/94 -->
@@ -246,6 +260,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="openinv_2_1_5">
+		<description>Open Inventor 2.1.5 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year> <!-- 10/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0794-002 -->
+				<disk name="open_inventor_2_1_5" sha1="2c9aea80d336df6ae2b67960bcd71230364184fb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="snmp_1_1_2">
+		<description>SNMP Access to HP-UX MIB 1.1.2 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year> <!-- 06/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0783-001 -->
+				<disk name="snmp_access_to_hp_ux_mib_1_1_2" sha1="ab4d302c197551e028fde5cef49476e857092f04" />
+			</diskarea>
+		</part>
+	</software>
+
+
 	<software name="softwin95_4_0">
 		<description>Insignia SoftWindows 95 4.0 for IRIX 6.3 and 6.4</description>
 		<year>1997</year> <!-- 08/97 -->
@@ -272,13 +313,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="teleffect_1_0">
+		<description>Teleffect 1.0 for IRIX 6.2, 6.3, 6.4, 6.5 for Microsoft NT 4.0</description>
+		<year>1998</year> <!-- 11/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0881-001 -->
+				<disk name="teleffect_1_0" sha1="c5e26c5ad1d844650567a7917091887bd7d64e90" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Hot Mix -->
 
 	<software name="hotmix_4">
 		<description>Hot Mix 4</description>
 		<year>1993</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
@@ -292,7 +345,6 @@ license:CC0
 		<description>Hot Mix Volume 8</description>
 		<year>1994</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: unknown -->
 			<diskarea name="cdrom">
@@ -391,7 +443,6 @@ license:CC0
 		<year>1994</year>
 		<publisher>Silicon Graphics</publisher>
 		<info name="version" value="1.0" />
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
@@ -405,7 +456,6 @@ license:CC0
 		<description>IndiZone^3</description>
 		<year>1995</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
@@ -441,7 +491,6 @@ license:CC0
 		<description>IRIX 6.2 Applications August 1996</description>
 		<year>1996</year>
 		<publisher>Silicon Graphics</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
@@ -463,6 +512,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="diag_5_3">
+		<description>Diagnostics 5.3</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0121-007 -->
+				<disk name="diagnostics_5_3" sha1="e86cc207b1770b3e29180511c088bdc1486f84e8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- IRIX patches (loose CDs) -->
 
 	<software name="patch_sg0000466">
@@ -473,6 +535,32 @@ license:CC0
 			<!-- P/N: 812-0355-001. Dumped with Plextor, without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="Patch_SG0000466" sha1="830782ab34d8e6b1014e1d9af59c345819f92041" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_5_3_sep_97">
+		<description>IRIX 5.3 Recommended/Required Patches September 1997</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0602-005 -->
+				<disk name="irix_5_3_recommended_required_patches_september_1997" sha1="88d3233671483a82b4f524e4b91fb465fb44ca5b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="patch_5_3_dec_97">
+		<description>IRIX 5.3 Current Patches December 1997</description>
+		<year>1997</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0685-009 -->
+				<disk name="irix_5_3_current_patches_december_1997" sha1="a2de6e6abe88a73c04e3c77ef9f79eaef1d9cc8a" />
 			</diskarea>
 		</part>
 	</software>
@@ -595,4 +683,83 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_inst">
+		<description>IRIX 6.5 Installation Tools</description>
+		<year>1998</year> <!-- 06/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0758-002 -->
+				<disk name="irix_6_5_installation_tools_june_1998" sha1="2123c5477c3533214a95dc7c801b7306d821d184" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_found">
+		<description>IRIX 6.5 Foundation</description>
+		<year>1998</year> <!-- 06/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0759-002 -->
+				<disk name="irix_6_5_foundation_1" sha1="6d6009e45d067238d363ec3c490f9fa1548e383b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0760-002 -->
+				<disk name="irix_6_5_foundation_2" sha1="56a4507f8ae92fcdf2e4eecc9d1cc1c7f4137347" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_4_ovr">
+		<description>IRIX 6.5.4 Installation Tools and Overlays</description>
+		<year>1999</year> <!-- 05/99 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0818-004 -->
+				<disk name="irix_6_5_4_overlays_1_2_may_1999" sha1="a5aa3e54848bed8d2c047a8384e2dcf2872971cb" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0819-004 -->
+				<disk name="irix_6_5_4_overlays_2_2_may_1999" sha1="f5d8423e82a9eb8bae748d9df6f92644e79b941b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_8_ovr">
+		<description>IRIX 6.5.8 Installation Tools and Overlays</description>
+		<year>2000</year> <!-- 05/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0818-008 -->
+				<disk name="irix_6_5_8_overlays_1_of_3_may_2000" sha1="52af3fd505845873117ba85ddaa199f86cf8431f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0819-008 -->
+				<disk name="irix_6_5_8_overlays_2_of_3_may_2000" sha1="f3365858fa3e80c9e556bdcc1d86a50755706983" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<!-- P/N: 812-0817-008 -->
+				<disk name="irix_6_5_8_overlays_3_of_3_may_2000" sha1="1c26a87f6674ff4fc29d86964fd053154b0a16b7" />
+			</diskarea>
+		</part>
+	</software>
 </softwarelist>
