@@ -207,7 +207,7 @@ static INPUT_PORTS_START(mdt60)
 	PORT_DIPSETTING(0x00, "TeleVideo (SOH...CR)")
 
 	PORT_START("DIP1")
-	PORT_BIT(0xff, 0xff, IPT_UNUSED) // SW2 is unpopulated
+	PORT_BIT(0xff, 0xff, IPT_UNUSED) // SW2 is unpopulated (as is LS244 at U20)
 INPUT_PORTS_END
 
 // XTAL frequency is specified as 16.589 MHz on actual parts as well as in MDT 60 schematics.
@@ -228,6 +228,7 @@ void mdt60_state::mdt60(machine_config &config)
 
 	Z29_KEYBOARD(config, m_keyboard, z29_keyboards, "md");
 	m_keyboard->keyin_callback().set(FUNC(mdt60_state::keyin_w)).invert();
+	// Reset output (pin 2) is not connected
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::amber());
