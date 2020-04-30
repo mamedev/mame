@@ -97,6 +97,15 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("000000000000edcb5433", "%020x", -0x1234abcd) );
 	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcd) );
 
+	REQUIRE(test("0xf",        "0x%01x", -1) );
+	REQUIRE(test("0xff",       "0x%02x", -1) );
+	REQUIRE(test("0xfff",      "0x%03x", -1) );
+	REQUIRE(test("0xffff",     "0x%04x", -1) );
+	REQUIRE(test("0xfffff",    "0x%05x", -1) );
+	REQUIRE(test("0xffffff",   "0x%06x", -1) );
+	REQUIRE(test("0xfffffff",  "0x%07x", -1) );
+	REQUIRE(test("0xffffffff", "0x%08x", -1) );
+
 	if (BX_ENABLED(BX_ARCH_32BIT) )
 	{
 		REQUIRE(test("2147483647", "%jd", INTMAX_MAX) );
