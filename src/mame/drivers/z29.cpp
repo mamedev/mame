@@ -146,7 +146,7 @@ void z29_state::z29(machine_config &config)
 
 	X2210(config, m_nvram);
 
-	Z29_KEYBOARD(config, m_keyboard, z29_keyboards, /*"heath"*/ "md");
+	Z29_KEYBOARD(config, m_keyboard, z29_keyboards, "heath");
 	m_keyboard->keyin_callback().set(FUNC(z29_state::keyin_w));
 	m_keyboard->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET).invert();
 

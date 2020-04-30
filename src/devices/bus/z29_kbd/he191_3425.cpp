@@ -5,9 +5,8 @@
     Heath HE 191-3425 keyboard
 
     This 91-key detached keyboard is standard issue for the H-29 (Z-29)
-    terminal. It is also specified for the MDT 60 in its schematics.
-
-    Since the 8021 MCU is not dumped, emulation is more or less a stub.
+    terminal. Its schematics are also included in the MDT 60 Service
+    Manual.
 
 ***************************************************************************/
 
@@ -130,8 +129,8 @@ static INPUT_PORTS_START(he191_3425)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('m') PORT_CHAR('M') PORT_CODE(KEYCODE_M)
 
 	PORT_START("B5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_F10)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space Bar") PORT_CHAR(' ') PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('6') PORT_CHAR('^') PORT_CODE(KEYCODE_6)
@@ -230,8 +229,8 @@ void he191_3425_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START(he191_3425)
-	ROM_REGION(0x400, "mcu", ROMREGION_ERASE00)
-	ROM_LOAD("p8021h-2155_444-100.z1", 0x000, 0x400, NO_DUMP)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("p8021h-2155_444-100.z1", 0x000, 0x400, CRC(41e62f11) SHA1(4369de412cef907a3734ba511abe902d2d1b6cbf))
 ROM_END
 
 const tiny_rom_entry *he191_3425_device::device_rom_region() const
