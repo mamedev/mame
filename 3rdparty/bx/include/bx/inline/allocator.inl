@@ -27,7 +27,7 @@ namespace bx
 		union { void* ptr; uintptr_t addr; } un;
 		un.ptr = _ptr;
 		uintptr_t unaligned = un.addr + _extra; // space for header
-		uintptr_t aligned = bx::alignUp(unaligned, _align);
+		uintptr_t aligned = bx::alignUp(unaligned, int32_t(_align) );
 		un.addr = aligned;
 		return un.ptr;
 	}
