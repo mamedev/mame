@@ -143,7 +143,7 @@ Notes:
 
     - abc806 30K banking
     - cassette
-	- abc800 video card bus 
+    - abc800 video card bus
 
 */
 
@@ -191,7 +191,7 @@ READ8_MEMBER( abc800_state::pling_r )
 READ8_MEMBER( abc800_state::read )
 {
 	uint8_t data = 0xff;
-	
+
 	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
 		data = m_video_ram[offset];
@@ -212,7 +212,7 @@ READ8_MEMBER( abc800_state::read )
 	{
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
-	
+
 	return data;
 }
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( abc800_state::write )
 	}
 	else if (offset >= 0x7800 && offset < 0x8000)
 	{
- 		m_char_ram[offset & (m_char_ram_size - 1)] = data;
+		m_char_ram[offset & (m_char_ram_size - 1)] = data;
 	}
 	else if (offset >= 0x8000)
 	{
@@ -248,9 +248,9 @@ READ8_MEMBER( abc802_state::read )
 			{
 				data = m_rom->base()[offset];
 			}
-			else 
+			else
 			{
-				if (m_fetch_charram) 
+				if (m_fetch_charram)
 				{
 					data = m_rom->base()[offset];
 				}

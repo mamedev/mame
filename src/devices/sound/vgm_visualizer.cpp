@@ -36,12 +36,12 @@ DEFINE_DEVICE_TYPE(VGMVIZ, vgmviz_device, "vgmviz", "VGM Visualizer")
 
 /*static*/ const bool vgmviz_device::NEEDS_FFT[VIZ_COUNT] =
 {
-	false,	// VIZ_WAVEFORM
-	true,	// VIZ_WATERFALL
-	true,	// VIZ_RAWSPEC
-	true,	// VIZ_BARSPEC4
-	true,	// VIZ_BARSPEC8
-	true	// VIZ_BARSPEC16
+	false,  // VIZ_WAVEFORM
+	true,   // VIZ_WATERFALL
+	true,   // VIZ_RAWSPEC
+	true,   // VIZ_BARSPEC4
+	true,   // VIZ_BARSPEC8
+	true    // VIZ_BARSPEC16
 };
 
 //**************************************************************************

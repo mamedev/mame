@@ -914,7 +914,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 					u32 dst = 0xd20000;
 					//u32 input_src = 0xc01cc0;
 					//u32 input_dst = 0xc00507;
-					
+
 					// screen 1
 					// if (m_last_prot_param == 0x004a)
 					// screen 2
@@ -925,7 +925,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 						//input_src += 0x10000;
 						//input_dst += 0x40;
 					}
-					
+
 					for (int spr = 0; spr < 256; spr++)
 					{
 						for (i = 0; i <= 0x10; i += 4)
@@ -969,7 +969,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				{
 					u32 src = 0xc18400;
 					u32 dst = 0xd21000;
-					
+
 					for (int spr = 0; spr < 0x400; spr++)
 					{
 						space.write_word(dst, space.read_word(src));
@@ -1255,7 +1255,7 @@ static INPUT_PORTS_START( common )
 	PORT_DIPUNUSED_DIPLOC( 0x00200000, 0x00200000, "SW2:6")
 	PORT_DIPUNUSED_DIPLOC( 0x00400000, 0x00400000, "SW2:7")
 	PORT_DIPUNUSED_DIPLOC( 0x00800000, 0x00800000, "SW2:8")
-	
+
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -1279,18 +1279,18 @@ static INPUT_PORTS_START( racinfrc )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_CODE_INC(KEYCODE_LCONTROL) PORT_REVERSE
-	
+
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01000000, 0x01000000, "SW1:1")
 	PORT_DIPUNUSED_DIPLOC( 0x02000000, 0x02000000, "SW1:2")
 	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    	  0x04000000, DEF_STR( No ) )
+	PORT_DIPSETTING(          0x04000000, DEF_STR( No ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x18000000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    	  0x18000000, "2in1" )
-	PORT_DIPSETTING(    	  0x10000000, "Upright (Mono)" )
+	PORT_DIPSETTING(          0x18000000, "2in1" )
+	PORT_DIPSETTING(          0x10000000, "Upright (Mono)" )
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Unused ) ) // ???
-	PORT_DIPSETTING(    	  0x00000000, "Upright (Stereo)" )
+	PORT_DIPSETTING(          0x00000000, "Upright (Stereo)" )
 	PORT_DIPNAME( 0xe0000000, 0xe0000000, "Car Number & Color" ) PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red)" )
 	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue)" )
@@ -1304,7 +1304,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
 	PORT_INCLUDE( racinfrc )
-	
+
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Shoot")
 	PORT_BIT( 0x00000060, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1314,13 +1314,13 @@ static INPUT_PORTS_START( opengolf )
 	PORT_BIT( 0x00600000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x60000000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("AN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )	
-	
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("SYSTEM_DSW")
 	// TODO: these coin mechs are available only when coin slots is in independent mode
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1345,7 +1345,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ggreats2 )
 	PORT_INCLUDE( opengolf )
-	
+
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED ) // P3/P4 connector
 	// Advice is on top of the ball device
@@ -1366,7 +1366,7 @@ static INPUT_PORTS_START( ggreats2 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Stance/Right")
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Advice")
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_START1 )
-	
+
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_BIT( 0x00000c00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0000c000, IP_ACTIVE_LOW, IPT_UNUSED )

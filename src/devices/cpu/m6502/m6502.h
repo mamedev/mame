@@ -269,6 +269,11 @@ protected:
 	virtual void execute_run() override;
 };
 
+class m6512_device : public m6502_device {
+public:
+	m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 enum {
 	M6502_PC = 1,
 	M6502_A,
@@ -286,5 +291,6 @@ enum {
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)
+DECLARE_DEVICE_TYPE(M6512, m6512_device)
 
 #endif // MAME_CPU_M6502_M6502_H

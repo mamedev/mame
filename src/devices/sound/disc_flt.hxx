@@ -90,7 +90,7 @@ DISCRETE_RESET(dst_crfilter)
  * Prototype filters come from "Active-Filter Cookbook" by Don Lancaster, Ch. 3
  *
  * Low Pass:        High Pass:
- *         
+ *
  *         K*wc             K*s
  * H(s) = ------    H(s) = ------
  *        s + wc           s + wc
@@ -183,20 +183,20 @@ DISCRETE_RESET(dst_filter1)
  * (d is the Damping Factor, which is also 1/Q)
  *
  * Low Pass:
- *         
+ *
  *              K*wc^2
  * H(s) = -------------------
  *        s^2 + d*wc*s + wc^2
  *
  * Band Pass:
- *         
+ *
  *              K*wc*s
  * H(s) = -------------------
  *        s^2 + d*wc*s + wc^2
  *
  *
  * High Pass:
- *         
+ *
  *               K*s^2
  * H(s) = -------------------
  *        s^2 + d*wc*s + wc^2

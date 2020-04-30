@@ -8,7 +8,7 @@
 
     TODO:
     - non-video stuff needs to be ported there as well
-	- Verify difference between TC0090LVC and TC0091LVC
+    - Verify difference between TC0090LVC and TC0091LVC
 
 ***************************************************************************/
 
@@ -145,14 +145,14 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 }
 
 /*
-	Scroll Tilemap format (2 bytes per tiles, 64x32 tilemap)
+    Scroll Tilemap format (2 bytes per tiles, 64x32 tilemap)
 
-	Offset Bits     Description
-	       76543210
-	00     xxxxxxxx Code (bit 0-7)
-	01     ------xx Code (bit 8-9)
-	       ----xx-- Bank select (0x400 code boundary)
-	       xxxx---- Palette select (16 color boundary)
+    Offset Bits     Description
+           76543210
+    00     xxxxxxxx Code (bit 0-7)
+    01     ------xx Code (bit 8-9)
+           ----xx-- Bank select (0x400 code boundary)
+           xxxx---- Palette select (16 color boundary)
 */
 
 template<unsigned Offset>
@@ -173,13 +173,13 @@ TILE_GET_INFO_MEMBER(tc0090lvc_device::get_tile_info)
 }
 
 /*
-	Fixed Tilemap format (2 bytes per tiles, 64x32 tilemap)
+    Fixed Tilemap format (2 bytes per tiles, 64x32 tilemap)
 
-	Offset Bits     Description
-	       76543210
-	00     xxxxxxxx Code (bit 0-7)
-	01     -----xxx Code (bit 8-10)
-	       xxxx---- Palette select (16 color boundary)
+    Offset Bits     Description
+           76543210
+    00     xxxxxxxx Code (bit 0-7)
+    01     -----xxx Code (bit 8-10)
+           xxxx---- Palette select (16 color boundary)
 */
 
 TILE_GET_INFO_MEMBER(tc0090lvc_device::get_tx_tile_info)
@@ -277,20 +277,20 @@ void tc0090lvc_device::mark_all_layer_dirty()
 }
 
 /*
-	Sprite format (8 bytes per sprites, max 125 entries (0x3e8 bytes))
+    Sprite format (8 bytes per sprites, max 125 entries (0x3e8 bytes))
 
-	Offset Bits     Description
-	       76543210
-	00     xxxxxxxx Code (bit 0-7)
-	01     xxxxxxxx Code (bit 8-15)
-	02     ----xxxx Palette select (16 color boundary)
-	03     ------x- Flip Y
-	       -------x Flip X
-	04     xxxxxxxx X position (bit 0-7)
-	05     -------x X position (bit 8, unsigned)
-	06     xxxxxxxx Y position (unsigned)
-	07     xxxxxxxx unknown / ignored? Seems just garbage in many cases, e.g
-	                plgirs2 bullets and raimais big bosses.
+    Offset Bits     Description
+           76543210
+    00     xxxxxxxx Code (bit 0-7)
+    01     xxxxxxxx Code (bit 8-15)
+    02     ----xxxx Palette select (16 color boundary)
+    03     ------x- Flip Y
+           -------x Flip X
+    04     xxxxxxxx X position (bit 0-7)
+    05     -------x X position (bit 8, unsigned)
+    06     xxxxxxxx Y position (unsigned)
+    07     xxxxxxxx unknown / ignored? Seems just garbage in many cases, e.g
+                    plgirs2 bullets and raimais big bosses.
 */
 
 void tc0090lvc_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -335,7 +335,7 @@ u32 tc0090lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		bitmap.fill(palette().black_pen(), cliprect);
 		return 0;
 	}
-	
+
 	if (bitmap_mode()) // 8bpp bitmap enabled
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)

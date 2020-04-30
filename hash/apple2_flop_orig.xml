@@ -12077,8 +12077,8 @@ license:CC0
 		<info name="release" value="2020-04-08"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-	
-    	<part name="flop1" interface="floppy_5_25">
+
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="48405">
 				<rom name="meteoroids in space.woz" size="48405" crc="7beb3c05" sha1="61cdb1028a091a7bd85ac636f1f29087b57b4426"/>
 			</dataarea>

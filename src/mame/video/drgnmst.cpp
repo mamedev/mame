@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(drgnmst_base_state::get_fg_tile_info)
 	tileno = m_fg_videoram[tile_index * 2] & 0xfff;
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
-	
+
 	if ((m_fg_videoram[tile_index * 2] & 0x4000))
 		tileno |= 0x10000;
 
@@ -40,8 +40,8 @@ TILE_GET_INFO_MEMBER(drgnmst_base_state::get_fg_tile_info)
 		tileno |= 0x8000;
 
 	tileno ^= 0x18000;
-	
-//	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1 (not on mastfury at least)
+
+//  tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1 (not on mastfury at least)
 	tileinfo.set(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 

@@ -414,7 +414,7 @@ std::string &video_manager::timecode_total_text(std::string &str)
 
 //-------------------------------------------------
 //  begin_recording_screen - begin recording a
-//	movie for a specific screen
+//  movie for a specific screen
 //-------------------------------------------------
 
 void video_manager::begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_recording::format format)

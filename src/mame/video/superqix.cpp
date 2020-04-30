@@ -2,7 +2,7 @@
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
 /***************************************************************************
 
-  video.c
+  superqix.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -84,13 +84,13 @@ rgb_t superqix_state_base::BBGGRRII(uint32_t raw)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(superqix_state_base::superqix_videoram_w)
+void superqix_state_base::superqix_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_bitmapram_w)
+void superqix_state_base::superqix_bitmapram_w(offs_t offset, uint8_t data)
 {
 	if (m_bitmapram[offset] != data)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER(superqix_state_base::superqix_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_bitmapram2_w)
+void superqix_state_base::superqix_bitmapram2_w(offs_t offset, uint8_t data)
 {
 	if (data != m_bitmapram2[offset])
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER(superqix_state_base::superqix_bitmapram2_w)
 	}
 }
 
-WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
+void hotsmash_state::pbillian_0410_w(u8 data)
 {
 	/*
 	 -------0  ? [not used]
@@ -140,7 +140,7 @@ WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
 	flip_screen_set(BIT(data,5));
 }
 
-WRITE8_MEMBER(superqix_state_base::superqix_0410_w)
+void superqix_state_base::superqix_0410_w(uint8_t data)
 {
 	/*
 	 ------10  tile bank

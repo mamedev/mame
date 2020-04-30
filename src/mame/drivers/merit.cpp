@@ -776,7 +776,7 @@ static INPUT_PORTS_START( mosdraw )
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // to bypass printer check TODO: proper emulation
 INPUT_PORTS_END
-	
+
 static INPUT_PORTS_START( iowapp )
 	PORT_INCLUDE( meritpoker )
 

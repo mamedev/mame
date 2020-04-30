@@ -673,22 +673,23 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 
 void cischeat_state::armchmp2_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x000000, 0x07ffff).rom();
 	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x082008, 0x08200d).nopw(); //      UNUSED LAYER
+	map(0x082008, 0x08200d).nopw();
 	map(0x082100, 0x082105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082208, 0x082209).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
-	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
-	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
-	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
-	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
-	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));              // A / D
-	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
-	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
-	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0f0000, 0x0fffff).ram().share("ram"); // Work RAM + Spriteram
+	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));
+	map(0x100004, 0x100005).portr("IN3"); // DSW
+	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); 
+	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));
+	// same hookup as acommand, most notably the "Arm Champs II" voice sample on title screen playbacks on oki1 mirror
+	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 }
 
 

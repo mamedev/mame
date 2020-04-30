@@ -152,4 +152,76 @@ Systemskiva för hårdskiveenhet [version 7242]
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Requires a hardware key which isn't dumped -->
+	<software name="stvaratt">
+		<description>Stava rätt på nytt sätt (version 8481)</description>
+		<year>19??</year>
+		<publisher>Esselte Stadium</publisher>
+		<info name="serial" value="24-34298-X" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2178838">
+				<rom name="Stava ratt pa nytt satt.mfm" size="2178838" crc="9777a5bb" sha1="1ac2be0062fe800deed3cbccddb95710ae116d92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mattev1">
+		<description>Matematikverkstad I (beta, nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Stadium</publisher>
+		<info name="serial" value="24-33777" />
+		<info name="release" value="19870806" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217678">
+				<rom name="Matematikverkstad I.mfm" size="2217678" crc="a5956a47" sha1="3e8e1af3c54b26775ab127f499f7260cca0f9389"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="video">
+		<description>Video-butiken (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Stadium</publisher>
+		<info name="serial" value="24-33070" />
+		<info name="release" value="19860916" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Video-butiken Drive A" />
+			<dataarea name="flop" size="2209512">
+				<rom name="Video-butiken Drive A.mfm" size="2209512" crc="5d4a1c41" sha1="315befb495c46360e9665e4525623543e2160cd1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Video-butiken Drive B" />
+			<dataarea name="flop" size="2209459">
+				<rom name="Video-butiken Drive B.mfm" size="2209459" crc="bf491515" sha1="b7ed4b1796f9f6056f7394381a0ea26cffdbef6a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="statett">
+		<description>StatEtt - Analys</description>
+		<year>1990</year>
+		<publisher>Esselte Stadium</publisher>
+		<info name="serial" value="24-35831" />
+		<info name="release" value="19900101" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217707">
+				<rom name="StatEtt Analys.mfm" size="2217707" crc="017ae3c4" sha1="6ff89815eb79ca9cd6369defaca59948035275e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a hardware key which isn't dumped -->
+	<software name="raknrattd" cloneof="raknratt">
+		<description>Räkna lätt, räkna rätt (demo, version 6175)</description>
+		<year>19??</year>
+		<publisher>Esselte Stadium</publisher>
+		<info name="serial" value="24-4408-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209405">
+				<rom name="Rakna latt, rakna ratt demo.mfm" size="2209405" crc="acc2bf39" sha1="f08288227e1ea1586976163ba42499aa13244c95"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

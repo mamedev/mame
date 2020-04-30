@@ -6998,8 +6998,8 @@ READ32_MEMBER(model2_state::doa_prot_r)
 	// doa only reads 16-bits at a time, while STV reads 32-bits
 	uint32 ret = 0;
 
-	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r(space,0,0xffff)<<16);
-	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r(space,0,0xffff);
+	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r()<<16);
+	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r();
 
 	return ret;
 }

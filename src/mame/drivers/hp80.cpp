@@ -487,10 +487,9 @@ READ8_MEMBER(hp80_base_state::keycod_r)
 
 WRITE8_MEMBER(hp80_base_state::keycod_w)
 {
-	if (m_has_int_keyb) {
+	if (m_kb_raw_readout) {
 		m_kb_keycode = data;
-	}
-	if (data == 1) {
+	} else if (data == 1) {
 		unsigned irq = get_kb_irq();
 		irq_w(irq , false);
 		m_kb_enable = true;

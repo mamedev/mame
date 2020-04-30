@@ -26,11 +26,11 @@ public:
 
 	void set_thunderh_hack(bool thunderh) { m_is_thunderh = thunderh; }
 
-	DECLARE_READ32_MEMBER(lanc_ram_r);
-	DECLARE_WRITE32_MEMBER(lanc_ram_w);
+	uint32_t lanc_ram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lanc_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(network_irq_clear);
 

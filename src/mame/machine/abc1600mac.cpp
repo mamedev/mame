@@ -249,7 +249,7 @@ uint8_t abc1600_mac_device::read_user_memory(offs_t offset)
 	uint8_t data = space().read_byte(virtual_offset);
 
 	if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user read %06x:%02x\n", machine().describe_context(), virtual_offset, data);
-	
+
 	return data;
 }
 
@@ -266,7 +266,7 @@ void abc1600_mac_device::write_user_memory(offs_t offset, uint8_t data)
 	//if (nonx || !wp) return;
 
 	if (LOG_IO && virtual_offset >= 0x1fe000) logerror("%s user write %06x:%02x\n", machine().describe_context(), virtual_offset, data);
-	
+
 	space().write_byte(virtual_offset, data);
 }
 

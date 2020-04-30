@@ -2,20 +2,20 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-	https://elinux.org/Pollux
+    https://elinux.org/Pollux
 
-	"The Pollux is a System on a Chip (SoC) that was manufactured by MagicEyes,
-	whose intellectual property is now owned by Core Logic. Originally designed
-	for LeapFrog as the LF1000, the 533MHz ARM926EJ core VR3520F has now made
-	its way into several products running WinCE and Linux."
+    "The Pollux is a System on a Chip (SoC) that was manufactured by MagicEyes,
+    whose intellectual property is now owned by Core Logic. Originally designed
+    for LeapFrog as the LF1000, the 533MHz ARM926EJ core VR3520F has now made
+    its way into several products running WinCE and Linux."
 
-	(there are also links to datasheets etc.)
+    (there are also links to datasheets etc.)
 
-	used by
-	Leapfrog Didj (as LF1000)
-	GP2X Wiz (as VR3520F)
-	GP2X Caanoo (as VR3520F)
-	 + more?
+    used by
+    Leapfrog Didj (as LF1000)
+    GP2X Wiz (as VR3520F)
+    GP2X Caanoo (as VR3520F)
+     + more?
 
 *******************************************************************************/
 

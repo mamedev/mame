@@ -69,8 +69,8 @@
     - hard disk
         - 4105 SASI interface card
     - connect RS-232 printer port
-	- Z80 SCC/DART interrupt chain
-	- Z80 SCC DMA request
+    - Z80 SCC/DART interrupt chain
+    - Z80 SCC DMA request
 
 */
 

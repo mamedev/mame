@@ -24,8 +24,8 @@ public:
 	// construction/destruction
 	tdc1008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE8_MEMBER(x_w);
-	DECLARE_WRITE8_MEMBER(y_w);
+	void x_w(uint8_t data);
+	void y_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tsx_w);
 	DECLARE_WRITE_LINE_MEMBER(tsm_w);
 	DECLARE_WRITE_LINE_MEMBER(tsl_w);
@@ -39,12 +39,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sub_w);
 
 	// Output preloads by group
-	DECLARE_WRITE8_MEMBER(xtp_w);
-	DECLARE_WRITE8_MEMBER(msp_w);
-	DECLARE_WRITE8_MEMBER(lsp_w);
+	void xtp_w(uint8_t data);
+	void msp_w(uint8_t data);
+	void lsp_w(uint8_t data);
 
 	// Full output preload
-	DECLARE_WRITE32_MEMBER(output_w);
+	void output_w(uint32_t data);
 
 	// Outputs by group
 	auto xtp() { return m_xtp.bind(); }

@@ -2883,7 +2883,7 @@ WRITE16_MEMBER(namcos23_state::mcuen_w)
 	default:
 		// For some reason, the main program write the high 16bits of the
 		// 32 bits words of itself there...
-		//		logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
+		//      logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
 		break;
 	}
 }

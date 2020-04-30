@@ -4177,6 +4177,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "zenith")
 files {
+	MAME_DIR .. "src/mame/drivers/mdt60.cpp",
 	MAME_DIR .. "src/mame/drivers/z100.cpp",
 	MAME_DIR .. "src/mame/drivers/z29.cpp",
 }

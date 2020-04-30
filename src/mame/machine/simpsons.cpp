@@ -22,6 +22,8 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 	simpsons_video_banking(data & 0x03);
 
 	m_firq_enabled = data & 0x04;
+	if (!m_firq_enabled)
+		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
 }
 
 /***************************************************************************

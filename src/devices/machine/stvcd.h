@@ -11,7 +11,7 @@
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t, 
+class stvcd_device : public device_t,
 					 public device_mixer_interface,
 					 public device_memory_interface
 {
@@ -194,7 +194,7 @@ private:
 	required_device<timer_device> m_sector_timer;
 	required_device<timer_device> m_sh1_timer;
 	required_device<cdda_device> m_cdda;
-	
+
 	// CDC commands
 	// 0x00
 	void cmd_get_status();
@@ -254,7 +254,7 @@ private:
 	void cmd_check_copy_protection();
 	void cmd_get_disc_region();
 	void cmd_get_mpeg_card_boot_rom();
-	
+
 	// comms
 	DECLARE_READ32_MEMBER(datatrns_r);
 	DECLARE_WRITE32_MEMBER(datatrns_w);
@@ -269,7 +269,7 @@ private:
 	DECLARE_WRITE16_MEMBER(cr2_w);
 	DECLARE_WRITE16_MEMBER(cr3_w);
 	DECLARE_WRITE16_MEMBER(cr4_w);
-	
+
 	DECLARE_READ16_MEMBER(hirq_r);
 	DECLARE_WRITE16_MEMBER(hirq_w);
 	DECLARE_READ16_MEMBER(hirqmask_r);

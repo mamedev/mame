@@ -352,7 +352,7 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
-	m_screen->screen_vblank().append(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(tecmo16_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);

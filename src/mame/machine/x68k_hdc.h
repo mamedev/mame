@@ -109,8 +109,8 @@ public:
 	virtual const char *custom_brief_instance_name() const noexcept override { return "sasi"; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_WRITE16_MEMBER( hdc_w );
-	DECLARE_READ16_MEMBER( hdc_r );
+	void hdc_w(offs_t offset, u16 data);
+	u16 hdc_r(offs_t offset);
 
 protected:
 	// device-level overrides

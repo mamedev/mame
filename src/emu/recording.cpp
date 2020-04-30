@@ -48,8 +48,8 @@ namespace
 		virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 
 	private:
-		std::unique_ptr<emu_file>			m_mng_file;           // handle to the open movie file
-		std::map<std::string, std::string>	m_info_fields;
+		std::unique_ptr<emu_file>           m_mng_file;           // handle to the open movie file
+		std::map<std::string, std::string>  m_info_fields;
 	};
 };
 
@@ -63,10 +63,10 @@ namespace
 //-------------------------------------------------
 
 movie_recording::movie_recording(screen_device *screen)
-    : m_screen(screen)
+	: m_screen(screen)
 	, m_frame(0)
 {
-    m_frame_period = m_screen ? m_screen->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
+	m_frame_period = m_screen ? m_screen->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
 }
 
 
@@ -107,7 +107,7 @@ bool movie_recording::append_video_frame(bitmap_rgb32 &bitmap, attotime curtime)
 
 //-------------------------------------------------
 //  movie_recording::create - creates a new recording
-//	for the specified format
+//  for the specified format
 //-------------------------------------------------
 
 movie_recording::ptr movie_recording::create(running_machine &machine, screen_device *screen, format fmt, std::unique_ptr<emu_file> &&file, bitmap_rgb32 &snap_bitmap)
@@ -154,9 +154,9 @@ const char *movie_recording::format_file_extension(movie_recording::format fmt)
 {
 	switch (fmt)
 	{
-		case format::AVI:	return "avi";
-		case format::MNG:	return "mng";
-		default:			throw false;
+		case format::AVI:   return "avi";
+		case format::MNG:   return "mng";
+		default:            throw false;
 	}
 }
 
