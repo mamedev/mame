@@ -730,6 +730,12 @@ namespace bx
 		{
 			int32_t size = 0;
 			int32_t len = (int32_t)strLen(_str, _len);
+
+			if (_param.width > 0)
+			{
+				len = min(_param.width, len);
+			}
+
 			int32_t padding = _param.width > len ? _param.width - len : 0;
 			bool sign = _param.sign && len > 1 && _str[0] != '-';
 			padding = padding > 0 ? padding - sign : 0;
