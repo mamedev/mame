@@ -3448,12 +3448,24 @@ ROM_START( cleopatr )
 	ROM_LOAD16_BYTE("e28-03.bin", 0x000000, 0x200000, CRC(15c7989d) SHA1(7cc63d93e5c1f9f52f889e973bbefd5e6f7ce807) )    // C8 C9 CA CB
 ROM_END
 
+/*
+About cleopatro:
+
+ROMs found in a genuine Taito Cleopatra Fortune cart meant for the Japanese market. It contained a genuine Taito ROM PCB with
+all genuine parts including mask ROMs, PALs, ect.  However the 4 program ROMs were replaced with 4 EPROMs without specific labels.
+
+The replacement ROMs were 27C010 type instead of the standard 27C040 that Taito would normaly use.  In the case of Cleopatra
+Fortune, each original program ROM is 0xFF filled from bytes 0x20000 through 0x3FFFF.
+
+In cleopatro, the program ROMs match the 1st 1/4 of cleopatr program ROMs except for 1 byte in ic17.bin.  0x1FFFF has been
+changed from 0x00 to 0x03, which amounts to a simple region hack.
+*/
 ROM_START( cleopatro )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
 	ROM_LOAD32_BYTE("ic20.bin", 0x000000, 0x20000, CRC(80dfc893) SHA1(192e121394825ba982998e831108310c26718ec3) )
 	ROM_LOAD32_BYTE("ic19.bin", 0x000001, 0x20000, CRC(666e8ca6) SHA1(4f75e4510975c04b66b0eeb1a861c47a3442b190) )
 	ROM_LOAD32_BYTE("ic18.bin", 0x000002, 0x20000, CRC(9f2d4f69) SHA1(481e7a525e749deb069adf92d335d1c89497f9ab) )
-	ROM_LOAD32_BYTE("ic17.bin", 0x000003, 0x20000, CRC(f892f60e) SHA1(60f1a6c6e780adfbd17892c783920ae88266f0e2) )
+	ROM_LOAD32_BYTE("ic17.bin", 0x000003, 0x20000, CRC(f892f60e) SHA1(60f1a6c6e780adfbd17892c783920ae88266f0e2) )	// 1 byte difference in 1st 0x20000 bytes of e28-07.bin (0x1FFFF==03 vs 0x00 for e28-07.bin)
 
 	ROM_REGION( 0x100000, "sprites" , 0) /* Sprites */
 	ROM_LOAD16_BYTE("e28-02.bin", 0x000000, 0x080000, CRC(b20d47cb) SHA1(6888e5564688840fed1c123ab38467066cd59c7f) )
