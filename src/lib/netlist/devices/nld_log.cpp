@@ -21,6 +21,7 @@ namespace netlist
 		, m_I(*this, "I")
 		, m_strm(plib::filesystem::u8path(plib::pfmt("{1}.log")(this->name())))
 		, m_writer(&m_strm)
+		, m_reset(false)
 		{
 			if (m_strm.fail())
 				throw plib::file_open_e(plib::pfmt("{1}.log")(this->name()));
@@ -30,7 +31,8 @@ namespace netlist
 
 		NETLIB_DESTRUCTOR(log)
 		{
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
+			if (m_reset)
+				m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
 		}
 
 		NETLIB_UPDATEI()
@@ -39,11 +41,12 @@ namespace netlist
 			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
 		}
 
-		NETLIB_RESETI() { }
+		NETLIB_RESETI() { m_reset = true; }
 	protected:
 		analog_input_t m_I;
 		std::ofstream m_strm;
 		plib::putf8_writer m_writer;
+		bool m_reset;
 	};
 
 	NETLIB_OBJECT_DERIVED(logD, log)
