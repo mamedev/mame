@@ -76,10 +76,9 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist.h"
 
 #include "logmacro.h"
-
-#include "softlist.h"
 
 class ip24_state : public driver_device
 {
