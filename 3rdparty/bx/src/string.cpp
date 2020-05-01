@@ -736,13 +736,28 @@ namespace bx
 				len = min(_param.width, len);
 			}
 
-			int32_t padding = _param.width > len ? _param.width - len : 0;
-			bool sign = _param.sign && len > 1 && _str[0] != '-';
-			padding = padding > 0 ? padding - sign : 0;
+			const bool hasSign = _param.sign || _str[0] == '-';
+			char sign = hasSign ? _str[0] == '-' ? '-' : '+' : '\0';
+
+			const char* str = _str;
+			if (str[0] == '-')
+			{
+				str++;
+				len--;
+			}
+
+			int32_t padding = _param.width > len ? _param.width - len - hasSign: 0;
 
 			if (!_param.left)
 			{
-				size += writeRep(_writer, _param.fill, padding, _err);
+				if (' '  != _param.fill
+				&&  '\0' != sign)
+				{
+					size += write(_writer, sign, _err);
+					sign = '\0';
+				}
+
+				size += writeRep(_writer, _param.fill, max(0, padding), _err);
 			}
 
 			if (NULL == _str)
@@ -753,17 +768,17 @@ namespace bx
 			{
 				for (int32_t ii = 0; ii < len; ++ii)
 				{
-					size += write(_writer, toUpper(_str[ii]), _err);
+					size += write(_writer, toUpper(str[ii]), _err);
 				}
-			}
-			else if (sign)
-			{
-				size += write(_writer, '+', _err);
-				size += write(_writer, _str, len, _err);
 			}
 			else
 			{
-				size += write(_writer, _str, len, _err);
+				if ('\0' != sign)
+				{
+					size += write(_writer, sign, _err);
+				}
+
+				size += write(_writer, str, len, _err);
 			}
 
 			if (_param.left)

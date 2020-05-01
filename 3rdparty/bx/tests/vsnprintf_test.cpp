@@ -92,6 +92,10 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("1234ABCD            ", "%-20X",  0x1234abcd) );
 	REQUIRE(test("edcb5433            ", "%-20x", -0x1234abcd) );
 	REQUIRE(test("EDCB5433            ", "%-20X", -0x1234abcd) );
+	REQUIRE(test("            1234abcd", "% 20x",  0x1234abcd) );
+	REQUIRE(test("            1234ABCD", "% 20X",  0x1234abcd) );
+	REQUIRE(test("            edcb5433", "% 20x", -0x1234abcd) );
+	REQUIRE(test("            EDCB5433", "% 20X", -0x1234abcd) );
 	REQUIRE(test("0000000000001234abcd", "%020x",  0x1234abcd) );
 	REQUIRE(test("0000000000001234ABCD", "%020X",  0x1234abcd) );
 	REQUIRE(test("000000000000edcb5433", "%020x", -0x1234abcd) );
@@ -105,6 +109,18 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("0xffffff",   "0x%06x", -1) );
 	REQUIRE(test("0xfffffff",  "0x%07x", -1) );
 	REQUIRE(test("0xffffffff", "0x%08x", -1) );
+
+	REQUIRE(test("  -1", "% 4i", -1) );
+	REQUIRE(test("  -1", "% 4i", -1) );
+	REQUIRE(test("   0", "% 4i",  0) );
+	REQUIRE(test("   1", "% 4i",  1) );
+	REQUIRE(test("  +1", "%+4i",  1) );
+	REQUIRE(test("  +0", "%+4i",  0) );
+	REQUIRE(test("  -1", "%+4i", -1) );
+	REQUIRE(test("0001", "%04i",  1) );
+	REQUIRE(test("0000", "%04i",  0) );
+	REQUIRE(test("-001", "%04i", -1) );
+	REQUIRE(test("+001", "%+04i", 1) );
 
 	if (BX_ENABLED(BX_ARCH_32BIT) )
 	{
