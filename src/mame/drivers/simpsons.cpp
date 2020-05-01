@@ -157,22 +157,11 @@ WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 	membank("bank2")->set_entry(data & 7);
 }
 
-#if 0
-void simpsons_state::sound_nmi_callback( int param )
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
-	m_nmi_enabled = 0;
-}
-#endif
-
 
 void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	case TIMER_NMI:
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		break;
 	case TIMER_DMASTART:
 		if (m_firq_enabled)
 			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, ASSERT_LINE);
@@ -189,7 +178,17 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
+	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock());
+}
+
+void simpsons_state::z80_nmi_w(int state)
+{
+	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 1) {
+		m_nmi_enabled = 0;
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	} else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void simpsons_state::z80_map(address_map &map)
@@ -338,9 +337,6 @@ void simpsons_state::simpsons(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	WATCHDOG_TIMER(config, "watchdog");
-	//So, the horizontal timing of simpsons is 16/32/16/320
-	//6MHz dot clock
-	//Vertical is 16/8/16/224
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -382,8 +378,9 @@ void simpsons_state::simpsons(machine_config &config)
 	ymsnd.add_route(1, "rspeaker", 0.0);
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified on pcb */
-	k053260.add_route(0, "lspeaker", 0.75);
-	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.add_route(0, "lspeaker", 1.00);
+	k053260.add_route(1, "rspeaker", 1.00);
+	k053260.sh2_cb().set(FUNC(simpsons_state::z80_nmi_w));
 }
 
 
