@@ -1,7 +1,7 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 /*
- * cccs.c
+ * cccs.cpp
  *
  */
 
@@ -15,19 +15,19 @@ NETLIST_START(cccs)
 	PARAM(Solver.ACCURACY, 1e-12)
 	PARAM(Solver.METHOD, "MAT_CR")
 
-	CCCS(VV)
-	PARAM(VV.G, 1)
+	ANALOG_INPUT(V5,5)
+	CCCS(VV, 0.9)
 	PARAM(VV.RI, 1e-3)
 
 	RES(R2, 1000)
 	RES(R1, 1000)
+
+	NET_C(V5, clk.VCC)
 	NET_C(clk, VV.IP)
 	NET_C(VV.IN, R1.1)
-	NET_C(R1.2, GND)
+	NET_C(GND, R1.2, R2.2, VV.OP, clk.GND)
 
-	NET_C(R2.1, VV.OP)
-	NET_C(R2.2, GND)
-	NET_C(VV.ON, GND)
+	NET_C(R2.1, VV.ON)
 
 	/* Simple current source */
 
