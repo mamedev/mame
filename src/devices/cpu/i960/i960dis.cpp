@@ -27,28 +27,28 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // 50
-	{ "58", 3 }, { "59", 3 }, { "5A", 3 }, { "5B", 3 }, { "5C", 2 }, { "5D", 3 }, { "?", 0 }, { "5F", 3 },
+	{ "58", 3 }, { "59", 3 }, { "5A", 3 }, { "5B", 3 }, { "5C", 2 }, { "5D", 2 }, { "?", 0 }, { "5F", 2 },
 
-	{ "synmov", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "64", 3 }, { "65", 3 }, { "calls", 0 }, { "67", 3 }, // 60
+	{ "60", 3 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "64", 3 }, { "65", 3 }, { "calls", 0 }, { "67", 3 }, // 60
 	{ "68", 3 }, { "69", 3 }, { "?", 0 }, { "?", 0 }, { "6C", 3 }, { "6D", 3 }, { "6E", 3 }, { "?", 0 },
 
 	{ "70", 3 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "74", 3 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // 70
 	{ "78", 3 }, { "79", 3 }, { "7A", 3 }, { "7B", 3 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
-	{ "ldob", 1 }, { "?", 0 }, { "stob", 1 }, { "?", 0 }, { "bx", 1 }, { "balx", 1 }, { "callx", 1 }, { "?", 0 }, // 80
-	{ "ldos", 1 }, { "?", 0 }, { "stos", 1 }, { "?", 0 }, { "lda", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
+	{ "ldob", 4 }, { "?", 0 }, { "stob", 1 }, { "?", 0 }, { "bx", 11 }, { "balx", 1 }, { "callx", 11 }, { "?", 0 }, // 80
+	{ "ldos", 4 }, { "?", 0 }, { "stos", 1 }, { "?", 0 }, { "lda", 4 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
-	{ "ld", 1 }, { "?", 0 }, { "st", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // 90
-	{ "ldl", 1 }, { "?", 0 }, { "stl", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
+	{ "ld", 4 }, { "?", 0 }, { "st", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // 90
+	{ "ldl", 4 }, { "?", 0 }, { "stl", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
-	{ "ldt", 1 }, { "?", 0 }, { "stt", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // a0
+	{ "ldt", 4 }, { "?", 0 }, { "stt", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // a0
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
-	{ "ldq", 1 }, { "?", 0 }, { "stq", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // b0
+	{ "ldq", 4 }, { "?", 0 }, { "stq", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // b0
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
-	{ "ldib", 1 }, { "?", 0 }, { "stib", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // c0
-	{ "ldis", 1 }, { "?", 0 }, { "stis", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
+	{ "ldib", 4 }, { "?", 0 }, { "stib", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // c0
+	{ "ldis", 4 }, { "?", 0 }, { "stis", 1 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
 
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, // d0
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 },
@@ -60,17 +60,18 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnemonic[256] = {
 	{ "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }, { "?", 0 }
 };
 
-const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[100] =
+const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[111] =
 {
 	{ "notbit", 0x580 }, { "and", 0x581 }, { "andnot", 0x582 }, { "setbit", 0x583 }, { "notand",0x584 },
 	{ "xor", 0x586 }, { "or", 0x587 }, { "nor", 0x588 }, { "xnor",0x589 }, { "not",0x58a },
-	{ "clrbit", 0x58c },
+	{ "clrbit", 0x58c }, { "alterbit", 0x58f },
 	{ "addo", 0x590 }, { "addi",0x591 }, { "subo",0x592 }, { "subi",0x593 }, { "cmpob",0x594 }, { "shro",0x598 }, { "shrdi",0x59a }, { "shri",0x59b }, { "shlo",0x59c }, { "rotate",0x59d }, { "shli",0x59e },
 	{ "cmpo",0x5a0 }, { "cmpi",0x5a1 }, { "concmpo",0x5a2 }, { "concmpi",0x5a3 }, { "cmpinco",0x5a4 }, { "cmpinci",0x5a5 }, { "cmpdeco",0x5a6 }, { "cmpdeci",0x5a7 }, { "scanbyte",0x5ac }, { "bswap",0x5ad }, { "chkbit",0x5ae },
 	{ "addc",0x5b0 }, { "subc",0x5b2 },
 	{ "mov", 0x5cc },
 	{ "movl",0x5dc },
 	{ "movq",0x5fc },
+	{ "synmov",0x600 }, { "synmovq",0x602 },
 	{ "scanbit", 0x641 }, { "daddc", 0x642 }, { "dsubc", 0x643 }, { "dmovt", 0x644 }, { "modac",0x645 },
 	{ "modify",0x650 }, { "extract",0x651 }, { "modtc",0x654 }, { "modpc",0x655 },
 	{ "emul",0x670 }, { "ediv",0x671 }, { "cvtir", 0x674 }, { "cvtilr", 0x675 }, { "scalerl", 0x676 }, { "scaler", 0x677 },
@@ -83,6 +84,8 @@ const i960_disassembler::mnemonic_t i960_disassembler::mnem_reg[100] =
 	{ "movre", 0x6e1 }, { "cpysre", 0x6e2 }, { "cpyrsre", 0x6e3 },
 	{ "mulo", 0x701 }, { "remo",0x708 }, { "divo",0x70b },
 	{ "muli",0x741 }, { "remi",0x748 }, { "modi",0x749 }, { "divi",0x74b },
+	{ "divr",0x78b }, { "mulr",0x78c }, { "subr",0x78d }, { "addr",0x78f },
+	{ "divrl",0x79b }, { "mulrl",0x79c }, { "subrl",0x79d }, { "addrl",0x79f },
 	{ "ending_code",0 }
 };
 
@@ -136,24 +139,24 @@ std::string i960_disassembler::dis_decode_reg(u32 iCode, unsigned char cnt)
 	}
 
 	if (S2)
-		src2 = "reserved";
+		src2 = ",reserved";
 	else
 	{
 		if(M2)
-			src2 = util::string_format("0x%lx,", SRC2);
+			src2 = util::string_format(",0x%lx", SRC2);
 		else
-			src2 = util::string_format("%s,", regnames[SRC2]);
+			src2 = util::string_format(",%s", regnames[SRC2]);
 	}
 
 	if(M3)
 		dst = "";
 	else
-		dst = util::string_format("%s,", regnames[DST]);
+		dst = util::string_format(",%s", regnames[DST]);
 
 	if (cnt == 1)
-		return util::string_format("%s%s", dst, src1);
+		return util::string_format("%s%s", src1, dst);
 	else
-		return util::string_format("%s%s%s", dst, src2, src1);
+		return util::string_format("%s%s%s", src1, src2, dst);
 }
 
 offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -186,7 +189,7 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	case 0: // not yet implemented
 		util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
-	case 1: // memory access
+	case 1: // memory access (write)
 		switch(modeh)
 		{
 		case 0:
@@ -264,6 +267,58 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		if (mnem_reg[i].type == opc) util::stream_format(stream, "%-8s%s", mnem_reg[i].mnem,dis_decode_reg(iCode,0));
 		else util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
 		break;
+	case 4: // memory access (read)
+		switch(modeh)
+		{
+		case 0:
+			util::stream_format(stream, "%-8s0x%lx,%s",NEM,iCode&0xfff,REG_DST);
+			break;
+		case 1:
+			switch (model)
+			{
+			case 0:
+				util::stream_format(stream, "%-8s(%s),%s",NEM,REG_ABASE,REG_DST);
+				break;
+			case 3:
+				util::stream_format(stream, "%-8s(%s)[%s*%ld],%s",NEM,REG_ABASE,REG_REG2,1<<((iCode>>7)&0x7),REG_DST);
+				break;
+			default:
+				util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+				break;
+			}
+			break;
+		case 2:
+			util::stream_format(stream, "%-8s0x%lx(%s),%s",NEM,iCode&0xfff,REG_ABASE,REG_DST);
+			break;
+		case 3:
+			switch (model)
+			{
+			case 0:
+				util::stream_format(stream, "%-8s0x%x,%s",NEM,opcodes.r32(IP + 4),REG_DST);
+				IPinc = 8;
+				break;
+			case 1:
+				util::stream_format(stream, "%-8s0x%x(%s),%s",NEM,opcodes.r32(IP + 4),REG_ABASE,REG_DST);
+				IPinc = 8;
+				break;
+			case 2:
+				util::stream_format(stream, "%-8s0x%x[%s*%ld],%s",NEM,opcodes.r32(IP + 4),REG_REG2,1<<((iCode>>7)&0x7),REG_DST);
+				IPinc = 8;
+				break;
+			case 3:
+				util::stream_format(stream, "%-8s0x%x(%s)[%s*%ld],%s",NEM, opcodes.r32(IP + 4),REG_ABASE,REG_REG2,1<<((iCode>>7)&0x7),REG_DST);
+				IPinc = 8;
+				break;
+			default:
+				util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+				break;
+			}
+			break;
+		default:
+			util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
+			break;
+		}
+		break;
 
 	case 6: // bitpos and branch type
 		util::stream_format(stream, "%-8s%ld,%s,0x%lx",NEM, COBRSRC1, REG_COBR_SRC2,((((s32)iCode&0x00fffffc)<<19)>>19) + (IP));
@@ -279,6 +334,9 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		break;
 	case 10: // TEST type: register only
 		util::stream_format(stream, "%s %s", NEM, REG_DST);
+		break;
+	case 11: // workaround to match users guide
+		util::stream_format(stream, "%-8s(%s)",NEM, REG_ABASE);
 		break;
 	default:
 		stream << "???";

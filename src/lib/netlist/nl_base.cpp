@@ -52,15 +52,15 @@ namespace netlist
 			m_R_low = nlconst::magic(1.0);
 			m_R_high = nlconst::magic(130.0);
 		}
-		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const override;
+		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
 	};
 
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const
 	{
 		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
 	{
 		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
@@ -80,16 +80,16 @@ namespace netlist
 			m_R_low = nlconst::magic(500.0);
 			m_R_high = nlconst::magic(500.0);
 		}
-		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const override;
+		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
 	};
 
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const
 	{
 		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
 	{
 		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
@@ -455,7 +455,7 @@ namespace netlist
 				index.push_back(i);
 
 			std::sort(index.begin(), index.end(),
-					[&](size_t i1, size_t i2) { return m_state.m_devices[i1].second->m_stats->m_stat_total_time.total() < m_state.m_devices[i2].second->m_stats->m_stat_total_time.total(); });
+					[&](size_t i1, size_t i2) { return m_state.m_devices[i1].second->stats()->m_stat_total_time.total() < m_state.m_devices[i2].second->stats()->m_stat_total_time.total(); });
 
 			plib::pperftime_t<true>::type total_time(0);
 			plib::pperftime_t<true>::ctype total_count(0);
@@ -463,7 +463,7 @@ namespace netlist
 			for (auto & j : index)
 			{
 				auto *entry = m_state.m_devices[j].second.get();
-				auto *stats = entry->m_stats.get();
+				auto *stats = entry->stats();
 				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
 						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
@@ -515,7 +515,7 @@ namespace netlist
 			for (auto &entry : m_state.m_devices)
 			{
 				auto *ep = entry.second.get();
-				auto *stats = ep->m_stats.get();
+				auto *stats = ep->stats();
 				// Factor of 3 offers best performace increase
 				if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 					&& stats->m_stat_inc_active() > trigger)
@@ -603,7 +603,7 @@ namespace netlist
 	{
 	}
 
-	void device_t::register_subalias(const pstring &name, detail::core_terminal_t &term)
+	void device_t::register_subalias(const pstring &name, const detail::core_terminal_t &term)
 	{
 		pstring alias = this->name() + "." + name;
 
@@ -629,18 +629,6 @@ namespace netlist
 	{
 		state().setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 	}
-
-	// FIXME: this is only used by solver code since matrix solvers are started in
-	//        post_start.
-	void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
-	{
-		if (!state().setup().connect(t1, t2))
-		{
-			log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-		}
-	}
-
 
 	// -----------------------------------------------------------------------------
 	// family_setter_t
@@ -811,7 +799,7 @@ namespace netlist
 		state().setup().register_term(*this, *otherterm);
 	}
 
-	void terminal_t::solve_now()
+	void terminal_t::solve_now() const
 	{
 		const auto *solv(solver());
 		// Nets may belong to railnets which do not have a solver attached

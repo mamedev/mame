@@ -57,6 +57,14 @@
 #define TTL_7404_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7404_DIP, name)
 
+
+#define TTL_7406_GATE(name)                                                    \
+		NET_REGISTER_DEV(TTL_7406_GATE, name)
+
+#define TTL_7406_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7406_DIP, name)
+
+
 #define TTL_7408_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7408_GATE, name)
 

@@ -6,6 +6,20 @@
 #
 ###########################################################################
 
+#
+# Notes:
+#    These should go into some compile.md
+#
+#    Mingw notes:
+#
+#		graphviz is needed for documentation
+#      		pacman -S mingw-w64-x86_64-graphviz
+#
+#       Please build documentation using
+#           make mingw PARAMS=doc
+#
+#
+
 SRC = ..
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
@@ -13,12 +27,12 @@ TIDY_DB = ../compile_commands.json
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
 TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
-TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
+#TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
-TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
+#TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
@@ -26,8 +40,8 @@ TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size
 
-space := 
-space += 
+space :=
+space +=
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
 TIDY_SOURCES = $(SOURCES)
 
@@ -41,8 +55,14 @@ TIDY_SOURCES = $(SOURCES)
 
 ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
+EXESUFFIX = .exe
+DOXYGEN = doxygen.exe
+HOSTARCH = WINDOWS
 else
 OBJ = obj/nix
+EXESUFFIX :=
+DOXYGEN = @./doxygen
+HOSTARCH = NIX
 endif
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
@@ -57,10 +77,17 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-DOXYGEN = @./doxygen
 CLANG_TIDY = clang-tidy-10
 
-TARGETS = nltool nlwav
+ifndef FAST
+FAST=1
+endif
+
+ifeq ($(FAST),1)
+CFLAGS += -DNL_USE_ACADEMIC_SOLVERS=0
+endif
+
+TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
@@ -135,6 +162,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74193.o \
 	$(NLOBJ)/devices/nld_74194.o \
 	$(NLOBJ)/devices/nld_74365.o \
+	$(NLOBJ)/devices/nld_74393.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S115.o \
@@ -166,7 +194,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 	$(NLOBJ)/generated/static_solvers.o \
-	
+
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
 	$(VSBUILD/netlistlib.vcxproj.user \
@@ -212,11 +240,11 @@ clean:
 # nltool
 #-------------------------------------------------
 
-nltool: $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
+nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav: $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
+nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
@@ -235,10 +263,10 @@ maketree: $(sort $(OBJDIRS))
 
 .PHONY: clang clang-5 mingw doc native
 
-native: 
+native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
-gcc9: 
+gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
@@ -259,15 +287,15 @@ tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
-# -Wweak-template-vtables 
+# -Wweak-template-vtables
 #
 # These have to be given:
-# -Wno-missing-variable-declarations : Device factory code, on purpose 
+# -Wno-missing-variable-declarations : Device factory code, on purpose
 
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
 		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
-		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS) 
+		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS)
 
 #
 # FIXME: Unicode
@@ -276,13 +304,10 @@ mingw:
 #
 
 
-doc: nltool
-	./nltool -c docheader > ../documentation/devsyn.dox.h
+doc: nltool$(EXESUFFIX)
+	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
-docw: 
-	$(DOXYGEN) doxygen.conf
-	
 #-------------------------------------------------
 # depends
 #-------------------------------------------------

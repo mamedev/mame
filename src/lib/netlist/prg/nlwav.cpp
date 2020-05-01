@@ -511,7 +511,7 @@ private:
 void nlwav_app::convert_wav(std::ostream &ostrm)
 {
 
-	double dt = 1.0 / static_cast<double>(opt_rate());
+	double dt = plib::reciprocal(static_cast<double>(opt_rate()));
 
 	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
 	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));

@@ -224,6 +224,8 @@ namespace plib {
 		options();
 		explicit options(option **o);
 
+		~options() = default;
+
 		PCOPYASSIGNMOVE(options, delete)
 
 		void register_option(option_base *opt);

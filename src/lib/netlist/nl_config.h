@@ -209,11 +209,11 @@ namespace netlist
 	template <>
 	struct fp_constants<long double>
 	{
-		static inline constexpr long double DIODE_MAXDIFF() noexcept { return  1e100L; }
-		static inline constexpr long double DIODE_MAXVOLT() noexcept { return  300.0L; }
+		static inline constexpr long double DIODE_MAXDIFF() noexcept { return  1e100L; } // NOLINT
+		static inline constexpr long double DIODE_MAXVOLT() noexcept { return  300.0L; } // NOLINT
 
-		static inline constexpr long double TIMESTEP_MAXDIFF() noexcept { return  1e100L; }
-		static inline constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; }
+		static inline constexpr long double TIMESTEP_MAXDIFF() noexcept { return  1e100L; } // NOLINT
+		static inline constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; } // NOLINT
 
 		static inline constexpr const char * name() noexcept { return "long double"; }
 		static inline constexpr const char * suffix() noexcept { return "L"; }
@@ -224,11 +224,11 @@ namespace netlist
 	template <>
 	struct fp_constants<double>
 	{
-		static inline constexpr double DIODE_MAXDIFF() noexcept { return  1e100; }
-		static inline constexpr double DIODE_MAXVOLT() noexcept { return  300.0; }
+		static inline constexpr double DIODE_MAXDIFF() noexcept { return  1e100; } // NOLINT
+		static inline constexpr double DIODE_MAXVOLT() noexcept { return  300.0; } // NOLINT
 
-		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; }
-		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; }
+		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; } // NOLINT
+		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; } // NOLINT
 
 		static inline constexpr const char * name() noexcept { return "double"; }
 		static inline constexpr const char * suffix() noexcept { return ""; }
@@ -239,11 +239,11 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20F; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0F; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20F; } // NOLINT
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0F; } // NOLINT
 
-		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30F; }
-		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8F; }
+		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30F; } // NOLINT
+		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8F; } // NOLINT
 
 		static inline constexpr const char * name() noexcept { return "float"; }
 		static inline constexpr const char * suffix() noexcept { return "f"; }

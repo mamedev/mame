@@ -242,7 +242,7 @@ struct putf8_traits
 		std::size_t ret = 0;
 		for (const auto &c : p)
 		{
-			if (!((c & 0xC0) == 0x80))
+			if (!((c & 0xC0) == 0x80)) // NOLINT
 				ret++;
 		}
 		return ret;
@@ -250,11 +250,11 @@ struct putf8_traits
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
 		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
-		if ((*p1 & 0xE0) == 0xC0)
+		if ((*p1 & 0xE0) == 0xC0) // NOLINT
 			return 2;
-		if ((*p1 & 0xF0) == 0xE0)
+		if ((*p1 & 0xF0) == 0xE0) // NOLINT
 			return 3;
-		if ((*p1 & 0xF8) == 0xF0)
+		if ((*p1 & 0xF8) == 0xF0) // NOLINT
 			return 4;
 
 		// valid utf8: ((*p1 & 0x80) == 0x00)
@@ -264,11 +264,11 @@ struct putf8_traits
 
 	static std::size_t codelen(const code_t c) noexcept
 	{
-		if (c < 0x0080)
+		if (c < 0x0080) // NOLINT
 			return 1;
-		if (c < 0x800)
+		if (c < 0x800) // NOLINT
 			return 2;
-		if (c < 0x10000)
+		if (c < 0x10000) // NOLINT
 			return 3;
 		// U+10000 U+1FFFFF
 		return 4; // no checks
@@ -277,41 +277,41 @@ struct putf8_traits
 	static code_t code(const mem_t *p) noexcept
 	{
 		const auto *p1 = reinterpret_cast<const unsigned char *>(p);
-		if ((*p1 & 0x80) == 0x00)
+		if ((*p1 & 0x80) == 0x00) // NOLINT
 			return *p1;
-		if ((*p1 & 0xE0) == 0xC0)
-			return static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f));
-		if ((*p1 & 0xF0) == 0xE0)
-			return static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0));
-		if ((*p1 & 0xF8) == 0xF0)
-			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0));
+		if ((*p1 & 0xE0) == 0xC0) // NOLINT
+			return static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f)); // NOLINT
+		if ((*p1 & 0xF0) == 0xE0) // NOLINT
+			return static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0)); // NOLINT
+		if ((*p1 & 0xF8) == 0xF0) // NOLINT
+			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0)); // NOLINT
 
-		return 0xFFFD; // unicode-replacement character
+		return 0xFFFD; // NOLINT: unicode-replacement character
 	}
 
 	static void encode(const code_t c, string_type &s)
 	{
-		if (c < 0x0080)
+		if (c < 0x0080) // NOLINT
 		{
 			s += static_cast<mem_t>(c);
 		}
-		else if (c < 0x800)
+		else if (c < 0x800) // NOLINT
 		{
-			s += static_cast<mem_t>(0xC0 | (c >> 6));
-			s += static_cast<mem_t>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xC0 | (c >> 6)); // NOLINT
+			s += static_cast<mem_t>(0x80 | (c & 0x3f)); // NOLINT
 		}
-		else if (c < 0x10000)
+		else if (c < 0x10000) // NOLINT
 		{
-			s += static_cast<mem_t>(0xE0 | (c >> 12));
-			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f));
-			s += static_cast<mem_t>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xE0 | (c >> 12)); // NOLINT
+			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f)); // NOLINT
+			s += static_cast<mem_t>(0x80 | (c & 0x3f)); // NOLINT
 		}
 		else // U+10000 U+1FFFFF
 		{
-			s += static_cast<mem_t>(0xF0 | (c >> 18));
-			s += static_cast<mem_t>(0x80 | ((c>>12) & 0x3f));
-			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f));
-			s += static_cast<mem_t>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xF0 | (c >> 18)); // NOLINT
+			s += static_cast<mem_t>(0x80 | ((c>>12) & 0x3f)); // NOLINT
+			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f)); // NOLINT
+			s += static_cast<mem_t>(0x80 | (c & 0x3f)); // NOLINT
 		}
 	}
 
@@ -340,7 +340,7 @@ struct putf16_traits
 		{
 			// FIXME: check that size is equal
 			auto c = static_cast<uint16_t>(*i++);
-			if (!((c & 0xd800) == 0xd800))
+			if (!((c & 0xd800) == 0xd800)) // NOLINT
 			{
 				ret++;
 			}
@@ -350,29 +350,29 @@ struct putf16_traits
 	static std::size_t codelen(const mem_t *p) noexcept
 	{
 		auto c = static_cast<uint16_t>(*p);
-		return ((c & 0xd800) == 0xd800) ? 2 : 1;
+		return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
 	}
 	static std::size_t codelen(const code_t c) noexcept
 	{
-		return (c < 0x10000) ? 1 : 2; // U+10000 U+1FFFFF
+		return (c < 0x10000) ? 1 : 2;  // NOLINT: U+10000 U+1FFFFF
 	}
 	static code_t code(const mem_t *p) noexcept
 	{
 		auto c = static_cast<uint32_t>(*p++);
-		if ((c & 0xd800) == 0xd800)
+		if ((c & 0xd800) == 0xd800) // NOLINT
 		{
-			c = (c - 0xd800) << 10;
-			c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+			c = (c - 0xd800) << 10; // NOLINT
+			c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000; // NOLINT
 		}
 		return static_cast<code_t>(c);
 	}
 	static void encode(code_t c, string_type &s) noexcept
 	{
 		auto cu = static_cast<uint32_t>(c);
-		if (c > 0xffff)
+		if (c > 0xffff) // NOLINT
 		{ //make a surrogate pair
-			uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
-			cu = (cu & 0x3ff) + 0xdc00;
+			uint32_t t = ((cu - 0x10000) >> 10) + 0xd800; // NOLINT
+			cu = (cu & 0x3ff) + 0xdc00; // NOLINT
 			s += static_cast<mem_t>(t);
 			s += static_cast<mem_t>(cu);
 		}
@@ -407,7 +407,7 @@ struct pwchar_traits
 			{
 				// FIXME: check that size is equal
 				auto c = static_cast<uint32_t>(*i++);
-				if (!((c & 0xd800) == 0xd800))
+				if (!((c & 0xd800) == 0xd800)) // NOLINT
 					ret++;
 			}
 			return ret;
@@ -421,7 +421,7 @@ struct pwchar_traits
 		if (sizeof(wchar_t) == 2)
 		{
 			auto c = static_cast<uint16_t>(static_cast<unsigned char>(*p));
-			return ((c & 0xd800) == 0xd800) ? 2 : 1;
+			return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
 		}
 
 		return 1;
@@ -430,7 +430,7 @@ struct pwchar_traits
 	static std::size_t codelen(const code_t c) noexcept
 	{
 		if (sizeof(wchar_t) == 2)
-			return ((c & 0xd800) == 0xd800) ? 2 : 1;
+			return ((c & 0xd800) == 0xd800) ? 2 : 1; // NOLINT
 
 		return 1;
 	}
@@ -440,10 +440,10 @@ struct pwchar_traits
 		if (sizeof(wchar_t) == 2)
 		{
 			auto c = static_cast<uint32_t>(static_cast<unsigned char>(*p++));
-			if ((c & 0xd800) == 0xd800)
+			if ((c & 0xd800) == 0xd800) // NOLINT
 			{
-				c = (c - 0xd800) << 10;
-				c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+				c = (c - 0xd800) << 10; // NOLINT
+				c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000; // NOLINT
 			}
 			return static_cast<code_t>(c);
 		}
@@ -456,10 +456,10 @@ struct pwchar_traits
 		if (sizeof(wchar_t) == 2)
 		{
 			auto cu = static_cast<uint32_t>(c);
-			if (c > 0xffff)
+			if (c > 0xffff) // NOLINT
 			{ //make a surrogate pair
-				uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
-				cu = (cu & 0x3ff) + 0xdc00;
+				uint32_t t = ((cu - 0x10000) >> 10) + 0xd800; // NOLINT
+				cu = (cu & 0x3ff) + 0xdc00; // NOLINT
 				s += static_cast<mem_t>(t);
 				s += static_cast<mem_t>(cu);
 			}
@@ -511,9 +511,9 @@ namespace std
 		result_type operator()(const argument_type & s) const
 		{
 			const typename argument_type::mem_t *string = s.c_str();
-			result_type result = 5381;
+			result_type result = 5381; // NOLINT
 			for (typename argument_type::mem_t c = *string; c != 0; c = *string++)
-				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c);
+				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c); // NOLINT
 			return result;
 		}
 	};

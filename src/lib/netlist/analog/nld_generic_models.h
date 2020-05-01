@@ -223,10 +223,10 @@ namespace analog
 		, m_Vcrit(nlconst::zero())
 		{
 			set_param(
-				nlconst::magic(1e-15)
-			  , nlconst::magic(1)
+				nlconst::np_Is()
+			  , nlconst::one()
 			  , nlconst::magic(1e-15)
-			  , nlconst::magic(300.0));
+			  , nlconst::T0());
 			//m_name = name;
 		}
 		//pstring m_name;
@@ -252,7 +252,7 @@ namespace analog
 					const nl_fptype old = std::max(nlconst::zero(), m_Vd());
 					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - old);
 					const nl_fptype a = plib::abs(d) * m_VtInv;
-					m_Vd = old + nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(a) * m_Vt;
+					m_Vd = old + plib::signum(d) * plib::log1p(a) * m_Vt;
 				}
 				else
 					m_Vd = std::max(-fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd);
@@ -314,7 +314,7 @@ namespace analog
 			m_logIs = plib::log(Is);
 			m_gmin = gmin;
 
-			m_Vt = n * temp * nlconst::k_b() / nlconst::Q_e();
+			m_Vt = nlconst::np_VT(n, temp);
 			m_VtInv = plib::reciprocal(m_Vt);
 
 #if USE_TEXTBOOK_DIODE
@@ -331,7 +331,7 @@ namespace analog
 			// ln(P/Is) = ln(V)+V/Vt ~= V - 1 + V/vt
 			// V = (1+ln(P/Is))/(1 + 1/Vt)
 
-			m_Vcrit = (1.0 + plib::log(0.5 / m_Is)) / (1.0 + m_VtInv);
+			m_Vcrit = (nlconst::one() + plib::log(nlconst::half() / m_Is)) / (nlconst::one() + m_VtInv);
 			//printf("Vcrit: %f\n", m_Vcrit);
 			m_Icrit_p_Is = plib::exp(m_logIs + m_Vcrit * m_VtInv);
 			//m_Icrit = plib::exp(m_logIs + m_Vcrit * m_VtInv) - m_Is;

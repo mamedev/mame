@@ -45,27 +45,6 @@
 //-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
 //-
 
-
-/*
- * "Description: The Swiss army knife for timing purposes\n"
- * "    which has a ton of applications.\n"
- * "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
- * "Package: DIP\n"
- * "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
- * "Limitations: Internal resistor network currently fixed to 5k\n"
- * "     more limitations\n"
- * "Function Table:\n"
- *
- *  Function table created from truthtable if missing.
- *
- *  For package, refer to:
- *
- *  https://en.wikipedia.org/wiki/List_of_integrated_circuit_packaging_types
- *
- *  Special case: GATE -> use symbolic names
- *
- */
-
 #include "nld_ne555.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
@@ -93,16 +72,16 @@ namespace netlist
 		, m_ff(*this, "m_ff", false)
 		, m_last_reset(*this, "m_last_reset", false)
 		{
-			register_subalias("GND",  m_R3.m_N);    // Pin 1
-			register_subalias("CONT", m_R1.m_N);    // Pin 5
-			register_subalias("DISCH", m_RDIS.m_P); // Pin 7
-			register_subalias("VCC",  m_R1.m_P);    // Pin 8
-			register_subalias("OUT",  m_ROUT.m_P);  // Pin 3
+			register_subalias("GND",  m_R3.N());    // Pin 1
+			register_subalias("CONT", m_R1.N());    // Pin 5
+			register_subalias("DISCH", m_RDIS.P()); // Pin 7
+			register_subalias("VCC",  m_R1.P());    // Pin 8
+			register_subalias("OUT",  m_ROUT.P());  // Pin 3
 
-			connect(m_R1.m_N, m_R2.m_P);
-			connect(m_R2.m_N, m_R3.m_P);
-			connect(m_RDIS.m_N, m_R3.m_N);
-			connect(m_OUT, m_ROUT.m_N);
+			connect(m_R1.N(), m_R2.P());
+			connect(m_R2.N(), m_R3.P());
+			connect(m_RDIS.N(), m_R3.N());
+			connect(m_OUT, m_ROUT.N());
 		}
 
 		NETLIB_UPDATEI();
@@ -127,7 +106,7 @@ namespace netlist
 		nl_fptype clamp(const nl_fptype v, const nl_fptype a, const nl_fptype b)
 		{
 			nl_fptype ret = v;
-			nl_fptype vcc = m_R1.m_P();
+			nl_fptype vcc = m_R1.P()();
 
 			if (ret >  vcc - a)
 				ret = vcc - a;
@@ -182,9 +161,9 @@ namespace netlist
 		}
 		else
 		{
-			const nl_fptype vt = clamp(m_R2.m_P(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype vt = clamp(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
 			const bool bthresh = (m_THRES() > vt);
-			const bool btrig = (m_TRIG() > clamp(m_R2.m_N(), nlconst::magic(0.7), nlconst::magic(1.4)));
+			const bool btrig = (m_TRIG() > clamp(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4)));
 
 			if (!btrig)
 				m_ff = true;
@@ -197,14 +176,14 @@ namespace netlist
 		if (m_last_out && !out)
 		{
 			m_RDIS.solve_now();
-			m_OUT.push(m_R3.m_N());
+			m_OUT.push(m_R3.N()());
 			m_RDIS.set_R(nlconst::magic(R_ON));
 		}
 		else if (!m_last_out && out)
 		{
 			m_RDIS.solve_now();
 			// FIXME: Should be delayed by 100ns
-			m_OUT.push(m_R1.m_P());
+			m_OUT.push(m_R1.P()());
 			m_RDIS.set_R(nlconst::magic(R_OFF));
 		}
 		m_last_reset = reset;

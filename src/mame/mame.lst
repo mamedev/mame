@@ -2358,6 +2358,12 @@ as_wwe                          //
 astoneag                        // (c) 2004? Astro Corp.
 dinodino                        // (c) 2003? Astro Corp.
 hacher                          // (c) 2005? bootleg (Gametron)
+magibomb                        // (c) 2001? Astro Corp.
+magibomba                       // (c) 2002  Astro Corp.
+magibombb                       // (c) 2002  Astro Corp.
+magibombc                       // (c) 2001  Astro Corp.
+magibombd                       // (c) 2005  Astro Corp.
+magibombe                       // (c) 2001? Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -2366,7 +2372,6 @@ westvent                        // (c) 2007? Astro Corp.
 winbingo                        // (c) 2005? Astro Corp.
 winbingoa                       // (c) 2005? Astro Corp.
 zoo                             // (c) 2005? Astro Corp.
-magibomb
 
 @source:astrocde.cpp
 demndrgn                        // (c) 1982 Bally Midway
@@ -16749,6 +16754,7 @@ arlingtn                        // (c) 1991 Strata/Incredible Technologies
 arlingtna                       // (c) 1991 Strata/Incredible Technologies
 dynobop                         // (c) 1990 Grand Products/Incredible Technologies
 gpgolf                          // (c) 1992 Strata/Incredible Technologies
+gpgolfa                         // (c) 1991 Strata/Incredible Technologies
 grmatch                         // (c) 1989 Yankee Game Technology
 gtg                             // (c) 1990 Strata/Incredible Technologies
 gtg2                            // (c) 1992 Strata/Incredible Technologies
@@ -21872,7 +21878,6 @@ fl100                           // (c) 198? Grundig
 
 @source:mdt60.cpp
 mdt60                           //
-z22                             //
 
 @source:meadows.cpp
 bowl3d                          // [1978?]
@@ -35151,6 +35156,9 @@ leonardoa
 ccmk5
 ccmk6
 
+@source:saitek_minichess.cpp
+smchess
+
 @source:saitek_prschess.cpp
 prschess
 
@@ -36117,6 +36125,7 @@ bingogal                        // 2009.05 Bingo Galaxy (main)
 bingogals                       // 2009.05 Bingo Galaxy (satellite)
 brickppl                        //
 dinoki25                        //
+dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
@@ -38570,6 +38579,7 @@ bubsymphe                       // 1994.?? D90 (c) 1994 Taito Corporation Japan 
 bubsymphj                       // 1994.10 D90 (c) 1994 Taito Corporation (Japan)
 bubsymphu                       // 1994.10 D90 (c) 1994 Taito America Corporation (US)
 cleopatr                        // 1996.10 E28 (c) 1996 Taito Corporation (Japan)
+cleopatro                       // 1996.10 E28 (c) 1996 Taito Corporation (World, bootleg)
 commandw                        // prototype
 cupfinal                        // 1993.?? D49 (c) 1993 Taito Corporation Japan (World)
 dankuga                         // 1994.?? D84? (c) 1994 Taito Corporation (Japan)
@@ -41436,6 +41446,7 @@ tz_l1                           //
 tz_l2                           //
 tz_l3                           //
 tz_l4                           //
+tz_l5                           //
 tz_p3                           //
 tz_p4                           //
 tz_pa1                          //
@@ -41789,6 +41800,9 @@ z1013a2                         //
 z1013k69                        //
 z1013k76                        //
 z1013s60                        //
+
+@source:z22.cpp
+z22                             //
 
 @source:z29.cpp
 z29                             //

@@ -12,7 +12,7 @@ Hardware notes:
 - 6301Y0(mode 1) or HD6303YP MCU @ 10MHz
 - 8KB RAM, 32KB ROM
 - "HELIOS" I/O (NEC gate array)
-- LCD screen
+- Seiko Epson SED1502F, LCD screen
 - magnet sensors chessboard with 81 leds
 
 The 6301Y0 seen on one of them, was a SX8A 6301Y0G84P, this is in fact the
@@ -22,7 +22,6 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- unknown LCD hardware, possibly MCU?
 - WIP
 
 ******************************************************************************/
@@ -145,6 +144,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP  MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, renaissa,  0,     0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1989, renaissaa, 0,     0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    CMP  MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1989, renaissa,  0,        0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, renaissaa, renaissa, 0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

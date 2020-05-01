@@ -209,11 +209,10 @@ public:
 	public:
 		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm);
 
-		token_id_t m_tok_ADD;
-		token_id_t m_tok_VALUE;
-		token_id_t m_tok_SIGNAL;
-		token_id_t m_tok_SEMICOLON;
-
+		token_id_t m_tok_ADD;       // NOLINT
+		token_id_t m_tok_VALUE;     // NOLINT
+		token_id_t m_tok_SIGNAL;    // NOLINT
+		token_id_t m_tok_SEMICOLON; // NOLINT
 	protected:
 
 		void verror(const pstring &msg) override;
@@ -242,16 +241,15 @@ public:
 	public:
 		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm);
 
-		token_id_t m_tok_HEA;
-		token_id_t m_tok_APP;
-		token_id_t m_tok_TIM;
-		token_id_t m_tok_TYP;
-		token_id_t m_tok_ADDC;
-		token_id_t m_tok_ATTC;
-		token_id_t m_tok_NET;
-		token_id_t m_tok_TER;
-		token_id_t m_tok_END;
-
+		token_id_t m_tok_HEA; // NOLINT
+		token_id_t m_tok_APP; // NOLINT
+		token_id_t m_tok_TIM; // NOLINT
+		token_id_t m_tok_TYP; // NOLINT
+		token_id_t m_tok_ADDC; // NOLINT
+		token_id_t m_tok_ATTC; // NOLINT
+		token_id_t m_tok_NET; // NOLINT
+		token_id_t m_tok_TER; // NOLINT
+		token_id_t m_tok_END; // NOLINT
 	protected:
 
 		void verror(const pstring &msg) override;

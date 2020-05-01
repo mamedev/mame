@@ -18,12 +18,12 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
-		logic_t *inout_proxied)
+		const logic_t *inout_proxied)
 		: device_t(anetlist, name)
 		, m_tp(nullptr)
 		, m_tn(nullptr)
 	{
-		m_logic_family = inout_proxied->logic_family();
+		set_logic_family(inout_proxied->logic_family());
 
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
@@ -69,12 +69,12 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_input_t *in_proxied)
+			const logic_input_t *in_proxied)
 	: nld_base_proxy(anetlist, name, in_proxied)
 	{
 	}
 
-	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *in_proxied)
 	: nld_base_a_to_d_proxy(anetlist, name, in_proxied)
 	, m_Q(*this, "Q")
 	, m_I(*this, "I")
@@ -106,19 +106,19 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_output_t *out_proxied)
+			const logic_output_t *out_proxied)
 	: nld_base_proxy(anetlist, name, out_proxied)
 	{
 	}
 
-	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied)
+	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied)
 	, m_I(*this, "I")
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", -1)
 	{
-		register_subalias("Q", m_RN.m_P);
+		register_subalias("Q", m_RN.P());
 
 		log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 		if (anetlist.is_extended_validation())
@@ -126,14 +126,14 @@ namespace netlist
 			// During validation, don't connect to terminals found
 			// This will cause terminals not connected to a rail net to
 			// fail connection stage.
-			connect(m_RN.m_N, m_RP.m_P);
+			connect(m_RN.N(), m_RP.P());
 		}
 		else
 		{
-			connect(m_RN.m_N, *m_tn);
-			connect(m_RP.m_P, *m_tp);
+			connect(m_RN.N(), *m_tn);
+			connect(m_RP.P(), *m_tp);
 		}
-		connect(m_RN.m_P, m_RP.m_N);
+		connect(m_RN.P(), m_RP.N());
 		//printf("vcc: %f\n", logic_family()->fixed_V());
 	}
 

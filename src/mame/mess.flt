@@ -796,6 +796,7 @@ saitek_delta1.cpp
 saitek_exchess.cpp
 saitek_leonardo.cpp
 saitek_mark5.cpp
+saitek_minichess.cpp
 saitek_prschess.cpp
 saitek_renaissance.cpp
 saitek_risc2500.cpp
@@ -1075,6 +1076,7 @@ ymtx81z.cpp
 ymvl70.cpp
 z100.cpp
 z1013.cpp
+z22.cpp
 z29.cpp
 z80dev.cpp
 z80ne.cpp

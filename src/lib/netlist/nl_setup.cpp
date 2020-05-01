@@ -329,6 +329,19 @@ namespace netlist
 	}
 
 	// ----------------------------------------------------------------------------------------
+	// Sources
+	// ----------------------------------------------------------------------------------------
+
+	plib::psource_t::stream_ptr nlparse_t::get_data_stream(const pstring &name)
+	{
+		auto strm = m_sources.get_stream<source_data_t>(name);
+		if (strm)
+			return strm;
+		log().warning(MW_DATA_1_NOT_FOUND(name));
+		return plib::psource_t::stream_ptr(nullptr);
+	}
+
+	// ----------------------------------------------------------------------------------------
 	// setup_t
 	// ----------------------------------------------------------------------------------------
 
@@ -564,11 +577,11 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	return (ret == m_params.end() ? nullptr : ret->second.param());
 }
 
-devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
+devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
-	auto &out_cast = static_cast<logic_output_t &>(out);
+	const auto &out_cast = static_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
 
 	if (iter_proxy != m_proxies.end())
@@ -609,7 +622,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
 	nl_assert(inp.is_logic());
 
-	auto &incast = dynamic_cast<logic_input_t &>(inp);
+	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
 
 	auto iter_proxy(m_proxies.find(&inp));
 
@@ -655,7 +668,7 @@ detail::core_terminal_t &setup_t::resolve_proxy(detail::core_terminal_t &term)
 {
 	if (term.is_logic())
 	{
-		auto &out = dynamic_cast<logic_t &>(term);
+		const auto &out = dynamic_cast<const logic_t &>(term);
 		auto iter_proxy(m_proxies.find(&out));
 		if (iter_proxy != m_proxies.end())
 			return iter_proxy->second->proxy_term();
@@ -764,7 +777,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 	}
 }
 
-void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
+void setup_t::connect_terminals(detail::core_terminal_t &t1,detail::core_terminal_t &t2)
 {
 	if (t1.has_net() && t2.has_net())
 	{
@@ -1023,16 +1036,6 @@ void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 	}
 }
 
-log_type &setup_t::log()
-{
-	return m_nlstate.log();
-}
-const log_type &setup_t::log() const
-{
-	return m_nlstate.log();
-}
-
-
 // ----------------------------------------------------------------------------------------
 // Models
 // ----------------------------------------------------------------------------------------
@@ -1132,18 +1135,18 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
-		case 'M': factor = nlconst::magic(1e6); break;
+		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
 		case 'k':
-		case 'K': factor = nlconst::magic(1e3); break;
-		case 'm': factor = nlconst::magic(1e-3); break;
-		case 'u': factor = nlconst::magic(1e-6); break;
-		case 'n': factor = nlconst::magic(1e-9); break;
-		case 'p': factor = nlconst::magic(1e-12); break;
-		case 'f': factor = nlconst::magic(1e-15); break;
-		case 'a': factor = nlconst::magic(1e-18); break;
+		case 'K': factor = nlconst::magic(1e3); break; // NOLINT
+		case 'm': factor = nlconst::magic(1e-3); break; // NOLINT
+		case 'u': factor = nlconst::magic(1e-6); break; // NOLINT
+		case 'n': factor = nlconst::magic(1e-9); break; // NOLINT
+		case 'p': factor = nlconst::magic(1e-12); break; // NOLINT
+		case 'f': factor = nlconst::magic(1e-15); break; // NOLINT
+		case 'a': factor = nlconst::magic(1e-18); break; // NOLINT
 		default:
 			if (*p < '0' || *p > '9')
-				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
+				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_2(model, entity));
 	}
 	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
@@ -1161,16 +1164,16 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 public:
 	logic_family_std_proxy_t() = default;
 	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override;
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+			const pstring &name, const logic_output_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
 };
 
 unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
-		const pstring &name, logic_output_t *proxied) const
+		const pstring &name, const logic_output_t *proxied) const
 {
 	return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
 {
 	return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -1179,44 +1182,30 @@ unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
 
-	if (m_models.value_str(model, "TYPE") == "TTL")
+	if (models().value_str(model, "TYPE") == "TTL")
 		return family_TTL();
-	if (m_models.value_str(model, "TYPE") == "CD4XXX")
+	if (models().value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
-	auto it = m_nlstate.m_family_cache.find(model);
-	if (it != m_nlstate.m_family_cache.end())
+	auto it = m_nlstate.family_cache().find(model);
+	if (it != m_nlstate.family_cache().end())
 		return it->second.get();
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_low_thresh_PCNT = m_models.value(model, "IVL");
-	ret->m_high_thresh_PCNT = m_models.value(model, "IVH");
-	ret->m_low_VO = m_models.value(model, "OVL");
-	ret->m_high_VO = m_models. value(model, "OVH");
-	ret->m_R_low = m_models.value(model, "ORL");
-	ret->m_R_high = m_models.value(model, "ORH");
+	ret->m_low_thresh_PCNT = models().value(model, "IVL");
+	ret->m_high_thresh_PCNT = models().value(model, "IVH");
+	ret->m_low_VO = models().value(model, "OVL");
+	ret->m_high_VO = models(). value(model, "OVH");
+	ret->m_R_low = models().value(model, "ORL");
+	ret->m_R_high = models().value(model, "ORH");
 
 	auto *retp = ret.get();
 
-	m_nlstate.m_family_cache.emplace(model, std::move(ret));
+	m_nlstate.family_cache().emplace(model, std::move(ret));
 
 	return retp;
 }
-
-// ----------------------------------------------------------------------------------------
-// Sources
-// ----------------------------------------------------------------------------------------
-
-plib::psource_t::stream_ptr setup_t::get_data_stream(const pstring &name)
-{
-	auto strm = m_sources.get_stream<source_data_t>(name);
-	if (strm)
-		return strm;
-	log().warning(MW_DATA_1_NOT_FOUND(name));
-	return plib::psource_t::stream_ptr(nullptr);
-}
-
 
 // ----------------------------------------------------------------------------------------
 // Device handling
@@ -1271,8 +1260,8 @@ void setup_t::prepare_to_run()
 
 	// set default model parameters
 
-	m_models.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
-	m_models.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	models().register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	models().register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
 
 	// create devices
 
@@ -1336,12 +1325,12 @@ void setup_t::prepare_to_run()
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
-		if (t->m_N.net().is_rail_net() && t->m_P.net().is_rail_net())
+		if (t->N().net().is_rail_net() && t->P().net().is_rail_net())
 		{
 			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-				t->name(), t->m_N.net().name(), t->m_P.net().name()));
-			t->m_N.net().remove_terminal(t->m_N);
-			t->m_P.net().remove_terminal(t->m_P);
+				t->name(), t->N().net().name(), t->P().net().name()));
+			t->setup_N().net().remove_terminal(t->setup_N());
+			t->setup_P().net().remove_terminal(t->setup_P());
 			m_nlstate.remove_device(t);
 		}
 	}

@@ -137,7 +137,11 @@ namespace devices
 				// Woodbury Formula
 				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 #else
-			default:
+			case solver::matrix_type_e::GMRES:
+			case solver::matrix_type_e::SOR:
+			case solver::matrix_type_e::SOR_MAT:
+			case solver::matrix_type_e::SM:
+			case solver::matrix_type_e::W:
 				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(m_params.m_method().name(), "MAT_CR"));
 				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 #endif

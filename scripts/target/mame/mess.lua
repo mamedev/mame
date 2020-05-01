@@ -918,6 +918,7 @@ BUSES["VTECH_MEMEXP"] = true
 BUSES["WANGPC"] = true
 BUSES["WSWAN"] = true
 BUSES["X68K"] = true
+BUSES["Z29_KBD"] = true
 BUSES["Z88"] = true
 BUSES["ZORRO"] = true
 
@@ -3349,6 +3350,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_exchess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_leonardo.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_minichess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_prschess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_renaissance.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",
@@ -4179,6 +4181,7 @@ createMESSProjects(_target, _subtarget, "zenith")
 files {
 	MAME_DIR .. "src/mame/drivers/mdt60.cpp",
 	MAME_DIR .. "src/mame/drivers/z100.cpp",
+	MAME_DIR .. "src/mame/drivers/z22.cpp",
 	MAME_DIR .. "src/mame/drivers/z29.cpp",
 }
 

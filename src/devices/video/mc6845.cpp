@@ -210,6 +210,7 @@ uint8_t mc6845_device::register_r()
 		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
 		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		// FIXME: status flag should not be reset if LPEN input is held high
 		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
 		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
 		case 0x1f:  transparent_update(); break;
@@ -1113,7 +1114,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}

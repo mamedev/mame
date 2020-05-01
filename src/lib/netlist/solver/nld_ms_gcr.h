@@ -237,12 +237,14 @@ namespace solver
 	template <typename FT, int SIZE>
 	pstring matrix_solver_GCR_t<FT, SIZE>::static_compile_name()
 	{
+		pstring str_floattype(fp_constants<FT>::name());
+		pstring str_fptype(fp_constants<nl_fptype>::name());
 		std::stringstream t;
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
 		generate_code(w);
 		//std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
-		return plib::pfmt("nl_gcr_{1:x}_{2}")(plib::hash( t.str().c_str(), t.str().size() ))(mat.nz_num);
+		return plib::pfmt("nl_gcr_{1:x}_{2}_{3}_{4}")(plib::hash( t.str().c_str(), t.str().size() ))(mat.nz_num)(str_fptype)(str_floattype);
 	}
 
 	template <typename FT, int SIZE>
@@ -252,7 +254,8 @@ namespace solver
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer strm(&t);
 		pstring name = static_compile_name();
-		pstring fptype(fp_constants<FT>::name());
+		pstring str_floattype(fp_constants<FT>::name());
+		pstring str_fptype(fp_constants<nl_fptype>::name());
 
 		pstring extqual;
 		if (target == CXX_EXTERNAL_C)
@@ -260,8 +263,8 @@ namespace solver
 		else if (target == CXX_STATIC)
 			extqual = "static";
 		strm.writeline(plib::pfmt("{1} void {2}({3} * __restrict V, "
-			"{3} * __restrict go, {3} * __restrict gt, "
-			"{3} * __restrict Idr, {3} ** __restrict cnV)\n")(extqual, name, fptype));
+			"{4} * __restrict go, {4} * __restrict gt, "
+			"{4} * __restrict Idr, {4} ** __restrict cnV)\n")(extqual, name, str_floattype, str_fptype));
 		strm.writeline("{\n");
 		generate_code(strm);
 		strm.writeline("}\n");

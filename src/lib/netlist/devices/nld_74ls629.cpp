@@ -87,11 +87,11 @@ namespace netlist
 		, m_FC(*this, "FC")
 		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		{
-			register_subalias("GND",    m_R_FC.m_N);
+			register_subalias("GND",    m_R_FC.N());
 
-			connect(m_FC, m_R_FC.m_P);
-			connect(m_RNG, m_R_RNG.m_P);
-			connect(m_R_FC.m_N, m_R_RNG.m_N);
+			connect(m_FC, m_R_FC.P());
+			connect(m_RNG, m_R_RNG.P());
+			connect(m_R_FC.N(), m_R_RNG.N());
 
 			register_subalias("Y", m_clock.m_Y);
 		}
@@ -134,9 +134,9 @@ namespace netlist
 			register_subalias("6",  m_A.m_ENQ);
 			register_subalias("7",  m_A.m_clock.m_Y);
 
-			register_subalias("8",  m_A.m_R_FC.m_N);
-			register_subalias("9",  m_A.m_R_FC.m_N);
-			connect(m_A.m_R_FC.m_N, m_B.m_R_FC.m_N);
+			register_subalias("8",  m_A.m_R_FC.N());
+			register_subalias("9",  m_A.m_R_FC.N());
+			connect(m_A.m_R_FC.N(), m_B.m_R_FC.N());
 
 			register_subalias("10",  m_B.m_clock.m_Y);
 

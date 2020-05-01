@@ -190,6 +190,8 @@
 #define COMBINATORIAL_ASSIGNMENT "="
 #define REGISTERED_ASSIGNMENT ":="
 
+#define MAXIMUM_PAGE_ITEMS 10
+
 
 
 /***************************************************************************

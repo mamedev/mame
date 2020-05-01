@@ -215,9 +215,9 @@ namespace netlist
 
 	NETLIB_UPDATE(opamp)
 	{
-		const nl_fptype cVt = nlconst::magic(0.0258 * 1.0); // * m_n;
+		const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
 		const nl_fptype cId = m_model.m_DAB; // 3 mA
-		const nl_fptype cVd = cVt * plib::log(cId / nlconst::magic(1e-15) + nlconst::one());
+		const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
 
 		m_VH.push(m_VCC() - m_model.m_VLH - cVd);
 		m_VL.push(m_GND() + m_model.m_VLL + cVd);
@@ -242,10 +242,10 @@ namespace netlist
 			nl_fptype G = m_model.m_UGF / m_model.m_FPF / RP;
 
 			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
-			if (m_model.m_SLEW / (nlconst::four() * nlconst::pi() * nlconst::magic(0.0258)) < m_model.m_UGF)
+			if (m_model.m_SLEW / (nlconst::four() * nlconst::pi() * nlconst::np_VT()) < m_model.m_UGF)
 				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
-			m_CP->m_C.set(CP);
+			m_CP->set_cap_embedded(CP);
 			m_RP.set_R(RP);
 			m_G1.m_G.set(G);
 

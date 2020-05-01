@@ -24,6 +24,9 @@
 #define MC14584B_DIP(name)                                                    \
 		NET_REGISTER_DEV(MC14584B_DIP, name)
 
+#define NE566_DIP(name)                                                         \
+		NET_REGISTER_DEV(NE566_DIP, name)
+
 #endif
 
 /* ----------------------------------------------------------------------------

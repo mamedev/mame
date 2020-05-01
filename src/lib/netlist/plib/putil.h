@@ -294,9 +294,9 @@ namespace plib
 	template <typename T>
 	std::size_t hash(const T *buf, std::size_t size)
 	{
-		std::size_t result = 5381;
+		std::size_t result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)
-			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p);
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p); // NOLINT
 		return result;
 	}
 

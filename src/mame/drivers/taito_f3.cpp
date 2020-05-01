@@ -3448,6 +3448,46 @@ ROM_START( cleopatr )
 	ROM_LOAD16_BYTE("e28-03.bin", 0x000000, 0x200000, CRC(15c7989d) SHA1(7cc63d93e5c1f9f52f889e973bbefd5e6f7ce807) )    // C8 C9 CA CB
 ROM_END
 
+/*
+About cleopatro:
+
+ROMs found in a genuine Taito Cleopatra Fortune cart meant for the Japanese market. It contained a genuine Taito ROM PCB with
+all genuine parts including mask ROMs, PALs, ect.  However the 4 program ROMs were replaced with 4 EPROMs without specific labels.
+
+The replacement ROMs were 27C010 type instead of the standard 27C040 that Taito would normaly use.  In the case of Cleopatra
+Fortune, each original program ROM is 0xFF filled from bytes 0x20000 through 0x3FFFF.
+
+In cleopatro, the program ROMs match the 1st 1/4 of cleopatr program ROMs except for 1 byte in ic17.bin.  0x1FFFF has been
+changed from 0x00 to 0x03, which amounts to a simple region hack.
+*/
+ROM_START( cleopatro )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
+	ROM_LOAD32_BYTE("ic20.bin", 0x000000, 0x20000, CRC(80dfc893) SHA1(192e121394825ba982998e831108310c26718ec3) )
+	ROM_LOAD32_BYTE("ic19.bin", 0x000001, 0x20000, CRC(666e8ca6) SHA1(4f75e4510975c04b66b0eeb1a861c47a3442b190) )
+	ROM_LOAD32_BYTE("ic18.bin", 0x000002, 0x20000, CRC(9f2d4f69) SHA1(481e7a525e749deb069adf92d335d1c89497f9ab) )
+	ROM_LOAD32_BYTE("ic17.bin", 0x000003, 0x20000, CRC(f892f60e) SHA1(60f1a6c6e780adfbd17892c783920ae88266f0e2) )	// 1 byte difference in 1st 0x20000 bytes of e28-07.bin (0x1FFFF==03 vs 0x00 for e28-07.bin)
+
+	ROM_REGION( 0x100000, "sprites" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e28-02.bin", 0x000000, 0x080000, CRC(b20d47cb) SHA1(6888e5564688840fed1c123ab38467066cd59c7f) )
+	ROM_LOAD16_BYTE("e28-01.bin", 0x000001, 0x080000, CRC(4440e659) SHA1(71dece81bac8d638473c6531fed5c32798096af9) )
+
+	EMPTY_SPRITE_HIDATA(0x080000)
+
+	ROM_REGION( 0x200000, "tilemap" , 0) /* Tiles */
+	ROM_LOAD32_WORD("e28-06.bin", 0x000000, 0x100000, CRC(21d0c454) SHA1(f4c815984b19321cfab303fa6f21d9cad35b09f2) )
+	ROM_LOAD32_WORD("e28-05.bin", 0x000002, 0x100000, CRC(2870dbbc) SHA1(4e412b90cbd9a05956cde3d8cff615ebadca9db6) )
+
+	ROM_REGION( 0x100000, "tilemap_hi", 0 )
+	ROM_LOAD       ("e28-04.bin", 0x000000, 0x100000, CRC(57aef029) SHA1(5c07209015d4749d1ffb3e9c1a890e6cfeec8cb0) )
+
+	ROM_REGION( 0x140000, "taito_en:audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD16_BYTE("e28-11.bin", 0x100000, 0x20000, CRC(01a06950) SHA1(94d22cd839f9027e9d45264c366e0cb5d698e0b6) )
+	ROM_LOAD16_BYTE("e28-12.bin", 0x100001, 0x20000, CRC(dc19260f) SHA1(fa0ca03a236326652e4f9898d07cd837c1507a9d) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 1 populated
+	ROM_LOAD16_BYTE("e28-03.bin", 0x000000, 0x200000, CRC(15c7989d) SHA1(7cc63d93e5c1f9f52f889e973bbefd5e6f7ce807) )    // C8 C9 CA CB
+ROM_END
+
 ROM_START( pbobble3 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
 	ROM_LOAD32_BYTE("e29-12.rom", 0x000000, 0x80000, CRC(9eb19a00) SHA1(5a6417e4377070f9f01110dc6d513d0de01cff1e) )
@@ -4604,6 +4644,7 @@ GAME( 1995, bubblem,  0,        f3_224a, f3, taito_f3_state, init_bubblem,  ROT0
 GAME( 1995, bubblemu, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito America Corporation", "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)", 0 )
 GAME( 1995, bubblemj, bubblem,  f3_224a, f3, taito_f3_state, init_bubblem,  ROT0,   "Taito Corporation",         "Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)", 0 )
 GAME( 1996, cleopatr, 0,        f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "Taito Corporation",         "Cleopatra Fortune (Ver 2.1J 1996/09/05)", 0 )
+GAME( 1996, cleopatro,cleopatr, f3_224a, f3, taito_f3_state, init_cleopatr, ROT0,   "bootleg",                   "Cleopatra Fortune (Ver 2.1O 1996/09/05, bootleg)", 0 )
 GAME( 1996, pbobble3, 0,        f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1O 1996/09/27)", 0 )
 GAME( 1996, pbobble3u,pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1A 1996/09/27)", 0 )
 GAME( 1996, pbobble3j,pbobble3, f3,      f3, taito_f3_state, init_pbobble3, ROT0,   "Taito Corporation",         "Puzzle Bobble 3 (Ver 2.1J 1996/09/27)", 0 )

@@ -93,11 +93,11 @@ namespace netlist
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		, m_last(*this, "m_last", false)
 		{
-			register_subalias("CTL", m_DUM1.m_P);   // Cathode
+			register_subalias("CTL", m_DUM1.P());   // Cathode
 
-			connect(m_DUM1.m_P, m_DUM2.m_P);
-			connect(m_DUM1.m_N, m_R.m_P);
-			connect(m_DUM2.m_N, m_R.m_N);
+			connect(m_DUM1.P(), m_DUM2.P());
+			connect(m_DUM1.N(), m_R.P());
+			connect(m_DUM2.N(), m_R.N());
 		}
 
 		NETLIB_RESETI()
@@ -113,7 +113,7 @@ namespace netlist
 		NETLIB_UPDATE_TERMINALSI()
 		{
 			nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
-			nl_fptype in = m_DUM1.m_P.net().Q_Analog() - m_supply.GND().Q_Analog();
+			nl_fptype in = m_DUM1.P().net().Q_Analog() - m_supply.GND().Q_Analog();
 			nl_fptype rON = m_base_r() * nlconst::magic(5.0) / sup;
 			nl_fptype R = std::exp(-(in / sup - nlconst::magic(0.55)) * nlconst::magic(25.0)) + rON;
 			nl_fptype G = plib::reciprocal(R);

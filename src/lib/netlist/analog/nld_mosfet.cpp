@@ -200,7 +200,7 @@ namespace analog
 		, m_lambda(nlconst::zero())
 		, m_Leff(nlconst::zero())
 		, m_CoxWL(nlconst::zero())
-		, m_polarity(nlconst::magic(qtype() == FET_NMOS ? 1.0 : -1.0))
+		, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
 		, m_Cgb(nlconst::zero())
 		, m_Cgs(nlconst::zero())
 		, m_Cgd(nlconst::zero())
@@ -208,17 +208,17 @@ namespace analog
 		, m_Vgs(*this, "m_Vgs", nlconst::zero())
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
 	{
-			register_subalias("S", m_SG.m_P);   // Source
-			register_subalias("G", m_SG.m_N);   // Gate
+			register_subalias("S", m_SG.P());   // Source
+			register_subalias("G", m_SG.N());   // Gate
 
-			register_subalias("D", m_DG.m_P);   // Drain
+			register_subalias("D", m_DG.P());   // Drain
 
-			connect(m_SG.m_P, m_SD.m_P);
-			connect(m_SG.m_N, m_DG.m_N);
-			connect(m_DG.m_P, m_SD.m_N);
+			connect(m_SG.P(), m_SD.P());
+			connect(m_SG.N(), m_DG.N());
+			connect(m_DG.P(), m_SD.N());
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = nlconst::magic((qtype() == FET_NMOS) ? 1.0 : -1.0);
+			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
@@ -397,7 +397,7 @@ namespace analog
 			else if (Vctrl <= 0)
 			{
 				Cgb = -Vctrl * m_CoxWL / m_phi;
-				Cgs = Vctrl * m_CoxWL * nlconst::magic(4.0 / 3.0) / m_phi + nlconst::magic(2.0 / 3.0) * m_CoxWL;
+				Cgs = Vctrl * m_CoxWL * nlconst::fraction(4.0, 3.0) / m_phi + nlconst::two_thirds() * m_CoxWL;
 				Cgd = nlconst::zero();
 			}
 			else
@@ -408,7 +408,7 @@ namespace analog
 				if (Vdsat <= Vds)
 				{
 					Cgb = nlconst::zero();
-					Cgs = nlconst::magic(2.0 / 3.0) * m_CoxWL;
+					Cgs = nlconst::two_thirds() * m_CoxWL;
 					Cgd = nlconst::zero();
 				}
 				else
@@ -417,8 +417,8 @@ namespace analog
 					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
 					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
-					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::magic(2.0 / 3.0);
-					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::magic(2.0 / 3.0);
+					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::two_thirds();
+					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::two_thirds();
 				}
 			}
 		}
@@ -431,12 +431,12 @@ namespace analog
 	NETLIB_UPDATE(MOSFET)
 	{
 		// FIXME: This should never be called
-		if (!m_SG.m_P.net().is_rail_net())
-			m_SG.m_P.solve_now();   // Basis
-		else if (!m_SG.m_N.net().is_rail_net())
-			m_SG.m_N.solve_now();   // Emitter
+		if (!m_SG.P().net().is_rail_net())
+			m_SG.P().solve_now();   // Basis
+		else if (!m_SG.N().net().is_rail_net())
+			m_SG.N().solve_now();   // Emitter
 		else
-			m_DG.m_N.solve_now();   // Collector
+			m_DG.N().solve_now();   // Collector
 	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
@@ -448,9 +448,9 @@ namespace analog
 
 		const nl_fptype k = nlconst::magic(3.5); // see "Circuit Simulation", page 185
 		nl_fptype d = (Vgs - m_Vgs);
-		Vgs = m_Vgs + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
+		Vgs = m_Vgs + plib::reciprocal(k) * plib::signum(d) * plib::log1p(k * plib::abs(d));
 		d = (Vgd - m_Vgd);
-		Vgd = m_Vgd + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
+		Vgd = m_Vgd + plib::reciprocal(k) * plib::signum(d) * plib::log1p(k * plib::abs(d));
 
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;

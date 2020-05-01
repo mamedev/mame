@@ -450,7 +450,7 @@ image_init_result cococart_slot_device::call_load()
 
 		while (read_length < cart_length)
 		{
-			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
+			offs_t len = std::min(read_length, cart_length - read_length);
 			memcpy(base + read_length, base, len);
 			read_length += len;
 		}

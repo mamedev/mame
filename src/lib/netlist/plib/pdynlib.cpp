@@ -65,7 +65,7 @@ dynlib::dynlib(const pstring &libname)
 	else
 		m_lib = GetModuleHandle(nullptr);
 	if (m_lib != nullptr)
-		m_is_loaded = true;
+		set_loaded(true);
 	//else
 	//  fprintf(stderr, "win: library <%s> not found!\n", libname.c_str());
 	delete [] buffer;
@@ -78,7 +78,7 @@ dynlib::dynlib(const pstring &libname)
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
-		m_is_loaded = true;
+		set_loaded(true);
 	//else
 	//  printf("library <%s> not found: %s\n", libname.c_str(), dlerror());
 #endif
@@ -97,7 +97,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	else
 		m_lib = GetModuleHandle(nullptr);
 	if (m_lib != nullptr)
-		m_is_loaded = true;
+		set_loaded(true);
 	else
 	{
 		//printf("win: library <%s> not found!\n", libname.c_str());
@@ -112,7 +112,7 @@ dynlib::dynlib(const pstring &path, const pstring &libname)
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
-		m_is_loaded = true;
+		set_loaded(true);
 	else
 	{
 		//printf("library <%s> not found!\n", libname.c_str());

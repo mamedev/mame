@@ -5,6 +5,8 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
+// FIXME: Remove QBJT_switch - no more use
+
 namespace netlist
 {
 namespace analog
@@ -13,21 +15,21 @@ namespace analog
 	{
 	public:
 		diode()
-		: m_Is(nlconst::magic(1e-15))
-		, m_VT(nlconst::magic(0.0258))
+		: m_Is(nlconst::np_Is())
+		, m_VT(nlconst::np_VT())
 		, m_VT_inv(plib::reciprocal(m_VT))
 		{}
 
 		diode(nl_fptype Is, nl_fptype n)
 		{
 			m_Is = Is;
-			m_VT = nlconst::magic(0.0258) * n;
+			m_VT = nlconst::np_VT(n);
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		void set(nl_fptype Is, nl_fptype n) noexcept
 		{
 			m_Is = Is;
-			m_VT = nlconst::magic(0.0258) * n;
+			m_VT = nlconst::np_VT(n);
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		nl_fptype I(nl_fptype V) const noexcept { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
@@ -174,18 +176,18 @@ namespace analog
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
 			, m_BC(*this, "m_BC", true)
-			, m_gB(nlconst::magic(1e-9))
-			, m_gC(nlconst::magic(1e-9))
+			, m_gB(nlconst::cgmin())
+			, m_gC(nlconst::cgmin())
 			, m_V(nlconst::zero())
 			, m_state_on(*this, "m_state_on", 0)
 		{
-			register_subalias("B", m_RB.m_P);
-			register_subalias("E", m_RB.m_N);
-			register_subalias("C", m_RC.m_P);
+			register_subalias("B", m_RB.P());
+			register_subalias("E", m_RB.N());
+			register_subalias("C", m_RC.P());
 
-			connect(m_RB.m_N, m_RC.m_N);
-			connect(m_RB.m_P, m_BC.m_P);
-			connect(m_RC.m_P, m_BC.m_N);
+			connect(m_RB.N(), m_RC.N());
+			connect(m_RB.P(), m_BC.P());
+			connect(m_RC.P(), m_BC.N());
 		}
 
 		NETLIB_RESETI();
@@ -222,14 +224,14 @@ namespace analog
 		, m_alpha_f(0)
 		, m_alpha_r(0)
 		{
-			register_subalias("E", m_D_EB.m_P);   // Cathode
-			register_subalias("B", m_D_EB.m_N);   // Anode
+			register_subalias("E", m_D_EB.P());   // Cathode
+			register_subalias("B", m_D_EB.N());   // Anode
 
-			register_subalias("C", m_D_CB.m_P);   // Cathode
+			register_subalias("C", m_D_CB.P());   // Cathode
 
-			connect(m_D_EB.m_P, m_D_EC.m_P);
-			connect(m_D_EB.m_N, m_D_CB.m_N);
-			connect(m_D_CB.m_P, m_D_EC.m_N);
+			connect(m_D_EB.P(), m_D_EC.P());
+			connect(m_D_EB.N(), m_D_CB.N());
+			connect(m_D_CB.P(), m_D_EC.N());
 
 			if (m_model.m_CJE > nlconst::zero())
 			{
@@ -300,12 +302,12 @@ namespace analog
 	NETLIB_UPDATE(QBJT_switch)
 	{
 		// FIXME: this should never be called
-		if (!m_RB.m_P.net().is_rail_net())
-			m_RB.m_P.solve_now();   // Basis
-		else if (!m_RB.m_N.net().is_rail_net())
-			m_RB.m_N.solve_now();   // Emitter
-		else if (!m_RC.m_P.net().is_rail_net())
-			m_RC.m_P.solve_now();   // Collector
+		if (!m_RB.P().net().is_rail_net())
+			m_RB.P().solve_now();   // Basis
+		else if (!m_RB.N().net().is_rail_net())
+			m_RB.N().solve_now();   // Emitter
+		else if (!m_RC.P().net().is_rail_net())
+			m_RC.P().solve_now();   // Collector
 	}
 
 
@@ -366,12 +368,12 @@ namespace analog
 	NETLIB_UPDATE(QBJT_EB)
 	{
 		// FIXME: this should never be called
-		if (!m_D_EB.m_P.net().is_rail_net())
-			m_D_EB.m_P.solve_now();   // Basis
-		else if (!m_D_EB.m_N.net().is_rail_net())
-			m_D_EB.m_N.solve_now();   // Emitter
+		if (!m_D_EB.P().net().is_rail_net())
+			m_D_EB.P().solve_now();   // Basis
+		else if (!m_D_EB.N().net().is_rail_net())
+			m_D_EB.N().solve_now();   // Emitter
 		else
-			m_D_CB.m_N.solve_now();   // Collector
+			m_D_CB.N().solve_now();   // Collector
 	}
 
 	NETLIB_RESET(QBJT_EB)
@@ -380,19 +382,19 @@ namespace analog
 		if (m_CJE)
 		{
 			m_CJE->reset();
-			m_CJE->m_C.set(m_model.m_CJE);
+			m_CJE->set_cap_embedded(m_model.m_CJE);
 		}
 		if (m_CJC)
 		{
 			m_CJC->reset();
-			m_CJC->m_C.set(m_model.m_CJC);
+			m_CJC->set_cap_embedded(m_model.m_CJC);
 		}
 
 	}
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity = nlconst::magic(qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_fptype polarity(qtype() == BJT_NPN ? nlconst::one() : -nlconst::one());
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);

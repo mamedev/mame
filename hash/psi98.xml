@@ -10,18 +10,15 @@ license:CC0
 		<description>KOS 6.05D Boot</description>
 		<year>1984</year>
 		<publisher>Kontron</publisher>
+		<info name="usage" value="At the login prompt enter *" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="KOS boot"/>
 			<dataarea name="flop" size="518086">
 				<rom name="kos605d.td0" size="518086" crc="4b16029c" sha1="bf41cb9e90f2a9b5653cbc6748fe427568099cbd"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="util605d">
-		<description>KOS 6.05D Utils</description>
-		<year>1984</year>
-		<publisher>Kontron</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="KOS utils"/>
 			<dataarea name="flop" size="545577">
 				<rom name="utils605d.td0" size="545577" crc="250c93d7" sha1="f06ae5f75f73cb4d64b2a191dc35d06ecb1f73b3"/>
 			</dataarea>

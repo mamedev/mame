@@ -68,11 +68,11 @@ namespace netlist
 				, m_model(*this, "MODEL", "TTL_7414_GATE")
 				, m_last_state(*this, "m_last_var", 1)
 			{
-				register_subalias("Q", m_RVO.m_P);
+				register_subalias("Q", m_RVO.P());
 
-				connect(m_A, m_RVI.m_P);
-				connect(m_supply.GND(), m_RVI.m_N);
-				connect(m_supply.GND(), m_RVO.m_N);
+				connect(m_A, m_RVI.P());
+				connect(m_supply.GND(), m_RVI.N());
+				connect(m_supply.GND(), m_RVO.N());
 			}
 
 		protected:

@@ -22,6 +22,7 @@
 #define RES_K(res) ((res) * 1e3)
 #define RES_M(res) ((res) * 1e6)
 #define CAP_U(cap) ((cap) * 1e-6)
+//#define CAP_U(cap) ((cap) * 1μ)
 #define CAP_N(cap) ((cap) * 1e-9)
 #define CAP_P(cap) ((cap) * 1e-12)
 #define IND_U(ind) ((ind) * 1e-6)
@@ -64,6 +65,7 @@
 #include "nld_74193.h"
 #include "nld_74194.h"
 #include "nld_74365.h"
+#include "nld_74393.h"
 #include "nld_7448.h"
 #include "nld_7450.h"
 #include "nld_7473.h"

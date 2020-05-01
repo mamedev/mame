@@ -65,22 +65,22 @@ nl_convert_base_t::nl_convert_base_t()
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
-			{"T",   "{1}e12",      1.0e12 },
-			{"G",   "{1}e9",       1.0e9  },
-			{"MEG", "RES_M({1})",  1.0e6  },
-			{"k",   "RES_K({1})",  1.0e3  }, // eagle
-			{"K",   "RES_K({1})",  1.0e3  },
-			{"",    "{1}",         1.0e0  },
-			{"M",   "{1}e-3",      1.0e-3 },
-			{"u",   "CAP_U({1})",  1.0e-6 }, // eagle
-			{"U",   "CAP_U({1})",  1.0e-6 },
-			{"μ",   "CAP_U({1})",  1.0e-6 },
-			{"N",   "CAP_N({1})",  1.0e-9 },
-			{"pF",  "CAP_P({1})",  1.0e-12},
-			{"P",   "CAP_P({1})",  1.0e-12},
-			{"F",   "{1}e-15",     1.0e-15},
+			{"T",   "{1}e12",      1.0e12 }, // NOLINT
+			{"G",   "{1}e9",       1.0e9  }, // NOLINT
+			{"MEG", "RES_M({1})",  1.0e6  }, // NOLINT
+			{"k",   "RES_K({1})",  1.0e3  }, // NOLINT: eagle
+			{"K",   "RES_K({1})",  1.0e3  }, // NOLINT
+			{"",    "{1}",         1.0e0  }, // NOLINT
+			{"M",   "{1}e-3",      1.0e-3 }, // NOLINT
+			{"u",   "CAP_U({1})",  1.0e-6 }, // NOLINT: eagle
+			{"U",   "CAP_U({1})",  1.0e-6 }, // NOLINT
+			{"μ",   "CAP_U({1})",  1.0e-6 }, // NOLINT
+			{"N",   "CAP_N({1})",  1.0e-9 }, // NOLINT
+			{"pF",  "CAP_P({1})",  1.0e-12}, // NOLINT
+			{"P",   "CAP_P({1})",  1.0e-12}, // NOLINT
+			{"F",   "{1}e-15",     1.0e-15}, // NOLINT
 
-			{"MIL", "{1}",  25.4e-6}
+			{"MIL", "{1}",  25.4e-6} // NOLINT
 	};
 
 	dev_map =

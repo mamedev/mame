@@ -8,43 +8,54 @@ Hegener + Glaser Mephisto chesscomputers with plugin modules
 After Roma, H+G started naming the different versions 16 Bit/32 Bit instead of 68000/68020.
 With Genius and the TM versions, they still applied "68030".
 
-Almeria 16 Bit 12MHz
-Almeria 32 Bit 12MHz
-Portorose 16 Bit 12MHz
-Portorose 32 Bit 12MHz
-Lyon 16 Bit 12MHz
-Lyon 32 Bit 12MHz
-Vancouver 16 Bit 12MHz
-Vancouver 32 Bit 12MHz
-Genius 68030 33.3330MHz
-
 The London program (1994 competition) is not a dedicated module, but an EPROM upgrade
 released by Richard Lang for Almeria, Lyon, Portorose and Vancouver modules, and also
-available as upgrades for Berlin/Berlin Pro and Genius.
-No Mephisto modules were released anymore after Saitek took over H+G, engine is the
-same as Saitek's 1996 Mephisto London 68030 (limited release TM version).
+available as upgrades for Berlin/Berlin Pro and Genius. The engine is the same as
+Saitek's 1996 Mephisto London 68030 (limited release TM version).
+
+Hardware notes:
+
+Almeria 16 Bit, Lyon 16 Bit:
+- MC68HC000FN12, 12.288MHz XTAL
+- 128KB ROM (2*27C512)
+- 512KB RAM (4*TC514256AP-10, or equivalent)
+
+Portorose 32 Bit:
+- MC68020RC12E, 12.288MHz XTAL
+- 128KB ROM (TC5710000-20)
+- 1MB RAM (8*TC514256AP-70)
+
+Genius 68030:
+- M68EC030RP40B, 33.3330MHz XTAL, 6.144MHz XTAL
+- 256KB ROM (M27C2001)
+- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20)
+
+Display Modul:
+- HD44780, 2-line LCD display
+- 8KB RAM (TC5565APL-15L), battery
+- piezo speaker
 
 For the dedicated tournament machines, see mephisto_modular_tm.cpp
-
-TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates),
-  especially gen32 is way too fast when comparing sound pitch
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot will clear the battery backed RAM
 
+TODO:
+- match I/S= diag speed test with real hardware (good test for proper waitstates),
+  especially gen32 is way too fast when comparing sound pitch
+
 ===============================================================================
 
 Bavaria piece recognition board:
--------------------------------------------------
+ _______________________________________________
 |                                               |
 | 74HC21                      74HC74    74HC238 |
 | 74HC4040   74HC574          74HC173   74HC374 |
 | ROM                  XTAL   74HC368   74HC374 |
 | 74HC4024   74HC32           74HC139   74HC374 |
-|                                               |
--------------------------------------------------
+|_______________________________________________|
+
 XTAL = 7.37280MHz
 ROM = TC57256AD-12, sine table (not used in MAME)
 
@@ -391,7 +402,7 @@ INPUT_PORTS_END
 void mmodular_state::alm16(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
 
@@ -426,9 +437,11 @@ void mmodular_state::alm32(machine_config &config)
 	alm16(config);
 
 	/* basic machine hardware */
-	M68020(config.replace(), m_maincpu, 12_MHz_XTAL);
+	M68020(config.replace(), m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
-	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(750));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
+	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
 	config.set_default_layout(layout_mephisto_alm32);
 }
@@ -450,7 +463,7 @@ void mmodular_state::gen32(machine_config &config)
 	van32(config);
 
 	/* basic machine hardware */
-	M68EC030(config.replace(), m_maincpu, 33.333_MHz_XTAL); // M68EC030RP40B
+	M68EC030(config.replace(), m_maincpu, 33.333_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::gen32_mem);
 
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
@@ -473,8 +486,8 @@ ROM_END
 
 ROM_START( alm16 ) // U013 65CE 2FCE
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
-	ROM_LOAD16_BYTE("alm16odd.bin", 0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
+	ROM_LOAD16_BYTE("almeria_16bit_v013_even", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb) )
+	ROM_LOAD16_BYTE("almeria_16bit_v013_odd",  0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908) )
 ROM_END
 
 ROM_START( port32 ) // V103 C734 1CD7
@@ -512,8 +525,8 @@ ROM_END
 
 ROM_START( lyon16 ) // V207 EC82 5805
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
-	ROM_LOAD16_BYTE("lyon16od.bin", 0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
+	ROM_LOAD16_BYTE("lyon_16bit_even_v207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
+	ROM_LOAD16_BYTE("lyon_16bit_odd_v207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
 
 	ROM_REGION( 0x8000, "bavaria", 0 )
 	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
@@ -529,8 +542,8 @@ ROM_END
 
 ROM_START( van16 ) // V309 C8F3 18D3
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
-	ROM_LOAD16_BYTE("va16odd.bin",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
+	ROM_LOAD16_BYTE("vancouver_16_even_v309", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44) )
+	ROM_LOAD16_BYTE("vancouver_16_odd_v309",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a) )
 
 	ROM_REGION( 0x8000, "bavaria", 0 )
 	ROM_LOAD("sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )

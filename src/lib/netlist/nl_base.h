@@ -264,9 +264,9 @@ namespace netlist
 		virtual ~logic_family_desc_t() noexcept = default;
 
 		virtual unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_output_t *proxied) const = 0;
+				const logic_output_t *proxied) const = 0;
 		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
-				logic_input_t *proxied) const = 0;
+				const logic_input_t *proxied) const = 0;
 
 		nl_fptype low_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
 		nl_fptype high_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_high_thresh_PCNT; }
@@ -311,6 +311,7 @@ namespace netlist
 
 	protected:
 		~logic_family_t() noexcept = default; // prohibit polymorphic destruction
+	private:
 		const logic_family_desc_t *m_logic_family;
 	};
 
@@ -467,9 +468,7 @@ namespace netlist
 		/// \brief The base class for netlist devices, terminals and parameters.
 		///
 		///  This class serves as the base class for all device, terminal and
-		///  objects. It provides new and delete operators to support e.g. pooled
-		///  memory allocation to enhance locality. Please refer to \ref NL_USE_MEMPOOL as
-		///  well.
+		///  objects.
 
 		class object_t
 		{
@@ -515,6 +514,8 @@ namespace netlist
 			: object_t(name)
 			, m_netlist(nl)
 			{ }
+
+			~netlist_object_t() = default;
 
 			PCOPYASSIGNMOVE(netlist_object_t, delete)
 
@@ -618,8 +619,7 @@ namespace netlist
 			void clear_net() noexcept { m_net = nullptr; }
 			bool has_net() const noexcept { return (m_net != nullptr); }
 
-			const net_t & net() const noexcept { return *m_net;}
-			net_t & net() noexcept { return *m_net;}
+			net_t & net() const noexcept { return *m_net;}
 
 			bool is_logic() const noexcept;
 			bool is_logic_input() const noexcept;
@@ -642,7 +642,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -835,7 +835,7 @@ namespace netlist
 			}
 		}
 
-		void solve_now();
+		void solve_now() const;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
@@ -1049,7 +1049,7 @@ namespace netlist
 			plib::pperfcount_t<true> m_stat_inc_active;
 		};
 
-		unique_pool_ptr<stats_t> m_stats;
+		stats_t * stats() noexcept { return m_stats.get(); }
 
 		virtual void update() noexcept { }
 		virtual void reset() { }
@@ -1072,6 +1072,7 @@ namespace netlist
 	private:
 		bool            m_hint_deactivate;
 		state_var_s32   m_active_outputs;
+		unique_pool_ptr<stats_t> m_stats;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1092,12 +1093,11 @@ namespace netlist
 		template<class C, typename... Args>
 		void create_and_register_subdevice(const pstring &name, unique_pool_ptr<C> &dev, Args&&... args);
 
-		void register_subalias(const pstring &name, detail::core_terminal_t &term);
+		void register_subalias(const pstring &name, const detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
-		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2) noexcept(false);
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1302,11 +1302,11 @@ namespace netlist
 		std::array<ST, 1 << AW> m_data;
 	};
 
-	// -----------------------------------------------------------------------------
-	// family_setter_t
-	// -----------------------------------------------------------------------------
-
 	namespace detail {
+
+		// -----------------------------------------------------------------------------
+		// family_setter_t
+		// -----------------------------------------------------------------------------
 
 		struct family_setter_t
 		{
@@ -1371,6 +1371,7 @@ namespace netlist
 	public:
 
 		using nets_collection_type = std::vector<owned_pool_ptr<detail::net_t>>;
+		using family_collection_type = std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>>;
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
@@ -1448,13 +1449,14 @@ namespace netlist
 		{
 			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + "." + stname);
 		}
+
 		template<typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
 			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
-		detail::net_t *find_net(const pstring &name) const;
+		// FIXME: only used by queue_t save state
 		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
@@ -1544,8 +1546,7 @@ namespace netlist
 		devices_collection_type & devices() noexcept { return m_devices; }
 		const devices_collection_type & devices() const noexcept { return m_devices; }
 
-		// sole use is to manage lifetime of family objects
-		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
+		family_collection_type &family_cache() { return m_family_cache; }
 
 		template<typename T, typename... Args>
 		unique_pool_ptr<T> make_object(Args&&... args)
@@ -1577,6 +1578,8 @@ namespace netlist
 	private:
 
 		void reset();
+		detail::net_t *find_net(const pstring &name) const; // FIXME: stale
+
 		nlmempool                           m_pool; // must be deleted last!
 
 		pstring                             m_name;
@@ -1590,6 +1593,8 @@ namespace netlist
 		nets_collection_type                m_nets;
 		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
+		// sole use is to manage lifetime of family objects
+		family_collection_type m_family_cache;
 		bool m_extended_validation;
 
 		// dummy version
@@ -1628,8 +1633,8 @@ namespace netlist
 			}
 
 		public:
-			logic_output_t m_Q;
-			netlist_time m_inc;
+			logic_output_t m_Q; // NOLINT: needed in core
+			netlist_time m_inc; // NOLINT: needed in core
 		private:
 			param_fp_t m_freq;
 		};
@@ -2067,7 +2072,7 @@ namespace netlist
 			for (auto & p : m_list_active)
 			{
 				p.set_copied_input(sig);
-				auto *stats = p.device().m_stats.get();
+				auto *stats(p.device().stats());
 				stats->m_stat_call_count.inc();
 				if ((p.terminal_state() & mask))
 				{

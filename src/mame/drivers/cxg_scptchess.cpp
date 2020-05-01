@@ -15,10 +15,18 @@ Initially, it had a "Sound" button for turning the beeps off. This was later
 changed to the more useful "New Game". With Portachess, they added a "Save"
 switch which puts the MCU in halt state.
 
-Hardware notes (Sensor Computachess):
-- PCB label WA 001
-- HD44801 MCU @ ~400kHz
+Hardware notes:
+
+Sensor Computachess:
+- PCB label WA 001 600 002
+- Hitachi 44801A50 MCU @ ~400kHz
 - buzzer, 16 leds, button sensors chessboard
+
+Portachess II:
+- PCB label CXG223-600-001 (main pcb), CXG 211 600 101 (led pcb taken from
+  Advanced Star Chess, extra led row unused here)
+- Hitachi HD44801C89 MCU @ ~400kHz (serial 202: from Portachess 1985 version)
+- rest same as above
 
 HD44801A50 used in:
 - CXG Sensor Computachess (1981 version) - 1st use
@@ -225,7 +233,7 @@ ROM_END
 
 ROM_START( prtchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) ) // 202 = Portachess model#
+	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
 ROM_END
 
 } // anonymous namespace

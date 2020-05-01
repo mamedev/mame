@@ -293,6 +293,7 @@ namespace plib {
 		{
 			clear();
 		}
+		~timed_queue_linear() = default;
 
 		PCOPYASSIGNMOVE(timed_queue_linear, delete)
 
@@ -407,10 +408,11 @@ namespace plib {
 
 	public:
 		// profiling
-		pperfcount_t<true> m_prof_sortmove;
-		pperfcount_t<true> m_prof_call;
-		pperfcount_t<true> m_prof_remove;
-		pperfcount_t<true> m_prof_retime;
+		// FIXME: Make those private
+		pperfcount_t<true> m_prof_sortmove; // NOLINT
+		pperfcount_t<true> m_prof_call; // NOLINT
+		pperfcount_t<true> m_prof_remove; // NOLINT
+		pperfcount_t<true> m_prof_retime; // NOLINT
 	};
 
 	template <class T, bool TS>
@@ -428,6 +430,7 @@ namespace plib {
 		{
 			clear();
 		}
+		~timed_queue_heap() = default;
 
 		PCOPYASSIGNMOVE(timed_queue_heap, delete)
 
@@ -514,10 +517,10 @@ namespace plib {
 
 	public:
 		// profiling
-		pperfcount_t<true> m_prof_sortmove;
-		pperfcount_t<true> m_prof_call;
-		pperfcount_t<true> m_prof_remove;
-		pperfcount_t<true> m_prof_retime;
+		pperfcount_t<true> m_prof_sortmove; // NOLINT
+		pperfcount_t<true> m_prof_call; // NOLINT
+		pperfcount_t<true> m_prof_remove; // NOLINT
+		pperfcount_t<true> m_prof_retime; // NOLINT
 	};
 
 } // namespace plib

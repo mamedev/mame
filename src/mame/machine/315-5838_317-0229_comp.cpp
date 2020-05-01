@@ -354,7 +354,7 @@ void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask
 	}
 }
 
-void sega_315_5838_comp_device::data_w_doa(uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 1); }
-void sega_315_5838_comp_device::data_w(uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 0); }
-void sega_315_5838_comp_device::srcaddr_w(uint32_t data, uint32_t mem_mask) { set_prot_addr(data, mem_mask); }
+void sega_315_5838_comp_device::data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 1); }
+void sega_315_5838_comp_device::data_w(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 0); }
+void sega_315_5838_comp_device::srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask) { set_prot_addr(data, mem_mask); }
 

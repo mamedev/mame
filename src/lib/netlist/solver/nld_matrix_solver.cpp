@@ -51,7 +51,11 @@ namespace solver
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
 	{
-		connect_post_start(m_fb_sync, m_Q_sync);
+		if (!anetlist.setup().connect(m_fb_sync, m_Q_sync))
+		{
+			log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
+		}
 		setup_base(nets);
 
 		// now setup the matrix
@@ -415,17 +419,6 @@ namespace solver
 		m_last_step = netlist_time_ext::zero();
 	}
 
-	void matrix_solver_t::update() noexcept
-	{
-		const netlist_time new_timestep = solve(exec().time());
-		update_inputs();
-
-		if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
-		{
-			m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
-		}
-	}
-
 	void matrix_solver_t::step(netlist_time delta) noexcept
 	{
 		const auto dd(delta.as_fp<nl_fptype>());
@@ -597,7 +590,7 @@ namespace solver
 					this->m_stat_calculations,
 					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_fp<nl_fptype>(),
 					this->m_iterative_fail,
-					nlconst::magic(100.0) * static_cast<nl_fptype>(this->m_iterative_fail)
+					nlconst::hundred() * static_cast<nl_fptype>(this->m_iterative_fail)
 						/ static_cast<nl_fptype>(this->m_stat_calculations),
 					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
 		}
