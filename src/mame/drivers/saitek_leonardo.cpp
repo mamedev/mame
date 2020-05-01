@@ -42,10 +42,12 @@ Expansion modules released:
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
-- game locks up when you get checkmated
-- 1.4 version: It locks up a short time after you make an input error (eg. on
-  computer's turn, enter the wrong move so it will give a low pitch error beep,
-  then hold INS to fast forward and it will lock up)
+- It locks up a short time after you make an input error (eg. on computer's
+  turn, enter the wrong move so it will give a low pitch error beep, then hold
+  INS to fast-forward and it will lock up) - happens with leonardoa too, but
+  after a longer delay. At first glance, it looks like it's caused by inaccurate
+  6801 timer emulation. It also locks up when you get checkmated, seems to be
+  the same problem as above.
 - OSA module support (softwarelist, devices/bus)
 - OSA PC link (probably uses MCU serial interface)
 - unsure about white/black/check/end/module/comm leds
@@ -192,7 +194,7 @@ void leo_state::p2_w(u8 data)
 u8 leo_state::p5_r()
 {
 	// ?
-	return 0xff;
+	return 0xff ^ 0x10;
 }
 
 void leo_state::p5_w(u8 data)

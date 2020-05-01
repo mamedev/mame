@@ -128,9 +128,11 @@ INPUT_PORTS_END
 void berlin_state::berlin(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 12.288_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &berlin_state::berlin_mem);
-	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), attotime::from_hz(750));
+
+	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000); // 750Hz
+	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);

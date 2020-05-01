@@ -83,9 +83,9 @@ private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
 
-	int m_numbanks;
-	u8 m_speech_bank;
-	u8 m_select;
+	int m_numbanks = 0;
+	u8 m_speech_bank = 0;
+	u8 m_select = 0;
 };
 
 void chesster_state::init_chesster()
@@ -96,10 +96,6 @@ void chesster_state::init_chesster()
 
 void chesster_state::machine_start()
 {
-	// zerofill
-	m_speech_bank = 0;
-	m_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));

@@ -3350,6 +3350,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_exchess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_leonardo.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_minichess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_prschess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_renaissance.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",

@@ -65,15 +65,16 @@
  @A88     HD38820  1984, Bandai Pair Match (PT-460) (1/2)
  @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
 
- *A34     HD44801  1981, Scisys Mini Chess / Graduate Chess / Chesspartner 3000/4000
+  A34     HD44801  1981, SciSys Mini Chess -> saitek_minichess.cpp
   A50     HD44801  1981, CXG Sensor Computachess -> cxg_scptchess.cpp
   A75     HD44801  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
- *A85     HD44801  1982, Scisys Travel Sensor / Travel Mate / Chesspartner 5000/6000
+ *A85     HD44801  1982, SciSys Travel Sensor / Travel Mate / Chesspartner 5000/6000
+ *A92     HD44801  1982, SciSys Play Bridge Computer
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
  *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
-  C89     HD44801  1985, CXG Portachess II / Computachess IV -> cxg_scptchess.cpp
+  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg_scptchess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)

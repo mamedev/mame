@@ -19,13 +19,13 @@ Hardware notes:
 
 Sensor Computachess:
 - PCB label WA 001 600 002
-- 44801A50 MCU @ ~400kHz
+- Hitachi 44801A50 MCU @ ~400kHz
 - buzzer, 16 leds, button sensors chessboard
 
 Portachess II:
 - PCB label CXG223-600-001 (main pcb), CXG 211 600 101 (led pcb taken from
   Advanced Star Chess, extra led row unused here)
-- HD44801C89 MCU @ ~400kHz (serial 202: from Portachess 1985 version)
+- Hitachi HD44801C89 MCU @ ~400kHz (serial 202: from Portachess 1985 version)
 - rest same as above
 
 HD44801A50 used in:

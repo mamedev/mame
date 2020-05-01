@@ -35156,6 +35156,9 @@ leonardoa
 ccmk5
 ccmk6
 
+@source:saitek_minichess.cpp
+smchess
+
 @source:saitek_prschess.cpp
 prschess
 

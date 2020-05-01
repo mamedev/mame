@@ -20,22 +20,16 @@ license:CC0
 
 	<element name="text_l01a"><text string="A" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l01b"><text string="1" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l01c"><text string="[P]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l02a"><text string="B" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l02b"><text string="2" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l02c"><text string="[N]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l03a"><text string="C" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l03b"><text string="3" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l03c"><text string="[B]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l04a"><text string="D" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l04b"><text string="4" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l04c"><text string="[R]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l05a"><text string="E" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l05b"><text string="5" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l05c"><text string="[Q]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l06a"><text string="F" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l06b"><text string="6" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l06c"><text string="[K]"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l07a"><text string="G" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l07b"><text string="7" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l08a"><text string="H" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -48,6 +42,13 @@ license:CC0
 	<element name="text_l13"><text string="CB"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l14"><text string="CE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l15"><text string="ENTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="text_p1"><image file="chess/wk.png"><color alpha="0.87" /></image></element>
+	<element name="text_p2"><image file="chess/wq.png"><color alpha="0.87" /></image></element>
+	<element name="text_p3"><image file="chess/wr.png"><color alpha="0.87" /></image></element>
+	<element name="text_p4"><image file="chess/wb.png"><color alpha="0.87" /></image></element>
+	<element name="text_p5"><image file="chess/wn.png"><color alpha="0.87" /></image></element>
+	<element name="text_p6"><image file="chess/wp.png"><color alpha="0.87" /></image></element>
 
 	<element name="text_cl00">
 		<rect><color red="0.7" green="0.8" blue="0.8" /></rect>
@@ -505,6 +506,14 @@ license:CC0
 
 	<group name="buttons">
 		<bounds x="-1" y="28.5" width="32" height="10.1" />
+
+		<bezel element="text_p6"><bounds x="0.7"  y="32.18" width="1.6" height="1.6" /></bezel>
+		<bezel element="text_p5"><bounds x="4.7"  y="32.18" width="1.6" height="1.6" /></bezel>
+		<bezel element="text_p4"><bounds x="8.7"  y="32.18" width="1.6" height="1.6" /></bezel>
+		<bezel element="text_p3"><bounds x="12.7" y="32.18" width="1.6" height="1.6" /></bezel>
+		<bezel element="text_p2"><bounds x="16.7" y="32.18" width="1.6" height="1.6" /></bezel>
+		<bezel element="text_p1"><bounds x="20.7" y="32.18" width="1.6" height="1.6" /></bezel>
+
 		<bezel element="button" inputtag="IN.0" inputmask="0x01"><bounds x="0" y="30" width="3" height="2.2" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x02"><bounds x="4" y="30" width="3" height="2.2" /></bezel>
 		<bezel element="button" inputtag="IN.0" inputmask="0x04"><bounds x="8" y="30" width="3" height="2.2" /></bezel>
@@ -539,13 +548,6 @@ license:CC0
 		<bezel element="text_l08a"><bounds x="28.3" y="28.5" width="2.4" height="1.3" /></bezel>
 		<bezel element="text_l08b"><bounds x="28.3" y="28.5" width="2.4" height="1.3" /></bezel>
 
-		<bezel element="text_l01c"><bounds x="0"  y="32.3" width="3" height="1.3" /></bezel>
-		<bezel element="text_l02c"><bounds x="4"  y="32.3" width="3" height="1.3" /></bezel>
-		<bezel element="text_l03c"><bounds x="8"  y="32.3" width="3" height="1.3" /></bezel>
-		<bezel element="text_l04c"><bounds x="12" y="32.3" width="3" height="1.3" /></bezel>
-		<bezel element="text_l05c"><bounds x="16" y="32.3" width="3" height="1.3" /></bezel>
-		<bezel element="text_l06c"><bounds x="20" y="32.3" width="3" height="1.3" /></bezel>
-
 		<bezel element="white"><bounds x="25" y="32.55" width="1" height="1" /></bezel>
 		<bezel element="white"><bounds x="29" y="32.55" width="1" height="1" /></bezel>
 		<bezel element="blackb"><bounds x="29.15" y="32.7" width="0.7" height="0.7" /></bezel>
@@ -578,7 +580,7 @@ license:CC0
 
 		<group ref="digits"><bounds x="8" y="21" width="15" height="5" /></group>
 		<group ref="buttons"><bounds x="-1" y="28.5" width="32" height="10.1" /></group>
-		<bezel element="white"><bounds x="-0.775" y="27.1875" width="32.55" height="0.3875" /></bezel>
+		<bezel element="cblack"><bounds x="-0.775" y="27.1875" width="32.55" height="0.3875" /></bezel>
 	</view>
 
 </mamelayout>
