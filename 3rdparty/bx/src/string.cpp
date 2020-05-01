@@ -736,11 +736,12 @@ namespace bx
 				len = min(_param.width, len);
 			}
 
-			const bool hasSign = _param.sign || _str[0] == '-';
-			char sign = hasSign ? _str[0] == '-' ? '-' : '+' : '\0';
+			const bool hasMinus = (NULL != _str && '-' == _str[0]);
+			const bool hasSign = _param.sign || hasMinus;
+			char sign = hasSign ? hasMinus ? '-' : '+' : '\0';
 
 			const char* str = _str;
-			if (str[0] == '-')
+			if (hasMinus)
 			{
 				str++;
 				len--;
@@ -760,6 +761,11 @@ namespace bx
 				size += writeRep(_writer, _param.fill, max(0, padding), _err);
 			}
 
+			if ('\0' != sign)
+			{
+				size += write(_writer, sign, _err);
+			}
+
 			if (NULL == _str)
 			{
 				size += write(_writer, "(null)", 6, _err);
@@ -773,11 +779,6 @@ namespace bx
 			}
 			else
 			{
-				if ('\0' != sign)
-				{
-					size += write(_writer, sign, _err);
-				}
-
 				size += write(_writer, str, len, _err);
 			}
 

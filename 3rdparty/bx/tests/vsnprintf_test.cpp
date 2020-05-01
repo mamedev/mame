@@ -66,6 +66,18 @@ TEST_CASE("vsnprintf f")
 	REQUIRE(test("     inf", "%8f",   std::numeric_limits<double>::infinity() ) );
 	REQUIRE(test("inf     ", "%-8f",  std::numeric_limits<double>::infinity() ) );
 	REQUIRE(test("    -INF", "%8F",  -std::numeric_limits<double>::infinity() ) );
+
+	REQUIRE(test(" 1.0",     "%4.1f",    1.0) );
+	REQUIRE(test(" 1.500",   "%6.3f",    1.5) );
+	REQUIRE(test("0001.500", "%08.3f",   1.5) );
+	REQUIRE(test("+001.500", "%+08.3f",  1.5) );
+	REQUIRE(test("-001.500", "%+08.3f", -1.5) );
+	REQUIRE(test("0.003906", "%f",       0.00390625) );
+	REQUIRE(test("0.0039",   "%.4f",     0.00390625) );
+
+	REQUIRE(test("0.00390625",          "%.8f",  0.00390625) );
+	REQUIRE(test("-0.00390625",         "%.8f", -0.00390625) );
+	REQUIRE(test("1.50000000000000000", "%.17f", 1.5) );
 }
 
 TEST_CASE("vsnprintf d/i/o/u/x")
@@ -82,6 +94,8 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("2471", "%o", 1337) );
 	REQUIRE(test("1337                ", "%-20o",  01337) );
 	REQUIRE(test("37777776441         ", "%-20o", -01337) );
+	REQUIRE(test("                2471", "%20o",    1337) );
+	REQUIRE(test("00000000000000002471", "%020o",   1337) );
 
 	REQUIRE(test("1337", "%u", 1337) );
 	REQUIRE(test("1337                ", "%-20u",  1337) );
@@ -114,11 +128,15 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("  -1", "% 4i", -1) );
 	REQUIRE(test("   0", "% 4i",  0) );
 	REQUIRE(test("   1", "% 4i",  1) );
+	REQUIRE(test("   1", "% 4o",  1) );
 	REQUIRE(test("  +1", "%+4i",  1) );
+	REQUIRE(test("  +1", "%+4o",  1) );
 	REQUIRE(test("  +0", "%+4i",  0) );
 	REQUIRE(test("  -1", "%+4i", -1) );
 	REQUIRE(test("0001", "%04i",  1) );
+	REQUIRE(test("0001", "%04o",  1) );
 	REQUIRE(test("0000", "%04i",  0) );
+	REQUIRE(test("0000", "%04o",  0) );
 	REQUIRE(test("-001", "%04i", -1) );
 	REQUIRE(test("+001", "%+04i", 1) );
 
