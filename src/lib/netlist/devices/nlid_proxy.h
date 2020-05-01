@@ -113,7 +113,7 @@ namespace devices
 
 	private:
 
-		static constexpr const nl_fptype G_OFF = nlconst::magic(1e-9);
+		static constexpr const nl_fptype G_OFF = nlconst::cgmin();
 
 		logic_input_t m_I;
 		analog::NETLIB_NAME(twoterm) m_RP;

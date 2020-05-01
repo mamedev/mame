@@ -200,7 +200,7 @@ namespace analog
 		, m_lambda(nlconst::zero())
 		, m_Leff(nlconst::zero())
 		, m_CoxWL(nlconst::zero())
-		, m_polarity(nlconst::magic(qtype() == FET_NMOS ? 1.0 : -1.0))
+		, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
 		, m_Cgb(nlconst::zero())
 		, m_Cgs(nlconst::zero())
 		, m_Cgd(nlconst::zero())
@@ -218,7 +218,7 @@ namespace analog
 			connect(m_DG.P(), m_SD.N());
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = nlconst::magic((qtype() == FET_NMOS) ? 1.0 : -1.0);
+			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
@@ -448,9 +448,9 @@ namespace analog
 
 		const nl_fptype k = nlconst::magic(3.5); // see "Circuit Simulation", page 185
 		nl_fptype d = (Vgs - m_Vgs);
-		Vgs = m_Vgs + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
+		Vgs = m_Vgs + plib::reciprocal(k) * plib::signum(d) * plib::log1p(k * plib::abs(d));
 		d = (Vgd - m_Vgd);
-		Vgd = m_Vgd + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
+		Vgd = m_Vgd + plib::reciprocal(k) * plib::signum(d) * plib::log1p(k * plib::abs(d));
 
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;

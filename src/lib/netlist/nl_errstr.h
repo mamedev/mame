@@ -81,7 +81,7 @@ namespace netlist
 	PERRMSGV(MF_MODEL_ERROR_ON_PAIR_1,              1, "Model error on pair {1}")
 	PERRMSGV(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, 2, "Model parameters should be uppercase:{1} {2}")
 	PERRMSGV(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2,      2, "Entity {1} not found in model {2}")
-	PERRMSGV(MF_UNKNOWN_NUMBER_FACTOR_IN_1,         1, "Unknown number factor in: {1}")
+	PERRMSGV(MF_UNKNOWN_NUMBER_FACTOR_IN_2,         2, "Unknown number factor in: {1}:{2}")
 	PERRMSGV(MF_MODEL_NUMBER_CONVERSION_ERROR,      4, "Can't convert {1}={2} to {3} for model {4}")
 	PERRMSGV(MF_NOT_FOUND_IN_SOURCE_COLLECTION,     1, "unable to find {1} in sources collection")
 

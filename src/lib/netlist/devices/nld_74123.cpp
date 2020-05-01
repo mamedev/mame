@@ -29,7 +29,7 @@ namespace netlist
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
 		, m_KP(*this, "m_KP", 0)
-		, m_K(*this, "K", nlconst::magic((m_dev_type == 4538) ? 1.0 : 0.4)) // CD4538 datasheet states PW=RC
+		, m_K(*this, "K", (m_dev_type == 4538) ? nlconst::one() : nlconst::magic(0.4)) // CD4538 datasheet states PW=RC
 		, m_RI(*this, "RI", nlconst::magic(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
 			if ((m_dev_type != 9602) && (m_dev_type != 4538) )

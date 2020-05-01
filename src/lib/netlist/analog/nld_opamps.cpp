@@ -215,9 +215,9 @@ namespace netlist
 
 	NETLIB_UPDATE(opamp)
 	{
-		const nl_fptype cVt = nlconst::magic(0.0258 * 1.0); // * m_n;
+		const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
 		const nl_fptype cId = m_model.m_DAB; // 3 mA
-		const nl_fptype cVd = cVt * plib::log(cId / nlconst::magic(1e-15) + nlconst::one());
+		const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
 
 		m_VH.push(m_VCC() - m_model.m_VLH - cVd);
 		m_VL.push(m_GND() + m_model.m_VLL + cVd);

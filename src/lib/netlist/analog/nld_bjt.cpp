@@ -176,8 +176,8 @@ namespace analog
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
 			, m_BC(*this, "m_BC", true)
-			, m_gB(nlconst::magic(1e-9))
-			, m_gC(nlconst::magic(1e-9))
+			, m_gB(nlconst::cgmin())
+			, m_gC(nlconst::cgmin())
 			, m_V(nlconst::zero())
 			, m_state_on(*this, "m_state_on", 0)
 		{
@@ -394,7 +394,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity = nlconst::magic(qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_fptype polarity(qtype() == BJT_NPN ? nlconst::one() : -nlconst::one());
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);

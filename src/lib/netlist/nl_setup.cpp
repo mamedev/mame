@@ -1146,7 +1146,7 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 		case 'a': factor = nlconst::magic(1e-18); break; // NOLINT
 		default:
 			if (*p < '0' || *p > '9')
-				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
+				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_2(model, entity));
 	}
 	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);

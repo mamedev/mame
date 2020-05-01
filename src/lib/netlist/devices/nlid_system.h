@@ -442,7 +442,7 @@ namespace devices
 		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", nlconst::one())
-		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E99))
+		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
 		, m_last_state(*this, "m_last_state", 0)
 		{
 			register_subalias("1", m_R.P());
@@ -493,8 +493,8 @@ namespace devices
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
 		, m_I(*this, "I")
-		, m_GON(*this, "GON", nlconst::magic(1e9))
-		, m_GOFF(*this, "GOFF", nlconst::magic(1e9))
+		, m_GON(*this, "GON", nlconst::magic(1e9)) // FIXME: all switches should have some on value
+		, m_GOFF(*this, "GOFF", nlconst::cgmin())
 		, m_last_state(*this, "m_last_state", 0)
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		, m_power_pins(*this)

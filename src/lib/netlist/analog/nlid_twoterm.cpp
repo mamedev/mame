@@ -124,7 +124,6 @@ namespace analog
 		m_G = m_gmin;
 		set_mat( m_G, -m_G, -m_I,
 				-m_G,  m_G,  m_I);
-		//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 	}
 
 	NETLIB_UPDATE_PARAM(L)

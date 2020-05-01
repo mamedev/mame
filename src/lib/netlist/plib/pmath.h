@@ -242,6 +242,21 @@ namespace plib
 		return std::trunc(v);
 	}
 
+	/// \brief signum function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \param  r optional argument, if given will return r and -r instead of 1 and -1
+	/// \return signum(v)
+	///
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	signum(T v, T r = static_cast<T>(1))
+	{
+		constexpr const auto z(static_cast<T>(0));
+		return (v > z) ? r : ((v < z) ? -r : v);
+	}
+
 	/// \brief pow function
 	///
 	/// \tparam T1 type of the first argument
