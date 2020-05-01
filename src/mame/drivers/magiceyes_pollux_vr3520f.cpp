@@ -110,8 +110,10 @@ void magiceyes_vr3520f_game_state::leapfrog_didj(machine_config &config)
 }
 
 ROM_START( didj )
-	ROM_REGION32_BE( 0x200000, "bios", 0 ) // external BIOS, undumped
-	ROM_LOAD16_WORD_SWAP( "didjbios.bin", 0x000000, 0x200000, NO_DUMP )
+	ROM_REGION32_BE( 0x10800000, "bios", 0 ) // external NAND
+	ROM_LOAD16_WORD_SWAP( "didj_29f2g08aac_2cda.bin", 0x000000, 0x10800000, CRC(3df8c3ee) SHA1(6dc4044be10da48b6dd37e40f8a112fc4314c87d) )
+
+	// is there an internal bootloader beyond copying code from NAND into RAM?
 ROM_END
 
 

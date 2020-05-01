@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_GCM394_VIDEO_H
-#define MAME_MACHINE_GCM394_VIDEO_H
+#ifndef MAME_MACHINE_GENERALPLUS_GPL16250SOC_VIDEO_H
+#define MAME_MACHINE_GENERALPLUS_GPL16250SOC_VIDEO_H
 
 #pragma once
 
@@ -288,4 +288,4 @@ public:
 
 DECLARE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device)
 
-#endif // MAME_MACHINE_GCM394_VIDEO_H
+#endif // MAME_MACHINE_GENERALPLUS_GPL16250SOC_VIDEO_H

@@ -2867,7 +2867,7 @@ end
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
---@src/devices/machine/sunplus_gcm394.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/sunplus_gpl16250soc.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then
@@ -2886,10 +2886,10 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110.h",
 		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394.h",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.cpp",
-		MAME_DIR .. "src/devices/machine/sunplus_gcm394_video.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.h",
 	}
 end
 

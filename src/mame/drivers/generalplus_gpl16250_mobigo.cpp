@@ -1,8 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+
+	GPL16250 is the GeneralPlus / SunPlus part number
+	GPAC800 is the JAKKS Pacific codename
+	GMC384 / GCM420 is what is printed on the die
+
+	----
+
+	GPL16250 Mobigo support
+	the original Mobigo is ROM+RAM config
+	the Mobigo 2 is NAND+RAM config
+	cartridges are compatible
+*/
+
 #include "emu.h"
-#include "includes/sunplus_unsp20soc.h"
+#include "includes/generalplus_gpl16250_nand.h"
+#include "includes/generalplus_gpl16250_romram.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist_dev.h"
