@@ -326,19 +326,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="snmp_1_1_2">
-		<description>SNMP Access to HP-UX MIB 1.1.2 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
-		<year>1998</year> <!-- 06/98 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0783-001"/>
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<disk name="snmp_access_to_hp_ux_mib_1_1_2" sha1="ab4d302c197551e028fde5cef49476e857092f04" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="softwin95_4_0">
 		<description>Insignia SoftWindows 95 4.0 for IRIX 6.3 and 6.4</description>
 		<year>1997</year> <!-- 08/97 -->
@@ -786,44 +773,82 @@ license:CC0
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0758-002"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Installation Tools June 1998"/>
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_installation_tools_june_1998" sha1="2123c5477c3533214a95dc7c801b7306d821d184" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0759-002"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Foundation 1"/>
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_foundation_1" sha1="6d6009e45d067238d363ec3c490f9fa1548e383b" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_number" value="812-0760-002"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Foundation 2"/>
+			<!-- Dumped with Plextor, without C2 errors -->
 			<diskarea name="cdrom">
-				<disk name="irix_6_5_foundation_2" sha1="56a4507f8ae92fcdf2e4eecc9d1cc1c7f4137347" />
+				<disk name="irix_6_5_foundation_2" sha1="e606152a6293febe00b0aaef6bf97054ef3c6a7a" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_number" value="812-0757-002"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Development Foundation"/>
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_development_foundation" sha1="220786e41c11349591a65a0ec078063d23f388a3" />
 			</diskarea>
 		</part>
 		<part name="cdrom5" interface="cdrom">
 			<feature name="part_number" value="812-0766-002"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Development Libraries"/>
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_development_libraries" sha1="762bf97ac6837be081d915d89ed50ac83ae417d4" />
 			</diskarea>
 		</part>
 		<part name="cdrom6" interface="cdrom">
 			<feature name="part_number" value="812-0779-001"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5 Base Documentation June 1998"/>
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_base_documentation_june_1998" sha1="01f5bb16d49ef08154ea9b429100ad5c66f3b7cf" />
+			</diskarea>
+		</part>
+		<part name="cdrom7" interface="cdrom">
+			<feature name="part_number" value="812-0761-002"/>
+			<feature name="part_id" value="IRIX 6.5 Aplications June 1998"/>
+			<!-- Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_Applications_June_1998" sha1="34e81089f83f4b92a70d530b60d0315b20501378" />
+			</diskarea>
+		</part>
+		<part name="cdrom8" interface="cdrom">
+			<feature name="part_number" value="812-0773-001"/>
+			<feature name="part_id" value="Freeware June 1998"/>
+			<!-- Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="Freeware_June_1998" sha1="51746305bc29cd962eee316ce40fc8e819ade42c" />
+			</diskarea>
+		</part>
+		<part name="cdrom9" interface="cdrom">
+			<feature name="part_number" value="812-0774-001"/>
+			<feature name="part_id" value="ONC3/NFS Version 3 for IRIX 6.2, 6.3, 6.4 and 6.5"/>
+			<!-- Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="ONC3_NFS_Version_3_for_IRIX_6_2_6_3_6_4_and_6_5" sha1="2c9422d70f3255fa8de5cb01e747c6197fc123e4" />
+			</diskarea>
+		</part>
+		<part name="cdrom10" interface="cdrom">
+			<feature name="part_number" value="812-0783-001"/>
+			<feature name="part_id" value="SNMP Access to HP-UX MIB 1.1.2 for IRIX 6.2, 6.3, 6.4 and 6.5"/>
+			<!-- Dumped with Plextor, without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="SNMP_Access_for_HP_UX_MIB_1_1_2_for_IRIX_6_2_6_3_6_4_and_6_5" sha1="f30a731f14e1490aa9bb0beff419a7e4f0c9f4ca" />
 			</diskarea>
 		</part>
 	</software>
