@@ -26,6 +26,7 @@ CPUS["DSP16"] = true -- for qsound
 -- only for MAME and so aren't included
 --------------------------------------------------
 
+SOUNDS["CDDA"] = true
 SOUNDS["AY8910"] = true
 SOUNDS["C140"] = true
 SOUNDS["C352"] = true
@@ -125,6 +126,7 @@ function createProjects_mame_virtual(_target, _subtarget)
 	createVirtualProjects(_target, _subtarget, "virtual")
 	files {
 		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+		MAME_DIR .. "src/mame/drivers/cdplay.cpp",
 		MAME_DIR .. "src/mame/drivers/ldplayer.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.h",

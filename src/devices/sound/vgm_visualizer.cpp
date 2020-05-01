@@ -168,7 +168,7 @@ void vgmviz_device::apply_waterfall()
 		}
 		int permuted = WDL_fft_permute(FFT_LENGTH / 2, bar);
 		float val = std::max<float>(bins[0][permuted].re, bins[1][permuted].re);
-		int level = int(log10f(val * 32768.0f) * 95.0f);
+		int level = int(val * 32768.0f);
 		m_waterfall_buf[m_waterfall_length % SCREEN_WIDTH][total_bars - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
 	}
 	m_waterfall_length++;
@@ -250,7 +250,7 @@ void vgmviz_device::device_reset()
 	m_waterfall_length = 0;
 	for (int i = 0; i < SCREEN_WIDTH; i++)
 	{
-		memset(m_waterfall_buf[i], 0, sizeof(int) * 256);
+		memset(m_waterfall_buf[i], 0, sizeof(float) * 256);
 	}
 
 	m_viz_mode = VIZ_WAVEFORM;
@@ -701,10 +701,12 @@ void vgmviz_device::draw_waterfall(bitmap_rgb32 &bitmap)
 {
 	const pen_t *pal = m_palette->pens();
 	float tex_height = ((float)FFT_LENGTH / 2) - 1.0f;
+	const float log_max = logf(SCREEN_HEIGHT);
 	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
 		const float v0 = (float)y / SCREEN_HEIGHT;
-		const float v1 = (float)(y + 1) / SCREEN_HEIGHT;
+		const float log_lerp_step = lerp(log_max, 1.0f, v0);
+		const float v1 = ((float)y + log_lerp_step) / SCREEN_HEIGHT;
 		const float v0h = v0 * tex_height;
 		const float v1h = v1 * tex_height;
 		const int v0_index = (int)v0h;
@@ -715,16 +717,16 @@ void vgmviz_device::draw_waterfall(bitmap_rgb32 &bitmap)
 		{
 			if (m_waterfall_length < SCREEN_WIDTH)
 			{
-				const float s0 = m_waterfall_buf[x][v0_index];
-				const float s1 = m_waterfall_buf[x][v1_index];
+				const float s0 = (float)m_waterfall_buf[x][v0_index];
+				const float s1 = (float)m_waterfall_buf[x][v1_index];
 				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}
 			else
 			{
 				const int x_index = ((m_waterfall_length - SCREEN_WIDTH) + x) % SCREEN_WIDTH;
-				const float s0 = m_waterfall_buf[x_index][v0_index];
-				const float s1 = m_waterfall_buf[x_index][v1_index];
+				const float s0 = (float)m_waterfall_buf[x_index][v0_index];
+				const float s1 = (float)m_waterfall_buf[x_index][v1_index];
 				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}

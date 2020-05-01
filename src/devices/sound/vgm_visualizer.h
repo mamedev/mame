@@ -122,7 +122,7 @@ protected:
 	bool m_audio_available;
 
 	int m_waterfall_length;
-	int m_waterfall_buf[SCREEN_WIDTH * 2][FFT_LENGTH / 2];
+	float m_waterfall_buf[SCREEN_WIDTH * 2][FFT_LENGTH / 2];
 
 	float m_curr_levels[2];
 	float m_curr_peaks[2];

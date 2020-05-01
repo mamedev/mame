@@ -10058,6 +10058,9 @@ quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 quizard4cz                      // (c) TAB Austria 1998
 
+@source:cdplay.cpp
+cdplay
+
 @source:cdsys5.cpp
 minijook                        //
 
