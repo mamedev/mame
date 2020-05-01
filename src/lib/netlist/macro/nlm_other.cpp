@@ -77,10 +77,10 @@ NETLIST_END()
 //-    This implementation is focused on performance. There may be edge cases
 //-    which lead to issues and ringing.
 //.
+//- Example: ne566.cpp,ne566_example
 //- FunctionTable:
 //-    https://www.egr.msu.edu/eceshop/Parts_Inventory/datasheets/lm566.pdf
 //-
-//- Example: ne566.cpp,ne566_example
 //.
 
 static NETLIST_START(NE566_DIP)

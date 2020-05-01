@@ -1,3 +1,12 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
+
+/*
+ * ne566.cpp
+ *
+ */
+
+//! [ne566_example]
 #include "netlist/devices/net_lib.h"
 
 
@@ -19,3 +28,4 @@ NETLIST_START(oscillator)
 	NET_C(GND, X.1, C1.2)
 	NET_C(C1.1, X.7)
 NETLIST_END()
+//! [ne566_example]
