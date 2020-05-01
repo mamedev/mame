@@ -28,6 +28,11 @@ namespace netlist
 			m_strm.imbue(std::locale::classic());
 		}
 
+		NETLIB_DESTRUCTOR(log)
+		{
+			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
+		}
+
 		NETLIB_UPDATEI()
 		{
 			/* use pstring::sprintf, it is a LOT faster */
