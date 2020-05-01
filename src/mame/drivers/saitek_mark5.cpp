@@ -127,7 +127,6 @@ private:
 	u8 m_lcd_rowsel = 0;
 	u8 m_cb_mux = 0;
 
-	emu_timer *m_cb_startdelay;
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
@@ -137,9 +136,6 @@ void mark5_state::machine_start()
 {
 	m_out_x.resolve();
 	m_irqtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mark5_state::interrupt),this));
-
-	m_cb_startdelay = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_cb_startdelay->adjust(attotime::from_msec(100));
 
 	// register for savestates
 	save_item(NAME(m_dac_data));
@@ -277,7 +273,7 @@ WRITE8_MEMBER(mark5_state::cb_w)
 
 READ8_MEMBER(mark5_state::cb_r)
 {
-	if (~m_inputs[6]->read() & 0x20 || m_cb_startdelay->enabled())
+	if (~m_inputs[6]->read() & 0x20)
 		return 0xff;
 
 	// read chessboard sensors

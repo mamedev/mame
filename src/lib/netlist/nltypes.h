@@ -33,7 +33,25 @@ namespace netlist
 	{
 		using BC = plib::constants<T>;
 
+		/// \brief constant startup gmin
+		///
+		/// This should be used during object creation to initialize
+		/// conductivities with a reasonable value.
+		/// During reset, the object should than make use of exec().gmin()
+		/// to use the actual gmin() value.
 		static inline constexpr T cgmin() noexcept { return BC::magic(1e-9); } // NOLINT
+
+		// FIXME: Some objects used 1e-15 for initial gmin. Needs to be
+		//        aligned with cgmin
+		static inline constexpr T cgminalt() noexcept { return BC::magic(1e-15); } // NOLINT
+
+		/// \brief Multiplier applied to VT in np diode models to determine range for constant model
+		///
+		static inline constexpr T diode_min_cutoff_mult() noexcept { return BC::magic(-5.0); } // NOLINT
+
+		/// \brief Startup voltage used by np diode models
+		///
+		static inline constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
 
 		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
 		{ return n * temp * BC::k_b() / BC::Q_e(); }

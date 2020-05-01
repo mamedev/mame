@@ -68,6 +68,8 @@ public:
 
 	void init_oplayer();
 
+	void init_m505neo();
+
 
 protected:
 	virtual DECLARE_READ16_MEMBER(porta_r) override;
@@ -777,7 +779,14 @@ ROM_START( dnv200fs )
 	ROM_LOAD16_WORD_SWAP( "famsport200in1.u2", 0x0000000, 0x8000000, CRC(f59221e2) SHA1(d532cf5a80ffe9d527efcccbf380a7a860f0fbd9) )
 ROM_END
 
-
+ROM_START( m505neo )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	// 1st and 2nd half are identical apart from one bit.  Likely used double capacity ROM and only wired up half of it because ROM had a problem?
+	// the data segment in question is identical to one in oplayer and suggests the first half of the ROM here is correct with the bit being set
+	// incorrectly in the 2nd half of the ROM.
+	ROM_LOAD16_WORD_SWAP( "m505arcadeneo.u2", 0x0000000, 0x4000000, CRC(b72bdbe1) SHA1(263b60148980ac1f82546e2449b1dd938b7b827c) )
+	ROM_IGNORE(0x4000000)
+ROM_END
 
 
 void oplayer_100in1_state::init_oplayer()
@@ -794,6 +803,54 @@ void oplayer_100in1_state::init_oplayer()
 	rom[0xad051 + (0x1000000 / 2)] = 0xf165;
 	rom[0xc351e + (0x3000000 / 2)] = 0xf165;
 }
+
+/*
+
+oplayer   m505
+---------------
+0001 |    0001    0
+0002 |    0100    8
+0004 |    0002    1
+0008 |    0200    9
+0010 |    0004    2
+0020 |    0400   10
+0040 |    0008    3
+0080 |    0800   11
+
+
+0100 |    8000   15
+0200 |    0080    7
+0400 |    4000   14
+0800 |    0040    6
+1000 |    2000   13
+2000 |    0020    5
+4000 |    1000   12
+8000 |    0010    4
+
+*/
+
+void oplayer_100in1_state::init_m505neo()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < size / 2; i++)
+	{
+		ROM[i] = bitswap<16>(ROM[i],
+									 11,  3,   10,  2,
+									 9,  1,  8,  0,
+			
+									 4, 12, 5, 13,
+									 6, 14,  7,  15		
+			);
+
+	}
+
+	// TODO: remove these hacks
+	// port a checks when starting the system
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot		
+}
+
 
 void denver_200in1_state::init_denver()
 {
@@ -815,6 +872,9 @@ void denver_200in1_state::init_denver()
 
 
 
+
+
+
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
 CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // My Wico Deluxe was also available under the MiWi brand (exact model unknown, but it was a cart there instead of built in)
@@ -824,6 +884,8 @@ CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,   
 
 // issues with 'low battery' always showing, but otherwise functional
 CONS( 200?, oplayer,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2012, m505neo,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /*
 DENVER(r)

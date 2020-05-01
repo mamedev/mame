@@ -41,8 +41,6 @@ TODO:
 - confirm display AP segment, is it used anywhere?
 - verify cartridge pinout, right now assume A0-A15 (max known cart size is 24KB).
   Boris/Sargon cartridge is A0-A11 and 2 CS lines, Steinitz uses the whole range.
-- (probably won't) add chesspieces to artwork? this machine supports more board
-  games than just chess: checkers, reversi, and even a blackjack game
 
 ******************************************************************************/
 

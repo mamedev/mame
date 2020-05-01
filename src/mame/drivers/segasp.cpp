@@ -616,7 +616,7 @@ ROM_START( dinokich )
 	// DINOSAUR KING
 	// MDA-C0081
 	DISK_REGION( "cflash" )
-	DISK_IMAGE( "mda-c0081", 0, SHA1(c9b8449666124f52b175a3d3d795bc0e7ea4d91e) )
+	DISK_IMAGE( "mda-c0081", 0, SHA1(c9b8449666124f52b175a3d3d795bc0e7ea4d91e) ) // unused space contain leftovers from "Disney Magical Dream Dance" game, encrypted, key is 1ffbc9f0
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 

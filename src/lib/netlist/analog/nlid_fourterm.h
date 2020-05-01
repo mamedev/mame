@@ -128,7 +128,7 @@ namespace analog {
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED_PASS(CCCS, VCCS, nlconst::one())
 		{
-			m_gfac = plib::reciprocal(m_RI());
+			m_gfac = -plib::reciprocal(m_RI());
 		}
 
 		NETLIB_RESETI();

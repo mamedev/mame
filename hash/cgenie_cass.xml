@@ -671,6 +671,19 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
+	<software name="megapede">
+		<description>Mega Pede</description>
+		<year>1984</year>
+		<publisher>Timo Pohl</publisher>
+		<info name="author" value="Timo Pohl" />
+		<info name="usage" value="Type SYSTEM and load with MEGA, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14627">
+				<rom name="mega84.cas" size="14627" crc="e9eb70ca" sha1="eba49ce24914931a6461f93ef55c5a0d2dbec565" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="musik">
 		<description>Musik</description>
 		<year>1983</year>

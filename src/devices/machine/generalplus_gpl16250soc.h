@@ -6,15 +6,15 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_SUNPLUS_GCM394_H
-#define MAME_MACHINE_SUNPLUS_GCM394_H
+#ifndef MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
+#define MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
 
 #pragma once
 
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
-#include "sunplus_gcm394_video.h"
+#include "generalplus_gpl16250soc_video.h"
 #include "spg2xx_audio.h"
 
 typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
@@ -427,4 +427,4 @@ DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
 
-#endif // MAME_MACHINE_SUNPLUS_GCM394_H
+#endif // MAME_MACHINE_GENERALPLUS_GPL16250SOC_H

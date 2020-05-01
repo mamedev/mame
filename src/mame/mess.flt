@@ -320,6 +320,12 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl16250.cpp
+generalplus_gpl16250_mobigo.cpp
+generalplus_gpl16250_nand.cpp
+generalplus_gpl16250_rom.cpp
+generalplus_gpl16250_romram.cpp
+generalplus_gpl16250_spi.cpp
 generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
@@ -889,8 +895,6 @@ sun2.cpp
 sun3.cpp
 sun3x.cpp
 sun4.cpp
-sunplus_unsp20soc.cpp
-sunplus_unsp20soc_mobigo.cpp
 super6.cpp
 super80.cpp
 superga2.cpp

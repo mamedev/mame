@@ -73,6 +73,7 @@ void simpsons_state::machine_start()
 	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_firq_enabled));
+	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
@@ -89,6 +90,7 @@ void simpsons_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_firq_enabled = 0;
+	m_nmi_enabled = 0;
 
 	/* init the default banks */
 	membank("bank1")->set_entry(0);

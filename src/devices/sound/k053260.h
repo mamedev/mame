@@ -29,11 +29,15 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	auto sh1_cb() { return m_sh1_cb.bind(); }
+	auto sh2_cb() { return m_sh2_cb.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -42,13 +46,22 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
+	// Pan multipliers
+	static const int pan_mul[8][2];
+
+	// Sample hold lines callbacks (often used for interrupts)
+	devcb_write_line m_sh1_cb;
+	devcb_write_line m_sh2_cb;
+
 	// configuration
 	sound_stream *  m_stream;
+	emu_timer   *m_timer;
 
 	// live state
 	u8           m_portdata[4];
 	u8           m_keyon;
 	u8           m_mode;
+	int          m_timer_state;
 
 	// per voice state
 	class KDSC_Voice
@@ -74,7 +87,7 @@ private:
 
 		// live state
 		u32  m_position = 0;
-		u16  m_pan_volume[2];
+		int  m_pan_volume[2];
 		u16  m_counter = 0;
 		s8   m_output = 0;
 		bool m_playing = false;

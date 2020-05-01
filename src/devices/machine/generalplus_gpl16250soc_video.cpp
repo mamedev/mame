@@ -101,9 +101,9 @@
 
 
 #include "emu.h"
-#include "sunplus_gcm394_video.h"
+#include "generalplus_gpl16250soc_video.h"
 
-DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus GCM394 System-on-a-Chip (Video)")
+DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPlus GPL16250 System-on-a-Chip (Video)")
 
 #define LOG_GCM394_VIDEO_PALETTE  (1U << 5)
 #define LOG_GCM394_VIDEO_DMA      (1U << 4)

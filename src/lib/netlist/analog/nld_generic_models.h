@@ -211,25 +211,23 @@ namespace analog
 	{
 	public:
 		generic_diode(device_t &dev, const pstring &name)
-		: m_Vd(dev, name + ".m_Vd", nlconst::magic(0.7))
+		: m_Vd(dev, name + ".m_Vd", nlconst::diode_start_voltage())
 		, m_Id(dev, name + ".m_Id", nlconst::zero())
-		, m_G(dev,  name + ".m_G", nlconst::magic(1e-15))
+		, m_G(dev,  name + ".m_G", nlconst::cgminalt())
 		, m_Vt(nlconst::zero())
 		, m_Vmin(nlconst::zero()) // not used in MOS model
 		, m_Is(nlconst::zero())
 		, m_logIs(nlconst::zero())
-		, m_gmin(nlconst::magic(1e-15))
+		, m_gmin(nlconst::cgminalt())
 		, m_VtInv(nlconst::zero())
 		, m_Vcrit(nlconst::zero())
 		{
 			set_param(
 				nlconst::np_Is()
 			  , nlconst::one()
-			  , nlconst::magic(1e-15)
+			  , nlconst::cgminalt()
 			  , nlconst::T0());
-			//m_name = name;
 		}
-		//pstring m_name;
 		// Basic math
 		//
 		// I(V) = f(V)
@@ -318,7 +316,7 @@ namespace analog
 			m_VtInv = plib::reciprocal(m_Vt);
 
 #if USE_TEXTBOOK_DIODE
-			m_Vmin = nlconst::magic(-5.0) * m_Vt;
+			m_Vmin = nlconst::diode_min_cutoff_mult() * m_Vt;
 			// Vcrit : f(V) has smallest radius of curvature rho(V) == min(rho(v))
 			m_Vcrit = m_Vt * plib::log(m_Vt / m_Is / nlconst::sqrt2());
 #else
