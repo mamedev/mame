@@ -26,7 +26,6 @@ TODO:
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/sensorboard.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -204,10 +203,6 @@ void chesstrv_state::chesstrv(machine_config &config)
 	psu.write_a().set(FUNC(chesstrv_state::ram_data_w));
 	psu.read_b().set(FUNC(chesstrv_state::input_r));
 	psu.write_b().set(FUNC(chesstrv_state::matrix_w));
-
-	// built-in chessboard is not electronic
-	sensorboard_device &board(SENSORBOARD(config, "board").set_type(sensorboard_device::NOSENSORS));
-	board.init_cb().set("board", FUNC(sensorboard_device::preset_chess));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);

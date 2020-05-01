@@ -10,6 +10,18 @@ Fidelity's 1st generation chess computers:
 
 * denotes not dumped (actually CC1 is dumped, but with half of the contents missing)
 
+The first generation of chesscomputers didn't have an electronic chessboard.
+Some of them required a separate chessboard, others had a small chessboard
+attached to it (the latter applies to Fidelity).
+
+For those familiar with MAME's sensorboard interface and really want to use it
+for the old keypad-input machines, there is an awkward workaround: Start a 2nd
+instance of MAME with -sound none and load mephisto3 or mephisto2e, turn off
+the ESB 6000 board in the machine configuration, and set the video options to
+"Internal Layout (Board)". The same thing can be done with ccmk6.
+
+That being said, it's probably a better idea to use a real chessboard.
+
 *******************************************************************************
 
 Chess Challenger (1)
@@ -30,9 +42,9 @@ CC1 hardware overview:
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
 - 8255C for I/O, 4*7seg display + 2 extra leds, 12-key keypad
 
-Chess Challenger (upgraded version) is on the same hardware, but with double the
-ROM size, and they corrected the reversed chess notation. It was also offered as
-an upgrade to CC1. PCB label P179 C-3 9.77.
+Chess Challenger (upgraded version) released a few months later is on the same
+hardware, but with double the ROM size, and they corrected the reversed chess
+notation. It was also offered as an upgrade to CC1. PCB label P179 C-3 9.77.
 
 Chess Challenger (model UCC10) is on nearly the same PCB too, same label as CC3,
 with a small daughterboard for 8KB ROM. Again, it was also offered as an upgrade

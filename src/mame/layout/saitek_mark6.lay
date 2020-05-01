@@ -781,6 +781,24 @@ license:CC0
 		<group ref="displayc"><bounds x="136.5" y="17.6" width="35" height="40.03" /></group>
 	</view>
 
+	<view name="Internal Layout (Board)">
+		<bounds left="21.5" right="100.5" top="18.5" bottom="88" />
+
+		<group ref="sb_board"><bounds x="33.5" y="21" width="64.5" height="64.5" /></group>
+		<group ref="sb_ui"><bounds x="22.5" y="21" width="8.06" height="64.5" /></group>
+
+		<repeat count="8">
+			<param name="x" start="33.5" increment="8.0625" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_hl~i~"><bounds x="~x~" y="86" width="8.0625" height="1.6125" /></element>
+		</repeat>
+		<repeat count="8">
+			<param name="y" start="24.225" increment="8.0625" />
+			<param name="i" start="8" increment="-1" />
+			<element ref="text_hn~i~"><bounds x="31.3" y="~y~" width="2" height="1.6125" /></element>
+		</repeat>
+	</view>
+
 	<view name="Internal Layout (Main Unit)">
 		<bounds left="99" right="171.5" top="17.5" bottom="88" />
 

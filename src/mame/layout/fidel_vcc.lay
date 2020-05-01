@@ -4,6 +4,8 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- NOTE: no chesspieces simulation here -->
+
 <!-- define elements -->
 
 	<element name="static_gray"><rect><color red="0.2" green="0.2" blue="0.2" /></rect></element>

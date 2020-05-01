@@ -4,7 +4,7 @@ license:CC0
 -->
 <mamelayout version="2">
 
-<!-- NOTE: no chesspieces simulation here, DCS CompuChess didn't have a built-in chessboard -->
+<!-- NOTE: no chesspieces simulation here -->
 
 <!-- define elements -->
 
