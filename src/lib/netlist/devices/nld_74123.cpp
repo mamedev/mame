@@ -56,8 +56,8 @@ namespace netlist
 	private:
 		int m_dev_type;
 	public:
-		NETLIB_SUB(res_sw) m_RP;
-		NETLIB_SUB(res_sw) m_RN;
+		NETLIB_SUB(sys_dsw1) m_RP;
+		NETLIB_SUB(sys_dsw1) m_RN;
 
 		logic_output_t m_RP_Q;
 		logic_output_t m_RN_Q;

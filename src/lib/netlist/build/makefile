@@ -175,7 +175,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
-	$(NLOBJ)/devices/nld_ne566.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
 	$(NLOBJ)/devices/nld_tristate.o \
 	$(NLOBJ)/devices/nld_schmitt.o \

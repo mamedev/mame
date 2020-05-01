@@ -182,6 +182,12 @@ namespace analog
 					-G,  G, nlconst::zero());
 		}
 
+		void set_G(nl_fptype G) const noexcept
+		{
+			set_mat( G, -G, nlconst::zero(),
+					-G,  G, nlconst::zero());
+		}
+
 		NETLIB_RESETI();
 
 	protected:
@@ -218,6 +224,7 @@ namespace analog
 		param_fp_t m_R;
 		// protect set_R ... it's a recipe to desaster when used to bypass the parameter
 		using NETLIB_NAME(R_base)::set_R;
+		using NETLIB_NAME(R_base)::set_G;
 	};
 
 	// -----------------------------------------------------------------------------

@@ -11,10 +11,43 @@
 
 #include <stack>
 #include <type_traits>
+#include <map>
+#include <utility>
 
 namespace plib {
 
 	static constexpr const std::size_t MAX_STACK = 32;
+
+	// FIXME: Exa parsing conflicts with e,E parsing
+	template<typename F>
+	static const std::map<pstring, F> &units_si()
+	{
+		static std::map<pstring, F> units_si_stat =
+		{
+			//{ "Y", static_cast<F>(1e24) }, // NOLINT: Yotta
+			//{ "Z", static_cast<F>(1e21) }, // NOLINT: Zetta
+			//{ "E", static_cast<F>(1e18) }, // NOLINT: Exa
+			{ "P", static_cast<F>(1e15) }, // NOLINT: Peta
+			{ "T", static_cast<F>(1e12) }, // NOLINT: Tera
+			{ "G", static_cast<F>( 1e9) }, // NOLINT: Giga
+			{ "M", static_cast<F>( 1e6) }, // NOLINT: Mega
+			{ "k", static_cast<F>( 1e3) }, // NOLINT: Kilo
+			{ "h", static_cast<F>( 1e2) }, // NOLINT: Hekto
+			//{ "da", static_cast<F>(1e1) }, // NOLINT: Deka
+			{ "d", static_cast<F>(1e-1) }, // NOLINT: Dezi
+			{ "c", static_cast<F>(1e-2) }, // NOLINT: Zenti
+			{ "m", static_cast<F>(1e-3) }, // NOLINT: Milli
+			{ "μ", static_cast<F>(1e-6) }, // NOLINT: Mikro
+			{ "n", static_cast<F>(1e-9) }, // NOLINT: Nano
+			{ "p", static_cast<F>(1e-12) }, // NOLINT: Piko
+			{ "f", static_cast<F>(1e-15) }, // NOLINT: Femto
+			{ "a", static_cast<F>(1e-18) }, // NOLINT: Atto
+			{ "z", static_cast<F>(1e-21) }, // NOLINT: Zepto
+			{ "y", static_cast<F>(1e-24) }, // NOLINT: Yokto
+		};
+		return units_si_stat;
+	}
+
 
 	template <typename NT>
 	void pfunction<NT>::compile(const pstring &expr, const inputs_container &inputs) noexcept(false)
@@ -78,9 +111,15 @@ namespace plib {
 				}
 				if (rc.m_cmd != PUSH_INPUT)
 				{
+					using fl_t = decltype(rc.m_param);
 					rc.m_cmd = PUSH_CONST;
 					bool err(false);
-					rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
+					auto rs(plib::right(cmd,1));
+					auto r=units_si<fl_t>().find(rs);
+					if (r == units_si<fl_t>().end())
+						rc.m_param = plib::pstonum_ne<fl_t>(cmd, err);
+					else
+						rc.m_param = plib::pstonum_ne<fl_t>(plib::left(cmd, cmd.size()-1), err) * r->second;
 					if (err)
 						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;
@@ -166,7 +205,9 @@ namespace plib {
 				auto l(plib::left(sexpr1[i], 1));
 				auto r(plib::right(sexpr1[i], 1));
 				auto ne(sexpr1[i+1]);
-				if ((l >= "0") && (l <= "9") && (r == "e" || r == "E") && (ne == "-" || ne == "+"))
+				if ((l >= "0") && (l <= "9")
+					&& (r == "e" || r == "E")
+					&& (ne == "-" || ne == "+"))
 				{
 					sexpr.push_back(sexpr1[i] + ne + sexpr1[i+2]);
 					i+=3;

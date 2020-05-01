@@ -45,27 +45,6 @@
 //-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
 //-
 
-
-/*
- * "Description: The Swiss army knife for timing purposes\n"
- * "    which has a ton of applications.\n"
- * "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
- * "Package: DIP\n"
- * "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
- * "Limitations: Internal resistor network currently fixed to 5k\n"
- * "     more limitations\n"
- * "Function Table:\n"
- *
- *  Function table created from truthtable if missing.
- *
- *  For package, refer to:
- *
- *  https://en.wikipedia.org/wiki/List_of_integrated_circuit_packaging_types
- *
- *  Special case: GATE -> use symbolic names
- *
- */
-
 #include "nld_ne555.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"

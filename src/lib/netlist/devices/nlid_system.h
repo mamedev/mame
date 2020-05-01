@@ -246,6 +246,7 @@ namespace devices
 		param_model_t m_FAMILY;
 		NETLIB_NAME(power_pins) m_supply;
 	};
+
 	template<std::size_t N>
 	NETLIB_OBJECT(logic_inputN)
 	{
@@ -396,9 +397,9 @@ namespace devices
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
 			{
-				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(state().make_object<analog_input_t>(*this, n));
-				inps.push_back(n);
+				pstring inpname = plib::pfmt("A{1}")(i);
+				m_I.push_back(state().make_object<analog_input_t>(*this, inpname));
+				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
 			m_compiled.compile(m_func(), inps);
@@ -431,17 +432,17 @@ namespace devices
 	};
 
 	// -----------------------------------------------------------------------------
-	// nld_res_sw
+	// nld_sys_dsw1
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(res_sw)
+	NETLIB_OBJECT(sys_dsw1)
 	{
 	public:
-		NETLIB_CONSTRUCTOR(res_sw)
+		NETLIB_CONSTRUCTOR(sys_dsw1)
 		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", nlconst::one())
-		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
+		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E99))
 		, m_last_state(*this, "m_last_state", 0)
 		{
 			register_subalias("1", m_R.P());
@@ -462,7 +463,6 @@ namespace devices
 				m_last_state = state;
 				const nl_fptype R = state ? m_RON() : m_ROFF();
 
-				// FIXME: We only need to update the net first if this is a time stepping net
 				m_R.change_state([this, &R]()
 				{
 					m_R.set_R(R);
@@ -477,6 +477,140 @@ namespace devices
 		logic_input_t m_I;
 		param_fp_t m_RON;
 		param_fp_t m_ROFF;
+
+	private:
+		state_var<netlist_sig_t> m_last_state;
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_dsw2
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(sys_dsw2)
+	{
+	public:
+		NETLIB_CONSTRUCTOR(sys_dsw2)
+		, m_R1(*this, "_R1")
+		, m_R2(*this, "_R2")
+		, m_I(*this, "I")
+		, m_GON(*this, "GON", nlconst::magic(1e9))
+		, m_GOFF(*this, "GOFF", nlconst::magic(1e9))
+		, m_last_state(*this, "m_last_state", 0)
+		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_power_pins(*this)
+		{
+			// Pass on logic family
+			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			m_I.set_logic_family(this->logic_family());
+
+			// connect and register pins
+			register_subalias("1", m_R1.P());
+			register_subalias("2", m_R1.N());
+			register_subalias("3", m_R2.N());
+			connect(m_R1.N(), m_R2.P());
+		}
+
+		NETLIB_RESETI()
+		{
+			m_last_state = 1;
+			m_R1.set_G(m_GOFF());
+			m_R2.set_G(m_GON());
+		}
+
+		NETLIB_UPDATEI()
+		{
+			const netlist_sig_t state = m_I();
+			if (1 || (state != m_last_state))
+			{
+				m_last_state = state;
+				//printf("Here %d\n", state);
+				const nl_fptype G1 = state ? m_GON() : m_GOFF();
+				const nl_fptype G2 = state ? m_GOFF() : m_GON();
+				if (m_R1.solver() == m_R2.solver())
+				{
+					m_R1.change_state([this, &G1, &G2]()
+					{
+						m_R1.set_G(G1);
+						m_R2.set_G(G2);
+					});
+				}
+				else
+				{
+					m_R1.change_state([this, &G1]()
+					{
+						m_R1.set_G(G1);
+					});
+					m_R2.change_state([this, &G2]()
+					{
+						m_R2.set_G(G2);
+					});
+				}
+			}
+		}
+
+		//NETLIB_UPDATE_PARAMI();
+
+		analog::NETLIB_SUB(R_base) m_R1;
+		analog::NETLIB_SUB(R_base) m_R2;
+		logic_input_t m_I;
+		param_fp_t m_GON;
+		param_fp_t m_GOFF;
+
+	private:
+		state_var<netlist_sig_t> m_last_state;
+		param_model_t m_FAMILY;
+		nld_power_pins m_power_pins;
+	};
+
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_comp
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(sys_compd)
+	{
+	public:
+		NETLIB_CONSTRUCTOR(sys_compd)
+		, m_IP(*this, "IP")
+		, m_IN(*this, "IN")
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
+		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_power_pins(*this)
+		, m_last_state(*this, "m_last_state", 2) // ensure first execution
+		{
+			// Pass on logic family
+			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			m_Q.set_logic_family(this->logic_family());
+			m_QQ.set_logic_family(this->logic_family());
+		}
+
+		NETLIB_RESETI()
+		{
+			m_last_state = 0;
+		}
+
+		NETLIB_UPDATEI()
+		{
+			//printf("P %f N %f\n", m_IP(), m_IN());
+			const netlist_sig_t state = (m_IP() > m_IN());
+			if (state != m_last_state)
+			{
+				m_last_state = state;
+				// FIXME: make timing a parameter
+				m_Q.push(state, NLTIME_FROM_NS(10));
+				m_QQ.push(!state, NLTIME_FROM_NS(10));
+			}
+		}
+
+		//NETLIB_UPDATE_PARAMI();
+
+		analog_input_t m_IP;
+		analog_input_t m_IN;
+		logic_output_t m_Q;
+		logic_output_t m_QQ;
+		param_model_t m_FAMILY;
+		nld_power_pins m_power_pins;
 
 	private:
 		state_var<netlist_sig_t> m_last_state;

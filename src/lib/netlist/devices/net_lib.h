@@ -22,6 +22,7 @@
 #define RES_K(res) ((res) * 1e3)
 #define RES_M(res) ((res) * 1e6)
 #define CAP_U(cap) ((cap) * 1e-6)
+//#define CAP_U(cap) ((cap) * 1μ)
 #define CAP_N(cap) ((cap) * 1e-9)
 #define CAP_P(cap) ((cap) * 1e-12)
 #define IND_U(ind) ((ind) * 1e-6)
@@ -90,7 +91,6 @@
 
 #include "nld_mm5837.h"
 #include "nld_ne555.h"
-#include "nld_ne566.h"
 
 #include "nld_r2r_dac.h"
 

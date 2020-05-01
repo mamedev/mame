@@ -77,10 +77,10 @@ static NETLIST_START(gunfight_schematics)
 	// accurately, it does not make any audible difference in the
 	// sound output produced.
 
-	RES_SWITCH(SW_LEFT_SHOT,  IN_LS, I_V16_5.Q, R130.1)
-	RES_SWITCH(SW_RIGHT_SHOT, IN_RS, I_V16_5.Q, R230.1)
-	RES_SWITCH(SW_LEFT_HIT,   IN_LH, I_V16_5.Q, R117.1)
-	RES_SWITCH(SW_RIGHT_HIT,  IN_RH, I_V16_5.Q, R217.1)
+	SYS_DSW(SW_LEFT_SHOT,  IN_LS, I_V16_5.Q, R130.1)
+	SYS_DSW(SW_RIGHT_SHOT, IN_RS, I_V16_5.Q, R230.1)
+	SYS_DSW(SW_LEFT_HIT,   IN_LH, I_V16_5.Q, R117.1)
+	SYS_DSW(SW_RIGHT_HIT,  IN_RH, I_V16_5.Q, R217.1)
 
 	// The default on-resistance of 1 ohm is a bit high for my tastes,
 	// considering the charging resistor which follows is only 15 ohms.

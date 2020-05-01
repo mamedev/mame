@@ -62,11 +62,18 @@
 		NET_C(cG,  name.G)                                                      \
 		NET_C(cOUT, name.Q)
 
-#define RES_SWITCH(name, cIN, cP1, cP2)                                         \
-		NET_REGISTER_DEV(RES_SWITCH, name)                                      \
-		NET_C(cIN, name.I)                                                      \
-		NET_C(cP1, name.1)                                                      \
+// FIXME ... remove parameters
+#define SYS_DSW(name, cIN, cP1, cP2)                                           \
+		NET_REGISTER_DEV(SYS_DSW, name)                                        \
+		NET_C(cIN, name.I)                                                     \
+		NET_C(cP1, name.1)                                                     \
 		NET_C(cP2, name.2)
+
+#define SYS_DSW2(name)                                                         \
+		NET_REGISTER_DEV(SYS_DSW2, name)
+
+#define SYS_COMPD(name)                                                        \
+		NET_REGISTER_DEV(SYS_COMPD, name)
 
 /* Default device to hold netlist parameters */
 #define PARAMETERS(name)                                                        \
