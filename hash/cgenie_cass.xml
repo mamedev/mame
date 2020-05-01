@@ -674,7 +674,8 @@ Screen-Printer (standalone)
 	<software name="megapede">
 		<description>Mega Pede</description>
 		<year>1984</year>
-		<publisher>&lt;Timo Pohl&gt;</publisher>
+		<publisher>Timo Pohl</publisher>
+		<info name="author" value="Timo Pohl" />
 		<info name="usage" value="Type SYSTEM and load with MEGA, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14627">
