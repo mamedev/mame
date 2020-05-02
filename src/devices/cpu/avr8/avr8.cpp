@@ -916,6 +916,7 @@ void avr8_device::device_reset()
 		LOGMASKED(LOG_BOOT, "Booting AVR core from address 0x0000\n");
 	} else {
 		m_shifted_pc = (m_addr_mask + 1) - 2*m_boot_size;
+		m_pc = m_shifted_pc >> 1;
 		LOGMASKED(LOG_BOOT, "AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
