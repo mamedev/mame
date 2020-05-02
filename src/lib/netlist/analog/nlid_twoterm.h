@@ -500,7 +500,7 @@ namespace analog
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
 		, m_t(*this, "m_t", nlconst::zero())
-		, m_R(*this, "R", nlconst::magic(0.1))
+		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
