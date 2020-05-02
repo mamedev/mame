@@ -264,6 +264,9 @@
     <ClCompile Include="..\generated\static_solvers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\devices\nld_74393.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">
@@ -633,6 +636,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_7442.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\nld_74393.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

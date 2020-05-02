@@ -23,7 +23,6 @@
 SRC = ..
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
-TIDY_DB = ../compile_commands.json
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
@@ -33,16 +32,18 @@ TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 #TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
-TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
+TIDY_FLAGSX += -bugprone-macro-parentheses,
+#TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
-TIDY_FLAGSX += -readability-named-parameter,-readability-function-size
+TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
+TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace
 
 space :=
 space +=
-TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
+TIDY_FLAGS = -p $(OBJ) $(subst $(space),,$(TIDY_FLAGSX))
 TIDY_SOURCES = $(SOURCES)
 
 #TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
@@ -65,7 +66,8 @@ DOXYGEN = @./doxygen
 HOSTARCH = NIX
 endif
 
-#-fuse-ld=gold -Wpedantic -march=native -march=native
+TIDY_DB = $(OBJ)/compile_commands.json
+
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
@@ -77,7 +79,7 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-CLANG_TIDY = clang-tidy-10
+CLANG_TIDY = clang-tidy-11
 
 ifndef FAST
 FAST=1
@@ -91,6 +93,8 @@ TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
+
+DEPEND = $(OBJ)/.depend
 
 OBJDIRS = $(OBJ) \
 			$(OBJ)/analog \
@@ -224,17 +228,23 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc
 #     --format=zip -o project-name-version.zip
 
 #-------------------------------------------------
+# PHONY
+#-------------------------------------------------
+
+.PHONY: clang clang-5 mingw doc native maketree depend $(DEPEND)
+
+#-------------------------------------------------
 # all
 #-------------------------------------------------
 
-all:    maketree depend $(TARGETS)
+all: maketree depend $(TARGETS)
 
 #-------------------------------------------------
 # clean
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o .depend doxy/*
+	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o $(DEPEND) doxy/*
 
 #-------------------------------------------------
 # nltool
@@ -248,6 +258,7 @@ nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
+
 #-------------------------------------------------
 # directories
 #-------------------------------------------------
@@ -260,8 +271,6 @@ maketree: $(sort $(OBJDIRS))
 #-------------------------------------------------
 # Special targets
 #-------------------------------------------------
-
-.PHONY: clang clang-5 mingw doc native
 
 native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
@@ -312,18 +321,18 @@ doc: nltool$(EXESUFFIX)
 # depends
 #-------------------------------------------------
 
-.depend: $(SOURCES)
-	@echo creating .depend
-	@rm -f ./.depend
+$(DEPEND): maketree $(SOURCES)
+	@echo creating $(DEPEND)
+	@rm -f $(DEPEND)
 	@for i in $(SOURCES); do \
-		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> ./.depend; \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
 	done
 
-depend: .depend
+depend: $(DEPEND)
 
 # Include only if the goal needs it
 ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
--include .depend
+-include $(DEPEND)
 endif
 
 #-------------------------------------------------
