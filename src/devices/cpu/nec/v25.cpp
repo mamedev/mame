@@ -263,6 +263,8 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 			break;
 	}
 
+	debugger_exception_hook(int_num);
+
 	dest_off = read_mem_word(int_num*4);
 	dest_seg = read_mem_word(int_num*4+2);
 

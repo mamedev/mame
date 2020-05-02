@@ -577,12 +577,8 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 	m_TF = m_IF = 0;
 
 	if (int_num == -1)
-	{
 		int_num = standard_irq_callback(0);
-
-		m_irq_state = CLEAR_LINE;
-		m_pending_irq &= ~INT_IRQ;
-	}
+	debugger_exception_hook(int_num);
 
 	m_easeg = CS;
 	uint16_t dest_off = read_word(int_num * 4 + 0);
