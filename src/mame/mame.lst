@@ -12304,6 +12304,9 @@ tanodr64h                       // Tano Dragon 64 (NTSC) with HD6309
 @source:dragrace.cpp
 dragrace                        // 008505-008521    1977/06 [6800]
 
+@source:drdmania.cpp
+drdmania                        //
+
 @source:dreambal.cpp
 dreambal                        // MM
 
