@@ -51,6 +51,14 @@ struct vzdos_dirent
 	uint8_t start_sector;
 	uint16_t start_address;
 	uint16_t end_address;
+
+	vzdos_dirent()
+	{
+	   ftype = delimitor = '\0';
+	   fname[0] = '\0';
+	   start_track = start_sector = 0;
+	   start_address = end_address = 0;
+	}
 };
 
 struct vz_iterator
