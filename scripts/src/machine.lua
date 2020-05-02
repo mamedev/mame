@@ -94,6 +94,18 @@ if (MACHINES["AKIKO"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/am2901b.h,MACHINES["AM2901B"] = true
+---------------------------------------------------
+
+if (MACHINES["AM2901B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am2901b.cpp",
+		MAME_DIR .. "src/devices/machine/am2901b.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
