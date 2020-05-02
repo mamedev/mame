@@ -24,7 +24,7 @@ void primo_state::primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline)
 	uint16_t *scanline = &bitmap.pix16(primo_scanline);
 
 	/* address of current line in Primo video memory */
-	const uint8_t* primo_video_ram_line = (const uint8_t*)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_video_memory_base + 32 * primo_scanline);
+	const uint8_t* primo_video_ram_line = &m_video_ram[m_video_memory_base + 32 * primo_scanline];
 
 	for (x=0; x<256; x+=8)
 	{
