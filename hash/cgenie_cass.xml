@@ -394,19 +394,6 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="polepos">
-		<description>Pole Position</description>
-		<year>1984</year>
-		<publisher>Timo Pohl</publisher>
-		<info name="author" value="Timo Pohl" />
-		<info name="usage" value="Type SYSTEM and load with POLEPO (req. 32k memory)" />
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14362">
-				<rom name="polepo.cas" size="14362" crc="cfd0d6ce" sha1="35658b20373f4ec0673a6aa81f161101dd916cea" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="primzahl">
 		<description>Primzahlsuche</description>
 		<year>198?</year>
@@ -680,19 +667,6 @@ Screen-Printer (standalone)
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="678">
 				<rom name="floh.cas" size="678" crc="15255e0e" sha1="2f489c1acc88c8f2fd1340fb01c4795548918792" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="megapede">
-		<description>Mega Pede</description>
-		<year>1984</year>
-		<publisher>Timo Pohl</publisher>
-		<info name="author" value="Timo Pohl" />
-		<info name="usage" value="Type SYSTEM and load with MEGA, enter / to start (req. 32k memory)" />
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="14627">
-				<rom name="mega84.cas" size="14627" crc="e9eb70ca" sha1="eba49ce24914931a6461f93ef55c5a0d2dbec565" />
 			</dataarea>
 		</part>
 	</software>
@@ -1558,6 +1532,19 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
+	<software name="megapede">
+		<description>Megapede</description>
+		<year>1984</year>
+		<publisher>Timo Pohl</publisher>
+		<info name="author" value="Timo Pohl" />
+		<info name="usage" value="Type SYSTEM and load with MEGA, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14627">
+				<rom name="mega84.cas" size="14627" crc="e9eb70ca" sha1="eba49ce24914931a6461f93ef55c5a0d2dbec565" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="meteor">
 		<description>Meteor</description>
 		<year>1983</year>
@@ -1648,6 +1635,19 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
+	<software name="polepos">
+		<description>Pole Position</description>
+		<year>1984</year>
+		<publisher>Andreas Müller</publisher>
+		<info name="author" value="Andreas Müller" />
+		<info name="usage" value="Type SYSTEM and load with POLEPO, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14362">
+				<rom name="polepo.cas" size="14362" crc="cfd0d6ce" sha1="35658b20373f4ec0673a6aa81f161101dd916cea" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="santapar">
 		<description>Santa Paravia und Fuimaccio</description>
 		<year>198?</year>
@@ -1717,7 +1717,7 @@ Screen-Printer (standalone)
 		<description>Space Attack</description>
 		<year>1984</year>
 		<publisher>TCC</publisher>
-		<info name="author" value="A. Mueller" />
+		<info name="author" value="Andreas Müller" />
 		<info name="usage" value="Type SYSTEM and load with SPACE, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7642">
