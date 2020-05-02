@@ -918,8 +918,9 @@ void naomi_gdrom_board::device_start()
 			netpic = picdata[0x6ee];
 
 			// set data for security pic rom
-			address_space &ps = m_securitycpu->space(AS_PROGRAM);
-			memcpy((uint8_t*)ps.get_read_ptr(0), picdata, 0x1000);
+			uint8_t *picrom = static_cast<uint8_t*>(m_securitycpu->memregion(DEVICE_SELF)->base());
+			for(offs_t b=0;b<0x1000;b++)
+				picrom[BYTE_XOR_LE(b)] = picdata[b];
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
