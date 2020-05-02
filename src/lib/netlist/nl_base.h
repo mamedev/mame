@@ -276,10 +276,10 @@ namespace netlist
 		nl_fptype R_high() const noexcept{ return m_R_high; }
 
 		bool is_above_high_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
-		{ return (V - VN) > high_thresh_V(VN, VP); }
+		{ return V > high_thresh_V(VN, VP); }
 
 		bool is_below_low_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
-		{ return (V - VN) < low_thresh_V(VN, VP); }
+		{ return V < low_thresh_V(VN, VP); }
 
 		nl_fptype m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		nl_fptype m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
