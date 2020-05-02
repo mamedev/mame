@@ -108,7 +108,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 //  system_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::system_r )
+uint8_t pc1512_base_state::system_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -180,7 +180,7 @@ READ8_MEMBER( pc1512_base_state::system_r )
 //  system_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::system_w )
+void pc1512_base_state::system_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -274,7 +274,7 @@ WRITE8_MEMBER( pc1512_base_state::system_w )
 //  mouse_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::mouse_r )
+uint8_t pc1512_base_state::mouse_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -297,7 +297,7 @@ READ8_MEMBER( pc1512_base_state::mouse_r )
 //  mouse_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::mouse_w )
+void pc1512_base_state::mouse_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -321,7 +321,7 @@ WRITE8_MEMBER( pc1512_base_state::mouse_w )
 //  dma_page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::dma_page_w )
+void pc1512_base_state::dma_page_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER( pc1512_base_state::dma_page_w )
 //  nmi_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::nmi_mask_w )
+void pc1512_base_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_enable = BIT(data, 7);
 }
@@ -379,7 +379,7 @@ WRITE8_MEMBER( pc1512_base_state::nmi_mask_w )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_base_state::printer_r )
+uint8_t pc1512_base_state::printer_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -442,7 +442,7 @@ READ8_MEMBER( pc1512_base_state::printer_r )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::printer_r )
+uint8_t pc1640_state::printer_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -494,7 +494,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 		break;
 
 	default:
-		data = pc1512_base_state::printer_r(space, offset);
+		data = pc1512_base_state::printer_r(offset);
 		break;
 	}
 
@@ -506,7 +506,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 //  printer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_base_state::printer_w )
+void pc1512_base_state::printer_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -552,7 +552,7 @@ WRITE8_MEMBER( pc1512_base_state::printer_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::io_r )
+uint8_t pc1640_state::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 	offs_t addr = offset & 0x3ff;
@@ -561,10 +561,10 @@ READ8_MEMBER( pc1640_state::io_r )
 	if      (                 addr <= 0x00f) { data = m_dmac->read(offset & 0x0f); decoded = true; }
 	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
-	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(offset & 0x0f); decoded = true; }
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(offset & 0x01); decoded = true; }
-	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
-	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(offset & 0x07); decoded = true; }
+	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
 	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(); decoded = true; }
 	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(); decoded = true; }
@@ -799,7 +799,7 @@ WRITE_LINE_MEMBER( pc1512_base_state::kbclk_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( pc1512_base_state::mouse_x_w )
+void pc1512_base_state::mouse_x_w(uint8_t data)
 {
 	if (data > m_mouse_x_old)
 		m_mouse_x+=3;
@@ -809,7 +809,7 @@ WRITE8_MEMBER( pc1512_base_state::mouse_x_w )
 	m_mouse_x_old = data;
 }
 
-WRITE8_MEMBER( pc1512_base_state::mouse_y_w )
+void pc1512_base_state::mouse_y_w(uint8_t data)
 {
 	if (data > m_mouse_y_old)
 		m_mouse_y-=3;
@@ -847,7 +847,7 @@ WRITE_LINE_MEMBER( pc1512_base_state::eop_w )
 	}
 }
 
-READ8_MEMBER( pc1512_base_state::memr_r )
+uint8_t pc1512_base_state::memr_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -855,7 +855,7 @@ READ8_MEMBER( pc1512_base_state::memr_r )
 	return program.read_byte(page_offset + offset);
 }
 
-WRITE8_MEMBER( pc1512_base_state::memw_w )
+void pc1512_base_state::memw_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -863,12 +863,12 @@ WRITE8_MEMBER( pc1512_base_state::memw_w )
 	program.write_byte(page_offset + offset, data);
 }
 
-READ8_MEMBER( pc1512_base_state::ior1_r )
+uint8_t pc1512_base_state::ior1_r()
 {
 	return m_bus->dack_r(1);
 }
 
-READ8_MEMBER( pc1512_base_state::ior2_r )
+uint8_t pc1512_base_state::ior2_r()
 {
 	if (m_nden)
 		return m_fdc->dma_r();
@@ -876,23 +876,23 @@ READ8_MEMBER( pc1512_base_state::ior2_r )
 		return m_bus->dack_r(2);
 }
 
-READ8_MEMBER( pc1512_base_state::ior3_r )
+uint8_t pc1512_base_state::ior3_r()
 {
 	return m_bus->dack_r(3);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow0_w )
+void pc1512_base_state::iow0_w(uint8_t data)
 {
 	m_dreq0 = 0;
 	m_dmac->dreq0_w(m_dreq0);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow1_w )
+void pc1512_base_state::iow1_w(uint8_t data)
 {
 	m_bus->dack_w(1, data);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow2_w )
+void pc1512_base_state::iow2_w(uint8_t data)
 {
 	if (m_nden)
 		m_fdc->dma_w(data);
@@ -900,7 +900,7 @@ WRITE8_MEMBER( pc1512_base_state::iow2_w )
 		m_bus->dack_w(2, data);
 }
 
-WRITE8_MEMBER( pc1512_base_state::iow3_w )
+void pc1512_base_state::iow3_w(uint8_t data)
 {
 	m_bus->dack_w(3, data);
 }
