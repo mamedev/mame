@@ -19,6 +19,7 @@
 #pragma once
 
 #include "cpu/i8085/i8085.h"
+#include "machine/6821pia.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
@@ -39,6 +40,7 @@ public:
 		m_ay8910(*this, "aysnd"),
 		m_ay(*this, "ay%u", 1U),
 		m_cvsd(*this, "cvsd"),
+		m_sndpia(*this, "sndpia"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2")
@@ -72,35 +74,38 @@ private:
 	optional_device<ay8910_device> m_ay8910;
 	optional_device_array<ay8910_device, 2> m_ay;
 	optional_device<hc55516_device> m_cvsd;
+	optional_device<pia6821_device> m_sndpia;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
 	std::unique_ptr<uint8_t[]> m_bitmap_colorram;
 	uint8_t m_control_xor;
-	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);
-	DECLARE_WRITE8_MEMBER(redalert_interrupt_clear_w);
-	DECLARE_READ8_MEMBER(panther_interrupt_clear_r);
-	DECLARE_READ8_MEMBER(panther_unk_r);
-	DECLARE_WRITE8_MEMBER(redalert_bitmap_videoram_w);
-	DECLARE_WRITE8_MEMBER(redalert_audio_command_w);
-	DECLARE_READ8_MEMBER(redalert_ay8910_latch_1_r);
-	DECLARE_WRITE8_MEMBER(redalert_ay8910_latch_2_w);
-	DECLARE_WRITE8_MEMBER(redalert_voice_command_w);
-	DECLARE_WRITE8_MEMBER(demoneye_audio_command_w);
+	uint8_t redalert_interrupt_clear_r();
+	void redalert_interrupt_clear_w(uint8_t data);
+	uint8_t panther_interrupt_clear_r();
+	uint8_t panther_unk_r();
+	void redalert_bitmap_videoram_w(offs_t offset, uint8_t data);
+	void redalert_audio_command_w(uint8_t data);
+	uint8_t redalert_ay8910_latch_1_r();
+	void redalert_ay8910_latch_2_w(uint8_t data);
+	void redalert_voice_command_w(uint8_t data);
+	void demoneye_audio_command_w(uint8_t data);
 	DECLARE_VIDEO_START(redalert);
 	DECLARE_VIDEO_START(ww3);
 	uint32_t screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(redalert_vblank_interrupt);
-	DECLARE_WRITE8_MEMBER(redalert_analog_w);
-	DECLARE_WRITE8_MEMBER(redalert_AY8910_w);
+	TIMER_CALLBACK_MEMBER(audio_irq_on);
+	TIMER_CALLBACK_MEMBER(audio_irq_off);
+	void redalert_analog_w(uint8_t data);
+	void redalert_AY8910_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sod_callback);
 	DECLARE_READ_LINE_MEMBER(sid_callback);
-	DECLARE_WRITE8_MEMBER(demoneye_ay8910_latch_1_w);
-	DECLARE_READ8_MEMBER(demoneye_ay8910_latch_2_r);
-	DECLARE_WRITE8_MEMBER(demoneye_ay8910_data_w);
+	void demoneye_ay8910_latch_1_w(uint8_t data);
+	uint8_t demoneye_ay8910_latch_2_r();
+	void demoneye_ay8910_data_w(uint8_t data);
 	void get_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
 
@@ -115,6 +120,9 @@ private:
 	void demoneye_audio_map(address_map &map);
 
 	void redalert_voice_map(address_map &map);
+
+	emu_timer *m_audio_irq_on_timer;
+	emu_timer *m_audio_irq_off_timer;
 
 	uint8_t m_ay8910_latch_1;
 	uint8_t m_ay8910_latch_2;

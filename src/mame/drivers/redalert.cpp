@@ -119,9 +119,10 @@ INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 }
 
 
-READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
+uint8_t redalert_state::redalert_interrupt_clear_r()
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
 	return m_screen->vpos();
@@ -129,19 +130,20 @@ READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
 
 
 
-WRITE8_MEMBER(redalert_state::redalert_interrupt_clear_w)
-{
-	redalert_interrupt_clear_r(space, 0);
-}
-
-READ8_MEMBER(redalert_state::panther_interrupt_clear_r)
+void redalert_state::redalert_interrupt_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+}
+
+uint8_t redalert_state::panther_interrupt_clear_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	return ioport("STICK0")->read();
 }
 
-READ8_MEMBER(redalert_state::panther_unk_r)
+uint8_t redalert_state::panther_unk_r()
 {
 	return ((machine().rand() & 0x01) | (ioport("C020")->read() & 0xfe));
 }
