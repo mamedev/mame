@@ -430,6 +430,9 @@ namespace analog
 	///  the following parameters. A "Y" in the first column indicates that the
 	///  parameter is actually used in netlist.
 	///
+	///  NBV, BV and IBV are only used in the ZDIODE model. It is assumed
+	///  that DIODEs are not modeled up to their breakdown voltage.
+	///
 	///   |NL? |name  |parameter                        |units|default| example|area  |
 	///   |:--:|:-----|:--------------------------------|:----|------:|-------:|:----:|
 	///   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
@@ -444,8 +447,9 @@ namespace analog
 	///   |    |KF    |flicker noise coefficient        |-    |      0|        |      |
 	///   |    |AF    |flicker noise exponent           |-    |      1|        |      |
 	///   |    |FC    |coefficient for forward-bias depletion capacitance formula|-|0.5|| |
-	///   |    |BV    |reverse breakdown voltage        |V    |infinite|     40|      |
-	///   |    |IBV   |current at breakdown voltage     |V    |  0.001|        |      |
+	///   | Y  |NBV   |reverse emission coefficient     |-    |      3|       1|      |
+	///   | Y  |BV    |reverse breakdown voltage        |V    |infinite|     40|      |
+	///   | Y  |IBV   |current at breakdown voltage     |A    |  0.001|        |      |
 	///   |    |TNOM  |parameter measurement temperature|deg C|     27|      50|      |
 	///
 	class diode_model_t : public param_model_t
@@ -459,6 +463,21 @@ namespace analog
 
 		value_t m_IS;    //!< saturation current.
 		value_t m_N;     //!< emission coefficient.
+	};
+
+	class zdiode_model_t : public diode_model_t
+	{
+	public:
+		zdiode_model_t(device_t &device, const pstring &name, const pstring &val)
+		: diode_model_t(device, name, val)
+		, m_NBV(*this, "NBV")
+		, m_BV(*this, "BV")
+		, m_IBV(*this, "IBV")
+		{}
+
+		value_t m_NBV;    //!< reverse emission coefficient.
+		value_t m_BV;     //!< reverse breakdown voltage.
+		value_t m_IBV;    //!< current at breakdown voltage.
 	};
 
 	// -----------------------------------------------------------------------------
@@ -487,6 +506,37 @@ namespace analog
 	private:
 		diode_model_t m_model;
 		generic_diode<diode_e::BIPOLAR> m_D;
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_Z - Zener Diode
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT_DERIVED(Z, twoterm)
+	{
+	public:
+		NETLIB_CONSTRUCTOR_DERIVED_EX(Z, twoterm, const pstring &model = "D")
+		, m_model(*this, "MODEL", model)
+		, m_D(*this, "m_D")
+		, m_R(*this, "m_R")
+		{
+			register_subalias("A", P());
+			register_subalias("K", N());
+		}
+
+		NETLIB_IS_DYNAMIC(true)
+		NETLIB_UPDATE_TERMINALSI();
+		NETLIB_RESETI();
+
+	protected:
+		//NETLIB_UPDATEI();
+		NETLIB_UPDATE_PARAMI();
+
+	private:
+		zdiode_model_t m_model;
+		generic_diode<diode_e::BIPOLAR> m_D;
+		// REVERSE diode
+		generic_diode<diode_e::BIPOLAR> m_R;
 	};
 
 	// -----------------------------------------------------------------------------

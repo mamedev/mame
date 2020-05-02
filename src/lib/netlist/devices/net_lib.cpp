@@ -33,6 +33,7 @@ namespace devices
 		LIB_ENTRY(C)
 		LIB_ENTRY(L)
 		LIB_ENTRY(D)
+		LIB_ENTRY(Z)
 		LIB_ENTRY(VS)
 		LIB_ENTRY(CS)
 		LIB_ENTRY(VCVS)
