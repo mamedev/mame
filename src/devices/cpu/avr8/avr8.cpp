@@ -904,23 +904,23 @@ void avr8_device::device_reset()
 	switch ((m_hfuses & (BOOTSZ1 | BOOTSZ0)) >> 1)
 	{
 	case 0:
-		if(m_addr_mask <= 0x0fff) { m_boot_size = 1024; }
-		else if(m_addr_mask <= 0x7fff) { m_boot_size = 2048; }
+		if (m_addr_mask <= 0x0fff) { m_boot_size = 1024; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 2048; }
 		else { m_boot_size = 4096; }
 		break;
 	case 1:
-		if(m_addr_mask <= 0x0fff) { m_boot_size = 512; }
-		else if(m_addr_mask <= 0x7fff) { m_boot_size = 1024; }
+		if (m_addr_mask <= 0x0fff) { m_boot_size = 512; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 1024; }
 		else { m_boot_size = 2048; }
 		break;
 	case 2:
-		if(m_addr_mask <= 0x0fff) { m_boot_size = 256; }
-		else if(m_addr_mask <= 0x7fff) { m_boot_size = 512; }
+		if (m_addr_mask <= 0x0fff) { m_boot_size = 256; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 512; }
 		else { m_boot_size = 1024; }
 		break;
 	case 3:
-		if(m_addr_mask <= 0x0fff) { m_boot_size = 128; }
-		else if(m_addr_mask <= 0x7fff) { m_boot_size = 256; }
+		if (m_addr_mask <= 0x0fff) { m_boot_size = 128; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 256; }
 		else { m_boot_size = 512; }
 		break;
 	default:
