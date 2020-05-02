@@ -9,8 +9,20 @@ license:CC0
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.2" green="0" blue="0" /></disk>
-		<disk state="1"><color red="1" green="0" blue="0" /></disk>
+		<rect state="0"><color red="0.15" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="ledro">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+	<element name="ledrr" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0" blue="0" /></rect>
+	</element>
+	<element name="ledrg" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="0" green="1" blue="0" /></rect>
 	</element>
 
 	<element name="ledo">
@@ -374,7 +386,7 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="88" top="-1.5" bottom="95.5" />
+		<bounds left="-13" right="88" top="-1.5" bottom="99" />
 
 		<element ref="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></element>
 		<element ref="black"><bounds x="3" y="2.5" width="81" height="81" /></element>
@@ -456,42 +468,39 @@ license:CC0
 		<element name="6.1" ref="ledr" blend="add"><bounds x="67.75" y="84.75" width="1.5" height="1.5" /></element>
 		<element name="7.1" ref="ledr" blend="add"><bounds x="77.75" y="84.75" width="1.5" height="1.5" /></element>
 
+		<!-- button panel -->
+		<element ref="ledro"><bounds x="0" y="90" width="2" height="1" /></element>
+		<element ref="ledro"><bounds x="0" y="93" width="2" height="1" /></element>
+		<element ref="ledro"><bounds x="0" y="96" width="2" height="1" /></element>
 
-		<element name="8.0"  ref="led" blend="add"><bounds x="0.25"  y="89" width="1.5" height="1.5" /></element>
-		<element name="8.1"  ref="led" blend="add"><bounds x="2.25"  y="89" width="1.5" height="1.5" /></element>
-		<element name="8.2"  ref="led" blend="add"><bounds x="4.25"  y="89" width="1.5" height="1.5" /></element>
-		<element name="8.3"  ref="led" blend="add"><bounds x="6.25"  y="89" width="1.5" height="1.5" /></element>
-		<element name="8.4"  ref="led" blend="add"><bounds x="8.25"  y="89" width="1.5" height="1.5" /></element>
-		<element name="8.5"  ref="led" blend="add"><bounds x="10.25" y="89" width="1.5" height="1.5" /></element>
-		<element name="8.6"  ref="led" blend="add"><bounds x="12.25" y="89" width="1.5" height="1.5" /></element>
-		<element name="8.7"  ref="led" blend="add"><bounds x="14.25" y="89" width="1.5" height="1.5" /></element>
-		<element name="8.8"  ref="led" blend="add"><bounds x="16.25" y="89" width="1.5" height="1.5" /></element>
-		<element name="8.9"  ref="led" blend="add"><bounds x="18.25" y="89" width="1.5" height="1.5" /></element>
-		<element name="8.10" ref="led" blend="add"><bounds x="20.25" y="89" width="1.5" height="1.5" /></element>
+		<element name="8.3" ref="ledrr" blend="add"><bounds x="0" y="90" width="2" height="1" /></element>
+		<element name="8.5" ref="ledrr" blend="add"><bounds x="0" y="93" width="2" height="1" /></element>
+		<element name="8.4" ref="ledrr" blend="add"><bounds x="0" y="96" width="2" height="1" /></element>
+		<element name="9.3" ref="ledrg" blend="add"><bounds x="0" y="90" width="2" height="1" /></element>
+		<element name="9.5" ref="ledrg" blend="add"><bounds x="0" y="93" width="2" height="1" /></element>
+		<element name="9.4" ref="ledrg" blend="add"><bounds x="0" y="96" width="2" height="1" /></element>
 
-		<element name="9.0"  ref="led" blend="add"><bounds x="0.25"  y="91" width="1.5" height="1.5" /></element>
-		<element name="9.1"  ref="led" blend="add"><bounds x="2.25"  y="91" width="1.5" height="1.5" /></element>
-		<element name="9.2"  ref="led" blend="add"><bounds x="4.25"  y="91" width="1.5" height="1.5" /></element>
-		<element name="9.3"  ref="led" blend="add"><bounds x="6.25"  y="91" width="1.5" height="1.5" /></element>
-		<element name="9.4"  ref="led" blend="add"><bounds x="8.25"  y="91" width="1.5" height="1.5" /></element>
-		<element name="9.5"  ref="led" blend="add"><bounds x="10.25" y="91" width="1.5" height="1.5" /></element>
-		<element name="9.6"  ref="led" blend="add"><bounds x="12.25" y="91" width="1.5" height="1.5" /></element>
-		<element name="9.7"  ref="led" blend="add"><bounds x="14.25" y="91" width="1.5" height="1.5" /></element>
-		<element name="9.8"  ref="led" blend="add"><bounds x="16.25" y="91" width="1.5" height="1.5" /></element>
-		<element name="9.9"  ref="led" blend="add"><bounds x="18.25" y="91" width="1.5" height="1.5" /></element>
-		<element name="9.10" ref="led" blend="add"><bounds x="20.25" y="91" width="1.5" height="1.5" /></element>
+		<element ref="ledro"><bounds x="10" y="90" width="2" height="1" /></element>
+		<element ref="ledro"><bounds x="10" y="93" width="2" height="1" /></element>
+		<element ref="ledro"><bounds x="10" y="96" width="2" height="1" /></element>
 
-		<element name="10.0"  ref="led" blend="add"><bounds x="0.25"  y="93" width="1.5" height="1.5" /></element>
-		<element name="10.1"  ref="led" blend="add"><bounds x="2.25"  y="93" width="1.5" height="1.5" /></element>
-		<element name="10.2"  ref="led" blend="add"><bounds x="4.25"  y="93" width="1.5" height="1.5" /></element>
-		<element name="10.3"  ref="led" blend="add"><bounds x="6.25"  y="93" width="1.5" height="1.5" /></element>
-		<element name="10.4"  ref="led" blend="add"><bounds x="8.25"  y="93" width="1.5" height="1.5" /></element>
-		<element name="10.5"  ref="led" blend="add"><bounds x="10.25" y="93" width="1.5" height="1.5" /></element>
-		<element name="10.6"  ref="led" blend="add"><bounds x="12.25" y="93" width="1.5" height="1.5" /></element>
-		<element name="10.7"  ref="led" blend="add"><bounds x="14.25" y="93" width="1.5" height="1.5" /></element>
-		<element name="10.8"  ref="led" blend="add"><bounds x="16.25" y="93" width="1.5" height="1.5" /></element>
-		<element name="10.9"  ref="led" blend="add"><bounds x="18.25" y="93" width="1.5" height="1.5" /></element>
-		<element name="10.10" ref="led" blend="add"><bounds x="20.25" y="93" width="1.5" height="1.5" /></element>
+		<element name="8.6" ref="ledrr" blend="add"><bounds x="10" y="90" width="2" height="1" /></element>
+		<element name="8.2" ref="ledrr" blend="add"><bounds x="10" y="93" width="2" height="1" /></element>
+		<element name="8.0" ref="ledrr" blend="add"><bounds x="10" y="96" width="2" height="1" /></element>
+		<element name="9.6" ref="ledrg" blend="add"><bounds x="10" y="90" width="2" height="1" /></element>
+		<element name="9.2" ref="ledrg" blend="add"><bounds x="10" y="93" width="2" height="1" /></element>
+		<element name="9.0" ref="ledrg" blend="add"><bounds x="10" y="96" width="2" height="1" /></element>
+
+		<element name="9.9" ref="led"><bounds x="20" y="90" width="2" height="1" /></element>
+		<element name="8.9" ref="led"><bounds x="24" y="90" width="2" height="1" /></element>
+		<element name="9.8" ref="led"><bounds x="20" y="93" width="2" height="1" /></element>
+		<element name="8.8" ref="led"><bounds x="24" y="93" width="2" height="1" /></element>
+		<element name="9.1" ref="led"><bounds x="20" y="96" width="2" height="1" /></element>
+		<element name="8.1" ref="led"><bounds x="24" y="96" width="2" height="1" /></element>
+
+		<element ref="ledro"><bounds x="40" y="90" width="2" height="1" /></element>
+		<element name="8.7" ref="ledrr" blend="add"><bounds x="40" y="90" width="2" height="1" /></element>
+		<element name="9.7" ref="ledrg" blend="add"><bounds x="40" y="90" width="2" height="1" /></element>
 
 	</view>
 </mamelayout>

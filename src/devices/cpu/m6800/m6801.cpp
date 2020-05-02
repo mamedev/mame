@@ -462,7 +462,7 @@ void m6801_cpu_device::set_timer_event()
 void hd6301x_cpu_device::set_timer_event()
 {
 	m6801_cpu_device::set_timer_event();
-	if (OC2D - CTD < m_timer_next)
+	if (OC2D - CTD < OCD - CTD && OC2D - CTD < TOD - CTD)
 		m_timer_next = OC2D;
 }
 
