@@ -72,7 +72,7 @@ enum
 //  video_ram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::video_ram_r )
+uint8_t pc1512_state::video_ram_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -100,7 +100,7 @@ READ8_MEMBER( pc1512_state::video_ram_r )
 //  video_ram_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::video_ram_w )
+void pc1512_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	switch (get_display_mode(m_vdu_mode))
 	{
@@ -130,7 +130,7 @@ WRITE8_MEMBER( pc1512_state::video_ram_w )
 //  vdu_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::vdu_r )
+uint8_t pc1512_state::vdu_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -185,7 +185,7 @@ READ8_MEMBER( pc1512_state::vdu_r )
 //  vdu_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::vdu_w )
+void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

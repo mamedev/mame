@@ -11,8 +11,8 @@ Mephistos, these boards are actual chesscomputers and not an accessory.
 They called the expansion capability "OSA", for "Open Systems Architecture".
 One for a link port to a PC, and one for a module slot. The expansion modules
 are basically entire chesscomputers, making the whole thing combined a
-'dual brain' chesscomputer. The embedded chess engine is by Julio Kaplan,
-same as the one in SciSys Turbo S-24K.
+'dual brain' chesscomputer. The embedded chess engine is by Julio Kaplan
+and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
 Hardware notes:
 
@@ -36,8 +36,8 @@ The 1.4 ROM is identical to it too, even though it's a different MCU type.
 And on the outside, the button panel was redesigned a bit.
 
 Expansion modules released:
-- Maestro (65C02, Julio Kaplan)
-- Analyst (65C02, Julio Kaplan)
+- Maestro (65C02, Kaplan/Barnes)
+- Analyst (65C02, Kaplan/Barnes)
 - Brute Force (H8, Frans Morsch)
 - Sparc (SPARClite, Spracklen's)
 

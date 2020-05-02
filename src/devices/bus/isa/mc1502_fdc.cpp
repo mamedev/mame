@@ -95,8 +95,9 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 	floppy->ss_w((data & 2) ? 1 : 0);
 
 	// bits 2, 3 -- motor on (drive 0, 1)
-	floppy0->mon_w(!(data & 4));
-	floppy1->mon_w(!(data & 8));
+	// the schematic appears to show the motor lines connected, if they aren't then motor_on doesn't work correctly
+	floppy0->mon_w(!(data & 12));
+	floppy1->mon_w(!(data & 12));
 
 	if (data & 12)
 	{

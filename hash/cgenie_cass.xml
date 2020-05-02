@@ -394,6 +394,19 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
+	<software name="polepos">
+		<description>Pole Position</description>
+		<year>1984</year>
+		<publisher>Timo Pohl</publisher>
+		<info name="author" value="Timo Pohl" />
+		<info name="usage" value="Type SYSTEM and load with POLEPO (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14362">
+				<rom name="polepo.cas" size="14362" crc="cfd0d6ce" sha1="35658b20373f4ec0673a6aa81f161101dd916cea" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="primzahl">
 		<description>Primzahlsuche</description>
 		<year>198?</year>

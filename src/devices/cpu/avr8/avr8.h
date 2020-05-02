@@ -330,6 +330,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
+DECLARE_DEVICE_TYPE(ATMEGA328,  atmega328_device)
 DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
 DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
@@ -343,6 +344,18 @@ public:
 	// construction/destruction
 	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void atmega88_internal_map(address_map &map);
+};
+
+// ======================> atmega328_device
+
+class atmega328_device : public avr8_device
+{
+public:
+	// construction/destruction
+	atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void update_interrupt(int source) override;
+	void atmega328_internal_map(address_map &map);
 };
 
 // ======================> atmega644_device

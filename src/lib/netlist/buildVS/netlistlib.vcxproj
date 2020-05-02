@@ -120,7 +120,6 @@
     <ClCompile Include="..\devices\nld_7442.cpp" />
     <ClCompile Include="..\devices\nld_7492.cpp" />
     <ClCompile Include="..\devices\nld_7497.cpp" />
-    <ClCompile Include="..\devices\nld_ne566.cpp" />
     <ClCompile Include="..\devices\nld_schmitt.cpp" />
     <ClCompile Include="..\devices\nld_tms4800.cpp" />
     <ClCompile Include="..\devices\nld_4020.cpp" />

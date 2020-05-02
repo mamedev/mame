@@ -59,7 +59,7 @@ NETLIB_UPDATE_PARAM(LVCCS)
 
 NETLIB_UPDATE_TERMINALS(LVCCS)
 {
-	const nl_fptype m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
+	const nl_fptype m_mult = m_G() * get_gfac(); // 1.0 ==> 1V ==> 1A
 	const nl_fptype vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
 	const auto c1(nlconst::magic(0.2));
 
@@ -101,11 +101,13 @@ NETLIB_UPDATE_PARAM(CCCS)
 
 NETLIB_RESET(VCVS)
 {
-	m_gfac = plib::reciprocal(m_RO());
+	const auto gfac(plib::reciprocal(m_RO()));
+	set_gfac(gfac);
+
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set_conductivity(m_gfac);
-	m_ON2.set_conductivity(m_gfac);
+	m_OP2.set_conductivity(gfac);
+	m_ON2.set_conductivity(gfac);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -114,11 +116,13 @@ NETLIB_RESET(VCVS)
 
 NETLIB_RESET(CCVS)
 {
-	m_gfac = plib::reciprocal(m_RO());
+	const auto gfac(plib::reciprocal(m_RO()));
+	set_gfac(gfac);
+
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set_conductivity(m_gfac);
-	m_ON2.set_conductivity(m_gfac);
+	m_OP2.set_conductivity(gfac);
+	m_ON2.set_conductivity(gfac);
 }
 
 	} //namespace analog

@@ -469,6 +469,8 @@ WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
 
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
+	if (!de)
+		return;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix32(y);
 

@@ -15,6 +15,7 @@
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/am25s55x.h"
+#include "machine/am2901b.h"
 #include "machine/am2910.h"
 #include "machine/com8116.h"
 #include "machine/fdc_pll.h"
@@ -76,6 +77,10 @@ public:
 		, m_filter_multprom(*this, "filter_multprom")
 		, m_filter_signal(nullptr)
 		, m_filter_mult(nullptr)
+		, m_size_yl(*this, "filter_de")
+		, m_size_yh(*this, "filter_df")
+		, m_size_xl(*this, "filter_dg")
+		, m_size_xh(*this, "filter_dh")
 	{
 	}
 
@@ -300,6 +305,11 @@ private:
 	uint8_t m_filter_abbb[16];
 
 	// Size Card
+	required_device<am2901b_device> m_size_yl;
+	required_device<am2901b_device> m_size_yh;
+	required_device<am2901b_device> m_size_xl;
+	required_device<am2901b_device> m_size_xh;
+
 	uint8_t m_size_h;
 	uint8_t m_size_v;
 
@@ -1825,6 +1835,12 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_fdd_serial->rxd_handler().set(FUNC(dpb7000_state::fddcpu_debug_rx));
 
 	config.set_perfect_quantum(m_fddcpu);
+
+	// Size Card
+	AM2901B(config, m_size_yl);
+	AM2901B(config, m_size_yh);
+	AM2901B(config, m_size_xl);
+	AM2901B(config, m_size_xh);
 }
 
 
