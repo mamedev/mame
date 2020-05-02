@@ -1418,27 +1418,23 @@ void m6801_cpu_device::cl_w(uint8_t data)
 
 uint8_t m6801_cpu_device::ocrh_r()
 {
-	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
-	{
-		m_tcsr &= ~TCSR_OCF;
-		modified_tcsr();
-	}
 	return m_output_compare.b.h;
 }
 
 uint8_t m6801_cpu_device::ocrl_r()
 {
-	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
-	{
-		m_tcsr &= ~TCSR_OCF;
-		modified_tcsr();
-	}
 	return m_output_compare.b.l;
 }
 
 void m6801_cpu_device::ocrh_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register: %02x\n", data);
+
+	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
+	{
+		m_tcsr &= ~TCSR_OCF;
+		modified_tcsr();
+	}
 
 	if( m_output_compare.b.h != data)
 	{
@@ -1450,6 +1446,12 @@ void m6801_cpu_device::ocrh_w(uint8_t data)
 void m6801_cpu_device::ocrl_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register: %02x\n", data);
+
+	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
+	{
+		m_tcsr &= ~TCSR_OCF;
+		modified_tcsr();
+	}
 
 	if( m_output_compare.b.l != data)
 	{
@@ -1497,27 +1499,23 @@ void hd6301x_cpu_device::tcsr2_w(uint8_t data)
 
 uint8_t hd6301x_cpu_device::ocr2h_r()
 {
-	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
-	{
-		m_tcsr2 &= ~TCSR2_OCF2;
-		modified_tcsr();
-	}
 	return m_output_compare2.b.h;
 }
 
 uint8_t hd6301x_cpu_device::ocr2l_r()
 {
-	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
-	{
-		m_tcsr2 &= ~TCSR2_OCF2;
-		modified_tcsr();
-	}
 	return m_output_compare2.b.l;
 }
 
 void hd6301x_cpu_device::ocr2h_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register 2: %02x\n", data);
+
+	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	{
+		m_tcsr2 &= ~TCSR2_OCF2;
+		modified_tcsr();
+	}
 
 	if( m_output_compare2.b.h != data)
 	{
@@ -1529,6 +1527,12 @@ void hd6301x_cpu_device::ocr2h_w(uint8_t data)
 void hd6301x_cpu_device::ocr2l_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register 2: %02x\n", data);
+
+	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	{
+		m_tcsr2 &= ~TCSR2_OCF2;
+		modified_tcsr();
+	}
 
 	if( m_output_compare2.b.l != data)
 	{
