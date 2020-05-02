@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 
 /*
@@ -9,6 +9,9 @@
 //! [ne566_example]
 #include "netlist/devices/net_lib.h"
 
+// ./nltool -t 1 -l X.3 -l X.4 -n oscillator src/lib/netlist/examples/ne566.cpp
+//  X.3 : Square out
+//  X.4 : Triangle out
 
 NETLIST_START(oscillator)
 

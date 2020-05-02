@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 /*
  * ne555_astable.c

@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 /*
  * Script to analyze opamp amplification as a function of frequency.
