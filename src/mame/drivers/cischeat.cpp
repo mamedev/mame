@@ -2161,6 +2161,9 @@ void cischeat_state::scudhamm(machine_config &config)
                             Arm Champs II
 **************************************************************************/
 
+// TODO: intentionally duplicate scudhamm_scanline fn
+// armchamp2_state shouldn't derive from scudhamm_state but share this as a common device,
+// also assuming it really is using the same irq config as well ...
 TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_state::armchamp2_scanline)
 {
 	int scanline = param;
