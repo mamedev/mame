@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/***************************************************************************
+/******************************************************************************
 
                             -= Jaleco Driving Games =-
 
@@ -159,6 +159,9 @@ To Do:
   in stage 6 etc.);
 - Force feedback :)
 - Major cleanups needed, especially in video file;
+- scudhamm: during attract mode every other how to play screen shows up with
+  wrong background layer colors;
+- armchmp2: arm input device not completely understood;
 - Split the non-road games into own driver, merge them with Alien Command,
   device-ify the sprite chip;
 
@@ -176,7 +179,7 @@ Dip locations verified for Big Run with the manual. Also added missing dips
 and locations from Service mode to: Scud Hammer, F1 GP Star 1 & 2 and
 Cisco Heat.
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/cischeat.h"
@@ -206,6 +209,17 @@ Cisco Heat.
                                 Big Run
 **************************************************************************/
 
+WRITE16_MEMBER(cischeat_state::leds_out_w)
+{
+	// leds
+	if (ACCESSING_BITS_0_7)
+	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		m_leds[0] = BIT(data, 4);   // start button
+		m_leds[1] = BIT(data, 5);   // ?
+	}
+}
 
 void cischeat_state::bigrun_map(address_map &map)
 {
@@ -562,6 +576,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 		m_leds[3] = BIT(data, 4);
 		m_leds[4] = BIT(data, 5);
 	}
@@ -613,37 +628,27 @@ void cischeat_state::scudhamm_map(address_map &map)
                             Arm Champs II
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::armchmp2_motor_status_r)
+READ16_MEMBER(armchamp2_state::motor_status_r)
 {
 	return 0x11;
 }
 
-WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
+WRITE16_MEMBER(armchamp2_state::motor_command_w)
 {
-	COMBINE_DATA( &m_scudhamm_motor_command );
+	// 0x00xx -> disable motor (test mode)
+	// 0x10ff -> automated test (test limits?)
+	// 0x10xx -> apply a left-to-right force
+	COMBINE_DATA( &m_arm_motor_command );
 }
 
-uint8_t cischeat_state::armchmp2_analog_r()
+uint8_t armchamp2_state::analog_r()
 {
 	int armdelta;
 
-	armdelta = ioport("IN1")->read() - m_armold;
-	m_armold = ioport("IN1")->read();
+	armdelta = ioport("ARM")->read() - m_armold;
+	m_armold = ioport("ARM")->read();
 
-	return ~( m_scudhamm_motor_command + armdelta );    // + x : x<=0 and player loses, x>0 and player wins
-}
-
-READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
-{
-	int arm_x = ioport("IN1")->read();
-
-	uint16_t ret = ioport("IN0")->read();
-
-	if (arm_x < 0x40)       ret &= ~1;
-	else if (arm_x > 0xc0)  ret &= ~2;
-	else if ((arm_x > 0x60) && (arm_x < 0xa0))  ret &= ~4;
-
-	return ret;
+	return (~( m_arm_motor_command + armdelta )) & 0xff;    // + x : x<=0 and player loses, x>0 and player wins
 }
 
 /*
@@ -654,7 +659,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
     ---- ---- 76-- ----     Coin counters
     ---- ---- --54 3210
 */
-WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
+WRITE16_MEMBER(armchamp2_state::output_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -671,7 +676,7 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 	}
 }
 
-void cischeat_state::armchmp2_map(address_map &map)
+void armchamp2_state::armchmp2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
@@ -682,11 +687,11 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0f0000, 0x0fffff).ram().share("ram"); // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));
-	map(0x100004, 0x100005).portr("IN3"); // DSW
-	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));
+	map(0x100000, 0x100001).portr("IN2").w(FUNC(armchamp2_state::scudhamm_oki_bank_w));
+	map(0x100004, 0x100005).portr("DSW"); // DSW
+	map(0x100008, 0x100009).portr("IN0").w(FUNC(armchamp2_state::output_w));
 	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); 
-	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));
+	map(0x100010, 0x100011).rw(FUNC(armchamp2_state::motor_status_r), FUNC(armchamp2_state::motor_command_w));
 	// same hookup as acommand, most notably the "Arm Champs II" voice sample on title screen playbacks on oki1 mirror
 	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -1567,7 +1572,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( scudhamm )
 	PORT_START("IN0")   // Buttons
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // PORT_IMPULSE(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // GAME OVER if pressed on the selection screen
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )     // called "Test"
@@ -1629,11 +1634,30 @@ INPUT_PORTS_END
                             Arm Champs II
 **************************************************************************/
 
+CUSTOM_INPUT_MEMBER(armchamp2_state::left_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return (arm_x < 0x40);
+}
+
+CUSTOM_INPUT_MEMBER(armchamp2_state::right_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return (arm_x > 0xc0);
+}
+
+CUSTOM_INPUT_MEMBER(armchamp2_state::center_sensor_r)
+{
+	int arm_x = ioport("ARM")->read();
+	return ((arm_x > 0x60) && (arm_x < 0xa0));
+}
+
+
 static INPUT_PORTS_START( armchmp2 )
 	PORT_START("IN0")   // Buttons + Sensors
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // left   sensor
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // right  sensor
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) // center sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, left_sensor_r)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, right_sensor_r)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(armchamp2_state, center_sensor_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1644,7 +1668,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) // easy
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) // elbow (it always complains though)
 
-	PORT_START("IN1")   // A/D
+	PORT_START("ARM")   // A/D
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("IN2")   // DSW
@@ -1669,7 +1693,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Europe ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
 
-	PORT_START("IN3")   // DSW
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -2078,10 +2102,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line(3, HOLD_LINE);
+	if(m_screen->frame_number() & 1)
+		return;
 
-	if(scanline == 120) // timer irq (clears a flag, presumably sprite DMA end)
+	if(scanline == 240) // vblank-out irq
+		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 16) // clears a flag, sprite end DMA? 
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -2100,10 +2127,12 @@ void cischeat_state::scudhamm(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz(30); //TODO: wrong!
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	// measured values for Arm Champs II: VSync: 59.1784Hz, HSync: 15082.0 kHz
+	m_screen->set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
+//	m_screen->set_refresh_hz(30); //TODO: wrong!
+//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//	m_screen->set_size(256, 256);
+//	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
 	m_screen->set_palette(m_palette);
 
@@ -2132,25 +2161,28 @@ void cischeat_state::scudhamm(machine_config &config)
                             Arm Champs II
 **************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_state::armchamp2_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line(2, HOLD_LINE);
+	if(m_screen->frame_number() & 1)
+		return;
 
-	if(scanline == 120) // timer irq (TODO: timing)
+	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 16) // does a bit more than scudhammer
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-void cischeat_state::armchmp2(machine_config &config)
+void armchamp2_state::armchmp2(machine_config &config)
 {
 	scudhamm(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::armchmp2_map);
-	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
-	subdevice<adc0804_device>("adc")->vin_callback().set(FUNC(cischeat_state::armchmp2_analog_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &armchamp2_state::armchmp2_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(armchamp2_state::armchamp2_scanline));
+	subdevice<adc0804_device>("adc")->vin_callback().set(FUNC(armchamp2_state::analog_r));
 }
 
 
@@ -3803,14 +3835,21 @@ void captflag_state::init_captflag()
 
 GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
+
 GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+
 GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS )
+
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
 GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+
 GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+
 GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
+
 GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                            MACHINE_IMPERFECT_GRAPHICS )
