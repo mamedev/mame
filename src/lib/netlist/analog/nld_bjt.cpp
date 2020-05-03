@@ -179,9 +179,8 @@ namespace analog
 			, m_gB(nlconst::cgmin())
 			, m_gC(nlconst::cgmin())
 			, m_V(nlconst::zero())
-			, m_state_on(*this, "m_state_on", 0)
+			, m_state_on(*this, "m_state_on", 0u)
 		{
-			register_subalias("B", m_RB.P());
 			register_subalias("E", m_RB.N());
 			register_subalias("C", m_RC.P());
 

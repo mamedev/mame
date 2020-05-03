@@ -553,14 +553,13 @@ namespace analog
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
 		, m_func(*this,"FUNC", "")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -570,7 +569,7 @@ namespace analog
 			m_t += step;
 			m_funcparam[0] = m_t;
 			this->set_G_V_I(plib::reciprocal(m_R()),
-					m_compiled.evaluate(m_funcparam),
+					m_compiled->evaluate(m_funcparam),
 					nlconst::zero());
 		}
 
@@ -587,7 +586,7 @@ namespace analog
 		param_fp_t m_R;
 		param_fp_t m_V;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -602,14 +601,13 @@ namespace analog
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -617,7 +615,7 @@ namespace analog
 		{
 			m_t += step;
 			m_funcparam[0] = m_t;
-			const nl_fptype I = m_compiled.evaluate(m_funcparam);
+			const nl_fptype I = m_compiled->evaluate(m_funcparam);
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -I,
 					zero, zero,  I);
@@ -649,7 +647,7 @@ namespace analog
 		state_var<nl_fptype> m_t;
 		param_fp_t m_I;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 

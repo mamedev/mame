@@ -92,10 +92,10 @@ namespace plib {
 		///
 		value_type evaluate(const values_container &values = values_container()) noexcept;
 
-		template <typename ST, typename STR>
-		void save_state(ST &st, const STR &name)
+		template <typename ST>
+		void save_state(ST &st)
 		{
-			st.save_item(m_lfsr, name, "m_lfsr");
+			st.save_item(m_lfsr, "m_lfsr");
 		}
 
 	private:

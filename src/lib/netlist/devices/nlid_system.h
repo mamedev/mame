@@ -127,12 +127,11 @@ namespace devices
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_func(*this,"FUNC", "")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -141,7 +140,7 @@ namespace devices
 		NETLIB_UPDATEI()
 		{
 			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
-			const netlist_time m_inc = netlist_time::from_fp(m_compiled.evaluate(m_funcparam));
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_funcparam));
 			m_Q.push(!m_feedback(), m_inc);
 		}
 
@@ -150,7 +149,7 @@ namespace devices
 		logic_output_t m_Q;
 
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -396,9 +395,8 @@ namespace devices
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
 			{
@@ -407,7 +405,7 @@ namespace devices
 				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
-			m_compiled.compile(m_func(), inps);
+			m_compiled->compile(m_func(), inps);
 		}
 
 	protected:
@@ -422,7 +420,7 @@ namespace devices
 			{
 				m_vals[i] = (*m_I[i])();
 			}
-			m_Q.push(m_compiled.evaluate(m_vals));
+			m_Q.push(m_compiled->evaluate(m_vals));
 		}
 
 	private:
@@ -432,7 +430,7 @@ namespace devices
 		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
 		std::vector<nl_fptype> m_vals;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 
 	};
 
@@ -641,10 +639,9 @@ namespace devices
 		, m_I(*this, "I")
 		, m_RI(*this, "RI", nlconst::magic(0.1))
 		, m_sigma(*this, "SIGMA", nlconst::zero())
-		, m_dis(m_sigma())
+		, m_mt(*this, "m_mt")
+		, m_dis(*this, "m_dis",m_sigma())
 		{
-			m_mt.save_state(*this, "m_mt");
-			m_dis.save_state(*this, "m_dis");
 
 			register_subalias("1", m_T.P());
 			register_subalias("2", m_T.N());
@@ -654,10 +651,10 @@ namespace devices
 
 		NETLIB_UPDATEI()
 		{
-			nl_fptype val = m_dis(m_mt);
+			nl_fptype val = m_dis.var()(m_mt.var());
 			m_T.change_state([this, val]()
 			{
-				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());;
+				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());
 			});
 		}
 
@@ -671,9 +668,8 @@ namespace devices
 		logic_input_t m_I;
 		param_fp_t m_RI;
 		param_fp_t m_sigma;
-		engine m_mt;
-		distribution m_dis;
-		//std::normal_distribution<nl_fptype> m_dis;
+		state_var<engine> m_mt;
+		state_var<distribution> m_dis;
 	};
 
 } // namespace devices

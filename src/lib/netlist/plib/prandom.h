@@ -52,11 +52,11 @@ namespace plib
 		static constexpr T min() noexcept { return static_cast<T>(0); }
 		static constexpr T max() noexcept { return ~T(0) >> (sizeof(T)*8 - w); }
 
-		template <typename ST, typename STR>
-		void save_state(ST &st, const STR &name)
+		template <typename ST>
+		void save_state(ST &st)
 		{
-			st.save_item(m_p, name, "index");
-			st.save_item(m_mt, name, "mt");
+			st.save_item(m_p,  "index");
+			st.save_item(m_mt, "mt");
 		}
 
 		void seed(T val) noexcept
@@ -142,9 +142,10 @@ namespace plib
 				* constants<FT>::sqrt3() * m_stddev;
 		}
 
-		template <typename ST, typename STR>
-		void save_state(ST &st, const STR &name)
+		template <typename ST>
+		void save_state(ST &st)
 		{
+			plib::unused_var(st);
 			/* no state to save */
 		}
 
@@ -169,11 +170,11 @@ namespace plib
 			return m_buf[m_p++];
 		}
 
-		template <typename ST, typename STR>
-		void save_state(ST &st, const STR &name)
+		template <typename ST>
+		void save_state(ST &st)
 		{
-			st.save_item(m_p, name, "m_p");
-			st.save_item(m_buf, name, "m_buf");
+			st.save_item(m_p,   "m_p");
+			st.save_item(m_buf, "m_buf");
 		}
 
 	private:
