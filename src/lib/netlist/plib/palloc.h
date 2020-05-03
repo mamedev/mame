@@ -323,6 +323,7 @@ namespace plib {
 			auto *mem = allocate(alignof(T), sizeof(T));
 			try
 			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(*this));
 			}
@@ -339,6 +340,7 @@ namespace plib {
 			auto *mem = allocate(alignof(T), sizeof(T));
 			try
 			{
+				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return owned_pool_ptr<T>(mema, true, arena_deleter<aligned_arena, T>(*this));
 			}
@@ -353,6 +355,7 @@ namespace plib {
 		static T *alloc(Args&&... args)
 		{
 			auto *p = allocate(alignof(T), sizeof(T));
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 			return new(p) T(std::forward<Args>(args)...);
 		}
 

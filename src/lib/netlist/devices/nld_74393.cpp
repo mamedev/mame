@@ -55,7 +55,6 @@ namespace netlist
 			}
 		}
 
-	protected:
 		logic_input_t m_CP;
 		logic_input_t m_MR;
 		object_array_t<logic_output_t, 4> m_Q;

@@ -21,7 +21,7 @@
 	{ \
 		template<typename... Args> explicit name(Args&&... args) \
 		: plib::perrmsg(str, std::forward<Args>(args)...) \
-		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
+		{ static_assert((narg) == sizeof...(args), "Argument count mismatch"); } \
 	};
 
 namespace plib {

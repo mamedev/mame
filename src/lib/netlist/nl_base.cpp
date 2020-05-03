@@ -111,11 +111,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl)
-		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
+		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(nlconst::max_queue_size())
 		, netlist_object_t(nl, nl.nlstate().name() + ".queue")
 		, m_qsize(0)
-		, m_times(512)
-		, m_net_ids(512)
+		, m_times(nlconst::max_queue_size())
+		, m_net_ids(nlconst::max_queue_size())
 	{
 	}
 

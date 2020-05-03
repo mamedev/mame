@@ -33,6 +33,13 @@ namespace netlist
 	{
 		using BC = plib::constants<T>;
 
+		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
+		{ return n * temp * BC::k_b() / BC::Q_e(); }
+
+		static inline constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
+
+		static inline constexpr std::size_t max_queue_size() { return 512; } // NOLINT
+
 		/// \brief constant startup gmin
 		///
 		/// This should be used during object creation to initialize
@@ -53,10 +60,6 @@ namespace netlist
 		///
 		static inline constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
 
-		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
-		{ return n * temp * BC::k_b() / BC::Q_e(); }
-
-		static inline constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
 	};
 
 	/// \brief nlconst_base struct specialized for nl_fptype.

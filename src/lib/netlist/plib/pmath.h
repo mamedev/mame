@@ -405,7 +405,7 @@ namespace plib
 	///
 	template<typename M, typename N>
 	constexpr typename std::common_type<M, N>::type
-	gcd(M m, N n) noexcept
+	gcd(M m, N n) noexcept //NOLINT(misc-no-recursion)
 	{
 		static_assert(plib::is_integral<M>::value, "gcd: M must be an integer");
 		static_assert(plib::is_integral<N>::value, "gcd: N must be an integer");
