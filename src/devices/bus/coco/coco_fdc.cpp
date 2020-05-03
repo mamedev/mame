@@ -81,7 +81,7 @@
 #include "formats/sdf_dsk.h"
 #include "formats/os9_dsk.h"
 
-#define VERBOSE (LOG_GENERAL )
+// #define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
 
 /***************************************************************************
@@ -304,7 +304,6 @@ READ8_MEMBER(coco_fdc_device_base::ff74_read)
 			break;
 		case 0x2:
 			data = m_cache_controler;
-			m_cache_controler |= 0x80; /* hi means interrupt clear */
 			LOG( "CachCtrl read: %2.2x\n", data );
 			break;
 	}
@@ -331,6 +330,16 @@ WRITE8_MEMBER(coco_fdc_device_base::ff74_write)
 			break;
 		case 0x2:
 			LOG( "CachCtrl write: %2.2x\n", data );
+
+			// reset static ram buffer pointer on any write
+			m_cache_pointer = 0;
+
+			if(data == 0)
+			{
+				// Clear interrupt when caching is turned off
+				set_line_value(line::CART, CLEAR_LINE);
+				m_cache_controler |= 0x80;
+			}
 
 			m_cache_controler = (m_cache_controler & 0x80) | (data & 0x7f);
 			break;
@@ -380,7 +389,6 @@ void coco_fdc_device_base::update_lines()
 	{
 		if( drq() == ASSERT_LINE)
 		{
-
 			if( (m_cache_controler & 0x07) == 0x07) /* Read cache on */
 			{
 				uint8_t data = m_wd17xx->data_r();
@@ -401,7 +409,7 @@ void coco_fdc_device_base::update_lines()
 			}
 			else
 			{
-				LOG("Unknown drq cached assert mode\n" );
+				LOG("illegal DRQ cached assert mode\n" );
 			}
 		}
 
@@ -412,7 +420,11 @@ void coco_fdc_device_base::update_lines()
 
 		if( intrq() == ASSERT_LINE)
 		{
-			m_cache_controler &= 0x7f; /* low mean irq asserted */
+			m_cache_controler &= 0x7f;
+		}
+		else
+		{
+			m_cache_controler |= 0x80;
 		}
 	}
 }
