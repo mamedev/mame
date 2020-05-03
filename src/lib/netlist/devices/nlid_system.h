@@ -11,6 +11,9 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/plib/putil.h"
+#include "netlist/plib/prandom.h"
+
+#include <random>
 
 namespace netlist
 {
@@ -520,7 +523,8 @@ namespace devices
 		NETLIB_UPDATEI()
 		{
 			const netlist_sig_t state = m_I();
-			if (1 || (state != m_last_state))
+			// FIXME: update should only be called if m_I changes
+			if (true || (state != m_last_state))
 			{
 				m_last_state = state;
 				//printf("Here %d\n", state);
@@ -614,6 +618,60 @@ namespace devices
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_noise - noise source
+	//
+	// An externally clocked noise source.
+	// -----------------------------------------------------------------------------
+
+	template <typename E, template<class> class D>
+	NETLIB_OBJECT(sys_noise)
+	{
+	public:
+
+		using engine = E;
+		using distribution = D<nl_fptype>;
+
+		NETLIB_CONSTRUCTOR(sys_noise)
+		, m_T(*this, "m_T")
+		, m_I(*this, "I")
+		, m_RI(*this, "RI", nlconst::magic(0.1))
+		, m_sigma(*this, "SIGMA", nlconst::zero())
+		, m_dis(m_sigma())
+		{
+			m_mt.save_state(*this, "m_mt");
+			m_dis.save_state(*this, "m_dis");
+
+			register_subalias("1", m_T.P());
+			register_subalias("2", m_T.N());
+		}
+
+	protected:
+
+		NETLIB_UPDATEI()
+		{
+			nl_fptype val = m_dis(m_mt);
+			m_T.change_state([this, val]()
+			{
+				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());;
+			});
+		}
+
+		NETLIB_RESETI()
+		{
+			m_T.set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
+		}
+
+	private:
+		analog::NETLIB_SUB(twoterm) m_T;
+		logic_input_t m_I;
+		param_fp_t m_RI;
+		param_fp_t m_sigma;
+		engine m_mt;
+		distribution m_dis;
+		//std::normal_distribution<nl_fptype> m_dis;
 	};
 
 } // namespace devices

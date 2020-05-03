@@ -525,6 +525,11 @@ namespace netlist
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
 
+			// State saving support - allows this to be passed
+			// to generic save_state members
+			template<typename C>
+			void save_item(C &state, const pstring &membername, const pstring &itemname);
+
 		private:
 			netlist_t & m_netlist;
 
@@ -1780,6 +1785,12 @@ namespace netlist
 	inline const netlist_state_t & detail::netlist_object_t::state() const noexcept
 	{
 		return m_netlist.nlstate();
+	}
+
+	template<typename C>
+	inline void detail::netlist_object_t::save_item(C &state, const pstring &membername, const pstring &itemname)
+	{
+		this->state().save(*this, state, name(), membername + "." + itemname);
 	}
 
 	template<class C, typename... Args>

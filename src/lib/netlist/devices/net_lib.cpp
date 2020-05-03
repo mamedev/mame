@@ -64,6 +64,8 @@ namespace devices
 		LIB_ENTRY(sys_dsw1)
 		LIB_ENTRY(sys_dsw2)
 		LIB_ENTRY(sys_compd)
+		LIB_ENTRY(sys_noise_mt_u)
+		LIB_ENTRY(sys_noise_mt_n)
 		LIB_ENTRY(switch1)
 		LIB_ENTRY(switch2)
 		LIB_ENTRY(nicRSFF)

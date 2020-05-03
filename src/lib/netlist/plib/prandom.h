@@ -42,8 +42,9 @@ namespace plib
 	class mersenne_twister_t
 	{
 	public:
+
 		mersenne_twister_t()
-		: index(N+1)
+		: m_p(N)
 		{
 			seed(5489);
 		}
@@ -51,22 +52,29 @@ namespace plib
 		static constexpr T min() noexcept { return static_cast<T>(0); }
 		static constexpr T max() noexcept { return ~T(0) >> (sizeof(T)*8 - w); }
 
+		template <typename ST, typename STR>
+		void save_state(ST &st, const STR &name)
+		{
+			st.save_item(m_p, name, "index");
+			st.save_item(m_mt, name, "mt");
+		}
+
 		void seed(T val) noexcept
 		{
 			const T lowest_w(~T(0) >> (sizeof(T)*8 - w));
-			index = N;
-			mt[0] = val;
+			m_p = N;
+			m_mt[0] = val;
 			for (std::size_t i=1; i< N; i++)
-				mt[i] = (f * (mt[i-1] ^ (mt[i-1] >> (w-2))) + i) & lowest_w;
+				m_mt[i] = (f * (m_mt[i-1] ^ (m_mt[i-1] >> (w-2))) + i) & lowest_w;
 		}
 
 		T operator()() noexcept
 		{
 			const T lowest_w(~T(0) >> (sizeof(T)*8 - w));
-			if (index >= N)
+			if (m_p >= N)
 				twist();
 
-			T y = mt[index++];
+			T y = m_mt[m_p++];
 			y = y ^ ((y >> u) & d);
 			y = y ^ ((y << s) & b);
 			y = y ^ ((y << t) & c);
@@ -77,9 +85,9 @@ namespace plib
 
 		void discard(std::size_t v) noexcept
 		{
-			if  (v > N - index)
+			if  (v > N - m_p)
 			{
-				v -= N - index;
+				v -= N - m_p;
 				twist();
 			}
 			while (v > N)
@@ -87,7 +95,7 @@ namespace plib
 				v -= N;
 				twist();
 			}
-			index += v;
+			m_p += v;
 		}
 
 	private:
@@ -99,15 +107,113 @@ namespace plib
 
 			for (std::size_t i=0; i<N; i++)
 			{
-				const T x((mt[i] & upper_mask) + (mt[(i+1) % N] & lower_mask));
+				const T x((m_mt[i] & upper_mask) + (m_mt[(i+1) % N] & lower_mask));
 				const T xA((x >> 1) ^ ((x & 1) ? a : 0));
-				mt[i] = mt[(i + m) % N] ^ xA;
+				m_mt[i] = m_mt[(i + m) % N] ^ xA;
 			 }
-			 index = 0;
-		 }
+			m_p = 0;
+		}
 
-		std::array<T, N> mt;
-		std::size_t index;
+		std::size_t m_p;
+		std::array<T, N> m_mt;
+	};
+
+	template <typename FT, typename T>
+	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero())
+	{
+		const auto mmin(static_cast<FT>(p.min()));
+		const auto mmax(static_cast<FT>(p.max()));
+		// -> 0 to a
+		return (p() - mmin) / (mmax - mmin) * m - b;
+	}
+
+	template<typename FT>
+	class uniform_distribution_t
+	{
+	public:
+		uniform_distribution_t(FT dev)
+		: m_stddev(dev) { }
+
+		template <typename P>
+		FT operator()(P &p) noexcept
+		{
+			// get -1 to 1
+			return normalize_uniform(p, constants<FT>::two(), constants<FT>::one())
+				* constants<FT>::sqrt3() * m_stddev;
+		}
+
+		template <typename ST, typename STR>
+		void save_state(ST &st, const STR &name)
+		{
+			/* no state to save */
+		}
+
+	private:
+		FT m_stddev;
+	};
+
+	template<typename FT>
+	class normal_distribution_t
+	{
+	public:
+		normal_distribution_t(FT dev)
+		: m_p(m_buf.size()), m_stddev(dev) { }
+
+		// Donald Knuth, Algorithm P (Polar method)
+
+		template <typename P>
+		FT operator()(P &p) noexcept
+		{
+			if (m_p >= m_buf.size())
+				fill(p);
+			return m_buf[m_p++];
+		}
+
+		template <typename ST, typename STR>
+		void save_state(ST &st, const STR &name)
+		{
+			st.save_item(m_p, name, "m_p");
+			st.save_item(m_buf, name, "m_buf");
+		}
+
+	private:
+
+		template <typename P>
+		void fill(P &p) noexcept
+		{
+			for (std::size_t i = 0; i < m_buf.size(); i += 2)
+			{
+				FT s;
+				FT v1;
+				FT v2;
+			    do
+			    {
+			        v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+			        v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+			        s = v1 * v1 + v2 * v2;
+			    } while (s >= constants<FT>::one());
+			    if (s == constants<FT>::zero())
+			    {
+			    	m_buf[i] = s;
+			    	m_buf[i+1] = s;
+			    }
+			    else
+			    {
+			    	// last value with error for log(s)/s
+			    	// double: 1.000000e-305
+			    	// float: 9.999999e-37
+			    	// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
+			    	const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
+			    	m_buf[i] = /*mean+*/ m * v1;
+			    	m_buf[i+1] = /*mean+*/ m * v2;
+			    }
+			}
+			m_p = 0;
+		}
+
+		std::array<FT, 256> m_buf;
+		std::size_t m_p;
+		FT m_stddev;
 	};
 
 	using mt19937_64 = mersenne_twister_t<
