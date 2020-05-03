@@ -127,9 +127,10 @@ namespace devices
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled()
 		, m_funcparam({nlconst::zero()})
 		{
+			m_compiled.save_state(*this, "m_compiled");
 			if (m_func() != "")
 				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
@@ -395,8 +396,9 @@ namespace devices
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled()
 		{
+			m_compiled.save_state(*this, "m_compiled");
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
 			{

@@ -199,7 +199,7 @@ namespace plib
 			    }
 			    else
 			    {
-			    	// last value with error for log(s)/s
+			    	// last value without error for log(s)/s
 			    	// double: 1.000000e-305
 			    	// float: 9.999999e-37
 			    	// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39

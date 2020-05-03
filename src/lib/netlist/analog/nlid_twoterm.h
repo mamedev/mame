@@ -553,9 +553,10 @@ namespace analog
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled()
 		, m_funcparam({nlconst::zero()})
 		{
+			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
@@ -601,9 +602,10 @@ namespace analog
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled()
 		, m_funcparam({nlconst::zero()})
 		{
+			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
