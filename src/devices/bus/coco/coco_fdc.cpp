@@ -40,6 +40,31 @@
 
     Reading from $FF48-$FF4F clears bit 7 of DSKREG ($FF40)
 
+    ---------------------------------------------------------------------------
+
+	Disto No Halt Extension
+
+    The Disto Super Controller II includes "no halt" circuitry. Implemented
+    by using a read and write cache.
+
+    CachDat - Cache Data Register
+    $FF74 & $FF75  Read write cache data.
+
+    CachCtrl - Cache Controller
+    $FF76
+
+    Read: bit 7 low indicates an interrupt request from the disk controller
+
+    Write:
+	   00000000 = Caching off
+	   00001000 = Tell cache controller to send interrupt when device is ready
+	   			  to send/receive a buffer (seek done, etc.)
+	   00000111 = Read cache on - Get next 256 data bytes from controller to cache
+	   00000100 = Write cache on - Next 256 bytes stored in cache are sector
+	   00000110 = Copy Write cache to controller
+
+
+
 *********************************************************************/
 
 #include "emu.h"
@@ -49,18 +74,20 @@
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"
+#include "machine/ram.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "formats/os9_dsk.h"
 
+#define VERBOSE (LOG_GENERAL )
+#include "logmacro.h"
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_FDC                 0
 #define WD_TAG                  "wd17xx"
 #define WD2797_TAG              "wd2797"
 #define DISTO_TAG               "disto"
@@ -89,6 +116,10 @@ protected:
 	};
 
 	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device-level overrides
 	virtual DECLARE_READ8_MEMBER(cts_read) override;
 	virtual DECLARE_READ8_MEMBER(scs_read) override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
@@ -108,6 +139,16 @@ protected:
 	required_device<msm6242_device> m_disto_msm6242;        // 6242 RTC on Disto interface
 	offs_t m_msm6242_rtc_address;
 	optional_ioport m_rtc;
+
+	// Protected
+	virtual DECLARE_READ8_MEMBER(ff74_read);
+	virtual DECLARE_WRITE8_MEMBER(ff74_write);
+
+private:
+	// registers
+	uint8_t m_cache_controler;
+	uint8_t m_cache_pointer;
+	required_device<ram_device>     	        m_cache_buffer;
 };
 
 
@@ -137,12 +178,14 @@ void coco_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
 
 	MSM6242(config, m_disto_msm6242, 32.768_kHz_XTAL);
 
 	DS1315(config, CLOUD9_TAG, 0);
+
+	RAM(config, "cachebuffer").set_default_size("256").set_default_value(0);
 }
 
 
@@ -183,6 +226,7 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 	return memregion("eprom")->base();
 }
 
+
 //-------------------------------------------------
 //  coco_family_fdc_device_base::get_cart_memregion
 //-------------------------------------------------
@@ -209,8 +253,90 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 	, m_disto_msm6242(*this, DISTO_TAG)
 	, m_msm6242_rtc_address(0)
 	, m_rtc(*this, ":real_time_clock")
+	, m_cache_buffer(*this, "cachebuffer")
 {
 }
+
+
+//-------------------------------------------------
+//  coco_fdc_device_base::device_start
+//-------------------------------------------------
+
+void coco_fdc_device_base::device_start()
+{
+	install_readwrite_handler(0xFF74, 0xFF76,
+			read8_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
+			write8_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));
+
+	save_item(NAME(m_cache_controler));
+	save_item(NAME(m_cache_pointer));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void coco_fdc_device_base::device_reset()
+{
+	m_cache_controler = 0x80;
+	m_cache_pointer = 0;
+}
+
+
+//-------------------------------------------------
+//  ff74_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_fdc_device_base::ff74_read)
+{
+	uint8_t data = 0x0;
+
+	switch(offset)
+	{
+		case 0x0:
+			data = m_cache_buffer->read(m_cache_pointer++);
+			LOG( "CachDat_A read: %2.2x\n", data );
+			break;
+		case 0x1:
+			data = m_cache_buffer->read(m_cache_pointer++);
+			LOG( "CachDat_B read: %2.2x\n", data );
+			break;
+		case 0x2:
+			data = m_cache_controler;
+			m_cache_controler |= 0x80; /* hi means interrupt clear */
+			LOG( "CachCtrl read: %2.2x\n", data );
+			break;
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  ff7d_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_fdc_device_base::ff74_write)
+{
+	switch(offset)
+	{
+		case 0x0:
+			LOG( "CachDat_A write: %2.2x\n", data );
+			m_cache_buffer->write(m_cache_pointer++, data);
+			break;
+		case 0x1:
+			LOG( "CachDat_B write: %2.2x\n", data );
+			m_cache_buffer->write(m_cache_pointer++, data);
+			break;
+		case 0x2:
+			LOG( "CachCtrl write: %2.2x\n", data );
+
+			m_cache_controler = (m_cache_controler & 0x80) | (data & 0x7f);
+			break;
+	}
+}
+
 
 //-------------------------------------------------
 //  real_time_clock
@@ -238,15 +364,57 @@ coco_fdc_device_base::rtc_type coco_fdc_device_base::real_time_clock()
 
 void coco_fdc_device_base::update_lines()
 {
-	// clear HALT enable under certain circumstances
-	if (intrq() && (dskreg() & 0x20))
-		set_dskreg(dskreg() & ~0x80);  // clear halt enable
+	if( (m_cache_controler & 0x7f) == 0) /* cache disabled */
+	{
+		// clear HALT enable under certain circumstances
+		if (intrq() && (dskreg() & 0x20))
+			set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
-	// set the NMI line
-	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
+		// set the NMI line
+		set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
-	// set the HALT line
-	set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
+		// set the HALT line
+		set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
+	}
+	else
+	{
+		if( drq() == ASSERT_LINE)
+		{
+
+			if( (m_cache_controler & 0x07) == 0x07) /* Read cache on */
+			{
+				uint8_t data = m_wd17xx->data_r();
+				LOG("Cached drq read: %2.2x\n", data );
+				m_cache_buffer->write(m_cache_pointer++, data);
+			}
+			else if( (m_cache_controler & 0x07) == 0x04 ) /* Write cache on */
+			{
+				uint8_t data = m_cache_buffer->read(m_cache_pointer++);
+				LOG("Cached drq write: %2.2x\n", data );
+				m_wd17xx->data_w(data);
+			}
+			else if( (m_cache_controler & 0x07) == 0x06 ) /* Copy Write cache to controller */
+			{
+				uint8_t data = m_cache_buffer->read(m_cache_pointer++);
+				LOG("Cached drq write: %2.2x\n", data );
+				m_wd17xx->data_w(data);
+			}
+			else
+			{
+				LOG("Unknown drq cached assert mode\n" );
+			}
+		}
+
+		if( (m_cache_controler & 0x08) == 0x08)
+		{
+			set_line_value(line::CART, intrq());
+		}
+
+		if( intrq() == ASSERT_LINE)
+		{
+			m_cache_controler &= 0x7f; /* low mean irq asserted */
+		}
+	}
 }
 
 
@@ -259,19 +427,16 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	uint8_t drive = 0;
 	uint8_t head;
 
-	if (LOG_FDC)
-	{
-		logerror("fdc_coco_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
-			data & 0x80 ? 'H' : 'h',
-			data & 0x40 ? '3' : '.',
-			data & 0x20 ? 'D' : 'S',
-			data & 0x10 ? 'P' : 'p',
-			data & 0x08 ? 'M' : 'm',
-			data & 0x04 ? '2' : '.',
-			data & 0x02 ? '1' : '.',
-			data & 0x01 ? '0' : '.',
-			data);
-	}
+	LOG("fdc_coco_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+		data & 0x80 ? 'H' : 'h',
+		data & 0x40 ? '3' : '.',
+		data & 0x20 ? 'D' : 'S',
+		data & 0x10 ? 'P' : 'p',
+		data & 0x08 ? 'M' : 'm',
+		data & 0x04 ? '2' : '.',
+		data & 0x02 ? '1' : '.',
+		data & 0x01 ? '0' : '.',
+		data);
 
 	// An email from John Kowalski informed me that if the DS3 is
 	// high, and one of the other drive bits is selected (DS0-DS2), then the
@@ -334,41 +499,46 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 	{
 		case 8:
 			result = m_wd17xx->status_r();
+			LOG("m_wd17xx->status_r: %2.2x\n", result );
 			break;
 		case 9:
 			result = m_wd17xx->track_r();
+			LOG("m_wd17xx->track_r: %2.2x\n", result );
 			break;
 		case 10:
 			result = m_wd17xx->sector_r();
+			LOG("m_wd17xx->sector_r: %2.2x\n", result );
 			break;
 		case 11:
 			result = m_wd17xx->data_r();
+			LOG("m_wd17xx->data_r: %2.2x\n", result );
 			break;
 	}
 
 	/* other stuff for RTCs */
 	switch (offset)
 	{
-	case 0x10:  /* FF50 */
-		if (real_time_clock() == rtc_type::DISTO)
-			result = m_disto_msm6242->read(m_msm6242_rtc_address);
-		break;
+		case 0x10:  /* FF50 */
+			if (real_time_clock() == rtc_type::DISTO)
+				result = m_disto_msm6242->read(m_msm6242_rtc_address);
+			break;
 
-	case 0x38:  /* FF78 */
-		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_0();
-		break;
+		case 0x38:  /* FF78 */
+			if (real_time_clock() == rtc_type::CLOUD9)
+				m_ds1315->read_0();
+			break;
 
-	case 0x39:  /* FF79 */
-		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_1();
-		break;
+		case 0x39:  /* FF79 */
+			if (real_time_clock() == rtc_type::CLOUD9)
+				m_ds1315->read_1();
+			break;
 
-	case 0x3C:  /* FF7C */
-		if (real_time_clock() == rtc_type::CLOUD9)
-			result = m_ds1315->read_data();
-		break;
+		case 0x3C:  /* FF7C */
+			if (real_time_clock() == rtc_type::CLOUD9)
+				result = m_ds1315->read_data();
+			break;
 	}
+
 	return result;
 }
 
@@ -386,15 +556,19 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 			dskreg_w(data);
 			break;
 		case 8:
+			LOG("m_wd17xx->cmd_w: %2.2x\n", data );
 			m_wd17xx->cmd_w(data);
 			break;
 		case 9:
+			LOG("m_wd17xx->track_w: %2.2x\n", data );
 			m_wd17xx->track_w(data);
 			break;
 		case 10:
+			LOG("m_wd17xx->sector_w: %2.2x\n", data );
 			m_wd17xx->sector_w(data);
 			break;
 		case 11:
+			LOG("m_wd17xx->data_w: %2.2x\n", data );
 			m_wd17xx->data_w(data);
 			break;
 	};
