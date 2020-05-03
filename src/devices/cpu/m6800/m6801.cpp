@@ -1430,7 +1430,7 @@ void m6801_cpu_device::ocrh_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register: %02x\n", data);
 
-	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
+	if(!(m_pending_tcsr&TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
 		modified_tcsr();
@@ -1447,7 +1447,7 @@ void m6801_cpu_device::ocrl_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register: %02x\n", data);
 
-	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
+	if(!(m_pending_tcsr&TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
 		modified_tcsr();
@@ -1511,7 +1511,7 @@ void hd6301x_cpu_device::ocr2h_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register 2: %02x\n", data);
 
-	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	if(!(m_pending_tcsr2&TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
 		modified_tcsr();
@@ -1528,7 +1528,7 @@ void hd6301x_cpu_device::ocr2l_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register 2: %02x\n", data);
 
-	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	if(!(m_pending_tcsr2&TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
 		modified_tcsr();

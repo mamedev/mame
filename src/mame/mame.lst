@@ -15817,6 +15817,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
@@ -15824,7 +15825,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-sfxchas                         // Tandy Corporation
 tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
