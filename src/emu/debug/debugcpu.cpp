@@ -1163,7 +1163,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 			m_machine.debug_view().flush_osd_updates();
 			m_last_periodic_update_time = osd_ticks();
 		}
-		else if (device == m_breakcpu)
+		if (device == m_breakcpu)
 		{   // check for pending breaks
 			m_execution_state = exec_state::STOPPED;
 			m_breakcpu = nullptr;
@@ -1190,6 +1190,13 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 void debugger_cpu::stop_hook(device_t *device)
 {
 	assert(m_livecpu == device);
+
+	// if we are supposed to be stopped at this point (most likely because of a watchpoint), keep going until this CPU is live again
+	if (m_execution_state == exec_state::STOPPED)
+	{
+		m_breakcpu = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 
 	// clear the live CPU
 	m_livecpu = nullptr;
@@ -2956,6 +2963,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 	}
 
 	// halt in the debugger by default
+	bool was_stopped = debug.cpu().is_stopped();
 	debug.cpu().set_execution_stopped();
 
 	// evaluate the action
@@ -2965,19 +2973,28 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 	// print a notification, unless the action made us go again
 	if (debug.cpu().is_stopped())
 	{
-		offs_t pc = m_space.device().state().pcbase();
 		std::string buffer;
 
 		buffer = string_format(type == read_or_write::READ ?
-							   "Stopped at watchpoint %X reading %0*X from %08X (PC=%X)" :
-							   "Stopped at watchpoint %X writing %0*X to %08X (PC=%X)",
+							   "Stopped at watchpoint %X reading %0*X from %08X" :
+							   "Stopped at watchpoint %X writing %0*X to %08X",
 							   m_index,
 							   size * unit_size / 4,
 							   data,
-							   address,
-							   pc);
-		debug.console().printf("%s\n", buffer);
-		m_debugInterface->compute_debug_flags();
+							   address);
+
+		if (debug.cpu().live_cpu() == &m_space.device())
+		{
+			offs_t pc = m_space.device().state().pcbase();
+			debug.console().printf("%s (PC=%X)\n", buffer, pc);
+			m_debugInterface->compute_debug_flags();
+		}
+		else if (!was_stopped)
+		{
+			debug.console().printf("%s\n", buffer);
+			debug.cpu().set_execution_running();
+			debug.cpu().set_break_cpu(&m_space.device());
+		}
 		m_debugInterface->set_triggered_watchpoint(this);
 	}
 
