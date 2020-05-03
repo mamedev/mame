@@ -178,8 +178,8 @@ void coco_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
 
 	MSM6242(config, m_disto_msm6242, 32.768_kHz_XTAL);
 
