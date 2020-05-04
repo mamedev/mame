@@ -90,6 +90,7 @@
 #include "emu.h"
 #include "includes/capbowl.h"
 
+#include "machine/rescap.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"

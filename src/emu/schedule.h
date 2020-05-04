@@ -24,17 +24,6 @@
 
 #define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
 
-// macro for the RC time constant on a 74LS123 with C > 1000pF
-// R is in ohms, C is in farads
-#define TIME_OF_74LS123(r,c)            (0.45 * (double)(r) * (double)(c))
-
-// macros for the RC time constant on a 555 timer IC
-// R is in ohms, C is in farads
-#define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)  ((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
-#define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c) ((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
-#define PERIOD_OF_555_MONOSTABLE(r,c)       attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
-#define PERIOD_OF_555_ASTABLE(r1,r2,c)      attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
