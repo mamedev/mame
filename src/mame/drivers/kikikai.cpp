@@ -24,10 +24,6 @@ Notes:
   To set it up, just enable the single board 4p mode and keep the master/slave
   mode to off and the board ID to master.
 
-- kicknrun the MC6801U4 mcu has been decapped and it's internal ROM has beed dumped.
-  Currently it's not hooked up properly, initial hook up is based the code from
-  Bubble Bobble - see bublbobl.ccp
-
 - mexico86 does a PS4 STOP ERROR shortly after boot, but works afterwards. PS4 is
   the MC6801U4 mcu, the bootleggers replaced it with a custom programmed 68705 MCU.
 
