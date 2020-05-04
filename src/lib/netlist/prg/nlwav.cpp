@@ -60,7 +60,8 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
-		m_f.write(reinterpret_cast<const std::ostream::char_type *>(&val), sizeof(T));
+		auto ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
+		m_f.write(ptr, sizeof(T));
 	}
 
 	void write_sample(const int *sample)
@@ -213,6 +214,7 @@ struct aggregator
 	{
 		while (time >= ct + m_quantum)
 		{
+			ct += m_quantum;
 			for (std::size_t i=0; i< m_channels; i++)
 			{
 				outsam[i] += (ct - lt) * cursam[i];
@@ -221,7 +223,6 @@ struct aggregator
 				outsam[i] = 0.0;
 			}
 			lt = ct;
-			ct += m_quantum;
 		}
 		for (std::size_t i=0; i< m_channels; i++)
 			outsam[i] += (time-lt)*cursam[i];
@@ -481,7 +482,7 @@ private:
 	void convert_wav(std::ostream &ostrm);
 	void convert_vcd(std::ostream &ostrm, vcdwriter::format_e format);
 	void convert_tab(std::ostream &ostrm);
-	void convert(std::ostream &ostrm);
+	void convert(const pstring &outname);
 
 	plib::option_str_limit<unsigned> opt_fmt;
 	plib::option_str    opt_out;
@@ -574,18 +575,42 @@ pstring nlwav_app::usage()
 			"nlwav [OPTION] ... [FILE] ...");
 }
 
-void nlwav_app::convert(std::ostream &ostrm)
+template <typename F>
+static void open_ostream_and_exec(pstring fname, bool binary, F func)
+{
+	if (fname != "-")
+	{
+		// FIXME: binary depends on format!
+		auto outstrm(std::ofstream(plib::filesystem::u8path(fname),
+			binary ? (std::ios::out | std::ios::binary) : std::ios::out));
+		if (outstrm.fail())
+			throw plib::file_open_e(fname);
+		outstrm.imbue(std::locale::classic());
+		func(outstrm);
+	}
+	else
+	{
+		std::cout.imbue(std::locale::classic());
+		func(std::cout);
+	}
+}
+
+void nlwav_app::convert(const pstring &outname)
 {
 	switch (opt_fmt())
 	{
 		case 0:
-			convert_wav(ostrm); break;
+			open_ostream_and_exec(outname, true, [this](std::ostream &ostrm) { convert_wav(ostrm); });
+			break;
 		case 1:
-			convert_vcd(ostrm, vcdwriter::ANALOG); break;
+			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::ANALOG); });
+			break;
 		case 2:
-			convert_vcd(ostrm, vcdwriter::DIGITAL); break;
+			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::DIGITAL); });
+			break;
 		case 3:
-			convert_tab(ostrm); break;
+			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_tab(ostrm); });
+			break;
 		default:
 			// tease compiler - can't happen
 			break;
@@ -627,19 +652,7 @@ int nlwav_app::execute()
 		m_instrms.push_back(std::move(fin));
 	}
 
-	if (opt_out() != "-")
-	{
-		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
-		if (outstrm.fail())
-			throw plib::file_open_e(opt_out());
-		outstrm.imbue(std::locale::classic());
-		convert(outstrm);
-	}
-	else
-	{
-		std::cout.imbue(std::locale::classic());
-		convert(std::cout);
-	}
+	convert(opt_out());
 
 	return 0;
 }
