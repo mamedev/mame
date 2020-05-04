@@ -1499,9 +1499,25 @@ void device_debug::exception_hook(int exception)
 	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
-		m_device.machine().debugger().cpu().set_execution_stopped();
-		m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
-		compute_debug_flags();
+		bool matched = true;
+		if (m_exception_condition && !m_exception_condition->is_empty())
+		{
+			try
+			{
+				matched = m_exception_condition->execute();
+			}
+			catch (expression_error &)
+			{
+				return;
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
+			compute_debug_flags();
+		}
 	}
 }
 
@@ -1513,18 +1529,18 @@ void device_debug::exception_hook(int exception)
 
 void device_debug::privilege_hook()
 {
-	bool matched = 1;
-
 	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
 	{
+		bool matched = true;
 		if (m_privilege_condition && !m_privilege_condition->is_empty())
 		{
 			try
 			{
 				matched = m_privilege_condition->execute();
 			}
-			catch (...)
+			catch (expression_error &)
 			{
+				return;
 			}
 		}
 
@@ -1847,12 +1863,13 @@ void device_debug::go_next_device()
 //  exception fires on the visible CPU
 //-------------------------------------------------
 
-void device_debug::go_exception(int exception)
+void device_debug::go_exception(int exception, const char *condition)
 {
 	assert(m_exec != nullptr);
 
 	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
+	m_exception_condition = std::make_unique<parsed_expression>(m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
