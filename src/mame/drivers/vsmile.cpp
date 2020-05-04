@@ -191,7 +191,7 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x04, "UK/US" )
 	PORT_DIPSETTING(    0x07, "China" )
 	PORT_DIPSETTING(    0x08, "Mexico" )
-	PORT_DIPSETTING(    0x0a, "Italy" )
+	PORT_DIPSETTING(    0x0a, "Italy" ) // not valid on V.Smile Motion?
 	PORT_DIPSETTING(    0x0b, "Germany" )
 	PORT_DIPSETTING(    0x0c, "Spain" )
 	PORT_DIPSETTING(    0x0d, "France" )
@@ -297,9 +297,9 @@ ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, BAD_DUMP CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a German unit (but doesn't seem region specific)
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
 CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
