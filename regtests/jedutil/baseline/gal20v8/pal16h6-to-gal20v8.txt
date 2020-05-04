@@ -4,12 +4,12 @@ Inputs:
 
 Outputs:
 
-16 (Combinatorial, Output feedback combinatorial, Active high)
-17 (Combinatorial, Output feedback combinatorial, Active high)
+16 (Combinatorial, Output feedback output, Active high)
+17 (Combinatorial, Output feedback output, Active high)
 18 (Combinatorial, No output feedback, Active high)
 19 (Combinatorial, No output feedback, Active high)
-20 (Combinatorial, Output feedback combinatorial, Active high)
-21 (Combinatorial, Output feedback combinatorial, Active high)
+20 (Combinatorial, Output feedback output, Active high)
+21 (Combinatorial, Output feedback output, Active high)
 
 Equations:
 

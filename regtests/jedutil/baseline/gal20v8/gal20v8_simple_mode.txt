@@ -4,21 +4,21 @@ Inputs:
 
 Outputs:
 
-16 (Combinatorial, Output feedback combinatorial, Active low)
+16 (Combinatorial, Output feedback output, Active low)
 18 (Combinatorial, No output feedback, Active high)
 19 (Combinatorial, No output feedback, Active low)
-21 (Combinatorial, Output feedback combinatorial, Active high)
+21 (Combinatorial, Output feedback output, Active high)
 
 Equations:
 
 /o16 = i1 & i2 & i3 & i4 & i5 +
-       /i6 & /i7 & /i8 & /i9 & /i10 & of21 +
+       /i6 & /i7 & /i8 & /i9 & /i10 & o21 +
        i11 & i13 & i14 & i15 +
        /i17 & /i20 & /i22 & /i23 +
        /i1 & /i2 & /i3 & /i4 & /i5 +
-       i6 & i7 & i8 & i9 & i10 & of16 +
+       i6 & i7 & i8 & i9 & i10 & o16 +
        /i11 & /i13 & /i14 & /i15 +
-       i17 & i20 & /of21 & i22 & i23
+       i17 & i20 & /o21 & i22 & i23
 o16.oe = vcc
 
 o18 = i17 & i20 & i22 & i23 +
@@ -26,14 +26,14 @@ o18 = i17 & i20 & i22 & i23 +
       i6 & i7 & i8 & i9 & i10 +
       /i1 & /i2 & /i3 & /i4 & /i5 +
       /i17 & /i20 & /i22 & /i23 +
-      i11 & i13 & i14 & i15 & /of16 & /of21 +
+      i11 & i13 & i14 & i15 & /o16 & /o21 +
       /i6 & /i7 & /i8 & /i9 & /i10 +
       i1 & i2 & i3 & i4 & i5
 o18.oe = vcc
 
 /o19 = /i1 & /i3 +
        /i5 & /i7 +
-       /i9 & /i11 & of16 & of21 +
+       /i9 & /i11 & o16 & o21 +
        /i13 & /i15 +
        i17 & i23 +
        i2 & i4 & i6 +

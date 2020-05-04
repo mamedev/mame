@@ -4,10 +4,10 @@ Inputs:
 
 Outputs:
 
-12 (Combinatorial, No output feedback, Active low)
+12 (Combinatorial, Output feedback output, Active low)
 15 (Combinatorial, No output feedback, Active low)
 16 (Combinatorial, No output feedback, Active high)
-18 (Combinatorial, No output feedback, Active low)
+18 (Combinatorial, Output feedback output, Active low)
 
 Equations:
 
