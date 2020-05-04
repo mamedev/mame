@@ -192,6 +192,8 @@ WRITE8_MEMBER(duet16_state::dispctrl_w)
 
 MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 {
+	if(!de)
+		return;
 	u8 *gvram = (u8 *)&m_gvram[0];
 	for(int i = 0; i < x_count; i++)
 	{

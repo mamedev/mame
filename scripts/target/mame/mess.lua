@@ -420,6 +420,7 @@ VIDEOS["BT431"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["AM2901B"] = true
 MACHINES["AUTOCONFIG"] = true
 MACHINES["BUSMOUSE"] = true
 MACHINES["CR511B"] = true
@@ -3211,16 +3212,6 @@ files {
 createMESSProjects(_target, _subtarget, "quantel")
 files {
 	MAME_DIR .. "src/mame/drivers/dpb7000.cpp",
-	MAME_DIR .. "src/mame/video/dpb_combiner.cpp",
-	MAME_DIR .. "src/mame/video/dpb_combiner.h",
-	MAME_DIR .. "src/mame/video/dpb_brushproc.cpp",
-	MAME_DIR .. "src/mame/video/dpb_brushproc.h",
-	MAME_DIR .. "src/mame/video/dpb_brushstore.cpp",
-	MAME_DIR .. "src/mame/video/dpb_brushstore.h",
-	MAME_DIR .. "src/mame/video/dpb_framestore.cpp",
-	MAME_DIR .. "src/mame/video/dpb_framestore.h",
-	MAME_DIR .. "src/mame/video/dpb_storeaddr.cpp",
-	MAME_DIR .. "src/mame/video/dpb_storeaddr.h",
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 }
 

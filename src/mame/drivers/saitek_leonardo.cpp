@@ -11,8 +11,8 @@ Mephistos, these boards are actual chesscomputers and not an accessory.
 They called the expansion capability "OSA", for "Open Systems Architecture".
 One for a link port to a PC, and one for a module slot. The expansion modules
 are basically entire chesscomputers, making the whole thing combined a
-'dual brain' chesscomputer. The embedded chess engine is by Julio Kaplan,
-same as the one in SciSys Turbo S-24K.
+'dual brain' chesscomputer. The embedded chess engine is by Julio Kaplan
+and Craig Barnes, same as the one in SciSys Turbo S-24K.
 
 Hardware notes:
 
@@ -36,21 +36,15 @@ The 1.4 ROM is identical to it too, even though it's a different MCU type.
 And on the outside, the button panel was redesigned a bit.
 
 Expansion modules released:
-- Maestro (65C02, Julio Kaplan)
-- Analyst (65C02, Julio Kaplan)
+- Maestro (65C02, Kaplan/Barnes)
+- Analyst (65C02, Kaplan/Barnes)
 - Brute Force (H8, Frans Morsch)
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
-- It locks up a short time after you make an input error (eg. on computer's
-  turn, enter the wrong move so it will give a low pitch error beep, then hold
-  INS to fast-forward and it will lock up) - happens with leonardoa too, but
-  after a longer delay. At first glance, it looks like it's caused by inaccurate
-  6801 timer emulation. It also locks up when you get checkmated, seems to be
-  the same problem as above.
+- computer calculates too fast: MCU timer emulation is bad
 - OSA module support (softwarelist, devices/bus)
 - OSA PC link (probably uses MCU serial interface)
-- unsure about white/black/check/end/module/comm leds
 - add nvram
 - finish internal artwork
 
@@ -107,10 +101,10 @@ private:
 	void unk_w(u8 data);
 
 	u8 p2_r();
-	u8 p5_r();
-	u8 p6_r();
 	void p2_w(u8 data);
+	u8 p6_r();
 	void p5_w(u8 data);
+	u8 p5_r();
 	void p6_w(u8 data);
 
 	u8 m_inp_mux = 0;
@@ -134,23 +128,24 @@ void leo_state::machine_start()
 void leo_state::update_display()
 {
 	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0], false);
-	m_display->matrix_partial(8, 3, ~m_inp_mux >> 5 & 7, (~m_inp_mux << 3 & 0x700) | m_led_data[1], true);
+	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1], true);
 }
 
 void leo_state::mux_w(u8 data)
 {
-	// d0-d3: input/chessboard leds mux
-	// d5-d7: button leds mux
+	// d0-d3: input/chessboard led mux
+	// d5: button led select
+	// d6,d7: button led data
 	m_inp_mux = data;
 	update_display();
 
 	// d4: speaker out
-	m_dac->write(data >> 4 & 1);
+	m_dac->write(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)
 {
-	// button leds data
+	// button led data
 	m_led_data[1] = ~data;
 	update_display();
 }
@@ -253,17 +248,17 @@ static INPUT_PORTS_START( leo )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // pawn
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // n
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // tab/color
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // +
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // freq
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // function?
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // sound
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // freq
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // freq sel
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // stop?
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // library?
 
@@ -278,14 +273,16 @@ static INPUT_PORTS_START( leo )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // analysis?
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // n
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // new game
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) // setup?
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_L) // low battery
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_CONFNAME( 0x04, 0x04, "Battery Status" )
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x04, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 
@@ -311,7 +308,7 @@ void leo_state::leo(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(8+3, 8+3);
+	PWM_DISPLAY(config, m_display).set_size(8+2, 8+2);
 	config.set_default_layout(layout_saitek_leonardo);
 
 	/* sound hardware */

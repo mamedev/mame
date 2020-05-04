@@ -2,7 +2,9 @@
 // copyright-holders:
 /*******************************************************************************
 
-    Skeleton driver for Sleic / Petaco's Star Touch / EuroPlay 2001
+    Skeleton driver for "EuroByte Electronics & Multimedia IASA" EuroPlay
+    (http://www.eurobyte.com.gr/gb_europlay.htm), sold in Spain by Sleic / Petaco
+    as Star Touch / EuroPlay 2001.
 
     Hardware overview:
     MB Soyo M5EH V1.2 (1MB cache)

@@ -1616,6 +1616,30 @@ READ8_MEMBER( isa8_ec1841_0002_device::io_read )
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_MC1502, isa8_cga_mc1502_device, "cga_mc1502", "MC1502 CGA")
 
+void isa8_cga_mc1502_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, CGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(16'000'000), 912, 0, 640, 462, 0, 400);
+	screen.set_screen_update(FUNC(isa8_cga_mc1502_device::screen_update));
+
+	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
+
+	MC6845(config, m_crtc, XTAL(16'000'000)/16); // soviet clone
+	m_crtc->set_screen(nullptr);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(isa8_cga_mc1502_device::crtc_update_row));
+	m_crtc->out_hsync_callback().set(FUNC(isa8_cga_mc1502_device::hsync_changed));
+	m_crtc->out_vsync_callback().set(FUNC(isa8_cga_mc1502_device::vsync_changed));
+	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_mc1502_device::reconfigure));
+}
+
+MC6845_RECONFIGURE( isa8_cga_mc1502_device::reconfigure )
+{
+	// this has a different horiz freq
+	m_screen->configure(width, height, visarea, frame_period);
+}
+
 //-------------------------------------------------
 //  isa8_cga_mc1502_device - constructor
 //-------------------------------------------------

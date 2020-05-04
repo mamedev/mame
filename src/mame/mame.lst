@@ -12304,6 +12304,9 @@ tanodr64h                       // Tano Dragon 64 (NTSC) with HD6309
 @source:dragrace.cpp
 dragrace                        // 008505-008521    1977/06 [6800]
 
+@source:drdmania.cpp
+drdmania                        //
+
 @source:dreambal.cpp
 dreambal                        // MM
 
@@ -15814,6 +15817,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
@@ -15821,7 +15825,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-sfxchas                         // Tandy Corporation
 tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
@@ -31208,6 +31211,7 @@ rf2                             // GX561 (c) 1985
 salamand                        // GX587 (c) 1986
 salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
+twinbeeb                        // Bubble System
 
 @source:neogeo.cpp
 neogeo                          // NeoGeo MV-6F

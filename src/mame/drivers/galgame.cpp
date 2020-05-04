@@ -59,7 +59,7 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
-	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
+	uint8_t galaxygame_irq_callback(offs_t offset);
 	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	void galaxygame_map(address_map &map);
@@ -303,9 +303,9 @@ void galaxygame_state::galaxygame_map(address_map &map)
 }
 
 
-IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
+uint8_t galaxygame_state::galaxygame_irq_callback(offs_t offset)
 {
-	device.execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x40;
 }
 
@@ -320,6 +320,8 @@ INTERRUPT_GEN_MEMBER(galaxygame_state::galaxygame_irq)
 
 void galaxygame_state::machine_reset()
 {
+	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
+
 	m_clk = 0x00;
 	m_point_work_list_index = 0;
 	m_point_display_list_index = 0;
@@ -331,7 +333,7 @@ void galaxygame_state::galaxygame(machine_config &config)
 	T11(config, m_maincpu, 3000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxygame_state::galaxygame_map);
 	m_maincpu->set_initial_mode(5 << 13);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxygame_state::galaxygame_irq_callback));
+	m_maincpu->in_iack().set(FUNC(galaxygame_state::galaxygame_irq_callback));
 	m_maincpu->set_periodic_int(FUNC(galaxygame_state::galaxygame_irq), attotime::from_hz(60));
 
 	/* video hardware */

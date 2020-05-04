@@ -71,6 +71,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
 		MAME_DIR .. "src/lib/netlist/plib/ppreprocessor.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/ppreprocessor.h",
+		MAME_DIR .. "src/lib/netlist/plib/prandom.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstonum.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",

@@ -134,7 +134,6 @@ namespace netlist
 			connect(m_RP.P(), *m_tp);
 		}
 		connect(m_RN.P(), m_RP.N());
-		//printf("vcc: %f\n", logic_family()->fixed_V());
 	}
 
 
@@ -161,7 +160,6 @@ namespace netlist
 			{
 				if (state)
 				{
-
 					m_RN.set_G_V_I(G_OFF,
 						nlconst::zero(),
 						nlconst::zero());

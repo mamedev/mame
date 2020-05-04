@@ -157,8 +157,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gv",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1, _2));
 	m_console.register_command("gint",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
 	m_console.register_command("gi",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
-	m_console.register_command("gex",       CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
-	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
+	m_console.register_command("gex",       CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
+	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
@@ -899,7 +899,11 @@ void debugger_commands::execute_go_exception(int ref, const std::vector<std::str
 	if (params.size() > 0 && !validate_number_parameter(params[0], exception))
 		return;
 
-	m_cpu.get_visible_cpu()->debug()->go_exception(exception);
+	parsed_expression condition(m_cpu.get_visible_cpu()->debug()->symtable());
+	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+		return;
+
+	m_cpu.get_visible_cpu()->debug()->go_exception(exception, (condition.is_empty()) ? "1" : condition.original_string());
 }
 
 

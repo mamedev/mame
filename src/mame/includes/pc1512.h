@@ -110,29 +110,29 @@ public:
 	void update_fdc_tc();
 	void update_ack();
 
-	DECLARE_READ8_MEMBER( system_r );
-	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_READ8_MEMBER( mouse_r );
-	DECLARE_WRITE8_MEMBER( mouse_w );
-	DECLARE_WRITE8_MEMBER( dma_page_w );
-	DECLARE_WRITE8_MEMBER( nmi_mask_w );
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
+	uint8_t system_r(offs_t offset);
+	void system_w(offs_t offset, uint8_t data);
+	uint8_t mouse_r(offs_t offset);
+	void mouse_w(offs_t offset, uint8_t data);
+	void dma_page_w(offs_t offset, uint8_t data);
+	void nmi_mask_w(uint8_t data);
+	uint8_t printer_r(offs_t offset);
+	void printer_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
-	DECLARE_READ8_MEMBER( memr_r );
-	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_READ8_MEMBER( ior1_r );
-	DECLARE_READ8_MEMBER( ior2_r );
-	DECLARE_READ8_MEMBER( ior3_r );
-	DECLARE_WRITE8_MEMBER( iow0_w );
-	DECLARE_WRITE8_MEMBER( iow1_w );
-	DECLARE_WRITE8_MEMBER( iow2_w );
-	DECLARE_WRITE8_MEMBER( iow3_w );
+	uint8_t memr_r(offs_t offset);
+	void memw_w(offs_t offset, uint8_t data);
+	uint8_t ior1_r();
+	uint8_t ior2_r();
+	uint8_t ior3_r();
+	void iow0_w(uint8_t data);
+	void iow1_w(uint8_t data);
+	void iow2_w(uint8_t data);
+	void iow3_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
@@ -145,8 +145,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE8_MEMBER( mouse_x_w );
-	DECLARE_WRITE8_MEMBER( mouse_y_w );
+	void mouse_x_w(uint8_t data);
+	void mouse_y_w(uint8_t data);
 
 	// system status register
 	int m_pit1;
@@ -221,10 +221,10 @@ public:
 	MC6845_UPDATE_ROW(draw_graphics_2);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
-	DECLARE_READ8_MEMBER( vdu_r );
-	DECLARE_WRITE8_MEMBER( vdu_w );
+	uint8_t video_ram_r(offs_t offset);
+	void video_ram_w(offs_t offset, uint8_t data);
+	uint8_t vdu_r(offs_t offset);
+	void vdu_w(offs_t offset, uint8_t data);
 
 	void pc1512_video(machine_config &config);
 	void pc1512hd(machine_config &config);
@@ -262,8 +262,8 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_READ8_MEMBER( printer_r );
+	uint8_t io_r(offs_t offset);
+	uint8_t printer_r(offs_t offset);
 
 	required_ioport m_sw;
 

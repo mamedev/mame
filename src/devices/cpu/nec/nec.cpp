@@ -323,7 +323,8 @@ void nec_common_device::nec_interrupt(unsigned int_num, int/*INTSOURCES*/ source
 	m_MF = 1;
 
 	if (source == INT_IRQ)  /* get vector */
-		int_num = (standard_irq_callback)(0);
+		int_num = standard_irq_callback(0);
+	debugger_exception_hook(int_num);
 
 	dest_off = read_mem_word(int_num*4);
 	dest_seg = read_mem_word(int_num*4+2);

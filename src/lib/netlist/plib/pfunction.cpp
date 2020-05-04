@@ -9,6 +9,7 @@
 #include "pstrutil.h"
 #include "putil.h"
 
+#include <array>
 #include <stack>
 #include <type_traits>
 #include <map>

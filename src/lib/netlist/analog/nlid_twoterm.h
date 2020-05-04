@@ -430,6 +430,9 @@ namespace analog
 	///  the following parameters. A "Y" in the first column indicates that the
 	///  parameter is actually used in netlist.
 	///
+	///  NBV, BV and IBV are only used in the ZDIODE model. It is assumed
+	///  that DIODEs are not modeled up to their breakdown voltage.
+	///
 	///   |NL? |name  |parameter                        |units|default| example|area  |
 	///   |:--:|:-----|:--------------------------------|:----|------:|-------:|:----:|
 	///   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
@@ -444,8 +447,9 @@ namespace analog
 	///   |    |KF    |flicker noise coefficient        |-    |      0|        |      |
 	///   |    |AF    |flicker noise exponent           |-    |      1|        |      |
 	///   |    |FC    |coefficient for forward-bias depletion capacitance formula|-|0.5|| |
-	///   |    |BV    |reverse breakdown voltage        |V    |infinite|     40|      |
-	///   |    |IBV   |current at breakdown voltage     |V    |  0.001|        |      |
+	///   | Y  |NBV   |reverse emission coefficient     |-    |      3|       1|      |
+	///   | Y  |BV    |reverse breakdown voltage        |V    |infinite|     40|      |
+	///   | Y  |IBV   |current at breakdown voltage     |A    |  0.001|        |      |
 	///   |    |TNOM  |parameter measurement temperature|deg C|     27|      50|      |
 	///
 	class diode_model_t : public param_model_t
@@ -459,6 +463,21 @@ namespace analog
 
 		value_t m_IS;    //!< saturation current.
 		value_t m_N;     //!< emission coefficient.
+	};
+
+	class zdiode_model_t : public diode_model_t
+	{
+	public:
+		zdiode_model_t(device_t &device, const pstring &name, const pstring &val)
+		: diode_model_t(device, name, val)
+		, m_NBV(*this, "NBV")
+		, m_BV(*this, "BV")
+		, m_IBV(*this, "IBV")
+		{}
+
+		value_t m_NBV;    //!< reverse emission coefficient.
+		value_t m_BV;     //!< reverse breakdown voltage.
+		value_t m_IBV;    //!< current at breakdown voltage.
 	};
 
 	// -----------------------------------------------------------------------------
@@ -490,6 +509,37 @@ namespace analog
 	};
 
 	// -----------------------------------------------------------------------------
+	// nld_Z - Zener Diode
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT_DERIVED(Z, twoterm)
+	{
+	public:
+		NETLIB_CONSTRUCTOR_DERIVED_EX(Z, twoterm, const pstring &model = "D")
+		, m_model(*this, "MODEL", model)
+		, m_D(*this, "m_D")
+		, m_R(*this, "m_R")
+		{
+			register_subalias("A", P());
+			register_subalias("K", N());
+		}
+
+		NETLIB_IS_DYNAMIC(true)
+		NETLIB_UPDATE_TERMINALSI();
+		NETLIB_RESETI();
+
+	protected:
+		//NETLIB_UPDATEI();
+		NETLIB_UPDATE_PARAMI();
+
+	private:
+		zdiode_model_t m_model;
+		generic_diode<diode_e::BIPOLAR> m_D;
+		// REVERSE diode
+		generic_diode<diode_e::BIPOLAR> m_R;
+	};
+
+	// -----------------------------------------------------------------------------
 	// nld_VS - Voltage source
 	//
 	// netlist voltage source must have inner resistance
@@ -500,16 +550,16 @@ namespace analog
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
 		, m_t(*this, "m_t", nlconst::zero())
-		, m_R(*this, "R", nlconst::magic(0.1))
+		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -519,7 +569,7 @@ namespace analog
 			m_t += step;
 			m_funcparam[0] = m_t;
 			this->set_G_V_I(plib::reciprocal(m_R()),
-					m_compiled.evaluate(m_funcparam),
+					m_compiled->evaluate(m_funcparam),
 					nlconst::zero());
 		}
 
@@ -536,7 +586,7 @@ namespace analog
 		param_fp_t m_R;
 		param_fp_t m_V;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -551,13 +601,13 @@ namespace analog
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -565,7 +615,7 @@ namespace analog
 		{
 			m_t += step;
 			m_funcparam[0] = m_t;
-			const nl_fptype I = m_compiled.evaluate(m_funcparam);
+			const nl_fptype I = m_compiled->evaluate(m_funcparam);
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -I,
 					zero, zero,  I);
@@ -597,7 +647,7 @@ namespace analog
 		state_var<nl_fptype> m_t;
 		param_fp_t m_I;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 

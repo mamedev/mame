@@ -111,11 +111,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl)
-		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
+		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(nlconst::max_queue_size())
 		, netlist_object_t(nl, nl.nlstate().name() + ".queue")
 		, m_qsize(0)
-		, m_times(512)
-		, m_net_ids(512)
+		, m_times(nlconst::max_queue_size())
+		, m_net_ids(nlconst::max_queue_size())
 	{
 	}
 
@@ -195,8 +195,8 @@ namespace netlist
 		, m_queue(*this)
 		, m_use_stats(false)
 	{
-		state.run_state_manager().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
-		state.run_state_manager().save_item(this, m_time, "m_time");
+		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "netlist", "m_queue");
+		state.save(*this, m_time, "netlist", "m_time");
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -655,8 +655,8 @@ namespace netlist
 
 	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal)
 		: netlist_object_t(nl.exec(), aname)
-		, m_new_Q(*this, "m_new_Q", 0)
-		, m_cur_Q (*this, "m_cur_Q", 0)
+		, m_new_Q(*this, "m_new_Q", netlist_sig_t(0))
+		, m_cur_Q (*this, "m_cur_Q", netlist_sig_t(0))
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
 		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
 		, m_railterminal(railterminal)

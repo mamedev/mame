@@ -1108,8 +1108,10 @@ inline void m68ki_set_sr(u32 value)
 /* ------------------------- Exception Processing ------------------------- */
 
 /* Initiate exception processing */
-inline u32 m68ki_init_exception()
+inline u32 m68ki_init_exception(u32 vector)
 {
+	debugger_exception_hook(vector);
+
 	/* Save the old status register */
 	u32 sr = m68ki_get_sr();
 
@@ -1454,7 +1456,7 @@ inline void m68ki_stack_frame_0111(u32 sr, u32 vector, u32 pc, u32 fault_address
  */
 inline void m68ki_exception_trap(u32 vector)
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(vector);
 
 	if(CPU_TYPE_IS_010_LESS())
 		m68ki_stack_frame_0000(m_pc, sr, vector);
@@ -1470,7 +1472,7 @@ inline void m68ki_exception_trap(u32 vector)
 /* Trap#n stacks a 0 frame but behaves like group2 otherwise */
 inline void m68ki_exception_trapN(u32 vector)
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(vector);
 	m68ki_stack_frame_0000(m_pc, sr, vector);
 	m68ki_jump_vector(vector);
 
@@ -1481,7 +1483,7 @@ inline void m68ki_exception_trapN(u32 vector)
 /* Exception for trace mode */
 inline void m68ki_exception_trace()
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_TRACE);
 
 	if(CPU_TYPE_IS_010_LESS())
 	{
@@ -1506,7 +1508,7 @@ inline void m68ki_exception_trace()
 /* Exception for privilege violation */
 inline void m68ki_exception_privilege_violation()
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_PRIVILEGE_VIOLATION);
 
 	if(CPU_TYPE_IS_000())
 	{
@@ -1523,9 +1525,7 @@ inline void m68ki_exception_privilege_violation()
 /* Exception for A-Line instructions */
 inline void m68ki_exception_1010()
 {
-	u32 sr;
-
-	sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_1010);
 	m68ki_stack_frame_0000(m_ppc, sr, EXCEPTION_1010);
 	m68ki_jump_vector(EXCEPTION_1010);
 
@@ -1536,9 +1536,7 @@ inline void m68ki_exception_1010()
 /* Exception for F-Line instructions */
 inline void m68ki_exception_1111()
 {
-	u32 sr;
-
-	sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_1111);
 	m68ki_stack_frame_0000(m_ppc, sr, EXCEPTION_1111);
 	m68ki_jump_vector(EXCEPTION_1111);
 
@@ -1549,9 +1547,7 @@ inline void m68ki_exception_1111()
 /* Exception for illegal instructions */
 inline void m68ki_exception_illegal()
 {
-	u32 sr;
-
-	sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_ILLEGAL_INSTRUCTION);
 
 	if(CPU_TYPE_IS_000())
 	{
@@ -1568,7 +1564,7 @@ inline void m68ki_exception_illegal()
 /* Exception for format errror in RTE */
 inline void m68ki_exception_format_error()
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_FORMAT_ERROR);
 	m68ki_stack_frame_0000(m_pc, sr, EXCEPTION_FORMAT_ERROR);
 	m68ki_jump_vector(EXCEPTION_FORMAT_ERROR);
 
@@ -1579,7 +1575,7 @@ inline void m68ki_exception_format_error()
 /* Exception for address error */
 inline void m68ki_exception_address_error()
 {
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_ADDRESS_ERROR);
 
 	/* If we were processing a bus error, address error, or reset,
 	 * this is a catastrophic failure.

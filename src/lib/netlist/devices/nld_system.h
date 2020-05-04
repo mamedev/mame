@@ -63,17 +63,20 @@
 		NET_C(cOUT, name.Q)
 
 // FIXME ... remove parameters
-#define SYS_DSW(name, cIN, cP1, cP2)                                           \
-		NET_REGISTER_DEV(SYS_DSW, name)                                        \
-		NET_C(cIN, name.I)                                                     \
-		NET_C(cP1, name.1)                                                     \
-		NET_C(cP2, name.2)
+#define SYS_DSW(name, pI, p1, p2)                                              \
+        NET_REGISTER_DEVEXT(SYS_DSW, name, pI, p1, p2)
 
 #define SYS_DSW2(name)                                                         \
-		NET_REGISTER_DEV(SYS_DSW2, name)
+        NET_REGISTER_DEV(SYS_DSW2, name)
 
 #define SYS_COMPD(name)                                                        \
-		NET_REGISTER_DEV(SYS_COMPD, name)
+        NET_REGISTER_DEV(SYS_COMPD, name)
+
+#define SYS_NOISE_MT_U(name, pSIGMA)                                           \
+        NET_REGISTER_DEVEXT(SYS_NOISE_MT_U, name, pSIGMA)
+
+#define SYS_NOISE_MT_N(name, pSIGMA)                                           \
+        NET_REGISTER_DEVEXT(SYS_NOISE_MT_N, name, pSIGMA)
 
 /* Default device to hold netlist parameters */
 #define PARAMETERS(name)                                                        \

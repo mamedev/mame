@@ -577,6 +577,8 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	return (ret == m_params.end() ? nullptr : ret->second.param());
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
@@ -618,6 +620,8 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
 	nl_assert(inp.is_logic());
@@ -676,6 +680,8 @@ detail::core_terminal_t &setup_t::resolve_proxy(detail::core_terminal_t &term)
 	return term;
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 {
 	log().debug("merging nets ...\n");
@@ -703,7 +709,7 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 }
 
 
-
+//NOLINTNEXTLINE(misc-no-recursion)
 void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog() && in.is_logic())
@@ -729,6 +735,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 }
 
 
+//NOLINTNEXTLINE(misc-no-recursion)
 void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp)
 {
 	if (inp.is_analog())
@@ -752,6 +759,8 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	}
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog())
@@ -807,6 +816,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1,detail::core_termina
 	}
 }
 
+//NOLINTNEXTLINE(misc-no-recursion)
 bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	bool ret = false;
@@ -843,6 +853,8 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	return ret;
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t2_in)
 {
 	log().debug("Connecting {1} to {2}\n", t1_in.name(), t2_in.name());
@@ -1051,6 +1063,8 @@ void models_t::register_model(const pstring &model_in)
 		throw nl_exception(MF_MODEL_ALREADY_EXISTS_1(model_in));
 }
 
+
+//NOLINTNEXTLINE(misc-no-recursion)
 void models_t::model_parse(const pstring &model_in, model_map_t &map)
 {
 	pstring model = model_in;
@@ -1276,6 +1290,7 @@ void setup_t::prepare_to_run()
 		}
 	}
 
+	int errcnt(0);
 	log().debug("Looking for unknown parameters ...\n");
 	for (auto &p : m_param_values)
 	{
@@ -1287,10 +1302,16 @@ void setup_t::prepare_to_run()
 				// FIXME: get device name, check for device
 				auto *dev = m_nlstate.find_device(plib::replace_all(p.first, sHINT_NO_DEACTIVATE, ""));
 				if (dev == nullptr)
-					log().warning(MW_DEVICE_NOT_FOUND_FOR_HINT(p.first));
+				{
+					log().error(ME_DEVICE_NOT_FOUND_FOR_HINT(p.first));
+					errcnt++;
+				}
 			}
 			else
-				log().warning(MW_UNKNOWN_PARAMETER(p.first));
+			{
+				log().error(ME_UNKNOWN_PARAMETER(p.first));
+				errcnt++;
+			}
 		}
 	}
 
@@ -1308,15 +1329,24 @@ void setup_t::prepare_to_run()
 				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
 				if (err || plib::abs(v - plib::floor(v)) > nlconst::magic(1e-6) )
 				{
-					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
-					throw nl_exception(MF_HND_VAL_NOT_SUPPORTED(p->second));
+					log().error(ME_HND_VAL_NOT_SUPPORTED(p->second));
+					errcnt++;
 				}
-				// FIXME comparison with zero
-				d.second->set_hint_deactivate(v == nlconst::zero());
+				else
+				{
+					// FIXME comparison with zero
+					d.second->set_hint_deactivate(v == nlconst::zero());
+				}
 			}
 		}
 		else
 			d.second->set_hint_deactivate(false);
+	}
+
+	if (errcnt)
+	{
+		log().fatal(MF_ERRORS_FOUND(errcnt));
+		throw nl_exception(MF_ERRORS_FOUND(errcnt));
 	}
 
 	// resolve inputs

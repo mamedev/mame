@@ -104,6 +104,7 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "render.h"
 #include "softlist.h"
 #include "speaker.h"

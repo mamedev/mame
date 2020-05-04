@@ -276,10 +276,10 @@ namespace netlist
 		nl_fptype R_high() const noexcept{ return m_R_high; }
 
 		bool is_above_high_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
-		{ return (V - VN) > high_thresh_V(VN, VP); }
+		{ return V > high_thresh_V(VN, VP); }
 
 		bool is_below_low_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
-		{ return (V - VN) < low_thresh_V(VN, VP); }
+		{ return V < low_thresh_V(VN, VP); }
 
 		nl_fptype m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		nl_fptype m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
@@ -333,11 +333,11 @@ namespace netlist
 	struct state_var
 	{
 	public:
-		template <typename O>
+		template <typename O, typename... Args>
 		//! Constructor.
 		state_var(O &owner,             //!< owner must have a netlist() method.
 				const pstring &name,    //!< identifier/name for this state variable
-				const T &value          //!< Initial value after construction
+				Args&&... args    //!< Initial values for construction of O
 				);
 
 		//! Destructor.
@@ -359,6 +359,10 @@ namespace netlist
 		//! Return const value of state variable.
 		constexpr operator const T & () const noexcept { return m_value; }
 		//! Return non-const value of state variable.
+		C14CONSTEXPR T & var() noexcept { return m_value; }
+		//! Return const value of state variable.
+		constexpr const T & var() const noexcept { return m_value; }
+		//! Return non-const value of state variable.
 		C14CONSTEXPR T & operator ()() noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr const T & operator ()() const noexcept { return m_value; }
@@ -366,6 +370,10 @@ namespace netlist
 		C14CONSTEXPR T * ptr() noexcept { return &m_value; }
 		//! Return const pointer to state variable.
 		constexpr const T * ptr() const noexcept{ return &m_value; }
+		//! Access state variable by ->.
+		C14CONSTEXPR T * operator->() noexcept { return &m_value; }
+		//! Access state variable by const ->.
+		constexpr const T * operator->() const noexcept{ return &m_value; }
 
 	private:
 		T m_value;
@@ -2030,9 +2038,9 @@ namespace netlist
 	}
 
 	template <typename T>
-	template <typename O>
-	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
-	: m_value(value)
+	template <typename O, typename... Args>
+	state_var<T>::state_var(O &owner, const pstring &name, Args&&... args)
+	: m_value(std::forward<Args>(args)...)
 	{
 		owner.state().save(owner, m_value, owner.name(), name);
 	}

@@ -4,7 +4,9 @@
 /******************************************************************************
 
 SciSys Mini Chess, pocket calculator style chesscomputer
-It's the first chess program on HMCS40, the engine was written by Mark Taylor.
+
+It's the first chess program on HMCS40. The engine was written by Mark Taylor
+with assistance from David Levy.
 
 Hardware notes:
 - Hitachi 44801A34 MCU @ ~400kHz
@@ -67,7 +69,7 @@ private:
 	void update_display();
 	template<int N> void seg_w(u8 data);
 	void mux_w(u16 data);
-	u16 input_r(offs_t offset);
+	u16 input_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_lcd_select = 0;
@@ -124,7 +126,7 @@ void mini_state::mux_w(u16 data)
 	update_display();
 }
 
-u16 mini_state::input_r(offs_t offset)
+u16 mini_state::input_r()
 {
 	// D0,D2: switches
 	u16 data = m_inputs[4]->read() & 5;

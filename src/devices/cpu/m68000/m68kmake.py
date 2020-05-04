@@ -27,7 +27,7 @@ cc_table_dn = [ "t", "f", "hi", "ls", "cc", "cs", "ne", "eq", "vc", "vs", "pl", 
 # Probably incorrect starting with the 030 and further
 #
 # The C code was going out-of-bounds, or more precisely
-# out-of-initialization, on the Coldfire, explaning the
+# out-of-initialization, on the Coldfire, explaining the
 # zeroes.
 #
 #                   000           010           020           030           040        FSCPU32      Coldfire

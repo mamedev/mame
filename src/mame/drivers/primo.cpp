@@ -135,20 +135,21 @@ void primo_state::primob_port(address_map &map)
 void primo_state::primo32_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).ram().mirror(0x8000);
+	map(0x4000, 0x7fff).ram().share("videoram").mirror(0x8000);
 }
 
 void primo_state::primo48_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
 	map(0x4000, 0x7fff).ram();
-	map(0x8000, 0xbfff).ram().mirror(0x4000);
+	map(0x8000, 0xbfff).ram().share("videoram").mirror(0x4000);
 }
 
 void primo_state::primo64_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0xffff).ram();
+	map(0x4000, 0xbfff).ram();
+	map(0xc000, 0xffff).ram().share("videoram");
 }
 
 static INPUT_PORTS_START( primo )
@@ -381,11 +382,11 @@ ROM_START( primoc64 )
 	ROM_LOAD( "c64_4.rom", 0x13000, 0x1000, CRC(3770e3e6) SHA1(792cc71d8f89eb447f94aded5afc70d626a26030) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY     FULLNAME      FLAGS
-COMP( 1984, primoa32, 0,        0,      primoa32, primo, primo_state, init_primo32, "Microkey", "Primo A-32", 0 )
-COMP( 1984, primoa48, primoa32, 0,      primoa48, primo, primo_state, init_primo48, "Microkey", "Primo A-48", 0 )
-COMP( 1984, primoa64, primoa32, 0,      primoa64, primo, primo_state, init_primo64, "Microkey", "Primo A-64", 0 )
-COMP( 1984, primob32, primoa32, 0,      primob32, primo, primo_state, init_primo32, "Microkey", "Primo B-32", 0 )
-COMP( 1984, primob48, primoa32, 0,      primob48, primo, primo_state, init_primo48, "Microkey", "Primo B-48", 0 )
-COMP( 1984, primob64, primoa32, 0,      primob64, primo, primo_state, init_primo64, "Microkey", "Primo B-64", 0 )
-COMP( 1984, primoc64, primoa32, 0,      primoc64, primo, primo_state, init_primo64, "Microkey", "Primo C-64", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1984, primoa32, 0,        0,      primoa32, primo, primo_state, init_primo, "Microkey", "Primo A-32", 0 )
+COMP( 1984, primoa48, primoa32, 0,      primoa48, primo, primo_state, init_primo, "Microkey", "Primo A-48", 0 )
+COMP( 1984, primoa64, primoa32, 0,      primoa64, primo, primo_state, init_primo, "Microkey", "Primo A-64", 0 )
+COMP( 1984, primob32, primoa32, 0,      primob32, primo, primo_state, init_primo, "Microkey", "Primo B-32", 0 )
+COMP( 1984, primob48, primoa32, 0,      primob48, primo, primo_state, init_primo, "Microkey", "Primo B-48", 0 )
+COMP( 1984, primob64, primoa32, 0,      primob64, primo, primo_state, init_primo, "Microkey", "Primo B-64", 0 )
+COMP( 1984, primoc64, primoa32, 0,      primoc64, primo, primo_state, init_primo, "Microkey", "Primo C-64", MACHINE_NOT_WORKING )

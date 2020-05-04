@@ -792,6 +792,8 @@ void applix_state::video_start()
 
 MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 {
+	if (!de)
+		return;
 	// The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
 	// There is a monochrome mode, but no info found as yet.
 	// The 6845 cursor signal is not used at all.

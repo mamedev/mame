@@ -141,7 +141,6 @@
 #define A2GS_LC00_TAG "lc00"
 #define A2GS_LC01_TAG "lc01"
 #define A2GS_B0CXXX_TAG "bnk0atc"
-#define A2GS_B01_TAG    "bnk1at0"
 #define A2GS_B1CXXX_TAG "bnk1atc"
 #define A2GS_B00000_TAG "b0r00bank"
 #define A2GS_B00200_TAG "b0r02bank"
@@ -203,7 +202,6 @@ public:
 		m_lc00(*this, A2GS_LC00_TAG),
 		m_lc01(*this, A2GS_LC01_TAG),
 		m_bank0_atc(*this, A2GS_B0CXXX_TAG),
-		m_bank1_at0(*this, A2GS_B01_TAG),
 		m_bank1_atc(*this, A2GS_B1CXXX_TAG),
 		m_scc(*this, SCC_TAG),
 		m_doc(*this, A2GS_DOC_TAG),
@@ -242,7 +240,7 @@ public:
 	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
 	required_device<address_map_bank_device> m_c100bank, m_c300bank, m_c400bank, m_c800bank;
 	required_device<address_map_bank_device> m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
-	required_device<address_map_bank_device> m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_at0, m_bank1_atc;
+	required_device<address_map_bank_device> m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
 	required_device<z80scc_device> m_scc;
 	required_device<es5503_device> m_doc;
 	required_device<applefdc_base_device> m_iwm;
@@ -479,7 +477,6 @@ private:
 	DECLARE_READ8_MEMBER(bank0_c000_r);
 	DECLARE_WRITE8_MEMBER(bank0_c000_w);
 	DECLARE_READ8_MEMBER(bank1_0000_r);
-	DECLARE_WRITE8_MEMBER(bank1_0000_w);
 	DECLARE_WRITE8_MEMBER(bank1_0000_sh_w);
 	DECLARE_READ8_MEMBER(bank1_c000_r);
 	DECLARE_WRITE8_MEMBER(bank1_c000_w);
@@ -1457,7 +1454,6 @@ void apple2gs_state::machine_reset()
 	m_b0_2000bank->set_bank(0);
 	m_b0_4000bank->set_bank(0);
 	m_bank0_atc->set_bank(1);
-	m_bank1_at0->set_bank(1);
 	m_bank1_atc->set_bank(1);
 
 	// LC default state: read ROM, write enabled, Dxxx bank 2
@@ -3466,7 +3462,7 @@ WRITE8_MEMBER(apple2gs_state::b1ram4000_w)
 	m_ram_ptr[offset+0x14000] = data;
 	if (offset < 0x2000)
 	{
-		if (!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES))
+		if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
 		{
 			auxram0000_w(space, offset+0x4000, data);
 		}
@@ -3512,7 +3508,6 @@ WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 }
 
 READ8_MEMBER(apple2gs_state::bank1_0000_r) { return m_ram_ptr[offset + 0x10000]; }
-WRITE8_MEMBER(apple2gs_state::bank1_0000_w) { m_ram_ptr[offset + 0x10000] = data; }
 READ8_MEMBER(apple2gs_state::bank1_c000_r) { if (offset & 0x2000) offset ^= 0x1000; return m_ram_ptr[offset + 0x1c000]; }
 WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { if (offset & 0x2000) offset ^= 0x1000; m_ram_ptr[offset + 0x1c000] = data; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
@@ -3590,7 +3585,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	map(0x002000, 0x003fff).m(m_b0_2000bank, FUNC(address_map_bank_device::amap8));
 	map(0x004000, 0x00bfff).m(m_b0_4000bank, FUNC(address_map_bank_device::amap8));
 	map(0x00c000, 0x00ffff).m(m_bank0_atc, FUNC(address_map_bank_device::amap8));
-	map(0x010000, 0x01bfff).m(m_bank1_at0, FUNC(address_map_bank_device::amap8));
+	map(0x010000, 0x01bfff).rw(FUNC(apple2gs_state::bank1_0000_r), FUNC(apple2gs_state::bank1_0000_sh_w));
 	map(0x01c000, 0x01ffff).m(m_bank1_atc, FUNC(address_map_bank_device::amap8));
 
 	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
@@ -3703,12 +3698,6 @@ void apple2gs_state::bank0_iolc_map(address_map &map)
 	map(0x4400, 0x47ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
 	map(0x4800, 0x4fff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
 	map(0x5000, 0x7fff).m(m_upper00,  FUNC(address_map_bank_device::amap8));
-}
-
-void apple2gs_state::bank1_lower48_map(address_map &map)
-{
-	map(0x0000, 0x0bfff).rw(FUNC(apple2gs_state::bank1_0000_r), FUNC(apple2gs_state::bank1_0000_w));
-	map(0xc000, 0x17fff).rw(FUNC(apple2gs_state::bank1_0000_r), FUNC(apple2gs_state::bank1_0000_sh_w));
 }
 
 void apple2gs_state::bank1_iolc_map(address_map &map)
@@ -4697,9 +4686,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	/* Bank 0 - I/O and LC area */
 	ADDRESS_MAP_BANK(config, A2GS_B0CXXX_TAG).set_map(&apple2gs_state::bank0_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-
-	/* Bank 1 - lower 48K */
-	ADDRESS_MAP_BANK(config, A2GS_B01_TAG).set_map(&apple2gs_state::bank1_lower48_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0xc000);
 
 	/* Bank 1 - I/O and LC area */
 	ADDRESS_MAP_BANK(config, A2GS_B1CXXX_TAG).set_map(&apple2gs_state::bank1_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);

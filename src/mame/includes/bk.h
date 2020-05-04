@@ -52,7 +52,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
-	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
+	uint8_t bk0010_irq_callback(offs_t offset);
 	required_device<t11_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<12> m_io_keyboard;

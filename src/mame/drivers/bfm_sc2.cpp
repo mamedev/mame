@@ -160,6 +160,7 @@ Adder hardware:
 
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
+#include "machine/rescap.h"
 
 #include "speaker.h"
 

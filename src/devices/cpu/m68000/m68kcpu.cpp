@@ -763,7 +763,7 @@ void m68000_base_device::m68k_cause_bus_error()
 		return;
 	}
 
-	u32 sr = m68ki_init_exception();
+	u32 sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
 
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
@@ -951,7 +951,7 @@ void m68000_base_device::execute_run()
 						}
 					}
 
-					sr = m68ki_init_exception();
+					sr = m68ki_init_exception(EXCEPTION_BUS_ERROR);
 
 					m_run_mode = RUN_MODE_BERR_AERR_RESET;
 
@@ -2278,7 +2278,7 @@ void m68000_base_device::m68ki_exception_interrupt(u32 int_level)
 		vector = m_cpu_space->read_word(0xfffffff0 | (int_level << 1)) & 0xff;
 
 	/* Start exception processing */
-	sr = m68ki_init_exception();
+	sr = m68ki_init_exception(vector);
 
 	/* Set the interrupt mask to the level of the one being serviced */
 	m_int_mask = int_level<<8;
