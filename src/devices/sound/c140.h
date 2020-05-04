@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/* C140.h */
+/* c140.h */
 
 #ifndef MAME_SOUND_C140_H
 #define MAME_SOUND_C140_H
@@ -22,6 +22,7 @@ class c140_device : public device_t,
 public:
 	enum class C140_TYPE
 	{
+		LINEAR,
 		SYSTEM2,
 		SYSTEM21,
 		ASIC219
@@ -35,6 +36,10 @@ public:
 
 	u8 c140_r(offs_t offset);
 	void c140_w(offs_t offset, u8 data);
+
+	// little endian: Swap even and odd word
+	u8 c140_le_r(offs_t offset) { return c140_r(offset ^ 1); }
+	void c140_le_w(offs_t offset, u8 data) { c140_w(offset ^ 1, data);}
 
 protected:
 	// device-level overrides
@@ -53,27 +58,27 @@ private:
 	{
 		C140_VOICE() { }
 
-		int32_t    ptoffset     = 0;
-		int32_t    pos          = 0;
-		int32_t    key          = 0;
+		s32    ptoffset     = 0;
+		s32    pos          = 0;
+		s32    key          = 0;
 		//--work
-		int32_t    lastdt       = 0;
-		int32_t    prevdt       = 0;
-		int32_t    dltdt        = 0;
+		s32    lastdt       = 0;
+		s32    prevdt       = 0;
+		s32    dltdt        = 0;
 		//--reg
-		int32_t    rvol         = 0;
-		int32_t    lvol         = 0;
-		int32_t    frequency    = 0;
-		int32_t    bank         = 0;
-		int32_t    mode         = 0;
+		s32    rvol         = 0;
+		s32    lvol         = 0;
+		s32    frequency    = 0;
+		s32    bank         = 0;
+		s32    mode         = 0;
 
-		int32_t    sample_start = 0;
-		int32_t    sample_end   = 0;
-		int32_t    sample_loop  = 0;
+		s32    sample_start = 0;
+		s32    sample_end   = 0;
+		s32    sample_loop  = 0;
 	};
 
-	void init_voice( C140_VOICE *v );
-	long find_sample(long adrs, long bank, int voice);
+	void init_voice(C140_VOICE *v);
+	int find_sample(int adrs, int bank, int voice);
 
 	TIMER_CALLBACK_MEMBER(int1_on);
 
@@ -83,13 +88,13 @@ private:
 	sound_stream *m_stream;
 	C140_TYPE m_banking_type;
 	/* internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_buffer_left;
-	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
+	std::unique_ptr<s16[]> m_mixer_buffer_left;
+	std::unique_ptr<s16[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	uint8_t m_REG[0x200];
+	u8 m_REG[0x200];
 
-	int16_t m_pcmtbl[8];        //2000.06.26 CAB
+	s16 m_pcmtbl[8];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[MAX_VOICE];
 

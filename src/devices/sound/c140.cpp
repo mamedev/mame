@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-C140.c
+c140.cpp
 
 Simulator based on AMUSE sources.
 The C140 sound chip is used by Namco System 2 and System 21
 The 219 ASIC (which incorporates a modified C140) is used by Namco NA-1 and NA-2
 This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
-Channels can be 8 bit signed PCM, or 12 bit signed PCM.
+Channels can be 8 bit compressed PCM, or 12 bit signed PCM.
 
-TODO: What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
+TODO:
+- What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
+- Acknowledge A9 bit (9th address bit) of host interface
+- Verify data bus bits of C219
 
 --------------
 
@@ -42,22 +45,23 @@ TODO: What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC
 
 #include "emu.h"
 #include "c140.h"
+#include <algorithm>
 
 struct voice_registers
 {
-	uint8_t volume_right;
-	uint8_t volume_left;
-	uint8_t frequency_msb;
-	uint8_t frequency_lsb;
-	uint8_t bank;
-	uint8_t mode;
-	uint8_t start_msb;
-	uint8_t start_lsb;
-	uint8_t end_msb;
-	uint8_t end_lsb;
-	uint8_t loop_msb;
-	uint8_t loop_lsb;
-	uint8_t reserved[4];
+	u8 volume_right;
+	u8 volume_left;
+	u8 frequency_msb;
+	u8 frequency_lsb;
+	u8 bank;
+	u8 mode;
+	u8 start_msb;
+	u8 start_lsb;
+	u8 end_msb;
+	u8 end_lsb;
+	u8 loop_msb;
+	u8 loop_lsb;
+	u8 reserved[4];
 };
 
 
@@ -69,11 +73,9 @@ DEFINE_DEVICE_TYPE(C140, c140_device, "c140", "Namco C140")
 //  LIVE DEVICE
 //**************************************************************************
 
-static inline int limit(int32_t in)
+static inline int limit(s32 in)
 {
-	if(in>0x7fff)       return 0x7fff;
-	else if(in<-0x8000) return -0x8000;
-	return in;
+	return std::max(-0x7fff, std::min(0x8000, in));
 }
 
 
@@ -84,17 +86,17 @@ static inline int limit(int32_t in)
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_BIG, 16) // Verified from schematics (24 bit address, 12(16? for C219) bit data)
 	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
-	, m_banking_type(C140_TYPE::SYSTEM2)
+	, m_banking_type(C140_TYPE::LINEAR)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
 {
-	memset(m_REG, 0, sizeof(uint8_t)*0x200);
-	memset(m_pcmtbl, 0, sizeof(int16_t)*8);
+	std::fill(std::begin(m_REG), std::end(m_REG), 0);
+	std::fill(std::begin(m_pcmtbl), std::end(m_pcmtbl), 0);
 }
 
 
@@ -112,43 +114,40 @@ void c140_device::device_start()
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
 	/* make decompress pcm table */     //2000.06.26 CAB
-	int32_t segbase = 0;
-	for(int i = 0; i < 8; i++)
+	s32 segbase = 0;
+	for (int i = 0; i < 8; i++)
 	{
-		m_pcmtbl[i]=segbase;    //segment base value
-		segbase += 16<<i;
+		m_pcmtbl[i] = segbase;    //segment base value
+		segbase += 16 << i;
 	}
 
-	memset(m_REG,0,sizeof(m_REG));
+	std::fill(std::begin(m_REG), std::end(m_REG), 0);
 
-	for(int i = 0; i < MAX_VOICE; i++)
+	for (int i = 0; i < MAX_VOICE; i++)
 	{
 		init_voice(&m_voi[i]);
 	}
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer_left = std::make_unique<int16_t[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);
+	m_mixer_buffer_left = std::make_unique<s16[]>(m_sample_rate);
+	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);
 
 	save_item(NAME(m_REG));
 
-	for (int i = 0; i < MAX_VOICE; i++)
-	{
-		save_item(NAME(m_voi[i].ptoffset), i);
-		save_item(NAME(m_voi[i].pos), i);
-		save_item(NAME(m_voi[i].key), i);
-		save_item(NAME(m_voi[i].lastdt), i);
-		save_item(NAME(m_voi[i].prevdt), i);
-		save_item(NAME(m_voi[i].dltdt), i);
-		save_item(NAME(m_voi[i].rvol), i);
-		save_item(NAME(m_voi[i].lvol), i);
-		save_item(NAME(m_voi[i].frequency), i);
-		save_item(NAME(m_voi[i].bank), i);
-		save_item(NAME(m_voi[i].mode), i);
-		save_item(NAME(m_voi[i].sample_start), i);
-		save_item(NAME(m_voi[i].sample_end), i);
-		save_item(NAME(m_voi[i].sample_loop), i);
-	}
+	save_item(STRUCT_MEMBER(m_voi, ptoffset));
+	save_item(STRUCT_MEMBER(m_voi, pos));
+	save_item(STRUCT_MEMBER(m_voi, key));
+	save_item(STRUCT_MEMBER(m_voi, lastdt));
+	save_item(STRUCT_MEMBER(m_voi, prevdt));
+	save_item(STRUCT_MEMBER(m_voi, dltdt));
+	save_item(STRUCT_MEMBER(m_voi, rvol));
+	save_item(STRUCT_MEMBER(m_voi, lvol));
+	save_item(STRUCT_MEMBER(m_voi, frequency));
+	save_item(STRUCT_MEMBER(m_voi, bank));
+	save_item(STRUCT_MEMBER(m_voi, mode));
+	save_item(STRUCT_MEMBER(m_voi, sample_start));
+	save_item(STRUCT_MEMBER(m_voi, sample_end));
+	save_item(STRUCT_MEMBER(m_voi, sample_loop));
 }
 
 
@@ -159,8 +158,8 @@ void c140_device::device_clock_changed()
 	m_stream->set_sample_rate(m_sample_rate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer_left = std::make_unique<int16_t[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);;
+	m_mixer_buffer_left = std::make_unique<s16[]>(m_sample_rate);
+	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);;
 }
 
 
@@ -176,149 +175,140 @@ void c140_device::rom_bank_updated()
 
 void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	int     i,j;
+	s32   dt;
 
-	int32_t   rvol,lvol;
-	int32_t   dt;
-	int32_t   sdt;
-	int32_t   st,ed,sz;
+	float  pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
 
-	long      sampleData;
-	int32_t   frequency,delta,offset,pos;
-	int32_t   cnt, voicecnt;
-	int32_t   lastdt,prevdt,dltdt;
-	float   pbase=(float)m_baserate*2.0f / (float)m_sample_rate;
+	s16   *lmix, *rmix;
 
-	int16_t   *lmix, *rmix;
-
-	if(samples>m_sample_rate) samples=m_sample_rate;
+	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer_left.get(), 0, samples * sizeof(int16_t));
-	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(int16_t));
+	std::fill_n(&m_mixer_buffer_left[0], samples, 0);
+	std::fill_n(&m_mixer_buffer_right[0], samples, 0);
 
 	/* get the number of voices to update */
-	voicecnt = (m_banking_type == C140_TYPE::ASIC219) ? 16 : 24;
+	const int voicecnt = (m_banking_type == C140_TYPE::ASIC219) ? 16 : 24;
 
 	//--- audio update
-	for( i=0;i<voicecnt;i++ )
+	for (int i = 0; i < voicecnt; i++)
 	{
 		C140_VOICE *v = &m_voi[i];
-		const struct voice_registers *vreg = (struct voice_registers *)&m_REG[i*16];
+		const struct voice_registers *vreg = (struct voice_registers *)&m_REG[i * 16];
 
-		if( v->key )
+		if (v->key)
 		{
-			frequency= vreg->frequency_msb*256 + vreg->frequency_lsb;
+			const u16 frequency = (vreg->frequency_msb << 8) | vreg->frequency_lsb;
 
 			/* Abort voice if no frequency value set */
-			if(frequency==0) continue;
+			if (frequency == 0) continue;
 
 			/* Delta =  frequency * ((8MHz/374)*2 / sample rate) */
-			delta=(long)((float)frequency * pbase);
+			const int delta = (int)((float)frequency * pbase);
 
 			/* Calculate left/right channel volumes */
-			lvol=(vreg->volume_left*32)/MAX_VOICE; //32ch -> 24ch
-			rvol=(vreg->volume_right*32)/MAX_VOICE;
+			const int lvol = (vreg->volume_left * 32) / MAX_VOICE; //32ch -> 24ch
+			const int rvol = (vreg->volume_right * 32) / MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
 			lmix = m_mixer_buffer_left.get();
 			rmix = m_mixer_buffer_right.get();
 
 			/* Retrieve sample start/end and calculate size */
-			st=v->sample_start;
-			ed=v->sample_end;
-			sz=ed-st;
+			const int st = v->sample_start;
+			const int ed = v->sample_end;
+			const int sz = ed - st;
 
 			/* Retrieve base pointer to the sample data */
-			sampleData = find_sample(st, v->bank, i);
+			const int sampleData = find_sample(st, v->bank, i);
 
 			/* Fetch back previous data pointers */
-			offset=v->ptoffset;
-			pos=v->pos;
-			lastdt=v->lastdt;
-			prevdt=v->prevdt;
-			dltdt=v->dltdt;
+			int offset = v->ptoffset;
+			int pos = v->pos;
+			s32 lastdt = v->lastdt;
+			s32 prevdt = v->prevdt;
+			s32 dltdt = v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode&8) && (m_banking_type != C140_TYPE::ASIC219))
+			if ((v->mode & 8) && (m_banking_type != C140_TYPE::ASIC219))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
-				for(j=0;j<samples;j++)
+				for (int j = 0; j < samples; j++)
 				{
 					offset += delta;
-					cnt = (offset>>16)&0x7fff;
+					const int cnt = (offset >> 16) & 0x7fff;
 					offset &= 0xffff;
-					pos+=cnt;
-					//for(;cnt>0;cnt--)
+					pos += cnt;
+					//for (; cnt > 0; cnt--)
 					{
 						/* Check for the end of the sample */
-						if(pos >= sz)
+						if (pos >= sz)
 						{
 							/* Check if its a looping sample, either stop or loop */
-							if(v->mode&0x10)
+							if (v->mode & 0x10)
 							{
 								pos = (v->sample_loop - st);
 							}
 							else
 							{
-								v->key=0;
+								v->key = 0;
 								break;
 							}
 						}
 
 						/* Read the chosen sample byte */
-						dt = (int8_t) read_byte(sampleData + pos);
+						dt = s8(read_byte((sampleData + pos) << 1));
 
 						/* decompress to 13bit range */     //2000.06.26 CAB
-						sdt=dt>>3;              //signed
-						if(sdt<0)   sdt = (sdt<<(dt&7)) - m_pcmtbl[dt&7];
-						else        sdt = (sdt<<(dt&7)) + m_pcmtbl[dt&7];
+						s32 sdt = dt >> 3;              //signed
+						if (sdt < 0)   sdt = (sdt << (dt & 7)) - m_pcmtbl[dt & 7];
+						else           sdt = (sdt << (dt & 7)) + m_pcmtbl[dt & 7];
 
-						prevdt=lastdt;
-						lastdt=sdt;
-						dltdt=(lastdt - prevdt);
+						prevdt = lastdt;
+						lastdt = sdt;
+						dltdt = (lastdt - prevdt);
 					}
 
 					/* Caclulate the sample value */
-					dt=((dltdt*offset)>>16)+prevdt;
+					dt = ((dltdt * offset) >> 16) + prevdt;
 
 					/* Write the data to the sample buffers */
-					*lmix++ +=(dt*lvol)>>(5+5);
-					*rmix++ +=(dt*rvol)>>(5+5);
+					*lmix++ += (dt * lvol) >> (5 + 5);
+					*rmix++ += (dt * rvol) >> (5 + 5);
 				}
 			}
 			else
 			{
-				/* linear 8bit signed PCM */
-				for(j=0;j<samples;j++)
+				/* linear 12bit(8bit for C219) signed PCM */
+				for (int j = 0; j < samples; j++)
 				{
 					offset += delta;
-					cnt = (offset>>16)&0x7fff;
+					const int cnt = (offset >> 16) & 0x7fff;
 					offset &= 0xffff;
 					pos += cnt;
 					/* Check for the end of the sample */
-					if(pos >= sz)
+					if (pos >= sz)
 					{
 						/* Check if its a looping sample, either stop or loop */
-						if( v->mode&0x10 )
+						if (v->mode & 0x10)
 						{
 							pos = (v->sample_loop - st);
 						}
 						else
 						{
-							v->key=0;
+							v->key = 0;
 							break;
 						}
 					}
 
-					if( cnt )
+					if (cnt)
 					{
-						prevdt=lastdt;
+						prevdt = lastdt;
 
 						if (m_banking_type == C140_TYPE::ASIC219)
 						{
-							lastdt = (int8_t) read_byte(sampleData + BYTE_XOR_BE(pos));
+							lastdt = s8(read_byte(sampleData + pos));
 
 							// Sign + magnitude format
 							if ((v->mode & 0x01) && (lastdt & 0x80))
@@ -327,30 +317,32 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 							// Sign flip
 							if (v->mode & 0x40)
 								lastdt = -lastdt;
+
+							lastdt <<= 8;
 						}
 						else
 						{
-							lastdt = (int8_t) read_byte(sampleData + pos);
+							lastdt = s16(read_word((sampleData + pos) << 1) & 0xfff0); // 12bit
 						}
 
 						dltdt = (lastdt - prevdt);
 					}
 
 					/* Caclulate the sample value */
-					dt=((dltdt*offset)>>16)+prevdt;
+					dt = ((dltdt * offset) >> 16) + prevdt;
 
 					/* Write the data to the sample buffers */
-					*lmix++ +=(dt*lvol)>>5;
-					*rmix++ +=(dt*rvol)>>5;
+					*lmix++ += (dt * lvol) >> (5 + 8);
+					*rmix++ += (dt * rvol) >> (5 + 8);
 				}
 			}
 
 			/* Save positional data for next callback */
-			v->ptoffset=offset;
-			v->pos=pos;
-			v->lastdt=lastdt;
-			v->prevdt=prevdt;
-			v->dltdt=dltdt;
+			v->ptoffset = offset;
+			v->pos = pos;
+			v->lastdt = lastdt;
+			v->prevdt = prevdt;
+			v->dltdt = dltdt;
 		}
 	}
 
@@ -360,9 +352,9 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	{
 		stream_sample_t *dest1 = outputs[0];
 		stream_sample_t *dest2 = outputs[1];
-		for (i = 0; i < samples; i++)
+		for (int i = 0; i < samples; i++)
 		{
-			int32_t val;
+			s32 val;
 
 			val = 8 * (*lmix++);
 			*dest1++ = limit(val);
@@ -375,7 +367,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 u8 c140_device::c140_r(offs_t offset)
 {
-	offset&=0x1ff;
+	offset &= 0x1ff;
 	return m_REG[offset];
 }
 
@@ -384,7 +376,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 {
 	m_stream->update();
 
-	offset&=0x1ff;
+	offset &= 0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
 	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_banking_type == C140_TYPE::ASIC219))
@@ -392,50 +384,54 @@ void c140_device::c140_w(offs_t offset, u8 data)
 		offset -= 8;
 	}
 
-	m_REG[offset]=data;
-	if( offset<0x180 )
+	m_REG[offset] = data;
+	if (offset < 0x180)
 	{
-		C140_VOICE *v = &m_voi[offset>>4];
+		const u8 ch = offset >> 4;
+		C140_VOICE *v = &m_voi[ch];
 
-		if( (offset&0xf)==0x5 )
+		if ((offset & 0xf) == 0x5)
 		{
-			if( data&0x80 )
+			if (data & 0x80)
 			{
-				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset&0x1f0];
-				v->key=1;
-				v->ptoffset=0;
-				v->pos=0;
-				v->lastdt=0;
-				v->prevdt=0;
-				v->dltdt=0;
+				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
+				v->key = 1;
+				v->ptoffset = 0;
+				v->pos = 0;
+				v->lastdt = 0;
+				v->prevdt = 0;
+				v->dltdt = 0;
 				v->bank = vreg->bank;
 				v->mode = data;
 
+				const u32 loop = (vreg->loop_msb << 8) + vreg->loop_lsb;
+				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
+				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
 				// on the 219 asic, addresses are in words
 				if (m_banking_type == C140_TYPE::ASIC219)
 				{
-					v->sample_loop = (vreg->loop_msb*256 + vreg->loop_lsb)*2;
-					v->sample_start = (vreg->start_msb*256 + vreg->start_lsb)*2;
-					v->sample_end = (vreg->end_msb*256 + vreg->end_lsb)*2;
+					v->sample_loop = loop << 1;
+					v->sample_start = start << 1;
+					v->sample_end = end << 1;
 
 					#if 0
 					logerror("219: play v %d mode %02x start %x loop %x end %x\n",
-						offset>>4, v->mode,
-						find_sample(v->sample_start, v->bank, offset>>4),
-						find_sample(v->sample_loop, v->bank, offset>>4),
-						find_sample(v->sample_end, v->bank, offset>>4));
+						ch, v->mode,
+						find_sample(v->sample_start, v->bank, ch),
+						find_sample(v->sample_loop, v->bank, ch),
+						find_sample(v->sample_end, v->bank, ch));
 					#endif
 				}
 				else
 				{
-					v->sample_loop = vreg->loop_msb*256 + vreg->loop_lsb;
-					v->sample_start = vreg->start_msb*256 + vreg->start_lsb;
-					v->sample_end = vreg->end_msb*256 + vreg->end_lsb;
+					v->sample_loop = loop;
+					v->sample_start = start;
+					v->sample_end = end;
 				}
 			}
 			else
 			{
-				v->key=0;
+				v->key = 0;
 			}
 		}
 	}
@@ -472,18 +468,18 @@ TIMER_CALLBACK_MEMBER(c140_device::int1_on)
 }
 
 
-void c140_device::init_voice( C140_VOICE *v )
+void c140_device::init_voice(C140_VOICE *v)
 {
-	v->key=0;
-	v->ptoffset=0;
-	v->rvol=0;
-	v->lvol=0;
-	v->frequency=0;
-	v->bank=0;
-	v->mode=0;
-	v->sample_start=0;
-	v->sample_end=0;
-	v->sample_loop=0;
+	v->key = 0;
+	v->ptoffset = 0;
+	v->rvol = 0;
+	v->lvol = 0;
+	v->frequency = 0;
+	v->bank = 0;
+	v->mode = 0;
+	v->sample_start = 0;
+	v->sample_end = 0;
+	v->sample_loop = 0;
 }
 
 
@@ -495,32 +491,45 @@ void c140_device::init_voice( C140_VOICE *v )
    is done by a small PAL or GAL external to the sound chip, which can be switched
    per-game or at least per-PCB revision as addressing range needs grow.
  */
-long c140_device::find_sample(long adrs, long bank, int voice)
+int c140_device::find_sample(int adrs, int bank, int voice)
 {
-	long newadr = 0;
+	int newadr = 0;
 
-	static const int16_t asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
+	static const s16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
 
-	adrs=(bank<<16)+adrs;
+	adrs = (bank << 16) + adrs;
 
 	switch (m_banking_type)
 	{
 		case C140_TYPE::SYSTEM2:
 			// System 2 banking
-			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
+			/*
+			Verified from schematics:
+			MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
+			MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
+			MA0-MA18 : Connected in Address bus of ROMs
+			MA19 : Connected in 74LS157 Select Pin
+			MA20 : Connected in 74LS157 Strobe Pin
+			MA21 : ROM select in MD4-MD11 area
+			*/
+			newadr = ((adrs & 0x200000) >> 2) | (adrs & 0x7ffff);
 			break;
 
 		case C140_TYPE::SYSTEM21:
 			// System 21 banking.
 			// similar to System 2's.
-			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
+			// TODO: verify from schematics
+			newadr = ((adrs & 0x300000) >> 1) | (adrs & 0x7ffff);
 			break;
 
 		case C140_TYPE::ASIC219:
 			// ASIC219's banking is fairly simple
-			newadr = ((m_REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
+			newadr = ((m_REG[asic219banks[voice / 4]] & 0x3) * 0x20000) + adrs;
 			break;
+		default:
+			// linear addressing, or banked with address map
+			return adrs;
 	}
 
-	return (newadr);
+	return newadr;
 }

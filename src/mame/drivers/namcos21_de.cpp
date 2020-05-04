@@ -291,9 +291,9 @@ void namco_de_pcbstack_device::sound_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)); /* mirror */
+	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
+	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namco_de_pcbstack_device::dpram_byte_r), FUNC(namco_de_pcbstack_device::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
@@ -696,11 +696,11 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_1:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0.8j",  0x000000, 0x020000, CRC(5474f203) SHA1(e0ae2f6978deb0c934d9311a334a6e36bb402aee) ) /* correct for center view */
 
-	ROM_REGION( 0x200000, "pcb_1:c140", 0 ) /* sound samples - populated for center view only */
-	ROM_LOAD("de1-voi0.12b", 0x040000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
-	ROM_LOAD("de1-voi1.12c", 0x0c0000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
-	ROM_LOAD("de1-voi2.12d", 0x140000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
-	ROM_LOAD("de1-voi3.12e", 0x1c0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
+	ROM_REGION16_BE( 0x400000, "pcb_1:c140", ROMREGION_ERASE00 ) /* sound samples - populated for center view only */
+	ROM_LOAD16_BYTE("de1-voi0.12b", 0x080000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
+	ROM_LOAD16_BYTE("de1-voi1.12c", 0x180000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
+	ROM_LOAD16_BYTE("de1-voi2.12d", 0x280000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
+	ROM_LOAD16_BYTE("de1-voi3.12e", 0x380000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
 
 	ROM_REGION( 0x8000, "pcb_1:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
@@ -742,7 +742,7 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_0:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) // correct for left & right views
 
-	ROM_REGION( 0x200000, "pcb_0:c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_REGION16_BE( 0x400000, "pcb_0:c140", ROMREGION_ERASE00 ) /* sound samples */
 	/* unpopulated for left / right views */
 
 	ROM_REGION( 0x8000, "pcb_0:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
@@ -785,7 +785,7 @@ ROM_START( driveyes )
 	ROM_REGION( 0x20000, "pcb_2:audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "de1-snd0r.8j", 0x000000, 0x020000, CRC(7bbeda42) SHA1(fe840cc9069758928492bbeec79acded18daafd9) ) // correct for left & right views
 
-	ROM_REGION( 0x200000, "pcb_2:c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_REGION16_BE( 0x400000, "pcb_2:c140", ROMREGION_ERASE00 ) /* sound samples */
 	/* unpopulated for left / right views */
 
 	ROM_REGION( 0x8000, "pcb_2:c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
