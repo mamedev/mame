@@ -769,7 +769,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 			m_limit[CS] = LIMIT(desc);
 			m_base[CS] = BASE(desc);
 			m_rights[CS] = RIGHTS(desc);
-			m_ip = offset;
+			m_prev_ip = m_ip = offset;
 		}
 		else
 		{ // systemdescriptor
@@ -862,7 +862,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 	}
 	else
 	{
-		m_ip = offset;
+		m_prev_ip = m_ip = offset;
 		m_sregs[CS]=selector;
 		m_base[CS]=selector<<4;
 		m_rights[CS]=0x93;
@@ -979,7 +979,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 			m_limit[CS] = LIMIT(gatedesc);
 			m_base[CS] = BASE(gatedesc);
 			m_rights[CS] = RIGHTS(gatedesc);
-			m_ip = GATEOFF(desc);
+			m_prev_ip = m_ip = GATEOFF(desc);
 			m_TF = 0;
 			m_NT = 0;
 			if(GATE(RIGHTS(desc)) == INTGATE)

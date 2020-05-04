@@ -595,7 +595,7 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 
 	PUSH(m_sregs[CS]);
 	PUSH(m_ip);
-	m_ip = dest_off;
+	m_prev_ip = m_ip = dest_off;
 	m_sregs[CS] = dest_seg;
 }
 
