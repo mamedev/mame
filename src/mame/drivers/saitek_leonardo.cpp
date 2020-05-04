@@ -42,7 +42,6 @@ Expansion modules released:
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
-- computer calculates too fast: MCU timer emulation is bad
 - OSA module support (softwarelist, devices/bus)
 - OSA PC link (probably uses MCU serial interface)
 - add nvram

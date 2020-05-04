@@ -24,7 +24,6 @@ so a chessboard display + 7seg info.
 TODO:
 - LCD (need SED150x device + SVG screen)
 - not sure about comm/module leds
-- computer calculates too fast, leds blink too fast (MCU timer problem)
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 

@@ -37,7 +37,7 @@
 #define OC2     m_output_compare2.w.l
 #define OC2H    m_output_compare2.w.h
 #define OC2D    m_output_compare2.d
-#define TOH     m_timer_over.w.l
+#define TOH     m_timer_over.w.h
 #define TOD     m_timer_over.d
 
 // serial I/O
