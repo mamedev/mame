@@ -323,7 +323,7 @@ ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a German unit (but doesn't seem region specific)
+	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a Spanish unit (but doesn't seem region specific)
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
