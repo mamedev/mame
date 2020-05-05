@@ -195,6 +195,12 @@ TEST_CASE("vsnprintf")
 	REQUIRE(test("hello               ", "%-20s", "hello") );
 	REQUIRE(test("hello, world!", "%s, %s!", "hello", "world") );
 
+	REQUIRE(test("h",     "%1s", "hello") );
+	REQUIRE(test("he",    "%2s", "hello") );
+	REQUIRE(test("hel",   "%3s", "hello") );
+	REQUIRE(test("hell",  "%4s", "hello") );
+	REQUIRE(test("hello", "%5s", "hello") );
+
 	bx::StringView str("0hello1world2");
 	bx::StringView hello(str, 1, 5);
 	bx::StringView world(str, 7, 5);
