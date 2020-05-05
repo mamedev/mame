@@ -278,6 +278,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mathbox.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"

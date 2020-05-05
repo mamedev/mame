@@ -123,6 +123,7 @@
 #include "sound/pokey.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 

@@ -192,6 +192,7 @@
 #include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/eeprompar.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
