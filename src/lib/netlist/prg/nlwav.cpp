@@ -1,13 +1,20 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "plib/pstring.h"
+#include "netlist/plib/pstring.h"
 #include "netlist/nl_setup.h"
-#include "plib/plists.h"
-#include "plib/pmain.h"
-#include "plib/ppmf.h"
-#include "plib/pstream.h"
+#include "netlist/plib/plists.h"
+#include "netlist/plib/pmain.h"
+#include "netlist/plib/ppmf.h"
+#include "netlist/plib/pstream.h"
 
 #include <cstdio>
+
+// see below - this belongs somewhere else!
+#ifdef _WIN32
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 // From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
 // The most compatible way to make a wav header for unknown length is to put
@@ -24,12 +31,20 @@
 class wav_t
 {
 public:
-	// XXNOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-	wav_t(std::ostream &strm, bool is_seekable, std::size_t sr, std::size_t channels)
+
+	enum format
+	{
+		s16,
+		s32,
+		f32
+	};
+
+	wav_t(std::ostream &strm, bool is_seekable, format fmt, std::size_t sr, std::size_t channels)
 	: m_f(strm)
 	, m_stream_is_seekable(is_seekable)
+	, m_format(fmt)
 	// force "play" to play and warn about eof instead of being silent
-	, m_fmt(static_cast<std::uint16_t>(channels), static_cast<std::uint32_t>(sr))
+	, m_fmt(static_cast<std::uint16_t>(channels), static_cast<std::uint32_t>(sr), fmt)
 	, m_data(is_seekable ? 0 : 0xffffffff)
 	{
 
@@ -60,17 +75,43 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
+		static_assert(sizeof(std::ostream::char_type) == 1, "char_type size must be 1");
 		auto ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
 		m_f.write(ptr, sizeof(T));
 	}
 
-	void write_sample(const int *sample)
+	template <typename T>
+	void write_sample_int(double sample)
+	{
+		const auto mmax(static_cast<double>(plib::numeric_limits<T>::max()));
+		const auto mmin(static_cast<double>(plib::numeric_limits<T>::min()));
+
+		sample *= mmax;
+		sample = std::max(mmin, sample);
+		sample = std::min(mmax, sample);
+		const auto dest(static_cast<T>(sample));
+		write(dest);
+	}
+
+	// expects normalized samples between -1.0 to 1.0 for s16 and s32
+	void write_samples(double *sample)
 	{
 		m_data.len += m_fmt.block_align;
 		for (std::size_t i = 0; i < channels(); i++)
 		{
-			auto ps = static_cast<int16_t>(sample[i]); // 16 bit sample, FIXME: Endianess?
-			write(ps);
+			switch (m_format)
+			{
+				case s16:
+					write_sample_int<int16_t>(sample[i]);
+					break;
+				case s32:
+					write_sample_int<int32_t>(sample[i]);
+					break;
+				case f32:
+					const auto df32(static_cast<float>(sample[i]));
+					write(df32);
+					break;
+			}
 		}
 	}
 
@@ -84,8 +125,23 @@ private:
 
 	struct riff_format_t
 	{
-		riff_format_t(uint16_t achannels, uint32_t asample_rate)
+		riff_format_t(uint16_t achannels, uint32_t asample_rate, format fm)
 		{
+			switch (fm)
+			{
+				case s16:
+					format_tag = 0x0001; // PCM
+					bits_sample  = 16;
+					break;
+				case s32:
+					format_tag = 0x0001; // PCM
+					bits_sample  = 32;
+					break;
+				case f32:
+					format_tag = 0x0003; // FLOAT
+					bits_sample  = 32;
+					break;
+			}
 			channels = achannels;
 			sample_rate = asample_rate;
 			block_align = channels * ((bits_sample + 7) / 8);
@@ -93,12 +149,12 @@ private:
 		}
 		std::array<uint8_t, 4> signature = {{'f','m','t',' '}};
 		uint32_t            fmt_length   = 16;
-		uint16_t            format_tag   = 0x0001; // PCM
+		uint16_t            format_tag;
 		uint16_t            channels;
 		uint32_t            sample_rate;
 		uint32_t            bytes_per_second;
 		uint16_t            block_align;
-		uint16_t            bits_sample  = 16;
+		uint16_t            bits_sample;
 	};
 
 	struct riff_data_t
@@ -111,6 +167,7 @@ private:
 
 	std::ostream &m_f;
 	bool m_stream_is_seekable;
+	format m_format;
 
 	riff_chunk_t m_fh;
 	riff_format_t m_fmt;
@@ -240,52 +297,130 @@ private:
 	std::vector<double> cursam;
 };
 
+struct filter_hp
+{
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+
+	filter_hp(double freq, bool boost, std::size_t channels, callback_type cb)
+	: m_channels(channels)
+	, m_cb(cb)
+	, m_hp_omega(plib::constants<double>::two() * plib::constants<double>::pi() * freq)
+	, m_boost(boost)
+	, m_lt(channels, 0.0)
+	, m_in(channels, 0.0)
+	, m_cap(channels, 0.0)
+	{ }
+	void process(std::size_t chan, double time, double val)
+	{
+		// based on CR filter
+		auto dt(time - m_lt[chan]);
+
+		double omega = ((m_boost && (time < 1.0/m_hp_omega)) ? 1e12 : m_hp_omega);
+		auto m(1.0 - plib::exp(-dt * omega));
+		m_cap[chan] += m * (m_in[chan] - m_cap[chan]);
+		// out = in - vcap
+		m_cb(chan, time, m_in[chan] - m_cap[chan]);
+
+		m_in[chan] = val;
+		m_lt[chan] = time;
+	}
+
+private:
+	std::size_t m_channels;
+	callback_type m_cb;
+	double m_hp_omega;
+	bool m_boost;
+	std::vector<double> m_lt;
+	std::vector<double> m_in;
+	std::vector<double> m_cap;
+};
+
+struct filter_lp
+{
+	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+
+	filter_lp(double freq, std::size_t channels, callback_type cb)
+	: m_channels(channels)
+	, m_cb(cb)
+	, m_lp_omega(plib::constants<double>::two() * plib::constants<double>::pi() * freq)
+	, m_lt(channels, 0.0)
+	, m_in(channels, 0.0) // lp filter
+	, m_cap(channels, 0.0) // hp filter
+	{ }
+	void process(std::size_t chan, double time, double val)
+	{
+		// based on RC filter
+		auto dt(time - m_lt[chan]);
+
+		auto m(1.0 - plib::exp(-dt * m_lp_omega));
+
+		m_cap[chan] += m * (m_in[chan] - m_cap[chan]);
+		// out = vcap
+		m_cb(chan, time, m_cap[chan]);
+
+		m_in[chan] = val;
+		m_lt[chan] = time;
+	}
+
+private:
+	std::size_t m_channels;
+	callback_type m_cb;
+	double m_lp_omega;
+	std::vector<double> m_lt;
+	std::vector<double> m_in;
+	std::vector<double> m_cap;
+};
+
 class wavwriter
 {
 public:
-	wavwriter(std::ostream &fo, bool is_seekable, std::size_t channels, std::size_t sample_rate, double ampa)
-	: mean(channels, 0.0)
-	, means(channels, 0.0)
-	, maxsam(channels, -1e9)
+	wavwriter(std::ostream &fo, bool is_seekable, wav_t::format fmt,
+		std::size_t channels, std::size_t sample_rate, double ampa)
+	: maxsam(channels, -1e9)
 	, minsam(channels, 1e9)
 	, m_n(channels, 0)
 	, m_samples(channels, 0)
 	, m_last_time(0)
 	, m_fo(fo)
-	, m_amp(ampa)
-	, m_wo(m_fo, is_seekable, sample_rate, channels)
+	, m_amp(ampa <= 0.0 ? 1.0e6 : ampa)
+	, m_auto(ampa <= 0.0)
+	, m_wo(m_fo, is_seekable, fmt, sample_rate, channels)
 	{ }
 
 	void process(std::size_t chan, double time, double outsam)
 	{
 		if (time > m_last_time)
-			m_wo.write_sample(m_samples.data());
+			m_wo.write_samples(m_samples.data());
 		m_last_time = time;
-		means[chan] += outsam;
 		maxsam[chan] = std::max(maxsam[chan], outsam);
 		minsam[chan] = std::min(minsam[chan], outsam);
 		m_n[chan]++;
-		//mean = means / (double) m_n;
-		mean[chan] += 5.0 / static_cast<double>(m_wo.sample_rate()) * (outsam - mean[chan]);
 
-		outsam = (outsam - mean[chan]) * m_amp;
-		outsam = std::max(-32000.0, outsam);
-		outsam = std::min(32000.0, outsam);
-		m_samples[chan] = static_cast<int>(outsam);
+		auto val(outsam * m_amp);
+		if (m_auto && plib::abs(val) > 1.0)
+		{
+			do
+			{
+				m_amp /= 2.0;
+				val = outsam * m_amp;
+			} while (plib::abs(val) > 1.0);
+			// FIXME: log this in state and provide on verbose output
+			//printf("dynamp adjusted to %f at %f\n", m_amp, time);
+		}
+		m_samples[chan] = val;
 	}
 
-	std::vector<double> mean;
-	std::vector<double> means;
 	std::vector<double> maxsam;
 	std::vector<double> minsam;
 	std::vector<std::size_t> m_n;
-	std::vector<int> m_samples;
+	std::vector<double> m_samples;
 	double m_last_time;
 
 private:
 
 	std::ostream &m_fo;
 	double m_amp;
+	bool m_auto;
 	wav_t m_wo;
 };
 
@@ -441,18 +576,23 @@ class nlwav_app : public plib::app
 public:
 	nlwav_app() :
 		plib::app(),
-		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav","vcda","vcdd", "tab"}),
-			"output format. Available options are wav|vcda|vcdd|tab."
-			" wav  : multichannel wav output"
-			" vcda : analog VCD output"
-			" vcdd : digital VCD output"
-			" tab  : sampled output"
+		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav16s","wav32s","wav32f","vcda","vcdd", "tab"}),
+			"output format. Available options are wav16s|wav32s|wav32f|vcda|vcdd|tab.\n"
+			" wav16s  : multichannel wav output 16 bit signed\n"
+			" wav32s  : multichannel wav output 32 bit signed\n"
+			" wav32f  : multichannel wav output 32 bit float\n"
+			" vcda : analog VCD output\n"
+			" vcdd : digital VCD output\n"
+			" tab  : sampled output\n"
 			" Digital signals are created using the --high and --low options"
 			),
 		opt_out(*this,  "o", "output",      "-",     "output file"),
 		opt_grp1(*this, "wav options", "These options apply to wav output only"),
 		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
 		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction"),
+		opt_lowpass(*this,  "", "lowpass",    20000.0,      "lowpass filter frequency.\nDefault {1:.0} Hz."),
+		opt_highpass(*this,  "", "highpass",    20.0, "highpass filter frequency.\nDefault is {1:.0} Hz."),
+		opt_hpboost(*this,  "", "hpboost",           "enable highpass boost to filter out initial click."),
 		opt_grp2(*this, "vcdd options", "These options apply to vcdd output only"),
 		opt_high(*this, "u", "high",   2.0,          "minimum input for high level"),
 		opt_low(*this,  "l", "low",   1.0,           "maximum input for low level"),
@@ -468,8 +608,8 @@ public:
 		opt_help(*this, "h", "help",                 "display help and exit"),
 		opt_ex1(*this, "./nlwav -f vcdd -o x.vcd log_V*",
 			"convert all files starting with \"log_V\" into a digital vcd file"),
-		opt_ex2(*this, "./nlwav -f wav -o x.wav log_V*",
-			"convert all files starting with \"log_V\" into a multichannel wav file"),
+		opt_ex2(*this, "./nlwav -f wav16s -o x.wav log_V*",
+			"convert all files starting with \"log_V\" into a multichannel wav file (16bit, signed)"),
 		opt_ex3(*this, "./nlwav -f tab -o x.tab -s 0.0000005 -i 0.000001 -n 256 log_BLUE.log",
 			"convert file log_BLUE.log to sampled output. First sample at 500ns "
 			"followed by 255 samples every micro-second.")
@@ -479,7 +619,7 @@ public:
 	pstring usage() override;
 
 private:
-	void convert_wav(std::ostream &ostrm);
+	void convert_wav(std::ostream &ostrm, wav_t::format fmt);
 	void convert_vcd(std::ostream &ostrm, vcdwriter::format_e format);
 	void convert_tab(std::ostream &ostrm);
 	void convert(const pstring &outname);
@@ -489,6 +629,9 @@ private:
 	plib::option_group opt_grp1;
 	plib::option_num<std::size_t>   opt_rate;
 	plib::option_num<double> opt_amp;
+	plib::option_num<double> opt_lowpass;
+	plib::option_num<double> opt_highpass;
+	plib::option_bool opt_hpboost;
 	plib::option_group opt_grp2;
 	plib::option_num<double> opt_high;
 	plib::option_num<double> opt_low;
@@ -509,16 +652,20 @@ private:
 	std::vector<plib::unique_ptr<std::istream>> m_instrms;
 };
 
-void nlwav_app::convert_wav(std::ostream &ostrm)
+void nlwav_app::convert_wav(std::ostream &ostrm, wav_t::format fmt)
 {
 
 	double dt = plib::reciprocal(static_cast<double>(opt_rate()));
+	auto nchan = m_instrms.size();
 
-	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
-	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
-	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
+	auto wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", fmt, nchan, opt_rate(), opt_amp());
+	auto ago = plib::make_unique<aggregator>(nchan, dt, aggregator::callback_type(&wavwriter::process, wo.get()));
+	auto fgo_hp = plib::make_unique<filter_hp>(opt_highpass(), opt_hpboost(), nchan, filter_hp::callback_type(&aggregator::process, ago.get()));
+	auto fgo_lp = plib::make_unique<filter_lp>(opt_lowpass(), nchan, filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
 
-	log_processor lp(m_instrms.size(), agcb);
+	auto topcb = log_processor::callback_type(&filter_lp::process, fgo_lp.get());
+
+	log_processor lp(nchan, topcb);
 
 	lp.process(m_instrms);
 
@@ -591,6 +738,10 @@ static void open_ostream_and_exec(pstring fname, bool binary, F func)
 	else
 	{
 		std::cout.imbue(std::locale::classic());
+		// FIXME: switch to binary on windows
+#ifdef _WIN32
+		_setmode(_fileno(stdout), _O_BINARY);
+#endif
 		func(std::cout);
 	}
 }
@@ -600,15 +751,21 @@ void nlwav_app::convert(const pstring &outname)
 	switch (opt_fmt())
 	{
 		case 0:
-			open_ostream_and_exec(outname, true, [this](std::ostream &ostrm) { convert_wav(ostrm); });
+			open_ostream_and_exec(outname, true, [this](std::ostream &ostrm) { convert_wav(ostrm, wav_t::s16); });
 			break;
 		case 1:
-			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::ANALOG); });
+			open_ostream_and_exec(outname, true, [this](std::ostream &ostrm) { convert_wav(ostrm, wav_t::s32); });
 			break;
 		case 2:
-			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::DIGITAL); });
+			open_ostream_and_exec(outname, true, [this](std::ostream &ostrm) { convert_wav(ostrm, wav_t::f32); });
 			break;
 		case 3:
+			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::ANALOG); });
+			break;
+		case 4:
+			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_vcd(ostrm, vcdwriter::DIGITAL); });
+			break;
+		case 5:
 			open_ostream_and_exec(outname, false, [this](std::ostream &ostrm) { convert_tab(ostrm); });
 			break;
 		default:
@@ -637,23 +794,34 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	for (const auto &oi: opt_args())
+	try
 	{
-		plib::unique_ptr<std::istream> fin;
-		if (oi == "-")
+		for (const auto &oi: opt_args())
 		{
-			auto temp(plib::make_unique<std::stringstream>());
-			plib::copystream(*temp, std::cin);
-			fin = std::move(temp);
+			plib::unique_ptr<std::istream> fin;
+			if (oi == "-")
+			{
+				auto temp(plib::make_unique<std::stringstream>());
+				plib::copystream(*temp, std::cin);
+				fin = std::move(temp);
+			}
+			else
+			{
+				fin = plib::make_unique<std::ifstream>(plib::filesystem::u8path(oi), std::ios::in);
+				if (fin->fail())
+					throw plib::file_open_e(oi);
+			}
+			fin->imbue(std::locale::classic());
+			m_instrms.push_back(std::move(fin));
 		}
-		else
-			fin = plib::make_unique<std::ifstream>(plib::filesystem::u8path(oi));
-		fin->imbue(std::locale::classic());
-		m_instrms.push_back(std::move(fin));
+
+		convert(opt_out());
 	}
-
-	convert(opt_out());
-
+	catch (plib::pexception &e)
+	{
+		perr("Exception caught: {}\n", e.text());
+		return 1;
+	}
 	return 0;
 }
 
