@@ -1306,7 +1306,7 @@ ROM_START( raiden2 )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1347,7 +1347,7 @@ ROM_START( raiden2g )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1407,7 +1407,7 @@ ROM_START( raiden2hk )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1483,7 +1483,7 @@ ROM_START( raiden2j )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1524,7 +1524,7 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1565,7 +1565,7 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1606,7 +1606,7 @@ ROM_START( raiden2nl )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1647,7 +1647,7 @@ ROM_START( raiden2u )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1688,7 +1688,7 @@ ROM_START( raiden2i )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1730,7 +1730,7 @@ ROM_START( raiden2k )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1788,7 +1788,7 @@ ROM_START( raiden2e )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1829,7 +1829,7 @@ ROM_START( raiden2ea )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1870,7 +1870,7 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1915,7 +1915,7 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -1960,7 +1960,7 @@ ROM_START( raiden2eg ) // this is the same code revision as raiden2eua but a ger
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
@@ -2005,7 +2005,7 @@ ROM_START( raiden2eup )
 
 	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
-	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342",   0x0000, 0x155, CRC(057a9cdc) SHA1(8b46f6673ddf11efbc3394ae423ec89d4a1283bf) )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341", 0x0000, 0x117, CRC(20931f21) SHA1(95ce9cfbfb280dfc6a326e378684eff3c6f54701) )
 
 	// Common Raiden II soldered mask ROMs below
