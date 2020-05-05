@@ -126,6 +126,14 @@ enum vgm_chip
 	CT_COUNT,
 };
 
+enum C140_TYPE
+{
+	C140_LINEAR = 0,
+	C140_SYSTEM2,
+	C140_SYSTEM21,
+	C140_ASIC219
+};
+
 class vgmplay_device : public cpu_device
 {
 public:
@@ -267,7 +275,7 @@ public:
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
-	void set_c140_bank_type(int index, c140_device::C140_TYPE type);
+	void set_c140_bank_type(int index, C140_TYPE type);
 
 	void stop();
 	void pause();
@@ -381,7 +389,7 @@ private:
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
 
-	c140_device::C140_TYPE m_c140_bank[2];
+	C140_TYPE m_c140_bank[2];
 
 	int m_sega32x_channel_hack;
 	int m_nes_apu_channel_hack[2];
@@ -2523,10 +2531,13 @@ READ16_MEMBER(vgmplay_device::c140_rom_r)
 {
 	switch (m_c140_bank[Index])
 	{
-	case c140_device::C140_TYPE::SYSTEM2:
-	case c140_device::C140_TYPE::SYSTEM21:
+	case C140_SYSTEM2:
+		offset = ((offset & 0x200000) >> 2) | (offset & 0x7ffff);
 		return rom_r(Index, 0x8d, offset) << 8; // high 8 bit only
-	case c140_device::C140_TYPE::ASIC219:
+	case C140_SYSTEM21:
+		offset = ((offset & 0x300000) >> 1) | (offset & 0x7ffff);
+		return rom_r(Index, 0x8d, offset) << 8; // high 8 bit only
+	case C140_ASIC219:
 	default:
 		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
 	}
@@ -2655,21 +2666,21 @@ static const uint8_t vgm_ay8910_flags(uint8_t vgm_flags)
 	return flags;
 }
 
-static const c140_device::C140_TYPE c140_bank_type(uint8_t vgm_type)
+static const C140_TYPE c140_bank_type(uint8_t vgm_type)
 {
 	switch (vgm_type)
 	{
 	case 0:
 	default:
-		return c140_device::C140_TYPE::SYSTEM2;
+		return C140_SYSTEM2;
 	case 1:
-		return c140_device::C140_TYPE::SYSTEM21;
+		return C140_SYSTEM21;
 	case 2:
-		return c140_device::C140_TYPE::ASIC219;
+		return C140_ASIC219;
 	}
 }
 
-void vgmplay_device::set_c140_bank_type(int index, c140_device::C140_TYPE type)
+void vgmplay_device::set_c140_bank_type(int index, C140_TYPE type)
 {
 	m_c140_bank[index] = type;
 }
@@ -2892,11 +2903,11 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		m_k054539[0]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 
-		c140_device::C140_TYPE type = c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0);
+		C140_TYPE type = c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0);
 		m_vgmplay->set_c140_bank_type(0, type);
 		m_vgmplay->set_c140_bank_type(1, type);
-		m_c140[0]->set_bank_type(type);
-		m_c140[1]->set_bank_type(type);
+		m_c140[0]->set_is_c219((type == C140_ASIC219) ? true : false);
+		m_c140[1]->set_is_c219((type == C140_ASIC219) ? true : false);
 
 		m_okim6295_pin7[0] = setup_device(*m_okim6295[0], 0, CT_OKIM6295, 0x98, 0x161);
 		m_okim6295_pin7[1] = setup_device(*m_okim6295[1], 1, CT_OKIM6295, 0x98, 0x161);

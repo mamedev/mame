@@ -20,18 +20,10 @@ class c140_device : public device_t,
 	public device_rom_interface
 {
 public:
-	enum class C140_TYPE
-	{
-		LINEAR,
-		SYSTEM2,
-		SYSTEM21,
-		ASIC219
-	};
-
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
+	void set_is_c219(bool is_c219) { m_is_c219 = is_c219; }
 	auto int1_callback() { return m_int1_callback.bind(); }
 
 	u8 c140_r(offs_t offset);
@@ -86,12 +78,12 @@ private:
 
 	int m_sample_rate;
 	sound_stream *m_stream;
-	C140_TYPE m_banking_type;
 	/* internal buffers */
 	std::unique_ptr<s16[]> m_mixer_buffer_left;
 	std::unique_ptr<s16[]> m_mixer_buffer_right;
 
 	int m_baserate;
+	bool m_is_c219;
 	u8 m_REG[0x200];
 
 	s16 m_pcmtbl[8];        //2000.06.26 CAB

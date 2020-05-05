@@ -875,6 +875,12 @@ void namcos2_state::sound_default_am(address_map &map)
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
 
+void namcos2_state::c140_default_am(address_map &map)
+{
+	map.global_mask(0x7fffff); // bit 23-24 not connected
+	map(0x000000, 0x7fffff).r(FUNC(namcos2_state::c140_rom_r));
+}
+
 /*************************************************************/
 /*                                                           */
 /*  NAMCO SYSTEM 2 PORT MACROS                               */
@@ -1718,7 +1724,7 @@ void namcos2_state::configure_common_standard(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->set_addrmap(0, &namcos2_state::c140_default_am);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 }
 

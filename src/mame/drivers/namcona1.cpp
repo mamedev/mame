@@ -1009,7 +1009,7 @@ void namcona1_state::namcona_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C140(config, m_c140, 44100);
-	m_c140->set_bank_type(c140_device::C140_TYPE::ASIC219);
+	m_c140->set_is_c219(true);
 	m_c140->set_addrmap(0, &namcona1_state::namcona1_c140_map);
 	m_c140->add_route(0, "rspeaker", 1.00);
 	m_c140->add_route(1, "lspeaker", 1.00);

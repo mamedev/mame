@@ -90,10 +90,10 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
-	, m_banking_type(C140_TYPE::LINEAR)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
+	, m_is_c219(false)
 {
 	std::fill(std::begin(m_REG), std::end(m_REG), 0);
 	std::fill(std::begin(m_pcmtbl), std::end(m_pcmtbl), 0);
@@ -188,7 +188,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	std::fill_n(&m_mixer_buffer_right[0], samples, 0);
 
 	/* get the number of voices to update */
-	const int voicecnt = (m_banking_type == C140_TYPE::ASIC219) ? 16 : 24;
+	const int voicecnt = (m_is_c219) ? 16 : 24;
 
 	//--- audio update
 	for (int i = 0; i < voicecnt; i++)
@@ -230,7 +230,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			s32 dltdt = v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode & 8) && (m_banking_type != C140_TYPE::ASIC219))
+			if ((v->mode & 8) && (!m_is_c219))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
@@ -306,7 +306,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					{
 						prevdt = lastdt;
 
-						if (m_banking_type == C140_TYPE::ASIC219)
+						if (m_is_c219)
 						{
 							lastdt = s8(read_byte(sampleData + pos));
 
@@ -318,11 +318,11 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 							if (v->mode & 0x40)
 								lastdt = -lastdt;
 
-							lastdt <<= 8;
+							lastdt <<= 4; // scale as 12bit
 						}
 						else
 						{
-							lastdt = s16(read_word((sampleData + pos) << 1) & 0xfff0); // 12bit
+							lastdt = s16(read_word((sampleData + pos) << 1) & 0xfff0) >> 4; // 12bit
 						}
 
 						dltdt = (lastdt - prevdt);
@@ -332,8 +332,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					dt = ((dltdt * offset) >> 16) + prevdt;
 
 					/* Write the data to the sample buffers */
-					*lmix++ += (dt * lvol) >> (5 + 8);
-					*rmix++ += (dt * rvol) >> (5 + 8);
+					*lmix++ += (dt * lvol) >> (5 + 4);
+					*rmix++ += (dt * rvol) >> (5 + 4);
 				}
 			}
 
@@ -379,7 +379,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 	offset &= 0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_banking_type == C140_TYPE::ASIC219))
+	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_is_c219))
 	{
 		offset -= 8;
 	}
@@ -408,7 +408,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
 				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
 				// on the 219 asic, addresses are in words
-				if (m_banking_type == C140_TYPE::ASIC219)
+				if (m_is_c219)
 				{
 					v->sample_loop = loop << 1;
 					v->sample_start = start << 1;
@@ -485,51 +485,18 @@ void c140_device::init_voice(C140_VOICE *v)
 
 /*
    find_sample: compute the actual address of a sample given it's
-   address and banking registers, as well as the board type.
-
-   I suspect in "real life" this works like the Sega MultiPCM where the banking
-   is done by a small PAL or GAL external to the sound chip, which can be switched
-   per-game or at least per-PCB revision as addressing range needs grow.
+   address and banking registers, as well as the chip type.
  */
 int c140_device::find_sample(int adrs, int bank, int voice)
 {
-	int newadr = 0;
-
 	static const s16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
 
 	adrs = (bank << 16) + adrs;
 
-	switch (m_banking_type)
+	if (m_is_c219)
 	{
-		case C140_TYPE::SYSTEM2:
-			// System 2 banking
-			/*
-			Verified from schematics:
-			MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
-			MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
-			MA0-MA18 : Connected in Address bus of ROMs
-			MA19 : Connected in 74LS157 Select Pin
-			MA20 : Connected in 74LS157 Strobe Pin
-			MA21 : ROM select in MD4-MD11 area
-			*/
-			newadr = ((adrs & 0x200000) >> 2) | (adrs & 0x7ffff);
-			break;
-
-		case C140_TYPE::SYSTEM21:
-			// System 21 banking.
-			// similar to System 2's.
-			// TODO: verify from schematics
-			newadr = ((adrs & 0x300000) >> 1) | (adrs & 0x7ffff);
-			break;
-
-		case C140_TYPE::ASIC219:
-			// ASIC219's banking is fairly simple
-			newadr = ((m_REG[asic219banks[voice / 4]] & 0x3) * 0x20000) + adrs;
-			break;
-		default:
-			// linear addressing, or banked with address map
-			return adrs;
+		// ASIC219's banking is fairly simple
+		return ((m_REG[asic219banks[voice / 4]] & 0x3) * 0x20000) + adrs;
 	}
-
-	return newadr;
+	return adrs;
 }

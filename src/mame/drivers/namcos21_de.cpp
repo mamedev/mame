@@ -84,6 +84,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 	required_shared_ptr<uint8_t> m_dpram;
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_device> m_namcos21_dsp;
@@ -120,6 +121,7 @@ private:
 	void driveyes_slave_map(address_map &map);
 
 	void sound_map(address_map &map);
+	void c140_map(address_map &map);
 };
 
 
@@ -140,6 +142,7 @@ namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig
 	m_palette(*this, "palette"),
 	m_screen(*this, "screen"),
 	m_audiobank(*this, "audiobank"),
+	m_c140_region(*this, "c140"),
 	m_dpram(*this, "dpram"),
 	m_namcos21_3d(*this, "namcos21_3d"),
 	m_namcos21_dsp(*this, "namcos21dsp")
@@ -202,7 +205,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->set_addrmap(0, &namco_de_pcbstack_device::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
@@ -300,6 +303,13 @@ void namco_de_pcbstack_device::sound_map(address_map &map)
 	map(0xc000, 0xc001).w(FUNC(namco_de_pcbstack_device::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+}
+
+void namco_de_pcbstack_device::c140_map(address_map &map)
+{
+	map.global_mask(0x7fffff);
+	// TODO: LSB not used? verify from schematics/real hardware
+	map(0x000000, 0x7fffff).lr16([this](offs_t offset) { return m_c140_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)]; }, "c140_rom_r");
 }
 
 /*************************************************************/
