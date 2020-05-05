@@ -24,10 +24,6 @@ Notes:
   To set it up, just enable the single board 4p mode and keep the master/slave
   mode to off and the board ID to master.
 
-- kicknrun the MC6801U4 mcu has been decapped and it's internal ROM has beed dumped.
-  Currently it's not hooked up properly, initial hook up is based the code from
-  Bubble Bobble - see bublbobl.ccp
-
 - mexico86 does a PS4 STOP ERROR shortly after boot, but works afterwards. PS4 is
   the MC6801U4 mcu, the bootleggers replaced it with a custom programmed 68705 MCU.
 
@@ -90,21 +86,21 @@ READ8_MEMBER(kikikai_state::kiki_ym2203_r)
  *
  *************************************/
 
-void kikikai_state::mexico86_map(address_map &map)
+void kikikai_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");                /* banked roms */
 	map(0xc000, 0xe7ff).ram().share("mainram");         /* shared with sound cpu */
 	map(0xe800, 0xe8ff).ram().share("mcu_sharedram");  /* shared with mcu */
 	map(0xe900, 0xefff).ram();
-	map(0xf000, 0xf000).w(FUNC(kikikai_state::mexico86_bankswitch_w));    /* program and gfx ROM banks */
-	map(0xf008, 0xf008).w(FUNC(kikikai_state::mexico86_f008_w));          /* cpu reset lines + other unknown stuff */
+	map(0xf000, 0xf000).w(FUNC(kikikai_state::main_bankswitch_w));    /* program and gfx ROM banks */
+	map(0xf008, 0xf008).w(FUNC(kikikai_state::main_f008_w));          /* cpu reset lines + other unknown stuff */
 	map(0xf010, 0xf010).portr("IN3");
 	map(0xf018, 0xf018).nopw();                        /* watchdog? */
 	map(0xf800, 0xffff).ram().share("subram");          /* communication ram - to connect 4 players's subboard */
 }
 
-void kikikai_state::mexico86_sound_map(address_map &map)
+void kikikai_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xa7ff).ram().share("mainram");  /* shared with main */
@@ -112,7 +108,7 @@ void kikikai_state::mexico86_sound_map(address_map &map)
 	map(0xc000, 0xc001).r(FUNC(kikikai_state::kiki_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 }
 
-WRITE8_MEMBER(kikikai_state::mexico86_sub_output_w)
+WRITE8_MEMBER(kikikai_state::kicknrun_sub_output_w)
 {
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/
@@ -120,7 +116,7 @@ WRITE8_MEMBER(kikikai_state::mexico86_sub_output_w)
 	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
-void kikikai_state::mexico86_sub_cpu_map(address_map &map)
+void kikikai_state::kicknrun_sub_cpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram(); /* sub cpu ram */
@@ -129,7 +125,7 @@ void kikikai_state::mexico86_sub_cpu_map(address_map &map)
 	map(0xc001, 0xc001).portr("IN5");
 	map(0xc002, 0xc002).portr("IN6");
 	map(0xc003, 0xc003).portr("IN7");
-	map(0xc004, 0xc004).w(FUNC(kikikai_state::mexico86_sub_output_w));
+	map(0xc004, 0xc004).w(FUNC(kikikai_state::kicknrun_sub_output_w));
 }
 
 /*************************************
@@ -137,6 +133,130 @@ void kikikai_state::mexico86_sub_cpu_map(address_map &map)
  *  Input ports
  *
  *************************************/
+
+static INPUT_PORTS_START( kicknrun )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )    /* service 2 */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	/* When Bit 1 is On, the machine waits a signal from another one */
+	/* Seems like if you can join two cabinets, one as master */
+	/* and the other as slave, probably to play four players. */
+	PORT_DIPNAME( 0x01, 0x01, "Master/Slave Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2") // Screen ?
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4") // Demo Sounds only play every 8th Demo
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Playing Time" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "40 Seconds" )
+	PORT_DIPSETTING(    0x0c, "One Minute" )
+	PORT_DIPSETTING(    0x08, "One Minute and 20 Sec." )
+	PORT_DIPSETTING(    0x04, "One Minute and 40 Sec." )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* The following dip seems to be related with the first one */
+	PORT_DIPNAME( 0x20, 0x20, "Board ID" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Master" )
+	PORT_DIPSETTING(    0x00, "Slave" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Matches" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x40, "6" )
+	PORT_DIPNAME( 0x80, 0x80, "Single board 4 Players Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //p3 service
+
+	PORT_START("IN5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //p4 service
+
+	PORT_START("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_COIN3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_COIN4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mexico86 )
 	PORT_START("IN0")
@@ -400,21 +520,33 @@ void kikikai_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 
+	save_item(NAME(m_charbank));
+
+}
+
+void mexico86_state::machine_start()
+{
+	kikikai_state::machine_start();
+
 	save_item(NAME(m_port_a_out));
 	save_item(NAME(m_port_b_out));
 	save_item(NAME(m_address));
 	save_item(NAME(m_latch));
 
+	m_port_a_out = 0xff;
+	m_port_b_out = 0xff;
+}
+
+void kikikai_simulation_state::machine_start()
+{
+	kikikai_state::machine_start();
+
 	save_item(NAME(m_kikikai_simulated_mcu_running));
 	save_item(NAME(m_kikikai_simulated_mcu_initialised));
 	save_item(NAME(m_coin_last));
 	save_item(NAME(m_coin_fract));
-
-	save_item(NAME(m_charbank));
-
-	m_port_a_out = 0xff;
-	m_port_b_out = 0xff;
 }
+
 
 void kikikai_state::machine_reset()
 {
@@ -422,31 +554,41 @@ void kikikai_state::machine_reset()
 	if (m_subcpu != nullptr)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
+	m_charbank = 0;
+}
+
+void mexico86_state::machine_reset()
+{
+	kikikai_state::machine_reset();
+
 	m_address = 0;
 	m_latch = 0;
+}
+
+void kikikai_simulation_state::machine_reset()
+{
+	kikikai_state::machine_reset();
 
 	m_kikikai_simulated_mcu_running = 0;
 	m_kikikai_simulated_mcu_initialised = 0;
 	m_coin_last[0] = false;
 	m_coin_last[1] = false;
 	m_coin_fract = 0;
-
-	m_charbank = 0;
 }
 
-void kikikai_state::mexico86(machine_config &config)
+void kikikai_state::base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
-	m_maincpu->set_addrmap(AS_PROGRAM, &kikikai_state::mexico86_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kikikai_state::main_map);
 
 	Z80(config, m_audiocpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &kikikai_state::mexico86_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kikikai_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(kikikai_state::irq0_line_hold));
 
 
 	Z80(config, m_subcpu, 8000000/2); /* 4 MHz, Uses 8Mhz OSC */
-	m_subcpu->set_addrmap(AS_PROGRAM, &kikikai_state::mexico86_sub_cpu_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &kikikai_state::kicknrun_sub_cpu_map);
 	m_subcpu->set_vblank_int("screen", FUNC(kikikai_state::irq0_line_hold));
 
 	/* 100 CPU slices per frame - high value to ensure proper synchronization of the CPUs */
@@ -454,11 +596,8 @@ void kikikai_state::mexico86(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second, vblank duration */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_mexico86));
+	m_screen->set_raw(24000000/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kicknrun));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mexico86);
@@ -476,62 +615,66 @@ void kikikai_state::mexico86(machine_config &config)
 	m_ymsnd->add_route(3, "mono", 1.00);
 }
 
-void kikikai_state::mexico86_68705(machine_config& config)
-{
-	mexico86(config);
-
-	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
-	m_68705mcu->portc_r().set_ioport("IN0");
-	m_68705mcu->porta_w().set(FUNC(kikikai_state::mexico86_68705_port_a_w));
-	m_68705mcu->portb_w().set(FUNC(kikikai_state::mexico86_68705_port_b_w));
-	m_68705mcu->set_vblank_int("screen", FUNC(kikikai_state::mexico86_m68705_interrupt));
-}
 
 
 void kikikai_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x0000).rw(FUNC(kikikai_state::bublbobl_mcu_ddr1_r), FUNC(kikikai_state::bublbobl_mcu_ddr1_w));
-	map(0x0001, 0x0001).rw(FUNC(kikikai_state::bublbobl_mcu_ddr2_r), FUNC(kikikai_state::bublbobl_mcu_ddr2_w));
-	map(0x0002, 0x0002).rw(FUNC(kikikai_state::bublbobl_mcu_port1_r), FUNC(kikikai_state::bublbobl_mcu_port1_w));
-	map(0x0003, 0x0003).rw(FUNC(kikikai_state::bublbobl_mcu_port2_r), FUNC(kikikai_state::bublbobl_mcu_port2_w));
-	map(0x0004, 0x0004).rw(FUNC(kikikai_state::bublbobl_mcu_ddr3_r), FUNC(kikikai_state::bublbobl_mcu_ddr3_w));
-	map(0x0005, 0x0005).rw(FUNC(kikikai_state::bublbobl_mcu_ddr4_r), FUNC(kikikai_state::bublbobl_mcu_ddr4_w));
-	map(0x0006, 0x0006).rw(FUNC(kikikai_state::bublbobl_mcu_port3_r), FUNC(kikikai_state::bublbobl_mcu_port3_w));
-	map(0x0007, 0x0007).rw(FUNC(kikikai_state::bublbobl_mcu_port4_r), FUNC(kikikai_state::bublbobl_mcu_port4_w));
+	map(0x0000, 0x0000).rw(FUNC(kikikai_state::kikikai_mcu_ddr1_r), FUNC(kikikai_state::kikikai_mcu_ddr1_w));
+	map(0x0001, 0x0001).rw(FUNC(kikikai_state::kikikai_mcu_ddr2_r), FUNC(kikikai_state::kikikai_mcu_ddr2_w));
+	map(0x0002, 0x0002).rw(FUNC(kikikai_state::kikikai_mcu_port1_r), FUNC(kikikai_state::kikikai_mcu_port1_w));
+	map(0x0003, 0x0003).rw(FUNC(kikikai_state::kikikai_mcu_port2_r), FUNC(kikikai_state::kikikai_mcu_port2_w));
+	map(0x0004, 0x0004).rw(FUNC(kikikai_state::kikikai_mcu_ddr3_r), FUNC(kikikai_state::kikikai_mcu_ddr3_w));
+	map(0x0005, 0x0005).rw(FUNC(kikikai_state::kikikai_mcu_ddr4_r), FUNC(kikikai_state::kikikai_mcu_ddr4_w));
+	map(0x0006, 0x0006).rw(FUNC(kikikai_state::kikikai_mcu_port3_r), FUNC(kikikai_state::kikikai_mcu_port3_w));
+	map(0x0007, 0x0007).rw(FUNC(kikikai_state::kikikai_mcu_port4_r), FUNC(kikikai_state::kikikai_mcu_port4_w));
 	map(0x0040, 0x00ff).ram();
 	map(0xf000, 0xffff).rom();
 }
 
-
 void kikikai_state::kicknrun(machine_config& config)
 {
-	mexico86(config);
+	base(config);
+
+	// Not too sure IRQs are triggered by MCU..
+	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
 
 	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	m_mcu->set_addrmap(AS_PROGRAM, &kikikai_state::mcu_map);
+
+	config.set_perfect_quantum(m_maincpu);
 
 	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
 }
 
 
-void kikikai_state::knightb(machine_config &config)
+void kikikai_simulation_state::kikikai(machine_config &config)
+{
+	base(config);
+
+	config.device_remove("sub");
+	m_screen->set_screen_update(FUNC(kikikai_simulation_state::screen_update_kikikai));
+
+	// IRQs should be triggered by the MCU, but we don't have it
+	m_maincpu->set_vblank_int("screen", FUNC(kikikai_simulation_state::kikikai_interrupt));
+}
+
+
+void mexico86_state::mexico86_68705(machine_config& config)
+{
+	base(config);
+
+	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	m_68705mcu->portc_r().set_ioport("IN0");
+	m_68705mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
+	m_68705mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
+	m_68705mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
+}
+
+void mexico86_state::knightb(machine_config &config)
 {
 	mexico86_68705(config);
 	config.device_remove("sub");
-	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
-}
-
-void kikikai_state::kikikai(machine_config &config)
-{
-	knightb(config);
-
-	// IRQs should be triggered by the MCU, but we don't have it
-	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
-
-	config.device_remove("68705mcu");   // we don't have code for the MC6801U4
-
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(kikikai_state::screen_update_kikikai));
+	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
 }
 
 
@@ -734,9 +877,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  kikikai_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrun, 0,        kicknrun,       mexico86, kikikai_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_NOT_WORKING )
-GAME( 1986, kicknrunu,kicknrun, kicknrun,       mexico86, kikikai_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_NOT_WORKING )
-GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, kikikai_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, kikikai_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,        kikikai,  kikikai_simulation_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,        kikikai,  mexico86_state,           empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, kicknrun, 0,        kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, kicknrun,       kicknrun, kikikai_state,            empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86_68705, mexico86, mexico86_state,           empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
