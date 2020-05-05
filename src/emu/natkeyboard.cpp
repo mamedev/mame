@@ -631,7 +631,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 	{
 		for (ioport_field &field : port.second->fields())
 		{
-			if (field.type() == IPT_KEYBOARD)
+			if ((field.type() == IPT_KEYBOARD) && (field.condition().evalzero()))
 			{
 				// iterate over all shift states
 				for (unsigned curshift = 0; curshift < SHIFT_STATES; ++curshift)
