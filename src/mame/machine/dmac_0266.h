@@ -28,8 +28,11 @@ protected:
 	virtual void device_reset() override;
 
 	// register handlers
-	void control_w(u32 data);
+	u32 control_r() { return m_control; }
 	u32 status_r() { return m_status; }
+	u32 tcount_r() { return m_tcount; }
+
+	void control_w(u32 data);
 	void tcount_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_tcount); }
 	void tag_w(offs_t offset, u32 data, u32 mem_mask)    { COMBINE_DATA(&m_tag); }
 	void offset_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_offset); }
@@ -59,6 +62,7 @@ private:
 	};
 
 	// registers
+	u32 m_control;
 	u32 m_status;
 	u32 m_tcount;
 	u32 m_tag;

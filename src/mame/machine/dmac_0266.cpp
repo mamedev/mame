@@ -36,9 +36,9 @@ dmac_0266_device::dmac_0266_device(machine_config const &mconfig, char const *ta
 
 void dmac_0266_device::map(address_map &map)
 {
-	map(0x00, 0x03).w(FUNC(dmac_0266_device::control_w));
+	map(0x00, 0x03).rw(FUNC(dmac_0266_device::control_r), FUNC(dmac_0266_device::control_w));
 	map(0x04, 0x07).r(FUNC(dmac_0266_device::status_r));
-	map(0x08, 0x0b).w(FUNC(dmac_0266_device::tcount_w));
+	map(0x08, 0x0b).rw(FUNC(dmac_0266_device::tcount_r), FUNC(dmac_0266_device::tcount_w));
 	map(0x0c, 0x0f).w(FUNC(dmac_0266_device::tag_w));
 	map(0x10, 0x13).w(FUNC(dmac_0266_device::offset_w));
 	map(0x14, 0x17).w(FUNC(dmac_0266_device::entry_w));
@@ -46,7 +46,7 @@ void dmac_0266_device::map(address_map &map)
 
 void dmac_0266_device::device_start()
 {
-	m_eop.resolve();
+	m_eop.resolve_safe();
 
 	m_dma_r.resolve_safe(0);
 	m_dma_w.resolve_safe();
@@ -77,6 +77,7 @@ void dmac_0266_device::device_reset()
 void dmac_0266_device::soft_reset()
 {
 	// soft reset does not clear map entries
+	m_control = 0;
 	m_status = 0;
 	m_tcount = 0;
 	m_tag = 0;
@@ -122,6 +123,7 @@ void dmac_0266_device::control_w(u32 data)
 				m_dma_check->enable(false);
 		}
 
+		m_control = data;
 		m_status = data & (ENABLE | DIRECTION);
 	}
 	else
@@ -142,7 +144,7 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 	if (!m_tcount)
 		return;
 
-	u32 const address = u32(m_map[m_tag & 0x7f]) << 12 | (m_offset & 0xfff);
+	u32 const address = (m_map[m_tag & 0x7f] << 12) | (m_offset & 0xfff);
 
 	// assert eop during last transfer
 	if (m_tcount == 1)
