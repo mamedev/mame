@@ -1,5 +1,7 @@
 
-// Driver for Grant Searle's Simple 6809 Computer
+// MAME driver for Grant Searle's Simple 6809 Computer
+// http://www.searle.wales/
+// Written by Frank Palazzolo - frank@avoidspikes.com
 
 #include "emu.h"
 
@@ -72,4 +74,4 @@ ROM_START(gs6809)
 ROM_END
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 2017, gs6809,       0,        0,      gs6809,    0,       gs6809_state, empty_init,    "Grant Searle",   "Simple 6809 Machine",  MACHINE_NO_SOUND_HW )
+COMP( 201?, gs6809,       0,        0,      gs6809,    0,       gs6809_state, empty_init,    "Grant Searle",   "Simple 6809 Machine",  MACHINE_NO_SOUND_HW )

@@ -1,5 +1,16 @@
 
 // MAME driver for Grant Searle's Simple CP/M Computer
+// http://searle.x10host.com/cpm/index.html
+// Written by Frank Palazzolo - frank@avoidspikes.com
+
+// This driver uses a compact flash card as a hard disk device.  
+// To create a virtual disk file, use the following (for a 128MB card):
+//     chdman createhd -s 134217728 -o filename.chd
+// (or use -s 67108864 for 64MB card)
+//
+// Then, run MAME with -hard filename.chd, or mount it using the GUI
+// and restart the driver
+//
 
 #include "emu.h"
 
@@ -174,4 +185,4 @@ ROM_START(gscpm)
 ROM_END
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 2017, gscpm,       0,        0,      gscpm,    0,       gscpm_state, empty_init,    "Grant Searle",   "Simple CP/M Machine",  MACHINE_NO_SOUND_HW )
+COMP( 201?, gscpm,       0,        0,      gscpm,    0,       gscpm_state, empty_init,    "Grant Searle",   "Simple CP/M Machine",  MACHINE_NO_SOUND_HW )

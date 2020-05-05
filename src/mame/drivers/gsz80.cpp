@@ -1,6 +1,6 @@
 
 // MAME Reference driver for Grant Searle's Simple Z80 Computer
-// http://searle.x10host.com/z80/SimpleZ80.html
+// http://www.searle.wales/
 // Written by Frank Palazzolo - frank@avoidspikes.com
 
 // All the common emulator stuff is here
@@ -97,4 +97,4 @@ ROM_END
 
 // This ties everything together
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY           FULLNAME                FLAGS
-COMP( 2017, gsz80,       0,        0,      gsz80,    0,       gsz80_state, empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
+COMP( 201?, gsz80,       0,        0,      gsz80,    0,       gsz80_state, empty_init,    "Grant Searle",   "Simple Z-80 Machine",  MACHINE_NO_SOUND_HW )
