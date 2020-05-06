@@ -78,27 +78,21 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 
-	u8 m_mux_data;
-	u8 m_led_select;
-	u8 m_inp_mux;
-	u8 m_7seg_data;
-	bool m_7seg_rc;
-	bool m_blink;
+	u8 m_mux_data = 0;
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+	bool m_7seg_rc = false;
+	bool m_blink = false;
 };
 
 void delta1_state::machine_start()
 {
-	// zerofill
-	m_mux_data = 0;
-	m_led_select = 0;
-	m_inp_mux = 0;
-	m_7seg_rc = false;
-	m_blink = false;
-
 	// register for savestates
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_7seg_rc));
 	save_item(NAME(m_blink));
 
