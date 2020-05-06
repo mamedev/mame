@@ -299,7 +299,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 		<info name="release" value="19851029" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2209468">
-				<rom name="Får dataregister skvallra.mfm" size="2209468" crc="06fc17bc" sha1="7de8a56025058f2a5298ee0dfa1db32c7f335643"/>
+				<rom name="Far dataregister skvallra.mfm" size="2209468" crc="06fc17bc" sha1="7de8a56025058f2a5298ee0dfa1db32c7f335643"/>
 			</dataarea>
 		</part>
 	</software>
@@ -312,7 +312,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 		<info name="release" value="19860904" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2152177">
-				<rom name="Får dataregister skvallra (Komplement).mfm" size="2152177" crc="9fa1f31a" sha1="8e0eb4e26d4167193f2b4504f014cf14a8ab8c65"/>
+				<rom name="Far dataregister skvallra (Komplement).mfm" size="2152177" crc="9fa1f31a" sha1="8e0eb4e26d4167193f2b4504f014cf14a8ab8c65"/>
 			</dataarea>
 		</part>
 	</software>
