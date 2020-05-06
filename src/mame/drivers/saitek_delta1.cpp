@@ -11,6 +11,22 @@ Hardware notes:
 - 4KB ROM(2332A), 256 bytes RAM(2*2111A-4)
 - 4-digit 7seg panel, no sound, no chessboard
 
+-------------------------------------------------------------------------------
+
+Program origin notes by bataais:
+
+They (some SciSys engineers) took the rom of Boris Master (rev. 1) and tried to
+rewrite it for a 4x 7-Segment LED, unfortunately they botched the hack job, the
+timer interrupt calls the new display routine much more frequently and so loses
+time for chess calculations; and more weird stuff is going on.
+
+No wonder it plays so weak.
+
+In the Delta-1 ROM is even some fragmented code remaining of the message:
+
+0878:BORIS AWAITS YOUR MOVE
+01 CD 7E 53 09 37 AE 50 (BC FD 59 C0 86 0)
+
 ******************************************************************************/
 
 #include "emu.h"
