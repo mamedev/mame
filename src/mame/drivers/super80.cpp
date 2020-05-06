@@ -864,6 +864,7 @@ void super80v_state::super80v(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("V");
+	SOFTWARE_LIST(config, "flop_list").set_original("super80_flop");
 }
 
 void super80r_state::super80r(machine_config &config)
