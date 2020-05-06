@@ -2628,7 +2628,7 @@ license:CC0
 
 	<!-- Missing one CD: "IRIX 6.5.13 Installation Tools and Overlays (1 of 3) August 2001" -->
 	<software name="irix_6_5_13">
-		<description>IRIX 6.5.9</description>
+		<description>IRIX 6.5.13</description>
 		<year>2001</year> <!-- 08/01 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
