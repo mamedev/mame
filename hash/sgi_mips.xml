@@ -1311,7 +1311,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- SupportFolio -->
+	<!-- SupportFolio, Support Advantage -->
 
 	<software name="sfolio_5_96">
 		<description>SupportFolio 5/96</description>
@@ -1335,6 +1335,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sfolio_6_96">
+		<description>SupportFolio June 96</description>
+		<year>1996</year> <!-- 6/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0508-002"/>
+			<feature name="part_id" value="SupportFolio Information Resources 6/96"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="SupportFolio_Information_Resources_6_96" sha1="5e9af5a94a094e040266cbcb48234b8da5f5ec6d" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0515-002"/>
+			<feature name="part_id" value="SupportFolio IRIX Patches 6/96"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="SupportFolio_IRIX_Patches_6_96" sha1="80b9576f41bb00922960aa019924c34ff220a97b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sfolio_10_96">
 		<description>SupportFolio 10/96</description>
 		<year>1996</year> <!-- 10/96 -->
@@ -1344,6 +1366,50 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_6_2_patches_10_96" sha1="55209bec451eb43fa27e8c65fe90d4b2c3157b73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_9_95">
+		<description>Support Advantage 9/95</description>
+		<year>1995</year> <!-- 9/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-4024-005"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 9/95"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="Support_Advantage_Support_Libraries_9_95" sha1="5cac63ac4127aa0c97797d746166a1178953c733" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0290-005"/>
+			<feature name="part_id" value="Support Advantage IRIX Patches 9/95"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="Support_Advantage_IRIX_Patches_9_95" sha1="057c9c63ccfd692e30b6325e6bcbc7aefdae58cb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_12_95">
+		<description>Support Advantage 12/95</description>
+		<year>1995</year> <!-- 12/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-4024-006"/>
+			<feature name="part_id" value="Support Advantage Support Libraries 12/95"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="Support_Advantage_Support_Libraries_12_95" sha1="3c2a70f3c1d0e4f7fbd4c5be6c9e79c276011641" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0290-006"/>
+			<feature name="part_id" value="Support Advantage IRIX Patches 12/95"/>
+			<diskarea name="cdrom">
+				<!-- Dumped with Plextor, without C2 errors -->
+				<disk name="Support_Advantage_IRIX_Patches_12_95" sha1="f0b8e3958a05d0ef9a9b38424706e7eb29bdfb0a" />
 			</diskarea>
 		</part>
 	</software>
@@ -1700,7 +1766,7 @@ license:CC0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0469-001"/>
 				<feature name="part_id" value="IRIX 6.2 part 1 of 2"/>
-			<!-- Origin: private dump -->
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_2_part_1_of_2" sha1="714ad598cde6a48132005e4728e7e7d18fdbbb1b" />
 			</diskarea>
@@ -1708,7 +1774,7 @@ license:CC0
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0470-001"/>
 			<feature name="part_id" value="IRIX 6.2 part 2 of 2"/>
-			<!-- Origin: private dump -->
+			<!-- Origin: private dump. Verified SHA1 against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_2_part_2_of_2" sha1="521a97cadc91f3380245b59e65ca0f7ad113193f" />
 			</diskarea>
@@ -1923,7 +1989,7 @@ license:CC0
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-004"/>
-			<feature name="part_id" value="IRIX_6.5.4 Overlays 1 of 2 May 1999"/>
+			<feature name="part_id" value="IRIX 6.5.4 Overlays 1 of 2 May 1999"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_4_overlays_1_2_may_1999" sha1="a5aa3e54848bed8d2c047a8384e2dcf2872971cb" />
@@ -1931,7 +1997,7 @@ license:CC0
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0819-004"/>
-			<feature name="part_id" value="IRIX_6.5.4 Overlays 2 of 2 May 1999"/>
+			<feature name="part_id" value="IRIX 6.5.4 Overlays 2 of 2 May 1999"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_4_overlays_2_2_may_1999" sha1="f5d8423e82a9eb8bae748d9df6f92644e79b941b" />
@@ -1943,6 +2009,36 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_4_applications_may_1999" sha1="5823291ca9caa171133efd4b0a6d62bf5041b045" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_5">
+		<description>IRIX 6.5.5</description>
+		<year>1999</year> <!-- 08/99 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-005"/>
+			<feature name="part_id" value="IRIX 6.5.5 Installation Tools and Overlays (1 of 2) August 1999"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_5_Installation_Tools_and_Overlays_1_of_2_August_1999" sha1="47b8dc05a432417b88720f2758a4d2f3a2591e9c" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-005"/>
+			<feature name="part_id" value="IRIX 6.5.5 Overlays (2 of 2) August 1999"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_5_Overlays_2_of_2_August_1999" sha1="9537a84a9783deca4403863cf8d748b920daaa69" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0877-004"/>
+			<feature name="part_id" value="IRIX 6.5 Applications August 1999"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_Applications_August_1999" sha1="1191d01b5111a12ea16f9599f26671a121d8ad04" />
 			</diskarea>
 		</part>
 	</software>
@@ -1985,30 +2081,60 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irix_6_5_7">
+		<description>IRIX 6.5.7</description>
+		<year>2000</year> <!-- 02/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-007"/>
+			<feature name="part_id" value="IRIX 6.5.7 Installation Tools and Overlays (1 of 2) February 2000"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_7_Installation_Tools_and_Overlays_1_of_2_February_2000" sha1="1cee0deaace987e83ce8fa8c07a7bad9f05f38e3" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-007"/>
+			<feature name="part_id" value="IRIX 6.5.7 Overlays (2 of 2) February 2000"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_7_Overlays_2_of_2_February_2000" sha1="44ae8b5c8b3c7ccc9300b45b4c7be96b3a46d5a1" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0877-006"/>
+			<feature name="part_id" value="IRIX 6.5 Applications February 2000"/>
+			<!-- Dumped with Plextor without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_Applications_February_2000" sha1="ad06bdb146790817bde38e1786db6038f2088d59" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="irix_6_5_8">
 		<description>IRIX 6.5.8</description>
 		<year>2000</year> <!-- 05/00 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-008"/>
-			<feature name="part_id" value="IRIX_6.5.8 Overlays 1 of 3 May 2000"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5.8 Installation Tools and Overlays (1 of 3) May 2000"/>
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_8_overlays_1_of_3_may_2000" sha1="52af3fd505845873117ba85ddaa199f86cf8431f" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0819-008"/>
-			<feature name="part_id" value="IRIX_6.5.8 Overlays 2 of 3 May 2000"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5.8 Overlays (2 of 3) May 2000"/>
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_8_overlays_2_of_3_may_2000" sha1="f3365858fa3e80c9e556bdcc1d86a50755706983" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_number" value="812-0817-008"/>
-			<feature name="part_id" value="IRIX_6.5.8 Overlays 3 of 3 May 2000"/>
-			<!-- Origin: private dump -->
+			<feature name="part_id" value="IRIX 6.5.8 Overlays (3 of 3) May 2000"/>
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_8_overlays_3_of_3_may_2000" sha1="1c26a87f6674ff4fc29d86964fd053154b0a16b7" />
 			</diskarea>
@@ -2016,7 +2142,7 @@ license:CC0
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_number" value="812-0877-007"/>
 			<feature name="part_id" value="IRIX 6.5 Applications May 2000"/>
-			<!-- Origin: private dump -->
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_8_applications_may_2000" sha1="ac6f283eb7a476703bdba843e36b737cc15788df" />
 			</diskarea>
@@ -2035,6 +2161,82 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="freeware_part_2_of_2_may_2000" sha1="76a0246639f4f982508dee19dbd2e44172878e39" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_9">
+		<description>IRIX 6.5.9</description>
+		<year>2000</year> <!-- 08/00 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-009"/>
+			<feature name="part_id" value="IRIX 6.5.9 Installation Tools and Overlays (1 of 3) August 2000"/>
+			<!-- Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_9_Installation_Tools_and_Overlays_1_of_3_August_2000" sha1="4dd005d51aa59e2161710cc699bab81d21ec9213" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-009"/>
+			<feature name="part_id" value="IRIX 6.5.9 Overlays (2 of 3) August 2000"/>
+			<!-- Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_9_Overlays_2_of_3_August_2000" sha1="5eb62bd26084e625537c7c3feabbebfff11e2ee4" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-009"/>
+			<feature name="part_id" value="IRIX 6.5.9 Overlays (3 of 3) August 2000"/>
+			<!-- Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_9_Overlays_3_of_3_August_2000" sha1="f7c00ec9da4ac3de7bb8fce62fac601b1c032815" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0877-008"/>
+			<feature name="part_id" value="IRIX 6.5 Applications August 2000"/>
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_Applications_August_2000" sha1="5a13268abafa687fc7d313c42de54f3cfe579ff3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Missing one CD: "IRIX 6.5.13 Installation Tools and Overlays (1 of 3) August 2001" -->
+	<software name="irix_6_5_13">
+		<description>IRIX 6.5.9</description>
+		<year>2001</year> <!-- 08/01 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0818-013"/>
+			<feature name="part_id" value="IRIX 6.5.13 Installation Tools and Overlays (1 of 3) August 2001"/>
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_13_Installation_Tools_and_Overlays_1_of_3_August_2001" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0819-013"/>
+			<feature name="part_id" value="IRIX 6.5.9 Overlays (2 of 3) August 2001"/>
+			<!-- Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_13_Overlays_2_of_3_August_2001" sha1="6a9fb3dd54ff3341642d25b2fb7a635da4756df4" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0817-013"/>
+			<feature name="part_id" value="IRIX 6.5.9 Overlays (3 of 3) August 2001"/>
+			<!-- Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_13_Overlays_3_of_3_August_2001" sha1="dba394a0ae8e82d7f0746c1e9669babcde56d974" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0877-012"/>
+			<feature name="part_id" value="IRIX 6.5 Applications August 2001"/>
+			<!-- Origin: private dump. Verified against a Plextor dump without C2 errors -->
+			<diskarea name="cdrom">
+				<disk name="IRIX_6_5_Applications_August_2001" sha1="a73ae9f7d0c5e42b948580463c8bc2c741c9629a" />
 			</diskarea>
 		</part>
 	</software>
@@ -2121,7 +2323,7 @@ license:CC0
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="812-0818-029"/>
-			<feature name="part_id" value="IRIX_6.5.29 Installation Tools and Overlays 1 of 3 February 06"/>
+			<feature name="part_id" value="IRIX 6.5.29 Installation Tools and Overlays 1 of 3 February 06"/>
 			<!-- Origin: unknown -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_29_installation_tools_and_overlays_1_of_3_feb_06" sha1="0416e9c1cae8667384eadc87920e20949676822a" />
@@ -2129,7 +2331,7 @@ license:CC0
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_number" value="812-0819-029"/>
-			<feature name="part_id" value="IRIX_6.5.29 Overlays 2 of 3 February 06"/>
+			<feature name="part_id" value="IRIX 6.5.29 Overlays 2 of 3 February 06"/>
 			<!-- Origin: unknown -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_29_overlays_2_of_3_feb_06" sha1="db5d9bd11b678daa64d4aa69441234cbe04b739c" />
@@ -2137,7 +2339,7 @@ license:CC0
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_number" value="812-0817-029"/>
-			<feature name="part_id" value="IRIX_6.5.29 Overlays 3 of 3 February 06"/>
+			<feature name="part_id" value="IRIX 6.5.29 Overlays 3 of 3 February 06"/>
 			<!-- Origin: unknown -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_29_overlays_3_of_3_feb_06" sha1="ae1f7af2432dffa8346cec37ed95cfd9ac1836d9" />
