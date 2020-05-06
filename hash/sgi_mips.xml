@@ -1151,7 +1151,7 @@ license:CC0
 	</software>
 
 	<software name="imagevis_3_2">
-		<description>	ImageVision Library 3.2</description>
+		<description>ImageVision Library 3.2</description>
 		<year>1998</year> <!-- 01/98 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom1" interface="cdrom">
