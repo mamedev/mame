@@ -22,8 +22,18 @@ namespace bx
 	///
 	simd128_t simd_mul(simd128_t _a, const float4x4_t* _b);
 
-	///
+	/// Multiplies two matrices
 	void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b);
+
+	/// Multiplies two 3x4 affine matrices (i.e. "model" or "world" matrices).
+	/// This function is a micro-optimized version of float4x4_mul() in the case
+	/// when the last row of the both input matrices are (0, 0, 0, 1).
+	void model4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b);
+
+	/// Multiplies a 3x4 affine matrix with a general 4x4 matrix.
+	/// This function is a micro-optimized version of float4x4_mul() in the case
+	/// when the last row of the _model input matrix is (0, 0, 0, 1).
+	void model4x4_mul_viewproj4x4(float4x4_t* _result, const float4x4_t* _model, const float4x4_t* _viewProj);
 
 	///
 	void float4x4_transpose(float4x4_t* _result, const float4x4_t* _mtx);
