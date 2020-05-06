@@ -23,7 +23,6 @@ public:
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_is_c219(bool is_c219) { m_is_c219 = is_c219; } // for vgmplay compatiblity
 	auto int1_callback() { return m_int1_callback.bind(); }
 
 	u8 c140_r(offs_t offset);
@@ -45,7 +44,7 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	virtual inline bool is_c219() { return m_is_c219; }
+	virtual inline bool is_c219() { return false; }
 private:
 	static constexpr unsigned MAX_VOICE = 24;
 
@@ -86,7 +85,6 @@ private:
 	std::unique_ptr<s16[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	bool m_is_c219;
 	u8 m_REG[0x200];
 
 	s16 m_pcmtbl[8];        //2000.06.26 CAB

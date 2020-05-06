@@ -259,6 +259,7 @@ public:
 	template<int Index> DECLARE_READ8_MEMBER(okim6295_rom_r);
 	template<int Index> DECLARE_READ8_MEMBER(k054539_rom_r);
 	template<int Index> DECLARE_READ16_MEMBER(c140_rom_r);
+	template<int Index> DECLARE_READ16_MEMBER(c219_rom_r);
 	template<int Index> DECLARE_READ8_MEMBER(k053260_rom_r);
 	template<int Index> DECLARE_READ8_MEMBER(qsound_rom_r);
 	template<int Index> DECLARE_READ8_MEMBER(es5505_rom_r);
@@ -276,6 +277,7 @@ public:
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
 	void set_c140_bank_type(int index, C140_TYPE type);
+	C140_TYPE c140_bank(int index) { return m_c140_bank[index]; }
 
 	void stop();
 	void pause();
@@ -431,6 +433,7 @@ public:
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 	template<int Index> DECLARE_WRITE8_MEMBER(scc_w);
+	template<int Index> DECLARE_WRITE8_MEMBER(c140_c219_w);
 
 	void vgmplay(machine_config &config);
 	void file_map(address_map &map);
@@ -452,6 +455,7 @@ public:
 	template<int Index> void okim6295_map(address_map &map);
 	template<int Index> void k054539_map(address_map &map);
 	template<int Index> void c140_map(address_map &map);
+	template<int Index> void c219_map(address_map &map);
 	template<int Index> void k053260_map(address_map &map);
 	template<int Index> void qsound_map(address_map &map);
 	template<int Index> void scsp_map(address_map &map);
@@ -500,6 +504,7 @@ private:
 	required_device_array<k054539_device, 2> m_k054539;
 	required_device_array<h6280_device, 2> m_huc6280;
 	required_device_array<c140_device, 2> m_c140;
+	required_device_array<c219_device, 2> m_c219;
 	required_device_array<k053260_device, 2> m_k053260;
 	required_device_array<pokey_device, 2> m_pokey;
 	required_device<qsound_device> m_qsound;
@@ -2538,9 +2543,19 @@ READ16_MEMBER(vgmplay_device::c140_rom_r)
 		offset = ((offset & 0x300000) >> 1) | (offset & 0x7ffff);
 		return rom_r(Index, 0x8d, offset) << 8; // high 8 bit only
 	case C140_ASIC219:
+		return 0; // c140 not used in this mode
 	default:
 		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
 	}
+	return 0;
+}
+
+template<int Index>
+READ16_MEMBER(vgmplay_device::c219_rom_r)
+{
+	if (m_c140_bank[Index] == C140_ASIC219)
+		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
+
 	return 0;
 }
 
@@ -2615,6 +2630,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_k054539(*this, "k054539.%d", 0)
 	, m_huc6280(*this, "huc6280.%d", 0)
 	, m_c140(*this, "c140.%d", 0)
+	, m_c219(*this, "c219.%d", 0)
 	, m_k053260(*this, "k053260.%d", 0)
 	, m_pokey(*this, "pokey.%d", 0)
 	, m_qsound(*this, "qsound")
@@ -2903,11 +2919,9 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		m_k054539[0]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 		m_k054539[1]->init_flags(version >= 0x161 && header_size >= 0x96 ? r8(0x95) : 0);
 
-		C140_TYPE type = c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0);
-		m_vgmplay->set_c140_bank_type(0, type);
-		m_vgmplay->set_c140_bank_type(1, type);
-		m_c140[0]->set_is_c219((type == C140_ASIC219) ? true : false);
-		m_c140[1]->set_is_c219((type == C140_ASIC219) ? true : false);
+		C140_TYPE c140_type = c140_bank_type(version >= 0x161 && header_size >= 0x96 ? r8(0x96) : 0);
+		m_vgmplay->set_c140_bank_type(0, c140_type);
+		m_vgmplay->set_c140_bank_type(1, c140_type);
 
 		m_okim6295_pin7[0] = setup_device(*m_okim6295[0], 0, CT_OKIM6295, 0x98, 0x161);
 		m_okim6295_pin7[1] = setup_device(*m_okim6295[1], 1, CT_OKIM6295, 0x98, 0x161);
@@ -2933,8 +2947,16 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 
 		setup_device(*m_huc6280[0], 0, CT_C6280, 0xa4, 0x161);
 		setup_device(*m_huc6280[1], 1, CT_C6280, 0xa4, 0x161);
-		setup_device(*m_c140[0], 0, CT_C140, 0xa8, 0x161);
-		setup_device(*m_c140[1], 1, CT_C140, 0xa8, 0x161);
+		if (c140_type == C140_ASIC219)
+		{
+			setup_device(*m_c219[0], 0, CT_C140, 0xa8, 0x161);
+			setup_device(*m_c219[1], 1, CT_C140, 0xa8, 0x161);
+		}
+		else
+		{
+			setup_device(*m_c140[0], 0, CT_C140, 0xa8, 0x161);
+			setup_device(*m_c140[1], 1, CT_C140, 0xa8, 0x161);
+		}
 		setup_device(*m_k053260[0], 0, CT_K053260, 0xac, 0x161);
 		setup_device(*m_k053260[1], 1, CT_K053260, 0xac, 0x161);
 		setup_device(*m_pokey[0], 0, CT_POKEY, 0xb0, 0x161);
@@ -3179,6 +3201,15 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 	}
 }
 
+template<int Index>
+WRITE8_MEMBER(vgmplay_state::c140_c219_w)
+{
+	if (m_vgmplay->c140_bank(Index) == C140_ASIC219)
+		m_c219[Index]->c140_w(offset, data);
+	else
+		m_c140[Index]->c140_w(offset, data);
+}
+
 INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 {
 	if (!newval && param != VGMPLAY_HOLD)
@@ -3338,8 +3369,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_K054539_1, vgmplay_device::A_K054539_1 + 0x22f).w(m_k054539[1], FUNC(k054539_device::write));
 	map(vgmplay_device::A_C6280_0, vgmplay_device::A_C6280_0 + 0xf).w("huc6280.0:psg", FUNC(c6280_device::c6280_w));
 	map(vgmplay_device::A_C6280_1, vgmplay_device::A_C6280_1 + 0xf).w("huc6280.1:psg", FUNC(c6280_device::c6280_w));
-	map(vgmplay_device::A_C140_0, vgmplay_device::A_C140_0 + 0x1ff).w(m_c140[0], FUNC(c140_device::c140_w));
-	map(vgmplay_device::A_C140_1, vgmplay_device::A_C140_1 + 0x1ff).w(m_c140[1], FUNC(c140_device::c140_w));
+	map(vgmplay_device::A_C140_0, vgmplay_device::A_C140_0 + 0x1ff).w(FUNC(vgmplay_state::c140_c219_w<0>));
+	map(vgmplay_device::A_C140_1, vgmplay_device::A_C140_1 + 0x1ff).w(FUNC(vgmplay_state::c140_c219_w<1>));
 	map(vgmplay_device::A_K053260_0, vgmplay_device::A_K053260_0 + 0x2f).w(m_k053260[0], FUNC(k053260_device::write));
 	map(vgmplay_device::A_K053260_1, vgmplay_device::A_K053260_1 + 0x2f).w(m_k053260[1], FUNC(k053260_device::write));
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
@@ -3463,6 +3494,12 @@ template<int Index>
 void vgmplay_state::c140_map(address_map &map)
 {
 	map(0, 0x1ffffff).r("vgmplay", FUNC(vgmplay_device::c140_rom_r<Index>));
+}
+
+template<int Index>
+void vgmplay_state::c219_map(address_map &map)
+{
+	map(0, 0x07ffff).r("vgmplay", FUNC(vgmplay_device::c219_rom_r<Index>));
 }
 
 template<int Index>
@@ -3835,6 +3872,16 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_c140[1]->set_addrmap(0, &vgmplay_state::c140_map<1>);
 	m_c140[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_c140[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
+
+	C219(config, m_c219[0], 0);
+	m_c219[0]->set_addrmap(0, &vgmplay_state::c219_map<0>);
+	m_c219[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c219[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
+
+	C219(config, m_c219[1], 0);
+	m_c219[1]->set_addrmap(0, &vgmplay_state::c219_map<1>);
+	m_c219[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_c219[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	K053260(config, m_k053260[0], 0);
 	m_k053260[0]->set_addrmap(0, &vgmplay_state::k053260_map<0>);

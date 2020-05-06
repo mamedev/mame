@@ -99,7 +99,6 @@ c140_device::c140_device(const machine_config &mconfig, device_type type, const 
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
-	, m_is_c219(false)
 {
 	std::fill(std::begin(m_REG), std::end(m_REG), 0);
 	std::fill(std::begin(m_pcmtbl), std::end(m_pcmtbl), 0);
