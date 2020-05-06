@@ -903,7 +903,6 @@ public:
 	// operators
 	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
 	bool eval() const;
-	bool evalzero() const;
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration

@@ -540,35 +540,6 @@ bool ioport_condition::eval() const
 }
 
 //-------------------------------------------------
-//  evalzero - evaluate zero condition
-//-------------------------------------------------
-
-bool ioport_condition::evalzero() const
-{
-	// always condition is always true
-	if (m_condition == ALWAYS)
-		return true;
-
-	// Read the zero condition
-	// This is used as a workaround, so that users who are parsing the
-	// the ioport structure at init time can get at least one valid set
-	// of values, even when PORT_CONDITION() is being used
-
-	ioport_value condvalue = 0;
-	switch (m_condition)
-	{
-		case ALWAYS:            return true;
-		case EQUALS:            return ((condvalue & m_mask) == m_value);
-		case NOTEQUALS:         return ((condvalue & m_mask) != m_value);
-		case GREATERTHAN:       return ((condvalue & m_mask) > m_value);
-		case NOTGREATERTHAN:    return ((condvalue & m_mask) <= m_value);
-		case LESSTHAN:          return ((condvalue & m_mask) < m_value);
-		case NOTLESSTHAN:       return ((condvalue & m_mask) >= m_value);
-	}
-	return true;
-}
-
-//-------------------------------------------------
 //  initialize - create the live state
 //-------------------------------------------------
 
