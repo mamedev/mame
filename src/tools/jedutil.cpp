@@ -54,6 +54,7 @@
         PAL16V8R    = QP20 QF2194
         PALCE16V8   = QP20 QF2194
         GAL16V8A    = QP20 QF2194
+        ATF16V8B    = QP20 QF2194
 
         18CV8       = QP20 QF2696
 
@@ -296,6 +297,7 @@ static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_gal20v8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_gal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -361,6 +363,7 @@ static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
 static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed);
 static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed);
+static void config_gal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -688,6 +691,18 @@ static pin_fuse_rows gal20v8pinfuserows[] = {
 	{22, 0, 0, 0}};
 
 static pin_fuse_rows palce22v10_pal22v10pinfuserows[] = {
+	{14, 5368, 5412, 5720},
+	{15, 4884, 4928, 5324},
+	{16, 4312, 4356, 4840},
+	{17, 3652, 3696, 4268},
+	{18, 2904, 2948, 3608},
+	{19, 2156, 2200, 2860},
+	{20, 1496, 1540, 2112},
+	{21, 924,  968,  1452},
+	{22, 440,  484,  880},
+	{23, 44,   88,   396}};
+
+static pin_fuse_rows gal22v10pinfuserows[] = {
 	{14, 5368, 5412, 5720},
 	{15, 4884, 4928, 5324},
 	{16, 4312, 4356, 4840},
@@ -1536,6 +1551,30 @@ static pin_fuse_columns palce22v10_pal22v10pinfusecolumns[] = {
 	{22, 7, 6},
 	{23, 3, 2}};
 
+static pin_fuse_columns gal22v10pinfusecolumns[] = {
+	{1,  1,  0},
+	{2,  5,  4},
+	{3,  9,  8},
+	{4,  13, 12},
+	{5,  17, 16},
+	{6,  21, 20},
+	{7,  25, 24},
+	{8,  29, 28},
+	{9 , 33, 32},
+	{10, 37, 36},
+	{11, 41, 40},
+	{13, 43, 42},
+	{14, 39, 38},
+	{15, 35, 34},
+	{16, 31, 30},
+	{17, 27, 26},
+	{18, 23, 22},
+	{19, 19, 18},
+	{20, 15, 14},
+	{21, 11, 10},
+	{22, 7,  6},
+	{23, 3,  2}};
+
 static pin_fuse_columns _82s153_pls153pinfusecolumns[] = {
 	{1,  1,  0},
 	{2,  3,  2},
@@ -2148,7 +2187,7 @@ static pal_data paldata[] = {
 		nullptr,
 		nullptr},
 	/*{"PAL16RA8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PAL16V8R", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"PAL16V8R", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/ // PAL16V8 same fusemap as GAL16V8?
 	{"PALCE16V8", 2194,
 		palce16v8pinfuserows, ARRAY_LENGTH(palce16v8pinfuserows),
 		palce16v8pinfusecolumns, ARRAY_LENGTH(palce16v8pinfusecolumns),
@@ -2157,6 +2196,13 @@ static pal_data paldata[] = {
 		nullptr,
 		nullptr},
 	{"GAL16V8", 2194,
+		gal16v8pinfuserows, ARRAY_LENGTH(gal16v8pinfuserows),
+		gal16v8pinfusecolumns, ARRAY_LENGTH(gal16v8pinfusecolumns),
+		print_gal16v8_product_terms,
+		config_gal16v8_pins,
+		is_gal16v8_product_term_enabled,
+		nullptr},
+	{"ATF16V8", 2194,
 		gal16v8pinfuserows, ARRAY_LENGTH(gal16v8pinfuserows),
 		gal16v8pinfusecolumns, ARRAY_LENGTH(gal16v8pinfusecolumns),
 		print_gal16v8_product_terms,
@@ -2254,7 +2300,6 @@ static pal_data paldata[] = {
 		config_gal20v8_pins,
 		is_gal20v8_product_term_enabled,
 		nullptr},
-	/*{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"PAL22V10", 5828,
 		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
 		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
@@ -2267,6 +2312,13 @@ static pal_data paldata[] = {
 		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
 		print_palce22v10_pal22v10_product_terms,
 		config_palce22v10_pal22v10_pins,
+		nullptr,
+		nullptr},
+	{"GAL22V10", 5892,
+		gal22v10pinfuserows, ARRAY_LENGTH(gal22v10pinfuserows),
+		gal22v10pinfusecolumns, ARRAY_LENGTH(gal22v10pinfusecolumns),
+		print_gal22v10_product_terms,
+		config_gal22v10_pins,
 		nullptr,
 		nullptr},
 	{"82S153", 1842,
@@ -3838,6 +3890,42 @@ static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const j
 	if (strlen(buffer))
 	{
 		printf("Synchronous Preset:\n\n");
+		printf("%s\n", buffer);
+		printf("\n");
+	}
+
+	/* Asynchronous Reset */
+
+	generate_product_terms(pal, jed, 0, buffer);
+
+	if (strlen(buffer))
+	{
+		printf("Asynchronous Reset:\n\n");
+		printf("%s\n", buffer);
+		printf("\n");
+	}
+}
+
+
+
+/*-------------------------------------------------
+    print_gal22v10_product_terms - prints the product
+    terms for a GAL22V10
+-------------------------------------------------*/
+
+static void print_gal22v10_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	char buffer[200];
+
+	print_product_terms(pal, jed);
+
+	/* Synchronous Reset */
+
+	generate_product_terms(pal, jed, 5764, buffer);
+
+	if (strlen(buffer))
+	{
+		printf("Synchronous Reset:\n\n");
 		printf("%s\n", buffer);
 		printf("\n");
 	}
@@ -6431,6 +6519,87 @@ static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data*
 		uint16_t pin;
 		uint16_t s0_fuse; /* output polarity (0 - low, 1 - high) */
 		uint16_t s1_fuse; /* registers allowed (0 - registered, 1 - not registered) */
+	};
+
+	static output_logic_macrocell macrocells[] = {
+		{14, 5826, 5827},
+		{15, 5824, 5825},
+		{16, 5822, 5823},
+		{17, 5820, 5821},
+		{18, 5818, 5819},
+		{19, 5816, 5817},
+		{20, 5814, 5815},
+		{21, 5812, 5813},
+		{22, 5810, 5811},
+		{23, 5808, 5809}};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
+	uint16_t index, output_pin_count;
+
+	output_pin_count = 0;
+
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
+	{
+		if (jed_get_fuse(jed, macrocells[index].s1_fuse))
+		{
+			/* Combinatorial output or dedicated input */
+
+			if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+			{
+				output_pins[output_pin_count].pin = macrocells[index].pin;
+				output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+				if (!jed_get_fuse(jed, macrocells[index].s0_fuse))
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+				}
+				else
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+				}
+
+				++output_pin_count;
+			}
+		}
+		else
+		{
+			/* Registered output */
+
+			output_pins[output_pin_count].pin = macrocells[index].pin;
+			output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+			if (!jed_get_fuse(jed, macrocells[index].s0_fuse))
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+			}
+			else
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+			}
+
+			++output_pin_count;
+		}
+	}
+
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
+
+
+
+/*-------------------------------------------------
+    config_gal22v10_pins - configures the pins for
+    a GAL22V10
+-------------------------------------------------*/
+
+static void config_gal22v10_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _output_logic_macrocell output_logic_macrocell;
+	struct _output_logic_macrocell
+	{
+		uint16_t pin;
+		uint16_t s0_fuse; /* 0 - active low, 1 - active high */
+		uint16_t s1_fuse; /* 0 - registered, 1 - combinatorial */
 	};
 
 	static output_logic_macrocell macrocells[] = {
