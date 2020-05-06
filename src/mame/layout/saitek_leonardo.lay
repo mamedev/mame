@@ -6,7 +6,7 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="black"><rect><color red="0.12" green="0.11" blue="0.1" /></rect></element>
 
 	<element name="led" defstate="0">
 		<rect state="0"><color red="0.15" green="0" blue="0" /></rect>

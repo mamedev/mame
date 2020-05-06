@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "includes/jedi.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "sound/pokey.h"
 #include "speaker.h"
 

@@ -100,10 +100,10 @@ private:
 	void unk_w(u8 data);
 
 	u8 p2_r();
-	u8 p5_r();
-	u8 p6_r();
 	void p2_w(u8 data);
+	u8 p6_r();
 	void p5_w(u8 data);
+	u8 p5_r();
 	void p6_w(u8 data);
 
 	u8 m_inp_mux = 0;
@@ -139,7 +139,7 @@ void leo_state::mux_w(u8 data)
 	update_display();
 
 	// d4: speaker out
-	m_dac->write(data >> 4 & 1);
+	m_dac->write(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)

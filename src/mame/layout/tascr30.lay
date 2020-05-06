@@ -10,10 +10,11 @@ license:CC0
 	<element name="blackd"><disk><color red="0.00" green="0.00" blue="0.00" /></disk></element>
 	<element name="black2b"><rect><color red="0.12" green="0.11" blue="0.11" /></rect></element>
 	<element name="black2d"><disk><color red="0.12" green="0.11" blue="0.11" /></disk></element>
+	<element name="black3b"><rect><color red="0.12" green="0.11" blue="0.10" /></rect></element>
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 
 	<element name="ledr" defstate="0">
-		<disk state="0">    <color red="0.15" green="0.05" blue="0.05" />   </disk>
+		<disk state="0">    <color red="0.12" green="0.11" blue="0.1" />   </disk>
 		<disk state="1">    <color red="1" green="0.01" blue="0.15" />  </disk>
 	</element>
 	<element name="ledg" defstate="0">
@@ -189,10 +190,10 @@ license:CC0
 	</element>
 
 	<group name="sb_board">
-		<bounds x="-3.4" y="-3.4" width="88.8" height="88.8" />
+		<bounds x="-3.5" y="-3.5" width="89" height="89" />
 
-		<bezel element="cblack"><bounds x="-3.4" y="-3.4" width="88.8" height="88.8" /></bezel>
-		<bezel element="blackb"><bounds x="0.6" y="0.6" width="80.8" height="80.8" /></bezel>
+		<bezel element="cblack"><bounds x="-3.5" y="-3.5" width="89" height="89" /></bezel>
+		<bezel element="black3b"><bounds x="0.5" y="0.5" width="81" height="81" /></bezel>
 
 		<!-- chessboard coords -->
 		<bezel element="text_8"><bounds x="-2.3" y="5"  width="2" height="2" /></bezel>
@@ -311,18 +312,18 @@ license:CC0
 
 		<!-- LEDs -->
 		<repeat count="9">
-			<param name="x" start="80.3" increment="-10" />
+			<param name="x" start="80.5" increment="-10" />
 			<param name="i" start="0" increment="1" />
 
-			<bezel name="led_0~i~" element="ledr"><bounds x="~x~"    y="0.3"    width="1.4" height="1.4" /></bezel>
-			<bezel name="led_1~i~" element="ledr"><bounds x="~x~"    y="10.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_2~i~" element="ledr"><bounds x="~x~"    y="20.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_3~i~" element="ledr"><bounds x="~x~"    y="30.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_4~i~" element="ledr"><bounds x="~x~"    y="40.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_5~i~" element="ledr"><bounds x="~x~"    y="50.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_6~i~" element="ledr"><bounds x="~x~"    y="60.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_7~i~" element="ledr"><bounds x="~x~"    y="70.3"   width="1.4" height="1.4" /></bezel>
-			<bezel name="led_8~i~" element="ledr"><bounds x="~x~"    y="80.3"   width="1.4" height="1.4" /></bezel>
+			<bezel name="led_0~i~" element="ledr"><bounds x="~x~"    y="0.5"    width="1" height="1" /></bezel>
+			<bezel name="led_1~i~" element="ledr"><bounds x="~x~"    y="10.5"   width="1" height="1" /></bezel>
+			<bezel name="led_2~i~" element="ledr"><bounds x="~x~"    y="20.5"   width="1" height="1" /></bezel>
+			<bezel name="led_3~i~" element="ledr"><bounds x="~x~"    y="30.5"   width="1" height="1" /></bezel>
+			<bezel name="led_4~i~" element="ledr"><bounds x="~x~"    y="40.5"   width="1" height="1" /></bezel>
+			<bezel name="led_5~i~" element="ledr"><bounds x="~x~"    y="50.5"   width="1" height="1" /></bezel>
+			<bezel name="led_6~i~" element="ledr"><bounds x="~x~"    y="60.5"   width="1" height="1" /></bezel>
+			<bezel name="led_7~i~" element="ledr"><bounds x="~x~"    y="70.5"   width="1" height="1" /></bezel>
+			<bezel name="led_8~i~" element="ledr"><bounds x="~x~"    y="80.5"   width="1" height="1" /></bezel>
 		</repeat>
 	</group>
 

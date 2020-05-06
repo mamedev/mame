@@ -119,6 +119,7 @@ protected:
 	void write_interrupt_mask(bool enabled, uint8_t bits);
 	void write_delayed_command(uint8_t data);
 	void write_command(uint8_t data);
+	virtual void write_screen2_address(bool msb, uint8_t data);
 
 	void recompute_parameters();
 
@@ -141,6 +142,7 @@ public:
 
 protected:
 	virtual void write_init_regs(uint8_t data) override;
+	virtual void write_screen2_address(bool msb, uint8_t data) override;
 };
 
 

@@ -1195,14 +1195,9 @@ int tool_app_t::execute()
 			return 1;
 		}
 	}
-	catch (netlist::nl_exception &e)
-	{
-		perr("Netlist exception caught: {}\n", e.text());
-		return 2;
-	}
 	catch (plib::pexception &e)
 	{
-		perr("plib exception caught: {}\n", e.text());
+		perr("Exception caught: {}\n", e.text());
 		return 2;
 	}
 
