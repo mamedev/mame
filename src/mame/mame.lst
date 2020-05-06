@@ -42138,3 +42138,15 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
+
+@source:gsz80.cpp
+gsz80
+
+@source:gscpm.cpp
+gscpm
+
+@source:gs6502.cpp
+gs6502
+
+@source:gs6809.cpp
+gs6809
