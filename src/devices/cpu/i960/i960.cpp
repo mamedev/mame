@@ -91,6 +91,27 @@ void i960_cpu_device::send_iac(uint32_t adr)
 	iac[3] = m_program->read_dword(adr+12);
 
 	switch(iac[0]>>24) {
+	case 0x40:  // generate irq
+		break;
+	case 0x41:  // test for pending interrupts
+		// check_irqs() seems to take care of this
+		// though it may not be entirely accurate
+		check_irqs();
+		break;
+	case 0x80:  // store SAT & PRCB in memory
+		m_program->write_dword(iac[1], m_SAT);
+		m_program->write_dword(iac[1]+4, m_PRCB);
+		break;
+	case 0x89:  // invalidate internal instruction cache
+		// we do not emulate the instruction cache, so this is safe to ignore
+		break;
+	case 0x8F:  // enable/disable breakpoints
+		// processor breakpoints are not emulated, safe to ignore
+		break;
+	case 0x91:  // stop processor
+		break;
+	case 0x92:  // continue initialization
+		break;
 	case 0x93: // reinit
 		m_SAT  = iac[1];
 		m_PRCB = iac[2];
