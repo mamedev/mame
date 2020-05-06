@@ -67,6 +67,7 @@ struct voice_registers
 
 // device type definition
 DEFINE_DEVICE_TYPE(C140, c140_device, "c140", "Namco C140")
+DEFINE_DEVICE_TYPE(C219, c219_device, "c219", "Namco C219")
 
 
 //**************************************************************************
@@ -84,7 +85,12 @@ static inline int limit(s32 in)
 //-------------------------------------------------
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C140, tag, owner, clock)
+	: c140_device(mconfig, C140, tag, owner, clock)
+{
+}
+
+c140_device::c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_BIG, 16) // Verified from schematics (24 bit address, 12(16? for C219) bit data)
 	, m_int1_callback(*this)
@@ -97,6 +103,12 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 {
 	std::fill(std::begin(m_REG), std::end(m_REG), 0);
 	std::fill(std::begin(m_pcmtbl), std::end(m_pcmtbl), 0);
+}
+
+c219_device::c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: c140_device(mconfig, C219, tag, owner, clock)
+{
+	// TODO: unknown address bus bits
 }
 
 
@@ -188,7 +200,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	std::fill_n(&m_mixer_buffer_right[0], samples, 0);
 
 	/* get the number of voices to update */
-	const int voicecnt = (m_is_c219) ? 16 : 24;
+	const int voicecnt = (is_c219()) ? 16 : 24;
 
 	//--- audio update
 	for (int i = 0; i < voicecnt; i++)
@@ -230,7 +242,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			s32 dltdt = v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode & 8) && (!m_is_c219))
+			if ((v->mode & 8) && (!is_c219()))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
@@ -306,7 +318,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					{
 						prevdt = lastdt;
 
-						if (m_is_c219)
+						if (is_c219())
 						{
 							lastdt = s8(read_byte(sampleData + pos));
 
@@ -379,7 +391,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 	offset &= 0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_is_c219))
+	if ((offset >= 0x1f8) && BIT(offset, 0) && (is_c219()))
 	{
 		offset -= 8;
 	}
@@ -408,7 +420,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
 				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
 				// on the 219 asic, addresses are in words
-				if (m_is_c219)
+				if (is_c219())
 				{
 					v->sample_loop = loop << 1;
 					v->sample_start = start << 1;
@@ -493,7 +505,7 @@ int c140_device::find_sample(int adrs, int bank, int voice)
 
 	adrs = (bank << 16) + adrs;
 
-	if (m_is_c219)
+	if (is_c219())
 	{
 		// ASIC219's banking is fairly simple
 		return ((m_REG[asic219banks[voice / 4]] & 0x3) * 0x20000) + adrs;

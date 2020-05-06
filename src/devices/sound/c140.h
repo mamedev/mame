@@ -23,7 +23,7 @@ public:
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_is_c219(bool is_c219) { m_is_c219 = is_c219; }
+	void set_is_c219(bool is_c219) { m_is_c219 = is_c219; } // for vgmplay compatiblity
 	auto int1_callback() { return m_int1_callback.bind(); }
 
 	u8 c140_r(offs_t offset);
@@ -34,6 +34,8 @@ public:
 	void c140_le_w(offs_t offset, u8 data) { c140_w(offset ^ 1, data);}
 
 protected:
+	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
@@ -43,6 +45,7 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	virtual inline bool is_c219() { return m_is_c219; }
 private:
 	static constexpr unsigned MAX_VOICE = 24;
 
@@ -93,6 +96,16 @@ private:
 	emu_timer *m_int1_timer;
 };
 
+class c219_device : public c140_device
+{
+public:
+	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual inline bool is_c219() override { return true; }
+};
+
 DECLARE_DEVICE_TYPE(C140, c140_device)
+DECLARE_DEVICE_TYPE(C219, c219_device)
 
 #endif // MAME_SOUND_C140_H
