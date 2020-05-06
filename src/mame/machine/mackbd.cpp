@@ -235,7 +235,7 @@ u8 mackbd_device::p0_r()
 		ret &= m_col[0]->read();
 
 	// capslock
-	if(!ioport("MODS")->read() & 0x1)
+	if(!(ioport("MODS")->read() & 0x1))
 		ret &= ~0x40;
 
 	return ret;
