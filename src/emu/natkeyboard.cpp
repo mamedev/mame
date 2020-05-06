@@ -603,8 +603,6 @@ void natural_keyboard::paste()
 
 void natural_keyboard::build_codes(ioport_manager &manager)
 {
-	keycode_map m_keycode_map2;
-
 	// find all shift keys
 	unsigned mask = 0;
 	std::array<ioport_field *, SHIFT_COUNT> shift;
@@ -898,7 +896,6 @@ const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t 
 
 void natural_keyboard::dump(std::ostream &str) const
 {
-#if 0
 	constexpr size_t left_column_width = 24;
 
 	// loop through all codes
@@ -911,15 +908,17 @@ void natural_keyboard::dump(std::ostream &str) const
 		// pad with spaces
 		util::stream_format(str, "%-*s", left_column_width, description);
 
-		// identify the keys used
-		for (std::size_t field = 0; (code.second.field.size() > field) && code.second.field[field]; ++field)
-			util::stream_format(str, "%s'%s'", first ? "" : ", ", code.second.field[field]->name());
+		for (auto &entry : code.second)
+		{
+			// identify the keys used
+			for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
+			    util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
 
-		// carriage return
-		str << '\n';
-		first = false;
+			// carriage return
+			str << '\n';
+			first = false;
+		}
 	}
-#endif
 }
 
 

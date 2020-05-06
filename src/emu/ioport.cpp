@@ -539,6 +539,7 @@ bool ioport_condition::eval() const
 	return true;
 }
 
+
 //-------------------------------------------------
 //  initialize - create the live state
 //-------------------------------------------------

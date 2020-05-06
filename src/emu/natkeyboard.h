@@ -74,7 +74,7 @@ private:
 	{
 		std::array<ioport_field *, SHIFT_COUNT + 1> field;
 		unsigned                                    shift;
-		ioport_condition condition;
+		ioport_condition                        condition;
 	};
 	typedef std::list<keycode_map_entry> keycode_map_list;
 	typedef std::unordered_map<char32_t, keycode_map_list> keycode_map;
