@@ -3123,9 +3123,7 @@ void funworld_state::saloon(machine_config &config)
 	config.device_remove("pia1");
 
 	/* Serial Memory */
-	i2cmem_device &m_i2cmem(I2CMEM(config, "i2cmem", 0));
-	m_i2cmem.set_data_size(256);
-	m_i2cmem.set_e0(1);
+	I2C_24C02(config, "i2cmem", 0).set_e0(1); // ? or maybe 2nd half of 24C04?
 }
 
 

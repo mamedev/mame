@@ -635,7 +635,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 //  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
 //  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
-//  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
+	I2C_24C16(config, "i2cmem", 0); // M24CL16-S
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -659,14 +659,12 @@ void ghosteo_state::bballoon(machine_config &config)
 {
 	ghosteo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::bballoon_map);
-	I2CMEM(config, "i2cmem", 0).set_data_size(256);
 }
 
 void ghosteo_state::touryuu(machine_config &config)
 {
 	ghosteo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::touryuu_map);
-	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
 }
 
 

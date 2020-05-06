@@ -82,8 +82,7 @@ void bbc_datacentre_device::device_add_mconfig(machine_config &config)
 	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", "hdd", false);
 	m_ide->irq_handler().set(FUNC(bbc_datacentre_device::irq_w));
 
-	/* 24LC512 - 512Kb I2C Serial EEPROM */
-	I2CMEM(config, m_nvram).set_page_size(128).set_data_size(0x10000);
+	I2C_24C512(config, m_nvram); // 24LC512
 
 	/* import floppy images - delayed to allow RAMFS to initialise before import */
 	QUICKLOAD(config, "import0", "ssd,dsd,img", attotime::from_seconds(1)).set_load_callback(FUNC(bbc_datacentre_device::quickload_cb<0>));
