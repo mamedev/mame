@@ -115,7 +115,7 @@ c0   8 data bits, Rx disabled
 #define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
-//#define MAC_USE_EMULATED_KBD (1)
+#define MAC_USE_EMULATED_KBD (1)
 
 /* tells which model is being emulated (set by macxxx_init) */
 enum mac128model_t
@@ -958,14 +958,12 @@ void mac128_state::keyboard_init()
 
 WRITE_LINE_MEMBER(mac128_state::mac_kbd_clk_in)
 {
-	printf("CLK: %d\n", state^1);
 	m_via->write_cb1(state ? 0 : 1);
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
-	printf("Sending %d to kbd (PC=%x)\n", state, m_maincpu->pc());
-	m_mackbd->data_w(state ? ASSERT_LINE : CLEAR_LINE);
+	m_mackbd->datain_w(state);
 }
 
 #else   // keyboard HLE
