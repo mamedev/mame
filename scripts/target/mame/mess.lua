@@ -4462,6 +4462,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/drivers/mindset.cpp",
+	MAME_DIR .. "src/mame/drivers/gs6502.cpp",
+	MAME_DIR .. "src/mame/drivers/gs6809.cpp",
+	MAME_DIR .. "src/mame/drivers/gscpm.cpp",
+	MAME_DIR .. "src/mame/drivers/gsz80.cpp",
 }
 
 end
