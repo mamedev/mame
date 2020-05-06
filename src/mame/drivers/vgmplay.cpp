@@ -3205,7 +3205,7 @@ template<int Index>
 WRITE8_MEMBER(vgmplay_state::c140_c219_w)
 {
 	if (m_vgmplay->c140_bank(Index) == C140_ASIC219)
-		m_c219[Index]->c140_w(offset, data);
+		m_c219[Index]->c219_w(offset, data);
 	else
 		m_c140[Index]->c140_w(offset, data);
 }

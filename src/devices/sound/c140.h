@@ -44,8 +44,8 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	virtual inline bool is_c219() { return false; }
-private:
+	virtual int find_sample(int adrs, int bank, int voice);
+
 	static constexpr unsigned MAX_VOICE = 24;
 
 	struct C140_VOICE
@@ -72,7 +72,10 @@ private:
 	};
 
 	void init_voice(C140_VOICE *v);
-	int find_sample(int adrs, int bank, int voice);
+	const inline bool ch_looped(C140_VOICE *v) { return BIT(v->mode, 4); } // shared as c140 and c219
+
+	virtual const inline bool ch_mulaw(C140_VOICE *v) { return BIT(v->mode, 3); }
+	// bit 6 used, unknown
 
 	TIMER_CALLBACK_MEMBER(int1_on);
 
@@ -87,7 +90,7 @@ private:
 	int m_baserate;
 	u8 m_REG[0x200];
 
-	s16 m_pcmtbl[8];        //2000.06.26 CAB
+	s16 m_pcmtbl[256];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[MAX_VOICE];
 
@@ -99,8 +102,29 @@ class c219_device : public c140_device
 public:
 	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	u8 c219_r(offs_t offset);
+	void c219_w(offs_t offset, u8 data);
+
+	// little endian: Swap even and odd word
+	u8 c219_le_r(offs_t offset) { return c219_r(offset ^ 1); }
+	void c219_le_w(offs_t offset, u8 data) { c219_w(offset ^ 1, data);}
+
 protected:
-	virtual inline bool is_c219() override { return true; }
+	// device-level overrides
+	virtual void device_start() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	virtual int find_sample(int adrs, int bank, int voice) override;
+
+	virtual const inline bool ch_mulaw(C140_VOICE *v) override { return BIT(v->mode, 0); }
+private:
+	// bit 1 used, unknown
+	const inline bool ch_noise(C140_VOICE *v) { return BIT(v->mode, 2); }
+	const inline bool ch_inv_lout(C140_VOICE *v) { return BIT(v->mode, 3); }
+	const inline bool ch_inv_sign(C140_VOICE *v) { return BIT(v->mode, 6); }
+	u16 m_lfsr;
 };
 
 DECLARE_DEVICE_TYPE(C140, c140_device)
