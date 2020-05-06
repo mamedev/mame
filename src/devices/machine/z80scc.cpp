@@ -1858,7 +1858,8 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  of these modes is selected and this command is issued before the data has been read from the
 		  Receive FIFO, the data is lost */
 		LOGCMD("%s: %c : WR0_ERROR_RESET - not implemented\n", owner()->tag(), 'A' + m_index);
-		m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
+		if (m_rx_fifo_wp != m_rx_fifo_rp)
+			m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
 		break;
 	case WR0_SEND_ABORT: // Flush transmitter and Send 8-13 bits of '1's, used with SDLC
 		LOGCMD("%s: %c : WR0_SEND_ABORT - not implemented\n", owner()->tag(), 'A' + m_index);
