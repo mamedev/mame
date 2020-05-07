@@ -44,40 +44,6 @@ namespace devices
 	};
 
 	// -----------------------------------------------------------------------------
-	// power pins - not a device, but a helper
-	// -----------------------------------------------------------------------------
-
-	/// \brief Power pins class.
-	///
-	/// Power Pins are passive inputs. Delegate noop will silently ignore any
-	/// updates.
-
-	class nld_power_pins
-	{
-	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
-		{
-		}
-
-		const analog_input_t &VCC() const noexcept
-		{
-			return m_VCC;
-		}
-		const analog_input_t &GND() const noexcept
-		{
-			return m_GND;
-		}
-
-	private:
-		void noop() { }
-		analog_input_t m_VCC;
-		analog_input_t m_GND;
-	};
-
-	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
 

@@ -5,8 +5,8 @@
  *
  */
 
-#include "nlid_system.h"
 #include "netlist/analog/nlid_twoterm.h"
+#include "nlid_system.h"
 
 namespace netlist
 {

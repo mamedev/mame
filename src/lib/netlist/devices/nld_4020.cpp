@@ -6,7 +6,8 @@
  */
 
 #include "nld_4020.h"
-#include "nlid_system.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 namespace netlist
 {

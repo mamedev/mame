@@ -333,12 +333,18 @@ namespace netlist
 	struct state_var
 	{
 	public:
-		template <typename O, typename... Args>
+		template <typename O>
 		//! Constructor.
 		state_var(O &owner,             //!< owner must have a netlist() method.
 				const pstring &name,    //!< identifier/name for this state variable
-				Args&&... args    //!< Initial values for construction of O
+				const T &value          //!< Initial value after construction
 				);
+
+		template <typename O>
+		//! Constructor.
+		state_var(O &owner,             //!< owner must have a netlist() method.
+				const pstring &name     //!< identifier/name for this state variable
+		);
 
 		//! Destructor.
 		~state_var() noexcept = default;
@@ -1777,6 +1783,40 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
+	// power pins - not a device, but a helper
+	// -----------------------------------------------------------------------------
+
+	/// \brief Power pins class.
+	///
+	/// Power Pins are passive inputs. Delegate noop will silently ignore any
+	/// updates.
+
+	class nld_power_pins
+	{
+	public:
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
+			const pstring &sGND = sPowerGND)
+		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
+		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
+		{
+		}
+
+		const analog_input_t &VCC() const noexcept
+		{
+			return m_VCC;
+		}
+		const analog_input_t &GND() const noexcept
+		{
+			return m_GND;
+		}
+
+	private:
+		void noop() { }
+		analog_input_t m_VCC;
+		analog_input_t m_GND;
+	};
+
+	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
@@ -2038,9 +2078,16 @@ namespace netlist
 	}
 
 	template <typename T>
-	template <typename O, typename... Args>
-	state_var<T>::state_var(O &owner, const pstring &name, Args&&... args)
-	: m_value(std::forward<Args>(args)...)
+	template <typename O>
+	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
+	: m_value(value)
+	{
+		owner.state().save(owner, m_value, owner.name(), name);
+	}
+
+	template <typename T>
+	template <typename O>
+	state_var<T>::state_var(O &owner, const pstring &name)
 	{
 		owner.state().save(owner, m_value, owner.name(), name);
 	}

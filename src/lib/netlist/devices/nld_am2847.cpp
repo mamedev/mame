@@ -7,7 +7,6 @@
 
 #include "nld_am2847.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {

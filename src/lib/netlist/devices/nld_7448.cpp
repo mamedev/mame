@@ -6,7 +6,6 @@
  */
 
 #include "nld_7448.h"
-#include "nlid_system.h"
 #include "nlid_truthtable.h"
 
 #include <array>

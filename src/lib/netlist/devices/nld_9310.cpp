@@ -7,7 +7,6 @@
 
 #include "nld_9310.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 #define MAXCNT 9
 
