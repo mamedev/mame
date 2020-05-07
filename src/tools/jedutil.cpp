@@ -96,10 +96,15 @@
         PAL20X10    = QP24 QF1600
 
         GAL20V8A    = QP24 QF2706
+
         GAL22V10    = QP24 QF5892
+        ATF22V10C   = QP24 QF5892 (GAL Mode)
 
         PALCE22V10  = QP24 QF5828
         PAL22V10    = QP24 QF5828
+        ATF22V10C   = QP24 QF5828 (PAL Mode)
+
+        ATF22V10C   = QP24 QF5893 (Power Down Mode)
 
     28-pin devices:
         PLS100      = QP28 QF1928 (Tri-State)
