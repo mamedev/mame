@@ -353,7 +353,6 @@ void dragon64_state::dragon64(machine_config &config)
 	rs232.dsr_handler().set(acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(acia, FUNC(mos6551_device::write_cts));
 
-
 	// software lists
 	SOFTWARE_LIST(config, "dragon_flex_list").set_original("dragon_flex");
 	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
