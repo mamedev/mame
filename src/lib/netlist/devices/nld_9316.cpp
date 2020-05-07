@@ -121,28 +121,31 @@ namespace netlist
 	};
 
 	template <bool ASYNC>
-	NETLIB_OBJECT_DERIVED(9316_dip_base, 9316_base<ASYNC>)
+	NETLIB_OBJECT(9316_dip_base)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(9316_dip_base, 9316_base<ASYNC>)
+		NETLIB_CONSTRUCTOR(9316_dip_base)
+		, A(*this, "A")
 		{
-			this->register_subalias("1", "CLRQ");
-			this->register_subalias("2", "CLK");
-			this->register_subalias("3", "A");
-			this->register_subalias("4", "B");
-			this->register_subalias("5", "C");
-			this->register_subalias("6", "D");
-			this->register_subalias("7", "ENP");
-			this->register_subalias("8", "GND");
+			this->register_subalias("1", "A.CLRQ");
+			this->register_subalias("2", "A.CLK");
+			this->register_subalias("3", "A.A");
+			this->register_subalias("4", "A.B");
+			this->register_subalias("5", "A.C");
+			this->register_subalias("6", "A.D");
+			this->register_subalias("7", "A.ENP");
+			this->register_subalias("8", "A.GND");
 
-			this->register_subalias("9", "LOADQ");
-			this->register_subalias("10", "ENT");
-			this->register_subalias("11", "QD");
-			this->register_subalias("12", "QC");
-			this->register_subalias("13", "QB");
-			this->register_subalias("14", "QA");
-			this->register_subalias("15", "RC");
-			this->register_subalias("16", "VCC");
+			this->register_subalias("9", "A.LOADQ");
+			this->register_subalias("10", "A.ENT");
+			this->register_subalias("11", "A.QD");
+			this->register_subalias("12", "A.QC");
+			this->register_subalias("13", "A.QB");
+			this->register_subalias("14", "A.QA");
+			this->register_subalias("15", "A.RC");
+			this->register_subalias("16", "A.VCC");
 		}
+	private:
+		NETLIB_SUB(9316_base)<ASYNC> A;
 	};
 
 	using NETLIB_NAME(9316) = NETLIB_NAME(9316_base)<true>;

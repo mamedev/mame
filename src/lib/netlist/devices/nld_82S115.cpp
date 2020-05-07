@@ -29,7 +29,8 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(82S115_dip);
+	private:
 		object_array_t<logic_input_t, 9> m_A;
 		logic_input_t m_CE1Q;
 		logic_input_t m_CE2;
@@ -42,40 +43,46 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(82S115_dip, 82S115)
+	NETLIB_OBJECT(82S115_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(82S115_dip, 82S115)
+		NETLIB_CONSTRUCTOR(82S115_dip)
+		, A(*this, "A")
 		{
-			register_subalias("21",    m_A[0]);
-			register_subalias("22",    m_A[1]);
-			register_subalias("23",    m_A[2]);
-			register_subalias("1",     m_A[3]);
-			register_subalias("2",     m_A[4]);
-			register_subalias("3",     m_A[5]);
-			register_subalias("4",     m_A[6]);
-			register_subalias("5",     m_A[7]);
-			register_subalias("6",     m_A[8]);
+			register_subalias("21",    A.m_A[0]);
+			register_subalias("22",    A.m_A[1]);
+			register_subalias("23",    A.m_A[2]);
+			register_subalias("1",     A.m_A[3]);
+			register_subalias("2",     A.m_A[4]);
+			register_subalias("3",     A.m_A[5]);
+			register_subalias("4",     A.m_A[6]);
+			register_subalias("5",     A.m_A[7]);
+			register_subalias("6",     A.m_A[8]);
 
-			register_subalias("20",    m_CE1Q);
-			register_subalias("19",    m_CE2);
+			register_subalias("20",    A.m_CE1Q);
+			register_subalias("19",    A.m_CE2);
 
+			// FIXME: implement FE1, FE2
 			// register_subalias("13",    m_FE1);
 			// register_subalias("11",    m_FE2);
 
-			register_subalias("18",    m_STROBE);
+			register_subalias("18",    A.m_STROBE);
 
-			register_subalias("7",     m_O[0]);
-			register_subalias("8",     m_O[1]);
-			register_subalias("9",     m_O[2]);
-			register_subalias("10",    m_O[3]);
-			register_subalias("14",    m_O[4]);
-			register_subalias("15",    m_O[5]);
-			register_subalias("16",    m_O[6]);
-			register_subalias("17",    m_O[7]);
+			register_subalias("7",     A.m_O[0]);
+			register_subalias("8",     A.m_O[1]);
+			register_subalias("9",     A.m_O[2]);
+			register_subalias("10",    A.m_O[3]);
+			register_subalias("14",    A.m_O[4]);
+			register_subalias("15",    A.m_O[5]);
+			register_subalias("16",    A.m_O[6]);
+			register_subalias("17",    A.m_O[7]);
 
-			register_subalias("12", "GND");
-			register_subalias("24", "VCC");
+			register_subalias("12", "A.GND");
+			register_subalias("24", "A.VCC");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(82S115) A;
 	};
 
 	NETLIB_RESET(82S115)

@@ -32,7 +32,8 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(74166_dip);
+	private:
 		object_array_t<logic_input_t, 8> m_DATA;
 		logic_input_t m_SER;
 		logic_input_t m_CLRQ;
@@ -47,28 +48,33 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(74166_dip, 74166)
+	NETLIB_OBJECT(74166_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(74166_dip, 74166)
+		NETLIB_CONSTRUCTOR(74166_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_SER);
-			register_subalias("2", m_DATA[7]);
-			register_subalias("3", m_DATA[6]);
-			register_subalias("4", m_DATA[5]);
-			register_subalias("5", m_DATA[4]);
-			register_subalias("6", m_CLKINH);
-			register_subalias("7", m_CLK);
-			register_subalias("8", "GND");
+			register_subalias("1", A.m_SER);
+			register_subalias("2", A.m_DATA[7]);
+			register_subalias("3", A.m_DATA[6]);
+			register_subalias("4", A.m_DATA[5]);
+			register_subalias("5", A.m_DATA[4]);
+			register_subalias("6", A.m_CLKINH);
+			register_subalias("7", A.m_CLK);
+			register_subalias("8", "A.GND");
 
-			register_subalias("9", m_CLRQ);
-			register_subalias("10", m_DATA[3]);
-			register_subalias("11", m_DATA[2]);
-			register_subalias("12", m_DATA[1]);
-			register_subalias("13", m_QH);
-			register_subalias("14", m_DATA[0]);
-			register_subalias("15", m_SH_LDQ);
-			register_subalias("16", "VCC");
+			register_subalias("9", A.m_CLRQ);
+			register_subalias("10", A.m_DATA[3]);
+			register_subalias("11", A.m_DATA[2]);
+			register_subalias("12", A.m_DATA[1]);
+			register_subalias("13", A.m_QH);
+			register_subalias("14", A.m_DATA[0]);
+			register_subalias("15", A.m_SH_LDQ);
+			register_subalias("16", "A.VCC");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(74166) A;
 	};
 
 	NETLIB_RESET(74166)

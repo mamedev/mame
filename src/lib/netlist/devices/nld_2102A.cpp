@@ -32,7 +32,8 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(2102A_dip);
+	private:
 		object_array_t<logic_input_t, 10> m_A;
 		logic_input_t m_CEQ;
 		logic_input_t m_RWQ;
@@ -45,31 +46,36 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(2102A_dip, 2102A)
+	NETLIB_OBJECT(2102A_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(2102A_dip, 2102A)
+		NETLIB_CONSTRUCTOR(2102A_dip)
+		, A(*this, "A")
 		{
-			register_subalias("8",     m_A[0]);
-			register_subalias("4",     m_A[1]);
-			register_subalias("5",     m_A[2]);
-			register_subalias("6",     m_A[3]);
-			register_subalias("7",     m_A[4]);
-			register_subalias("2",     m_A[5]);
-			register_subalias("1",     m_A[6]);
-			register_subalias("16",    m_A[7]);
-			register_subalias("15",    m_A[8]);
-			register_subalias("14",    m_A[9]);
+			register_subalias("8",     A.m_A[0]);
+			register_subalias("4",     A.m_A[1]);
+			register_subalias("5",     A.m_A[2]);
+			register_subalias("6",     A.m_A[3]);
+			register_subalias("7",     A.m_A[4]);
+			register_subalias("2",     A.m_A[5]);
+			register_subalias("1",     A.m_A[6]);
+			register_subalias("16",    A.m_A[7]);
+			register_subalias("15",    A.m_A[8]);
+			register_subalias("14",    A.m_A[9]);
 
-			register_subalias("13",    m_CEQ);
-			register_subalias("3",     m_RWQ);
+			register_subalias("13",    A.m_CEQ);
+			register_subalias("3",     A.m_RWQ);
 
-			register_subalias("11",    m_DI);
-			register_subalias("12",    m_DO);
+			register_subalias("11",    A.m_DI);
+			register_subalias("12",    A.m_DO);
 
-			register_subalias("10",    "VCC");
-			register_subalias("9",     "GND");
+			register_subalias("10",    "A.VCC");
+			register_subalias("9",     "A.GND");
 
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(2102A) A;
 	};
 
 	NETLIB_UPDATE(2102A)

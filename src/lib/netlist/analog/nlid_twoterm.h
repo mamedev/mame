@@ -452,32 +452,31 @@ namespace analog
 	///   | Y  |IBV   |current at breakdown voltage     |A    |  0.001|        |      |
 	///   |    |TNOM  |parameter measurement temperature|deg C|     27|      50|      |
 	///
-	class diode_model_t : public param_model_t
+	class diode_model_t
 	{
 	public:
-		diode_model_t(device_t &device, const pstring &name, const pstring &val)
-		: param_model_t(device, name, val)
-		, m_IS(*this, "IS")
-		, m_N(*this, "N")
+		diode_model_t(param_model_t &model)
+		: m_IS(model, "IS")
+		, m_N(model, "N")
 		{}
 
-		value_t m_IS;    //!< saturation current.
-		value_t m_N;     //!< emission coefficient.
+		param_model_t::value_t m_IS;    //!< saturation current.
+		param_model_t::value_t m_N;     //!< emission coefficient.
 	};
 
 	class zdiode_model_t : public diode_model_t
 	{
 	public:
-		zdiode_model_t(device_t &device, const pstring &name, const pstring &val)
-		: diode_model_t(device, name, val)
-		, m_NBV(*this, "NBV")
-		, m_BV(*this, "BV")
-		, m_IBV(*this, "IBV")
+		zdiode_model_t(param_model_t &model)
+		: diode_model_t(model)
+		, m_NBV(model, "NBV")
+		, m_BV(model, "BV")
+		, m_IBV(model, "IBV")
 		{}
 
-		value_t m_NBV;    //!< reverse emission coefficient.
-		value_t m_BV;     //!< reverse breakdown voltage.
-		value_t m_IBV;    //!< current at breakdown voltage.
+		param_model_t::value_t m_NBV;    //!< reverse emission coefficient.
+		param_model_t::value_t m_BV;     //!< reverse breakdown voltage.
+		param_model_t::value_t m_IBV;    //!< current at breakdown voltage.
 	};
 
 	// -----------------------------------------------------------------------------
@@ -504,7 +503,7 @@ namespace analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		diode_model_t m_model;
+		param_model_t m_model;
 		generic_diode<diode_e::BIPOLAR> m_D;
 	};
 
@@ -533,7 +532,7 @@ namespace analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		zdiode_model_t m_model;
+		param_model_t m_model;
 		generic_diode<diode_e::BIPOLAR> m_D;
 		// REVERSE diode
 		generic_diode<diode_e::BIPOLAR> m_R;

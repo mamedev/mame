@@ -97,27 +97,26 @@ namespace analog
 	/// |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
 	/// |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
 	///
-	class bjt_model_t : public param_model_t
+	class bjt_model_t
 	{
 	public:
-		bjt_model_t(device_t &device, const pstring &name, const pstring &val)
-		: param_model_t(device, name, val)
-		, m_IS (*this, "IS")
-		, m_BF (*this, "BF")
-		, m_NF (*this, "NF")
-		, m_BR (*this, "BR")
-		, m_NR (*this, "NR")
-		, m_CJE(*this, "CJE")
-		, m_CJC(*this, "CJC")
+		bjt_model_t(param_model_t &model)
+		: m_IS (model, "IS")
+		, m_BF (model, "BF")
+		, m_NF (model, "NF")
+		, m_BR (model, "BR")
+		, m_NR (model, "NR")
+		, m_CJE(model, "CJE")
+		, m_CJC(model, "CJC")
 		{}
 
-		value_t m_IS;  //!< transport saturation current
-		value_t m_BF;  //!< ideal maximum forward beta
-		value_t m_NF;  //!< forward current emission coefficient
-		value_t m_BR;  //!< ideal maximum reverse beta
-		value_t m_NR;  //!< reverse current emission coefficient
-		value_t m_CJE; //!< B-E zero-bias depletion capacitance
-		value_t m_CJC; //!< B-C zero-bias depletion capacitance
+		param_model_t::value_t m_IS;  //!< transport saturation current
+		param_model_t::value_t m_BF;  //!< ideal maximum forward beta
+		param_model_t::value_t m_NF;  //!< forward current emission coefficient
+		param_model_t::value_t m_BR;  //!< ideal maximum reverse beta
+		param_model_t::value_t m_NR;  //!< reverse current emission coefficient
+		param_model_t::value_t m_CJE; //!< B-E zero-bias depletion capacitance
+		param_model_t::value_t m_CJC; //!< B-C zero-bias depletion capacitance
 
 	};
 
@@ -147,7 +146,7 @@ namespace analog
 		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
 	protected:
 
-		bjt_model_t m_model;
+		param_model_t m_model;
 	private:
 		q_type m_qtype;
 	};
@@ -216,6 +215,7 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
+		, m_modacc(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
 		, m_D_CB(*this, "m_D_CB", true)
@@ -233,13 +233,13 @@ namespace analog
 			connect(m_D_EB.N(), m_D_CB.N());
 			connect(m_D_CB.P(), m_D_EC.N());
 
-			if (m_model.m_CJE > nlconst::zero())
+			if (m_modacc.m_CJE > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
-			if (m_model.m_CJC > nlconst::zero())
+			if (m_modacc.m_CJC > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
@@ -256,6 +256,7 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
+		bjt_model_t m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_gD_BC;
 		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
@@ -313,11 +314,14 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		nl_fptype IS = m_model.m_IS;
-		nl_fptype BF = m_model.m_BF;
-		nl_fptype NF = m_model.m_NF;
-		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
+		bjt_model_t model(m_model);
 
+		nl_fptype IS = model.m_IS;
+		nl_fptype BF = model.m_BF;
+		nl_fptype NF = model.m_NF;
+		//nl_fptype VJE = model.dValue("VJE", 0.75);
+
+		// FIXME: check for PNP as well and bail out
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		nl_fptype alpha = BF / (nlconst::one() + BF);
@@ -382,12 +386,12 @@ namespace analog
 		if (m_CJE)
 		{
 			m_CJE->reset();
-			m_CJE->set_cap_embedded(m_model.m_CJE);
+			m_CJE->set_cap_embedded(m_modacc.m_CJE);
 		}
 		if (m_CJC)
 		{
 			m_CJC->reset();
-			m_CJC->set_cap_embedded(m_model.m_CJC);
+			m_CJC->set_cap_embedded(m_modacc.m_CJC);
 		}
 
 	}
@@ -421,13 +425,14 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{
-		nl_fptype IS = m_model.m_IS;
-		nl_fptype BF = m_model.m_BF;
-		nl_fptype NF = m_model.m_NF;
-		nl_fptype BR = m_model.m_BR;
-		nl_fptype NR = m_model.m_NR;
+		nl_fptype IS = m_modacc.m_IS;
+		nl_fptype BF = m_modacc.m_BF;
+		nl_fptype NF = m_modacc.m_NF;
+		nl_fptype BR = m_modacc.m_BR;
+		nl_fptype NR = m_modacc.m_NR;
 		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
 
+		// FIXME: check for PNP as well and bail out
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
 		m_alpha_f = BF / (nlconst::one() + BF);
