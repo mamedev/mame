@@ -1521,8 +1521,6 @@ files {
 	MAME_DIR .. "src/mame/includes/mitchell.h",
 	MAME_DIR .. "src/mame/video/mitchell.cpp",
 	MAME_DIR .. "src/mame/drivers/sf.cpp",
-	MAME_DIR .. "src/mame/includes/sf.h",
-	MAME_DIR .. "src/mame/video/sf.cpp",
 	MAME_DIR .. "src/mame/drivers/sidearms.cpp",
 	MAME_DIR .. "src/mame/includes/sidearms.h",
 	MAME_DIR .. "src/mame/video/sidearms.cpp",
