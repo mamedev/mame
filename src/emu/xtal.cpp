@@ -243,6 +243,7 @@ const double XTAL::known_xtals[] = {
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
 	 16'200'000, /* 16.2_MHz_XTAL          Debut */
 	 16'257'000, /* 16.257_MHz_XTAL        IBM PC MDA & EGA */
+	 16'313'000, /* 16.313_MHz_XTAL        Micro-Term ERGO 201 */
 	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */

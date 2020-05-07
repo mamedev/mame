@@ -13082,6 +13082,9 @@ splndrbtb                       // (c) 1985 Alpha Denshi Co.
 @source:eispc.cpp
 epc                             // 1984 Ericsson PC
 
+@source:ergo201.cpp
+ergo201                         //
+
 @source:ertictac.cpp
 ertictac                        // (c) 1992 Sisteme
 ertictaca                       // (c) 1992 Sisteme

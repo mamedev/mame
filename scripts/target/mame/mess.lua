@@ -4281,6 +4281,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/emate.cpp",
 	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
+	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
