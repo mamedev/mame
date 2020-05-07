@@ -309,7 +309,7 @@ struct filter_hp
 	, m_lt(channels, 0.0)
 	, m_in(channels, 0.0)
 	, m_cap(channels, 0.0)
-	{ }
+	{ (void)m_channels; }
 	void process(std::size_t chan, double time, double val)
 	{
 		// based on CR filter
@@ -346,7 +346,7 @@ struct filter_lp
 	, m_lt(channels, 0.0)
 	, m_in(channels, 0.0) // lp filter
 	, m_cap(channels, 0.0) // hp filter
-	{ }
+	{ (void)m_channels; }
 	void process(std::size_t chan, double time, double val)
 	{
 		// based on RC filter
