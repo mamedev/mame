@@ -264,6 +264,10 @@ private:
 public:
 	// debugger-related information
 	u32                     debug_flags;        // the current debug flags
+	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
+
+	// used by debug_console to take ownership of the debug.log file
+	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
 
 private:
 	class side_effects_disabler {
@@ -346,7 +350,8 @@ private:
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
-	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
+	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
+	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
 
 	// load/save management
 	enum class saveload_schedule

@@ -314,10 +314,18 @@ int running_machine::run(bool quiet)
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			osd_file::error filerr = m_logfile->open("error.log");
 			if (filerr != osd_file::error::NONE)
-				throw emu_fatalerror("running_machine::run: unable to open log file");
+				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
 			using namespace std::placeholders;
 			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
+		}
+
+		if (options().debug() && options().debuglog())
+		{
+			m_debuglogfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			osd_file::error filerr = m_debuglogfile->open("debug.log");
+			if (filerr != osd_file::error::NONE)
+				throw emu_fatalerror("running_machine::run: unable to open debug.log file");
 		}
 
 		// then finish setting up our local machine
