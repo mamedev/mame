@@ -57,7 +57,7 @@ namespace
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram_device, "cocopakram", "Disto 512k RAM Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram_device, "cocopakram", "Disto 1M RAM Cartridge")
 
 
 
@@ -81,7 +81,7 @@ coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const ch
 
 void coco_pak_ram_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, STATICRAM_TAG).set_default_size("512K").set_default_value(0);
+	RAM(config, STATICRAM_TAG).set_default_size("1M").set_default_value(0);
 }
 
 
@@ -117,7 +117,7 @@ void coco_pak_ram_device::device_reset()
 
 WRITE8_MEMBER(coco_pak_ram_device::scs_write)
 {
-	LOG("scs_write: %d, %d\n", offset, data);
+	LOG("scs_write: %s: %08x, %02x, %02x\n", machine().describe_context(), m_offset, offset, data);
 
 	switch(offset)
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(coco_pak_ram_device::scs_write)
 			m_offset = (m_offset & 0x00ffff) + (data << 16);
 			break;
 		case 3:
-			m_staticram->write(m_offset & 0x7ff, data);
+			m_staticram->write(m_offset & 0xfffff, data);
 			break;
 	}
 }
@@ -158,10 +158,10 @@ READ8_MEMBER(coco_pak_ram_device::scs_read)
 			data = (m_offset & 0xff0000) >> 16;
 			break;
 		case 3:
-			data = m_staticram->read(m_offset & 0x7ff);
+			data = m_staticram->read(m_offset & 0xfffff);
 			break;
 	}
 
-	LOG("scs_read: %d, %d\n", offset, data);
+	LOG("scs_read:  %s: %08x, %02x, %02x\n", machine().describe_context(), m_offset, offset, data);
 	return data;
 }
