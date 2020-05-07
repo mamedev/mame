@@ -234,7 +234,6 @@ void super80_state::machine_reset_common()
 	m_keylatch = 0xff;
 	m_key_pressed = 0;
 	m_palette_index = 0;
-	m_vidpg = 0xfe00;
 }
 
 void super80_state::machine_reset()
@@ -242,6 +241,7 @@ void super80_state::machine_reset()
 	std::copy_n(&m_rom[0], 0x3000, &m_ram[0xc000]);   // make 0 F1 C0 work
 	std::fill_n(&m_ram[0xf000], 0x1000, 0xff);        // make O F1 FF work
 	machine_reset_common();
+	m_vidpg = 0xfe00;
 }
 
 void super80r_state::machine_reset()
