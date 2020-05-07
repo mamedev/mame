@@ -25010,7 +25010,7 @@ license:CC0
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-28"/>
 		<info name="release" value="19900629"/>
-		<info name="alt_title" value="燃えろ!! 柔道うぉり・ーず"/>
+		<info name="alt_title" value="燃えろ!! 柔道うおりあ〜ず"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jf17" />
 			<feature name="pcb" value="JALECO-JF-17" />
@@ -75764,7 +75764,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf3_9">
+	<software name="sf3_9" cloneof="sf3">
 		<description>Street Fighter III (Asia, 9 characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
