@@ -680,12 +680,12 @@ void gal3_state::gal3(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C140(config, m_c140_16g, 8000000/374);
-	m_c140_16g->set_bank_type(c140_device::C140_TYPE::SYSTEM21);    //to be verified
+	//m_c140_16g->set_addrmap(0, &gal3_state::c140_16g_map);    //to be verified
 	m_c140_16g->add_route(0, "lspeaker", 0.50);
 	m_c140_16g->add_route(1, "rspeaker", 0.50);
 
 	C140(config, m_c140_16a, 8000000/374);
-	m_c140_16a->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	//m_c140_16a->set_addrmap(0, &gal3_state::c140_16a_map);    //to be verified
 	m_c140_16a->add_route(0, "lspeaker", 0.50);
 	m_c140_16a->add_route(1, "rspeaker", 0.50);
 }
