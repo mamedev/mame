@@ -5312,7 +5312,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="gw126a">
+	<software name="gw126a" cloneof="gw126">
 		<description>Game World - 126 Games (Kor, Hacked?)</description>
 		<year>19??</year>
 		<publisher>Zemina</publisher>
