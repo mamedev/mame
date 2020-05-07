@@ -3727,13 +3727,13 @@ static void print_gal18v10_product_terms(const pal_data* pal, const jed_data* je
 
 	print_product_terms(pal, jed);
 
-	/* Synchronous Reset */
+	/* Synchronous Preset */
 
 	generate_product_terms(pal, jed, 3420, buffer);
 
 	if (strlen(buffer))
 	{
-		printf("Synchronous Reset:\n\n");
+		printf("Synchronous Preset:\n\n");
 		printf("%s\n", buffer);
 		printf("\n");
 	}
@@ -3919,13 +3919,13 @@ static void print_gal22v10_product_terms(const pal_data* pal, const jed_data* je
 
 	print_product_terms(pal, jed);
 
-	/* Synchronous Reset */
+	/* Synchronous Preset */
 
 	generate_product_terms(pal, jed, 5764, buffer);
 
 	if (strlen(buffer))
 	{
-		printf("Synchronous Reset:\n\n");
+		printf("Synchronous Preset:\n\n");
 		printf("%s\n", buffer);
 		printf("\n");
 	}
