@@ -215,7 +215,7 @@ void phantom_state::update_lcd()
 {
 	u8 mask = (m_select & 0x80) ? 0xff : 0;
 	for (int i = 0; i < 4; i++)
-		m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ mask);
+		m_display->write_row(i+1, (m_lcd_data >> (8*i) & 0xff) ^ mask);
 
 	m_display->update();
 }
