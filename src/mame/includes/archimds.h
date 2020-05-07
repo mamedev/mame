@@ -12,7 +12,7 @@
 #include "cpu/arm/arm.h"
 #include "imagedev/floppy.h"
 #include "machine/aakart.h"
-#include "machine/i2cmem.h"
+#include "machine/pcf8583.h"
 #include "machine/wd_fdc.h"
 #include "machine/acorn_vidc.h"
 
@@ -90,7 +90,7 @@ public:
 
 protected:
 	required_device<arm_cpu_device> m_maincpu;
-	optional_device<i2cmem_device> m_i2cmem;
+	optional_device<pcf8583_device> m_i2cmem;
 	required_device<acorn_vidc10_device> m_vidc;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;

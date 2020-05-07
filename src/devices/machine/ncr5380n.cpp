@@ -434,13 +434,18 @@ int ncr5380n_device::state_step()
 		break;
 
 	case ARB_BUS_FREE:
-		LOGMASKED(LOG_STATE, "arbitration: waiting for bus free\n");
 		if (!(scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
 		{
+			LOGMASKED(LOG_STATE, "arbitration: bus free\n");
 			// FIXME: AIP should only be set when arbitration begins
 			m_icmd |= IC_AIP;
 			m_state = ARB_START;
 			delay = 1700;
+		}
+		else
+		{
+			LOGMASKED(LOG_STATE, "arbitration: bus not free\n");
+			m_state = IDLE;
 		}
 		break;
 	case ARB_START:

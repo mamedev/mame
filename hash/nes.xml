@@ -15269,7 +15269,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn">
+	<software name="guardlgnu" cloneof="guardlgn" supported="no">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15288,7 +15288,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn">
+	<software name="guardlgn" supported="no">
 		<description>The Guardian Legend (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -15307,7 +15307,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn">
+	<software name="guardic" cloneof="guardlgn" supported="no">
 		<description>Guardic Gaiden (Jpn)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>

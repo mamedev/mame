@@ -184,7 +184,7 @@ void hotblock_state::hotblock(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04A
+	I2C_24C04(config, "i2cmem", 0); // 24C04A
 
 	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 

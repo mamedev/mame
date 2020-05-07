@@ -342,6 +342,10 @@ gp2x.cpp
 gp32.cpp
 grfd2301.cpp
 gridcomp.cpp
+gs6502.cpp
+gs6809.cpp
+gscpm.cpp
+gsz80.cpp
 h01x.cpp
 h19.cpp
 h8.cpp
