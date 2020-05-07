@@ -217,7 +217,7 @@ license:CC0
 			<feature name="part_number" value="812-0241-003"/>
 			<diskarea name="cdrom">
 				<!-- Dumped with Plextor, without C2 errors -->
-				<disk name="European_Languaje_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
+				<disk name="European_Language_Module_1_3" sha1="9d4ef603308722130a8bf548f1e227c842690885" />
 			</diskarea>
 		</part>
 	</software>
