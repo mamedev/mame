@@ -160,7 +160,7 @@ void dominator_state::main_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x4000, 0x400f).rw(FUNC(dominator_state::input_r), FUNC(dominator_state::leds_w));
 	map(0x4010, 0x4010).w(FUNC(dominator_state::control_w));
-	//map(0x7f00, 0x7fff).nopr(); // mid-opcode dummy read
+	map(0x7f00, 0x7fff).nopr(); // dummy read on 6502 absolute X page wrap
 	map(0x8000, 0xffff).rom();
 }
 

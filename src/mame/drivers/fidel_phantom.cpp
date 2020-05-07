@@ -76,12 +76,10 @@ private:
 	void main_map(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	void update_lcd();
+	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_WRITE8_MEMBER(lcd_mask_w);
 	DECLARE_WRITE8_MEMBER(motors_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(motors_r);
 	DECLARE_READ8_MEMBER(irq_ack_r);
@@ -89,8 +87,7 @@ private:
 	DECLARE_READ8_MEMBER(vmotor_ff_clear_r);
 	void update_pieces_position(int state);
 
-	uint8_t   m_mux;
-	uint8_t   m_lcd_mask;
+	uint8_t   m_select;
 	uint32_t  m_lcd_data;
 	uint8_t   m_motors_ctrl;
 	uint8_t   m_hmotor_pos;
@@ -108,8 +105,7 @@ void phantom_state::machine_start()
 {
 	m_out_motor.resolve();
 
-	save_item(NAME(m_mux));
-	save_item(NAME(m_lcd_mask));
+	save_item(NAME(m_select));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_motors_ctrl));
 	save_item(NAME(m_hmotor_pos));
@@ -125,8 +121,7 @@ void phantom_state::machine_start()
 
 void phantom_state::machine_reset()
 {
-	m_mux = 0;
-	m_lcd_mask = 0;
+	m_select = 0;
 	m_lcd_data = 0;
 	m_motors_ctrl = 0;
 	m_hmotor_pos = 0xff;
@@ -147,6 +142,10 @@ void phantom_state::init_fphantom()
 	m_rombank->configure_entries(0, 2, memregion("rombank")->base(), 0x4000);
 }
 
+
+/******************************************************************************
+    Motor Sim
+******************************************************************************/
 
 TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 {
@@ -212,25 +211,31 @@ void phantom_state::update_pieces_position(int state)
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(phantom_state::mux_w)
+void phantom_state::update_lcd()
 {
+	u8 mask = (m_select & 0x80) ? 0xff : 0;
+	for (int i = 0; i < 4; i++)
+		m_display->write_row(i+2, (m_lcd_data >> (8*i) & 0xff) ^ mask);
+
+	m_display->update();
+}
+
+WRITE8_MEMBER(phantom_state::control_w)
+{
+	// a0-a2,d1: 74259
 	uint8_t mask = 1 << offset;
-	m_mux = (m_mux & ~mask) | ((data & 0x02) ? mask : 0);
-}
+	m_select = (m_select & ~mask) | ((data & 0x02) ? mask : 0);
 
-WRITE8_MEMBER(phantom_state::lcd_mask_w)
-{
-	m_lcd_mask = (data & 0x02) ? 0x00 : 0xff;
-}
+	// 74259 Q0-Q3: 7442 a0-a3
+	// 7442 0-8: led data, input mux
+	// 74259 Q4: led select
+	m_display->matrix_partial(0, 1, BIT(~m_select, 4), 1 << (m_select & 0xf), false);
 
-WRITE8_MEMBER(phantom_state::led_w)
-{
-	m_display->matrix_partial(0, 2, 1, BIT(~data, 7) << m_mux);
-}
+	// 74259 Q6: bookrom bank
+	m_rombank->set_entry(BIT(m_select, 6));
 
-WRITE8_MEMBER(phantom_state::rombank_w)
-{
-	m_rombank->set_entry(data & 1);
+	// 74259 Q7: lcd polarity
+	update_lcd();
 }
 
 WRITE8_MEMBER(phantom_state::motors_w)
@@ -254,38 +259,36 @@ WRITE8_MEMBER(phantom_state::motors_w)
 
 WRITE8_MEMBER(phantom_state::lcd_w)
 {
-	data ^= m_lcd_mask;
-
+	// a0-a2,d0,d2,d4,d6: 4*74259 to lcd digit segments
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
 	for (int i = 0; i < 4; i++)
 	{
 		m_lcd_data = (m_lcd_data & ~mask) | (BIT(data, i * 2) ? mask : 0);
 		mask <<= 8;
-
-		m_display->write_row(i+2, m_lcd_data >> (8*i) & 0xff);
 	}
 
-	m_display->update();
+	update_lcd();
 }
 
 READ8_MEMBER(phantom_state::input_r)
 {
+	uint8_t mux = m_select & 0xf;
 	uint8_t data = 0xff;
 
-	if (m_mux == 8)
+	if (mux == 8)
 	{
 		if (BIT(m_input->read(), offset * 2 + 1))  data &= ~0x40;
 		if (BIT(m_input->read(), offset * 2 + 0))  data &= ~0x80;
 	}
 	else if (offset < 4)
 	{
-		if (BIT(m_board->read_file(offset * 2 + 1), m_mux))  data &= ~0x40;
-		if (BIT(m_board->read_file(offset * 2 + 0), m_mux))  data &= ~0x80;
+		if (BIT(m_board->read_file(offset * 2 + 1), mux))  data &= ~0x40;
+		if (BIT(m_board->read_file(offset * 2 + 0), mux))  data &= ~0x80;
 	}
 	else
 	{
-		if (BIT(m_board->read_file( 8 + (offset & 1)), m_mux))  data &= ~0x40;  // black captured pieces
-		if (BIT(m_board->read_file(11 - (offset & 1)), m_mux))  data &= ~0x80;  // white captured pieces
+		if (BIT(m_board->read_file( 8 + (offset & 1)), mux))  data &= ~0x40;  // black captured pieces
+		if (BIT(m_board->read_file(11 - (offset & 1)), mux))  data &= ~0x80;  // white captured pieces
 	}
 
 	return data;
@@ -341,10 +344,7 @@ READ8_MEMBER(phantom_state::vmotor_ff_clear_r)
 void phantom_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2003).w(FUNC(phantom_state::mux_w));
-	map(0x2004, 0x2004).w(FUNC(phantom_state::led_w));
-	map(0x2006, 0x2006).w(FUNC(phantom_state::rombank_w));
-	map(0x20ff, 0x20ff).w(FUNC(phantom_state::lcd_mask_w));
+	map(0x2000, 0x2007).mirror(0x00f8).w(FUNC(phantom_state::control_w));
 	map(0x2100, 0x2107).w(FUNC(phantom_state::lcd_w)).nopr();
 	map(0x2200, 0x2200).w(FUNC(phantom_state::motors_w));
 	map(0x2400, 0x2405).r(FUNC(phantom_state::input_r));
@@ -399,8 +399,8 @@ void phantom_state::fphantom(machine_config &config)
 	TIMER(config, "motors_timer").configure_periodic(FUNC(phantom_state::motors_timer), attotime::from_hz(120));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
-	m_display->set_segmask(0x3c, 0x7f);
+	PWM_DISPLAY(config, m_display).set_size(1+4, 9);
+	m_display->set_segmask(0x1e, 0x7f);
 
 	config.set_default_layout(layout_fidel_phantom);
 
