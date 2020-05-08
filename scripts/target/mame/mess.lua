@@ -382,6 +382,7 @@ VIDEOS["PWM_DISPLAY"] = true
 VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
+VIDEOS["SED1500"] = true
 VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
 VIDEOS["STVVDP"] = true

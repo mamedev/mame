@@ -68,6 +68,7 @@ public:
 	auto write_port5_callback() { return m_write_port[4].bind(); }
 	auto write_port6_callback() { return m_write_port[5].bind(); }
 	auto write_port7_callback() { return m_write_port[6].bind(); }
+	tms1024_device &set_ms(u8 i) { m_ms = i & 1; return *this; } // if hardwired, can just set MS pin state here
 
 	void write_h(u8 data);
 	u8 read_h();

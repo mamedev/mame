@@ -122,20 +122,14 @@ private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(control_r);
 
-	u8 m_inp_mux;
-	u8 m_control;
-	u8 m_shift;
-	u32 m_lcd_q;
+	u8 m_inp_mux = 0;
+	u8 m_control = 0;
+	u8 m_shift = 0;
+	u32 m_lcd_q = 0;
 };
 
 void ssystem3_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_control = 0;
-	m_shift = 0;
-	m_lcd_q = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_control));
