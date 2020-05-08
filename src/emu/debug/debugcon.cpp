@@ -65,6 +65,7 @@ debugger_console::debugger_console(running_machine &machine)
 
 	/* register our own custom-command help */
 	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
+	register_command("condump", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_console::execute_condump, this, _1, _2));
 
 	/* first CPU is visible by default */
 	for (device_t &device : device_iterator(m_machine.root_device()))
@@ -139,6 +140,42 @@ void debugger_console::execute_help_custom(int ref, const std::vector<std::strin
 	}
 }
 
+/*------------------------------------------------------------
+	execute_condump - execute the condump command
+------------------------------------------------------------*/
+
+void debugger_console::execute_condump(int ref, const std::vector<std::string>& params)
+{
+	std::string filename = params[0];
+	const char* mode;
+
+	/* replace macros */
+	strreplace(filename, "{game}", m_machine.basename());
+
+	mode = "w";
+	/* opening for append? */
+	if ((filename[0] == '>') && (filename[1] == '>'))
+	{
+		mode = "a";
+		filename = filename.substr(2);
+	}
+
+	FILE* f = fopen(filename.c_str(), mode);
+	if (!f)
+	{
+		printf("Error opening file '%s'\n", filename.c_str());
+		return;
+	}
+
+	for (auto line_info : text_buffer_get_lines(m_console_textbuf))
+	{
+		fwrite(line_info.text, sizeof(char), line_info.length, f);
+		fputc('\n', f);
+	}
+
+	fclose(f);
+	printf("Wrote console contents to '%s'\n", filename.c_str());
+}
 
 //-------------------------------------------------
 //  visible_symtable - return the locally-visible
