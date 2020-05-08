@@ -149,13 +149,23 @@ private:
 	plib::option_example opt_ex3;
 	plib::option_example opt_ex4;
 
+	struct compile_map_entry
+	{
+		compile_map_entry(pstring mod, pstring code)
+		: m_module(mod), m_code(code) { }
+		pstring m_module;
+		pstring m_code;
+	};
+
+	using compile_map = std::map<pstring, compile_map_entry>;
+
 	void run();
 	void validate();
 	void convert();
 
 	void compile_one_and_add_to_map(const pstring &file,
 		const pstring &name, netlist::solver::static_compile_target target,
-		std::map<pstring, pstring> &map);
+		compile_map &map);
 	void static_compile();
 
 	void mac_out(const pstring &s, bool cont = true);
@@ -547,7 +557,7 @@ void tool_app_t::validate()
 
 void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 	const pstring &name, netlist::solver::static_compile_target target,
-	std::map<pstring, pstring> &map)
+	compile_map &map)
 {
 	try
 	{
@@ -571,10 +581,10 @@ void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 		{
 			auto it = map.find(e.first);
 			if (it == map.end())
-				map.insert(e);
+				map.insert({e.first, compile_map_entry(name, e.second)});
 			else
 			{
-				if (it->second != e.second)
+				if (it->second.m_code != e.second)
 				{
 					pstring msg = plib::pfmt("nltool: found hash conflict in {1}, netlist {2}")(file, name);
 					throw netlist::nl_exception(msg);
@@ -607,19 +617,19 @@ void tool_app_t::static_compile()
 		if (opt_files().size() != 1)
 			throw netlist::nl_exception("nltool: static_compile needs exactly one file");
 
-		std::map<pstring, pstring> mp;
+		compile_map mp;
 
 		compile_one_and_add_to_map(opt_files()[0], opt_name(), target, mp);
 
 		for (auto &e : mp)
 		{
 			auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
-			sout << e.second;
+			sout << e.second.m_code;
 		}
 	}
 	else
 	{
-		std::map<pstring, pstring> map;
+		compile_map map;
 
 		for (const auto &f : opt_files())
 		{
@@ -664,10 +674,16 @@ void tool_app_t::static_compile()
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
-			sout << e.second;
+		{
+			sout << "// " << e.second.m_module << "\n";
+			sout << e.second.m_code;
+		}
 		sout << "plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
+		{
+			sout << "// " << e.second.m_module << "\n";
 			sout << "\t{\"" << e.first << "\", reinterpret_cast<void *>(&" << e.first << ")},\n";
+		}
 		sout << "{\"\", nullptr}\n";
 		sout << "};\n";
 

@@ -302,14 +302,13 @@ struct filter_hp
 	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	filter_hp(double freq, bool boost, std::size_t channels, callback_type cb)
-	: m_channels(channels)
-	, m_cb(cb)
+	: m_cb(cb)
 	, m_hp_omega(plib::constants<double>::two() * plib::constants<double>::pi() * freq)
 	, m_boost(boost)
 	, m_lt(channels, 0.0)
 	, m_in(channels, 0.0)
 	, m_cap(channels, 0.0)
-	{ (void)m_channels; }
+	{ }
 	void process(std::size_t chan, double time, double val)
 	{
 		// based on CR filter
@@ -326,7 +325,6 @@ struct filter_hp
 	}
 
 private:
-	std::size_t m_channels;
 	callback_type m_cb;
 	double m_hp_omega;
 	bool m_boost;
@@ -340,13 +338,12 @@ struct filter_lp
 	using callback_type = plib::pmfp<void, std::size_t, double, double>;
 
 	filter_lp(double freq, std::size_t channels, callback_type cb)
-	: m_channels(channels)
-	, m_cb(cb)
+	: m_cb(cb)
 	, m_lp_omega(plib::constants<double>::two() * plib::constants<double>::pi() * freq)
 	, m_lt(channels, 0.0)
 	, m_in(channels, 0.0) // lp filter
 	, m_cap(channels, 0.0) // hp filter
-	{ (void)m_channels; }
+	{ }
 	void process(std::size_t chan, double time, double val)
 	{
 		// based on RC filter
@@ -363,7 +360,6 @@ struct filter_lp
 	}
 
 private:
-	std::size_t m_channels;
 	callback_type m_cb;
 	double m_lp_omega;
 	std::vector<double> m_lt;
