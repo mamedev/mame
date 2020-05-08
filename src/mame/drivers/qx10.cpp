@@ -731,11 +731,8 @@ void qx10_state::qx10(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
 	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
@@ -800,7 +797,7 @@ void qx10_state::qx10(machine_config &config)
 
 	I8255(config, m_ppi, 0);
 
-	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
+	UPD7220(config, m_hgdc, 16.67_MHz_XTAL/4/2);
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
 	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
