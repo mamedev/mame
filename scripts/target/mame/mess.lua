@@ -1901,6 +1901,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fp200.cpp",
 	MAME_DIR .. "src/mame/drivers/fp1100.cpp",
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
+	MAME_DIR .. "src/mame/machine/fp6000_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/fp6000_kbd.h",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
