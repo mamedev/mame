@@ -61,6 +61,7 @@ public:
 	void blkpnthr(machine_config &config);
 
 	void bubsys_init();
+	void bubsys_twinbeeb_init();
 
 private:
 	/* memory pointers */
