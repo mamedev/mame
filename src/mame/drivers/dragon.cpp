@@ -358,10 +358,6 @@ void dragon64_state::dragon64(machine_config &config)
 	SOFTWARE_LIST(config, "dragon_os9_list").set_original("dragon_os9");
 }
 
-//-------------------------------------------------
-//  pia0_irq_a
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( dragon64_state::acia_irq )
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
