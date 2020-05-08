@@ -37,7 +37,7 @@ To do:
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
 - bishjan, new2001, humlan, saklove, squeenb: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
-- mtrain: implement hopper. Double up does not work?
+- mtrain: implement hopper.
 - xplan: starts with 4 credits, no controls to move the aircraft
 
 ************************************************************************************************************/
