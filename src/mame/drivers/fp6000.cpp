@@ -5,9 +5,10 @@
     Casio FP-6000
 
     TODO:
-	- Fix cassette
-	- Floppy/HDD
-	- Printer
+    - Fix cassette (SAVE is at 300 baud Kansas City format, loadable
+      on the super80, but LOAD throws RW error).
+    - Floppy/HDD
+    - Printer
     - gvram color pen is a rather crude guess (the layer is monochrome on
       BASIC?);
     - everything else
@@ -433,7 +434,7 @@ void fp6000_state::pit_timer2_w(int state)
 	if (BIT(m_port_0a, 7))
 		m_speaker->level_w(state);
 	else
-		m_cassette->output(state ? 1.0 : 0.0);
+		m_cassette->output(state ? -1.0 : +1.0);
 }
 
 void fp6000_state::machine_start()
@@ -463,7 +464,7 @@ void fp6000_state::fp6000(machine_config &config)
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(16000000 / 16); // 1 MHz
 	m_pit->out_handler<0>().set(FUNC(fp6000_state::pit_timer0_w)).invert();
-	m_pit->set_clk<2>(16000000 / 16); // 1 MHz?
+	m_pit->set_clk<2>(16000000 / 8); // 2 MHz?
 	m_pit->out_handler<2>().set(FUNC(fp6000_state::pit_timer2_w));
 
 	// video hardware
