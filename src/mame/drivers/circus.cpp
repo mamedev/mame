@@ -35,7 +35,7 @@ C000      Option Switches
 D000      Paddle Position and Interrupt Reset (where applicable)
 
     NOTES:
-    - Circus: Taito licensed and releasd the game as "Acrobat TV"
+    - Circus: Taito licensed and released the game as "Acrobat TV"
 
     TODO:
     - generic video timing (vsync, vblank, # of scanlines)
@@ -56,7 +56,7 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 #include "crash.lh"
 
 
-READ8_MEMBER(circus_state::circus_paddle_r)
+uint8_t circus_state::circus_paddle_r()
 {
 	// also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -441,6 +441,10 @@ ROM_START( circus )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
+
+	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( springbd )
@@ -463,6 +467,36 @@ ROM_START( springbd )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "93448.14d",  0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
+
+	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
+ROM_END
+
+ROM_START( circusb ) // bootleg found both on a PCB and a PROMs blister, labeled 'Circus - punteggio basso' ('Circus - low scoring')
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6341-1j-a1.1a",    0x1000, 0x0200, CRC(68e710ba) SHA1(63957802f8db3b4ac7bbab83376771ce1744c6b3) )
+	ROM_LOAD( "f93448bpc-a2.2a",  0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
+	ROM_LOAD( "sn74s474n1-a3.3a", 0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
+	ROM_LOAD( "sn74s474n1-a5.5a", 0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
+	ROM_LOAD( "sn74s474n1-a6.6a", 0x1800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
+	ROM_LOAD( "6341-1j-a7.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
+	ROM_LOAD( "6341-1j-a8.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
+	ROM_LOAD( "6341-1j-a9.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
+	ROM_RELOAD(                   0xfe00, 0x0200 ) // for the reset and interrupt vectors
+
+	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
+	ROM_LOAD( "sn74s474n1-c4.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
+	ROM_LOAD( "sn74s474n1-c3.3c",    0x0200, 0x0200, CRC(30d72ef5) SHA1(45fc8285e213bf3906a26205a8c0b22f311fd6c3) )
+	ROM_LOAD( "sn74s474n1-c2.2c",    0x0400, 0x0200, CRC(361da7ee) SHA1(6e6fe5b37ccb4c11aa4abbd9b7df772953abfe7e) )
+	ROM_LOAD( "sn74s474n1-c1.1c",    0x0600, 0x0200, CRC(1f954bb3) SHA1(62a958b48078caa639b96f62a690583a1c8e83f5) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
+	ROM_LOAD( "sn74s474n1-d14.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
+
+	ROM_REGION( 0x400, "extra_proms", 0 ) // timing? not used by the emulation
+	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
 
 ROM_START( robotbwl )
@@ -589,6 +623,7 @@ void circus_state::init_ripcord()
 
 GAMEL( 1977, circus,   0,      circus,   circus,   circus_state, init_circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
 GAMEL( 1977, springbd, circus, circus,   circus,   circus_state, init_circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
+GAMEL( 1977, circusb,  circus, circus,   circus,   circus_state, init_circus,   ROT0, "bootleg", "Circus / Acrobat TV (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus )
 GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, circus_state, init_robotbwl, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL( 1979, crash,    0,      crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
 GAMEL( 1979, crasha,   crash,  crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash (alt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
