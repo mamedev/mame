@@ -259,7 +259,7 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 
 
 //-------------------------------------------------
-//  coco_fdc_device_base::device_start
+//  device_start - device-specific start
 //-------------------------------------------------
 
 void coco_fdc_device_base::device_start()
@@ -285,7 +285,7 @@ void coco_fdc_device_base::device_reset()
 
 
 //-------------------------------------------------
-//  ff74_read
+//  ff74_read - no halt registers
 //-------------------------------------------------
 
 READ8_MEMBER(coco_fdc_device_base::ff74_read)
@@ -313,7 +313,7 @@ READ8_MEMBER(coco_fdc_device_base::ff74_read)
 
 
 //-------------------------------------------------
-//  ff7d_write
+//  ff74_write - no halt registers
 //-------------------------------------------------
 
 WRITE8_MEMBER(coco_fdc_device_base::ff74_write)
