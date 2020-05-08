@@ -855,12 +855,12 @@ void i8085a_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(m_PC.d);
-
 		/* the instruction after an EI does not take an interrupt, so
 		   we cannot check immediately; handle post-EI behavior here */
 		if (m_after_ei != 0 && --m_after_ei == 0)
 			check_for_interrupts();
+
+		debugger_instruction_hook(m_PC.d);
 
 		/* here we go... */
 		execute_one(read_op());
