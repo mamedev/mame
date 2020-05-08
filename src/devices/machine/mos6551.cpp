@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "mos6551.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -127,7 +127,6 @@ void mos6551_device::device_start()
 	save_item(NAME(m_tx_irq_enable));
 	save_item(NAME(m_tx_internal_clock));
 
-	LOG("set internal clock unscaled: %d\n", m_xtal);
 	m_internal_clock->set_unscaled_clock(m_xtal);
 
 	output_txd(1);
@@ -260,8 +259,6 @@ void mos6551_device::update_divider()
 		{
 			scale = 0;
 		}
-
-		LOG("update divider (internal clock): %d, divide: %d, scale: %16.18f, result: %d\n", m_xtal, m_divide, scale, (double)m_xtal / (double)m_divide * (float) scale );
 	}
 	else
 	{
@@ -269,11 +266,8 @@ void mos6551_device::update_divider()
 
 		m_divide = scale * 16;
 		scale = 0;
-
-		LOG("update divider (external clock): %d, divide: %d, scale: %16.18f, result: %d\n", m_xtal, m_divide, scale, (double)m_xtal / (double)m_divide * (float) scale );
 	}
 
-	LOG("set internal clock scales: %f\n", scale);
 	m_internal_clock->set_clock_scale(scale);
 }
 
@@ -450,7 +444,6 @@ void mos6551_device::set_xtal(uint32_t xtal)
 
 	if (started())
 	{
-		LOG("set internal clock unscaled: %d\n", m_xtal);
 		m_internal_clock->set_unscaled_clock(m_xtal);
 		update_divider();
 	}
