@@ -69,6 +69,9 @@
         EPL16RP6    = QP20
         EPL16RP4    = QP20
 
+        PAL16A4     = QP20
+        PAL16X4     = QP20
+
     24-pin devices:
         PAL6L16     = QP24 QF0192
         PAL8L14     = QP24 QF0224
@@ -96,6 +99,8 @@
         PAL20X10    = QP24 QF1600
 
         GAL20V8A    = QP24 QF2706
+        PALCE20V8   = QP24 QF2706
+        ATF20V10B   = QP24 QF2706
 
         GAL22V10    = QP24 QF5892
         ATF22V10C   = QP24 QF5892 (GAL Mode)
@@ -105,6 +110,10 @@
         ATF22V10C   = QP24 QF5828 (PAL Mode)
 
         ATF22V10C   = QP24 QF5893 (Power Down Mode)
+
+        PLS173      = QP24
+
+        GAL6001     = QP24
 
     28-pin devices:
         PLS100      = QP28 QF1928 (Tri-State)
@@ -196,8 +205,6 @@
 #define COMBINATORIAL_ASSIGNMENT "="
 #define REGISTERED_ASSIGNMENT ":="
 
-#define MAXIMUM_PAGE_ITEMS 10
-
 
 
 /***************************************************************************
@@ -286,7 +293,6 @@ static void print_pal16l8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal16r4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal16r6_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal16r8_product_terms(const pal_data* pal, const jed_data* jed);
-static void print_palce16v8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_gal16v8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_peel18cv8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ampal18p8_product_terms(const pal_data* pal, const jed_data* jed);
@@ -352,7 +358,6 @@ static void config_pal16l8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal16r4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal16r6_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal16r8_pins(const pal_data* pal, const jed_data* jed);
-static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed);
 static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed);
 static void config_peel18cv8_pins(const pal_data* pal, const jed_data* jed);
 static void config_ampal18p8_pins(const pal_data* pal, const jed_data* jed);
@@ -532,16 +537,6 @@ static pin_fuse_rows pal16r8pinfuserows[] = {
 	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
 	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},   /* Registered Output */
 	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};    /* Registered Output */
-
-static pin_fuse_rows palce16v8pinfuserows[] = {
-	{12, 0, 0, 0},
-	{13, 0, 0, 0},
-	{14, 0, 0, 0},
-	{15, 0, 0, 0},
-	{16, 0, 0, 0},
-	{17, 0, 0, 0},
-	{18, 0, 0, 0},
-	{19, 0, 0, 0}};
 
 static pin_fuse_rows gal16v8pinfuserows[] = {
 	{12, 0, 0, 0},
@@ -1214,24 +1209,6 @@ static pin_fuse_columns pal16r8pinfusecolumns[] = {
 	{17, 11, 10}, /* Registered Output */
 	{18, 7, 6},   /* Registered Output */
 	{19, 3, 2}};  /* Registered Output */
-
-static pin_fuse_columns palce16v8pinfusecolumns[] = {
-	{2, 1, 0},
-	{3, 5, 4},
-	{4, 9, 8},
-	{5, 13, 12},
-	{6, 17, 16},
-	{7, 21, 20},
-	{8, 25, 24},
-	{9, 29, 28},
-	{12, 31, 30},
-	{13, 27, 26},
-	{14, 23, 22},
-	{15, 19, 18},
-	{16, 15, 14},
-	{17, 11, 10},
-	{18, 7, 6},
-	{19, 3, 2}};
 
 static pin_fuse_columns gal16v8pinfusecolumns[] = {
 	{0, 0, 0},
@@ -2194,10 +2171,10 @@ static pal_data paldata[] = {
 	/*{"PAL16RA8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"PAL16V8R", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/ // PAL16V8 same fusemap as GAL16V8?
 	{"PALCE16V8", 2194,
-		palce16v8pinfuserows, ARRAY_LENGTH(palce16v8pinfuserows),
-		palce16v8pinfusecolumns, ARRAY_LENGTH(palce16v8pinfusecolumns),
-		print_palce16v8_product_terms,
-		config_palce16v8_pins,
+		gal16v8pinfuserows, ARRAY_LENGTH(gal16v8pinfuserows),
+		gal16v8pinfusecolumns, ARRAY_LENGTH(gal16v8pinfusecolumns),
+		print_gal16v8_product_terms,
+		config_gal16v8_pins,
 		nullptr,
 		nullptr},
 	{"GAL16V8", 2194,
@@ -2299,6 +2276,20 @@ static pal_data paldata[] = {
 		nullptr,
 		nullptr},
 	{"GAL20V8", 2706,
+		gal20v8pinfuserows, ARRAY_LENGTH(gal20v8pinfuserows),
+		gal20v8pinfusecolumns, ARRAY_LENGTH(gal20v8pinfusecolumns),
+		print_gal20v8_product_terms,
+		config_gal20v8_pins,
+		is_gal20v8_product_term_enabled,
+		nullptr},
+	{"PALCE20V8", 2706,
+		gal20v8pinfuserows, ARRAY_LENGTH(gal20v8pinfuserows),
+		gal20v8pinfusecolumns, ARRAY_LENGTH(gal20v8pinfusecolumns),
+		print_gal20v8_product_terms,
+		config_gal20v8_pins,
+		is_gal20v8_product_term_enabled,
+		nullptr},
+	{"ATF20V10", 2706,
 		gal20v8pinfuserows, ARRAY_LENGTH(gal20v8pinfuserows),
 		gal20v8pinfusecolumns, ARRAY_LENGTH(gal20v8pinfusecolumns),
 		print_gal20v8_product_terms,
@@ -3269,74 +3260,6 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 
 
 /*-------------------------------------------------
-    config_palce16v8_pin_as_7_product_terms_and_oe_term - configures
-    the fuse rows of a PALCE16V8 pin with seven
-    product terms and one output enable product term.
--------------------------------------------------*/
-
-static void config_palce16v8_pin_as_7_product_terms_and_oe_term(uint16_t pin)
-{
-	static pin_fuse_rows pinfuserows[] = {
-		{12, 1792, 1824, 2016},
-		{13, 1536, 1568, 1760},
-		{14, 1280, 1312, 1504},
-		{15, 1024, 1056, 1248},
-		{16, 768, 800, 992},
-		{17, 512, 544, 736},
-		{18, 256, 288, 480},
-		{19, 0, 32, 224}};
-	uint16_t index;
-
-	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
-	{
-		if (pinfuserows[index].pin == pin)
-		{
-			palce16v8pinfuserows[index].fuserowoutputenable = pinfuserows[index].fuserowoutputenable;
-			palce16v8pinfuserows[index].fuserowtermstart = pinfuserows[index].fuserowtermstart;
-			palce16v8pinfuserows[index].fuserowtermend = pinfuserows[index].fuserowtermend;
-
-			break;
-		}
-	}
-}
-
-
-
-/*-------------------------------------------------
-    config_palce16v8_pin_as_8_product_terms - configures
-    the fuse rows of a PALCE16V8 pin with eight
-    product terms and no output enable product term.
--------------------------------------------------*/
-
-static void config_palce16v8_pin_as_8_product_terms(uint16_t pin)
-{
-	static pin_fuse_rows pinfuserows[] = {
-		{12, NO_OUTPUT_ENABLE_FUSE_ROW, 1792, 2016},
-		{13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760},
-		{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504},
-		{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248},
-		{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},
-		{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},
-		{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},
-		{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};
-	uint16_t index;
-
-	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
-	{
-		if (pinfuserows[index].pin == pin)
-		{
-			palce16v8pinfuserows[index].fuserowoutputenable = pinfuserows[index].fuserowoutputenable;
-			palce16v8pinfuserows[index].fuserowtermstart = pinfuserows[index].fuserowtermstart;
-			palce16v8pinfuserows[index].fuserowtermend = pinfuserows[index].fuserowtermend;
-
-			break;
-		}
-	}
-}
-
-
-
-/*-------------------------------------------------
     print_pal20xxx_product_terms - prints the product
     terms for a PAL20X4, PAL20X8 and PAL20X10
 -------------------------------------------------*/
@@ -3644,18 +3567,6 @@ static void print_pal16r6_product_terms(const pal_data* pal, const jed_data* jed
 -------------------------------------------------*/
 
 static void print_pal16r8_product_terms(const pal_data* pal, const jed_data* jed)
-{
-	print_product_terms(pal, jed);
-}
-
-
-
-/*-------------------------------------------------
-    print_palce16v8_product_terms - prints the product
-    terms for a PALCE16V8
--------------------------------------------------*/
-
-static void print_palce16v8_product_terms(const pal_data* pal, const jed_data* jed)
 {
 	print_product_terms(pal, jed);
 }
@@ -5066,272 +4977,6 @@ static void config_pal16r8_pins(const pal_data* pal, const jed_data* jed)
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
-}
-
-
-
-/*-------------------------------------------------
-    config_palce16v8_pins - configures the pins for
-    a PALCE16V8
--------------------------------------------------*/
-
-static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
-{
-	typedef struct _output_logic_macrocell output_logic_macrocell;
-	struct _output_logic_macrocell
-	{
-		uint16_t pin;
-		uint16_t sl0_fuse; /* registers allowed (0 - registered, 1 - not registered) */
-		uint16_t sl1_fuse; /* output polarity (0 - low, 1 - high) */
-		uint16_t fuserowoutputenable;
-	};
-
-	static output_logic_macrocell macrocells[] = {
-		{12, 2127, 2055, 1792},
-		{13, 2126, 2054, 1536},
-		{14, 2125, 2053, 1280},
-		{15, 2124, 2052, 1024},
-		{16, 2123, 2051, 768},
-		{17, 2122, 2050, 512},
-		{18, 2121, 2049, 256},
-		{19, 2120, 2048, 0}};
-	static pin_fuse_columns pinfusecolumns_i_or_o[] = {
-		{1, 3, 2},
-		{2, 1, 0},
-		{3, 5, 4},
-		{4, 9, 8},
-		{5, 13, 12},
-		{6, 17, 16},
-		{7, 21, 20},
-		{8, 25, 24},
-		{9, 29, 28},
-		{11, 31, 30},
-		{12, 27, 26},
-		{13, 23, 22},
-		{14, 19, 18},
-		{17, 15, 14},
-		{18, 11, 10},
-		{19, 7, 6}};
-	static pin_fuse_columns pinfusecolumns_io[] = {
-		{1, 3, 2},
-		{2, 1, 0},
-		{3, 5, 4},
-		{4, 9, 8},
-		{5, 13, 12},
-		{6, 17, 16},
-		{7, 21, 20},
-		{8, 25, 24},
-		{9, 29, 28},
-		{11, 31, 30},
-		{13, 27, 26},
-		{14, 23, 22},
-		{15, 19, 18},
-		{16, 15, 14},
-		{17, 11, 10},
-		{18, 7, 6}};
-	static pin_fuse_columns pinfusecolumns_regs[] = {
-		{2, 1, 0},
-		{3, 5, 4},
-		{4, 9, 8},
-		{5, 13, 12},
-		{6, 17, 16},
-		{7, 21, 20},
-		{8, 25, 24},
-		{9, 29, 28},
-		{12, 31, 30},
-		{13, 27, 26},
-		{14, 23, 22},
-		{15, 19, 18},
-		{16, 15, 14},
-		{17, 11, 10},
-		{18, 7, 6},
-		{19, 3, 2}};
-	static uint16_t input_pins_i_or_o[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
-	static uint16_t input_pins_io[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
-	static uint16_t input_pins_regs[] = {2, 3, 4, 5, 6, 7, 8, 9};
-	static uint16_t sg0 = 2192;
-	static uint16_t sg1 = 2193;
-	uint16_t input_pins[18];
-	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	uint16_t index, input_pin_count, output_pin_count;
-
-	input_pin_count = 0;
-	output_pin_count = 0;
-
-	if (!jed_get_fuse(jed, sg0))
-	{
-		/* Device uses registers */
-
-		if (jed_get_fuse(jed, sg1))
-		{
-			memcpy(palce16v8pinfusecolumns, pinfusecolumns_regs, sizeof(pinfusecolumns_regs));
-
-			memcpy(input_pins, input_pins_regs, sizeof(input_pins_regs));
-
-			input_pin_count = ARRAY_LENGTH(input_pins_regs);
-
-			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
-			{
-				if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
-				{
-					/* Registered output */
-
-					config_palce16v8_pin_as_8_product_terms(macrocells[index].pin);
-
-					output_pins[output_pin_count].pin = macrocells[index].pin;
-					output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
-
-					if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
-					}
-					else
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
-					}
-
-					++output_pin_count;
-
-					input_pins[input_pin_count] = macrocells[index].pin;
-
-					++input_pin_count;
-				}
-				else
-				{
-					/* Combinatorial I/O */
-
-					if (does_output_enable_fuse_row_allow_output(pal, jed, macrocells[index].fuserowoutputenable))
-					{
-						config_palce16v8_pin_as_7_product_terms_and_oe_term(macrocells[index].pin);
-
-						output_pins[output_pin_count].pin = macrocells[index].pin;
-						output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
-
-						if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
-						{
-							output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
-						}
-						else
-						{
-							output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
-						}
-
-						++output_pin_count;
-					}
-
-					input_pins[input_pin_count] = macrocells[index].pin;
-
-					++input_pin_count;
-				}
-			}
-		}
-		else
-		{
-			fprintf(stderr, "Unknown configuration type!\n");
-		}
-	}
-	else
-	{
-		/* Device uses no registers */
-
-		if (jed_get_fuse(jed, sg1))
-		{
-			/* Combinatorial I/O (7 product terms and 1 output enable product term) */
-
-			memcpy(palce16v8pinfusecolumns, pinfusecolumns_io, sizeof(pinfusecolumns_io));
-
-			memcpy(input_pins, input_pins_io, sizeof(input_pins_io));
-
-			input_pin_count = ARRAY_LENGTH(input_pins_io);
-
-			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
-			{
-				if (does_output_enable_fuse_row_allow_output(pal, jed, macrocells[index].fuserowoutputenable))
-				{
-					config_palce16v8_pin_as_7_product_terms_and_oe_term(macrocells[index].pin);
-
-					output_pins[output_pin_count].pin = macrocells[index].pin;
-					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
-
-					if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
-					}
-					else
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
-					}
-
-					++output_pin_count;
-				}
-
-				/* Pins 12 and 19 cannot be used as an input only an output. */
-
-				if (macrocells[index].pin != 12 && macrocells[index].pin != 19)
-				{
-					input_pins[input_pin_count] = macrocells[index].pin;
-
-					++input_pin_count;
-				}
-			}
-		}
-		else
-		{
-			/* Combinatorial Output or Input */
-
-			memcpy(palce16v8pinfusecolumns, pinfusecolumns_i_or_o, sizeof(pinfusecolumns_i_or_o));
-
-			memcpy(input_pins, input_pins_i_or_o, sizeof(input_pins_i_or_o));
-
-			input_pin_count = ARRAY_LENGTH(input_pins_i_or_o);
-
-			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
-			{
-				if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
-				{
-					/* pin configured as an output only */
-
-					config_palce16v8_pin_as_8_product_terms(macrocells[index].pin);
-
-					output_pins[output_pin_count].pin = macrocells[index].pin;
-					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
-
-					if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
-					}
-					else
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
-					}
-
-					++output_pin_count;
-				}
-				else
-				{
-					/* pin configured as an input only */
-
-					input_pins[input_pin_count] = macrocells[index].pin;
-
-					++input_pin_count;
-				}
-			}
-		}
-	}
-
-	set_input_pins(input_pins, input_pin_count);
-	set_output_pins(output_pins, output_pin_count);
-
-	/* 2056 - 2119 are the 64 bit signature fuses */
-
-	/* 2128 - 2135 product term 8? */
-	/* 2136 - 2143 product term 7? */
-	/* 2144 - 2151 product term 6? */
-	/* 2152 - 2159 product term 5? */
-	/* 2160 - 2167 product term 4? */
-	/* 2168 - 2175 product term 3? */
-	/* 2176 - 2183 product term 2? */
-	/* 2184 - 2191 product term 1? */
 }
 
 
