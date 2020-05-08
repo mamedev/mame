@@ -456,7 +456,7 @@ void juku_state::juku(machine_config &config)
 	I8080A(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &juku_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &juku_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_call));
 
 	ADDRESS_MAP_BANK(config, m_bank);
 	m_bank->set_map(&juku_state::bank_map);

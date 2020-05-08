@@ -90,6 +90,7 @@ void isbc8030_state::isbc8030(machine_config &config)
 	I8085A(config, m_maincpu, XTAL(22'118'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8030_state::isbc8030_mem);
 	m_maincpu->set_addrmap(AS_IO, &isbc8030_state::isbc8030_io);
+	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_call));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);

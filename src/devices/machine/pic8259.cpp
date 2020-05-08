@@ -39,14 +39,15 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		/* is this IRQ in service and not cascading and sfnm? */
 		if ((m_isr & mask) && !(m_master && m_cascade && m_nested && (m_slave & mask)))
 		{
-			LOG("pic8259_timerproc(): PIC IRQ #%d still in service\n", irq);
+			LOG("pic8259_timerproc(): PIC IR%d still in service\n", irq);
 			break;
 		}
 
 		/* is this IRQ pending and enabled? */
 		if ((m_state == state_t::READY) && (m_irr & mask) && !(m_imr & mask))
 		{
-			LOG("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
+			LOG("pic8259_timerproc(): PIC triggering IR%d\n", irq);
+			m_current_level = irq;
 			m_out_int_func(1);
 			return;
 		}
@@ -54,6 +55,7 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		if((m_isr & mask) && m_master && m_cascade && m_nested && (m_slave & mask))
 			break;
 	}
+	m_current_level = -1;
 	m_out_int_func(0);
 }
 
@@ -64,7 +66,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	if (state)
 	{
 		/* setting IRQ line */
-		LOG("set_irq_line(): PIC set IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC set IR%d line\n", irq);
 
 		if(m_level_trig_mode || (!m_level_trig_mode && !(m_irq_lines & mask)))
 		{
@@ -75,26 +77,28 @@ void pic8259_device::set_irq_line(int irq, int state)
 	else
 	{
 		/* clearing IRQ line */
-		LOG("set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC cleared IR%d line\n", irq);
 
 		m_irq_lines &= ~mask;
 		m_irr &= ~mask;
 	}
-	set_timer();
+
+	if (m_inta_sequence == 0)
+		set_timer();
 }
 
 
-uint32_t pic8259_device::acknowledge()
+uint8_t pic8259_device::acknowledge()
 {
-	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
+	if (is_x86())
 	{
-		uint8_t mask = 1 << irq;
-
 		/* is this IRQ pending and enabled? */
-		if ((m_irr & mask) && !(m_imr & mask))
+		if (m_current_level != -1)
 		{
-			if (!machine().side_effects_disabled()) {
-				LOG("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
+			uint8_t mask = 1 << m_current_level;
+			if (!machine().side_effects_disabled())
+			{
+				LOG("pic8259_acknowledge(): PIC acknowledge IR%d\n", m_current_level);
 				if (!m_level_trig_mode)
 					m_irr &= ~mask;
 
@@ -107,35 +111,85 @@ uint32_t pic8259_device::acknowledge()
 			if ((m_cascade!=0) && (m_master!=0) && (mask & m_slave))
 			{
 				// it's from slave device
-				return m_read_slave_ack_func(irq);
+				return m_read_slave_ack_func(m_current_level);
 			}
 			else
 			{
-				if (is_x86())
-				{
-					/* For x86 mode*/
-					return irq + m_base;
-				}
-				else
-				{
-					/* in case of 8080/85) */
-					return 0xcd0000 + (m_vector_addr_high << 8) + m_vector_addr_low + (irq << (3-m_vector_size));
-				}
+				/* For x86 mode*/
+				return m_current_level + m_base;
 			}
 		}
+		else
+		{
+			if (!machine().side_effects_disabled())
+				logerror("Spurious INTA\n");
+			return m_base + 7;
+		}
 	}
-	if (!machine().side_effects_disabled())
-		logerror("Spurious IRQ\n");
-	if (is_x86())
-		return m_base + 7;
 	else
-		return 0xcd0000 + (m_vector_addr_high << 8) + m_vector_addr_low + (7 << (3-m_vector_size));
+	{
+		/* in case of 8080/85 */
+		if (m_inta_sequence == 0)
+		{
+			if (!machine().side_effects_disabled())
+			{
+				if (m_current_level != -1)
+				{
+					LOG("pic8259_acknowledge(): PIC acknowledge IR%d\n", m_current_level);
+
+					uint8_t mask = 1 << m_current_level;
+					if (!m_level_trig_mode)
+						m_irr &= ~mask;
+					m_isr |= mask;
+				}
+				else
+					logerror("Spurious INTA\n");
+				m_inta_sequence = 1;
+			}
+			if (m_cascade && m_master && m_current_level != -1 && BIT(m_slave, m_current_level))
+				return m_read_slave_ack_func(m_current_level);
+			else
+				return 0xcd;
+		}
+		else if (m_inta_sequence == 1)
+		{
+			if (!machine().side_effects_disabled())
+				m_inta_sequence = 2;
+			if (m_cascade && m_master && m_current_level != -1 && BIT(m_slave, m_current_level))
+				return m_read_slave_ack_func(m_current_level);
+			else
+				return m_vector_addr_low + ((m_current_level & 7) << (3-m_vector_size));
+		}
+		else
+		{
+			if (!machine().side_effects_disabled())
+			{
+				m_inta_sequence = 0;
+				if (m_auto_eoi && m_current_level != -1)
+					m_isr &= ~(1 << m_current_level);
+				set_timer();
+			}
+			if (m_cascade && m_master && m_current_level != -1 && BIT(m_slave, m_current_level))
+				return m_read_slave_ack_func(m_current_level);
+			else
+				return m_vector_addr_high;
+		}
+	}
 }
 
 
 IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 {
 	return acknowledge();
+}
+
+IRQ_CALLBACK_MEMBER(pic8259_device::inta_call)
+{
+	// FIXME: make 8085 and Z80 devices read CALL vectors one byte at a time, not all at once
+	uint32_t vector = acknowledge() << 16;
+	vector |= acknowledge();
+	vector |= acknowledge() << 8;
+	return vector;
 }
 
 
@@ -150,18 +204,17 @@ uint8_t pic8259_device::read(offs_t offset)
 			if ( m_ocw3 & 0x04 )
 			{
 				/* Polling mode */
-				if ( m_irr & ~m_imr )
+				if (m_current_level != -1)
 				{
-					/* check the various IRQs */
-					for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
-					{
-						if ( ( 1 << irq ) & m_irr & ~m_imr )
-						{
-							data = 0x80 | irq;
-							break;
-						}
-					}
-					acknowledge();
+					data = 0x80 | m_current_level;
+
+					if (!m_level_trig_mode)
+						m_irr &= ~(1 << m_current_level);
+
+					if (!m_auto_eoi)
+						m_isr |= 1 << m_current_level;
+
+					set_timer();
 				}
 			}
 			else
@@ -207,7 +260,9 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 				m_cascade            = (data & 0x02) ? 0 : 1;
 				m_icw4_needed        = (data & 0x01) ? 1 : 0;
 				m_vector_addr_low    = (data & 0xe0);
-				m_state          = state_t::ICW2;
+				m_state              = state_t::ICW2;
+				m_current_level      = -1;
+				m_inta_sequence      = 0;
 				m_out_int_func(0);
 			}
 			else if (m_state == state_t::READY)
@@ -377,6 +432,8 @@ void pic8259_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_auto_eoi));
 	save_item(NAME(m_is_x86));
+	save_item(NAME(m_current_level));
+	save_item(NAME(m_inta_sequence));
 }
 
 
@@ -406,6 +463,8 @@ void pic8259_device::device_reset()
 	m_is_x86 = 0;
 	m_vector_addr_low = 0;
 	m_vector_addr_high = 0;
+	m_current_level = -1;
+	m_inta_sequence = 0;
 
 	m_master = m_in_sp_func();
 }

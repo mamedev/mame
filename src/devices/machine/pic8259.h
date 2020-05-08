@@ -39,7 +39,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	uint32_t acknowledge();
+	uint8_t acknowledge();
 
 	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { set_irq_line(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { set_irq_line(1, state); }
@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
+	IRQ_CALLBACK_MEMBER(inta_call);
 
 protected:
 	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -81,7 +82,7 @@ private:
 
 	devcb_write_line m_out_int_func;
 	devcb_read_line m_in_sp_func;
-	devcb_read32 m_read_slave_ack_func;
+	devcb_read8 m_read_slave_ack_func;
 
 	state_t m_state;
 
@@ -113,6 +114,9 @@ private:
 	uint8_t m_mode;
 	uint8_t m_auto_eoi;
 	uint8_t m_is_x86;
+
+	int8_t m_current_level;
+	uint8_t m_inta_sequence;
 };
 
 class v5x_icu_device : public pic8259_device

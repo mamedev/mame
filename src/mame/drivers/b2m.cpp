@@ -193,7 +193,7 @@ void b2m_state::b2m(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
 	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_io);
 	m_maincpu->set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

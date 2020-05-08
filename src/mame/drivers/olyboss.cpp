@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
 {
 	if(!irqline)
-		return m_pic->acknowledge();
+		return m_pic->inta_call(device, 0);
 	return 0;
 }
 

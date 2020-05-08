@@ -241,7 +241,7 @@ void pk8020_state::pk8020(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
 	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("inr", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("inr", FUNC(pic8259_device::inta_call));
 
 	PLS100(config, m_decplm); // КР556РТ2 (82S100 equivalent; D31)
 

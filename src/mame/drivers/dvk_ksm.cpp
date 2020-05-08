@@ -416,7 +416,7 @@ void ksm_state::ksm(machine_config &config)
 	I8080(config, m_maincpu, XTAL(15'400'000)/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
 	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 

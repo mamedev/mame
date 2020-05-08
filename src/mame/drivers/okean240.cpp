@@ -513,6 +513,7 @@ void okean240_state::okean240t(machine_config &config)
 	I8080(config, m_maincpu, XTAL(12'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &okean240_state::okean240_mem);
 	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240t_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_call));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

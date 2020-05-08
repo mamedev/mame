@@ -395,7 +395,7 @@ void iq151_state::iq151(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &iq151_state::iq151_mem);
 	m_maincpu->set_addrmap(AS_IO, &iq151_state::iq151_io);
 	m_maincpu->set_vblank_int("screen", FUNC(iq151_state::iq151_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
