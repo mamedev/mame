@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
-	IRQ_CALLBACK_MEMBER(inta_call);
 
 protected:
 	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

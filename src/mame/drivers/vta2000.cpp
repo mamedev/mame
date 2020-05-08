@@ -52,7 +52,7 @@ private:
 	void io_map(address_map &map);
 
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_mainpit;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -186,7 +186,7 @@ void vta2000_state::vta2000(machine_config &config)
 	I8080(config, m_maincpu, XTAL(4'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vta2000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vta2000_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_call));
+	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	PIT8253(config, m_mainpit, 0);
 	m_mainpit->set_clk<0>(500'000);

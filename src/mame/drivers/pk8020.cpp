@@ -237,11 +237,11 @@ static void pk8020_floppies(device_slot_interface &device)
 void pk8020_state::pk8020(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 20_MHz_XTAL / 8); // КР580ВМ80А
-	m_maincpu->set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
-	m_maincpu->set_addrmap(AS_IO, &pk8020_state::pk8020_io);
-	m_maincpu->set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("inr", FUNC(pic8259_device::inta_call));
+	i8080a_cpu_device &maincpu(I8080A(config, m_maincpu, 20_MHz_XTAL / 8)); // КР580ВМ80А
+	maincpu.set_addrmap(AS_PROGRAM, &pk8020_state::pk8020_mem);
+	maincpu.set_addrmap(AS_IO, &pk8020_state::pk8020_io);
+	maincpu.set_vblank_int("screen", FUNC(pk8020_state::pk8020_interrupt));
+	maincpu.in_inta_func().set("inr", FUNC(pic8259_device::acknowledge));
 
 	PLS100(config, m_decplm); // КР556РТ2 (82S100 equivalent; D31)
 

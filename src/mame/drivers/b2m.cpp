@@ -189,11 +189,11 @@ static void b2m_floppies(device_slot_interface &device)
 void b2m_state::b2m(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
-	m_maincpu->set_addrmap(AS_IO, &b2m_state::b2m_io);
-	m_maincpu->set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, 2000000));
+	maincpu.set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
+	maincpu.set_addrmap(AS_IO, &b2m_state::b2m_io);
+	maincpu.set_vblank_int("screen", FUNC(b2m_state::b2m_vblank_interrupt));
+	maincpu.in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

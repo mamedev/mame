@@ -113,6 +113,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( mc146818_r );
 	DECLARE_WRITE8_MEMBER( mc146818_w );
+	IRQ_CALLBACK_MEMBER( inta_call );
 	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_READ8_MEMBER( vram_bank_r );
 	DECLARE_WRITE8_MEMBER( vram_bank_w );
@@ -504,6 +505,14 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
     IR7     Slave cascade
 */
 
+IRQ_CALLBACK_MEMBER(qx10_state::inta_call)
+{
+	uint32_t vector = m_pic_m->acknowledge() << 16;
+	vector |= m_pic_m->acknowledge();
+	vector |= m_pic_m->acknowledge() << 8;
+	return vector;
+}
+
 uint8_t qx10_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
@@ -727,7 +736,7 @@ void qx10_state::qx10(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CLK / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
 	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_call));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(qx10_state::inta_call));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

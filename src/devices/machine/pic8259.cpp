@@ -183,15 +183,6 @@ IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 	return acknowledge();
 }
 
-IRQ_CALLBACK_MEMBER(pic8259_device::inta_call)
-{
-	// FIXME: make 8085 and Z80 devices read CALL vectors one byte at a time, not all at once
-	uint32_t vector = acknowledge() << 16;
-	vector |= acknowledge();
-	vector |= acknowledge() << 8;
-	return vector;
-}
-
 
 uint8_t pic8259_device::read(offs_t offset)
 {

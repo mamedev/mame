@@ -111,7 +111,6 @@ private:
 	void olyboss_io(address_map &map);
 	void olyboss_mem(address_map &map);
 	void olyboss85_io(address_map &map);
-	IRQ_CALLBACK_MEMBER(irq_cb);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
@@ -250,13 +249,6 @@ WRITE8_MEMBER( olyboss_state::vchrram_w )
 WRITE_LINE_MEMBER( olyboss_state::romdis_w )
 {
 	m_romen = state ? false : true;
-}
-
-IRQ_CALLBACK_MEMBER( olyboss_state::irq_cb )
-{
-	if(!irqline)
-		return m_pic->inta_call(device, 0);
-	return 0;
 }
 
 //**************************************************************************
@@ -501,7 +493,7 @@ void olyboss_state::bossb85(machine_config &config)
 	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 4_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &olyboss_state::olyboss_mem);
 	maincpu.set_addrmap(AS_IO, &olyboss_state::olyboss85_io);
-	maincpu.set_irq_acknowledge_callback(FUNC(olyboss_state::irq_cb));
+	maincpu.in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */

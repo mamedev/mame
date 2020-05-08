@@ -634,7 +634,7 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 //  m_maincpu->set_addrmap(AS_IO, &fastinvaders_state::fastinvaders_io_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(fastinvaders_state::irq0_line_hold));
 	m_maincpu->in_sid_func().set(FUNC(fastinvaders_state::sid_read));
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(fastinvaders_state::scanline_timer), "screen", 0, 1);
 

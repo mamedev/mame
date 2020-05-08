@@ -151,7 +151,7 @@ private:
 	void update_brg(bool a, bool b, int c);
 
 	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -416,7 +416,7 @@ void ksm_state::ksm(machine_config &config)
 	I8080(config, m_maincpu, XTAL(15'400'000)/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
 	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_call));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
