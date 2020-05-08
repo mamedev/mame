@@ -42,26 +42,27 @@
 
     ---------------------------------------------------------------------------
 
-	Disto No Halt Extension
+    Disto No Halt Extension
 
     The Disto Super Controller II includes "no halt" circuitry. Implemented
     by using a read and write cache.
 
     CachDat - Cache Data Register
-    $FF74 & $FF75  Read write cache data.
+        $FF74 & $FF75: Read/Write cache data.
 
     CachCtrl - Cache Controller
-    $FF76
+      $FF76: Read
+        Bit 7 low indicates an interrupt request from the disk controller
 
-    Read: bit 7 low indicates an interrupt request from the disk controller
-
-    Write:
-	   00000000 = Caching off
-	   00001000 = Tell cache controller to send interrupt when device is ready
-	   			  to send/receive a buffer (seek done, etc.)
-	   00000111 = Read cache on - Get next 256 data bytes from controller to cache
-	   00000100 = Write cache on - Next 256 bytes stored in cache are sector
-	   00000110 = Copy Write cache to controller
+      $FF76: Write:
+        00000000 = Caching off
+        00001000 = Tell cache controller to send interrupt when device is
+                   ready to send/receive a buffer (seek done, etc.)
+        00000111 = Read cache on - Get next 256 data bytes from controller
+                   to cache
+        00000100 = Write cache on - Next 256 bytes stored in cache are
+                   sector
+        00000110 = Copy Write cache to controller
 
 
 
