@@ -26,7 +26,10 @@ namespace netlist
 			register_subalias("Q1", m_Q[0]);
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_Q = 0;
+		}
 		NETLIB_UPDATEI();
 
 		void update_outputs(std::size_t start, std::size_t end);
@@ -46,7 +49,7 @@ namespace netlist
 
 	NETLIB_OBJECT_DERIVED(7475, 7477)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7475, 7477)
+		NETLIB_CONSTRUCTOR(7475)
 		, m_QQ(*this, {"QQ1", "QQ2", "QQ3", "QQ4"})
 		{
 		}
@@ -140,11 +143,6 @@ namespace netlist
 			m_last_Q &= ~(1 << i);
 			m_last_Q |= d << i;
 		}
-	}
-
-	NETLIB_RESET(7477)
-	{
-		m_last_Q = 0;
 	}
 
 	NETLIB_UPDATE(7477)

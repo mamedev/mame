@@ -35,7 +35,10 @@ namespace netlist
 		, m_power_pins(*this)
 		{
 		}
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_lastr = 0;
+		}
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(upd_a);
 		NETLIB_HANDLERI(upd_b);
@@ -92,11 +95,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(7483) A;
 	};
-
-	NETLIB_RESET(7483)
-	{
-		m_lastr = 0;
-	}
 
 	NETLIB_HANDLER(7483, upd_a)
 	{

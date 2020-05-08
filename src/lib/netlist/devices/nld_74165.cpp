@@ -28,7 +28,11 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_shifter = 0;
+			m_last_CLK = 0;
+		}
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(74165_dip);
@@ -70,16 +74,10 @@ namespace netlist
 			register_subalias("16", "A.VCC");
 		}
 		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {};
+		NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(74165) A;
 	};
-
-	NETLIB_RESET(74165)
-	{
-		m_shifter = 0;
-		m_last_CLK = 0;
-	}
 
 	// FIXME: Timing
 	NETLIB_UPDATE(74165)

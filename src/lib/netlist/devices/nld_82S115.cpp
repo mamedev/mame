@@ -26,7 +26,10 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_O = 0;
+		}
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(82S115_dip);
@@ -84,11 +87,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(82S115) A;
 	};
-
-	NETLIB_RESET(82S115)
-	{
-		m_last_O = 0;
-	}
 
 	// FIXME: timing!
 	NETLIB_UPDATE(82S115)

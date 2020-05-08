@@ -102,7 +102,7 @@ namespace netlist
 	};
 
 
-	NETLIB_OBJECT(opamp)
+	NETLIB_BASE_OBJECT(opamp)
 	{
 		NETLIB_CONSTRUCTOR(opamp)
 		, m_RP(*this, "RP1")
@@ -135,8 +135,8 @@ namespace netlist
 			}
 			if (m_type == 2 || m_type == 3)
 			{
-				create_and_register_subdevice("CP1", m_CP);
-				create_and_register_subdevice("EBUF", m_EBUF);
+				create_and_register_subdevice(*this, "CP1", m_CP);
+				create_and_register_subdevice(*this, "EBUF", m_EBUF);
 #if TEST_ALT_OUTPUT
 				create_and_register_subdevice("RO", m_RO);
 #endif
@@ -166,8 +166,8 @@ namespace netlist
 			if (m_type == 3)
 			{
 
-				create_and_register_subdevice("DN", m_DN, "D(IS=1e-15 N=1)");
-				create_and_register_subdevice("DP", m_DP, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice(*this, "DN", m_DN, "D(IS=1e-15 N=1)");
+				create_and_register_subdevice(*this, "DP", m_DP, "D(IS=1e-15 N=1)");
 
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");

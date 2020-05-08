@@ -34,7 +34,7 @@
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
-	class device_t;
+	class core_device_t;
 	class nlparse_t;
 	class setup_t;
 	class netlist_state_t;
@@ -55,7 +55,7 @@ namespace factory {
 
 		PCOPYASSIGNMOVE(element_t, default)
 
-		virtual unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		virtual unique_pool_ptr<core_device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
@@ -88,7 +88,7 @@ namespace factory {
 				const pstring &def_param, const pstring &sourcefile)
 		: element_t(name, classname, def_param, sourcefile) { }
 
-		unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		unique_pool_ptr<core_device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override
 		{
@@ -159,7 +159,7 @@ namespace factory {
 		{
 		}
 
-		unique_pool_ptr<device_t> make_device(nlmempool &pool,
+		unique_pool_ptr<core_device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
 

@@ -557,9 +557,6 @@ namespace netlist
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
-		// FIXME: logic_family should always be nullptr here
-		if (logic_family() == nullptr)
-			set_logic_family(family_TTL());
 		if (exec().stats_enabled())
 			m_stats = owner.make_object<stats_t>();
 	}
@@ -569,10 +566,6 @@ namespace netlist
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
-		set_logic_family(owner.logic_family());
-		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
-		if (logic_family() == nullptr)
-			set_logic_family(family_TTL());
 		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
 		if (exec().stats_enabled())
 			m_stats = owner.state().make_object<stats_t>();
@@ -590,20 +583,20 @@ namespace netlist
 	}
 
 	// ----------------------------------------------------------------------------------------
-	// device_t
+	// base_device_t
 	// ----------------------------------------------------------------------------------------
 
-	device_t::device_t(netlist_state_t &owner, const pstring &name)
+	base_device_t::base_device_t(netlist_state_t &owner, const pstring &name)
 	: core_device_t(owner, name)
 	{
 	}
 
-	device_t::device_t(core_device_t &owner, const pstring &name)
+	base_device_t::base_device_t(base_device_t &owner, const pstring &name)
 	: core_device_t(owner, name)
 	{
 	}
 
-	void device_t::register_subalias(const pstring &name, const detail::core_terminal_t &term)
+	void base_device_t::register_subalias(const pstring &name, const detail::core_terminal_t &term)
 	{
 		pstring alias = this->name() + "." + name;
 
@@ -611,7 +604,7 @@ namespace netlist
 		state().setup().register_alias_nofqn(alias, term.name());
 	}
 
-	void device_t::register_subalias(const pstring &name, const pstring &aliased)
+	void base_device_t::register_subalias(const pstring &name, const pstring &aliased)
 	{
 		pstring alias = this->name() + "." + name;
 		pstring aliased_fqn = this->name() + "." + aliased;
@@ -620,33 +613,93 @@ namespace netlist
 		state().setup().register_alias_nofqn(alias, aliased_fqn);
 	}
 
-	void device_t::connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2)
+	void base_device_t::connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2)
 	{
 		state().setup().register_link_fqn(t1.name(), t2.name());
 	}
 
-	void device_t::connect(const pstring &t1, const pstring &t2)
+	void base_device_t::connect(const pstring &t1, const pstring &t2)
 	{
 		state().setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 	}
 
-	// -----------------------------------------------------------------------------
-	// family_setter_t
-	// -----------------------------------------------------------------------------
 
-	// NOLINTNEXTLINE(modernize-use-equals-default)
-	detail::family_setter_t::family_setter_t()
+	// ----------------------------------------------------------------------------------------
+	// device_t
+	// ----------------------------------------------------------------------------------------
+
+	device_t::device_t(netlist_state_t &owner, const pstring &name)
+	: base_device_t(owner, name)
 	{
+		// FIXME: this needs debugging!
+		if (logic_family() == nullptr)
+		{
+			//printf("Issue with 1 %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
 	}
 
-	detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring &desc)
+	device_t::device_t(netlist_state_t &owner, const pstring &name,
+		const pstring &model)
+	: base_device_t(owner, name)
 	{
-		dev.set_logic_family(dev.state().setup().family_from_model(desc));
+		//printf("In 1a %s: %s\n", this->name().c_str(), model.c_str());
+		set_logic_family(state().setup().family_from_model(model));		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
+		// FIXME: this needs debugging!
+		if (logic_family() == nullptr)
+		{
+			printf("Issue with 1a %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
 	}
 
-	detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t &desc)
+	device_t::device_t(netlist_state_t &owner, const pstring &name,
+		const logic_family_desc_t *desc)
+	: base_device_t(owner, name)
 	{
-		dev.set_logic_family(&desc);
+		set_logic_family(desc);
+		// FIXME: this needs debugging!
+		if (logic_family() == nullptr)
+		{
+			printf("Issue with 1b %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
+	}
+
+	device_t::device_t(device_t &owner, const pstring &name)
+	: base_device_t(owner, name)
+	{
+		set_logic_family(owner.logic_family());
+		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
+		if (logic_family() == nullptr)
+		{
+			printf("Issue with 2 %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
+	}
+
+	device_t::device_t(device_t &owner, const pstring &name, const pstring &model)
+	: base_device_t(owner, name)
+	{
+		set_logic_family(state().setup().family_from_model(model));
+		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
+		if (logic_family() == nullptr)
+		{
+			printf("Issue with 3 %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
+	}
+
+	device_t::device_t(device_t &owner, const pstring &name, const logic_family_desc_t *desc)
+	: base_device_t(owner, name)
+	{
+		set_logic_family(desc);
+		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
+		if (logic_family() == nullptr)
+		{
+			printf("Issue with 3 %s\n", this->name().c_str());
+			set_logic_family(family_TTL());
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -780,7 +833,7 @@ namespace netlist
 	{
 	}
 
-	logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state,
+	logic_t::logic_t(device_t &dev, const pstring &aname, const state_e state,
 			nldelegate delegate)
 		: core_terminal_t(dev, aname, state, delegate)
 	{
@@ -819,7 +872,7 @@ namespace netlist
 	// logic_output_t
 	// ----------------------------------------------------------------------------------------
 
-	logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
+	logic_output_t::logic_output_t(device_t &dev, const pstring &aname)
 		: logic_t(dev, aname, STATE_OUT)
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
@@ -870,7 +923,7 @@ namespace netlist
 	// logic_input_t
 	// -----------------------------------------------------------------------------
 
-	logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname,
+	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
 			nldelegate delegate)
 			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
@@ -882,7 +935,7 @@ namespace netlist
 	// Parameters ...
 	// ----------------------------------------------------------------------------------------
 
-	param_t::param_t(device_t &device, const pstring &name)
+	param_t::param_t(core_device_t &device, const pstring &name)
 		: device_object_t(device, device.name() + "." + name)
 	{
 		device.state().setup().register_param_t(this->name(), *this);
@@ -906,7 +959,7 @@ namespace netlist
 	}
 
 
-	pstring param_t::get_initial(const device_t &dev, bool *found) const
+	pstring param_t::get_initial(const core_device_t &dev, bool *found) const
 	{
 		pstring res = dev.state().setup().get_initial_param_val(this->name(), "");
 		*found = (res != "");
@@ -918,7 +971,7 @@ namespace netlist
 		return state().setup().models().type(str());
 	}
 
-	param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
+	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(device, name)
 	{
 		m_param = device.state().setup().get_initial_param_val(this->name(),val);
@@ -928,7 +981,7 @@ namespace netlist
 	{
 	}
 
-	param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
+	param_ptr_t::param_ptr_t(core_device_t &device, const pstring &name, uint8_t * val)
 	: param_t(device, name)
 	{
 		m_param = val; //device.setup().get_initial_param_val(this->name(),val);

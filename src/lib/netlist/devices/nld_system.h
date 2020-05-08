@@ -22,12 +22,12 @@
 #define LOGIC_INPUT(name, v, family)                                            \
 		NET_REGISTER_DEV(LOGIC_INPUT, name)                                     \
 		PARAM(name.IN, v)                                                       \
-		PARAM(name.FAMILY, family)
+		PARAM(name.MODEL, family)
 
 #define LOGIC_INPUT8(name, v, family)                                           \
 		NET_REGISTER_DEV(LOGIC_INPUT8, name)                                    \
 		PARAM(name.IN, v)                                                       \
-		PARAM(name.FAMILY, family)
+		PARAM(name.MODEL, family)
 
 #define ANALOG_INPUT(name, v)                                                   \
 		NET_REGISTER_DEV(ANALOG_INPUT, name)                                    \

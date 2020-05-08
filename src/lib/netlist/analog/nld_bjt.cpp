@@ -122,7 +122,7 @@ namespace analog
 
 	// Have a common start for transistors
 
-	NETLIB_OBJECT(QBJT)
+	NETLIB_BASE_OBJECT(QBJT)
 	{
 	public:
 		enum q_type {
@@ -171,7 +171,7 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT_switch, QBJT)
+		NETLIB_CONSTRUCTOR(QBJT_switch)
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
 			, m_BC(*this, "m_BC", true)
@@ -214,7 +214,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
+		NETLIB_CONSTRUCTOR(QBJT_EB)
 		, m_modacc(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
@@ -235,13 +235,13 @@ namespace analog
 
 			if (m_modacc.m_CJE > nlconst::zero())
 			{
-				create_and_register_subdevice("m_CJE", m_CJE);
+				create_and_register_subdevice(*this, "m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
 			if (m_modacc.m_CJC > nlconst::zero())
 			{
-				create_and_register_subdevice("m_CJC", m_CJC);
+				create_and_register_subdevice(*this, "m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
 				connect("C", "m_CJC.2");
 			}

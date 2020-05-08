@@ -124,7 +124,7 @@ namespace plib
 		const auto mmin(static_cast<FT>(p.min()));
 		const auto mmax(static_cast<FT>(p.max()));
 		// -> 0 to a
-		return (p() - mmin) / (mmax - mmin) * m - b;
+		return (static_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
 	}
 
 	template<typename FT>

@@ -19,11 +19,17 @@ namespace netlist
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
-		: device_t(anetlist, name)
+		: device_t(anetlist, name, inout_proxied->logic_family())
 		, m_tp(nullptr)
 		, m_tn(nullptr)
 	{
-		set_logic_family(inout_proxied->logic_family());
+		//set_logic_family(inout_proxied->logic_family());
+
+		if (logic_family() == nullptr)
+		{
+			// FIXME convert to error
+			printf("nullptr family in proxy\n");
+		}
 
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 

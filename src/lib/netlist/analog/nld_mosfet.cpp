@@ -145,7 +145,7 @@ namespace analog
 
 	// Have a common start for mosfets
 
-	NETLIB_OBJECT(FET)
+	NETLIB_BASE_OBJECT(FET)
 	{
 	public:
 		enum q_type {
@@ -181,7 +181,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(MOSFET, FET)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(MOSFET, FET)
+		NETLIB_CONSTRUCTOR(MOSFET)
 		, m_DG(*this, "m_DG", true)
 		, m_SG(*this, "m_SG", true)
 		, m_SD(*this, "m_SD", true)

@@ -14,18 +14,14 @@ namespace netlist
 	{
 	NETLIB_OBJECT(CD4006)
 	{
-		NETLIB_CONSTRUCTOR(CD4006)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4006, "CD4XXX")
+		//NETLIB_FAMILY("CD4XXX")
 		, m_CLOCK(*this, "CLOCK")
 		, m_I(*this, {"D1", "D2", "D3", "D4"})
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D3P5"})
 		, m_d(*this, "m_d", 0)
 		, m_last_clock(*this, "m_last_clock", 0)
 		, m_supply(*this, "VDD", "VSS")
-		{
-		}
-
-		NETLIB_RESETI()
 		{
 		}
 
@@ -93,7 +89,6 @@ namespace netlist
 			register_subalias("14", "A.VDD");
 
 		}
-		NETLIB_RESETI() {}
 		NETLIB_UPDATEI() {}
 	private:
 		NETLIB_SUB(CD4006) A;

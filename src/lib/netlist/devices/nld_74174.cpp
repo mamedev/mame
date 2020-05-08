@@ -25,7 +25,12 @@ namespace devices
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_clrq = 0;
+			m_data = 0xFF;
+		}
 		NETLIB_UPDATEI();
 
 		NETLIB_HANDLERI(sub)
@@ -109,14 +114,6 @@ namespace devices
 			m_data = d;
 			m_CLK.activate_lh();
 		}
-	}
-
-
-	NETLIB_RESET(74174)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_clrq = 0;
-		m_data = 0xFF;
 	}
 
 	NETLIB_DEVICE_IMPL(74174,   "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")

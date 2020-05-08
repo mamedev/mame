@@ -37,7 +37,11 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_last_CLK = 0;
+		}
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(74161_dip);
@@ -91,12 +95,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(74161) A;
 	};
-
-	NETLIB_RESET(74161)
-	{
-		m_cnt = 0;
-		m_last_CLK = 0;
-	}
 
 	// FIXME: Timing
 	static constexpr const std::array<netlist_time, 4> delay =

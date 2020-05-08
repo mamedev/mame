@@ -45,7 +45,7 @@ NETLIST_END()
 
 //- Identifier:  NE566_DIP
 //- Title: NE566 Voltage Controlled Oscillator
-//-Description: The LM566CN is a general purpose voltage controlled oscillator
+//- Description: The LM566CN is a general purpose voltage controlled oscillator
 //-    which may be used to generate square and triangula waves, the frequency
 //-    of which is a very linear function of a control voltage. The frequency
 //-    is also a function of an external resistor and capacitor.
@@ -96,7 +96,7 @@ static NETLIST_START(NE566_DIP)
 	RES(ROSQ, 5200)
 
 	PARAM(VO.RO, 50)
-	PARAM(COMP.FAMILY, "FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.1 ORL=50 ORH=50)")
+	PARAM(COMP.MODEL, "FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.1 ORL=50 ORH=50)")
 	PARAM(SW.GOFF, 0) // This has to be zero to block current sources
 
 	NET_C(CI2.IN, VI.OP)

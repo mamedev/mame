@@ -229,8 +229,8 @@ namespace netlist
 
 	NETLIB_OBJECT(4538_dip)
 	{
-		NETLIB_CONSTRUCTOR(4538_dip)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(4538_dip, "CD4XXX")
+		//NETLIB_FAMILY()
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		{

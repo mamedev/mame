@@ -29,7 +29,12 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_last_CLK = 0;
+		}
+
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(74164_dip);
@@ -71,11 +76,6 @@ namespace netlist
 		NETLIB_SUB(74164) A;
 	};
 
-	NETLIB_RESET(74164)
-	{
-		m_cnt = 0;
-		m_last_CLK = 0;
-	}
 
 	NETLIB_UPDATE(74164)
 	{

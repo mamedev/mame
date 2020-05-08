@@ -53,7 +53,7 @@ namespace devices
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_model(*this, "MODEL", "FAMILY(TYPE=TTL)")
 		, m_supply(*this)
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
@@ -79,7 +79,7 @@ namespace devices
 		param_fp_t m_freq;
 		netlist_time m_inc;
 
-		param_model_t m_FAMILY;
+		param_model_t m_model;
 		NETLIB_NAME(power_pins) m_supply;
 };
 
@@ -193,10 +193,10 @@ namespace devices
 		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", false)
 		// make sure we get the family first
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_model(*this, "MODEL", "FAMILY(TYPE=TTL)")
 		, m_supply(*this)
 		{
-			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			set_logic_family(state().setup().family_from_model(m_model()));
 			m_Q.set_logic_family(this->logic_family());
 		}
 
@@ -212,7 +212,7 @@ namespace devices
 		logic_output_t m_Q;
 
 		param_logic_t m_IN;
-		param_model_t m_FAMILY;
+		param_model_t m_model;
 		NETLIB_NAME(power_pins) m_supply;
 	};
 
@@ -223,10 +223,10 @@ namespace devices
 		, m_Q(*this, "Q{}")
 		, m_IN(*this, "IN", 0)
 		// make sure we get the family first
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_model(*this, "model", "MODEL(TYPE=TTL)")
 		, m_supply(*this)
 		{
-			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			set_logic_family(state().setup().family_from_model(m_model()));
 			for (auto &q : m_Q)
 				q.set_logic_family(this->logic_family());
 		}
@@ -244,7 +244,7 @@ namespace devices
 		object_array_t<logic_output_t, N> m_Q;
 
 		param_int_t m_IN;
-		param_model_t m_FAMILY;
+		param_model_t m_model;
 		NETLIB_NAME(power_pins) m_supply;
 	};
 
@@ -465,11 +465,11 @@ namespace devices
 		, m_GON(*this, "GON", nlconst::magic(1e9)) // FIXME: all switches should have some on value
 		, m_GOFF(*this, "GOFF", nlconst::cgmin())
 		, m_last_state(*this, "m_last_state", 0)
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_model(*this, "MODEL", "FAMILY(TYPE=TTL)")
 		, m_power_pins(*this)
 		{
 			// Pass on logic family
-			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			set_logic_family(state().setup().family_from_model(m_model()));
 			m_I.set_logic_family(this->logic_family());
 
 			// connect and register pins
@@ -528,7 +528,7 @@ namespace devices
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
-		param_model_t m_FAMILY;
+		param_model_t m_model;
 		nld_power_pins m_power_pins;
 	};
 
@@ -545,12 +545,12 @@ namespace devices
 		, m_IN(*this, "IN")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_model(*this, "MODEL", "FAMILY(TYPE=TTL)")
 		, m_power_pins(*this)
 		, m_last_state(*this, "m_last_state", 2) // ensure first execution
 		{
 			// Pass on logic family
-			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			set_logic_family(state().setup().family_from_model(m_model()));
 			m_Q.set_logic_family(this->logic_family());
 			m_QQ.set_logic_family(this->logic_family());
 		}
@@ -579,7 +579,7 @@ namespace devices
 		analog_input_t m_IN;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
-		param_model_t m_FAMILY;
+		param_model_t m_model;
 		nld_power_pins m_power_pins;
 
 	private:

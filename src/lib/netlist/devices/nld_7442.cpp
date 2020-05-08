@@ -30,7 +30,11 @@ namespace devices
 
 	private:
 		NETLIB_UPDATEI();
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_val = 0;
+			m_last_val = 0;
+		}
 
 		void update_outputs() noexcept
 		{
@@ -78,12 +82,6 @@ namespace devices
 	private:
 		NETLIB_SUB(7442) A;
 	};
-
-	NETLIB_RESET(7442)
-	{
-		m_val = 0;
-		m_last_val = 0;
-	}
 
 	NETLIB_UPDATE(7442)
 	{

@@ -68,7 +68,7 @@ namespace analog
 		return d2;
 	}
 
-	NETLIB_OBJECT(twoterm)
+	NETLIB_BASE_OBJECT(twoterm)
 	{
 		// FIXME locate use case of owned = true and eliminate them if possible
 		NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
@@ -171,7 +171,7 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(R_base, twoterm)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(R_base, twoterm)
+		NETLIB_CONSTRUCTOR(R_base)
 		{
 		}
 
@@ -197,7 +197,7 @@ namespace analog
 
 	NETLIB_OBJECT_DERIVED(R, R_base)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
+		NETLIB_CONSTRUCTOR(R)
 		, m_R(*this, "R", nlconst::magic(1e9))
 		{
 		}
@@ -231,7 +231,7 @@ namespace analog
 	// nld_POT
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(POT)
+	NETLIB_BASE_OBJECT(POT)
 	{
 		NETLIB_CONSTRUCTOR(POT)
 		, m_R1(*this, "_R1")
@@ -263,7 +263,7 @@ namespace analog
 		param_logic_t m_Reverse;
 	};
 
-	NETLIB_OBJECT(POT2)
+	NETLIB_BASE_OBJECT(POT2)
 	{
 		NETLIB_CONSTRUCTOR(POT2)
 		, m_R1(*this, "_R1")
@@ -297,7 +297,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(C, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+		NETLIB_CONSTRUCTOR(C)
 		, m_C(*this, "C", nlconst::magic(1e-6))
 		, m_cap(*this, "m_cap")
 		{
@@ -398,7 +398,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(L, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
+		NETLIB_CONSTRUCTOR(L)
 		, m_L(*this, "L", nlconst::magic(1e-6))
 		, m_gmin(nlconst::zero())
 		, m_G(nlconst::zero())
@@ -486,7 +486,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(D, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_EX(D, twoterm, const pstring &model = "D")
+		NETLIB_CONSTRUCTOR_EX(D, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
 		, m_D(*this, "m_D")
 		{
@@ -514,7 +514,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(Z, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_EX(Z, twoterm, const pstring &model = "D")
+		NETLIB_CONSTRUCTOR_EX(Z, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
 		, m_D(*this, "m_D")
 		, m_R(*this, "m_R")
@@ -547,7 +547,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(VS, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
+		NETLIB_CONSTRUCTOR(VS)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
@@ -596,7 +596,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(CS, twoterm)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
+		NETLIB_CONSTRUCTOR(CS)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")

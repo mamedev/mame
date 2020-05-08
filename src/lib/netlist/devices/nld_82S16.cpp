@@ -29,7 +29,15 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			for (std::size_t i=0; i<4; i++)
+			{
+				m_ram[i] = 0;
+			}
+			m_addr = 0;
+			m_enq = 0;
+		}
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(addr)
 		{
@@ -128,16 +136,6 @@ namespace netlist
 			}
 			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}
-	}
-
-	NETLIB_RESET(82S16)
-	{
-		for (std::size_t i=0; i<4; i++)
-		{
-			m_ram[i] = 0;
-		}
-		m_addr = 0;
-		m_enq = 0;
 	}
 
 	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")

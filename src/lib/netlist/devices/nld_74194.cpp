@@ -29,7 +29,11 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_CLK = 0;
+			m_last_Q = 0;
+		}
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(74194_dip);
@@ -78,11 +82,6 @@ namespace netlist
 		NETLIB_SUB(74194) A;
 	};
 
-	NETLIB_RESET(74194)
-	{
-		m_last_CLK = 0;
-		m_last_Q = 0;
-	}
 
 	// FIXME: Timing
 	NETLIB_UPDATE(74194)

@@ -29,7 +29,15 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_MRQ = 0;
+			m_last_EQ = 0;
+			m_last_SQ = 0;
+			m_last_D = 0;
+			m_last_Q = 0;
+		}
+
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(9314_dip);
@@ -74,15 +82,6 @@ namespace netlist
 		private:
 			NETLIB_SUB(9314) A;
 	};
-
-	NETLIB_RESET(9314)
-	{
-		m_last_MRQ = 0;
-		m_last_EQ = 0;
-		m_last_SQ = 0;
-		m_last_D = 0;
-		m_last_Q = 0;
-	}
 
 	NETLIB_UPDATE(9314)
 	{

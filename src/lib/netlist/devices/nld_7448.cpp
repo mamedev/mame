@@ -31,7 +31,10 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_state = 0;
+		}
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(7448_dip);
@@ -147,11 +150,6 @@ namespace netlist
 					v = 15;
 			update_outputs(v);
 		}
-	}
-
-	NETLIB_RESET(7448)
-	{
-		m_state = 0;
 	}
 
 	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")

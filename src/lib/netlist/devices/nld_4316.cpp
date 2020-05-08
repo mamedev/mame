@@ -13,8 +13,8 @@ namespace netlist { namespace devices {
 
 	NETLIB_OBJECT(CD4316_GATE)
 	{
-		NETLIB_CONSTRUCTOR(CD4316_GATE)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4316_GATE, "CD4XXX")
+		//NETLIB_FAMILY("CD4XXX")
 		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "_R")
 		, m_S(*this, "S")

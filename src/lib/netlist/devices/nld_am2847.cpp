@@ -84,7 +84,11 @@ namespace netlist
 			register_subalias("VDD", "A.VDD");
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_CP = 0;
+		}
+
 		NETLIB_UPDATEI();
 
 		friend class NETLIB_NAME(AM2847_dip);
@@ -125,11 +129,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(AM2847) A;
 	};
-
-	NETLIB_RESET(AM2847)
-	{
-		m_last_CP = 0;
-	}
 
 	NETLIB_UPDATE(AM2847)
 	{

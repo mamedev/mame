@@ -19,7 +19,7 @@ namespace netlist
 	// SWITCH
 	// ----------------------------------------------------------------------------------------
 
-	NETLIB_OBJECT(switch1)
+	NETLIB_BASE_OBJECT(switch1)
 	{
 		NETLIB_CONSTRUCTOR(switch1)
 		, m_R(*this, "R")
@@ -60,7 +60,7 @@ namespace netlist
 // SWITCH2
 // ----------------------------------------------------------------------------------------
 
-	NETLIB_OBJECT(switch2)
+	NETLIB_BASE_OBJECT(switch2)
 	{
 		NETLIB_CONSTRUCTOR(switch2)
 		, m_R1(*this, "R1")

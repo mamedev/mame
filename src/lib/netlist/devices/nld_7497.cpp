@@ -41,7 +41,13 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_rate = 0;
+			m_lastclock = 0;
+		}
+
 		NETLIB_UPDATEI();
 
 		NETLIB_HANDLERI(noop) { }
@@ -87,13 +93,6 @@ namespace netlist
 			return a;
 		}
 	};
-
-	NETLIB_RESET(7497)
-	{
-		m_cnt = 0;
-		m_rate = 0;
-		m_lastclock = 0;
-	}
 
 	NETLIB_UPDATE(7497)
 	{

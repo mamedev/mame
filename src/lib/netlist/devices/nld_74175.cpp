@@ -26,7 +26,11 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_data = 0xFF;
+		}
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(clk);
 
@@ -115,12 +119,6 @@ namespace netlist
 		}
 	}
 
-
-	NETLIB_RESET(74175)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_data = 0xFF;
-	}
 
 	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74175_dip,"TTL_74175_DIP", "")

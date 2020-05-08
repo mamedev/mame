@@ -245,7 +245,7 @@ namespace devices
 		: truthtable_base_element_t(name, classname, def_param, sourcefile)
 		{ }
 
-		unique_pool_ptr<device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
+		unique_pool_ptr<core_device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 
@@ -259,14 +259,7 @@ namespace devices
 				desc_s.parse(m_desc);
 			}
 
-			// update truthtable family definitions
-			if (m_family_name != "")
-				m_family_desc = anetlist.setup().family_from_model(m_family_name);
-
-			if (m_family_desc == nullptr)
-				throw nl_exception("family description not found for {1}", m_family_name);
-
-			return pool.make_unique<tt_type>(anetlist, name, *m_family_desc, *m_ttbl, m_desc);
+			return pool.make_unique<tt_type>(anetlist, name, m_family_name, *m_ttbl, m_desc);
 		}
 	private:
 		unique_pool_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
@@ -481,13 +474,14 @@ namespace factory
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name, const pstring &classname,
 			const pstring &def_param, const pstring &sourcefile)
 	: factory::element_t(name, classname, def_param, sourcefile)
-	, m_family_desc(family_TTL())
+	, m_family_name(NETLIST_DEFAULT_TRUTHTABLE_FAMILY)
 	{
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
-			ret = plib::make_unique<xtype>(desc.name, desc.classname, desc.def_param, s); } break
+			ret = plib::make_unique<xtype>(desc.name, desc.classname, desc.def_param, s); } \
+			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
@@ -516,7 +510,7 @@ namespace factory
 				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = desc.family;
+		ret->m_family_name = (desc.family != "" ? desc.family : pstring(NETLIST_DEFAULT_TRUTHTABLE_FAMILY));
 
 		return ret;
 	}

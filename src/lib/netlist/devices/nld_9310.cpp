@@ -39,7 +39,13 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_cnt = 0;
+			m_loadq = 1;
+			m_ent = 1;
+		}
 		NETLIB_UPDATEI();
 
 		NETLIB_HANDLERI(abcd) { } // do nothing
@@ -189,14 +195,6 @@ namespace netlist
 	private:
 		NETLIB_SUB(9310) A;
 	};
-
-	NETLIB_RESET(9310)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_cnt = 0;
-		m_loadq = 1;
-		m_ent = 1;
-	}
 
 	NETLIB_UPDATE(9310)
 	{
