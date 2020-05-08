@@ -27,6 +27,7 @@
 #include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_psg.h"
@@ -207,6 +208,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
