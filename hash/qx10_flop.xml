@@ -7,12 +7,24 @@ license:CC0
 
 	<software name="cpm22">
 		<description>CP/M-80 R2.2 for QX-10 &amp; QX-16</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Epson</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="238734">
 				<rom name="epsnqx10.td0" size="238734" crc="f14a8b30" sha1="f951416a80caba395d4ce1e0fa0d14a8d0b5ea04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22_83">
+		<description>CP/M-80 R2.2 for QX-10 &amp; QX-16 1983</description>
+		<year>1983</year>
+		<publisher>Epson</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="273195">
+				<rom name="qx10_cpm.imd" size="273195" crc="47d0c8cc" sha1="f6a10a280925d26d4c74cdf17e01ace13ead4773" />
 			</dataarea>
 		</part>
 	</software>
