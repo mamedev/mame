@@ -11042,7 +11042,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom">
 		<description>Baby Boom (Prototype, 19940811)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11053,7 +11053,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom1" cloneof="babyboom">
 		<description>Baby Boom (Prototype, 19940603)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11064,7 +11064,7 @@ but dumps still have to be confirmed.
 
 	<software name="babyboom2" cloneof="babyboom">
 		<description>Baby Boom (Prototype, 19940606)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
