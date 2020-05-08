@@ -113,7 +113,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( mc146818_r );
 	DECLARE_WRITE8_MEMBER( mc146818_w );
-	DECLARE_READ8_MEMBER( get_slave_ack );
+	DECLARE_READ32_MEMBER( get_slave_ack );
 	DECLARE_READ8_MEMBER( vram_bank_r );
 	DECLARE_WRITE8_MEMBER( vram_bank_w );
 	DECLARE_READ16_MEMBER( vram_r );
@@ -504,7 +504,7 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
     IR7     Slave cascade
 */
 
-READ8_MEMBER( qx10_state::get_slave_ack )
+READ32_MEMBER( qx10_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic_s->acknowledge();

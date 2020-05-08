@@ -81,7 +81,7 @@ private:
 
 	devcb_write_line m_out_int_func;
 	devcb_read_line m_in_sp_func;
-	devcb_read8 m_read_slave_ack_func;
+	devcb_read32 m_read_slave_ack_func;
 
 	state_t m_state;
 
