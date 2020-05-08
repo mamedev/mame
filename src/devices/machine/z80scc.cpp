@@ -1840,8 +1840,8 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 			// loop over all interrupt sources
 			for (auto & elem : m_uart->m_int_state)
 			{
-				// find the first channel with an interrupt requested
-				if (elem & Z80_DAISY_INT)
+				// find the first interrupt under service
+				if (elem & Z80_DAISY_IEO)
 				{
 					LOGCMD("- %c found IUS bit to clear\n", 'A' + m_index);
 					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
