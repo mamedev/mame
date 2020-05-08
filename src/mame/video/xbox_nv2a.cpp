@@ -826,10 +826,23 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[3] = par_in[p3_C + 3];
 		break;
 	case 2: // "RCP"
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / par_in[p3_C + 0];
+		if (par_in[p3_C + 0] == 0)
+			t.f = std::numeric_limits<float>::infinity();
+		else if (par_in[p3_C + 0] == 1.0f)
+			t.f = 1.0f;
+		else
+			t.f = 1.0f / par_in[p3_C + 0];
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = t.f;
 		break;
 	case 3: // "RCC"
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / par_in[p3_C + 0]; // ?
+		t.f = par_in[p3_C + 0];
+		if ((t.f < 0) && (t.f > -5.42101e-20f))
+			t.f = -5.42101e-20f;
+		else if ((t.f >= 0) && (t.f < 5.42101e-20f))
+			t.f = 5.42101e-20f;
+		if (t.f != 1.0f)
+			t.f = 1.0f / t.f;
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = t.f;
 		break;
 	case 4: // "RSQ"
 		/*
