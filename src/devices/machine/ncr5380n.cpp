@@ -10,9 +10,7 @@
  * TODO:
  *  - target mode
  *  - cxd1180 enhancements
- *  - improve bus free detection
  */
-// 40801766 - IIx ROM waiting point for "next read fails"
 
 #include "emu.h"
 #include "ncr5380n.h"
@@ -21,10 +19,10 @@
 #define LOG_REGW     (1U << 1)
 #define LOG_REGR     (1U << 2)
 #define LOG_SCSI     (1U << 3)
-#define LOG_STATE    (1U << 4)
+#define LOG_ARB      (1U << 4)
 #define LOG_DMA      (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_SCSI|LOG_STATE|LOG_DMA)
+//#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_SCSI|LOG_ARB|LOG_DMA)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new)")
@@ -134,10 +132,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 			LOGMASKED(LOG_SCSI, "scsi_ctrl_changed 0x%x BUS FREE\n", ctrl);
 	}
 
-	// update phase match
-	m_bas &= ~(BAS_PHASEMATCH | BAS_BUSYERROR);
-	if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
-		m_bas |= BAS_PHASEMATCH;
+	m_bas &= ~BAS_BUSYERROR;
 
 	if (ctrl & S_RST)
 	{
@@ -155,6 +150,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 		{
 			// stop dma
 			m_mode &= ~MODE_DMA;
+			m_bas &= ~BAS_ENDOFDMA;
 
 			set_drq(false);
 		}
@@ -178,7 +174,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 		// target asserted REQ
 		if (m_mode & MODE_DMA)
 		{
-			if (m_bas & BAS_PHASEMATCH)
+			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
 				// transfer cycle
 				if (m_state != IDLE && !m_state_timer->enabled())
@@ -284,6 +280,8 @@ void ncr5380n_device::mode_w(u8 data)
 		m_state = IDLE;
 		m_state_timer->enable(false);
 
+		m_bas &= ~BAS_ENDOFDMA;
+
 		if (m_has_lbs)
 			m_tcmd &= ~TC_LBS;
 
@@ -322,11 +320,6 @@ void ncr5380n_device::tcmd_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "tcmd_w 0x%02x (%s)\n", data, machine().describe_context());
 
-	// recalculate phase match
-	m_bas &= ~BAS_PHASEMATCH;
-	if ((scsi_bus->ctrl_r() & S_PHASE_MASK) == (data & S_PHASE_MASK))
-		m_bas |= BAS_PHASEMATCH;
-
 	if (m_has_lbs)
 		m_tcmd = (m_tcmd & TC_LBS) | (data & ~TC_LBS);
 	else
@@ -358,6 +351,7 @@ u8 ncr5380n_device::bas_r()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
 	u8 const data = m_bas |
+		(((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE)) ? BAS_PHASEMATCH : 0) |
 		(ctrl & S_ATN ? BAS_ATN : 0) |
 		(ctrl & S_ACK ? BAS_ACK : 0);
 
@@ -426,6 +420,7 @@ void ncr5380n_device::state_timer(void *ptr, s32 param)
 
 int ncr5380n_device::state_step()
 {
+	u32 const ctrl = scsi_bus->ctrl_r();
 	int delay = 0;
 
 	switch (m_state)
@@ -434,9 +429,9 @@ int ncr5380n_device::state_step()
 		break;
 
 	case ARB_BUS_FREE:
-		if (!(scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
+		if (!(ctrl & (S_SEL | S_BSY | S_RST)))
 		{
-			LOGMASKED(LOG_STATE, "arbitration: bus free\n");
+			LOGMASKED(LOG_ARB, "arbitration: bus free\n");
 			// FIXME: AIP should only be set when arbitration begins
 			m_icmd |= IC_AIP;
 			m_state = ARB_START;
@@ -444,12 +439,12 @@ int ncr5380n_device::state_step()
 		}
 		else
 		{
-			LOGMASKED(LOG_STATE, "arbitration: bus not free\n");
+			LOGMASKED(LOG_ARB, "arbitration: bus not free\n");
 			m_state = IDLE;
 		}
 		break;
 	case ARB_START:
-		LOGMASKED(LOG_STATE, "arbitration: started\n");
+		LOGMASKED(LOG_ARB, "arbitration: started\n");
 		m_icmd |= IC_BSY;
 		m_state = ARB_EVALUATE;
 		delay = 2200;
@@ -460,9 +455,9 @@ int ncr5380n_device::state_step()
 		break;
 	case ARB_EVALUATE:
 		// check if SEL asserted, or if there's a higher ID on the bus
-		if ((scsi_bus->ctrl_r() & S_SEL) || (scsi_bus->data_r() & ~((m_odata - 1) | m_odata)))
+		if ((ctrl & S_SEL) || (scsi_bus->data_r() & ~((m_odata - 1) | m_odata)))
 		{
-			LOGMASKED(LOG_STATE, "arbitration: lost\n");
+			LOGMASKED(LOG_ARB, "arbitration: lost\n");
 			m_icmd &= ~IC_BSY;
 			m_icmd |= IC_LA;
 
@@ -474,15 +469,15 @@ int ncr5380n_device::state_step()
 		}
 		else
 		{
-			LOGMASKED(LOG_STATE, "arbitration: won\n");
+			LOGMASKED(LOG_ARB, "arbitration: won\n");
 			m_state = IDLE;
 		}
 		break;
 
 	case DMA_IN_REQ:
-		if (scsi_bus->ctrl_r() & S_REQ)
+		if (ctrl & S_REQ)
 		{
-			if (m_bas & BAS_PHASEMATCH)
+			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
 				m_idata = scsi_bus->data_r();
 				LOGMASKED(LOG_DMA, "dma in: 0x%02x\n", m_idata);
@@ -498,7 +493,7 @@ int ncr5380n_device::state_step()
 		}
 		break;
 	case DMA_IN_ACK:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(ctrl & S_REQ))
 		{
 			m_state = (m_bas & BAS_ENDOFDMA) ? IDLE : DMA_IN_REQ;
 
@@ -508,9 +503,9 @@ int ncr5380n_device::state_step()
 		break;
 
 	case DMA_OUT_REQ:
-		if (scsi_bus->ctrl_r() & S_REQ)
+		if (ctrl & S_REQ)
 		{
-			if (m_bas & BAS_PHASEMATCH)
+			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
 				m_state = DMA_OUT_DRQ;
 				set_drq(true);
@@ -528,7 +523,7 @@ int ncr5380n_device::state_step()
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 		break;
 	case DMA_OUT_ACK:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(ctrl & S_REQ))
 		{
 			if (m_bas & BAS_ENDOFDMA)
 			{
@@ -626,7 +621,7 @@ void ncr5380n_device::set_drq(bool drq_state)
 		if (drq_state)
 			m_bas |= BAS_DMAREQUEST;
 		else
-			m_bas &= ~(BAS_DMAREQUEST | BAS_ENDOFDMA);
+			m_bas &= ~BAS_DMAREQUEST;
 
 		m_drq_state = drq_state;
 		m_drq_handler(m_drq_state);
