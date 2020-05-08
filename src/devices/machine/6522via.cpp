@@ -459,7 +459,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 
 			// If in continous mode or the shifter is still shifting we re-arm the timer
-			if (SO_T2_RATE(m_acr) || (m_shift_counter != 0x0f))
+			if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
@@ -703,9 +703,14 @@ u8 via6522_device::read(offs_t offset)
 		val = m_sr;
 		if (!machine().side_effects_disabled())
 		{
-			m_out_cb1 = 1;
-			m_cb1_handler(m_out_cb1);
-			m_shift_counter = 0x0f;
+			if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
+				m_out_cb1 = 1;
+				m_cb1_handler(m_out_cb1);
+				m_shift_counter = 0x0f;
+			}
+			else
+				m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+
 			LOGINT("SR INT ");
 			clear_int(INT_SR);
 			LOGSHIFT(" - ACR: %02x ", m_acr);
@@ -889,15 +894,14 @@ void via6522_device::write(offs_t offset, u8 data)
 		m_sr = data;
 		LOGSHIFT("Write SR: %02x\n", m_sr);
 
-		// make sure CB1 is high - this should not be needed though
-		if (m_out_cb1 != 1)
-		{
-			logerror("VIA: CB1 is low starting shifter\n");
+		if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
 			m_out_cb1 = 1;
 			m_cb1_handler(m_out_cb1);
+			m_shift_counter = 0x0f;
 		}
+		else
+			m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
 
-		m_shift_counter = 0x0f;
 		LOGINT("SR INT ");
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
