@@ -6,7 +6,7 @@
 
     Code for emulating the Disto RAM cartridge
 
-	This cartridge came in two forms: 256kb and 512kb.
+	This cartridge came in several forms: 256K, 512K, 768K, and 1024K.
 
 ***************************************************************************/
 
@@ -18,11 +18,14 @@
 #define STATICRAM_TAG   "static_ram"
 
 
-#define VERBOSE (LOG_GENERAL )
+// #define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
 
-#define SIZE_STRING "512K"
-#define SIZE_MASK (512 * 1024 - 1)
+#define RAM_SIZE_IN_K 1024
+#define BUFFER_SIZE (RAM_SIZE_IN_K * 1024)
+
+#define STRINGIZE_HELPER(expr) #expr
+#define STRINGIZE(expr) STRINGIZE_HELPER(expr)
 
 //**************************************************************************
 //  TYPE DECLARATIONS
@@ -60,7 +63,7 @@ namespace
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram_device, "cocopakram", "Disto " SIZE_STRING " RAM Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_RAM, device_cococart_interface, coco_pak_ram_device, "cocopakram", "Disto " STRINGIZE(RAM_SIZE_IN_K) "K RAM Cartridge")
 
 
 
@@ -84,7 +87,7 @@ coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const ch
 
 void coco_pak_ram_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, STATICRAM_TAG).set_default_size(SIZE_STRING).set_default_value(0);
+	RAM(config, STATICRAM_TAG).set_default_size(STRINGIZE(RAM_SIZE_IN_K) "K").set_default_value(0);
 }
 
 
@@ -114,6 +117,7 @@ void coco_pak_ram_device::device_reset()
 }
 
 
+
 //-------------------------------------------------
 //    scs_write
 //-------------------------------------------------
@@ -125,16 +129,19 @@ WRITE8_MEMBER(coco_pak_ram_device::scs_write)
 	switch(offset)
 	{
 		case 0:
-			m_offset = ((m_offset & 0xffff00) + data) & SIZE_MASK;
+			m_offset = ((m_offset & 0xffff00) + data);
 			break;
 		case 1:
-			m_offset = ((m_offset & 0xff00ff) + (data << 8)) & SIZE_MASK;
+			m_offset = ((m_offset & 0xff00ff) + (data << 8));
 			break;
 		case 2:
-			m_offset = ((m_offset & 0x00ffff) + (data << 16)) & SIZE_MASK;
+			m_offset = ((m_offset & 0x00ffff) + (data << 16));
 			break;
 		case 3:
-			m_staticram->write(m_offset, data);
+			if( m_offset < BUFFER_SIZE )
+			{
+				m_staticram->write(m_offset, data);
+			}
 			break;
 	}
 
@@ -154,19 +161,23 @@ READ8_MEMBER(coco_pak_ram_device::scs_read)
 	switch (offset)
 	{
 		case 0:
-			data = (m_offset & SIZE_MASK) & 0xff;
+			data = (m_offset) & 0xff;
 			break;
 		case 1:
-			data = ((m_offset & SIZE_MASK) & 0xff00ff) >> 8;
+			data = (m_offset & 0xff00ff) >> 8;
 			break;
 		case 2:
-			data = ((m_offset & SIZE_MASK) & 0xff0000) >> 16;
+			data = (m_offset & 0xff0000) >> 16;
 			break;
 		case 3:
-			data = m_staticram->read(m_offset & SIZE_MASK);
+			if( m_offset < BUFFER_SIZE )
+			{
+				data = m_staticram->read(m_offset);
+			}
+
 			break;
 	}
 
-	LOG("scs_read:  %s: %06x, %02x, %02x\n", machine().describe_context(), m_offset & SIZE_MASK, offset, data);
+	LOG("scs_read:  %s: %06x, %02x, %02x\n", machine().describe_context(), m_offset, offset, data);
 	return data;
 }
