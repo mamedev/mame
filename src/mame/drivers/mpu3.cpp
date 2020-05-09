@@ -112,6 +112,7 @@ TODO: - Distinguish door switches using manual
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+#include "machine/rescap.h"
 
 #include "mpu3.lh"
 

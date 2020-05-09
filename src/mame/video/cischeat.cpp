@@ -144,19 +144,6 @@ READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
 }
 
 
-WRITE16_MEMBER(cischeat_state::leds_out_w)
-{
-	// leds
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		m_leds[0] = BIT(data, 4);   // start button
-		m_leds[1] = BIT(data, 5);   // ?
-	}
-}
-
-
 WRITE16_MEMBER(cischeat_state::unknown_out_w)
 {
 	// ?? 91/1/91/1 ...

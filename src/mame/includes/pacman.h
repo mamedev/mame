@@ -224,7 +224,7 @@ public:
 	void porky(machine_config &config);
 	void pacman(machine_config &config, bool latch = true);
 	void _8bpm(machine_config &config);
-	void maketrax(machine_config &config);
+	void crush2(machine_config &config);
 	void korosuke(machine_config &config);
 	void alibaba(machine_config &config);
 	void drivfrcp(machine_config &config);

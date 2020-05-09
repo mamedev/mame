@@ -1146,8 +1146,15 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	assert(m_livecpu == nullptr);
 	m_livecpu = device;
 
+	// can't stop on a device without a state interface
+	if (m_execution_state == exec_state::STOPPED && dynamic_cast<device_state_interface *>(device) == nullptr)
+	{
+		if (m_stop_when_not_device == nullptr)
+			m_stop_when_not_device = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 	// if we're a new device, stop now
-	if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device)
+	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing())
 	{
 		m_stop_when_not_device = nullptr;
 		m_execution_state = exec_state::STOPPED;
@@ -1163,7 +1170,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 			m_machine.debug_view().flush_osd_updates();
 			m_last_periodic_update_time = osd_ticks();
 		}
-		else if (device == m_breakcpu)
+		if (device == m_breakcpu)
 		{   // check for pending breaks
 			m_execution_state = exec_state::STOPPED;
 			m_breakcpu = nullptr;
@@ -1183,13 +1190,23 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		}
 		// check for debug keypresses
 		if (m_machine.ui_input().pressed(IPT_UI_DEBUG_BREAK))
+		{
+			m_visiblecpu->debug()->ignore(false);
 			m_visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
+		}
 	}
 }
 
 void debugger_cpu::stop_hook(device_t *device)
 {
 	assert(m_livecpu == device);
+
+	// if we are supposed to be stopped at this point (most likely because of a watchpoint), keep going until this CPU is live again
+	if (m_execution_state == exec_state::STOPPED)
+	{
+		m_breakcpu = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 
 	// clear the live CPU
 	m_livecpu = nullptr;
@@ -1492,9 +1509,25 @@ void device_debug::exception_hook(int exception)
 	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
-		m_device.machine().debugger().cpu().set_execution_stopped();
-		m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
-		compute_debug_flags();
+		bool matched = true;
+		if (m_exception_condition && !m_exception_condition->is_empty())
+		{
+			try
+			{
+				matched = m_exception_condition->execute();
+			}
+			catch (expression_error &)
+			{
+				return;
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
+			compute_debug_flags();
+		}
 	}
 }
 
@@ -1506,18 +1539,18 @@ void device_debug::exception_hook(int exception)
 
 void device_debug::privilege_hook()
 {
-	bool matched = 1;
-
 	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
 	{
+		bool matched = true;
 		if (m_privilege_condition && !m_privilege_condition->is_empty())
 		{
 			try
 			{
 				matched = m_privilege_condition->execute();
 			}
-			catch (...)
+			catch (expression_error &)
 			{
+				return;
 			}
 		}
 
@@ -1840,12 +1873,13 @@ void device_debug::go_next_device()
 //  exception fires on the visible CPU
 //-------------------------------------------------
 
-void device_debug::go_exception(int exception)
+void device_debug::go_exception(int exception, const char *condition)
 {
 	assert(m_exec != nullptr);
 
 	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
+	m_exception_condition = std::make_unique<parsed_expression>(m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -2956,6 +2990,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 	}
 
 	// halt in the debugger by default
+	bool was_stopped = debug.cpu().is_stopped();
 	debug.cpu().set_execution_stopped();
 
 	// evaluate the action
@@ -2965,19 +3000,28 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 	// print a notification, unless the action made us go again
 	if (debug.cpu().is_stopped())
 	{
-		offs_t pc = m_space.device().state().pcbase();
 		std::string buffer;
 
 		buffer = string_format(type == read_or_write::READ ?
-							   "Stopped at watchpoint %X reading %0*X from %08X (PC=%X)" :
-							   "Stopped at watchpoint %X writing %0*X to %08X (PC=%X)",
+							   "Stopped at watchpoint %X reading %0*X from %08X" :
+							   "Stopped at watchpoint %X writing %0*X to %08X",
 							   m_index,
 							   size * unit_size / 4,
 							   data,
-							   address,
-							   pc);
-		debug.console().printf("%s\n", buffer);
-		m_debugInterface->compute_debug_flags();
+							   address);
+
+		if (debug.cpu().live_cpu() == &m_space.device())
+		{
+			offs_t pc = m_space.device().state().pcbase();
+			debug.console().printf("%s (PC=%X)\n", buffer, pc);
+			m_debugInterface->compute_debug_flags();
+		}
+		else if (!was_stopped)
+		{
+			debug.console().printf("%s\n", buffer);
+			debug.cpu().set_execution_running();
+			debug.cpu().set_break_cpu(&m_space.device());
+		}
 		m_debugInterface->set_triggered_watchpoint(this);
 	}
 

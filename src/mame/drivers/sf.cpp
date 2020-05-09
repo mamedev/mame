@@ -6,124 +6,105 @@
 
     driver by Olivier Galibert
 
-    TODO:
-    - acquire i8751 protection mcu internal rom dump and emulate it
-
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sf.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "emupal.h"
+#include "machine/gen_latch.h"
 #include "screen.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/* The protection of the Japanese (and alt US) version */
-/* I'd love to see someone dump the i8751 rom */
-
-void sf_state::write_dword( address_space &space, offs_t offset, uint32_t data )
+class sf_state : public driver_device
 {
-	space.write_word(offset, data >> 16);
-	space.write_word(offset + 2, data);
-}
+public:
+	sf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_protcpu(*this, "protcpu"),
+		m_msm(*this, "msm%u", 1U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_videoram(*this, "videoram"),
+		m_objectram(*this, "objectram"),
+		m_tilerom(*this, "tilerom"),
+		m_audiobank(*this, "audiobank")
+	{ }
 
-WRITE16_MEMBER(sf_state::protection_w)
-{
-	static const int maplist[4][10] = {
-		{ 1, 0, 3, 2, 4, 5, 6, 7, 8, 9 },
-		{ 4, 5, 6, 7, 1, 0, 3, 2, 8, 9 },
-		{ 3, 2, 1, 0, 6, 7, 4, 5, 8, 9 },
-		{ 6, 7, 4, 5, 3, 2, 1, 0, 8, 9 }
-	};
-	int map = maplist
-		[space.read_byte(0xffc006)]
-		[(space.read_byte(0xffc003) << 1) + (space.read_word(0xffc004) >> 8)];
+	void sfp(machine_config &config);
+	void sfjp(machine_config &config);
+	void sfus(machine_config &config);
+	void sfan(machine_config &config);
 
-	switch (space.read_byte(0xffc684))
-	{
-	case 1:
-		{
-			int base;
+private:
+	/* devices */
+	required_device<m68000_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
+	optional_device<i8751_device> m_protcpu;
+	required_device_array<msm5205_device, 2> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-			base = 0x1b6e8 + 0x300e * map;
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_objectram;
+	required_region_ptr<uint8_t> m_tilerom;
 
-			write_dword(space, 0xffc01c, 0x16bfc + 0x270 * map);
-			write_dword(space, 0xffc020, base + 0x80);
-			write_dword(space, 0xffc024, base);
-			write_dword(space, 0xffc028, base + 0x86);
-			write_dword(space, 0xffc02c, base + 0x8e);
-			write_dword(space, 0xffc030, base + 0x20e);
-			write_dword(space, 0xffc034, base + 0x30e);
-			write_dword(space, 0xffc038, base + 0x38e);
-			write_dword(space, 0xffc03c, base + 0x40e);
-			write_dword(space, 0xffc040, base + 0x80e);
-			write_dword(space, 0xffc044, base + 0xc0e);
-			write_dword(space, 0xffc048, base + 0x180e);
-			write_dword(space, 0xffc04c, base + 0x240e);
-			write_dword(space, 0xffc050, 0x19548 + 0x60 * map);
-			write_dword(space, 0xffc054, 0x19578 + 0x60 * map);
-			break;
-		}
-	case 2:
-		{
-			static const int delta1[10] = {
-				0x1f80, 0x1c80, 0x2700, 0x2400, 0x2b80, 0x2e80, 0x3300, 0x3600, 0x3a80, 0x3d80
-			};
-			static const int delta2[10] = {
-				0x2180, 0x1800, 0x3480, 0x2b00, 0x3e00, 0x4780, 0x5100, 0x5a80, 0x6400, 0x6d80
-			};
+	required_memory_bank m_audiobank;
 
-			int d1 = delta1[map] + 0xc0;
-			int d2 = delta2[map];
+	/* video-related */
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	int m_active;
+	bool m_prot_t0;
+	uint16_t m_bgscroll;
+	uint16_t m_fgscroll;
 
-			space.write_word(0xffc680, d1);
-			space.write_word(0xffc682, d2);
-			space.write_word(0xffc00c, 0xc0);
-			space.write_word(0xffc00e, 0);
+	void coin_w(u8 data);
+	void soundcmd_w(u8 data);
+	void protection_w(u16);
+	void sound2_bank_w(u8 data);
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask);
+	void bg_scroll_w(offs_t, u16 data, u16 mem_mask);
+	void fg_scroll_w(offs_t, u16 data, u16 mem_mask);
+	void gfxctrl_w(offs_t, u16 data, u16 mem_mask);
+	template<int Chip> void msm_w(u8 data);
+	void prot_p3_w(u8 data);
+	void prot_ram_w(offs_t offset, u8 data);
+	u8 prot_ram_r(offs_t offset);
 
-			fg_scroll_w(space, 0, d1, 0xffff);
-			bg_scroll_w(space, 0, d2, 0xffff);
-			break;
-		}
-	case 4:
-		{
-			int pos = space.read_byte(0xffc010);
-			pos = (pos + 1) & 3;
-			space.write_byte(0xffc010, pos);
-			if(!pos)
-			{
-				int d1 = space.read_word(0xffc682);
-				int off = space.read_word(0xffc00e);
-				if (off!=512)
-				{
-					off++;
-					d1++;
-				}
-				else
-				{
-					off = 0;
-					d1 -= 512;
-				}
-				space.write_word(0xffc682, d1);
-				space.write_word(0xffc00e, off);
-				bg_scroll_w(space, 0, d1, 0xffff);
-			}
-			break;
-		}
-	default:
-		{
-			logerror("Write protection at %06x (%04x)\n", m_maincpu->pc(), data & 0xffff);
-			logerror("*** Unknown protection %d\n", space.read_byte(0xffc684));
-			break;
-		}
-	}
-}
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline int invert( int nb );
+	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void write_dword( address_space &space, offs_t offset, uint32_t data );
 
+	void sfan_map(address_map &map);
+	void sfjp_map(address_map &map);
+	void sfus_map(address_map &map);
+	void sound2_io_map(address_map &map);
+	void sound2_map(address_map &map);
+	void sound_map(address_map &map);
+	void prot_map(address_map &map);
+};
 
-WRITE8_MEMBER(sf_state::coin_w)
+void sf_state::coin_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0,  data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,  data & 0x02);
@@ -132,19 +113,19 @@ WRITE8_MEMBER(sf_state::coin_w)
 	machine().bookkeeping().coin_lockout_w(2, ~data & 0x40); /* is there a third coin input? */
 }
 
-WRITE8_MEMBER(sf_state::soundcmd_w)
+void sf_state::soundcmd_w(u8 data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(sf_state::sound2_bank_w)
+void sf_state::sound2_bank_w(u8 data)
 {
 	m_audiobank->set_entry(data);
 }
 
 template<int Chip>
-WRITE8_MEMBER(sf_state::msm_w)
+void sf_state::msm_w(u8 data)
 {
 	m_msm[Chip]->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
@@ -172,7 +153,6 @@ void sf_state::sfan_map(address_map &map)
 	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
 	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
 	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
-//  map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }
@@ -196,7 +176,6 @@ void sf_state::sfus_map(address_map &map)
 	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
 	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
 	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
-//  map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }
@@ -250,6 +229,240 @@ void sf_state::sound2_io_map(address_map &map)
 	map(0x02, 0x02).w(FUNC(sf_state::sound2_bank_w));
 }
 
+void sf_state::prot_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(sf_state::prot_ram_r), FUNC(sf_state::prot_ram_w));
+}
+
+TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
+{
+	uint8_t *base = &m_tilerom[2 * tile_index];
+	int attr = base[0x10000];
+	int color = base[0];
+	int code = (base[0x10000 + 1] << 8) | base[1];
+	tileinfo.set(0, code, color, TILE_FLIPYX(attr & 3));
+}
+
+TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
+{
+	uint8_t *base = &m_tilerom[0x20000 + 2 * tile_index];
+	int attr = base[0x10000];
+	int color = base[0];
+	int code = (base[0x10000 + 1] << 8) | base[1];
+	tileinfo.set(1, code, color, TILE_FLIPYX(attr & 3));
+}
+
+TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
+{
+	int code = m_videoram[tile_index];
+	tileinfo.set(3, code & 0x3ff, code>>12, TILE_FLIPYX((code & 0xc00)>>10));
+}
+
+void sf_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sf_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sf_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sf_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8,   64, 32);
+
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(3);
+}
+
+void sf_state::protection_w(u16)
+{
+	m_protcpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+void sf_state::prot_p3_w(u8 data)
+{
+	m_prot_t0 = data & 0x10;
+
+	// Dunno if it's using HALT or DTACK, not really important though
+	if(!(data & 0x02)) {
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_protcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	}
+}
+
+void sf_state::prot_ram_w(offs_t offset, u8 data)
+{
+	offset = offset * 2 + m_prot_t0;
+	if(offset & 0x8000)
+		offset = 0xff8000 | offset;
+	else
+		offset = 0xc00000 | (offset & 0x7fff);
+
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+u8 sf_state::prot_ram_r(offs_t offset)
+{
+	offset = offset * 2 + m_prot_t0;
+	if(offset & 0x8000)
+		offset = 0xff8000 | offset;
+	else
+		offset = 0xc00000 | (offset & 0x7fff);
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void sf_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+void sf_state::bg_scroll_w(offs_t, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bgscroll);
+	m_bg_tilemap->set_scrollx(0, m_bgscroll);
+}
+
+void sf_state::fg_scroll_w(offs_t, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_fgscroll);
+	m_fg_tilemap->set_scrollx(0, m_fgscroll);
+}
+
+void sf_state::gfxctrl_w(offs_t, u16 data, u16 mem_mask)
+{
+	/* b0 = reset, or maybe "set anyway" */
+	/* b1 = pulsed when control6.b6==0 until it's 1 */
+	/* b2 = active when dip 8 (flip) on */
+	/* b3 = active character plane */
+	/* b4 = unused */
+	/* b5 = active background plane */
+	/* b6 = active middle plane */
+	/* b7 = active sprites */
+
+	if(ACCESSING_BITS_0_7) {
+		m_active = data & 0xff;
+		flip_screen_set(data & 0x04);
+		m_tx_tilemap->enable(data & 0x08);
+		m_bg_tilemap->enable(data & 0x20);
+		m_fg_tilemap->enable(data & 0x40);
+	}
+}
+
+
+inline int sf_state::invert( int nb )
+{
+	static const int delta[4] = {0x00, 0x18, 0x18, 0x00};
+	return nb ^ delta[(nb >> 3) & 3];
+}
+
+void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
+{
+	int offs;
+
+	for (offs = 0x1000 - 0x20; offs >= 0; offs -= 0x20)
+	{
+		int c = m_objectram[offs];
+		int attr = m_objectram[offs + 1];
+		int sy = m_objectram[offs + 2];
+		int sx = m_objectram[offs + 3];
+		int color = attr & 0x000f;
+		int flipx = attr & 0x0100;
+		int flipy = attr & 0x0200;
+
+		if (attr & 0x400)   /* large sprite */
+		{
+			int c1, c2, c3, c4, t;
+
+			if (flip_screen())
+			{
+				sx = 480 - sx;
+				sy = 224 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			c1 = c;
+			c2 = c + 1;
+			c3 = c + 16;
+			c4 = c + 17;
+
+			if (flipx)
+			{
+				t = c1; c1 = c2; c2 = t;
+				t = c3; c3 = c4; c4 = t;
+			}
+			if (flipy)
+			{
+				t = c1; c1 = c3; c3 = t;
+				t = c2; c2 = c4; c4 = t;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(bitmap,
+					cliprect,
+					invert(c1),
+					color,
+					flipx,flipy,
+					sx,sy, 15);
+			m_gfxdecode->gfx(2)->transpen(bitmap,
+					cliprect,
+					invert(c2),
+					color,
+					flipx,flipy,
+					sx+16,sy, 15);
+			m_gfxdecode->gfx(2)->transpen(bitmap,
+					cliprect,
+					invert(c3),
+					color,
+					flipx,flipy,
+					sx,sy+16, 15);
+			m_gfxdecode->gfx(2)->transpen(bitmap,
+					cliprect,
+					invert(c4),
+					color,
+					flipx,flipy,
+					sx+16,sy+16, 15);
+		}
+		else
+		{
+			if (flip_screen())
+			{
+				sx = 496 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(bitmap,
+					cliprect,
+					invert(c),
+					color,
+					flipx,flipy,
+					sx,sy, 15);
+		}
+	}
+}
+
+
+uint32_t sf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if(m_active & 0x20)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	else
+		bitmap.fill(0, cliprect);
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	if(m_active & 0x80)
+		draw_sprites(bitmap, cliprect);
+
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 
 /***************************************************************************
@@ -519,6 +732,7 @@ void sf_state::machine_start()
 	save_item(NAME(m_active));
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
+	save_item(NAME(m_prot_t0));
 
 	m_audiobank->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
@@ -528,6 +742,7 @@ void sf_state::machine_reset()
 	m_active = 0;
 	m_bgscroll = 0;
 	m_fgscroll = 0;
+	m_prot_t0 = 0;
 }
 
 void sf_state::sfan(machine_config &config)
@@ -589,6 +804,10 @@ void sf_state::sfjp(machine_config &config)
 {
 	sfan(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfjp_map);
+
+	I8751(config, m_protcpu, XTAL(8'000'000)); // Clock unknown, but shares the bus with the 68k, so could be similar
+	m_protcpu->set_addrmap(AS_IO, &sf_state::prot_map);
+	m_protcpu->port_out_cb<3>().set(FUNC(sf_state::prot_p3_w));
 }
 
 void sf_state::sfp(machine_config &config)
@@ -684,12 +903,12 @@ ROM_START( sfua )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.7k", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
+	ROM_REGION( 0x1000, "protcpu", 0 )
+	ROM_LOAD( "sf_s.id8751h-8.14f", 0x0000, 0x1000, CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) ) // is this mcu label right for the US set?
+
 	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sfu-00.1h",0x00000, 0x20000, CRC(a7cce903) SHA1(76f521c9a00abd95a3491ab95e8eccd0fc7ea0e5) )
 	ROM_LOAD( "sf-01.1k", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
-
-	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP ) // is this mcu label right for the US set?
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.2k", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
@@ -754,12 +973,12 @@ ROM_START( sfj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.7k", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
+	ROM_REGION( 0x1000, "protcpu", 0 )
+	ROM_LOAD( "sf_s.id8751h-8.14f", 0x0000, 0x1000, CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) )
+
 	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sf-00.1h", 0x00000, 0x20000, CRC(4b733845) SHA1(f7ff46e02f8ce6682d6e573588271bae2edfa90f) )
 	ROM_LOAD( "sf-01.1k", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
-
-	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "sf_s.id8751h-8.14f",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.2k", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
@@ -958,12 +1177,12 @@ ROM_START( sfw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.7k", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
+	ROM_REGION( 0x1000, "protcpu", 0 )
+	ROM_LOAD( "sf.14e", 0x0000, 0x1000, CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) )
+
 	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sfu-00.1h",0x00000, 0x20000, CRC(a7cce903) SHA1(76f521c9a00abd95a3491ab95e8eccd0fc7ea0e5) )
 	ROM_LOAD( "sf-01.2k", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
-
-	ROM_REGION( 0x0800, "mcu", 0 ) /* i8751 MCU */
-	ROM_LOAD( "sf.14e",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "sf-39.2k", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/

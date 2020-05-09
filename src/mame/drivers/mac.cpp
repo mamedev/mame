@@ -179,14 +179,14 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 				{
 					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
-					m_rbv_clutoffs++;
+					m_rbv_clutoffs = (m_rbv_clutoffs + 1) & 0xff;
 					m_rbv_count = 0;
 				}
 				else
 				{
 					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_clutoffs++;
+					m_rbv_clutoffs = (m_rbv_clutoffs + 1) & 0xff;
 					m_rbv_count = 0;
 				}
 			}

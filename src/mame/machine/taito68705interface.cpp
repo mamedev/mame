@@ -46,7 +46,7 @@
 
 
 DEFINE_DEVICE_TYPE(TAITO68705_MCU,       taito68705_mcu_device,       "taito68705",      "Taito MC68705 MCU Interface")
-DEFINE_DEVICE_TYPE(TAITO68705_MCU_TIGER, taito68705_mcu_tiger_device, "taito68705tiger", "Taito MC68705 MCU Interface (Tiger Heli)")
+DEFINE_DEVICE_TYPE(TAITO68705_MCU_TIGER, taito68705_mcu_tiger_device, "taito68705tiger", "Taito MC68705 MCU Interface (Tiger-Heli)")
 DEFINE_DEVICE_TYPE(ARKANOID_68705P3,     arkanoid_68705p3_device,     "arkanoid68705p3", "Arkanoid MC68705P3 Interface")
 DEFINE_DEVICE_TYPE(ARKANOID_68705P5,     arkanoid_68705p5_device,     "arkanoid68705p5", "Arkanoid MC68705P5 Interface")
 
@@ -254,7 +254,7 @@ void taito68705_mcu_device::mcu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 }
 
 
-/* The Tiger Heli interface has some extensions, handle them here */
+/* The Tiger-Heli interface has some extensions, handle them here */
 
 taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, tag, owner, clock)
@@ -263,7 +263,7 @@ taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &m
 
 u8 taito68705_mcu_tiger_device::mcu_portc_r()
 {
-	// Tiger Heli has these status bits inverted MCU-side
+	// Tiger-Heli has these status bits inverted MCU-side
 	return taito68705_mcu_device::mcu_portc_r() ^ 0x03;
 }
 

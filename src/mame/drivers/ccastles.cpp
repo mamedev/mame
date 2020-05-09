@@ -123,6 +123,7 @@
 #include "includes/ccastles.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"

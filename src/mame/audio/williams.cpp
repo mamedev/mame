@@ -33,6 +33,7 @@
 #include "emu.h"
 #include "williams.h"
 #include "machine/6821pia.h"
+#include "machine/rescap.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"

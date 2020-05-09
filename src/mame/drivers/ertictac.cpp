@@ -26,7 +26,6 @@ PCB has a single OSC at 24MHz
 #include "includes/archimds.h"
 #include "cpu/arm/arm.h"
 #include "machine/aakart.h"
-#include "machine/i2cmem.h"
 #include "screen.h"
 
 
@@ -219,17 +218,13 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 	archimedes_request_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 }
 
-/* TODO: Are we sure that this HW have I2C device? */
-#define NVRAM_SIZE 256
-#define NVRAM_PAGE_SIZE 0   /* max size of one write request */
-
 void ertictac_state::ertictac(machine_config &config)
 {
 	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(NVRAM_PAGE_SIZE).set_data_size(NVRAM_SIZE);
+	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583 // TODO: Are we sure that this HW have I2C device?
 
 //  AAKART(config, m_kart, 24_MHz_XTAL/3); // TODO: frequency
 

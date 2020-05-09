@@ -1042,7 +1042,7 @@ void cubo_state::cubo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(1024);
+	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
 	akiko_device &akiko(AKIKO(config, "akiko", 0));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));

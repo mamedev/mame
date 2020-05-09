@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(diode_models)
-	NET_MODEL("D _(IS=1e-15 N=1)")
+	NET_MODEL("D _(IS=1e-15 N=1 NBV=3 IBV=0.001 BV=1E9)")
 
 	NET_MODEL("1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	// FIXME: 1N916 currently only a copy of 1N914!

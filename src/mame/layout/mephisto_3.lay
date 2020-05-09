@@ -643,6 +643,10 @@ license:CC0
 		<bezel element="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></bezel>
 	</view>
 
+	<view name="Internal Layout (Brikett)">
+		<group ref="brikett"><bounds x="0" y="0" width="58.5" height="32" /></group>
+	</view>
+
 	<view name="Internal Layout (Board)">
 		<bounds left="-13" right="88" top="-1.5" bottom="87.5" />
 
@@ -671,7 +675,4 @@ license:CC0
 		<bezel element="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></bezel>
 	</view>
 
-	<view name="Internal Layout (Brikett)">
-		<group ref="brikett"><bounds x="0" y="0" width="58.5" height="32" /></group>
-	</view>
 </mamelayout>

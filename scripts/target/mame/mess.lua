@@ -382,6 +382,7 @@ VIDEOS["PWM_DISPLAY"] = true
 VIDEOS["SDA5708"] = true
 VIDEOS["SED1200"] = true
 VIDEOS["SED1330"] = true
+VIDEOS["SED1500"] = true
 VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
 VIDEOS["STVVDP"] = true
@@ -1901,6 +1902,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fp200.cpp",
 	MAME_DIR .. "src/mame/drivers/fp1100.cpp",
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
+	MAME_DIR .. "src/mame/machine/fp6000_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/fp6000_kbd.h",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
@@ -2003,6 +2006,8 @@ files {
 	MAME_DIR .. "src/mame/machine/cit101_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/cit101_kbd.h",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
+	MAME_DIR .. "src/mame/machine/cit220_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/cit220_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "coleco")
@@ -4279,6 +4284,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/emate.cpp",
 	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
+	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
@@ -4460,6 +4466,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/drivers/mindset.cpp",
+	MAME_DIR .. "src/mame/drivers/gs6502.cpp",
+	MAME_DIR .. "src/mame/drivers/gs6809.cpp",
+	MAME_DIR .. "src/mame/drivers/gscpm.cpp",
+	MAME_DIR .. "src/mame/drivers/gsz80.cpp",
 }
 
 end

@@ -309,6 +309,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
+		m_c140_region(*this, "c140"),
 		m_dpram(*this, "dpram"),
 		m_gpu_intc(*this, "gpu_intc"),
 		m_namcos21_3d(*this, "namcos21_3d"),
@@ -332,6 +333,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 	required_shared_ptr<uint8_t> m_dpram;
 	required_device<namco_c148_device> m_gpu_intc;
 	required_device<namcos21_3d_device> m_namcos21_3d;
@@ -386,6 +388,7 @@ private:
 	void winrun_gpu_map(address_map &map);
 
 	void sound_map(address_map &map);
+	void c140_map(address_map &map);
 };
 
 READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
@@ -586,15 +589,22 @@ void namcos21_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)); /* mirror */
+	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
+	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
 	map(0xc000, 0xc001).w(FUNC(namcos21_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+}
+
+void namcos21_state::c140_map(address_map &map)
+{
+	map.global_mask(0x7fffff);
+	// TODO: LSB not used? verify from schematics/real hardware
+	map(0x000000, 0x7fffff).lr16([this](offs_t offset) { return m_c140_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)]; }, "c140_rom_r");
 }
 
 
@@ -898,7 +908,7 @@ void namcos21_state::winrun(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->set_addrmap(0, &namcos21_state::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
@@ -942,11 +952,11 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
 	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("wr-voi-0.11b", 0x040000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
-	ROM_LOAD("wr-voi-1.11c", 0x0c0000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
-	ROM_LOAD("wr-voi-2.11d", 0x140000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
-	ROM_LOAD("wr-voi-3.11e", 0x1c0000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("wr-voi-0.11b", 0x080000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
+	ROM_LOAD16_BYTE("wr-voi-1.11c", 0x180000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
+	ROM_LOAD16_BYTE("wr-voi-2.11d", 0x280000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
+	ROM_LOAD16_BYTE("wr-voi-3.11e", 0x380000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
 
 	ROM_REGION( 0x1000, "pals", 0 )
 	/* Main PCB (2252960101) */
@@ -1010,9 +1020,9 @@ ROM_START( winrungp )
 	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
 	ROM_LOAD16_BYTE( "sg1-pt1-l.8e", 0x40001, 0x20000, CRC(6385e325) SHA1(d50bceb2e9c0d0a38d7b0f918f99c482649e260d) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("sg-voi-1.11c", 0x080000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
-	ROM_LOAD("sg-voi-3.11e", 0x180000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("sg-voi-1.11c", 0x100000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
+	ROM_LOAD16_BYTE("sg-voi-3.11e", 0x300000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93cca84c) SHA1(e39510d9f066266a77780662a6d991c3dd0348d1) )
@@ -1057,9 +1067,9 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )
 	ROM_LOAD16_BYTE( "r911-pt1l.8e", 0x40001, 0x20000, CRC(38a54ec5) SHA1(5c6017c98cae674868153ff2d64532027cf0ab83) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("r911-avo1.11c", 0x080000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
-	ROM_LOAD("r911-avo3.11e", 0x180000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("r911-avo1.11c", 0x100000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
+	ROM_LOAD16_BYTE("r911-avo3.11e", 0x300000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(75bcbc22) SHA1(1e7e785735d27aa8cd8393b16b589a46ecd7956a) )

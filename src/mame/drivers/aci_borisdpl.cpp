@@ -67,18 +67,14 @@ private:
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
 
 	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address;
-	u8 m_matrix;
-	u8 m_digit_data;
+	u8 m_ram_address = 0;
+	u8 m_matrix = 0;
+	u8 m_digit_data = 0;
 };
 
 void borisdpl_state::machine_start()
 {
-	// zerofill
 	m_ram = make_unique_clear<u8[]>(0x100);
-	m_ram_address = 0;
-	m_matrix = 0;
-	m_digit_data = 0;
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x100);

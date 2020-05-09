@@ -351,6 +351,7 @@ Super Missile Attack Board Layout
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"

@@ -36,6 +36,7 @@
 #include "bus/coco/coco_psg.h"
 #include "bus/coco/coco_rs232.h"
 #include "bus/coco/coco_ssc.h"
+#include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
@@ -169,6 +170,13 @@ INPUT_PORTS_END
 INPUT_PORTS_START( coco_beckerport )
 	PORT_START(BECKERPORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, "Becker Port" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
+INPUT_PORTS_START( coco_beckerport_dw )
+	PORT_START(BECKERPORT_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Becker Port" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
 INPUT_PORTS_END
@@ -408,6 +416,7 @@ void coco_cart(device_slot_interface &device)
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ssc", COCO_SSC);
+	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);

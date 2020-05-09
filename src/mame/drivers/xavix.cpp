@@ -1562,25 +1562,18 @@ void xavix_guru_state::xavix_guru(machine_config &config)
 }
 
 
-void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
-{
-	xavix(config);
-
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02 (taiko)
-}
-
 void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
+	I2C_24C02(config, "i2cmem", 0);
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
+	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
@@ -1597,7 +1590,7 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x400); // 24C08 (Excite Fishing DX)
+	I2C_24C08(config, "i2cmem", 0);
 }
 
 void xavix_state::xavixp(machine_config &config)
@@ -1654,9 +1647,7 @@ void xavix_state::xavix2002(machine_config &config)
 
 void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 {
-	xavix2002(config);
-
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // ?
+	xavix2002_i2c_24c04(config);
 
 	m_xavix2002io->read_0_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io0));
 	m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
@@ -1688,14 +1679,14 @@ void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
+	I2C_24C04(config, "i2cmem", 0);
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 {
 	xavix2000(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
+	I2C_24C02(config, "i2cmem", 0);
 }
 
 void xavix_mtrk_state::xavix_mtrk(machine_config &config)
@@ -1733,7 +1724,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
+	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
@@ -1745,7 +1736,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24LC02
+	I2C_24C02(config, "i2cmem", 0); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
@@ -1856,14 +1847,14 @@ void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 {
 	xavix2002(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
+	I2C_24C04(config, "i2cmem", 0);
 }
 
 void xavix_i2c_state::xavix2002_i2c_mrangbat(machine_config &config)
 {
 	xavix2002(config);
 
-	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02?
+	I2C_24C02(config, "i2cmem", 0); // 24C02?
 
 	m_xavix2002io->read_0_callback().set_ioport("EX0");
 	//m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));

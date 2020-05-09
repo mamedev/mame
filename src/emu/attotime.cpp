@@ -153,3 +153,20 @@ const char *attotime::as_string(int precision) const
 	}
 	return buffer;
 }
+
+//-------------------------------------------------
+//  to_string - return a human-readable string
+//  describing an attotime for use in logs
+//-------------------------------------------------
+
+std::string attotime::to_string() const
+{
+	attotime t = *this;
+	const char *sign = "";
+	if(t.seconds() < 0) {
+		t = attotime::zero-t;
+		sign = "-";
+	}
+	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+}

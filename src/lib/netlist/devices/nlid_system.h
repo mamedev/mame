@@ -11,6 +11,9 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/plib/putil.h"
+#include "netlist/plib/prandom.h"
+
+#include <random>
 
 namespace netlist
 {
@@ -38,40 +41,6 @@ namespace devices
 		param_num_t<unsigned>   m_mos_capmodel;
 		//! How many times do we try to resolve links (connections)
 		param_num_t<unsigned>   m_max_link_loops;
-	};
-
-	// -----------------------------------------------------------------------------
-	// power pins - not a device, but a helper
-	// -----------------------------------------------------------------------------
-
-	/// \brief Power pins class.
-	///
-	/// Power Pins are passive inputs. Delegate noop will silently ignore any
-	/// updates.
-
-	class nld_power_pins
-	{
-	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
-		{
-		}
-
-		const analog_input_t &VCC() const noexcept
-		{
-			return m_VCC;
-		}
-		const analog_input_t &GND() const noexcept
-		{
-			return m_GND;
-		}
-
-	private:
-		void noop() { }
-		analog_input_t m_VCC;
-		analog_input_t m_GND;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -124,11 +93,11 @@ namespace devices
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -137,7 +106,7 @@ namespace devices
 		NETLIB_UPDATEI()
 		{
 			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
-			const netlist_time m_inc = netlist_time::from_fp(m_compiled.evaluate(m_funcparam));
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_funcparam));
 			m_Q.push(!m_feedback(), m_inc);
 		}
 
@@ -146,7 +115,7 @@ namespace devices
 		logic_output_t m_Q;
 
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -392,7 +361,7 @@ namespace devices
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled(*this, "m_compiled")
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
@@ -402,7 +371,7 @@ namespace devices
 				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
-			m_compiled.compile(m_func(), inps);
+			m_compiled->compile(m_func(), inps);
 		}
 
 	protected:
@@ -417,7 +386,7 @@ namespace devices
 			{
 				m_vals[i] = (*m_I[i])();
 			}
-			m_Q.push(m_compiled.evaluate(m_vals));
+			m_Q.push(m_compiled->evaluate(m_vals));
 		}
 
 	private:
@@ -427,7 +396,7 @@ namespace devices
 		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
 		std::vector<nl_fptype> m_vals;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 
 	};
 
@@ -520,7 +489,8 @@ namespace devices
 		NETLIB_UPDATEI()
 		{
 			const netlist_sig_t state = m_I();
-			if (1 || (state != m_last_state))
+			// FIXME: update should only be called if m_I changes
+			if (true || (state != m_last_state))
 			{
 				m_last_state = state;
 				//printf("Here %d\n", state);
@@ -614,6 +584,58 @@ namespace devices
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_noise - noise source
+	//
+	// An externally clocked noise source.
+	// -----------------------------------------------------------------------------
+
+	template <typename E, template<class> class D>
+	NETLIB_OBJECT(sys_noise)
+	{
+	public:
+
+		using engine = E;
+		using distribution = D<nl_fptype>;
+
+		NETLIB_CONSTRUCTOR(sys_noise)
+		, m_T(*this, "m_T")
+		, m_I(*this, "I")
+		, m_RI(*this, "RI", nlconst::magic(0.1))
+		, m_sigma(*this, "SIGMA", nlconst::zero())
+		, m_mt(*this, "m_mt")
+		, m_dis(*this, "m_dis",m_sigma())
+		{
+
+			register_subalias("1", m_T.P());
+			register_subalias("2", m_T.N());
+		}
+
+	protected:
+
+		NETLIB_UPDATEI()
+		{
+			nl_fptype val = m_dis.var()(m_mt.var());
+			m_T.change_state([this, val]()
+			{
+				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());
+			});
+		}
+
+		NETLIB_RESETI()
+		{
+			m_T.set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
+		}
+
+	private:
+		analog::NETLIB_SUB(twoterm) m_T;
+		logic_input_t m_I;
+		param_fp_t m_RI;
+		param_fp_t m_sigma;
+		state_var<engine> m_mt;
+		state_var<distribution> m_dis;
 	};
 
 } // namespace devices

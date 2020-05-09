@@ -17,7 +17,7 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR           12
+#define NL_VERSION_MINOR           13
 /// \brief Version - Patch level.
 ///
 #define NL_VERSION_PATCHLEVEL      0

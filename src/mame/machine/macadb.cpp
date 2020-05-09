@@ -448,6 +448,11 @@ void mac_state::adb_talk()
 								}
 								m_adb_datasize = 2;
 							}
+							else
+							{
+								m_adb_buffer[0] = 0xff;
+								m_adb_buffer[1] = 0xff;
+							}
 							break;
 
 						// read modifier keys

@@ -315,8 +315,8 @@ public:
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "williams2_tile"),
-		m_gain({ 0.8f, 0.73f, 0.81f }),
-		m_offset({ -0.27f, 0.0f, -0.22f })
+		m_gain(  { 0.25f, 0.25f, 0.25f }),
+		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
 
 	void williams2_base(machine_config &config);
@@ -418,7 +418,11 @@ class mysticm_state : public williams_d000_ram_state
 public:
 	mysticm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_d000_ram_state(mconfig, type, tag)
-	{ }
+	{
+		// overwrite defaults for mysticm
+		m_gain =   {   0.8f, 0.73f,  0.81f };
+		m_offset = { -0.27f, 0.00f, -0.22f };
+	}
 
 	void mysticm(machine_config &config);
 

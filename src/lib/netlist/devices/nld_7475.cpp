@@ -8,7 +8,6 @@
 
 #include "nld_7475.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -32,7 +31,11 @@ namespace netlist
 
 		void update_outputs(std::size_t start, std::size_t end);
 
-	public:
+		friend class NETLIB_NAME(7477_dip);
+		friend class NETLIB_NAME(7475_dip);
+		// FIXME: needs cleanup
+		friend class NETLIB_NAME(7475);
+	private:
 		logic_input_t m_C1C2;
 		logic_input_t m_C3C4;
 		state_var<unsigned> m_last_Q;
@@ -50,54 +53,66 @@ namespace netlist
 
 		NETLIB_UPDATEI();
 
-	public:
+		friend class NETLIB_NAME(7477_dip);
+		friend class NETLIB_NAME(7475_dip);
+	private:
 		object_array_t<logic_output_t, 4> m_QQ;
 	};
 
-	NETLIB_OBJECT_DERIVED(7475_dip, 7475)
+	NETLIB_OBJECT(7475_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7475_dip, 7475)
+		NETLIB_CONSTRUCTOR(7475_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_QQ[0]);
-			register_subalias("2", m_D[0]);
-			register_subalias("3", m_D[1]);
-			register_subalias("4", m_C3C4);
-			register_subalias("5", "VCC");
-			register_subalias("6", m_D[2]);
-			register_subalias("7", m_D[3]);
-			register_subalias("8", m_QQ[3]);
+			register_subalias("1", A.m_QQ[0]);
+			register_subalias("2", A.m_D[0]);
+			register_subalias("3", A.m_D[1]);
+			register_subalias("4", A.m_C3C4);
+			register_subalias("5", "A.VCC");
+			register_subalias("6", A.m_D[2]);
+			register_subalias("7", A.m_D[3]);
+			register_subalias("8", A.m_QQ[3]);
 
-			register_subalias("9",  m_Q[3]);
-			register_subalias("10", m_Q[2]);
-			register_subalias("11", m_QQ[2]);
-			register_subalias("12", "GND");
-			register_subalias("13", m_C1C2);
-			register_subalias("14", m_QQ[1]);
-			register_subalias("15", m_Q[1]);
-			register_subalias("16", m_Q[0]);
+			register_subalias("9",  A.m_Q[3]);
+			register_subalias("10", A.m_Q[2]);
+			register_subalias("11", A.m_QQ[2]);
+			register_subalias("12", "A.GND");
+			register_subalias("13", A.m_C1C2);
+			register_subalias("14", A.m_QQ[1]);
+			register_subalias("15", A.m_Q[1]);
+			register_subalias("16", A.m_Q[0]);
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(7475) A;
 	};
 
-	NETLIB_OBJECT_DERIVED(7477_dip, 7477)
+	NETLIB_OBJECT(7477_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7477_dip, 7477)
+		NETLIB_CONSTRUCTOR(7477_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_D[0]);
-			register_subalias("2", m_D[1]);
-			register_subalias("3", m_C3C4);
-			//register_subalias("4", ); ==> VCC
-			register_subalias("5", m_D[2]);
-			register_subalias("6", m_D[3]);
+			register_subalias("1", A.m_D[0]);
+			register_subalias("2", A.m_D[1]);
+			register_subalias("3", A.m_C3C4);
+			register_subalias("4", "A.VCC");
+			register_subalias("5", A.m_D[2]);
+			register_subalias("6", A.m_D[3]);
 			//register_subalias("7", ); ==> NC
 
-			register_subalias("8",  m_Q[3]);
-			register_subalias("9",  m_Q[2]);
+			register_subalias("8",  A.m_Q[3]);
+			register_subalias("9",  A.m_Q[2]);
 			//register_subalias("10", ); ==> NC
-			//register_subalias("11", ); ==> GND
-			register_subalias("12", m_C1C2);
-			register_subalias("13", m_Q[1]);
-			register_subalias("14", m_Q[0]);
+			register_subalias("11", "A.GND");
+			register_subalias("12", A.m_C1C2);
+			register_subalias("13", A.m_Q[1]);
+			register_subalias("14", A.m_Q[0]);
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(7477) A;
 	};
 
 	NETLIB_UPDATE(7475)

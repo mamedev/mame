@@ -71,6 +71,15 @@ namespace devices
 	NETLIB_DEVICE_IMPL(sys_dsw1,            "SYS_DSW",                "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(sys_dsw2,            "SYS_DSW2",               "")
 	NETLIB_DEVICE_IMPL(sys_compd,           "SYS_COMPD",              "")
+
+	using NETLIB_NAME(sys_noise_mt_u) =
+		NETLIB_NAME(sys_noise)<plib::mt19937_64, plib::uniform_distribution_t>;
+	NETLIB_DEVICE_IMPL(sys_noise_mt_u,      "SYS_NOISE_MT_U",         "SIGMA")
+
+	using NETLIB_NAME(sys_noise_mt_n) =
+		NETLIB_NAME(sys_noise)<plib::mt19937_64, plib::normal_distribution_t>;
+	NETLIB_DEVICE_IMPL(sys_noise_mt_n,      "SYS_NOISE_MT_N",         "SIGMA")
+
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
 	NETLIB_DEVICE_IMPL(gnd,                 "GNDA",                   "")
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")

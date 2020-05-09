@@ -1786,8 +1786,7 @@ void bbcm_state::bbcmc(machine_config &config)
 	FLOPPY_CONNECTOR(config, "wd1772:0", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "wd1772:1", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
 
-	/* eeprom pcd8572 */
-	I2CMEM(config, "i2cmem", 0).set_data_size(0x80);
+	I2C_PCD8572(config, "i2cmem", 0);
 	config.device_remove("rtc");
 
 	/* user via */

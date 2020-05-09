@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "generalplus_gpl16250.h"
 
 // device type definition

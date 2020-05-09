@@ -10282,6 +10282,7 @@ wotwc                           // (c) 1981
 
 @source:circus.cpp
 circus                          // no copyright notice [1977?]
+circusb                         // bootleg
 crash                           // Exidy [1979?]
 crasha                          // no copyright notice [1979?]
 ripcord                         // Exidy [1977?]
@@ -13082,6 +13083,9 @@ splndrbtb                       // (c) 1985 Alpha Denshi Co.
 @source:eispc.cpp
 epc                             // 1984 Ericsson PC
 
+@source:ergo201.cpp
+ergo201                         //
+
 @source:ertictac.cpp
 ertictac                        // (c) 1992 Sisteme
 ertictaca                       // (c) 1992 Sisteme
@@ -15817,6 +15821,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
@@ -15824,7 +15829,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-sfxchas                         // Tandy Corporation
 tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
@@ -16771,7 +16775,9 @@ sftm111                         // (c) 1995 Capcom/Incredible Technologies
 sftmj114                        // (c) 1995 Capcom/Incredible Technologies
 sftmj112                        // (c) 1995 Capcom/Incredible Technologies
 shufshot                        // (c) Strata/Incredible Technologies
+shufshot135                     // (c) Strata/Incredible Technologies
 shufshot137                     // (c) Strata/Incredible Technologies
+shufshot138                     // (c) Strata/Incredible Technologies
 shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill100                     // (c) 1992 Strata/Incredible Technologies
@@ -31211,6 +31217,7 @@ rf2                             // GX561 (c) 1985
 salamand                        // GX587 (c) 1986
 salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
+twinbeeb                        // Bubble System
 
 @source:neogeo.cpp
 neogeo                          // NeoGeo MV-6F
@@ -40428,6 +40435,7 @@ video21                         // Videogames GmbH 1980
 @source:videopin.cpp
 solarwar                        // 036154-036169    1979    [6502]
 videopin                        // 034253-034267    1979/02 [6502]
+videopina                       //
 
 @source:videopkr.cpp
 babydad                         // (c) 1987 Recreativos Franco
@@ -42135,3 +42143,15 @@ vgmplay
 @source:ldplayer.cpp
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
+
+@source:gsz80.cpp
+gsz80
+
+@source:gscpm.cpp
+gscpm
+
+@source:gs6502.cpp
+gs6502
+
+@source:gs6809.cpp
+gs6809

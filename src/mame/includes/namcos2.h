@@ -55,6 +55,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
+		m_c140_region(*this, "c140"),
 		m_dpram(*this, "dpram"),
 		m_spriteram(*this, "spriteram"),
 		m_c45_road(*this, "c45_road"),
@@ -182,6 +183,7 @@ enum
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
@@ -193,6 +195,7 @@ enum
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 
+	DECLARE_READ16_MEMBER(c140_rom_r);
 	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
@@ -248,6 +251,7 @@ enum
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
 	void RozCB_metlhawk(uint16_t code, int *tile, int *mask, int which);
 
+	void c140_default_am(address_map &map);
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
 	void common_suzuka8h_am(address_map &map);

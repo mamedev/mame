@@ -129,7 +129,7 @@ void diablo_state::machine_start()
 void diablo_state::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
@@ -353,7 +353,7 @@ void diablo_state::scorpio68k(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( diablo68 ) // UCB ID = D 1.08
+ROM_START( diablo68 ) // ID = D 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
 	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
@@ -361,7 +361,7 @@ ROM_START( diablo68 ) // UCB ID = D 1.08
 ROM_END
 
 
-ROM_START( scorpio68 ) // UCB ID = S 1.08
+ROM_START( scorpio68 ) // ID = S 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("s_evn_904.u3", 0x00000, 0x8000, CRC(a8f63245) SHA1(0ffdc6eb8ecad730440b0bfb2620fb00820e1aea) )
 	ROM_LOAD16_BYTE("s_odd_c18.u2", 0x00001, 0x8000, CRC(4f033319) SHA1(fce228b1705b7156d4d01ef92b22a875d0f6f321) )

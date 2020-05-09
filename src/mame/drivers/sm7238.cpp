@@ -98,7 +98,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_videobank;
 	required_shared_ptr<u8> m_p_videoram;
@@ -357,7 +357,7 @@ void sm7238_state::sm7238(machine_config &config)
 	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
 	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 

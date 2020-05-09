@@ -9,7 +9,6 @@
 
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
-#include "nlid_system.h"
 
 // This is an experimental approach to implement the analog switch.
 // This will make the switch a 3 terminal element which is completely

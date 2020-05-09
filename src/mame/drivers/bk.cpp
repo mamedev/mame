@@ -166,10 +166,10 @@ INPUT_PORTS_END
 void bk_state::bk0010(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, 3000000);
+	T11(config, m_maincpu, 3000000); // FIXME: actually K1801VM1
 	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0010_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(bk_state::bk0010_irq_callback));
+	m_maincpu->in_iack().set(FUNC(bk_state::bk0010_irq_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -201,7 +201,7 @@ public:
 	void go(offs_t targetpc = ~0);
 	void go_vblank();
 	void go_interrupt(int irqline = -1);
-	void go_exception(int exception);
+	void go_exception(int exception, const char *condition);
 	void go_milliseconds(u64 milliseconds);
 	void go_privilege(const char *condition);
 	void go_next_device();
@@ -320,6 +320,7 @@ private:
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
 	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
+	std::unique_ptr<parsed_expression> m_exception_condition;      // expression to evaluate on exception hit
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles

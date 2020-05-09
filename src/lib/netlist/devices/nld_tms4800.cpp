@@ -29,7 +29,8 @@ namespace netlist
 
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(TMS4800_dip);
+	private:
 		object_array_t<logic_input_t, 11> m_A;
 		logic_input_t m_AR;
 		logic_input_t m_OE1;
@@ -42,35 +43,42 @@ namespace netlist
 		NETLIB_NAME(power_pins) m_supply;
 	};
 
-	NETLIB_OBJECT_DERIVED(TMS4800_dip, TMS4800)
+	NETLIB_OBJECT(TMS4800_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(TMS4800_dip, TMS4800)
+		NETLIB_CONSTRUCTOR(TMS4800_dip)
+		, A(*this, "A")
 		{
-			register_subalias("2",     m_A[0]);
-			register_subalias("3",     m_A[1]);
-			register_subalias("4",     m_A[2]);
-			register_subalias("5",     m_A[3]);
-			register_subalias("6",     m_A[4]);
-			register_subalias("7",     m_A[5]);
-			register_subalias("12",    m_A[6]);
-			register_subalias("11",    m_A[7]);
-			register_subalias("10",    m_A[8]);
-			register_subalias("8",     m_A[9]);
-			register_subalias("15",    m_A[10]);
+			// FIXME: this device is missing supply pins
+			register_subalias("2",     A.m_A[0]);
+			register_subalias("3",     A.m_A[1]);
+			register_subalias("4",     A.m_A[2]);
+			register_subalias("5",     A.m_A[3]);
+			register_subalias("6",     A.m_A[4]);
+			register_subalias("7",     A.m_A[5]);
+			register_subalias("12",    A.m_A[6]);
+			register_subalias("11",    A.m_A[7]);
+			register_subalias("10",    A.m_A[8]);
+			register_subalias("8",     A.m_A[9]);
+			register_subalias("15",    A.m_A[10]);
 
-			register_subalias("13",    m_AR);
-			register_subalias("24",    m_OE1);
-			register_subalias("14",    m_OE2);
+			register_subalias("13",    A.m_AR);
+			register_subalias("24",    A.m_OE1);
+			register_subalias("14",    A.m_OE2);
 
-			register_subalias("23",     m_D[0]);
-			register_subalias("22",     m_D[1]);
-			register_subalias("21",     m_D[2]);
-			register_subalias("20",     m_D[3]);
-			register_subalias("19",     m_D[4]);
-			register_subalias("18",     m_D[5]);
-			register_subalias("17",     m_D[6]);
-			register_subalias("16",     m_D[7]);
+			register_subalias("23",     A.m_D[0]);
+			register_subalias("22",     A.m_D[1]);
+			register_subalias("21",     A.m_D[2]);
+			register_subalias("20",     A.m_D[3]);
+			register_subalias("19",     A.m_D[4]);
+			register_subalias("18",     A.m_D[5]);
+			register_subalias("17",     A.m_D[6]);
+			register_subalias("16",     A.m_D[7]);
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(TMS4800) A;
+
 	};
 
 	// FIXME: timing!

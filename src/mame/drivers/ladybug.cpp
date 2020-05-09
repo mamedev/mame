@@ -1016,7 +1016,7 @@ GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, empty_init,   
 GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
+GAME( 1981, snapjack,  0,       ladybug, snapjack, ladybug_state, empty_init,   ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dorodon,   0,       dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
 GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, empty_init,   ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sraider,   0,       sraider, sraider,  sraider_state, empty_init,   ROT270, "Universal",              "Space Raider",                            MACHINE_SUPPORTS_SAVE )

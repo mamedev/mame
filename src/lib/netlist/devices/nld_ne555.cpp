@@ -116,19 +116,24 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
+	NETLIB_OBJECT(NE555_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(NE555_dip, NE555)
+		NETLIB_CONSTRUCTOR(NE555_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", "GND");      // Pin 1
-			register_subalias("2", "TRIG");     // Pin 2
-			register_subalias("3", "OUT");      // Pin 3
-			register_subalias("4", "RESET");    // Pin 4
-			register_subalias("5", "CONT");     // Pin 5
-			register_subalias("6", "THRESH");   // Pin 6
-			register_subalias("7", "DISCH");    // Pin 7
-			register_subalias("8", "VCC");      // Pin 8
+			register_subalias("1", "A.GND");      // Pin 1
+			register_subalias("2", "A.TRIG");     // Pin 2
+			register_subalias("3", "A.OUT");      // Pin 3
+			register_subalias("4", "A.RESET");    // Pin 4
+			register_subalias("5", "A.CONT");     // Pin 5
+			register_subalias("6", "A.THRESH");   // Pin 6
+			register_subalias("7", "A.DISCH");    // Pin 7
+			register_subalias("8", "A.VCC");      // Pin 8
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(NE555) A;
 	};
 
 	NETLIB_RESET(NE555)

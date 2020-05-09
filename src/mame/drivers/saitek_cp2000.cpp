@@ -76,18 +76,13 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 
-	u16 m_inp_mux;
-	u8 m_select;
-	u8 m_7seg_data;
+	u16 m_inp_mux = 0;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
 };
 
 void cp2000_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_select = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_inp_mux));

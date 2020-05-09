@@ -13,8 +13,10 @@
 enum
 {
 	NEC_PC=0,
-	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
-	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
+	NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
+	NEC_DS1, NEC_PS, NEC_SS, NEC_DS0,
+	NEC_AL, NEC_AH, NEC_CL, NEC_CH, NEC_DL, NEC_DH, NEC_BL, NEC_BH,
+	NEC_PSW,
 	NEC_XA,
 	NEC_PENDING
 };
@@ -77,6 +79,7 @@ private:
 	uint16_t  m_sregs[4];
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;

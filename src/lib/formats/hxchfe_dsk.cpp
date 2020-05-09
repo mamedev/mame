@@ -615,7 +615,6 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 		// Start of track? Use next entry.
 		if (edge==0)
 		{
-			cur_pos = 0;
 			edge = tbuf[++cur_entry] & floppy_image::TIME_MASK;
 		}
 
@@ -671,10 +670,6 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 		}
 
 		cur_pos = next;
-		if(cur_pos >= 200000000) {
-			cur_pos -= 200000000;
-			cur_entry = 0;
-		}
 
 		bit = (bit << 1) & 0xff;
 		if (bit == 0)

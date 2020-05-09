@@ -264,6 +264,7 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
+#include "machine/rescap.h"
 #include "speaker.h"
 
 #include "mpu4.lh"

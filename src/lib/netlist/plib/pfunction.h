@@ -9,7 +9,6 @@
 ///
 
 #include "pmath.h"
-#include "pstate.h"
 #include "pstring.h"
 #include "putil.h"
 
@@ -57,20 +56,7 @@ namespace plib {
 		using inputs_container = std::vector<pstring>;
 		using values_container = std::vector<value_type>;
 
-		/// \brief Constructor with state saving support
-		///
-		/// \param name Name of this object
-		/// \param owner Owner of this object
-		/// \param state_manager State manager to handle saving object state
-		///
-		///
-		pfunction(const pstring &name, const void *owner, state_manager_t &state_manager)
-		: m_lfsr(0xace1U) // NOLINT
-		{
-			state_manager.save_item(owner, m_lfsr, name + ".lfsr");
-		}
-
-		/// \brief Constructor without state saving support
+		/// \brief Constructor
 		///
 		pfunction()
 		: m_lfsr(0xace1U) // NOLINT
@@ -105,6 +91,12 @@ namespace plib {
 		/// \return value of expression
 		///
 		value_type evaluate(const values_container &values = values_container()) noexcept;
+
+		template <typename ST>
+		void save_state(ST &st)
+		{
+			st.save_item(m_lfsr, "m_lfsr");
+		}
 
 	private:
 

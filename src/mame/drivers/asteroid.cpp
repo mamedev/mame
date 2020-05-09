@@ -250,6 +250,7 @@ NOTE: Previous program versions, for the second line would only show 4 digits.  
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/output_latch.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "video/avgdvg.h"

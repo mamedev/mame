@@ -16,8 +16,10 @@
 enum
 {
 	V25_PC=0,
-	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
-	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
+	V25_DS1, V25_PS, V25_SS, V25_DS0,
+	V25_AL, V25_AH, V25_CL, V25_CH, V25_DL, V25_DH, V25_BL, V25_BH,
+	V25_PSW,
 	V25_IDB,
 	V25_PENDING
 };
@@ -80,6 +82,7 @@ private:
 	required_shared_ptr<uint16_t> m_internal_ram;
 
 	uint16_t  m_ip;
+	uint16_t  m_prev_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;

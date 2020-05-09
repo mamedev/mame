@@ -279,6 +279,7 @@ namespace devices
 			return false;
 		}
 
+		// NOLINTNEXTLINE(misc-no-recursion)
 		void process_net(netlist_state_t &netlist, analog_net_t &n)
 		{
 			// ignore empty nets. FIXME: print a warning message

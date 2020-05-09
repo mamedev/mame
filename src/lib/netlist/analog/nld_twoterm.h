@@ -34,6 +34,10 @@
 #define DIODE(name,  model)                                                    \
 		NET_REGISTER_DEVEXT(DIODE, name, model)
 
+// Generic Zener Diode
+#define ZDIODE(name,  model)                                                   \
+		NET_REGISTER_DEVEXT(ZDIODE, name, model)
+
 #define VS(name, pV)                                                           \
 		NET_REGISTER_DEVEXT(VS, name, pV)
 
