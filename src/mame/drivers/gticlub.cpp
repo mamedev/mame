@@ -255,6 +255,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
+		m_gn680(*this, "gn680"),
 		m_adc1038(*this, "adc1038"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
@@ -297,6 +298,7 @@ private:
 	required_device<adsp21062_device> m_dsp;
 	optional_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
+	optional_device<cpu_device> m_gn680;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
@@ -327,6 +329,7 @@ private:
 	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_WRITE16_MEMBER(gn680_sysctrl);
 	DECLARE_READ32_MEMBER(dsp_dataram0_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
@@ -351,6 +354,7 @@ private:
 
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
+	void gn680_memmap(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
@@ -575,6 +579,26 @@ void gticlub_state::sound_memmap(address_map &map)
 	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
 	map(0x500000, 0x500001).w(FUNC(gticlub_state::soundtimer_en_w)).nopr();
 	map(0x600000, 0x600001).w(FUNC(gticlub_state::soundtimer_count_w)).nopr();
+}
+
+/*****************************************************************************/
+
+WRITE16_MEMBER(gticlub_state::gn680_sysctrl)
+{
+	// bit 15 = watchdog toggle
+	// lower 4 bits = LEDs?
+}
+
+// WORD at 30000e: IRQ 5 tests bits 6 and 7, IRQ 6 tests bits 4 and 5
+// IRQ 3 tests for network/056230 at 310000 to communicate with the main pcb
+
+void gticlub_state::gn680_memmap(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x203fff).ram();
+	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl));
+//	map(0x310000, 0x311fff).nopw(); //056230 regs?
+//	map(0x312000, 0x313fff).nopw(); //056230 ram?
 }
 
 /*****************************************************************************/
@@ -1006,13 +1030,16 @@ void gticlub_state::gticlub(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
-void gticlub_state::thunderh(machine_config &config) //todo: add 68000 and K056230 from the I/O board
+void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I/O board
 {
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
 
 	m_k056230->set_thunderh_hack(true);
+	
+	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
+	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
 
 void gticlub_state::slrasslt(machine_config &config)
@@ -1259,7 +1286,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1289,7 +1316,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
