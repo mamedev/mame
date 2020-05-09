@@ -86,6 +86,8 @@ private:
 
 void monty_state::machine_start()
 {
+	memset(m_lcd_data, 0, sizeof(m_lcd_data));
+
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_cs));
 	save_item(NAME(m_halt));

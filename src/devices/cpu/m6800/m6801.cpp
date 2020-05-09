@@ -1390,11 +1390,7 @@ uint8_t m6801_cpu_device::ch_r()
 
 uint8_t m6801_cpu_device::cl_r()
 {
-	uint8_t data = m_counter.b.l;
-
-	// HACK there should be a break here, but Coleco Adam won't boot with it present, proper fix required to the free-running counter
-	(void)data;
-	return ocrh_r();
+	return m_counter.b.l;
 }
 
 void m6801_cpu_device::ch_w(uint8_t data)
