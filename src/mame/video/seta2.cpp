@@ -444,7 +444,7 @@ int seta2_state::calculate_global_yoffset(int special)
 }
 
 
-void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline)
+void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline)
 {
 	if (!m_vregs.found())
 		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
@@ -484,6 +484,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		{
 			use_shadow = 0;
 		//  which_gfx = 4 << 8;
+			scanline = realscanline; // no zooming?
 		}
 
 		// Number of single-sprites
@@ -565,7 +566,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, scanline, tileline, opaque);
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -624,7 +625,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					for (int x = 0; x <= sizex; x++)
 					{
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, scanline, line, opaque);
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
@@ -658,7 +659,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		tempcliprect.sety(y,y);
 
-		draw_sprites(bitmap, tempcliprect, y);
+		draw_sprites(bitmap, tempcliprect, y/2, y);
 	}
 }
 
