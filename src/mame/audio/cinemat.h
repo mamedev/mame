@@ -11,7 +11,7 @@
 #include "sound/samples.h"
 
 #define STARCAS_USE_NETLIST			(1)
-#define WOTW_USE_NETLIST			(0)
+#define WOTW_USE_NETLIST			(1)
 
 #define ENABLE_NETLIST_LOGGING		(1)
 
@@ -19,7 +19,7 @@
 class cinemat_audio_device : public device_t
 {
 public:
-	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask);
 
 	void configure_latch_inputs(ls259_device &latch, u8 mask);
 
@@ -48,12 +48,28 @@ protected:
 	virtual void shiftreg16_changed(u16 newvals, u16 oldvals);
 
 	optional_device<samples_device> m_samples;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_out_input;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_shiftreg_input;
+	optional_device_array<netlist_mame_logic_input_device, 16> m_shiftreg16_input;
 
 private:
-	void log_changes(u8 newvals, u8 oldvals, const char *names[8]);
-	void log_changes16(u16 newvals, u16 oldvals, const char *names[16]);
+	template<typename _Type>
+	void log_changes(_Type newvals, _Type oldvals, const char *name_prefix, _Type mask = _Type(~0))
+	{
+	#if ENABLE_NETLIST_LOGGING
+		if (m_logfile != nullptr)
+		{
+			attotime time = machine().scheduler().time();
+			for (int bit = 0; bit < 8 * sizeof(_Type); bit++)
+				if (((mask >> bit) & 1) != 0)
+					if ((((newvals ^ oldvals) >> bit) & 1) != 0)
+						fprintf(m_logfile, "%s,%s_%u.IN,%d\n", time.as_string(), name_prefix, bit, (newvals >> bit) & 1);
+		}
+	#endif
+	}
 
 	u8 m_inputs = 0xff;
+	u8 m_inputs_mask = 0xff;
 	u8 m_shiftreg = 0xff;
 	u8 m_shiftreg_accum = 0xff;
 	u16 m_shiftreg16 = 0xffff;
@@ -61,10 +77,6 @@ private:
 
 #if ENABLE_NETLIST_LOGGING
 	FILE *m_logfile = nullptr;
-protected:
-	const char *m_input_names[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-	const char *m_shiftreg_names[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-	const char *m_shiftreg16_names[16] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 #endif
 
 };
@@ -196,19 +208,7 @@ protected:
 
 private:
 
-#if STARCAS_USE_NETLIST
-	required_device<netlist_mame_logic_input_device> m_laser_en;
-	required_device<netlist_mame_logic_input_device> m_soft_exp;
-	required_device<netlist_mame_logic_input_device> m_loud_exp;
-	required_device<netlist_mame_logic_input_device> m_fireball_en;
-	required_device<netlist_mame_logic_input_device> m_shield_en;
-	required_device<netlist_mame_logic_input_device> m_star_en;
-	required_device<netlist_mame_logic_input_device> m_thrust_en;
-	required_device<netlist_mame_logic_input_device> m_bl2;
-	required_device<netlist_mame_logic_input_device> m_bl1;
-	required_device<netlist_mame_logic_input_device> m_bl0;
-	required_device<netlist_mame_logic_input_device> m_background_en;
-#else
+#if !STARCAS_USE_NETLIST
 	u64 m_last_frame = 0;
 	u32 m_current_pitch = 0x10000;
 #endif
@@ -264,19 +264,7 @@ protected:
 
 private:
 
-#if WOTW_USE_NETLIST
-	required_device<netlist_mame_logic_input_device> m_laser_en;
-	required_device<netlist_mame_logic_input_device> m_soft_exp;
-	required_device<netlist_mame_logic_input_device> m_loud_exp;
-	required_device<netlist_mame_logic_input_device> m_fireball_en;
-	required_device<netlist_mame_logic_input_device> m_shield_en;
-	required_device<netlist_mame_logic_input_device> m_star_en;
-	required_device<netlist_mame_logic_input_device> m_thrust_en;
-	required_device<netlist_mame_logic_input_device> m_bl2;
-	required_device<netlist_mame_logic_input_device> m_bl1;
-	required_device<netlist_mame_logic_input_device> m_bl0;
-	required_device<netlist_mame_logic_input_device> m_background_en;
-#else
+#if !WOTW_USE_NETLIST
 	u64 m_last_frame = 0;
 	u32 m_current_pitch = 0x10000;
 #endif

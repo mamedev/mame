@@ -34,9 +34,13 @@
  *
  *************************************/
 
-cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 inputs_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_samples(*this, "samples")
+	, m_out_input(*this, "sound_nl:out_%u", 0)
+	, m_shiftreg_input(*this, "sound_nl:shiftreg_%u", 0)
+	, m_shiftreg16_input(*this, "sound_nl:shiftreg16_%u", 0)
+	, m_inputs_mask(inputs_mask)
 {
 }
 
@@ -78,7 +82,10 @@ void cinemat_audio_device::input_set(int bit, int state)
 	m_inputs = (m_inputs & ~(1 << bit)) | ((state & 1) << bit);
 	if (oldvals != m_inputs)
 	{
-		log_changes(m_inputs, oldvals, m_input_names);
+		log_changes(m_inputs, oldvals, "I_OUT", m_inputs_mask);
+		for (int index = 0; index < 8; index++)
+			if (m_out_input[index] != nullptr)
+				m_out_input[index]->write_line(BIT(m_inputs, index));
 		inputs_changed(m_inputs, oldvals);
 	}
 }
@@ -89,18 +96,24 @@ void cinemat_audio_device::shiftreg_latch()
 	m_shiftreg = m_shiftreg_accum;
 	if (oldvals != m_shiftreg)
 	{
-		log_changes(m_shiftreg, oldvals, m_shiftreg_names);
+		log_changes(m_shiftreg, oldvals, "I_SHIFTREG");
+		for (int index = 0; index < 8; index++)
+			if (m_shiftreg_input[index] != nullptr)
+				m_shiftreg_input[index]->write_line(BIT(m_shiftreg, index));
 		shiftreg_changed(m_shiftreg, oldvals);
 	}
 }
 
 void cinemat_audio_device::shiftreg16_latch()
 {
-	u8 oldvals = m_shiftreg16;
+	u16 oldvals = m_shiftreg16;
 	m_shiftreg16 = m_shiftreg16_accum;
 	if (oldvals != m_shiftreg16)
 	{
-		log_changes16(m_shiftreg16, oldvals, m_shiftreg16_names);
+		log_changes(m_shiftreg16, oldvals, "I_SHIFTREG16");
+		for (int index = 0; index < 16; index++)
+			if (m_shiftreg16_input[index] != nullptr)
+				m_shiftreg16_input[index]->write_line(BIT(m_shiftreg16, index));
 		shiftreg16_changed(m_shiftreg16, oldvals);
 	}
 }
@@ -112,7 +125,7 @@ void cinemat_audio_device::shiftreg_set(int bit, int val)
 	m_shiftreg = (m_shiftreg & ~mask) | ((val & 1) << bit);
 	if (oldvals != m_shiftreg)
 	{
-		log_changes(m_shiftreg, oldvals, m_shiftreg_names);
+		log_changes(m_shiftreg, oldvals, "I_SHIFTREG");
 		shiftreg_changed(m_shiftreg, oldvals);
 	}
 }
@@ -132,32 +145,6 @@ void cinemat_audio_device::shiftreg16_changed(u16 newvals, u16 oldvals)
 	// overridden by base class if needed
 }
 
-void cinemat_audio_device::log_changes(u8 newvals, u8 oldvals, const char *names[8])
-{
-#if ENABLE_NETLIST_LOGGING
-	if (m_logfile != nullptr)
-	{
-		attotime time = machine().scheduler().time();
-		for (int bit = 0; bit < 8; bit++)
-			if (names[bit] != nullptr && (((newvals ^ oldvals) >> bit) & 1) != 0)
-				fprintf(m_logfile, "%s,%s.IN,%d\n", time.as_string(), names[bit], (newvals >> bit) & 1);
-	}
-#endif
-}
-
-void cinemat_audio_device::log_changes16(u16 newvals, u16 oldvals, const char *names[16])
-{
-#if ENABLE_NETLIST_LOGGING
-	if (m_logfile != nullptr)
-	{
-		attotime time = machine().scheduler().time();
-		for (int bit = 0; bit < 16; bit++)
-			if (names[bit] != nullptr && (((newvals ^ oldvals) >> bit) & 1) != 0)
-				fprintf(m_logfile, "%s,%s.IN,%d\n", time.as_string(), names[bit], (newvals >> bit) & 1);
-	}
-#endif
-}
-
 
 
 /*************************************
@@ -169,7 +156,7 @@ void cinemat_audio_device::log_changes16(u16 newvals, u16 oldvals, const char *n
 DEFINE_DEVICE_TYPE(SPACE_WARS_AUDIO, spacewar_audio_device, "spacewar_audio", "Space Wars Sound Board")
 
 spacewar_audio_device::spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SPACE_WARS_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, SPACE_WARS_AUDIO, tag, owner, clock, 0x1f)
 {
 }
 
@@ -245,7 +232,7 @@ void spacewar_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(BARRIER_AUDIO, barrier_audio_device, "barrier_audio", "Barrier Sound Board")
 
 barrier_audio_device::barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, BARRIER_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, BARRIER_AUDIO, tag, owner, clock, 0x07)
 {
 }
 
@@ -294,7 +281,7 @@ void barrier_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(SPEED_FREAK_AUDIO, speedfrk_audio_device, "speedfrk_audio", "Speed Freak Sound Board")
 
 speedfrk_audio_device::speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x10)
 {
 }
 
@@ -344,7 +331,7 @@ void speedfrk_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
 DEFINE_DEVICE_TYPE(STAR_HAWK_AUDIO, starhawk_audio_device, "starhawk_audio", "Star Hawk Sound Board")
 
 starhawk_audio_device::starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, STAR_HAWK_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, STAR_HAWK_AUDIO, tag, owner, clock, 0x9f)
 {
 }
 
@@ -414,7 +401,7 @@ void starhawk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(SUNDANCE_AUDIO, sundance_audio_device, "sundance_audio", "Sundance Sound Board")
 
 sundance_audio_device::sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SUNDANCE_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, SUNDANCE_AUDIO, tag, owner, clock, 0x9f)
 {
 }
 
@@ -478,7 +465,7 @@ void sundance_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(TAIL_GUNNER_AUDIO, tailg_audio_device, "tailg_audio", "Tail Gunner Sound Board")
 
 tailg_audio_device::tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock, 0x00)
 {
 }
 
@@ -558,7 +545,7 @@ void tailg_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(WARRIOR_AUDIO, warrior_audio_device, "warrior_audio", "Warrior Sound Board")
 
 warrior_audio_device::warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, WARRIOR_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, WARRIOR_AUDIO, tag, owner, clock, 0x1f)
 {
 }
 
@@ -620,7 +607,7 @@ void warrior_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(ARMOR_ATTACK_AUDIO, armora_audio_device, "armora_audio", "Armor Atrack Sound Board")
 
 armora_audio_device::armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock, 0x0e)
 {
 }
 
@@ -709,7 +696,7 @@ void armora_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(RIP_OFF_AUDIO, ripoff_audio_device, "ripoff_audio", "Rip Off Sound Board")
 
 ripoff_audio_device::ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock, 0x98)
 {
 }
 
@@ -795,34 +782,8 @@ void ripoff_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(STAR_CASTLE_AUDIO, starcas_audio_device, "starcas_audio", "Star Castle Sound Board")
 
 starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock)
-#if STARCAS_USE_NETLIST
-	, m_laser_en(*this, "sound_nl:laser_en")
-	, m_soft_exp(*this, "sound_nl:soft_exp")
-	, m_loud_exp(*this, "sound_nl:loud_exp")
-	, m_fireball_en(*this, "sound_nl:fireball_en")
-	, m_shield_en(*this, "sound_nl:shield_en")
-	, m_star_en(*this, "sound_nl:star_en")
-	, m_thrust_en(*this, "sound_nl:thrust_en")
-	, m_bl2(*this, "sound_nl:bl2")
-	, m_bl1(*this, "sound_nl:bl1")
-	, m_bl0(*this, "sound_nl:bl0")
-	, m_background_en(*this, "sound_nl:background_en")
-#endif
+	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock, 0x0e)
 {
-#if ENABLE_NETLIST_LOGGING
-	m_input_names[1] = "I_LOUD_EXP";
-	m_input_names[2] = "I_SOFT_EXP";
-	m_input_names[3] = "I_LASER_EN";
-	m_shiftreg_names[0] = "I_BL0";
-	m_shiftreg_names[1] = "I_BL1";
-	m_shiftreg_names[2] = "I_BL2";
-	m_shiftreg_names[3] = "I_BACKGROUND_EN";
-	m_shiftreg_names[4] = "I_THRUST_EN";
-	m_shiftreg_names[5] = "I_STAR_EN";
-	m_shiftreg_names[6] = "I_SHIELD_EN";
-	m_shiftreg_names[7] = "I_FIREBALL_EN";
-#endif
 }
 
 void starcas_audio_device::device_start()
@@ -847,17 +808,17 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(starcas))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:laser_en",      "I_LASER_EN.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:soft_exp",      "I_SOFT_EXP.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:loud_exp",      "I_LOUD_EXP.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:fireball_en",   "I_FIREBALL_EN.IN",   0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shield_en",     "I_SHIELD_EN.IN",     0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:star_en",       "I_STAR_EN.IN",       0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:thrust_en",     "I_THRUST_EN.IN",     0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl2",           "I_BL2.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl1",           "I_BL1.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl0",           "I_BL0.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:background_en", "I_BACKGROUND_EN.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_0", "I_SHIFTREG_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_1", "I_SHIFTREG_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_2", "I_SHIFTREG_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_3", "I_SHIFTREG_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_4", "I_SHIFTREG_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_5", "I_SHIFTREG_5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_6", "I_SHIFTREG_6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_7", "I_SHIFTREG_7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C47.1").set_mult_offset(30000.0, 0.0);
 
@@ -895,13 +856,7 @@ void starcas_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 	if (rising_edge(curvals, oldvals, 4))
 		shiftreg_clock(curvals >> 7);
 
-#if STARCAS_USE_NETLIST
-
-	m_loud_exp->write_line(BIT(curvals, 1));
-	m_soft_exp->write_line(BIT(curvals, 2));
-	m_laser_en->write_line(BIT(curvals, 3));
-
-#else
+#if !STARCAS_USE_NETLIST
 
 	// loud explosion - falling edge
 	if (falling_edge(curvals, oldvals, 1))
@@ -920,18 +875,7 @@ void starcas_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 
 void starcas_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 {
-#if STARCAS_USE_NETLIST
-
-	m_fireball_en->write_line(BIT(curvals, 7));
-	m_shield_en->write_line(BIT(curvals, 6));
-	m_star_en->write_line(BIT(curvals, 5));
-	m_thrust_en->write_line(BIT(curvals, 4));
-	m_background_en->write_line(BIT(curvals, 3));
-	m_bl2->write_line(BIT(curvals, 2));
-	m_bl1->write_line(BIT(curvals, 1));
-	m_bl0->write_line(BIT(curvals, 0));
-
-#else
+#if !STARCAS_USE_NETLIST
 
 	// fireball - falling edge
 	if (falling_edge(curvals, oldvals, 7))
@@ -989,7 +933,7 @@ void starcas_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 DEFINE_DEVICE_TYPE(SOLAR_QUEST_AUDIO, solarq_audio_device, "solarq_audio", "Solar Quest Sound Board")
 
 solarq_audio_device::solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock, 0x00)
 {
 }
 
@@ -1126,7 +1070,7 @@ void solarq_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
 DEFINE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device, "boxingb_audio", "Boxing Bugs Sound Board")
 
 boxingb_audio_device::boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock)
+	: cinemat_audio_device(mconfig, RIP_OFF_AUDIO, tag, owner, clock, 0x0c)
 {
 }
 
@@ -1250,41 +1194,11 @@ void boxingb_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
  *
  *************************************/
 
-#if WOTW_USE_NETLIST
-//#include "nl_starcas.cpp"
-#endif
-
 DEFINE_DEVICE_TYPE(WAR_OF_THE_WORLDS_AUDIO, wotw_audio_device, "wotw_audio", "War of the Worlds Sound Board")
 
 wotw_audio_device::wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock)
-#if WOTW_USE_NETLIST
-	, m_laser_en(*this, "sound_nl:laser_en")
-	, m_soft_exp(*this, "sound_nl:soft_exp")
-	, m_loud_exp(*this, "sound_nl:loud_exp")
-	, m_fireball_en(*this, "sound_nl:fireball_en")
-	, m_shield_en(*this, "sound_nl:shield_en")
-	, m_star_en(*this, "sound_nl:star_en")
-	, m_thrust_en(*this, "sound_nl:thrust_en")
-	, m_bl2(*this, "sound_nl:bl2")
-	, m_bl1(*this, "sound_nl:bl1")
-	, m_bl0(*this, "sound_nl:bl0")
-	, m_background_en(*this, "sound_nl:background_en")
-#endif
+	: cinemat_audio_device(mconfig, WAR_OF_THE_WORLDS_AUDIO, tag, owner, clock, 0x0e)
 {
-#if ENABLE_NETLIST_LOGGING
-	m_input_names[1] = "I_LOUD_EXP";
-	m_input_names[2] = "I_SOFT_EXP";
-	m_input_names[3] = "I_LASER_EN";
-	m_shiftreg_names[0] = "I_BL0";
-	m_shiftreg_names[1] = "I_BL1";
-	m_shiftreg_names[2] = "I_BL2";
-	m_shiftreg_names[3] = "I_BACKGROUND_EN";
-	m_shiftreg_names[4] = "I_THRUST_EN";
-	m_shiftreg_names[5] = "I_STAR_EN";
-	m_shiftreg_names[6] = "I_SHIELD_EN";
-	m_shiftreg_names[7] = "I_FIREBALL_EN";
-#endif
 }
 
 void wotw_audio_device::device_start()
@@ -1304,22 +1218,22 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 #if WOTW_USE_NETLIST
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(starcas))
+		.set_source(NETLIST_NAME(wotw))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:laser_en",      "I_LASER_EN.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:soft_exp",      "I_SOFT_EXP.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:loud_exp",      "I_LOUD_EXP.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:fireball_en",   "I_FIREBALL_EN.IN",   0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:shield_en",     "I_SHIELD_EN.IN",     0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:star_en",       "I_STAR_EN.IN",       0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:thrust_en",     "I_THRUST_EN.IN",     0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl2",           "I_BL2.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl1",           "I_BL1.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:bl0",           "I_BL0.IN",           0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:background_en", "I_BACKGROUND_EN.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_0", "I_SHIFTREG_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_1", "I_SHIFTREG_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_2", "I_SHIFTREG_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_3", "I_SHIFTREG_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_4", "I_SHIFTREG_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_5", "I_SHIFTREG_5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_6", "I_SHIFTREG_6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_7", "I_SHIFTREG_7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C47.1").set_mult_offset(30000.0 * 10.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C47.1").set_mult_offset(30000.0, 0.0);
 
 #else
 
@@ -1355,13 +1269,7 @@ void wotw_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 	if (rising_edge(curvals, oldvals, 4))
 		shiftreg_clock(curvals >> 7);
 
-#if WOTW_USE_NETLIST
-
-	m_loud_exp->write_line(BIT(curvals, 1));
-	m_soft_exp->write_line(BIT(curvals, 2));
-	m_laser_en->write_line(BIT(curvals, 3));
-
-#else
+#if !WOTW_USE_NETLIST
 
 	// loud explosion - falling edge
 	if (falling_edge(curvals, oldvals, 1))
@@ -1379,18 +1287,7 @@ void wotw_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 
 void wotw_audio_device::shiftreg_changed(u8 curvals, u8 oldvals)
 {
-#if WOTW_USE_NETLIST
-
-	m_fireball_en->write_line(BIT(curvals, 7));
-	m_shield_en->write_line(BIT(curvals, 6));
-	m_star_en->write_line(BIT(curvals, 5));
-	m_thrust_en->write_line(BIT(curvals, 4));
-	m_background_en->write_line(BIT(curvals, 3));
-	m_bl2->write_line(BIT(curvals, 2));
-	m_bl1->write_line(BIT(curvals, 1));
-	m_bl0->write_line(BIT(curvals, 0));
-
-#else
+#if !WOTW_USE_NETLIST
 
 	// fireball - falling edge
 	if (falling_edge(curvals, oldvals, 7))

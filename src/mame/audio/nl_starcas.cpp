@@ -5,6 +5,20 @@
 
 
 //
+// First pass through the compilation goes down this path.
+// Here we set up common defines and models used by both
+// Star Castle and War of the Worlds.
+//
+
+#ifndef SOUND_VARIANT
+
+//
+// The final amplifier is documented but not emulated.
+//
+#define EMULATE_FINAL_AMP	0
+
+
+//
 // Substitutes/models
 //
 
@@ -282,16 +296,35 @@ NETLIST_END()
 //   (M) Locate the three, previously cut, traces that run directly below IC1 and IC2. Short together all three of these
 //       traces on the right side of your cut, now connect these three shorted traces to pin 6 of IC3.
 //
+
 #define VARIANT_STARCASTLE 	0
 #define VARIANT_WOTW		1
-#define SOUND_VARIANT 		(VARIANT_STARCASTLE)
 
 //
-// The final amplifier is documented but not emulated.
+// Generate both variants
 //
-#define EMULATE_FINAL_AMP	0
 
+#define SOUND_VARIANT		VARIANT_STARCASTLE
+#include "nl_starcas.cpp"
+
+#undef SOUND_VARIANT
+#define SOUND_VARIANT		VARIANT_WOTW
+#include "nl_starcas.cpp"
+
+#else
+
+
+//
+// The following code is only processed by the above two includes.
+// It has ifdefs to generate both Star Castle and War of the Worlds
+// sound boards, based on the SOUND_VARIANT define.
+//
+
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 static NETLIST_START(StarCastle_schematics)
+#else // (SOUND_VARIANT == VARIANT_WOTW)
+static NETLIST_START(WarOfTheWorlds_schematics)
+#endif
 
 	// Used by some CA3080 models above
 	NET_MODEL("CA3080_QN_OTA NPN(IS=21.48f XTI=3 EG=1.11 VAF=80 BF=550 ISE=50f NE=1.5 IKF=10m XTB=1.5 BR=.1 ISC=10f NC=2 IKR=3m RC=10 CJC=800f MJC=.3333 VJC=.75 FC=.5 CJE=1.3p MJE=.3333 VJE=.75 TR=30n TF=400P ITF=30m XTF=1 VTF=10 CJS=5.8P MJS=.3333 VJS=.75)")
@@ -567,16 +600,16 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V15, R2.1, IC7.7, IC8.7)
 	NET_C(I_VM15, C13.2, R12.1, R18.1, R21.1, IC7.4, IC8.4, IC9.1)
 	NET_C(R2.2, D5.K, R3.1, R5.1, R7.1)
-	NET_C(I_BL2, IC6.9)
+	NET_C(I_SHIFTREG_2, IC6.9)
 	NET_C(IC6.8, R3.2, R4.1)
-	NET_C(I_BL1, IC6.11)
+	NET_C(I_SHIFTREG_1, IC6.11)
 #if (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(I_BL1, IC6.3)				// WOTW modification (J)
+	NET_C(I_SHIFTREG_1, IC6.3)				// WOTW modification (J)
 #endif
 	NET_C(IC6.10, R5.2, R6.1)
-	NET_C(I_BL0, IC6.13)
+	NET_C(I_SHIFTREG_0, IC6.13)
 #if (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(I_BL0, R100.1)			// WOTW modification (K)
+	NET_C(I_SHIFTREG_0, R100.1)			// WOTW modification (K)
 #endif
 	NET_C(IC6.12, R7.2, R8.1)
 	NET_C(R4.2, R6.2, R8.2, IC7.2, R9.1)
@@ -611,10 +644,10 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V5, R22.1, IC10.16, IC11.16, IC12.14, IC13.14, IC28.14)
 	NET_C(CLK, IC10.2, IC11.2, IC13.1, IC28.12)
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)
-	NET_C(I_BACKGROUND_EN, IC6.1, IC13.2)
+	NET_C(I_SHIFTREG_3, IC6.1, IC13.2)
 #else // (SOUND_VARIANT == VARIANT_WOTW)
 	NET_C(IC6.1, IC13.2)			// WOTW modification (E)
-	NET_C(I_BACKGROUND_EN, R75.1)	// WOTW modification (I)
+	NET_C(I_SHIFTREG_3, R75.1)	// WOTW modification (I)
 #endif
 	NET_C(IC6.2, R22.2, IC10.1, IC11.1)
 	NET_C(HI, IC10.3, IC10.7, IC10.10, IC11.5, IC11.6, IC11.7)
@@ -669,7 +702,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V5, R34.1, R36.1, R45.1, Q3.E)
 	NET_C(I_V15, R39.1, R43.1, IC17.8)
 	NET_C(I_VM15, R37.1, R46.1)
-	NET_C(I_LASER_EN, IC6.5, IC12.2)
+	NET_C(I_OUT_3, IC6.5, IC12.2)
 	NET_C(IC6.6, R36.2, R35.1)
 	NET_C(R35.2, Q3.B, R34.2)
 	NET_C(Q3.C, R37.2, R38.2, R40.1)
@@ -704,7 +737,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V5, R52.1)
 	NET_C(I_V15, IC18.7)
 	NET_C(I_VM15, C27.2, R54.1, IC18.4)
-	NET_C(I_SOFT_EXP, R52.2, R53.1)
+	NET_C(I_OUT_2, R52.2, R53.1)
 	NET_C(R53.2, Q6.B)
 	NET_C(Q6.E, V2_2)
 	NET_C(Q6.C, R54.2, R55.2, Q7.E)
@@ -725,7 +758,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V5, R63.1)
 	NET_C(I_V15, IC19.7)
 	NET_C(I_VM15, C30.2, R65.1, IC19.4)
-	NET_C(I_LOUD_EXP, R63.2, R64.1)
+	NET_C(I_OUT_1, R63.2, R64.1)
 	NET_C(R64.2, Q8.B)
 	NET_C(Q8.E, V2_2)
 	NET_C(Q8.C, R65.2, R66.2, Q9.E)
@@ -747,10 +780,10 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V15, IC20.7)
 	NET_C(I_VM15, C33.2, R77.1, IC20.4)
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)
-	NET_C(I_FIREBALL_EN, R74.2, R75.1)
+	NET_C(I_SHIFTREG_7, R74.2, R75.1)
 #else // (SOUND_VARIANT == VARIANT_WOTW)
 	NET_C(R74.2, R75.1)				// WOTW modification (B)
-	NET_C(I_FIREBALL_EN, IC6.1)		// WOTW modification (G)
+	NET_C(I_SHIFTREG_7, IC6.1)		// WOTW modification (G)
 #endif
 	NET_C(R75.2, R76.2, Q10.B)
 	NET_C(Q10.C, R77.2, R78.2, Q11.E)
@@ -771,7 +804,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V15, IC21.7)
 	NET_C(I_VM15, R91.1, IC21.4)
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)
-	NET_C(I_SHIELD_EN, R85.2, R86.1)
+	NET_C(I_SHIFTREG_6, R85.2, R86.1)
 #else // (SOUND_VARIANT == VARIANT_WOTW)
 	NET_C(R85.2, R86.1)				// WOTW modification (B)
 #endif
@@ -797,10 +830,10 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(I_V15, IC22.7)
 	NET_C(I_VM15, C34.2, R102.1, IC22.4)
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)
-	NET_C(I_THRUST_EN, R99.2, R100.1)
+	NET_C(I_SHIFTREG_4, R99.2, R100.1)
 #else // (SOUND_VARIANT == VARIANT_WOTW)
 	NET_C(R99.2, R100.1)			// WOTW modification (D)
-	NET_C(I_THRUST_EN, R86.1)		// WOTW modification (H)
+	NET_C(I_SHIFTREG_4, R86.1)		// WOTW modification (H)
 #endif
 	NET_C(R100.2, R101.2, Q15.B)
 	NET_C(Q15.C, R102.2, R103.2, Q16.E)
@@ -820,7 +853,7 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, C37.1, C38.1, C39.1, C40.1, C41.1, R119.1, IC23.1, IC24.1)
 	NET_C(I_V5, R112.1, R117.1, IC23.8, IC24.8)
-	NET_C(I_STAR_EN, IC23.4, IC24.4)
+	NET_C(I_SHIFTREG_5, IC23.4, IC24.4)
 	NET_C(R112.2, IC23.7, R113.1)
 	NET_C(R113.2, IC23.2, IC23.6, C37.2)
 	NET_C(C38.2, IC23.5)
@@ -878,7 +911,11 @@ static NETLIST_START(StarCastle_schematics)
 NETLIST_END()
 
 
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 NETLIST_START(starcas)
+#else // (SOUND_VARIANT == VARIANT_WOTW)
+NETLIST_START(wotw)
+#endif
 
 	// 192k is not high enough to make the laser and background pitches high enough
 	SOLVER(Solver, 384000)
@@ -890,23 +927,31 @@ NETLIST_START(starcas)
 //	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 //	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
 
-	TTL_INPUT(I_BL0, 0)				// active high
-	TTL_INPUT(I_BL1, 0)				// active high
-	TTL_INPUT(I_BL2, 0)				// active high
-	TTL_INPUT(I_BACKGROUND_EN, 1)	// active low
-	TTL_INPUT(I_LASER_EN, 1)		// active low
-	TTL_INPUT(I_STAR_EN, 0)			// active high
-	TTL_INPUT(I_SOFT_EXP, 1)		// active low
-	TTL_INPUT(I_LOUD_EXP, 1)		// active low
-	TTL_INPUT(I_FIREBALL_EN, 1)		// active low
-	TTL_INPUT(I_SHIELD_EN, 1)		// active low
-	TTL_INPUT(I_THRUST_EN, 1)		// active low
+	TTL_INPUT(I_SHIFTREG_0, 0)	// active high
+	TTL_INPUT(I_SHIFTREG_1, 0)	// active high
+	TTL_INPUT(I_SHIFTREG_2, 0)	// active high
+	TTL_INPUT(I_SHIFTREG_3, 1)	// active low
+	TTL_INPUT(I_SHIFTREG_4, 1)	// active low
+	TTL_INPUT(I_SHIFTREG_5, 0)	// active high
+	TTL_INPUT(I_SHIFTREG_6, 1)	// active low
+	TTL_INPUT(I_SHIFTREG_7, 1)	// active low
+	TTL_INPUT(I_OUT_1, 1)		// active low
+	TTL_INPUT(I_OUT_2, 1)		// active low
+	TTL_INPUT(I_OUT_3, 1)		// active low
 
-	NET_C(GND, I_BL0.GND, I_BL1.GND, I_BL2.GND, I_BACKGROUND_EN.GND, I_LASER_EN.GND, I_STAR_EN.GND, I_SOFT_EXP.GND, I_LOUD_EXP.GND, I_FIREBALL_EN.GND, I_SHIELD_EN.GND, I_THRUST_EN.GND)
-	NET_C(I_V5, I_BL0.VCC, I_BL1.VCC, I_BL2.VCC, I_BACKGROUND_EN.VCC, I_LASER_EN.VCC, I_STAR_EN.VCC, I_SOFT_EXP.VCC, I_LOUD_EXP.VCC, I_FIREBALL_EN.VCC, I_SHIELD_EN.VCC, I_THRUST_EN.VCC)
+	NET_C(GND, I_SHIFTREG_0.GND, I_SHIFTREG_1.GND, I_SHIFTREG_2.GND, I_SHIFTREG_3.GND, I_SHIFTREG_4.GND, I_SHIFTREG_5.GND, I_SHIFTREG_6.GND, I_SHIFTREG_7.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND)
+	NET_C(I_V5, I_SHIFTREG_0.VCC, I_SHIFTREG_1.VCC, I_SHIFTREG_2.VCC, I_SHIFTREG_3.VCC, I_SHIFTREG_4.VCC, I_SHIFTREG_5.VCC, I_SHIFTREG_6.VCC, I_SHIFTREG_7.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC)
 
 	LOCAL_SOURCE(CA3080)
+
+#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	LOCAL_SOURCE(StarCastle_schematics)
 	INCLUDE(StarCastle_schematics)
+#else // (SOUND_VARIANT == VARIANT_WOTW)
+	LOCAL_SOURCE(WarOfTheWorlds_schematics)
+	INCLUDE(WarOfTheWorlds_schematics)
+#endif
 
 NETLIST_END()
+
+#endif

@@ -8,5 +8,6 @@
 #include "netlist/nl_setup.h"
 
 NETLIST_EXTERNAL(starcas)
+NETLIST_EXTERNAL(wotw)
 
 #endif // MAME_AUDIO_NL_STARCAS_H
