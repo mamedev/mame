@@ -110,8 +110,9 @@ TODO:
 
 Notes:
 
-- daimyojn: In Test->Option, press "N Ron Ron N" to access more options
-- kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode)
+- all games using black as default palette is trusted from a real rongrong PCB;
+- daimyojn: In Test->Option, press "N Ron Ron N" to access more options;
+- kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode);
 
 **********************************************************************************************************************/
 
@@ -4398,7 +4399,7 @@ void ddenlovr_state::htengoku(machine_config &config)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	PALETTE(config, m_palette).set_entries(16*256);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
 
@@ -5102,62 +5103,63 @@ static INPUT_PORTS_START( rongrong )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? blitter irq flag ?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? blitter busy flag ?
 
+	// default all off except for SW2:9, that's unused anyway so presumably an error of the dip sheet
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Helps" )
+	PORT_DIPNAME( 0x20, 0x20, "Helps" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Blinking on Matching Pieces" ) PORT_DIPLOCATION("SW1:8") // "Teach Flash Hai"
+	PORT_DIPSETTING(    0x80, "First Level and on Continues" ) // "First Game & Continue"
+	PORT_DIPSETTING(    0x00, "Always On" ) // "All Game"
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0c, "0" )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x30, 0x30, "VS Rounds" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Base Time" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "80 Seconds" )
+	PORT_DIPSETTING(    0x08, "90 Seconds" )
+	PORT_DIPSETTING(    0x04, "70 Seconds" )
+	PORT_DIPSETTING(    0x00, "60 Seconds" )
+	PORT_DIPNAME( 0x30, 0x30, "VS Rounds" ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "3 (duplicate)" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:9")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_SERVICE( 0x02, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:10")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:9")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Select Round" )
+	PORT_DIPNAME( 0x08, 0x08, "Select Round (Cheat)" ) PORT_DIPLOCATION("SW2:10") // undocumented
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -9750,7 +9752,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::ddenlovr_irq));
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq));
 
@@ -9873,7 +9875,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
@@ -9963,7 +9965,7 @@ void ddenlovr_state::mmpanic(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mmpanic_blitter_irq));
 
@@ -10048,7 +10050,7 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
@@ -10093,7 +10095,7 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
@@ -10210,7 +10212,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
@@ -10496,7 +10498,7 @@ void ddenlovr_state::jongtei(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10548,7 +10550,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10594,7 +10596,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10662,7 +10664,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	PALETTE(config, m_palette).set_entries(0x100);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::pa7_w)).invert(); // PA bit 7 = blitter busy
 
@@ -10710,7 +10712,7 @@ void ddenlovr_state::daimyojn(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz); // blitter commands in the roms are shuffled around
 
