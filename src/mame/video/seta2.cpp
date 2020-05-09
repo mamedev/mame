@@ -169,7 +169,6 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 	COMBINE_DATA(&m_vregs[offset]);
 
-	popmessage("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  ", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 	if (m_vregs[offset] != olddata)
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
@@ -657,9 +656,32 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 	{
 		rectangle tempcliprect(cliprect);
 
-		tempcliprect.sety(y,y);
+		tempcliprect.sety(y, y);
 
-		int yy = y; // y / 2;
+		//printf("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+
+		// TODO the global yscroll should be applied here too as it can be sub-pixel for precision in zoomed cases
+		uint32 yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
+		yzoom &= 0x07ffffff;
+		bool yzoominverted = false;
+
+		if (yzoom & 0x04000000)
+		{
+			yzoom = 0x8000000 - yzoom;
+			yzoominverted = true;
+		}
+
+		int yy;
+
+		if (!yzoominverted)
+		{
+			yy = y; // not handled yet (this is using negative yzoom to do flipscreen...)
+		}
+		else
+		{
+			yy = y * yzoom;
+			yy >>= 16;
+		}
 
 		draw_sprites(bitmap, tempcliprect, yy, y);
 	}
@@ -714,6 +736,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 {
+	//popmessage("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 }
 
 // staraudi
