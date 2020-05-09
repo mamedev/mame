@@ -107,7 +107,7 @@ Regular game cartridges
 |        | 80-090160(US)     | <unknown> (Should be Monsters vs. Aliens #80-084440, exists in VTech V.Link database)          |
 |        | 80-090163(UK)     | Monsters vs. Aliens                                                                            |
 |   XX   | 80-090164(GE)     | Monsters vs. Aliens                                                                            |
-|        | 80-090165(FR)     | Monsters Contre Aliens                                                                         |
+|   XX   | 80-090165(FR)     | Monsters Contre Aliens                                                                         |
 |   XX   | 80-090167(SP)     | Monstruos contra Alienígenas (52-090167(SP) on back label)                                     |
 +========+===================+================================================================================================+
 |        | 80-090180(US)     | <Unknown>                                                                                      |
@@ -421,7 +421,7 @@ Regular game cartridges
 |        | 80-092503(UK)     | Whiz Kid Wheels                                                                                |
 |        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                      |
 |   XX   | 80-092504(GE)     | Flitzers Schlaue Staedtetour (purple, 52-092504(GER) on back label)                            |
-|        | 80-092505(FR)     | Mission Pilote                                                                                 |
+|   XX   | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                                              |
 |        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
@@ -510,6 +510,7 @@ Regular game cartridges
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
 |        |          (NO)     | Wall-E                                                                                         |
 |        |          (FI)     | Wall-E                                                                                         |
+|        |          (CN)     | 瓦力                                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (alt)                                           |
@@ -1998,8 +1999,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<dataarea name="rom" size="0x800000">
 				<rom name="52-91327 - V.Smile Gimnasio Interactivo (Spain).bin" size="0x800000" crc="a203eaf7" sha1="bb7c7ecf6b208cd8b81daba58748345d3109268a" />
 			</dataarea>
-			<dataarea name="nvram" size="131072">
-			</dataarea>
 		</part>
 	</software>
 
@@ -2508,6 +2507,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="monstalnf" cloneof="monstalng" supported="no">
+		<description>DreamWorks Monstres contre Aliens (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090165(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="090165 - MonstresContreAliens (FR).bin" size="8388608" crc="eb7b16b2" sha1="45d32470b2283ea47032e007e4f803f8b5ea6dfa" />
 			</dataarea>
 		</part>
 	</software>
@@ -4563,7 +4578,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092504(GER)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_nvram" />
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -4571,7 +4586,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092504 - Flitzers Schlaue Stadtetour (GER).bin" size="8388608" crc="1bdd6066" sha1="1e2a9090c0bfe08c31e750e263bad4a4a1fb2e73" />
 			</dataarea>
-			<dataarea name="nvram" size="131072">
+		</part>
+	</software>
+
+	<software name="wkwheelf" cloneof="wkwheelg"> <!-- Will be clone of "wkwheel" once found and dumped. -->
+		<description>Mission Pilote (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092505(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092505 - MissionPilote (FR).bin" size="8388608" crc="81531074" sha1="11631a6e837d3aa7a7bd6c0bcefa8289440a60b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -4582,15 +4610,13 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092507(SP)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_nvram" />
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="8388608" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" />
-			</dataarea>
-			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -4602,15 +4628,13 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090224(GE)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_nvram" />
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-090224 - Dolphis Wasserabenteuer (GE).bin" size="8388608" crc="3fd78b1b" sha1="eadbc8b2a9bf09f623f27d3b94a1b19643685629" />
-			</dataarea>
-			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
