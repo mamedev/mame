@@ -169,7 +169,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 	COMBINE_DATA(&m_vregs[offset]);
 
-//  popmessage("%04x %04x", m_vregs[0x1e/2],  m_vregs[0x1c/2]);
+	popmessage("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  ", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 	if (m_vregs[offset] != olddata)
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
@@ -659,7 +659,9 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		tempcliprect.sety(y,y);
 
-		draw_sprites(bitmap, tempcliprect, y/2, y);
+		int yy = y; // y / 2;
+
+		draw_sprites(bitmap, tempcliprect, yy, y);
 	}
 }
 
