@@ -1195,6 +1195,12 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int page = m_page2 ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
 
+	// IIgs force-monochrome-DHR setting
+	if (m_newvideo & 0x20)
+	{
+		mon_type = 1;
+	}
+
 	/* sanity checks */
 	if (beginrow < cliprect.top())
 		beginrow = cliprect.top();

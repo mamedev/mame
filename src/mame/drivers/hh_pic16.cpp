@@ -652,9 +652,10 @@ ROM_END
   Flash is a wall-mounted game, players throw beanbags to activate the buttons.
   It's described in patent US4333657 as an electronic dart game.
 
-  In games 4 and 5 it's easy to lock up the program by pressing the buttons
-  repeatedly and causing a score overflow. Although that wouldn't be possible
-  by properly throwing beanbags at it.
+  BTANB: In games 4 and 5 it's easy to lock up the program by pressing the
+  buttons repeatedly and causing a score overflow. Although that wouldn't be
+  possible by properly throwing beanbags at it. This bug is warned about in
+  the manual.
 
   This could also be purchased as a bare PCB from Radio Shack under the Archer
   brand, catalog number 277-1013. It was named "Sound Effects Chassis" but
@@ -1909,8 +1910,8 @@ CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_
 
 CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_init, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_init, "Ideal", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

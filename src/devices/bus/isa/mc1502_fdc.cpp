@@ -70,13 +70,30 @@ TIMER_CALLBACK_MEMBER(mc1502_fdc_device::motor_callback)
 	motor_on = 0;
 }
 
+void mc1502_fdc_device::motors_onoff()
+{
+	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
+
+	if (motor_on)
+	{
+		// bits 2, 3 -- motor on (drive 0, 1)
+		floppy0->mon_w(!(m_control & 4));
+		floppy1->mon_w(!(m_control & 8));
+	}
+	else
+	{
+		floppy0->mon_w(ASSERT_LINE);
+		floppy1->mon_w(ASSERT_LINE);
+	}
+}
+
 uint8_t mc1502_fdc_device::mc1502_wd17xx_aux_r()
 {
-	uint8_t data;
-
-	data = 0;
-
-	return data;
+	motor_timer->adjust(attotime::from_msec(3000));
+	motor_on = 1;
+	motors_onoff();
+	return 0;
 }
 
 void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
@@ -86,24 +103,15 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 	floppy_image_device *floppy = ((data & 0x10) ? floppy1 : floppy0);
 
 	// master reset
-	if ((data & 1) == 0)
-		m_fdc->reset();
+	m_fdc->mr_w(data & 1);
 
 	m_fdc->set_floppy(floppy);
 
 	// SIDE ONE
 	floppy->ss_w((data & 2) ? 1 : 0);
 
-	// bits 2, 3 -- motor on (drive 0, 1)
-	// the schematic appears to show the motor lines connected, if they aren't then motor_on doesn't work correctly
-	floppy0->mon_w(!(data & 12));
-	floppy1->mon_w(!(data & 12));
-
-	if (data & 12)
-	{
-		motor_timer->adjust(attotime::from_msec(3000));
-		motor_on = 1;
-	}
+	m_control = data;
+	motors_onoff();
 }
 
 /*
@@ -191,6 +199,7 @@ mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *
 	, device_isa8_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
 	, motor_on(0)
+	, m_control(0)
 	, motor_timer(nullptr)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
@@ -214,4 +223,5 @@ void mc1502_fdc_device::device_start()
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));
 	motor_on = 0;
+	m_control = 0;
 }

@@ -66,16 +66,12 @@ private:
 	void digit_w(u8 data);
 	u8 input_r();
 
-	u8 m_io[2]; // MK3850 I/O ports
-	u8 m_4042;  // 4042 latch output
+	u8 m_io[2] = { 0, 0 };
+	u8 m_4042 = 0;
 };
 
 void boris_state::machine_start()
 {
-	// zerofill
-	memset(m_io, 0, sizeof(m_io));
-	m_4042 = 0;
-
 	// register for savestates
 	save_item(NAME(m_io));
 	save_item(NAME(m_4042));

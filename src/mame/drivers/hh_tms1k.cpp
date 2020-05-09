@@ -5371,16 +5371,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
 	void ginv2000(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
-
-void ginv2000_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	m_expander->write_ms(1); // Vss
-}
 
 // handlers
 
@@ -5453,7 +5444,7 @@ void ginv2000_state::ginv2000(machine_config &config)
 	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
 	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
 
-	TMS1024(config, m_expander);
+	TMS1024(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
 	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
 	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
@@ -11926,7 +11917,6 @@ void tbreakup_state::machine_reset()
 {
 	hh_tms1k_state::machine_reset();
 	set_clock();
-	m_expander->write_ms(1); // Vss
 }
 
 // handlers
@@ -12021,7 +12011,7 @@ void tbreakup_state::tbreakup(machine_config &config)
 	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
 	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
 
-	TMS1025(config, m_expander);
+	TMS1025(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
@@ -12564,7 +12554,7 @@ CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  emp
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

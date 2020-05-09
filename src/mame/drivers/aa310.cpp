@@ -91,7 +91,6 @@
 #include "formats/apd_dsk.h"
 #include "formats/jfd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/i2cmem.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
@@ -427,7 +426,7 @@ void aa310_state::aa310(machine_config &config)
 	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
 	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
+	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 

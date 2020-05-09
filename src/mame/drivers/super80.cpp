@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /*****************************************************************************
 
-Super80.c written by Robbbert, 2005-2010.
+Super80.cpp written by Robbbert, 2005-2010.
 
 2010-12-19: Added V3.7 bios freshly dumped today.
 2014-04-28: Added disk system and did cleanups
@@ -173,11 +173,6 @@ are high, and /M1 is active. This particular combination occurs on all ROM varia
 fifth byte in the ROM. In reality, the switchover can take place any time between the 4th byte until
 the computer has booted up. This is because the low RAM does not contain any system areas.
 
-Since MAME does not emulate /M1, a banking scheme has had to be used. Bank 0 is normal RAM. Bank 1
-points to the ROMs. When a machine reset occurs, bank 1 is switched in. A timer is triggered, and
-after 4 bytes are read, bank 0 is selected. The timer is as close as can be to real operation of the
-hardware.
-
 
 Super80 disk WD2793, Z80DMA:
 
@@ -207,7 +202,6 @@ Port(hex)  Role       Comment
 ToDo:
 - Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
        of the horrible inline editor they use)
-- Disk system works, only connected to super80r atm - is it needed for super80v?
 
 
 ***********************************************************************************************************/
@@ -864,6 +858,7 @@ void super80v_state::super80v(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("V");
+	SOFTWARE_LIST(config, "flop_list").set_original("super80_flop");
 }
 
 void super80r_state::super80r(machine_config &config)
@@ -989,9 +984,10 @@ ROM_START( super80v )
 ROM_END
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS          INIT          COMPANY                   FULLNAME */
-COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state, empty_init, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state, empty_init, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state, empty_init, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state, empty_init, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80r, super80, 0,   super80r, super80r, super80r_state, empty_init, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80v, super80, 0,   super80v, super80v, super80v_state, empty_init, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state,  empty_init, "Dick Smith Electronics", "Super-80 (V1.2)" , MACHINE_SUPPORTS_SAVE )
+COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state,  empty_init, "Dick Smith Electronics", "Super-80 (V2.2)" , MACHINE_SUPPORTS_SAVE )
+COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  empty_init, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  empty_init, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, super80r, super80, 0,   super80r, super80r, super80r_state, empty_init, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, super80v, super80, 0,   super80v, super80v, super80v_state, empty_init, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )
+

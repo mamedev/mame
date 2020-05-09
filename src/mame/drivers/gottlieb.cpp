@@ -200,6 +200,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "includes/gottlieb.h"
 
 #include "machine/nvram.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "speaker.h"

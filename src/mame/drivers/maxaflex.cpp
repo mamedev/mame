@@ -19,6 +19,7 @@
 #include "cpu/m6805/m68705.h"
 
 #include "machine/6821pia.h"
+#include "machine/rescap.h"
 #include "machine/timer.h"
 
 #include "sound/spkrdev.h"

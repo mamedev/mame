@@ -9,6 +9,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "grid2102.h"
 
 // device type definition

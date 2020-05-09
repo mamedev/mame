@@ -1770,7 +1770,7 @@ void pokemini_state::pokemini(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
+	I2C_24C64(config, m_i2cmem, 0); // ?
 
 	/* This still needs to be improved to actually match the hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

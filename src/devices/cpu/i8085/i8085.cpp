@@ -212,6 +212,7 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_in_inta_func(*this)
 	, m_out_status_func(*this)
 	, m_out_inte_func(*this)
 	, m_in_sid_func(*this)
@@ -308,6 +309,7 @@ void i8085a_cpu_device::device_start()
 	m_trap_pending = 0;
 	m_trap_im_copy = 0;
 	m_sod_state = 0;
+	m_in_acknowledge = false;
 	m_ietemp = false;
 
 	init_tables();
@@ -351,6 +353,7 @@ void i8085a_cpu_device::device_start()
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */
+	m_in_inta_func.resolve();
 	m_out_status_func.resolve_safe();
 	m_out_inte_func.resolve_safe();
 	m_in_sid_func.resolve_safe(0);
@@ -372,6 +375,7 @@ void i8085a_cpu_device::device_start()
 	save_item(NAME(m_trap_pending));
 	save_item(NAME(m_trap_im_copy));
 	save_item(NAME(m_sod_state));
+	save_item(NAME(m_in_acknowledge));
 
 	set_icountptr(m_icount);
 }
@@ -479,11 +483,13 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 {
 	int newstate = (state != CLEAR_LINE);
 
-	/* NMI is edge-triggered */
-	if (irqline == INPUT_LINE_NMI)
+	/* TRAP is level and edge-triggered NMI */
+	if (irqline == I8085_TRAP_LINE)
 	{
 		if (!m_nmi_state && newstate)
 			m_trap_pending = true;
+		else if (!newstate)
+			m_trap_pending = false;
 		m_nmi_state = newstate;
 	}
 
@@ -511,6 +517,8 @@ void i8085a_cpu_device::break_halt_for_interrupt()
 	}
 	else
 		set_status(0x23); /* int ack */
+
+	m_in_acknowledge = true;
 }
 
 void i8085a_cpu_device::check_for_interrupts()
@@ -527,7 +535,7 @@ void i8085a_cpu_device::check_for_interrupts()
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(INPUT_LINE_NMI);
+		standard_irq_callback(I8085_TRAP_LINE);
 
 		/* push the PC and jump to $0024 */
 		op_push(m_PC);
@@ -584,29 +592,17 @@ void i8085a_cpu_device::check_for_interrupts()
 	/* followed by classic INTR */
 	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
-		u32 vector;
-
 		/* break out of HALT state and call the IRQ ack callback */
+		if (!m_in_inta_func.isnull())
+			standard_irq_callback(I8085_INTR_LINE);
 		break_halt_for_interrupt();
-		vector = standard_irq_callback(I8085_INTR_LINE);
+
+		u8 vector = read_inta();
 
 		/* use the resulting vector as an opcode to execute */
 		set_inte(0);
-		switch (vector & 0xff0000)
-		{
-			case 0xcd0000:  /* CALL nnnn */
-				m_icount -= 7;
-				op_push(m_PC);
-			case 0xc30000:  /* JMP  nnnn */
-				m_icount -= 10;
-				m_PC.d = vector & 0xffff;
-				break;
-
-			default:
-				LOG("i8085 take int $%02x\n", vector);
-				execute_one(vector & 0xff);
-				break;
-		}
+		LOG("i8085 take int $%02x\n", vector);
+		execute_one(vector);
 	}
 }
 
@@ -670,14 +666,27 @@ u8 i8085a_cpu_device::get_rim_value()
 // memory access
 u8 i8085a_cpu_device::read_arg()
 {
-	return m_cache->read_byte(m_PC.w.l++);
+	set_status(0x82); // memory read
+	if (m_in_acknowledge)
+		return read_inta();
+	else
+		return m_cache->read_byte(m_PC.w.l++);
 }
 
 PAIR i8085a_cpu_device::read_arg16()
 {
 	PAIR p;
-	p.b.l = m_cache->read_byte(m_PC.w.l++);
-	p.b.h = m_cache->read_byte(m_PC.w.l++);
+	set_status(0x82); // memory read
+	if (m_in_acknowledge)
+	{
+		p.b.l = read_inta();
+		p.b.h = read_inta();
+	}
+	else
+	{
+		p.b.l = m_cache->read_byte(m_PC.w.l++);
+		p.b.h = m_cache->read_byte(m_PC.w.l++);
+	}
 	return p;
 }
 
@@ -685,6 +694,14 @@ u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
 	return m_opcode_cache->read_byte(m_PC.w.l++);
+}
+
+u8 i8085a_cpu_device::read_inta()
+{
+	if (m_in_inta_func.isnull())
+		return standard_irq_callback(I8085_INTR_LINE);
+	else
+		return m_in_inta_func(m_PC.w.l);
 }
 
 u8 i8085a_cpu_device::read_mem(u32 a)
@@ -855,12 +872,14 @@ void i8085a_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(m_PC.d);
-
 		/* the instruction after an EI does not take an interrupt, so
 		   we cannot check immediately; handle post-EI behavior here */
 		if (m_after_ei != 0 && --m_after_ei == 0)
 			check_for_interrupts();
+
+		m_in_acknowledge = false;
+		logerror("PC=%04X\n", m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 
 		/* here we go... */
 		execute_one(read_op());

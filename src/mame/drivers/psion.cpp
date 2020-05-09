@@ -76,19 +76,6 @@ uint8_t psion_state::port2_r()
 	return m_pack1->data_r() | m_pack2->data_r();
 }
 
-void psion_state::tcsr_w(uint8_t data)
-{
-	m_tcsr_value = data;
-	m_maincpu->tcsr_w(data);
-}
-
-uint8_t psion_state::tcsr_r()
-{
-	if (!machine().side_effects_disabled())
-		m_maincpu->tcsr_w(m_tcsr_value);
-	return m_maincpu->tcsr_r();
-}
-
 uint8_t psion_state::rcp5c_r()
 {
 	return (m_maincpu->rcr_r()&0x7f) | (m_stby_pwr<<7);
@@ -247,7 +234,6 @@ void psion_state::psion_int_reg(address_map &map)
 {
 	// FIXME: this should all be made internal to the CPU device
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io));
-	map(0x0008, 0x0008).rw(FUNC(psion_state::tcsr_r), FUNC(psion_state::tcsr_w));
 	map(0x0014, 0x0014).r(FUNC(psion_state::rcp5c_r));
 }
 
@@ -496,7 +482,6 @@ void psion_state::machine_start()
 
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
-	save_item(NAME(m_tcsr_value));
 	save_item(NAME(m_stby_pwr));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_rom_bank));

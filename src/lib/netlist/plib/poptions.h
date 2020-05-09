@@ -12,6 +12,7 @@
 #include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"
+#include "pfmtlog.h"
 
 namespace plib {
 
@@ -27,7 +28,7 @@ namespace plib {
 
 		PCOPYASSIGNMOVE(option_base, delete)
 
-		pstring help() const { return m_help; }
+		virtual pstring help() const { return m_help; }
 	private:
 		pstring m_help;
 	};
@@ -169,15 +170,22 @@ namespace plib {
 	public:
 		option_num(options &parent, const pstring &ashort, const pstring &along, T defval,
 				const pstring &help,
-				T minval = std::numeric_limits<T>::min(),
+				T minval = std::numeric_limits<T>::lowest(),
 				T maxval = std::numeric_limits<T>::max() )
 		: option(parent, ashort, along, help, true)
 		, m_val(defval)
 		, m_min(minval)
 		, m_max(maxval)
+		, m_def(defval)
 		{}
 
 		T operator ()() const { return m_val; }
+
+		pstring help() const override
+		{
+			auto hs(option::help());
+			return plib::pfmt(hs)(m_def, m_min, m_max);
+		}
 
 	protected:
 		int parse(const pstring &argument) override
@@ -191,6 +199,7 @@ namespace plib {
 		T m_val;
 		T m_min;
 		T m_max;
+		T m_def;
 	};
 
 	class option_vec : public option

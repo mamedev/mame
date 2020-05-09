@@ -7,7 +7,6 @@
 
 #include "nld_74161.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 #include <array>
 
@@ -41,7 +40,8 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(74161_dip);
+	private:
 		logic_input_t m_A;
 		logic_input_t m_B;
 		logic_input_t m_C;
@@ -61,29 +61,35 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(74161_dip, 74161)
+	NETLIB_OBJECT(74161_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(74161_dip, 74161)
+		NETLIB_CONSTRUCTOR(74161_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_CLRQ);
-			register_subalias("2", m_CLK);
-			register_subalias("3", m_A);
-			register_subalias("4", m_B);
-			register_subalias("5", m_C);
-			register_subalias("6", m_D);
-			register_subalias("7", m_ENABLEP);
-			register_subalias("8", "GND");
+			register_subalias("1", A.m_CLRQ);
+			register_subalias("2", A.m_CLK);
+			register_subalias("3", A.m_A);
+			register_subalias("4", A.m_B);
+			register_subalias("5", A.m_C);
+			register_subalias("6", A.m_D);
+			register_subalias("7", A.m_ENABLEP);
+			register_subalias("8", "A.GND");
 
-			register_subalias("9", m_LOADQ);
-			register_subalias("10", m_ENABLET);
-			register_subalias("11", m_Q[3]);
-			register_subalias("12", m_Q[2]);
-			register_subalias("13", m_Q[1]);
-			register_subalias("14", m_Q[0]);
-			register_subalias("15", m_RCO);
-			register_subalias("16", "VCC");
-
+			register_subalias("9", A.m_LOADQ);
+			register_subalias("10", A.m_ENABLET);
+			register_subalias("11", A.m_Q[3]);
+			register_subalias("12", A.m_Q[2]);
+			register_subalias("13", A.m_Q[1]);
+			register_subalias("14", A.m_Q[0]);
+			register_subalias("15", A.m_RCO);
+			register_subalias("16", "A.VCC");
 		}
+
+		NETLIB_RESETI() { }
+		NETLIB_UPDATEI() { }
+
+	private:
+		NETLIB_SUB(74161) A;
 	};
 
 	NETLIB_RESET(74161)

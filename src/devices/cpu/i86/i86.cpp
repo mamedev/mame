@@ -359,7 +359,7 @@ void i8086_cpu_device::device_start()
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
 	state_add( I8086_PC, "PC", m_pc ).callimport().formatstr("%05X");
-	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
+	state_add<uint32_t>( STATE_GENPCBASE, "CURPC", [this] { return (m_sregs[CS] << 4) + m_prev_ip; }).mask(0xfffff).noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 }
 
@@ -421,10 +421,10 @@ void i8086_common_cpu_device::state_import(const device_state_entry &entry)
 		break;
 
 	case STATE_GENPC:
-	case STATE_GENPCBASE:
 		if (m_pc - (m_sregs[CS] << 4) > 0xffff)
 			m_sregs[CS] = m_pc >> 4;
 		m_ip = m_pc - (m_sregs[CS] << 4);
+		m_prev_ip = m_ip;
 		break;
 	}
 }
@@ -506,13 +506,22 @@ void i8086_common_cpu_device::device_start()
 	// Register state for debugger
 	state_add( I8086_IP, "IP", m_ip         ).callimport().formatstr("%04X");
 	state_add( I8086_AX, "AX", m_regs.w[AX] ).formatstr("%04X");
-	state_add( I8086_CX, "CX", m_regs.w[CS] ).formatstr("%04X");
+	state_add( I8086_CX, "CX", m_regs.w[CX] ).formatstr("%04X");
 	state_add( I8086_DX, "DX", m_regs.w[DX] ).formatstr("%04X");
 	state_add( I8086_BX, "BX", m_regs.w[BX] ).formatstr("%04X");
 	state_add( I8086_SP, "SP", m_regs.w[SP] ).formatstr("%04X");
 	state_add( I8086_BP, "BP", m_regs.w[BP] ).formatstr("%04X");
 	state_add( I8086_SI, "SI", m_regs.w[SI] ).formatstr("%04X");
 	state_add( I8086_DI, "DI", m_regs.w[DI] ).formatstr("%04X");
+
+	state_add( I8086_AL, "AL", m_regs.b[AL] ).noshow();
+	state_add( I8086_AH, "AH", m_regs.b[AH] ).noshow();
+	state_add( I8086_CL, "CL", m_regs.b[CL] ).noshow();
+	state_add( I8086_CH, "CH", m_regs.b[CH] ).noshow();
+	state_add( I8086_DL, "DL", m_regs.b[DL] ).noshow();
+	state_add( I8086_DH, "DH", m_regs.b[DH] ).noshow();
+	state_add( I8086_BL, "BL", m_regs.b[BL] ).noshow();
+	state_add( I8086_BH, "BH", m_regs.b[BH] ).noshow();
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).formatstr("%16s").noshow();
 
@@ -586,7 +595,7 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 
 	PUSH(m_sregs[CS]);
 	PUSH(m_ip);
-	m_ip = dest_off;
+	m_prev_ip = m_ip = dest_off;
 	m_sregs[CS] = dest_seg;
 }
 

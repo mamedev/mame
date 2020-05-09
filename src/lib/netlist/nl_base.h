@@ -340,6 +340,12 @@ namespace netlist
 				const T &value          //!< Initial value after construction
 				);
 
+		template <typename O>
+		//! Constructor.
+		state_var(O &owner,             //!< owner must have a netlist() method.
+				const pstring &name     //!< identifier/name for this state variable
+		);
+
 		//! Destructor.
 		~state_var() noexcept = default;
 		//! Copy Constructor.
@@ -359,6 +365,10 @@ namespace netlist
 		//! Return const value of state variable.
 		constexpr operator const T & () const noexcept { return m_value; }
 		//! Return non-const value of state variable.
+		C14CONSTEXPR T & var() noexcept { return m_value; }
+		//! Return const value of state variable.
+		constexpr const T & var() const noexcept { return m_value; }
+		//! Return non-const value of state variable.
 		C14CONSTEXPR T & operator ()() noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr const T & operator ()() const noexcept { return m_value; }
@@ -366,6 +376,10 @@ namespace netlist
 		C14CONSTEXPR T * ptr() noexcept { return &m_value; }
 		//! Return const pointer to state variable.
 		constexpr const T * ptr() const noexcept{ return &m_value; }
+		//! Access state variable by ->.
+		C14CONSTEXPR T * operator->() noexcept { return &m_value; }
+		//! Access state variable by const ->.
+		constexpr const T * operator->() const noexcept{ return &m_value; }
 
 	private:
 		T m_value;
@@ -524,11 +538,6 @@ namespace netlist
 
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
-
-			// State saving support - allows this to be passed
-			// to generic save_state members
-			template<typename C>
-			void save_item(C &state, const pstring &membername, const pstring &itemname);
 
 		private:
 			netlist_t & m_netlist;
@@ -1774,6 +1783,40 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
+	// power pins - not a device, but a helper
+	// -----------------------------------------------------------------------------
+
+	/// \brief Power pins class.
+	///
+	/// Power Pins are passive inputs. Delegate noop will silently ignore any
+	/// updates.
+
+	class nld_power_pins
+	{
+	public:
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
+			const pstring &sGND = sPowerGND)
+		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
+		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
+		{
+		}
+
+		const analog_input_t &VCC() const noexcept
+		{
+			return m_VCC;
+		}
+		const analog_input_t &GND() const noexcept
+		{
+			return m_GND;
+		}
+
+	private:
+		void noop() { }
+		analog_input_t m_VCC;
+		analog_input_t m_GND;
+	};
+
+	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
@@ -1785,12 +1828,6 @@ namespace netlist
 	inline const netlist_state_t & detail::netlist_object_t::state() const noexcept
 	{
 		return m_netlist.nlstate();
-	}
-
-	template<typename C>
-	inline void detail::netlist_object_t::save_item(C &state, const pstring &membername, const pstring &itemname)
-	{
-		this->state().save(*this, state, name(), membername + "." + itemname);
 	}
 
 	template<class C, typename... Args>
@@ -2044,6 +2081,13 @@ namespace netlist
 	template <typename O>
 	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
 	: m_value(value)
+	{
+		owner.state().save(owner, m_value, owner.name(), name);
+	}
+
+	template <typename T>
+	template <typename O>
+	state_var<T>::state_var(O &owner, const pstring &name)
 	{
 		owner.state().save(owner, m_value, owner.name(), name);
 	}

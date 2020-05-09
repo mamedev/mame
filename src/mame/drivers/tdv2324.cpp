@@ -267,9 +267,10 @@ static void tdv2324_floppies(device_slot_interface &device)
 void tdv2324_state::tdv2324(machine_config &config)
 {
 	// basic system hardware
-	I8085A(config, m_maincpu, 8700000/2); // ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
-	m_maincpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 8700000/2)); // ???
+	maincpu.set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
+	maincpu.set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
+	maincpu.in_inta_func().set(P8259A_TAG, FUNC(pic8259_device::acknowledge));
 
 	I8085A(config, m_subcpu, 8000000/2); // ???
 	m_subcpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_sub_mem);

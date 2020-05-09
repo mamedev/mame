@@ -23,6 +23,16 @@ enum
 	I286_BP,
 	I286_SI,
 	I286_DI,
+
+	I286_AL,
+	I286_AH,
+	I286_CL,
+	I286_CH,
+	I286_DL,
+	I286_DH,
+	I286_BL,
+	I286_BH,
+
 	I286_FLAGS,
 
 	I286_ES,

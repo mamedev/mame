@@ -13,10 +13,11 @@ Hold Pawn + Knight buttons at boot for test mode.
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
-#include "machine/mmboard.h"
+#include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -30,25 +31,24 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
+		, m_display(*this, "display")
 		, m_dac(*this, "dac")
 		, m_keys(*this, "KEY")
 		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u.%u", 0U, 0U)
 	{ }
 
 	void modena(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<mephisto_board_device> m_board;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_keys;
 	output_finder<4> m_digits;
-	output_finder<3, 8> m_leds;
 
 	void modena_mem(address_map &map);
 
@@ -56,10 +56,12 @@ private:
 	DECLARE_WRITE8_MEMBER(digits_w);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(led_w);
+	void update_display();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(M6502_NMI_LINE, CLEAR_LINE);  }
 
+	uint8_t m_board_mux = 0xff;
 	uint8_t m_digits_idx = 0;
 	uint8_t m_io_ctrl = 0;
 };
@@ -67,16 +69,9 @@ private:
 void mephisto_modena_state::machine_start()
 {
 	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_digits_idx));
 	save_item(NAME(m_io_ctrl));
-}
-
-void mephisto_modena_state::machine_reset()
-{
-	m_digits_idx = 0;
-	m_io_ctrl = 0;
 }
 
 
@@ -85,31 +80,42 @@ void mephisto_modena_state::machine_reset()
     I/O
 ******************************************************************************/
 
+void mephisto_modena_state::update_display()
+{
+	m_display->matrix(m_io_ctrl >> 1 & 7, ~m_board_mux);
+}
+
 READ8_MEMBER(mephisto_modena_state::input_r)
 {
-	if (m_board->mux_r() == 0xff)
-		return m_keys->read();
-	else
-		return m_board->input_r() ^ 0xff;
+	uint8_t data = 0;
+
+	// read buttons
+	if (~m_io_ctrl & 1)
+		data |= m_keys->read();
+
+	// read chessboard sensors
+	for (int i=0; i<8; i++)
+		if (!BIT(m_board_mux, i))
+			data |= m_board->read_rank(i);
+
+	return data;
 }
 
 WRITE8_MEMBER(mephisto_modena_state::led_w)
 {
-	m_board->mux_w(data);
-
-	for (int sel = 0; sel < 3; sel++)
-	{
-		if (BIT(m_io_ctrl, sel+1))
-		{
-			for (int i = 0; i < 8; i++)
-				m_leds[sel][i] = BIT(data, i) ? 0 : 1;
-		}
-	}
+	// d0-d7: chessboard mux, led data
+	m_board_mux = data;
+	update_display();
 }
 
 WRITE8_MEMBER(mephisto_modena_state::io_w)
 {
+	// d0: button select
+	// d1-d3: led select
+	// d4: lcd polarity
+	// d6: speaker out
 	m_io_ctrl = data;
+	update_display();
 	m_dac->write(BIT(data, 6));
 }
 
@@ -131,7 +137,8 @@ void mephisto_modena_state::modena_mem(address_map &map)
 	map(0x4000, 0x4000).w(FUNC(mephisto_modena_state::digits_w));
 	map(0x5000, 0x5000).w(FUNC(mephisto_modena_state::led_w));
 	map(0x6000, 0x6000).w(FUNC(mephisto_modena_state::io_w));
-	map(0x7000, 0x7fff).r(FUNC(mephisto_modena_state::input_r));
+	map(0x7000, 0x7000).r(FUNC(mephisto_modena_state::input_r));
+	map(0x7f00, 0x7fff).nopr(); // dummy read on 6502 absolute X page wrap
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -161,6 +168,7 @@ INPUT_PORTS_END
 
 void mephisto_modena_state::modena(machine_config &config)
 {
+	/* basic machine hardware */
 	M65C02(config, m_maincpu, XTAL(4'194'304)); // W65C02SP or RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_modena_state::modena_mem);
 	timer_device &nmi_on(TIMER(config, "nmi_on"));
@@ -170,8 +178,12 @@ void mephisto_modena_state::modena(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MEPHISTO_BUTTONS_BOARD(config, m_board);
-	m_board->set_disable_leds(true);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_mephisto_modena);
 
 	/* sound hardware */

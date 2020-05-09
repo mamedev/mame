@@ -57,8 +57,8 @@ public:
 	void super80d(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_common();
+	void machine_reset_common();
+	void machine_start_common();
 	void cassette_motor(bool data);
 	void screen_vblank_super80m(bool state);
 	void portf0_w(u8 data);
@@ -72,6 +72,7 @@ protected:
 	u8 m_keylatch;
 	u8 m_cass_data[4];
 	u8 m_key_pressed;
+	u8 m_last_data;
 	bool m_boot_in_progress;
 	std::unique_ptr<u8[]> m_ram;
 	void super80m_palette(palette_device &palette) const;
@@ -98,6 +99,7 @@ protected:
 private:
 
 	void machine_reset() override;
+	void machine_start() override;
 	void portf1_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -111,7 +113,6 @@ private:
 	void super80m_map(address_map &map);
 
 	u8 m_int_sw;
-	u8 m_last_data;
 	u16 m_vidpg;
 	bool m_current_charset;
 };
@@ -155,6 +156,7 @@ protected:
 
 private:
 	void machine_reset() override;
+	void machine_start() override;
 	void low_w(u16 offset, u8 data);
 	void high_w(u16 offset, u8 data);
 	u8 low_r(u16 offset);
@@ -171,6 +173,7 @@ public:
 private:
 
 	void machine_reset() override;
+	void machine_start() override;
 	void low_w(u16 offset, u8 data);
 	void high_w(u16 offset, u8 data);
 	void super80r_map(address_map &map);

@@ -59,8 +59,8 @@ void mephisto_display_module2_device::device_add_mconfig(machine_config &config)
 
 void mephisto_display_module2_device::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
 }
 
 

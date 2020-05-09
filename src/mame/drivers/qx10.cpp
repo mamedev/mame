@@ -113,7 +113,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( mc146818_r );
 	DECLARE_WRITE8_MEMBER( mc146818_w );
-	DECLARE_READ8_MEMBER( get_slave_ack );
+	IRQ_CALLBACK_MEMBER( inta_call );
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_READ8_MEMBER( vram_bank_r );
 	DECLARE_WRITE8_MEMBER( vram_bank_w );
 	DECLARE_READ16_MEMBER( vram_r );
@@ -504,7 +505,15 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
     IR7     Slave cascade
 */
 
-READ8_MEMBER( qx10_state::get_slave_ack )
+IRQ_CALLBACK_MEMBER(qx10_state::inta_call)
+{
+	uint32_t vector = m_pic_m->acknowledge() << 16;
+	vector |= m_pic_m->acknowledge();
+	vector |= m_pic_m->acknowledge() << 8;
+	return vector;
+}
+
+uint8_t qx10_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic_s->acknowledge();
@@ -727,15 +736,12 @@ void qx10_state::qx10(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CLK / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
 	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(qx10_state::inta_call));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
 	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
@@ -800,7 +806,7 @@ void qx10_state::qx10(machine_config &config)
 
 	I8255(config, m_ppi, 0);
 
-	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
+	UPD7220(config, m_hgdc, 16.67_MHz_XTAL/4/2);
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
 	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
@@ -846,7 +852,8 @@ ROM_START( qx10 )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only
-	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
+//  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
+	ROM_LOAD( "qga.2e",   0x0000, 0x1000, CRC(4120b128) SHA1(9b96f6d78cfd402f8aec7c063ffb70a21b78eff0))
 ROM_END
 
 /* Driver */

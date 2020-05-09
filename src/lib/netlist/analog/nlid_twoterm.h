@@ -452,32 +452,31 @@ namespace analog
 	///   | Y  |IBV   |current at breakdown voltage     |A    |  0.001|        |      |
 	///   |    |TNOM  |parameter measurement temperature|deg C|     27|      50|      |
 	///
-	class diode_model_t : public param_model_t
+	class diode_model_t
 	{
 	public:
-		diode_model_t(device_t &device, const pstring &name, const pstring &val)
-		: param_model_t(device, name, val)
-		, m_IS(*this, "IS")
-		, m_N(*this, "N")
+		diode_model_t(param_model_t &model)
+		: m_IS(model, "IS")
+		, m_N(model, "N")
 		{}
 
-		value_t m_IS;    //!< saturation current.
-		value_t m_N;     //!< emission coefficient.
+		param_model_t::value_t m_IS;    //!< saturation current.
+		param_model_t::value_t m_N;     //!< emission coefficient.
 	};
 
 	class zdiode_model_t : public diode_model_t
 	{
 	public:
-		zdiode_model_t(device_t &device, const pstring &name, const pstring &val)
-		: diode_model_t(device, name, val)
-		, m_NBV(*this, "NBV")
-		, m_BV(*this, "BV")
-		, m_IBV(*this, "IBV")
+		zdiode_model_t(param_model_t &model)
+		: diode_model_t(model)
+		, m_NBV(model, "NBV")
+		, m_BV(model, "BV")
+		, m_IBV(model, "IBV")
 		{}
 
-		value_t m_NBV;    //!< reverse emission coefficient.
-		value_t m_BV;     //!< reverse breakdown voltage.
-		value_t m_IBV;    //!< current at breakdown voltage.
+		param_model_t::value_t m_NBV;    //!< reverse emission coefficient.
+		param_model_t::value_t m_BV;     //!< reverse breakdown voltage.
+		param_model_t::value_t m_IBV;    //!< current at breakdown voltage.
 	};
 
 	// -----------------------------------------------------------------------------
@@ -504,7 +503,7 @@ namespace analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		diode_model_t m_model;
+		param_model_t m_model;
 		generic_diode<diode_e::BIPOLAR> m_D;
 	};
 
@@ -533,7 +532,7 @@ namespace analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		zdiode_model_t m_model;
+		param_model_t m_model;
 		generic_diode<diode_e::BIPOLAR> m_D;
 		// REVERSE diode
 		generic_diode<diode_e::BIPOLAR> m_R;
@@ -553,14 +552,13 @@ namespace analog
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
 		, m_func(*this,"FUNC", "")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -570,7 +568,7 @@ namespace analog
 			m_t += step;
 			m_funcparam[0] = m_t;
 			this->set_G_V_I(plib::reciprocal(m_R()),
-					m_compiled.evaluate(m_funcparam),
+					m_compiled->evaluate(m_funcparam),
 					nlconst::zero());
 		}
 
@@ -587,7 +585,7 @@ namespace analog
 		param_fp_t m_R;
 		param_fp_t m_V;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -602,14 +600,13 @@ namespace analog
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
 		, m_func(*this,"FUNC", "")
-		, m_compiled()
+		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			m_compiled.save_state(*this, "m_compiled");
 			register_subalias("P", P());
 			register_subalias("N", N());
 			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -617,7 +614,7 @@ namespace analog
 		{
 			m_t += step;
 			m_funcparam[0] = m_t;
-			const nl_fptype I = m_compiled.evaluate(m_funcparam);
+			const nl_fptype I = m_compiled->evaluate(m_funcparam);
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -I,
 					zero, zero,  I);
@@ -649,7 +646,7 @@ namespace analog
 		state_var<nl_fptype> m_t;
 		param_fp_t m_I;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
+		state_var<plib::pfunction<nl_fptype>> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 

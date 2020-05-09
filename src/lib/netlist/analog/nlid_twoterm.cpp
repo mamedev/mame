@@ -145,8 +145,9 @@ namespace analog
 
 	NETLIB_RESET(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		diode_model_t modacc(m_model);
+		nl_fptype Is = modacc.m_IS;
+		nl_fptype n = modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
@@ -154,8 +155,9 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(D)
 	{
-		nl_fptype Is = m_model.m_IS;
-		nl_fptype n = m_model.m_N;
+		diode_model_t modacc(m_model);
+		nl_fptype Is = modacc.m_IS;
+		nl_fptype n = modacc.m_N;
 
 		m_D.set_param(Is, n, exec().gmin(), nlconst::T0());
 	}
@@ -176,19 +178,21 @@ namespace analog
 
 	NETLIB_RESET(Z)
 	{
-		nl_fptype IsBV = m_model.m_IBV / (plib::exp(m_model.m_BV / nlconst::np_VT(m_model.m_NBV)) - nlconst::one());
+		zdiode_model_t modacc(m_model);
+		nl_fptype IsBV = modacc.m_IBV / (plib::exp(modacc.m_BV / nlconst::np_VT(modacc.m_NBV)) - nlconst::one());
 
-		m_D.set_param(m_model.m_IS, m_model.m_N, exec().gmin(), nlconst::T0());
-		m_R.set_param(IsBV, m_model.m_NBV, exec().gmin(), nlconst::T0());
+		m_D.set_param(modacc.m_IS, modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
 
 	NETLIB_UPDATE_PARAM(Z)
 	{
-		nl_fptype IsBV = m_model.m_IBV / (plib::exp(m_model.m_BV / nlconst::np_VT(m_model.m_NBV)) - nlconst::one());
+		zdiode_model_t modacc(m_model);
+		nl_fptype IsBV = modacc.m_IBV / (plib::exp(modacc.m_BV / nlconst::np_VT(modacc.m_NBV)) - nlconst::one());
 
-		m_D.set_param(m_model.m_IS, m_model.m_N, exec().gmin(), nlconst::T0());
-		m_R.set_param(IsBV, m_model.m_NBV, exec().gmin(), nlconst::T0());
+		m_D.set_param(modacc.m_IS, modacc.m_N, exec().gmin(), nlconst::T0());
+		m_R.set_param(IsBV, modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
 

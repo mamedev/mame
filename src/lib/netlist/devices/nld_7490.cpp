@@ -7,7 +7,6 @@
 
 #include "nld_7490.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -64,27 +63,32 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(7490_dip, 7490)
+	NETLIB_OBJECT(7490_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7490_dip, 7490)
+		NETLIB_CONSTRUCTOR(7490_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", "B");
-			register_subalias("2", "R1");
-			register_subalias("3", "R2");
+			register_subalias("1", "A.B");
+			register_subalias("2", "A.R1");
+			register_subalias("3", "A.R2");
 
 			// register_subalias("4", ); --> NC
-			register_subalias("5", "VCC");
-			register_subalias("6", "R91");
-			register_subalias("7", "R92");
+			register_subalias("5", "A.VCC");
+			register_subalias("6", "A.R91");
+			register_subalias("7", "A.R92");
 
-			register_subalias("8", "QC");
-			register_subalias("9", "QB");
-			register_subalias("10", "GND");
-			register_subalias("11", "QD");
-			register_subalias("12", "QA");
+			register_subalias("8", "A.QC");
+			register_subalias("9", "A.QB");
+			register_subalias("10", "A.GND");
+			register_subalias("11", "A.QD");
+			register_subalias("12", "A.QA");
 			// register_subalias("13", ); --> NC
-			register_subalias("14", "A");
+			register_subalias("14", "A.A");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(7490) A;
 	};
 
 	NETLIB_RESET(7490)

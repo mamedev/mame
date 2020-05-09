@@ -7,7 +7,6 @@
 
 #include "nld_am2847.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -88,7 +87,8 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+		friend class NETLIB_NAME(AM2847_dip);
+	private:
 		NETLIB_SUB(Am2847_shifter) m_A;
 		NETLIB_SUB(Am2847_shifter) m_B;
 		NETLIB_SUB(Am2847_shifter) m_C;
@@ -98,27 +98,32 @@ namespace netlist
 		state_var<uint32_t> m_last_CP;
 	};
 
-	NETLIB_OBJECT_DERIVED(AM2847_dip, AM2847)
+	NETLIB_OBJECT(AM2847_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(AM2847_dip, AM2847)
+		NETLIB_CONSTRUCTOR(AM2847_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_A.m_OUT);
-			register_subalias("2", m_A.m_RC);
-			register_subalias("3", m_A.m_IN);
-			register_subalias("4", m_B.m_OUT);
-			register_subalias("5", m_B.m_RC);
-			register_subalias("6", m_B.m_IN);
-			register_subalias("7", m_C.m_OUT);
-			register_subalias("8", "VDD");
+			register_subalias("1", A.m_A.m_OUT);
+			register_subalias("2", A.m_A.m_RC);
+			register_subalias("3", A.m_A.m_IN);
+			register_subalias("4", A.m_B.m_OUT);
+			register_subalias("5", A.m_B.m_RC);
+			register_subalias("6", A.m_B.m_IN);
+			register_subalias("7", A.m_C.m_OUT);
+			register_subalias("8", "A.VDD");
 
-			register_subalias("9",  m_C.m_RC);
-			register_subalias("10", m_C.m_IN);
-			register_subalias("11", m_CP);
-			register_subalias("13", m_D.m_OUT);
-			register_subalias("14", m_D.m_RC);
-			register_subalias("15", m_D.m_IN);
-			register_subalias("16", "VSS");
+			register_subalias("9",  A.m_C.m_RC);
+			register_subalias("10", A.m_C.m_IN);
+			register_subalias("11", A.m_CP);
+			register_subalias("13", A.m_D.m_OUT);
+			register_subalias("14", A.m_D.m_RC);
+			register_subalias("15", A.m_D.m_IN);
+			register_subalias("16", "A.VSS");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(AM2847) A;
 	};
 
 	NETLIB_RESET(AM2847)

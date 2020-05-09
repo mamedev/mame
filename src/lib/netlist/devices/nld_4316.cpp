@@ -8,7 +8,6 @@
 #include "nld_4316.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
-#include "nlid_system.h"
 
 namespace netlist { namespace devices {
 

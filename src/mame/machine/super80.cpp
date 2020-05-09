@@ -189,21 +189,45 @@ void super80_state::portf0_w(u8 data)
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-void super80_state::machine_start()
+void super80_state::machine_start_common()
 {
 	// zerofill
 	m_ram = make_unique_clear<u8[]>(0x10000);
-	m_vidpg = 0xfe00;
 	m_cass_led.resolve();
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x10000);
-//	save_item(NAME(m_ram_address));
-//	save_item(NAME(m_matrix));
-//	save_item(NAME(m_digit_data));
+	save_item(NAME(m_portf0));
+	save_item(NAME(m_s_options));
+	save_item(NAME(m_palette_index));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_boot_in_progress));
+	save_item(NAME(m_last_data));
 }
 
-void super80_state::machine_common()
+void super80_state::machine_start()
+{
+	machine_start_common();
+	save_item(NAME(m_int_sw));
+	save_item(NAME(m_vidpg));
+	save_item(NAME(m_current_charset));
+	std::copy_n(&m_rom[0], 0x3000, &m_ram[0xc000]);   // make 0 F1 C0 work
+	std::fill_n(&m_ram[0xf000], 0x1000, 0xff);        // make O F1 FF work
+}
+
+void super80r_state::machine_start()
+{
+	machine_start_common();
+}
+
+void super80v_state::machine_start()
+{
+	machine_start_common();
+}
+
+void super80_state::machine_reset_common()
 {
 	m_boot_in_progress = true;
 	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
@@ -216,17 +240,18 @@ void super80_state::machine_reset()
 {
 	std::copy_n(&m_rom[0], 0x3000, &m_ram[0xc000]);   // make 0 F1 C0 work
 	std::fill_n(&m_ram[0xf000], 0x1000, 0xff);        // make O F1 FF work
-	machine_common();
+	machine_reset_common();
+	m_vidpg = 0xfe00;
 }
 
 void super80r_state::machine_reset()
 {
-	machine_common();
+	machine_reset_common();
 }
 
 void super80v_state::machine_reset()
 {
-	machine_common();
+	machine_reset_common();
 }
 
 

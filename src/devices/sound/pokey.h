@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "machine/rescap.h"
-
 /*
  *  ATARI Pokey (CO12294) pin-out
  *

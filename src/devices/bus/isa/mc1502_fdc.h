@@ -51,9 +51,10 @@ private:
 
 	required_device<fd1793_device> m_fdc;
 	int motor_on;
+	u8 m_control;
 	emu_timer *motor_timer;
 	required_device<cpu_device> m_cpu;
-
+	void motors_onoff();
 public:
 	void mc1502_wd17xx_aux_w(uint8_t data);
 	uint8_t mc1502_wd17xx_aux_r();

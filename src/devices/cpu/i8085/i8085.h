@@ -45,6 +45,9 @@ public:
 	// CLK rate callback (8085A only)
 	template <typename... T> void set_clk_out(T &&... args) { m_clk_out_func.set(std::forward<T>(args)...); }
 
+	// INTA vector fetch callback
+	auto in_inta_func() { return m_in_inta_func.bind(); }
+
 	// STATUS changed callback
 	auto out_status_func() { return m_out_status_func.bind(); }
 
@@ -100,6 +103,7 @@ private:
 	address_space_config m_io_config;
 	address_space_config m_opcode_config;
 
+	devcb_read8 m_in_inta_func;
 	devcb_write8 m_out_status_func;
 	devcb_write_line m_out_inte_func;
 	devcb_read_line m_in_sid_func;
@@ -121,6 +125,7 @@ private:
 	u8 m_trap_pending;   /* TRAP interrupt latched? */
 	u8 m_trap_im_copy;   /* copy of IM register when TRAP was taken */
 	u8 m_sod_state;      /* state of the SOD line */
+	bool m_in_acknowledge;
 
 	bool m_ietemp;       /* import/export temp space */
 
@@ -144,6 +149,7 @@ private:
 	u8 get_rim_value();
 	void break_halt_for_interrupt();
 	u8 read_op();
+	u8 read_inta();
 	u8 read_arg();
 	PAIR read_arg16();
 	u8 read_mem(u32 a);

@@ -481,6 +481,7 @@ void nemesis_state::bubsys_map(address_map &map)
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x057000, 0x057fff).ram();
 	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
 	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05c402, 0x05c403).portr("DSW0");
@@ -3034,6 +3035,27 @@ ROM_START( gradiusb )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
+ROM_START( twinbeeb )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
+
+	ROM_REGION( 0x806*0x90, "bubblememory", ROMREGION_ERASE00 )
+//	ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
+	
+	ROM_REGION( 0x806*0x80, "bubblememory_temp", 0 )
+	ROM_LOAD( "twinbee.bin", 0x00000, 0x40300, CRC(4d396a0a) SHA1(ee922a1bd7062c0fcf358f5079cca6424aadc975) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )
+	ROM_LOAD( "400-a01.fse",  0x00000, 0x0100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
 void nemesis_state::bubsys_init()
 {
 	/*
@@ -3060,9 +3082,48 @@ void nemesis_state::bubsys_init()
 	m_bubsys_control_ram[3]=0x240;
 }
 
+
+void nemesis_state::bubsys_twinbeeb_init()
+{
+	// the twinbee bubble data is in a stripped down, predecoded state already, why?
+	// this reencodes it to something the loading code can actually use
+
+	uint8_t *src = memregion("bubblememory_temp")->base();
+	uint8_t *dst = memregion("bubblememory")->base();
+
+	for (int i = 0; i < 0x806; i++)
+	{
+		uint16_t crc = 0;
+		
+		int sourcebase = i * 0x80;
+		int destbase = i * 0x90;
+
+		for (int j = 0; j < 0x80; j++)
+		{
+			uint8_t dat = src[sourcebase + j];
+			dst[destbase + j + 0] |= (dat >> 6) & 0x03;
+			dst[destbase + j + 1] |= (dat << 2) & 0xfc;
+
+			crc += dat;
+		}
+
+		for (int j = 0; j < 0x82; j += 2)
+		{
+			uint8_t temp1 = dst[destbase + j + 0];
+			dst[destbase + j + 0] = dst[destbase + j + 1];
+			dst[destbase + j + 1] = temp1;
+		}
+
+		dst[destbase+0x83] = i >> 8;
+		dst[destbase+0x82] = i & 0xff;
+	}
+
+	bubsys_init();
+}
+
 GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-// Bubble System Twinbee
+GAME( 1985, twinbeeb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 // Bubble System RF2
 // Bubble System Galactic Warriors
 // Bubble System Attack Rush

@@ -852,6 +852,17 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/sed1500.h,VIDEOS["SED1500"] = true
+--------------------------------------------------
+if (VIDEOS["SED1500"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sed1500.cpp",
+		MAME_DIR .. "src/devices/video/sed1500.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/sed1520.h,VIDEOS["SED1520"] = true
 --------------------------------------------------
 if (VIDEOS["SED1520"]~=null) then

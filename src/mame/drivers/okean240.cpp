@@ -118,7 +118,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppikbd;
 };
 
@@ -513,6 +513,7 @@ void okean240_state::okean240t(machine_config &config)
 	I8080(config, m_maincpu, XTAL(12'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &okean240_state::okean240_mem);
 	m_maincpu->set_addrmap(AS_IO, &okean240_state::okean240t_io);
+	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

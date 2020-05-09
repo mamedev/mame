@@ -484,6 +484,18 @@ namespace plib {
 			{
 				m_if_flag ^= (1 << m_if_level);
 			}
+			else if (lti[0] == "#elif")
+			{
+				m_if_flag ^= (1 << m_if_level);
+				lt = replace_macros(lt);
+				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(5), m_expr_sep, true, true)));
+				auto val = static_cast<int>(prepro_expr(t, 255));
+				t.skip_ws();
+				if (!t.eod())
+					error("found unprocessed content at end of line");
+				if (val == 0)
+					m_if_flag |= (1 << m_if_level);
+			}
 			else if (lti[0] == "#endif")
 			{
 				m_if_flag &= ~(1 << m_if_level);

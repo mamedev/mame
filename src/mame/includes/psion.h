@@ -85,8 +85,6 @@ protected:
 	void update_banks();
 	void port2_w(offs_t offset, uint8_t data, uint8_t ddr);
 	uint8_t port2_r();
-	void tcsr_w(uint8_t data);
-	uint8_t tcsr_r();
 	uint8_t rcp5c_r();
 	uint8_t port5_r();
 	void port6_w(uint8_t data);
