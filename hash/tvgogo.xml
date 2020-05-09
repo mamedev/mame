@@ -39,7 +39,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 		</part>
 	</software>
 
-  <software name="4in1u" cloneof="4in1" supported="no">
+	<software name="4in1u" cloneof="4in1" supported="no">
 		<description>4-in-1 (Flashcard Fishing, Break a Brick, Balloon Juggling, Penguin Maze) (US)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
@@ -48,9 +48,9 @@ _(EU)__|__(US)__|____________|_____________________________________
 				<rom name="tvgogo4in1_m5m29gb320_001c0021.bin" size="0x400000" crc="2bbcbeff" sha1="1e58c05c1efa344622962476d465c1540d964d14"/>
 			</dataarea>
 		</part>
-  </software>
+	</software>
 
-  <software name="basebalu" supported="no">
+	<software name="basebalu" supported="no">
 		<description>Baseball (US)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
@@ -61,7 +61,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 		</part>
 	</software>
 
-  <software name="tennis" supported="no">
+	<software name="tennis" supported="no">
 		<description>Tennis (EU)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
@@ -94,7 +94,7 @@ _(EU)__|__(US)__|____________|_____________________________________
 		</part>
 	</software>
 
-  <software name="dodgebalu" supported="no">
+	<software name="dodgebalu" supported="no">
 		<description>Dodgeball (US)</description>
 		<year>2005</year>
 		<publisher>Toyquest</publisher>
@@ -103,6 +103,6 @@ _(EU)__|__(US)__|____________|_____________________________________
 				<rom name="tvgogododgeball_m5m29gt320_001c0020.bin" size="0x400000" crc="785f4305" sha1="0c96d6330acd2771adb4dbdcb6b9ccaa73ffc513"/>
 			</dataarea>
 		</part>
-  </software>
+	</software>
 
 </softwarelist>
