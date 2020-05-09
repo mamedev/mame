@@ -661,7 +661,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 		//printf("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 		// TODO the global yscroll should be applied here too as it can be sub-pixel for precision in zoomed cases
-		uint32 yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
+		uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
 		yzoom &= 0x07ffffff;
 		bool yzoominverted = false;
 
