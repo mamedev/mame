@@ -76,11 +76,6 @@ uint8_t psion_state::port2_r()
 	return m_pack1->data_r() | m_pack2->data_r();
 }
 
-uint8_t psion_state::rcp5c_r()
-{
-	return (m_maincpu->rcr_r()&0x7f) | (m_stby_pwr<<7);
-}
-
 uint8_t psion_state::port5_r()
 {
 	/*
@@ -234,7 +229,6 @@ void psion_state::psion_int_reg(address_map &map)
 {
 	// FIXME: this should all be made internal to the CPU device
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io));
-	map(0x0014, 0x0014).r(FUNC(psion_state::rcp5c_r));
 }
 
 void psion1_state::psion1_mem(address_map &map)
@@ -499,6 +493,10 @@ void psion_state::machine_reset()
 
 	if (m_rom_bank_count || m_ram_bank_count)
 		update_banks();
+
+	// enable warm boot
+	u8 mcu_rp5cr = m_maincpu->space(AS_PROGRAM).read_byte(0x14);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x14, (mcu_rp5cr & 0x7f) | (m_stby_pwr << 7));
 }
 
 void psion1_state::machine_reset()
