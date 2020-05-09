@@ -199,7 +199,7 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_irqclear_w)
 
 void vrt_vt1682_timer_device::device_add_mconfig(machine_config& config)
 {
-	TIMER(config, m_timer).configure_periodic(FUNC(vrt_vt1682_timer_device::timer_expired), attotime::never);
+	TIMER(config, m_timer).configure_generic(FUNC(vrt_vt1682_timer_device::timer_expired));
 }
 
 void vrt_vt1682_timer_device::change_clock()

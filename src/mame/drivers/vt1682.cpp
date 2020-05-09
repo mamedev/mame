@@ -5487,7 +5487,7 @@ void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
 void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 {
 	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
-	TIMER(config, m_render_timer).configure_periodic(FUNC(vt_vt1682_state::line_render_start), attotime::never);
+	TIMER(config, m_render_timer).configure_generic(FUNC(vt_vt1682_state::line_render_start));
 
 	VT_VT1682_ALU(config, m_maincpu_alu, 0);
 	VT_VT1682_ALU(config, m_soundcpu_alu, 0);

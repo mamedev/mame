@@ -577,7 +577,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
 
-	TIMER(config, m_timer).configure_periodic(FUNC(nes_sh6578_state::timer_expired), attotime::never);
+	TIMER(config, m_timer).configure_generic(FUNC(nes_sh6578_state::timer_expired));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
