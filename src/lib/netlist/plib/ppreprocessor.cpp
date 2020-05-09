@@ -587,6 +587,19 @@ namespace plib {
 					}
 				}
 			}
+			else if (lti[0] == "#undef")
+			{
+				if (m_if_flag == 0)
+				{
+					if (lti.size() < 2)
+						error("undef needs at least one argument");
+					auto args(simple_iter<ppreprocessor>(this, tokenize(lt.substr(7), m_expr_sep, false, false)));
+					pstring n = args.next();
+					if (!is_valid_token(n))
+						error("undef expected identifier");
+					m_defines.erase(n);
+				}
+			}
 			else
 			{
 				if (m_if_flag == 0)
