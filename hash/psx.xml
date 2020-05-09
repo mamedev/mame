@@ -45427,8 +45427,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, locks up when first dialogue appears/attempts to speech -->
 	<software name="harukaby" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Harukanaru Toki no Naka de - Banjou Yuugi (Japan) [SLPM-87241].bin" size="688315152" crc="60c4e9f2" sha1="4bee265b29acf0da66a63daa212f918e6b837e7a"/>
 		<rom name="Harukanaru Toki no Naka de - Banjou Yuugi (Japan) [SLPM-87241].cue" size="128" crc="66f38954" sha1="b96ab6df215efce4c3ac371df52c34b730bbcce0"/>
 		-->
@@ -45441,7 +45443,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="harukanaru toki no naka de - banjou yuugi (japan) [slpm-87241]" sha1="e183fe993ae96c03c582db74decf40eace1b1669"/>
+				<disk name="harukanaru toki no naka de - banjou yuugi (japan) [slpm-87241]" sha1="e183fe993ae96c03c582db74decf40eace1b1669" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46182,8 +46184,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hyoryuki" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hyoryuki" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hyouryuuki - The Reportage Beyond The Sea (Japan) [SLPS-02358].bin" size="65086896" crc="44257b30" sha1="b14fd40c44f40ffdd0362ff254df8d40d6f373a6"/>
 		<rom name="Hyouryuuki - The Reportage Beyond The Sea (Japan) [SLPS-02358].cue" size="128" crc="aa224350" sha1="cc16b35086dff2b4bb9d1d6b363337ef600b746e"/>
 		-->
@@ -46196,7 +46200,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hyouryuuki - the reportage beyond the sea (japan) [slps-02358]" sha1="02cd0c84ed58c0861b8f4c1f77c53c6409c4df62"/>
+				<disk name="hyouryuuki - the reportage beyond the sea (japan) [slps-02358]" sha1="02cd0c84ed58c0861b8f4c1f77c53c6409c4df62" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
