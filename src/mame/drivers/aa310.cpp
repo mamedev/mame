@@ -426,7 +426,7 @@ void aa310_state::aa310(machine_config &config)
 	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
 	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	PCF8583(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 

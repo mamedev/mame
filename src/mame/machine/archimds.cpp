@@ -462,7 +462,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 
 			if ( m_i2cmem )
 			{
-				i2c_data = (m_i2cmem->sda_r() & 1);
+				i2c_data = (m_i2cmem->read_sda() & 1);
 			}
 
 			floppy_ready_state = check_floppy_ready();
@@ -532,8 +532,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 			if ( m_i2cmem )
 			{
-				m_i2cmem->sda_w(data & 0x01);
-				m_i2cmem->scl_w((data & 0x02) >> 1);
+				m_i2cmem->write_sda(data & 0x01);
+				m_i2cmem->write_scl((data & 0x02) >> 1);
 			}
 			m_i2c_clk = (data & 2) >> 1;
 			//TODO: does writing bit 2 here causes a fdc force ready?
