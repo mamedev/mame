@@ -5,14 +5,6 @@
 
 
 //
-// First pass through the compilation goes down this path.
-// Here we set up common defines and models used by both
-// Star Castle and War of the Worlds.
-//
-
-#ifndef SOUND_VARIANT
-
-//
 // The final amplifier is documented but not emulated.
 //
 #define EMULATE_FINAL_AMP	0
@@ -261,70 +253,7 @@ static NETLIST_START(CA3080)
 NETLIST_END()
 
 
-//
-// Conversion of Star Castle audio board to War of the Worlds,
-// taken from http://zonn.com/Cinematronics/wotw-hack.htm
-//
-// Still TODO: (A) (C) (F) (L) (M)
-//
-// Lets start with the cuts:
-//   (A) Follow the trace leading from pin 5 of IC3 down. When you reach the end of this trace, just to the right will
-//       be a small 3/8" trace running in parallel. Cut the small 3/8" trace. Do NOT cut the trace leading from pin 5
-//       of IC3, this lead was only mentioned as a reference.
-//   (B) Cut the traces coming from the pins 2 and 5 of IC3. These two traces run in parallel, cut them near IC3.
-//   (C) Directly below IC2 and IC1 are three horizontal traces running in parallel with each other (They connect to
-//       nothing on top of the board). Cut all three of these traces.
-//
-// Flip over the board and make the following two cuts (be careful when counting IC pins, they appear as a mirror image
-// when viewed from the bottom).
-//   (D) Cut the trace leading from pin 9 of IC3 to R100.
-//   (E) Cut the trace leading from IC3 pin 12, directly at pin 12.
-//
-// Flip the board back over, it's time to add the 1k resistor.
-//   (F) Below IC28 (74LS107) is a single 1.25" straight trace, it connects to nothing on top of the board, remember this
-//       trace. Along the bottom of the board, above the very bottom row of ICs run four thick traces. Count down to the
-//       3rd thick trace from the top (+5v) and connect a 1k 5% (Brown, Black, Red, Gold) resistor from this trace to
-//       the previously described trace that runs below IC28.
-//
-// Now using some light gauge wire-wrap wire, add the following jumpers:
-//   (G) Connect pin 2 of IC3 (74LS377) to pin 1 of IC6 (7406).
-//   (H) Connect pin 9 of IC3 to the right side of resistor R86.
-//   (I) Connect pin 12 of IC3 to the right side of resistor R75.
-//   (J) Connect pin 16 of IC3 to pin 3 of IC6.
-//   (K) Connect pin 19 of IC3 to the right side of resistor R100.
-//   (L) Connect pin 4 of IC6 to the top side of the 1k resistor just installed.
-//   (M) Locate the three, previously cut, traces that run directly below IC1 and IC2. Short together all three of these
-//       traces on the right side of your cut, now connect these three shorted traces to pin 6 of IC3.
-//
-
-#define VARIANT_STARCASTLE 	0
-#define VARIANT_WOTW		1
-
-//
-// Generate both variants
-//
-
-#define SOUND_VARIANT		VARIANT_STARCASTLE
-#include "nl_starcas.cpp"
-
-#undef SOUND_VARIANT
-#define SOUND_VARIANT		VARIANT_WOTW
-#include "nl_starcas.cpp"
-
-#else
-
-
-//
-// The following code is only processed by the above two includes.
-// It has ifdefs to generate both Star Castle and War of the Worlds
-// sound boards, based on the SOUND_VARIANT define.
-//
-
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 static NETLIST_START(StarCastle_schematics)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-static NETLIST_START(WarOfTheWorlds_schematics)
-#endif
 
 	// Used by some CA3080 models above
 	NET_MODEL("CA3080_QN_OTA NPN(IS=21.48f XTI=3 EG=1.11 VAF=80 BF=550 ISE=50f NE=1.5 IKF=10m XTB=1.5 BR=.1 ISC=10f NC=2 IKR=3m RC=10 CJC=800f MJC=.3333 VJC=.75 FC=.5 CJE=1.3p MJE=.3333 VJE=.75 TR=30n TF=400P ITF=30m XTF=1 VTF=10 CJS=5.8P MJS=.3333 VJS=.75)")
@@ -484,9 +413,6 @@ static NETLIST_START(WarOfTheWorlds_schematics)
     RES(R127, RES_K(30))
 	POT(R128, RES_K(10))
 	PARAM(R128.DIAL, 0.500000)
-#if (SOUND_VARIANT == VARIANT_WOTW)
-	RES(R129, RES_K(1))		// WOTW modification (F)
-#endif
 
 //  CAP(C2, CAP_U(25))		// electrolytic
 //  CAP(C4, CAP_U(25))		// electrolytic
@@ -603,14 +529,8 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 	NET_C(I_SHIFTREG_2, IC6.9)
 	NET_C(IC6.8, R3.2, R4.1)
 	NET_C(I_SHIFTREG_1, IC6.11)
-#if (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(I_SHIFTREG_1, IC6.3)				// WOTW modification (J)
-#endif
 	NET_C(IC6.10, R5.2, R6.1)
 	NET_C(I_SHIFTREG_0, IC6.13)
-#if (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(I_SHIFTREG_0, R100.1)			// WOTW modification (K)
-#endif
 	NET_C(IC6.12, R7.2, R8.1)
 	NET_C(R4.2, R6.2, R8.2, IC7.2, R9.1)
 	NET_C(IC7.6, R9.2, R10.1)
@@ -643,12 +563,7 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 	NET_C(GND, R27.1, IC10.4, IC10.5, IC10.6, IC10.8, IC11.3, IC11.4, IC11.8, IC12.7, IC12.12, IC13.7, IC13.12, IC28.4, IC28.7)
 	NET_C(I_V5, R22.1, IC10.16, IC11.16, IC12.14, IC13.14, IC28.14)
 	NET_C(CLK, IC10.2, IC11.2, IC13.1, IC28.12)
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	NET_C(I_SHIFTREG_3, IC6.1, IC13.2)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(IC6.1, IC13.2)			// WOTW modification (E)
-	NET_C(I_SHIFTREG_3, R75.1)	// WOTW modification (I)
-#endif
 	NET_C(IC6.2, R22.2, IC10.1, IC11.1)
 	NET_C(HI, IC10.3, IC10.7, IC10.10, IC11.5, IC11.6, IC11.7)
 	NET_C(IC10.15, IC11.10)
@@ -779,12 +694,7 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 	NET_C(I_V5, Q10.E, R74.1, R76.1)
 	NET_C(I_V15, IC20.7)
 	NET_C(I_VM15, C33.2, R77.1, IC20.4)
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	NET_C(I_SHIFTREG_7, R74.2, R75.1)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(R74.2, R75.1)				// WOTW modification (B)
-	NET_C(I_SHIFTREG_7, IC6.1)		// WOTW modification (G)
-#endif
 	NET_C(R75.2, R76.2, Q10.B)
 	NET_C(Q10.C, R77.2, R78.2, Q11.E)
 	NET_C(R79.2, Q11.B)
@@ -803,11 +713,7 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 	NET_C(I_V5, R85.1, R87.1, R88.1, Q12.E)
 	NET_C(I_V15, IC21.7)
 	NET_C(I_VM15, R91.1, IC21.4)
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	NET_C(I_SHIFTREG_6, R85.2, R86.1)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(R85.2, R86.1)				// WOTW modification (B)
-#endif
 	NET_C(R86.2, R87.2, Q12.B)
 	NET_C(Q12.C, R90.1, Q13.E)
 	NET_C(SQUAREWAVE, R88.2, R89.1)
@@ -829,12 +735,7 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 	NET_C(I_V5, R99.1, R101.1, Q15.E)
 	NET_C(I_V15, IC22.7)
 	NET_C(I_VM15, C34.2, R102.1, IC22.4)
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	NET_C(I_SHIFTREG_4, R99.2, R100.1)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-	NET_C(R99.2, R100.1)			// WOTW modification (D)
-	NET_C(I_SHIFTREG_4, R86.1)		// WOTW modification (H)
-#endif
 	NET_C(R100.2, R101.2, Q15.B)
 	NET_C(Q15.C, R102.2, R103.2, Q16.E)
 	NET_C(R104.2, Q16.B)
@@ -911,11 +812,7 @@ static NETLIST_START(WarOfTheWorlds_schematics)
 NETLIST_END()
 
 
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 NETLIST_START(starcas)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-NETLIST_START(wotw)
-#endif
 
 	// 192k is not high enough to make the laser and background pitches high enough
 	SOLVER(Solver, 384000)
@@ -944,14 +841,7 @@ NETLIST_START(wotw)
 
 	LOCAL_SOURCE(CA3080)
 
-#if (SOUND_VARIANT == VARIANT_STARCASTLE)
 	LOCAL_SOURCE(StarCastle_schematics)
 	INCLUDE(StarCastle_schematics)
-#else // (SOUND_VARIANT == VARIANT_WOTW)
-	LOCAL_SOURCE(WarOfTheWorlds_schematics)
-	INCLUDE(WarOfTheWorlds_schematics)
-#endif
 
 NETLIST_END()
-
-#endif

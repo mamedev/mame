@@ -93,7 +93,7 @@ void cinemat_audio_device::input_set(int bit, int state)
 void cinemat_audio_device::shiftreg_latch()
 {
 	u8 oldvals = m_shiftreg;
-	m_shiftreg = m_shiftreg_accum;
+	m_shiftreg = shiftreg_swizzle(m_shiftreg_accum);
 	if (oldvals != m_shiftreg)
 	{
 		log_changes(m_shiftreg, oldvals, "I_SHIFTREG");
@@ -143,6 +143,12 @@ void cinemat_audio_device::shiftreg_changed(u8 newvals, u8 oldvals)
 void cinemat_audio_device::shiftreg16_changed(u16 newvals, u16 oldvals)
 {
 	// overridden by base class if needed
+}
+
+u8 cinemat_audio_device::shiftreg_swizzle(u8 rawvals)
+{
+	// overridden if needed by base class
+	return rawvals;
 }
 
 
@@ -1218,7 +1224,7 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 #if WOTW_USE_NETLIST
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(wotw))
+		.set_source(NETLIST_NAME(starcas))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:shiftreg_0", "I_SHIFTREG_0.IN", 0);
@@ -1257,6 +1263,25 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 #endif
+}
+
+u8 wotw_audio_device::shiftreg_swizzle(u8 rawvals)
+{
+	//
+	// Thanks to Frank Palazzolo for figuring out this mapping, based
+	// on board photos and the information provided here:
+	//
+	// http://zonn.com/Cinematronics/wotw-hack.htm
+	//
+
+	u8 starcas_bits = 0;
+	if (BIT(rawvals, 0)) starcas_bits |= 0x10;
+	if (!BIT(rawvals, 1)) starcas_bits |= 0x20;
+	if (BIT(rawvals, 3)) starcas_bits |= 0x80;
+	if (BIT(rawvals, 4)) starcas_bits |= 0x40;
+	if (BIT(rawvals, 5)) starcas_bits |= 0x07;
+	if (BIT(rawvals, 7)) starcas_bits |= 0x08;
+	return starcas_bits;
 }
 
 void wotw_audio_device::inputs_changed(u8 curvals, u8 oldvals)
