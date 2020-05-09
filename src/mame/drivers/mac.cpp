@@ -1348,7 +1348,7 @@ void mac_state::maclc520(machine_config &config)
 
 void mac_state::maciivx(machine_config &config)
 {
-	maclc(config, false);
+	maclc(config, false, true, asc_device::asc_type::VASP);
 
 	M68030(config, m_maincpu, C32M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);

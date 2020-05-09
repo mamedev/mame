@@ -1903,6 +1903,11 @@ void mac_state::machine_start()
 
 void mac_state::machine_reset()
 {
+	if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
 	// stop 60.15 Hz timer
 	m_6015_timer->adjust(attotime::never);
 
@@ -2055,6 +2060,7 @@ WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
 		set_memory_overlay(1);
 	}
 
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
