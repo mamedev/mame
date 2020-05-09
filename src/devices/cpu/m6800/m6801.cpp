@@ -1352,9 +1352,9 @@ uint8_t hd6301x_cpu_device::p7_data_r()
 
 void hd6301x_cpu_device::p7_data_w(uint8_t data)
 {
-	LOGPORT("Port 7 Data Register: %02x\n", data);
-
 	data &= 0x1f;
+
+	LOGPORT("Port 7 Data Register: %02x\n", data);
 
 	m_portx_data[2] = data;
 	m_out_portx_func[2](0, m_portx_data[2], 0x1f);
@@ -1369,9 +1369,11 @@ uint8_t m6801_cpu_device::tcsr_r()
 
 void m6801_cpu_device::tcsr_w(uint8_t data)
 {
+	data &= 0x1f;
+
 	LOGTIMER("Timer Control and Status Register: %02x\n", data);
 
-	m_tcsr = data;
+	m_tcsr = data | (m_tcsr & 0xe0);
 	m_pending_tcsr &= m_tcsr;
 	modified_tcsr();
 	if( !(m_cc & 0x10) )

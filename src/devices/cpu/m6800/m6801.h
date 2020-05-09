@@ -91,10 +91,9 @@ protected:
 	uint8_t p4_data_r();
 	void p4_data_w(uint8_t data);
 
-public: // FIXME: psion.cpp accesses this
+protected:
 	uint8_t tcsr_r();
 	void tcsr_w(uint8_t data);
-protected:
 	uint8_t ch_r();
 	uint8_t cl_r();
 	void ch_w(uint8_t data);
