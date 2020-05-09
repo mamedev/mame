@@ -202,6 +202,13 @@ files{
 	MAME_DIR .. "src/mame/includes/cheekyms.h",
 	MAME_DIR .. "src/mame/video/cheekyms.cpp",
 
+	MAME_DIR .. "src/mame/drivers/cinemat.cpp",
+	MAME_DIR .. "src/mame/includes/cinemat.h",
+	MAME_DIR .. "src/mame/audio/cinemat.cpp",
+	MAME_DIR .. "src/mame/audio/cinemat.h",
+	MAME_DIR .. "src/mame/video/cinemat.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcas.cpp",
+
 	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
 	MAME_DIR .. "src/mame/includes/galaxian.h",
 	MAME_DIR .. "src/mame/audio/galaxian.cpp",

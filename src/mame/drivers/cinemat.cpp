@@ -1076,76 +1076,82 @@ void cinemat_state::cinemat_jmi_32k(machine_config &config)
 void cinemat_state::spacewar(machine_config &config)
 {
 	cinemat_nojmi_4k(config);
-	spacewar_sound(config);
+	SPACE_WARS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x1f);
 	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
 }
 
 void cinemat_state::barrier(machine_config &config)
 {
 	cinemat_jmi_4k(config);
-	barrier_sound(config);
+	BARRIER_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x07);
+}
+
+WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
+{
+	/* start LED is controlled by bit 0x02 */
+	m_led = !state;
 }
 
 void cinemat_state::speedfrk(machine_config &config)
 {
 	cinemat_nojmi_8k(config);
-	speedfrk_sound(config);
+	SPEED_FREAK_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x1c);
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
 }
 
 void cinemat_state::starhawk(machine_config &config)
 {
 	cinemat_jmi_4k(config);
-	starhawk_sound(config);
+	STAR_HAWK_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_16level_state::sundance(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	sundance_sound(config);
+	SUNDANCE_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_state::tailg(machine_config &config)
 {
 	cinemat_nojmi_8k(config);
-	tailg_sound(config);
-
+	TAIL_GUNNER_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x1f);
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
 }
 
 void cinemat_state::warrior(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	warrior_sound(config);
+	WARRIOR_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x1f);
 }
 
 void cinemat_state::armora(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	armora_sound(config);
+	ARMOR_ATTACK_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_state::ripoff(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	ripoff_sound(config);
+	RIP_OFF_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_state::starcas(machine_config &config)
 {
 	cinemat_jmi_8k(config);
-	starcas_sound(config);
+	STAR_CASTLE_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_64level_state::solarq(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	solarq_sound(config);
+	SOLAR_QUEST_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x93);
 }
 
 void cinemat_color_state::boxingb(machine_config &config)
 {
 	cinemat_jmi_32k(config);
-	boxingb_sound(config);
+	BOXING_BUGS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 	m_screen->set_visarea(0, 1024, 0, 788);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
@@ -1155,13 +1161,13 @@ void cinemat_state::wotw(machine_config &config)
 {
 	cinemat_jmi_16k(config);
 	m_screen->set_visarea(0, 1120, 0, 767);
-	wotw_sound(config);
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void cinemat_color_state::wotwc(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	wotw_sound(config);
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0).configure_latch_inputs(*m_outlatch, 0x9f);
 }
 
 void demon_state::demon(machine_config &config)
