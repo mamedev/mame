@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /*****************************************************************************
 
-Super80.c written by Robbbert, 2005-2010.
+Super80.cpp written by Robbbert, 2005-2010.
 
 2010-12-19: Added V3.7 bios freshly dumped today.
 2014-04-28: Added disk system and did cleanups
@@ -173,11 +173,6 @@ are high, and /M1 is active. This particular combination occurs on all ROM varia
 fifth byte in the ROM. In reality, the switchover can take place any time between the 4th byte until
 the computer has booted up. This is because the low RAM does not contain any system areas.
 
-Since MAME does not emulate /M1, a banking scheme has had to be used. Bank 0 is normal RAM. Bank 1
-points to the ROMs. When a machine reset occurs, bank 1 is switched in. A timer is triggered, and
-after 4 bytes are read, bank 0 is selected. The timer is as close as can be to real operation of the
-hardware.
-
 
 Super80 disk WD2793, Z80DMA:
 
@@ -207,7 +202,6 @@ Port(hex)  Role       Comment
 ToDo:
 - Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
        of the horrible inline editor they use)
-- Disk system works, only connected to super80r atm - is it needed for super80v?
 
 
 ***********************************************************************************************************/
