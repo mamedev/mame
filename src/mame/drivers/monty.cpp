@@ -26,7 +26,7 @@ Hardware notes:
 
 TODO:
 - put expansion roms in softwarelist? (note: slot #1 only accepts rom #1,
-  slot #2 only accepts rom #2)
+  slot #2 only accepts rom #2), they can be disabled in-game with option M
 
 ****************************************************************************/
 
@@ -138,7 +138,9 @@ WRITE_LINE_MEMBER(monty_state::key_pressed)
 
 void monty_state::monty_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).rom(); // slot 1
+	map(0x8000, 0xbfff).rom(); // slot 2
 	map(0xf800, 0xffff).ram();
 }
 
@@ -146,7 +148,8 @@ void monty_state::mmonty_mem(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xbfff).rom(); // slot 2
+	map(0xc000, 0xffff).rom(); // slot 1
 }
 
 void monty_state::monty_io(address_map &map)
@@ -278,8 +281,8 @@ ROM_END
 ROM_START( mmonty )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "master_monty_main.bin", 0x0000, 0x8000, CRC(bb5ef4d4) SHA1(ba2c759e429f8740df419f9abb60832eddfba8ab) ) // 27C256
-	ROM_LOAD( "monty_module1.bin",     0x8000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) ) // 27128
-	ROM_LOAD( "monty_module2.bin",     0xc000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) ) // 27128
+	ROM_LOAD( "monty_module2.bin",     0x8000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) ) // 27128
+	ROM_LOAD( "monty_module1.bin",     0xc000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) ) // 27128
 ROM_END
 
 } // anonymous namespace
