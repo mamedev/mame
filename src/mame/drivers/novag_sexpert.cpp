@@ -197,7 +197,7 @@ void sforte_state::machine_start()
 void sexpert_state::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
