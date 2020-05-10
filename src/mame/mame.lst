@@ -12224,21 +12224,22 @@ dms86                           //
 dmv                             //
 
 @source:docastle.cpp
-asoccer                         // 8461 (c) 1987
-docastle                        // 8302 (c) 1983
-docastle2                       // 8302 (c) 1983
-docastleo                       // 8302 (c) 1983
-dorunrun                        // ???? (c) 1984
-dorunrun2                       // ???? (c) 1984
-dorunrunc                       // ???? (c) 1984
-dorunrunca                      // ???? (c) 1984
-douni                           // 8302 (c) 1983
-dowild                          // ???? (c) 1984
-idsoccer                        // ???? (c) 1985
-idsoccera                       // ???? (c) 1985
-jjack                           // ???? (c) 1984
-kickridr                        // ???? (c) 1984
-spiero                          // ???? (c) 1987
+asoccer                         // 8461  (c) 1987
+docastle                        // 8302  (c) 1983
+docastle2                       // 8302  (c) 1983
+docastleo                       // 8302  (c) 1983
+dorunrun                        // ????  (c) 1984
+dorunrun2                       // ????  (c) 1984
+dorunrunc                       // ????  (c) 1984
+dorunrunca                      // ????  (c) 1984
+douni                           // 8302  (c) 1983
+dowild                          // ????  (c) 1984
+dowilda                         // 8339A (c) 1984
+idsoccer                        // ????  (c) 1985
+idsoccera                       // ????  (c) 1985
+jjack                           // ????  (c) 1984
+kickridr                        // ????  (c) 1984
+spiero                          // ????  (c) 1987
 
 @source:dogfgt.cpp
 dogfgt                          // TA-0011 (c) 1984
