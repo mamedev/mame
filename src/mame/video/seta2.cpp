@@ -453,7 +453,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	uint16_t *s1 = m_private_spriteram.get();
 
-	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4)
+	int sprite_debug_count = 0;
+
+	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4,sprite_debug_count++)
 	{
 		int num = s1[0];
 
@@ -477,6 +479,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		int which_gfx = num & 0x0700;
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
+
+
 
 		if (yoffs & 0x200)
 			yoffs -= 0x400;
@@ -587,12 +591,19 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				else
 				{
 					// "normal" sprite
-					int sy = s2[1] & 0x3ff;
+					int sy = s2[1] & 0x1ff;
+
+					if (sy & 0x100)
+						sy -= 0x200;
+
 					sy += global_yoffset;
 					sy &= 0x3ff;
 
-					if (sy & 0x200)
-						sy -= 0x400;
+
+					if (realscanline == 128)
+					{
+					//	printf("%04x %02x %d %d\n", sprite_debug_count, num, yoffs, sy);
+					}
 
 					int sizey = use_global_size ? global_sizey : s2[1] & 0xfc00;
 
@@ -600,6 +611,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 					int firstline = (sy + yoffs) & 0x3ff;
 					int endline = (firstline + (sizey + 1) * 8) - 1;
+
+					firstline &= 0x3ff;
+					endline &= 0x3ff;
 
 					// if the sprite doesn't cover this scanline, bail now
 					if (firstline > usedscanline)    continue;
