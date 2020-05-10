@@ -12277,4 +12277,101 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="frakfaeb">
+		<description>Fraktured Faebles</description>
+		<year>1985</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-05-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234831">
+				<rom name="fraktured faebles side a.woz" size="234831" crc="e6d11525" sha1="68252011379e9e2d1d98479424e87fd456e67556"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234830">
+				<rom name="fraktured faebles side b.woz" size="234830" crc="d826ac22" sha1="619e4716fa89b8946fb9627cccaef4e4c858b565"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewkill">
+		<description>A View To A Kill</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="a view to a kill.woz" size="234774" crc="e5baa6cc" sha1="23b5f4e4cc226a9bf6db8ca01d1019b7d66f65a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballyhr97">
+		<description>Ballyhoo (Release 97 / 851218)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="ballyhoo r97.woz" size="234797" crc="4a4edff2" sha1="c1e73096b7d23753e6e42517a80fbb96b8e73964"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234798">
+				<rom name="championship golf.woz" size="234798" crc="9d1a193f" sha1="e7b0eb6e3272044046a9373ea7acabe598cabd46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunjnqrn">
+		<description>Dunjonquest: The Datestones of Ryn</description>
+		<year>1980</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-05-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive and a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234844">
+				<rom name="dunjonquest- the datestones of ryn.woz" size="234844" crc="05154f9f" sha1="0d749206c8d00f872a253387dd9e7e69f1e35ca6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graforth">
+		<description>GraFORTH</description>
+		<year>1981</year>
+		<publisher>Insoft</publisher>
+		<info name="release" value="2020-05-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="graforth.woz" size="234776" crc="52f7d7b7" sha1="b2e05a726c9e1d614fdedd42ff491cdd1802c28f"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
