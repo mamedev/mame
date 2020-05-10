@@ -12369,7 +12369,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234776">
-				<rom name="graforth.woz" size="234776" crc="52f7d7b7" sha1="b2e05a726c9e1d614fdedd42ff491cdd1802c28f"/>
+				<rom name="graforth.woz" size="234776" crc="75e75e89" sha1="758fd362cf28f8dc46516e01c4fde5b66b589311"/>
 			</dataarea>
 		</part>
 	</software>

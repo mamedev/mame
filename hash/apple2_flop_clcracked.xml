@@ -36728,4 +36728,64 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hom1r2">
+		<description>Homonyms I (Revision 2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms i rev. 2 (4am crack).dsk" size="143360" crc="9681d4b6" sha1="1deb93a2be7d78d848c4def9bb319b0ab2bffbda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hom2r2">
+		<description>Homonyms II (Revision 2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms ii rev. 2 (4am crack).dsk" size="143360" crc="cd7c8e9e" sha1="3bfa0f7a7156845eb1b7392c7fa09756ae50ad4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pron1r2">
+		<description>Pronouns I (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns i rev. 2 (4am crack).dsk" size="143360" crc="85d199a0" sha1="b4dd139c4f17825a13f5dd762b7bf1a242e59481"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pron2r2">
+		<description>Pronouns II (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns ii rev. 2 (4am crack).dsk" size="143360" crc="e73e4fcb" sha1="b675fac3a52944031b1fa51e884b9e52496ed35c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verb1r2">
+		<description>Verbs I (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs i rev. 2 (4am crack).dsk" size="143360" crc="b0c2705f" sha1="a6b36da980cb96e8421bb1492d0d115bf528e38a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
