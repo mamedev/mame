@@ -1664,10 +1664,14 @@ ROM_START( swclone )
 	// ensure eeprom defaults to 00 or there are unwanted invalid entries already saved
 ROM_END
 
-
-ROM_START( vtechtvs )
+ROM_START( vtechtvssp )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "vtechtvstation.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
+	ROM_LOAD16_WORD_SWAP( "vtechtvstation_sp.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
+ROM_END
+
+ROM_START( vtechtvsgr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
 ROM_END
 
 void spg2xx_game_state::init_crc()
@@ -1722,56 +1726,52 @@ void spg2xx_game_albkickb_state::init_ablkickb()
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat, 0, rad_skatp,rad_skatp,  spg2xx_game_state, init_crc, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,   spg2xx_game_state, init_crc, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, init_crc, "Radica", "Play TV Football 2",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
+CONS( 2006, rad_skat,   0,        0, rad_skat,  rad_skat,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Skateboarder (NTSC)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp,  rad_skat, 0, rad_skatp, rad_skatp, spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Skateboarder (PAL)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Cricket (PAL)",                                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // ABL TV Games
-CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,   0,        0, abltenni,  abltenni,  spg2xx_game_state,          empty_init,    "f / V-Tac Technology Co Ltd.",                           "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
-CONS( 2006, ablkickb,    0,     0,        ablkickb,       ablkickb,    spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
+CONS( 2007, lxspidaj,   0,        0, abltenni,  lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, fordrace,   0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, lxspidaj,    0,     0,        abltenni,       lxspidaj,    spg2xx_game_albkickb_state, init_ablkickb, "Lexibook", "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// Same as Excalibur Decathlon? Not the same as the ABL game
+CONS( 2006, tvsprt10,   0,        0, tvsprt10,  tvsprt10,  spg2xx_game_state,          init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",                       "TV Sports 10-in-1 / Decathlon Athletic Sport Games",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, decathln,   0,        0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 1)",                                                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
+CONS( 200?, decathlna,  decathln, 0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 2, SM570, ABL TV Game)",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
 
-CONS( 2006, fordrace,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "Excalibur Electronics", "Ford Racing", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-
-CONS( 2008, comil,       0,     0,        comil,          comil,       spg2xx_game_comil_state, empty_init, "Character Options", "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// same as Excalibur Decathlon? not the same as the ABL game
-CONS( 2006, tvsprt10,    0,        0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",              "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, decathln,    0,        0,        tvsprt10,       decathln,    spg2xx_game_state, init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Decathlon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
-CONS( 200?, decathlna,   decathln, 0,        tvsprt10,       decathln,    spg2xx_game_state, init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Decathlon (set 2, SM570, ABL TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
-
-CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_game_state, empty_init, "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, guitarfv,   0,        0, guitarfv,  guitarfv,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd",                                     "Guitar Fever (2007.07.03 Ver 2.7)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The box for these has 'YOU take the stage' text, but unlike the sequel, it is not part of the ingame title screen, this sometimes causes confusion
-CONS( 200?, guitarss,    0,        0,        abltenni,       guitarss,    spg2xx_game_state, empty_init, "Senario", "Guitar Super Star ('Fender Stratocaster' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, guitarssa,   guitarss, 0,        abltenni,       guitarss,    spg2xx_game_state, empty_init, "Senario", "Guitar Super Star (red 'Gibson Flying V' style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarss,   0,        0, abltenni,  guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarssa,  guitarss, 0, abltenni,  guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The sequel has 'You Take The Stage' on both the box and title screen
-CONS( 2009, gssytts,     0,     0,        gssytts,        guitarss,    spg2xx_game_gssytts_state, empty_init, "Senario", "Guitar Super Star: You Take The Stage", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, vtechtvs,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "VTech", "TV Station (VTech, Spain)", MACHINE_NOT_WORKING )
+// VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
+CONS( 2006, vtechtvssp, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvsgr, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
-CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntbftc,    0,        0,        abltenni,       tmntbftc,    spg2xx_game_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Battle for the City", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntbftc,   0,        0, abltenni,  tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_tmntmutm_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, dreamlss,   0,     0,        dreamlss,       dreamlss,    spg2xx_game_dreamlss_state, empty_init, "Hasbro / Tiger Electronics", "Dream Life Superstar (Version 0.3, Mar 16 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-
-// meeds a hack to not show garbage sprite on startup, seeprom hookup (24LC08), gun fine-tuning etc.
-CONS( 2008, swclone,   0,     0,        swclone,       swclone,    spg2xx_game_swclone_state, init_swclone, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Needs a hack to not show garbage sprite on startup, seeprom hookup (24LC08), gun fine-tuning, etc.
+CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars - The Clone Wars",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
-CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mattelcs,   0,        0, rad_skat, mattelcs,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// both the WiWi and Fox Sports units seem to be related to the 'Virtual Interactive' (aka 'Vi') console
-
+// Both the WiWi and Fox Sports units seem to be related to the 'Virtual Interactive' (aka 'Vi') console
