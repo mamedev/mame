@@ -4,7 +4,8 @@
 /******************************************************************************
 
 SciSys Delta-1, it was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER
-HK 1979", Winkler was the founder of SciSys(later renamed to Saitek).
+HK 1979", Winkler was the founder of SciSys(later renamed to Saitek). It was
+released in late-1980, even though it says 1979 in the ROM and manual.
 
 Hardware notes:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
@@ -252,4 +253,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ccdelta1, 0,      0, delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
