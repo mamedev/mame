@@ -323,28 +323,30 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 
 	uint16_t* dest = &bitmap.pix16(screenline);
 
-	const int x0 = flipx ? (base_sx + 8 - 1) : (base_sx);
-	const int x1 = flipx ? (base_sx - 1) : (x0 + 8);
-	const int dx = flipx ? (-1) : (1);
+	const int x0 = flipx ? (base_sx + 0x80000 - 0x10000) : (base_sx);
+	const int x1 = flipx ? (base_sx - 0x10000) : (x0 + 0x80000);
+	const int dx = flipx ? (-0x10000) : (0x10000);
 
 	int column = 0;
 	for (int sx = x0; sx != x1; sx += dx)
 	{
 		uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
-		if (sx >= cliprect.min_x && sx <= cliprect.max_x)
+		int realsx = sx >> 16;
+
+		if (realsx >= cliprect.min_x && realsx <= cliprect.max_x)
 		{
 			if (pen || opaque)
 			{
 				if (!shadow)
 				{
-					dest[sx] = (realcolor + pen) & 0x7fff;
+					dest[realsx] = (realcolor + pen) & 0x7fff;
 				}
 				else
 				{
 					int pen_shift = 15 - shadow;
 					int pen_mask = (1 << pen_shift) - 1;
-					dest[sx] = ((dest[sx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+					dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
 				}
 			}
 		}
@@ -597,7 +599,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, realscanline, tileline, opaque);
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x << 16, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -679,7 +681,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					for (int x = 0; x <= sizex; x++)
 					{
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realscanline, line, opaque);
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, (sx + x * 8)<<16, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
