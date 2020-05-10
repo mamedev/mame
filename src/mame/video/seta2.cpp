@@ -626,11 +626,27 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int endline = (firstline + (sizey + 1) * 8) - 1;
 
 					//firstline &= 0x3ff;
-					//endline &= 0x3ff;
+					endline &= 0x3ff;
+
+					if (firstline & 0x200)
+						firstline -= 0x400;
+
+					if (endline & 0x200)
+						endline -= 0x400;
+
 
 					// if the sprite doesn't cover this scanline, bail now
-					if (firstline > usedscanline)    continue;
-					if (endline < usedscanline)    continue;
+					if (endline >= firstline)
+					{
+						if (firstline > usedscanline)    continue;
+						if (endline < usedscanline)    continue;
+					}
+					else
+					{
+						// cases where the sprite crosses 0
+						if ((usedscanline > endline) && (usedscanline < firstline))
+							continue;
+					}
 
 					// otherwise get the rest of the things we need to draw
 					int attr = s2[2];
