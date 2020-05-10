@@ -9479,7 +9479,7 @@ license:CC0
 	<software name="colonize">
 		<description>Sid Meier's Colonization</description>
 		<year>1994</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<info name="developer" value="Microprose" />
 		<info name="version" value="2.25 - 15 Sept 94" />
 		<part name="flop1" interface="floppy_3_5">
@@ -10586,7 +10586,7 @@ license:CC0
 	<software name="goblins">
 		<description>Gobliiins (US - VGA release)</description>
 		<year>1992</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000 09/11/92" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -10604,7 +10604,7 @@ license:CC0
 	<software name="goblins2">
 		<description>Gobliins 2: The Prince Buffoon</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000.000 02/10/93" />
 		<info name="developer" value="Coktel Vision, M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
@@ -10622,7 +10622,7 @@ license:CC0
 	<software name="goblins3">
 		<description>Goblins Quest 3</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.00" />
 		<info name="developer" value="Coktel Vision" />
 		<part name="flop1" interface="floppy_3_5">
@@ -10922,7 +10922,7 @@ license:CC0
 	</software>
 
 	<software name="incait">
-		<description>Inca (Italian)</description>
+		<description>Inca (Italy)</description>
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
@@ -11304,7 +11304,7 @@ license:CC0
 	<software name="kingqst5">
 		<description>King's Quest V - Absence Makes the Heart Go Yonder!</description>
 		<year>1990</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1474560">
@@ -11359,7 +11359,7 @@ license:CC0
 	<software name="kingqst5_525" cloneof="kingqst5">
 		<description>King's Quest V - Absence Makes the Heart Go Yonder! (Re-release)</description>
 		<year>1990</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
@@ -12222,6 +12222,39 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="pquestvga">
+		<description>Police Quest in Pursuit of the Death Angel (VGA release)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="9219bbe8" sha1="59fe0fed82c6f97150e559ab6ab7e3d46137bb95"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="23b75b13" sha1="0b24570f0ba52429de3ecce02b2a8cae8a54e4b4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="3ccabfdd" sha1="8aed555bf0cdb420e978e55ac40f458ad3dcfa38"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="bd0972a9" sha1="ceeaac5e05f1a29489789c67ec17680d7cda34f6"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="2d5eedea" sha1="effb9ca42378507ac7880882d927460b8ae61249"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Fatal error: i386: Called modrm_to_EA with modrm value F5! -->
 	<software name="powdoll" supported="no">
@@ -12593,6 +12626,23 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="silverb2p">
+		<description>Silverball 2 Plus</description>
+		<year>1994</year>
+		<publisher>MicroLeague Multimedia</publisher>
+		<info name="developer" value="Digital Extremes - Epic MegaGames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Silverball Plus 2 [MicroLeague] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d249822c" sha1="919d79a81b04e0f6d74c1fc9441b96430dc6d633"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silverball Plus 2 [MicroLeague] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="05e3094e" sha1="1bb8b9bc0cbed8701a706f4a2f86102a20ccb29b"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="simant">
 		<description>SimAnt</description>
@@ -12799,7 +12849,7 @@ license:CC0
 	<software name="sq5a" cloneof="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.03)</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.03" />
 		<info name="developer" value="Sierra" />
 		<part name="flop1" interface="floppy_3_5">
@@ -13267,7 +13317,7 @@ license:CC0
 	<software name="ufoeuita" cloneof="ufoeu">
 		<description>UFO - Enemy Unknown (Italy)</description>
 		<year>1994</year>
-		<publisher>Microprose</publisher>
+		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e6cac594" sha1="ff9e23147c99fa8bf101c556a6727a6261542893"/>
@@ -14231,7 +14281,7 @@ license:CC0
 	<software name="airduel">
 		<description>Air Duel - 80 Years of Dogfighting</description>
 		<year>1993</year>
-		<publisher>MicroProse Ltd.</publisher>
+		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" status="baddump" />
