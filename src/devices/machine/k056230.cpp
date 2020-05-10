@@ -2,7 +2,24 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Konami IC 056230 (LANC)
+Konami IC 056230 (LANC)
+
+Schematic (located on page 28): http://arcarc.xmission.com/PDF_Arcade_Manuals_and_Schematics/Racing_Force_Schematics.pdf
+
+Device Notes:
+-The custom IC itself
+-64k shared ram
+-LS161 4-bit binary counter
+-PAL(0056787) for racinfrc's sub board and plygonet.cpp
+-PAL(0056787A) for zr107.cpp, gticlub.cpp and thunderh's I/O board
+-HYC2485S RS485 transciever
+
+Todo: nearly everything
+-Have the device fired at any irq, not just the ppc from zr107.cpp and gticlub.cpp
+-What exactly "happens" if an IRQ is fired to this device?
+-Is ram shared between the main cpu and other communicating units?
+-Find and hook the "networking" exchange, some sort of UART serial?
+-Daisy chain support, a stream perhaps?
 
 ***************************************************************************/
 
@@ -39,7 +56,7 @@ void k056230_device::device_start()
 }
 
 
-uint8_t k056230_device::read(offs_t offset)
+READ8_MEMBER(k056230_device::read)
 {
 	switch (offset)
 	{
@@ -61,7 +78,7 @@ TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
 }
 
 
-void k056230_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER(k056230_device::write)
 {
 	switch(offset)
 	{
@@ -94,13 +111,13 @@ void k056230_device::write(offs_t offset, uint8_t data)
 //  logerror("k056230_w: %d, %02X at %08X\n", offset, data, machine().describe_context());
 }
 
-uint32_t k056230_device::lanc_ram_r(offs_t offset, uint32_t mem_mask)
+READ32_MEMBER(k056230_device::lanc_ram_r)
 {
 	//logerror("LANC_RAM_r: %08X, %08X %s\n", offset, mem_mask, machine().describe_context());
 	return m_ram[offset & 0x7ff];
 }
 
-void k056230_device::lanc_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+WRITE32_MEMBER(k056230_device::lanc_ram_w)
 {
 	//logerror("LANC_RAM_w: %08X, %08X, %08X %s\n", data, offset, mem_mask, machine().describe_context());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));
