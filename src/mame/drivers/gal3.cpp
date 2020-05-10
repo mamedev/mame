@@ -599,7 +599,7 @@ void gal3_state::gal3(machine_config &config)
 	rs_cpu.set_addrmap(AS_PROGRAM, &gal3_state::rs_cpu_map);
 	rs_cpu.set_vblank_int("lscreen", FUNC(gal3_state::irq5_line_hold));  /// programmable via 148 IC
 
-	m68000_device &sound_cpu(M68000(config, "sound_cpu", 12000000)); // ??
+	m68000_device &sound_cpu(M68000(config, "sound_cpu", 49152000/4)); // ??
 	sound_cpu.set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
 
 	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", 12000000)); // ??
@@ -679,12 +679,12 @@ void gal3_state::gal3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140_16g, 8000000/374);
+	C140(config, m_c140_16g, 49152000/2304);
 	//m_c140_16g->set_addrmap(0, &gal3_state::c140_16g_map);    //to be verified
 	m_c140_16g->add_route(0, "lspeaker", 0.50);
 	m_c140_16g->add_route(1, "rspeaker", 0.50);
 
-	C140(config, m_c140_16a, 8000000/374);
+	C140(config, m_c140_16a, 49152000/2304);
 	//m_c140_16a->set_addrmap(0, &gal3_state::c140_16a_map);    //to be verified
 	m_c140_16a->add_route(0, "lspeaker", 0.50);
 	m_c140_16a->add_route(1, "rspeaker", 0.50);
