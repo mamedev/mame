@@ -1746,7 +1746,8 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 static const floppy_format_type dpb7000_floppy_formats[] =
 {
 	FLOPPY_HFE_FORMAT,
-	FLOPPY_MFM_FORMAT
+	FLOPPY_MFM_FORMAT,
+	nullptr
 };
 
 static void dpb7000_floppies(device_slot_interface &device)
