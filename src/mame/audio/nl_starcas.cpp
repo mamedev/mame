@@ -1,6 +1,38 @@
 // license:CC0
 // copyright-holders:Aaron Giles,Couriersud
 
+//
+// Netlist for Star Castle/War of the Worlds
+//
+// Derived from the schematics and parts list in the Star Castle
+// manual.
+//
+// War of the Worlds uses effectively the same sound board, but
+// with a swizzled set of inputs.
+//
+// Known problems/issues:
+//
+//    * It's very slow, due to needing to run the solver at 384kHz
+//       in order to get close to accurate shot and background sounds.
+//       These sounds are both derived from 566 timers, so perhaps
+//       there is something deficient about the current 566
+//       implementation. Schematics state that the background VCO
+//       should range from 7.5kHz -> 23.3kHz, while the laser VCO
+//       should be either 22kHz or 5.8kHz.
+//
+//    * There is a hack on the outputs of the 566 timer to prevent
+//       them from driving infinite current. This is a known
+//       limitation that should eventually be fixed in the device.
+//
+//    * Even at 384kHz, the highest frequency background sound is not
+//       quite as high pitched as some videos I've seen. The best spot
+//       to listen for background pitch is immediately after the
+//       player dies.
+//
+//    * There are 5 different models of the CA3080 presented here.
+//       Ultimately this should be moved into the core.
+//
+
 #include "netlist/devices/net_lib.h"
 
 
@@ -797,10 +829,12 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(C47.1, IC25.3, R128.2)
 	NET_C(R122.2, C45.2, Q17.B)
 	NET_C(R124.2, C46.1, Q18.B)
+	ALIAS(OUTPUT, Q18.E)
 #else
 	NET_C(GND, C47.2)
 	NET_C(C47.1, R128.2)
 	NET_C(GND, IC25.4, IC25.7, C46.1, C43.2, C45.2, C45.1, R124.1, R122.1, R121.1, R124.2, R120.1, R120.2, R121.2, R123.1, C43.1, IC25.3, R123.2, C46.2, C44.2, C44.1, R122.2, IC25.2)
+	ALIAS(OUTPUT, C47.1)
 #endif
 
 	//
@@ -836,8 +870,10 @@ NETLIST_START(starcas)
 	TTL_INPUT(I_OUT_2, 1)		// active low
 	TTL_INPUT(I_OUT_3, 1)		// active low
 
-	NET_C(GND, I_SHIFTREG_0.GND, I_SHIFTREG_1.GND, I_SHIFTREG_2.GND, I_SHIFTREG_3.GND, I_SHIFTREG_4.GND, I_SHIFTREG_5.GND, I_SHIFTREG_6.GND, I_SHIFTREG_7.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND)
-	NET_C(I_V5, I_SHIFTREG_0.VCC, I_SHIFTREG_1.VCC, I_SHIFTREG_2.VCC, I_SHIFTREG_3.VCC, I_SHIFTREG_4.VCC, I_SHIFTREG_5.VCC, I_SHIFTREG_6.VCC, I_SHIFTREG_7.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC)
+	NET_C(GND, I_SHIFTREG_0.GND, I_SHIFTREG_1.GND, I_SHIFTREG_2.GND, I_SHIFTREG_3.GND, I_SHIFTREG_4.GND, I_SHIFTREG_5.GND, I_SHIFTREG_6.GND, I_SHIFTREG_7.GND)
+	NET_C(I_V5, I_SHIFTREG_0.VCC, I_SHIFTREG_1.VCC, I_SHIFTREG_2.VCC, I_SHIFTREG_3.VCC, I_SHIFTREG_4.VCC, I_SHIFTREG_5.VCC, I_SHIFTREG_6.VCC, I_SHIFTREG_7.VCC)
+	NET_C(GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND)
+	NET_C(I_V5, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC)
 
 	LOCAL_SOURCE(CA3080)
 

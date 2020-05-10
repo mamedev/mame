@@ -208,6 +208,9 @@ files{
 	MAME_DIR .. "src/mame/audio/cinemat.h",
 	MAME_DIR .. "src/mame/video/cinemat.cpp",
 	MAME_DIR .. "src/mame/audio/nl_starcas.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcas.h",
+	MAME_DIR .. "src/mame/audio/nl_spacewar.cpp",
+	MAME_DIR .. "src/mame/audio/nl_spacewar.h",
 
 	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
 	MAME_DIR .. "src/mame/includes/galaxian.h",

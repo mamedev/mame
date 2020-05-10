@@ -10,6 +10,8 @@
 #include "netlist/nl_setup.h"
 #include "sound/samples.h"
 
+#define SPACEWAR_USE_NETLIST		(1)
+#define BARRIER_USE_NETLIST			(1)
 #define STARCAS_USE_NETLIST			(1)
 #define WOTW_USE_NETLIST			(1)
 

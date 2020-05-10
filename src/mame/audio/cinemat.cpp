@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "includes/cinemat.h"
 
+#include "audio/nl_spacewar.h"
 #include "audio/nl_starcas.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
@@ -170,6 +171,22 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
+#if SPACEWAR_USE_NETLIST
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(spacewar))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0",      "I_OUT_0.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4",      "I_OUT_4.IN",      0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+
+#else
+
 	static const char *const sample_names[] =
 	{
 		"*spacewar",
@@ -188,10 +205,14 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->set_channels(8);
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+#endif
 }
 
 void spacewar_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
+#if !SPACEWAR_USE_NETLIST
+
 	// Explosion - rising edge
 	if (rising_edge(curvals, oldvals, 0))
 		m_samples->start(0, (machine().rand() & 1) ? 0 : 6);
@@ -225,6 +246,8 @@ void spacewar_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 		// Pop when board is shut off
 		m_samples->start(2, 5);
 	}
+
+#endif
 }
 
 
@@ -246,6 +269,20 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
+#if BARRIER_USE_NETLIST
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(barrier))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0",      "I_OUT_0.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+
+#else
+
 	static const char *const sample_names[] =
 	{
 		"*barrier",
@@ -259,10 +296,14 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->set_channels(3);
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+#endif
 }
 
 void barrier_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
+#if !BARRIER_USE_NETLIST
+
 	// Player die - rising edge
 	if (rising_edge(curvals, oldvals, 0))
 		m_samples->start(0, 0);
@@ -274,6 +315,8 @@ void barrier_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 	// Enemy move - falling edge
 	if (falling_edge(curvals, oldvals, 2))
 		m_samples->start(2, 2);
+
+#endif
 }
 
 
@@ -808,8 +851,6 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 
 #if STARCAS_USE_NETLIST
 
-	NETLIST_EXTERNAL(starcas);
-
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(starcas))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -826,7 +867,7 @@ void starcas_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C47.1").set_mult_offset(30000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
 
 #else
 
@@ -1223,6 +1264,11 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 
 #if WOTW_USE_NETLIST
 
+	//
+	// Sound board is bascially Star Castle, with some input swizzling, so
+	// just use the Star Castle board
+	//
+
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(starcas))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1239,7 +1285,7 @@ void wotw_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C47.1").set_mult_offset(30000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0, 0.0);
 
 #else
 
