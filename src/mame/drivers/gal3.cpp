@@ -679,6 +679,7 @@ void gal3_state::gal3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	// TODO: Total 5 of C140s in sound board, verified from gal3zlgr PCB - gal3 uses same board?
 	C140(config, m_c140_16g, 49152000/2304);
 	//m_c140_16g->set_addrmap(0, &gal3_state::c140_16g_map);    //to be verified
 	m_c140_16g->add_route(0, "lspeaker", 0.50);
