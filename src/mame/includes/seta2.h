@@ -86,7 +86,7 @@ protected:
 
 	int calculate_global_xoffset(int special);
 	int calculate_global_yoffset(int special);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline);
+	void draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, uint32_t xoffset, uint32_t xzoom, bool xzoominverted);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -444,7 +444,7 @@ int seta2_state::calculate_global_yoffset(int special)
 }
 
 
-void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline)
+void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, uint32_t xoffset, uint32_t xzoom, bool xzoominverted)
 {
 	if (!m_vregs.found())
 		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
@@ -707,29 +707,52 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 
 void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
+	//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+
+	uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
+	yoffset &= 0x07ffffff;
+	yoffset = 0x07ffffff - yoffset;
+
+	uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
+	yzoom &= 0x07ffffff;
+	bool yzoominverted = false;
+	bool xzoominverted = false;
+
+	if (yzoom & 0x04000000)
+	{
+		yzoom = 0x8000000 - yzoom;
+		yzoominverted = true;
+	}
+
+
+	uint32_t xoffset = (m_vregs[0x12 / 2] << 16) | m_vregs[0x10 / 2];
+	xoffset &= 0x07ffffff;
+	xoffset = 0x07ffffff - xoffset;
+
+	uint32_t xzoom = (m_vregs[0x16 / 2] << 16) | m_vregs[0x14 / 2];
+
+	if (xzoom & 0x04000000)
+	{
+		xzoom = 0x8000000 - xzoom;
+		xzoominverted = true;
+	}
+
+
+	if (!xzoom)
+		return;
+
+	uint64_t inc = 0x100000000ULL;
+
+	uint32_t inc2 = inc / xzoom;
+
+	printf("xinc is %04x xoom %04x\n", inc2, xzoom);
+
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		rectangle tempcliprect(cliprect);
 
 		tempcliprect.sety(y, y);
-
-		//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
-
-		// TODO the global yscroll should be applied here too as it can be sub-pixel for precision in zoomed cases
-
-		uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
-		yoffset &= 0x07ffffff;
-		yoffset = 0x07ffffff - yoffset;
-
-		uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
-		yzoom &= 0x07ffffff;
-		bool yzoominverted = false;
-
-		if (yzoom & 0x04000000)
-		{
-			yzoom = 0x8000000 - yzoom;
-			yzoominverted = true;
-		}
 
 		int yy;
 
@@ -751,7 +774,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		}
 
-		draw_sprites(bitmap, tempcliprect, yy, y);
+		draw_sprites_line(bitmap, tempcliprect, yy, y, xoffset, xzoom, xzoominverted);
 	}
 }
 
