@@ -474,7 +474,7 @@ namespace factory
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name, const pstring &classname,
 			const pstring &def_param, const pstring &sourcefile)
 	: factory::element_t(name, classname, def_param, sourcefile)
-	, m_family_name(NETLIST_DEFAULT_TRUTHTABLE_FAMILY)
+	, m_family_name(NETLIST_DEFAULT_LOGIC_FAMILY)
 	{
 	}
 
@@ -510,7 +510,7 @@ namespace factory
 				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = (desc.family != "" ? desc.family : pstring(NETLIST_DEFAULT_TRUTHTABLE_FAMILY));
+		ret->m_family_name = (desc.family != "" ? desc.family : pstring(NETLIST_DEFAULT_LOGIC_FAMILY));
 
 		return ret;
 	}

@@ -1177,24 +1177,38 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	return val * factor;
 }
 
+// FIXME: all this belongs elsewhere
+
+P_ENUM(family_type,
+	CUSTOM,
+	TTL,
+	MOS,
+	CMOS,
+	NMOS,
+	PMOS);
+
 class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
-	logic_family_std_proxy_t() = default;
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
-			const pstring &name, const logic_output_t *proxied) const override;
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
-};
+	logic_family_std_proxy_t(family_type ft)
+	: m_family_type(ft)
+	{
+	}
 
-unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
-		const pstring &name, const logic_output_t *proxied) const
-{
-	return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-}
-unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
-{
-	return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-}
+	// FIXME: create proxies based on family type (far future)
+	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist,
+			const pstring &name, const logic_output_t *proxied) const override
+	{
+		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override
+	{
+		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	}
+private:
+	family_type m_family_type;
+};
 
 
 /// \brief Class representing the logic families.
@@ -1232,19 +1246,19 @@ public:
 	param_model_t::value_t m_ORH;    //!< Output output resistance for logic 1
 };
 
+
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
+	family_type ft(family_type::CUSTOM);
 
-	if (models().value_str(model, "TYPE") == "TTL")
-		return family_TTL();
-	if (models().value_str(model, "TYPE") == "CD4XXX")
-		return family_CD4XXX();
+	if (!ft.set_from_string(models().value_str(model, "TYPE")) || ft == family_type::CUSTOM)
+		throw nl_exception(MF_UNKNOWN_FAMILY_TYPE_1(models().value_str(model, "TYPE"), model));
 
 	auto it = m_nlstate.family_cache().find(model);
 	if (it != m_nlstate.family_cache().end())
 		return it->second.get();
 
-	auto ret = plib::make_unique<logic_family_std_proxy_t>();
+	auto ret = plib::make_unique<logic_family_std_proxy_t>(ft);
 
 	ret->m_low_thresh_PCNT = models().value(model, "IVL");
 	ret->m_high_thresh_PCNT = models().value(model, "IVH");

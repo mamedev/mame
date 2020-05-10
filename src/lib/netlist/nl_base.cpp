@@ -25,86 +25,14 @@
 namespace netlist
 {
 
+	// ----------------------------------------------------------------------------------------
+	// callbacks_t
+	// ----------------------------------------------------------------------------------------
+
 	plib::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
 	{
 		return plib::make_unique<plib::dynlib_static>(nullptr);
 	}
-
-	// ----------------------------------------------------------------------------------------
-	// logic_family_ttl_t
-	// ----------------------------------------------------------------------------------------
-
-	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
-	logic_family_desc_t::logic_family_desc_t()
-	{
-	}
-
-	class logic_family_ttl_t : public logic_family_desc_t
-	{
-	public:
-		logic_family_ttl_t() : logic_family_desc_t()
-		{
-			m_low_thresh_PCNT = nlconst::magic(0.8 / 5.0);
-			m_high_thresh_PCNT = nlconst::magic(2.0 / 5.0);
-			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-			m_low_VO = nlconst::magic(0.1);
-			m_high_VO = nlconst::magic(1.0); // 4.0
-			m_R_low = nlconst::magic(1.0);
-			m_R_high = nlconst::magic(130.0);
-		}
-		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const override;
-		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
-	};
-
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const
-	{
-		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
-	{
-		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
-
-	class logic_family_cd4xxx_t : public logic_family_desc_t
-	{
-	public:
-		logic_family_cd4xxx_t() : logic_family_desc_t()
-		{
-			m_low_thresh_PCNT = nlconst::magic(1.5 / 5.0);
-			m_high_thresh_PCNT = nlconst::magic(3.5 / 5.0);
-			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-			m_low_VO = nlconst::magic(0.05);
-			m_high_VO = nlconst::magic(0.05); // 4.95
-			// https://www.classe.cornell.edu/~ib38/teaching/p360/lectures/wk09/l26/EE2301Exp3F10.pdf
-			// typical CMOS may sink 0.4mA while output stays <= 0.4V
-			m_R_low = nlconst::magic(500.0);
-			m_R_high = nlconst::magic(500.0);
-		}
-		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const override;
-		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override;
-	};
-
-	unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *proxied) const
-	{
-		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-
-	unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const
-	{
-		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
-
-	const logic_family_desc_t *family_TTL()
-	{
-		static logic_family_ttl_t obj;
-		return &obj;
-	}
-	const logic_family_desc_t *family_CD4XXX()
-	{
-		static logic_family_cd4xxx_t obj;
-		return &obj;
-	}
-
 
 	// ----------------------------------------------------------------------------------------
 	// queue_t
@@ -445,88 +373,93 @@ namespace netlist
 	#endif
 	}
 
-
 	void netlist_t::print_stats() const
 	{
 		if (m_use_stats)
 		{
-			std::vector<size_t> index;
-			for (size_t i=0; i < m_state.m_devices.size(); i++)
-				index.push_back(i);
-
-			std::sort(index.begin(), index.end(),
-					[&](size_t i1, size_t i2) { return m_state.m_devices[i1].second->stats()->m_stat_total_time.total() < m_state.m_devices[i2].second->stats()->m_stat_total_time.total(); });
-
-			plib::pperftime_t<true>::type total_time(0);
-			plib::pperftime_t<true>::ctype total_count(0);
-
-			for (auto & j : index)
-			{
-				auto *entry = m_state.m_devices[j].second.get();
-				auto *stats = entry->stats();
-				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
-						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
-						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
-				total_time += stats->m_stat_total_time.total();
-				total_count += stats->m_stat_total_time.count();
-			}
-
-			log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-				total_time, total_time / static_cast<decltype(total_time)>(total_count ? total_count : 1));
-
-			log().verbose("Total loop     {1:15}", m_stat_mainloop());
-			log().verbose("Total time     {1:15}", total_time);
-
-			// FIXME: clang complains about unreachable code without
-			const auto clang_workaround_unreachable_code = NL_USE_QUEUE_STATS;
-			if (clang_workaround_unreachable_code)
-			{
-				// Only one serialization should be counted in total time
-				// But two are contained in m_stat_mainloop
-				plib::pperftime_t<true> overhead;
-				plib::pperftime_t<true> test;
-				{
-					auto overhead_guard(overhead.guard());
-					for (int j=0; j<100000;j++)
-					{
-						auto test_guard(test.guard());
-					}
-				}
-
-				plib::pperftime_t<true>::type total_overhead = overhead()
-						* static_cast<plib::pperftime_t<true>::type>(total_count)
-						/ static_cast<plib::pperftime_t<true>::type>(200000);
-
-				log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
-				log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
-				log().verbose("Queue Removes  {1:15}", m_queue.m_prof_remove());
-				log().verbose("Queue Retimes  {1:15}", m_queue.m_prof_retime());
-				log().verbose("");
-
-				log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
-				log().verbose("Total overhead {1:15}", total_overhead);
-				plib::pperftime_t<true>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-						/ static_cast<plib::pperftime_t<true>::type>(m_queue.m_prof_call());
-				log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
-				log().verbose("");
-			}
-
-			auto trigger = total_count * 200 / 1000000; // 200 ppm
-			for (auto &entry : m_state.m_devices)
-			{
-				auto *ep = entry.second.get();
-				auto *stats = ep->stats();
-				// Factor of 3 offers best performace increase
-				if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
-					&& stats->m_stat_inc_active() > trigger)
-					log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
-						static_cast<nl_fptype>(stats->m_stat_inc_active()) / static_cast<nl_fptype>(stats->m_stat_total_time.count()),
-						stats->m_stat_inc_active(), stats->m_stat_total_time.count());
-			}
-			log().verbose("");
+			netlist_state_t::stats_info si{m_queue, m_stat_mainloop, m_perf_out_processed};
+			m_state.print_stats(si);
 		}
 		log().verbose("Current pool memory allocated: {1:12} kB", nlstate().pool().cur_alloc() >> 10);
 		log().verbose("Maximum pool memory allocated: {1:12} kB", nlstate().pool().max_alloc() >> 10);
+	}
+
+	void netlist_state_t::print_stats(stats_info &si) const
+	{
+		std::vector<size_t> index;
+		for (size_t i=0; i < this->m_devices.size(); i++)
+			index.push_back(i);
+
+		std::sort(index.begin(), index.end(),
+				[&](size_t i1, size_t i2) { return this->m_devices[i1].second->stats()->m_stat_total_time.total() < this->m_devices[i2].second->stats()->m_stat_total_time.total(); });
+
+		plib::pperftime_t<true>::type total_time(0);
+		plib::pperftime_t<true>::ctype total_count(0);
+
+		for (auto & j : index)
+		{
+			auto *entry = this->m_devices[j].second.get();
+			auto *stats = entry->stats();
+			log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
+					stats->m_stat_call_count(), stats->m_stat_total_time.count(),
+					stats->m_stat_total_time.total(), stats->m_stat_inc_active());
+			total_time += stats->m_stat_total_time.total();
+			total_count += stats->m_stat_total_time.count();
+		}
+
+		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
+			total_time, total_time / static_cast<decltype(total_time)>(total_count ? total_count : 1));
+
+		log().verbose("Total loop     {1:15}", si.m_stat_mainloop());
+		log().verbose("Total time     {1:15}", total_time);
+
+		// FIXME: clang complains about unreachable code without
+		const auto clang_workaround_unreachable_code = NL_USE_QUEUE_STATS;
+		if (clang_workaround_unreachable_code)
+		{
+			// Only one serialization should be counted in total time
+			// But two are contained in m_stat_mainloop
+			plib::pperftime_t<true> overhead;
+			plib::pperftime_t<true> test;
+			{
+				auto overhead_guard(overhead.guard());
+				for (int j=0; j<100000;j++)
+				{
+					auto test_guard(test.guard());
+				}
+			}
+
+			plib::pperftime_t<true>::type total_overhead = overhead()
+					* static_cast<plib::pperftime_t<true>::type>(total_count)
+					/ static_cast<plib::pperftime_t<true>::type>(200000);
+
+			log().verbose("Queue Pushes   {1:15}", si.m_queue.m_prof_call());
+			log().verbose("Queue Moves    {1:15}", si.m_queue.m_prof_sortmove());
+			log().verbose("Queue Removes  {1:15}", si.m_queue.m_prof_remove());
+			log().verbose("Queue Retimes  {1:15}", si.m_queue.m_prof_retime());
+			log().verbose("");
+
+			log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
+			log().verbose("Total overhead {1:15}", total_overhead);
+			plib::pperftime_t<true>::type overhead_per_pop = (si.m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+					/ static_cast<plib::pperftime_t<true>::type>(si.m_queue.m_prof_call());
+			log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
+			log().verbose("");
+		}
+
+		auto trigger = total_count * 200 / 1000000; // 200 ppm
+		for (auto &entry : this->m_devices)
+		{
+			auto *ep = entry.second.get();
+			auto *stats = ep->stats();
+			// Factor of 3 offers best performace increase
+			if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
+				&& stats->m_stat_inc_active() > trigger)
+				log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
+					static_cast<nl_fptype>(stats->m_stat_inc_active()) / static_cast<nl_fptype>(stats->m_stat_total_time.count()),
+					stats->m_stat_inc_active(), stats->m_stat_total_time.count());
+		}
+		log().verbose("");
 	}
 
 	core_device_t *netlist_state_t::get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const
@@ -630,76 +563,49 @@ namespace netlist
 
 	device_t::device_t(netlist_state_t &owner, const pstring &name)
 	: base_device_t(owner, name)
+	, m_model(*this, "MODEL", pstring(NETLIST_DEFAULT_LOGIC_FAMILY))
 	{
-		// FIXME: this needs debugging!
+		set_logic_family(state().setup().family_from_model(m_model()));
 		if (logic_family() == nullptr)
-		{
-			//printf("Issue with 1 %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
+			throw nl_exception(MF_NULLPTR_FAMILY(this->name(), m_model()));
 	}
 
 	device_t::device_t(netlist_state_t &owner, const pstring &name,
 		const pstring &model)
 	: base_device_t(owner, name)
+	, m_model(*this, "MODEL", model)
 	{
-		//printf("In 1a %s: %s\n", this->name().c_str(), model.c_str());
-		set_logic_family(state().setup().family_from_model(model));		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
-		// FIXME: this needs debugging!
+		set_logic_family(state().setup().family_from_model(m_model()));
 		if (logic_family() == nullptr)
-		{
-			printf("Issue with 1a %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
+			throw nl_exception(MF_NULLPTR_FAMILY(this->name(), m_model()));
 	}
 
 	device_t::device_t(netlist_state_t &owner, const pstring &name,
 		const logic_family_desc_t *desc)
 	: base_device_t(owner, name)
+	, m_model(*this, "MODEL", pstring(""))
 	{
 		set_logic_family(desc);
-		// FIXME: this needs debugging!
 		if (logic_family() == nullptr)
-		{
-			printf("Issue with 1b %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
+			throw nl_exception(MF_NULLPTR_FAMILY(this->name(), "<pointer provided by constructor>"));
 	}
 
 	device_t::device_t(device_t &owner, const pstring &name)
 	: base_device_t(owner, name)
+	, m_model(*this, "MODEL", pstring(""))
 	{
 		set_logic_family(owner.logic_family());
-		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
 		if (logic_family() == nullptr)
-		{
-			printf("Issue with 2 %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
+			throw nl_exception(MF_NULLPTR_FAMILY(this->name(), "<owner logic family>"));
 	}
 
 	device_t::device_t(device_t &owner, const pstring &name, const pstring &model)
 	: base_device_t(owner, name)
+	, m_model(*this, "MODEL", model)
 	{
-		set_logic_family(state().setup().family_from_model(model));
-		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
+		set_logic_family(state().setup().family_from_model(m_model()));
 		if (logic_family() == nullptr)
-		{
-			printf("Issue with 3 %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
-	}
-
-	device_t::device_t(device_t &owner, const pstring &name, const logic_family_desc_t *desc)
-	: base_device_t(owner, name)
-	{
-		set_logic_family(desc);
-		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
-		if (logic_family() == nullptr)
-		{
-			printf("Issue with 3 %s\n", this->name().c_str());
-			set_logic_family(family_TTL());
-		}
+			throw nl_exception(MF_NULLPTR_FAMILY(this->name(), m_model()));
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -742,7 +648,7 @@ namespace netlist
 		auto *p = dynamic_cast<analog_net_t *>(this);
 
 		if (p != nullptr)
-			p->m_cur_Analog = nlconst::zero();
+			p->set_Q_Analog(nlconst::zero());
 
 		// rebuild m_list and reset terminals to active or analog out state
 
@@ -833,12 +739,6 @@ namespace netlist
 	{
 	}
 
-	logic_t::logic_t(device_t &dev, const pstring &aname, const state_e state,
-			nldelegate delegate)
-		: core_terminal_t(dev, aname, state, delegate)
-	{
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
@@ -868,6 +768,29 @@ namespace netlist
 	// net_output_t
 	// ----------------------------------------------------------------------------------------
 
+	// -----------------------------------------------------------------------------
+	// logic_t
+	// -----------------------------------------------------------------------------
+
+	logic_t::logic_t(device_t &dev, const pstring &aname, const state_e terminal_state,
+			nldelegate delegate)
+		: core_terminal_t(dev, aname, terminal_state, delegate)
+		, logic_family_t(dev.logic_family())
+	{
+	}
+
+	// -----------------------------------------------------------------------------
+	// logic_input_t
+	// -----------------------------------------------------------------------------
+
+	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
+			nldelegate delegate)
+			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
+	{
+		state().setup().register_term(*this);
+	}
+
+
 	// ----------------------------------------------------------------------------------------
 	// logic_output_t
 	// ----------------------------------------------------------------------------------------
@@ -878,7 +801,6 @@ namespace netlist
 	{
 		this->set_net(&m_my_net);
 		state().register_net(owned_pool_ptr<logic_net_t>(&m_my_net, false));
-		set_logic_family(dev.logic_family());
 		state().setup().register_term(*this);
 	}
 
@@ -917,18 +839,6 @@ namespace netlist
 	void analog_output_t::initial(nl_fptype val) noexcept
 	{
 		net().set_Q_Analog(val);
-	}
-
-	// -----------------------------------------------------------------------------
-	// logic_input_t
-	// -----------------------------------------------------------------------------
-
-	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
-			nldelegate delegate)
-			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
-	{
-		set_logic_family(dev.logic_family());
-		state().setup().register_term(*this);
 	}
 
 	// ----------------------------------------------------------------------------------------

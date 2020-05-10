@@ -64,8 +64,8 @@ namespace netlist
 				, m_supply(*this)
 				, m_RVI(*this, "RVI")
 				, m_RVO(*this, "RVO")
-				, m_model(*this, "MODEL", "TTL_7414_GATE")
-				, m_modacc(m_model)
+				, m_stmodel(*this, "STMODEL", "TTL_7414_GATE")
+				, m_modacc(m_stmodel)
 				, m_last_state(*this, "m_last_var", 1)
 			{
 				register_subalias("Q", m_RVO.P());
@@ -117,12 +117,12 @@ namespace netlist
 			NETLIB_NAME(power_pins) m_supply;
 			analog::NETLIB_SUB(twoterm) m_RVI;
 			analog::NETLIB_SUB(twoterm) m_RVO;
-			param_model_t m_model;
+			param_model_t m_stmodel;
 			schmitt_trigger_model_t m_modacc;
 			state_var<int> m_last_state;
 		};
 
-		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")
+		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "STMODEL")
 
 	} // namespace devices
 } // namespace netlist

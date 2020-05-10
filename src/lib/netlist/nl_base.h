@@ -279,7 +279,11 @@ namespace netlist
 	class logic_family_desc_t
 	{
 	public:
-		logic_family_desc_t();
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
+		logic_family_desc_t()
+		{
+		}
+
 
 		PCOPYASSIGNMOVE(logic_family_desc_t, delete)
 
@@ -326,6 +330,7 @@ namespace netlist
 	{
 	public:
 		logic_family_t() : m_logic_family(nullptr) {}
+		logic_family_t(const logic_family_desc_t *d) : m_logic_family(d) {}
 		PCOPYASSIGNMOVE(logic_family_t, delete)
 
 		const logic_family_desc_t *logic_family() const noexcept { return m_logic_family; }
@@ -336,9 +341,6 @@ namespace netlist
 	private:
 		const logic_family_desc_t *m_logic_family;
 	};
-
-	const logic_family_desc_t *family_TTL();        ///< logic family for TTL devices.
-	const logic_family_desc_t *family_CD4XXX();     ///< logic family for CD4XXX CMOS devices.
 
 	/// \brief A persistent variable template.
 	///  Use the state_var template to define a variable whose value is saved.
@@ -891,14 +893,10 @@ namespace netlist
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname,
-				state_e state, nldelegate delegate = nldelegate());
+				state_e terminal_state, nldelegate delegate = nldelegate());
 
 		logic_net_t & net() noexcept;
 		const logic_net_t &  net() const noexcept;
-
-	protected:
-
-	private:
 	};
 
 	// -----------------------------------------------------------------------------
@@ -969,8 +967,6 @@ namespace netlist
 	public:
 
 		using list_t =  std::vector<analog_net_t *>;
-
-		friend class detail::net_t;
 
 		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
 
@@ -1348,14 +1344,14 @@ namespace netlist
 		device_t(netlist_state_t &owner, const pstring &name);
 		device_t(netlist_state_t &owner, const pstring &name,
 			const pstring &model);
+		// only needed by proxies
 		device_t(netlist_state_t &owner, const pstring &name,
 			const logic_family_desc_t *desc);
 
 		device_t(device_t &owner, const pstring &name);
+		// pass in a default model - this may be overwritten by PARAM(DEVICE.MODEL, "XYZ(...)")
 		device_t(device_t &owner, const pstring &name,
 			const pstring &model);
-		device_t(device_t &owner, const pstring &name,
-			const logic_family_desc_t *desc);
 
 		PCOPYASSIGNMOVE(device_t, delete)
 
@@ -1366,6 +1362,8 @@ namespace netlist
 		NETLIB_UPDATEI() { }
 		NETLIB_UPDATE_TERMINALSI() { }
 
+	private:
+		param_model_t m_model;
 	};
 
 	namespace detail {
@@ -1439,8 +1437,6 @@ namespace netlist
 		/// to connect to the outside world. For examples see MAME netlist.cpp.
 		///
 		virtual ~netlist_state_t() noexcept = default;
-
-		friend class netlist_t; // allow access to private members
 
 		template<class C>
 		static bool check_class(core_device_t *p) noexcept
@@ -1628,9 +1624,21 @@ namespace netlist
 		/// turned on.
 		bool is_extended_validation() const { return m_extended_validation; }
 
-	private:
+		struct stats_info
+		{
+			const detail::queue_t				&m_queue;// performance
+			const plib::pperftime_t<true>       &m_stat_mainloop;
+			const plib::pperfcount_t<true>      &m_perf_out_processed;
+		};
+
+		/// \brief print statistics gathered during run
+		///
+		void print_stats(stats_info &si) const;
 
 		void reset();
+
+	private:
+
 		detail::net_t *find_net(const pstring &name) const; // FIXME: stale
 
 		nlmempool                           m_pool; // must be deleted last!
@@ -2045,9 +2053,7 @@ namespace netlist
 
 	inline solver::matrix_solver_t *analog_t::solver() const noexcept
 	{
-		if (this->has_net())
-			return net().solver();
-		return nullptr;
+		return (this->has_net() ? net().solver() : nullptr);
 	}
 
 	inline nl_fptype terminal_t::operator ()() const noexcept { return net().Q_Analog(); }
@@ -2056,7 +2062,6 @@ namespace netlist
 	{
 		if (!(gt && go && Idr) && (gt || go || Idr))
 		{
-			state().log().fatal("Inconsistent nullptrs for terminal {}", name());
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
 

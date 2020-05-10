@@ -180,7 +180,7 @@ static constexpr const int NETLIST_CLOCK = 1'000'000'000;
 
 // FIXME: need a better solution for global constants.
 
-static constexpr const char *NETLIST_DEFAULT_TRUTHTABLE_FAMILY = "74XX";
+static constexpr const char *NETLIST_DEFAULT_LOGIC_FAMILY = "74XX";
 
 /// \brief  Floating point types used
 ///
