@@ -329,7 +329,7 @@ private:
 	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_WRITE16_MEMBER(gn680_sysctrl);
+	DECLARE_WRITE16_MEMBER(gn680_sysctrl_w);
 	DECLARE_READ32_MEMBER(dsp_dataram0_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
@@ -583,7 +583,7 @@ void gticlub_state::sound_memmap(address_map &map)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(gticlub_state::gn680_sysctrl)
+WRITE16_MEMBER(gticlub_state::gn680_sysctrl_w)
 {
 	// bit 15 = watchdog toggle
 	// lower 4 bits = LEDs?
@@ -596,7 +596,7 @@ void gticlub_state::gn680_memmap(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
-	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl));
+	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl_w));
 //	map(0x310000, 0x311fff).nopw(); //056230 regs?
 //	map(0x312000, 0x313fff).nopw(); //056230 ram?
 }

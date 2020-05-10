@@ -196,9 +196,9 @@ void sforte_state::machine_start()
 
 void sexpert_state::lcd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // background
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xe8, 0xe8, 0xe8)); // lcd pixel off
 }
 
 HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
