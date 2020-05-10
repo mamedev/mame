@@ -535,8 +535,21 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int endline = firstline + height * 0x10 - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
-					if (firstline > usedscanline)    continue;
-					if (endline < usedscanline)    continue;
+					
+					if (endline & 0x200)
+						endline -= 0x400;
+					
+					if (endline >= firstline)
+					{
+						if (firstline > usedscanline)    continue;
+						if (endline < usedscanline)    continue;
+					}
+					else
+					{
+						// cases where the sprite crosses 0
+						if ((usedscanline > endline) && (usedscanline < firstline))
+							continue;
+					}
 
 					// get everything we need to calculate if sprite is actually within the x co-ordinates of the screen
 					int sx = s2[0];
