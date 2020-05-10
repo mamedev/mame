@@ -479,11 +479,16 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		int global_xoffset = calculate_global_xoffset(special);
 		int global_yoffset = calculate_global_yoffset(special);
+		int usedscanline;
 		if (special)
 		{
 			use_shadow = 0;
 		//  which_gfx = 4 << 8;
-			scanline = realscanline; // no zooming?
+			usedscanline = realscanline; // no zooming?
+		}
+		else
+		{
+			usedscanline = scanline;
 		}
 
 		// Number of single-sprites
@@ -516,8 +521,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int endline = firstline + height * 0x10 - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
-					if (firstline > scanline)    continue;
-					if (endline < scanline)    continue;
+					if (firstline > usedscanline)    continue;
+					if (endline < usedscanline)    continue;
 
 					// get everything we need to calculate if sprite is actually within the x co-ordinates of the screen
 					int sx = s2[0];
@@ -543,7 +548,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int scrolly = s2[3];
 					scrolly &= 0x1ff;
 					scrolly += global_yoffset;
-					int sourceline = (scanline - scrolly) & 0x1ff;
+					int sourceline = (usedscanline - scrolly) & 0x1ff;
 
 					int scrollx = s2[2];
 					int is_16x16 = (scrollx & 0x8000) >> 15;
@@ -590,8 +595,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int endline = (sy + (sizey + 1) * 8) - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
-					if (firstline > scanline)    continue;
-					if (endline < scanline)    continue;
+					if (firstline > usedscanline)    continue;
+					if (endline < usedscanline)    continue;
 
 					// otherwise get the rest of the things we need to draw
 					int attr = s2[2];
@@ -611,7 +616,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
 
-					int line = scanline - firstline;
+					int line = usedscanline - firstline;
 					int y = (line >> 3);
 					line &= 0x7;
 
