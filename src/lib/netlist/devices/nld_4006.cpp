@@ -15,7 +15,6 @@ namespace netlist
 	NETLIB_OBJECT(CD4006)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4006, "CD4XXX")
-		//NETLIB_FAMILY("CD4XXX")
 		, m_CLOCK(*this, "CLOCK")
 		, m_I(*this, {"D1", "D2", "D3", "D4"})
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D3P5"})

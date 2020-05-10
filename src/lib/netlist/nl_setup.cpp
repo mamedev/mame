@@ -768,7 +768,11 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 		log().debug("connect_terminal_output: {1} {2}\n", in.name(), out.name());
 		// no proxy needed, just merge existing terminal net
 		if (in.has_net())
+		{
+			if (&out.net() == &in.net())
+				log().warning(MW_CONNECTING_1_TO_2_SAME_NET(in.name(), out.name(), in.net().name()));
 			merge_nets(out.net(), in.net());
+		}
 		else
 			out.net().add_terminal(in);
 	}
@@ -1192,6 +1196,41 @@ unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create
 	return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
+
+/// \brief Class representing the logic families.
+///
+///  This is the model representation of the logic families. This is a
+///  netlist specific model. Examples give values for TTL family
+///
+//
+///   |NL? |name  |parameter                                                  |units| TTL   |
+///   |:--:|:-----|:----------------------------------------------------------|:----|------:|
+///   | Y  |IVL   |Input voltage low threshold relative to supply voltage     |     |1.0e-14|
+///   | Y  |IVH   |Input voltage high threshold relative to supply voltage    |     |      0|
+///   | Y  |OVL   |Output voltage minimum voltage relative to supply voltage  |     |1.0e-14|
+///   | Y  |OVL   |Output voltage maximum voltage relative to supply voltage  |     |1.0e-14|
+///   | Y  |ORL   |Output output resistance for logic 0                       |     |      0|
+///   | Y  |ORH   |Output output resistance for logic 1                       |     |      0|
+///
+class family_model_t
+{
+public:
+	family_model_t(param_model_t &model)
+	: m_IVL(model, "IVL")
+	, m_IVH(model, "IVH")
+	, m_OVL(model, "OVL")
+	, m_OVH(model, "OVH")
+	, m_ORL(model, "ORL")
+	, m_ORH(model, "ORH")
+	{}
+
+	param_model_t::value_t m_IVL;    //!< Input voltage low threshold relative to supply voltage
+	param_model_t::value_t m_IVH;    //!< Input voltage high threshold relative to supply voltage
+	param_model_t::value_t m_OVL;    //!< Output voltage minimum voltage relative to supply voltage
+	param_model_t::value_t m_OVH;    //!< Output voltage maximum voltage relative to supply voltage
+	param_model_t::value_t m_ORL;    //!< Output output resistance for logic 0
+	param_model_t::value_t m_ORH;    //!< Output output resistance for logic 1
+};
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {

@@ -23,8 +23,6 @@ namespace netlist
 		, m_tp(nullptr)
 		, m_tn(nullptr)
 	{
-		//set_logic_family(inout_proxied->logic_family());
-
 		if (logic_family() == nullptr)
 		{
 			// FIXME convert to error
