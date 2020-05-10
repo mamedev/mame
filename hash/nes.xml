@@ -45049,6 +45049,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" status="baddump" />
 			</dataarea>
+			<dataarea name="bwram" size="8192"> <!-- TODO: verify on cart, but without it game doesn't start or continue after title screen -->
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
