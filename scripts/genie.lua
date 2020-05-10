@@ -1260,8 +1260,8 @@ configuration { "mingw*" }
 				"-static",
 			}
 		end
-		linkoptions {
-			"-Wl,--start-group",
+		flags {
+			"LinkSupportCircularDependencies",
 		}
 		links {
 			"user32",
