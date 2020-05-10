@@ -612,8 +612,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int firstline = (sy + yoffs) & 0x3ff;
 					int endline = (firstline + (sizey + 1) * 8) - 1;
 
-					firstline &= 0x3ff;
-					endline &= 0x3ff;
+					//firstline &= 0x3ff;
+					//endline &= 0x3ff;
 
 					// if the sprite doesn't cover this scanline, bail now
 					if (firstline > usedscanline)    continue;
@@ -690,7 +690,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
 		yoffset &= 0x07ffffff;
-		yoffset = 0x8000000 - yoffset;
+		yoffset = 0x07ffffff - yoffset;
 
 		uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
 		yzoom &= 0x07ffffff;
