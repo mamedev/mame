@@ -140,7 +140,7 @@ Language:
 |   XX   | 80-084360(US)     | Handy Manny                                                                               |
 |        | 80-084362(NL)     | Handy Manny                                                                               |
 |        | 80-084363(UK)     | Handy Manny                                                                               |
-|        | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
+|   XX   | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
 |   XX   | 80-084365(FR)     | Manny et ses outils                                                                       |
 |        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)                                                           |
 |        | 80-084367(SP)     | Manny Manitas                                                                             |
@@ -482,6 +482,20 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- From a multi-game cart found on a on-store demo console -->
+	<software name="hmannymg" cloneof="hmannym" supported="no">
+		<description>Disney Meister Manny's Werkzeugkiste (Germany)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084364(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Meister Mannys Werkzeugkiste (Motion) (GER).bin" size="8388608" crc="e7832bf7" sha1="e0a0d1158dabc6b9fed07b28e697e1877ed7eda0" />
 			</dataarea>
 		</part>
 	</software>
