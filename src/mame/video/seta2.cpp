@@ -430,11 +430,12 @@ int seta2_state::calculate_global_xoffset(int special)
 int seta2_state::calculate_global_yoffset(int special)
 {
 	// Sprites list
-	int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
-	if (global_yoffset & 0x400)
-		global_yoffset -= 0x800;
+	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
+	//if (global_yoffset & 0x400)
+	//	global_yoffset -= 0x800;
 
-	global_yoffset += 1; // +2 for myangel / myangel2?
+	//global_yoffset += 1; // +2 for myangel / myangel2?
+	int global_yoffset = 0;
 
 	if (special)
 		global_yoffset = -0x90;
@@ -477,6 +478,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
 
+		if (yoffs & 0x200)
+			yoffs -= 0x400;
+
 		int global_xoffset = calculate_global_xoffset(special);
 		int global_yoffset = calculate_global_yoffset(special);
 		int usedscanline;
@@ -508,16 +512,22 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					// the 'floating tilemap sprites' are just a window into the tilemap, the position of the sprite does not change the scroll values
 
 					// get everything we need to calculate if sprite covers this scanline
-					int sy = s2[1];
-					int local_sizey = sy & 0xfc00;
+					int sy = s2[1] & 0x3ff;
 					sy += global_yoffset;
-					sy &= 0x1ff;
-					if (sy & 0x100)
-						sy -= 0x200;
+					sy &= 0x3ff;
+					if (sy & 0x200)
+						sy -= 0x400;
+
+					int local_sizey = s2[1] & 0xfc00;
+
 					int height = use_global_size ? global_sizey : local_sizey;
 					height = ((height & 0xfc00) >> 10) + 1;
-					int firstline = (sy + yoffs) & 0x1ff;
-					if (firstline & 0x100) firstline -= 0x200;
+					
+					int firstline = (sy + yoffs) & 0x3ff;
+					
+					if (firstline & 0x200)
+						firstline -= 0x400;
+					
 					int endline = firstline + height * 0x10 - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
@@ -577,22 +587,19 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				else
 				{
 					// "normal" sprite
-					int sy = s2[1];
+					int sy = s2[1] & 0x3ff;
+					sy += global_yoffset;
+					sy &= 0x3ff;
 
-					int sizey = use_global_size ? global_sizey : sy;
+					if (sy & 0x200)
+						sy -= 0x400;
+
+					int sizey = use_global_size ? global_sizey : s2[1] & 0xfc00;
 
 					sizey = (1 << ((sizey & 0x0c00) >> 10)) - 1;
 
-					sy += yoffs;
-					sy += global_yoffset;
-
-					sy &= 0x1ff;
-
-					if (sy & 0x100)
-						sy -= 0x200;
-
-					int firstline = sy;
-					int endline = (sy + (sizey + 1) * 8) - 1;
+					int firstline = (sy + yoffs) & 0x3ff;
+					int endline = (firstline + (sizey + 1) * 8) - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
 					if (firstline > usedscanline)    continue;
@@ -663,9 +670,14 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		tempcliprect.sety(y, y);
 
-		//printf("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+		//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 		// TODO the global yscroll should be applied here too as it can be sub-pixel for precision in zoomed cases
+
+		uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
+		yoffset &= 0x07ffffff;
+		yoffset = 0x8000000 - yoffset;
+
 		uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
 		yzoom &= 0x07ffffff;
 		bool yzoominverted = false;
@@ -685,7 +697,15 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 		else
 		{
 			yy = y * yzoom;
+			yy += yoffset;
+			yy &= 0x07ffffff;
 			yy >>= 16;
+
+		//	printf("line %04x yline requested %04x\n", y, yy);
+
+			if (yy & 0x400)
+				yy -= 0x800;
+
 		}
 
 		draw_sprites(bitmap, tempcliprect, yy, y);
@@ -741,7 +761,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 {
-	//popmessage("yscroll: %04x%04x yzoom: %04x%04x | xscroll: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+	//popmessage("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 }
 
 // staraudi
