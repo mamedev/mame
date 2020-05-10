@@ -13012,6 +13012,29 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="srcrx">
+		<description>Speed Racer in the Challenge of Racer X</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="0a9fdb73" sha1="4ad50c468cb5fbf1035b239915094d8ac8d86561"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="f81fdeb7" sha1="7d5d3b8660b2dc9215c0fd444bf1b430c4e4e7e4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="3492240a" sha1="d09314500a72cb24e314720c3e4e901aedd3e427"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="trek25th">
 		<description>Star Trek - 25th Anniversary</description>
 		<year>1992</year>
@@ -13131,7 +13154,7 @@ license:CC0
 	<software name="sf2">
 		<description>Street Fighter II</description>
 		<year>1993</year>
-		<publisher>US Gold</publisher>
+		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Capcom USA" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -13242,6 +13265,38 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sw2050">
+		<description>Subwar 2050 - The Underwater Combat Simulation</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Particle Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="0d95139a" sha1="3444dcff49f379efc4d1e62a89415816ea6c179a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="80068c39" sha1="0479d164d1df91ac3f857877935d89bfd6bb89db"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="97fd4b9e" sha1="6c0faa95f4e35b18747ee515522541f5e288c8ff"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="f60023b4" sha1="cbff229bc8c2e2270981239c942f074909ee98a2"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Subwar 2050 - The Underwater Combat Simulation [MicroProse] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d9ace5d" sha1="a2fdceac39406c3c4a008bb6a8f9bfe454372a74"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="syndicate">
 		<description>Syndicate</description>
 		<year>1993</year>
@@ -13748,7 +13803,7 @@ license:CC0
 	<software name="wcusa94">
 		<description>World Cup USA '94</description>
 		<year>1994</year>
-		<publisher>US Gold</publisher>
+		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Tiertex Design Studios" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
