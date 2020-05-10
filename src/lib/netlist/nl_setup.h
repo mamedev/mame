@@ -68,7 +68,7 @@
 
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
-{																			   \
+{                                                                              \
 	plib::unused_var(setup);
 
 #define NETLIST_END()  }
@@ -183,8 +183,6 @@ namespace netlist
 	{
 	public:
 
-		friend class setup_t;
-
 		source_netlist_t() = default;
 
 		PCOPYASSIGNMOVE(source_netlist_t, delete)
@@ -196,8 +194,6 @@ namespace netlist
 	class source_data_t : public plib::psource_t
 	{
 	public:
-
-		friend class setup_t;
 
 		source_data_t() = default;
 
@@ -212,20 +208,33 @@ namespace netlist
 	class models_t
 	{
 	public:
+		using model_map_t = std::unordered_map<pstring, pstring>;
+		class model_t
+		{
+		public:
+			model_t(const pstring &model, const model_map_t &map)
+			: m_model(model), m_map(map) { }
+
+			pstring value_str(const pstring &entity) const;
+
+			nl_fptype value(const pstring &entity) const;
+
+			pstring type() const { return value_str("COREMODEL"); }
+
+		private:
+			static pstring model_string(const model_map_t &map);
+
+			const pstring m_model; // only for error messages
+			const model_map_t &m_map;
+		};
+
 		void register_model(const pstring &model_in);
-		// model / family related
 
-		pstring value_str(const pstring &model, const pstring &entity);
-
-		nl_fptype value(const pstring &model, const pstring &entity);
-
-		pstring type(const pstring &model) { return value_str(model, "COREMODEL"); }
+		model_t get_model(const pstring &model);
 
 	private:
-		using model_map_t = std::unordered_map<pstring, pstring>;
 
 		void model_parse(const pstring &model, model_map_t &map);
-		static pstring model_string(const model_map_t &map);
 
 		std::unordered_map<pstring, pstring> m_models;
 		std::unordered_map<pstring, model_map_t> m_cache;

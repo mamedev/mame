@@ -33,7 +33,6 @@ namespace netlist
 
 		friend class NETLIB_NAME(74107_dip);
 		friend class NETLIB_NAME(74107);
-		//friend class NETLIB_NAME(74107A_dip);
 
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();

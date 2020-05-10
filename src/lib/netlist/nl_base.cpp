@@ -448,7 +448,7 @@ namespace netlist
 		}
 
 		auto trigger = total_count * 200 / 1000000; // 200 ppm
-		for (auto &entry : this->m_devices)
+		for (const auto &entry : this->m_devices)
 		{
 			auto *ep = entry.second.get();
 			auto *stats = ep->stats();
@@ -876,11 +876,6 @@ namespace netlist
 		return res;
 	}
 
-	pstring param_model_t::type()
-	{
-		return state().setup().models().type(str());
-	}
-
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(device, name)
 	{
@@ -902,14 +897,20 @@ namespace netlist
 	{
 	}
 
+	pstring param_model_t::type()
+	{
+		auto mod = state().setup().models().get_model(str());
+		return mod.type();
+	}
+
 	pstring param_model_t::value_str(const pstring &entity)
 	{
-		return state().setup().models().value_str(str(), entity);
+		return state().setup().models().get_model(str()).value_str(entity);
 	}
 
 	nl_fptype param_model_t::value(const pstring &entity)
 	{
-		return state().setup().models().value(str(), entity);
+		return state().setup().models().get_model(str()).value(entity);
 	}
 
 

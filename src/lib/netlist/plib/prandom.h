@@ -24,11 +24,11 @@ namespace plib
 	/// This is a Mersenne Twister implementation which is state saveable.
 	/// It has been written following this wikipedia entry:
 	///
-	/// 	https://en.wikipedia.org/wiki/Mersenne_Twister
+	///     https://en.wikipedia.org/wiki/Mersenne_Twister
 	///
 	/// The implementation has basic support for the interface described here
 	///
-	/// 	https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
+	///     https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
 	///
 	/// so that it can be used with the C++11 random environment
 	///
@@ -187,27 +187,27 @@ namespace plib
 				FT s;
 				FT v1;
 				FT v2;
-			    do
-			    {
-			        v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
-			        v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
-			        s = v1 * v1 + v2 * v2;
-			    } while (s >= constants<FT>::one());
-			    if (s == constants<FT>::zero())
-			    {
-			    	m_buf[i] = s;
-			    	m_buf[i+1] = s;
-			    }
-			    else
-			    {
-			    	// last value without error for log(s)/s
-			    	// double: 1.000000e-305
-			    	// float: 9.999999e-37
-			    	// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
-			    	const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
-			    	m_buf[i] = /*mean+*/ m * v1;
-			    	m_buf[i+1] = /*mean+*/ m * v2;
-			    }
+				do
+				{
+					v1 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+					v2 = normalize_uniform(p, constants<FT>::two(), constants<FT>::one()); // [-1..1[
+					s = v1 * v1 + v2 * v2;
+				} while (s >= constants<FT>::one());
+				if (s == constants<FT>::zero())
+				{
+					m_buf[i] = s;
+					m_buf[i+1] = s;
+				}
+				else
+				{
+					// last value without error for log(s)/s
+					// double: 1.000000e-305
+					// float: 9.999999e-37
+					// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
+					const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
+					m_buf[i] = /*mean+*/ m * v1;
+					m_buf[i+1] = /*mean+*/ m * v2;
+				}
 			}
 			m_p = 0;
 		}

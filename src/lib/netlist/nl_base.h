@@ -1160,8 +1160,14 @@ namespace netlist
 		class value_base_t
 		{
 		public:
-			value_base_t(param_model_t &param, const pstring &name)
+			template <typename P, typename Y=T, typename DUMMY = typename std::enable_if<plib::is_arithmetic<Y>::value>::type>
+			value_base_t(P &param, const pstring &name)
 			: m_value(static_cast<T>(param.value(name)))
+			{
+			}
+			template <typename P, typename Y=T, typename std::enable_if<!plib::is_arithmetic<Y>::value, int>::type = 0>
+			value_base_t(P &param, const pstring &name)
+			: m_value(static_cast<T>(param.value_str(name)))
 			{
 			}
 			T operator()() const noexcept { return m_value; }
@@ -1171,6 +1177,7 @@ namespace netlist
 		};
 
 		using value_t = value_base_t<nl_fptype>;
+		using value_str_t = value_base_t<pstring>;
 
 		param_model_t(core_device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
@@ -1307,7 +1314,7 @@ namespace netlist
 	// base_device_t
 	// -----------------------------------------------------------------------------
 
-	class base_device_t : 	public core_device_t
+	class base_device_t :   public core_device_t
 	{
 	public:
 		base_device_t(netlist_state_t &owner, const pstring &name);
@@ -1337,7 +1344,7 @@ namespace netlist
 	// device_t
 	// -----------------------------------------------------------------------------
 
-	class device_t : 	public base_device_t,
+	class device_t :    public base_device_t,
 						public logic_family_t
 	{
 	public:
@@ -1626,7 +1633,7 @@ namespace netlist
 
 		struct stats_info
 		{
-			const detail::queue_t				&m_queue;// performance
+			const detail::queue_t               &m_queue;// performance
 			const plib::pperftime_t<true>       &m_stat_mainloop;
 			const plib::pperfcount_t<true>      &m_perf_out_processed;
 		};
@@ -1645,7 +1652,7 @@ namespace netlist
 
 		pstring                             m_name;
 		unique_pool_ptr<netlist_t>          m_netlist;
-		plib::unique_ptr<plib::dynlib_base> m_lib; // external lib needs to be loaded as long as netlist exists
+		plib::unique_ptr<plib::dynlib_base> m_lib;
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
@@ -1655,8 +1662,8 @@ namespace netlist
 		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
 		// sole use is to manage lifetime of family objects
-		family_collection_type m_family_cache;
-		bool m_extended_validation;
+		family_collection_type              m_family_cache;
+		bool                                m_extended_validation;
 
 		// dummy version
 		int                                 m_dummy_version;

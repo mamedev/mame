@@ -75,7 +75,9 @@ NETLIST_END()
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(family_models)
-	NET_MODEL("FAMILY _(TYPE=CUSTOM IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130.0)")
+
+	// FAMILIES always need a type. UNKNOWN below will break
+	NET_MODEL("FAMILY _(TYPE=UNKNOWN IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130.0)")
 	NET_MODEL("OPAMP _()")
 	NET_MODEL("SCHMITT_TRIGGER _()")
 
