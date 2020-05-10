@@ -1300,6 +1300,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 		case MODEL_MAC_LC:
 		case MODEL_MAC_LC_II:
 		case MODEL_MAC_IIVX:
+		case MODEL_MAC_IIVI:
 			return 0x81 | PA6 | PA4 | PA2;
 
 		case MODEL_MAC_IICI:
@@ -2141,6 +2142,9 @@ READ32_MEMBER(mac_state::mac_read_id)
 		case MODEL_MAC_QUADRA_840AV:
 			return 0xa55a2830;
 
+		case MODEL_MAC_IIVX:
+			return 0xa55a2015;
+
 		default:
 			return 0;
 	}
@@ -2223,6 +2227,7 @@ MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
 MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
+MAC_DRIVER_INIT(maciivi, MODEL_MAC_IIVI)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(macpd210, MODEL_MAC_PBDUO_210)
 MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)

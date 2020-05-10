@@ -152,6 +152,7 @@ public:
 	void init_macse30();
 	void init_macprtb();
 	void init_maciivx();
+	void init_maciivi();
 	void init_macpd210();
 	void init_macii();
 	void init_macclassic();
