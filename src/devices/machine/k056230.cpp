@@ -4,22 +4,15 @@
 
 Konami IC 056230 (LANC)
 
-Schematic (located on page 28): http://arcarc.xmission.com/PDF_Arcade_Manuals_and_Schematics/Racing_Force_Schematics.pdf
-
 Device Notes:
 -The custom IC itself
 -64k shared ram
 -LS161 4-bit binary counter
--PAL(0056787) for racinfrc's sub board and plygonet.cpp
--PAL(0056787A) for zr107.cpp, gticlub.cpp and thunderh's I/O board
--HYC2485S RS485 transciever
+-PAL(056787) for racinfrc's sub board and plygonet.cpp
+-PAL(056787A) for zr107.cpp, gticlub.cpp and thunderh's I/O board
+-HYC2485S RS485 transceiver
 
-Todo: nearly everything
--Have the device fired at any irq, not just the ppc from zr107.cpp and gticlub.cpp
--What exactly "happens" if an IRQ is fired to this device?
--Is ram shared between the main cpu and other communicating units?
--Find and hook the "networking" exchange, some sort of UART serial?
--Daisy chain support, a stream perhaps?
+TODO: nearly everything
 
 ***************************************************************************/
 
