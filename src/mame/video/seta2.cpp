@@ -290,7 +290,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -311,48 +311,106 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 		{ 0xff, 0, 8 }, // 7: common 8bpp case
 	};
 
-	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].shadow;
-	int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_mask;
-	int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_shift;
+	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].shadow;
+	int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_mask;
+	int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_shift;
 
 	if (!use_shadow)
 		shadow = 0;
 
-	const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
-
-
 	uint16_t* dest = &bitmap.pix16(screenline);
 
-	int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
-	int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
-	const int dx = flipx ? (-xzoom) : (xzoom);
-
-	int column = 0;
-	
 	int minx = cliprect.min_x << 16;
 	int maxx = cliprect.max_x << 16;
 
-	for (int sx = x0; sx != x1; sx += dx)
+	if (xzoom < 0x10000) // shrink
 	{
-		uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
+		int x0 = flipx ? (base_sx + (8 * xzoom) - xzoom) : (base_sx);
+		int x1 = flipx ? (base_sx - xzoom) : (x0 + (8 * xzoom));
+		const int dx = flipx ? (-xzoom) : (xzoom);
 
+		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
+		int column = 0;
 
-		if (sx >= minx && sx <= maxx)
+		for (int sx = x0; sx != x1; sx += dx)
 		{
-			int realsx = sx >> 16;
+			uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
-			if (pen || opaque)
+
+			if (sx >= minx && sx <= maxx)
 			{
-				if (!shadow)
+				int realsx = sx >> 16;
+
+				if (pen || opaque)
 				{
-					dest[realsx] = (realcolor + pen) & 0x7fff;
+					if (!shadow)
+					{
+						dest[realsx] = (realcolor + pen) & 0x7fff;
+					}
+					else
+					{
+						int pen_shift = 15 - shadow;
+						int pen_mask = (1 << pen_shift) - 1;
+						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+					}
+				}
+			}
+		}
+	}
+	else // enlarge or no zoom
+	{
+		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
+
+		int x0 = (base_sx);
+		int x1 = (x0 + (8 * xzoom));
+
+		int column;
+		if (!flipx)
+		{
+			column = 0;
+		}
+		else
+		{
+			column = 7;
+		}
+
+		uint32_t countx = 0;
+		for (int sx = x0; sx < x1; sx += 0x10000)
+		{
+			uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
+
+			if (sx >= minx && sx <= maxx)
+			{
+				int realsx = sx >> 16;
+
+				if (pen || opaque)
+				{
+					if (!shadow)
+					{
+						dest[realsx] = (realcolor + pen) & 0x7fff;
+					}
+					else
+					{
+						int pen_shift = 15 - shadow;
+						int pen_mask = (1 << pen_shift) - 1;
+						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+					}
+				}
+			}
+
+			countx += 0x10000;
+			if (countx >= xzoom)
+			{
+				if (!flipx)
+				{
+					column++;
 				}
 				else
 				{
-					int pen_shift = 15 - shadow;
-					int pen_mask = (1 << pen_shift) - 1;
-					dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+					column--;
 				}
+
+				countx -= xzoom;
 			}
 		}
 	}

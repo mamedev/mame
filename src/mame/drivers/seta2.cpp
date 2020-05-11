@@ -51,7 +51,7 @@ TODO:
 
 - Proper emulation of the TMP68301 CPU, in a core file.
 - Proper emulation of the ColdFire CPU, in a core file.
-- Flip screen / Zooming support.
+- improvements to Flip screen / Zooming support. (Flip Screen is often done with 'negative zoom value')
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
@@ -74,20 +74,6 @@ myangel2:
 - before each level, the background image is shown with completely wrong colors. It
   corrects itself when the level starts.
 
-grdians:
-- the map screen after the character selection needs zooming. There is a global
-  zoom register that should affect the background map and the level picture but
-  not the frontmost frame. This latter should use color 7ff (the last one) and
-  ignore the individual color codes in the tiles data. Note: the frontmost frame
-  has the shadow bit set, and has become invisible after implementing it.
-
-penbros/ablast:
-- Zooming is used briefly (between scenes, stage exit, stage introduction)
-
-deerhunt,wschamp:
-- offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
-  in to the deer. In wschamp intro the GPS unit should zoom to the high scores.
-
 wschampb:
 - dumps of the program ROMs matched the hand written checksum for each chip, but
   the boot screen reports NG for both ROMs. - Is this correct and a bug from the
@@ -97,9 +83,6 @@ wschampb:
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
-
-reelquak:
-- Needs an x offset for tilemap sprites.
 
 ***************************************************************************/
 
