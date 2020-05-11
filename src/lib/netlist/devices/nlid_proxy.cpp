@@ -6,7 +6,8 @@
  */
 
 #include "nlid_proxy.h"
-#include "netlist/solver/nld_solver.h"
+#include "solver/nld_solver.h"
+#include "nl_errstr.h"
 
 namespace netlist
 {
@@ -25,8 +26,7 @@ namespace netlist
 	{
 		if (logic_family() == nullptr)
 		{
-			// FIXME convert to error
-			printf("nullptr family in proxy\n");
+			throw nl_exception(MF_NULLPTR_FAMILY_NP("nld_base_proxy"));
 		}
 
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
@@ -63,7 +63,7 @@ namespace netlist
 			}
 		}
 		if (!f)
-			log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
+			throw nl_exception(MF_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
 		else
 			log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
 	}

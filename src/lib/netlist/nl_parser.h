@@ -30,6 +30,7 @@ namespace netlist
 		void net_alias();
 		void dippins();
 		void netdev_param();
+		void netdev_defparam();
 		void netdev_hint();
 		void net_c();
 		void frontier();
@@ -52,6 +53,7 @@ namespace netlist
 		token_id_t m_tok_DIPPINS;
 		token_id_t m_tok_FRONTIER;
 		token_id_t m_tok_PARAM;
+		token_id_t m_tok_DEFPARAM;
 		token_id_t m_tok_HINT;
 		token_id_t m_tok_NET_MODEL;
 		token_id_t m_tok_NETLIST_START;

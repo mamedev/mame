@@ -38,9 +38,9 @@ namespace netlist
 	// queue_t
 	// ----------------------------------------------------------------------------------------
 
-	detail::queue_t::queue_t(netlist_t &nl)
+	detail::queue_t::queue_t(netlist_t &nl, const pstring &name)
 		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(nlconst::max_queue_size())
-		, netlist_object_t(nl, nl.nlstate().name() + ".queue")
+		, netlist_object_t(nl, name)
 		, m_qsize(0)
 		, m_times(nlconst::max_queue_size())
 		, m_net_ids(nlconst::max_queue_size())
@@ -89,7 +89,7 @@ namespace netlist
 	// device_object_t
 	// ----------------------------------------------------------------------------------------
 
-	detail::device_object_t::device_object_t(core_device_t &dev, const pstring &aname)
+	detail::device_object_t::device_object_t(core_device_t *dev, const pstring &aname)
 	: object_t(aname)
 	, m_device(dev)
 	{
@@ -115,26 +115,25 @@ namespace netlist
 	// netlist_t
 	// ----------------------------------------------------------------------------------------
 
-	netlist_t::netlist_t(netlist_state_t &state)
+	netlist_t::netlist_t(netlist_state_t &state, const pstring &aname)
 		: m_state(state)
 		, m_solver(nullptr)
 		, m_time(netlist_time_ext::zero())
 		, m_mainclock(nullptr)
-		, m_queue(*this)
+		, m_queue(*this, aname + "." + "m_queue")
 		, m_use_stats(false)
 	{
-		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "netlist", "m_queue");
-		state.save(*this, m_time, "netlist", "m_time");
+		state.save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), aname, "m_queue");
+		state.save(*this, m_time, aname, "m_time");
 	}
 
 	// ----------------------------------------------------------------------------------------
 	// netlist_t
 	// ----------------------------------------------------------------------------------------
 
-	netlist_state_t::netlist_state_t(const pstring &aname,
+	netlist_state_t::netlist_state_t(const pstring &name,
 		plib::unique_ptr<callbacks_t> &&callbacks)
-	: m_name(aname)
-	, m_callbacks(std::move(callbacks)) // Order is important here
+	: m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
 	, m_dummy_version(1)
@@ -144,14 +143,14 @@ namespace netlist
 
 		m_setup = plib::make_unique<setup_t>(*this);
 		// create the run interface
-		m_netlist = m_pool.make_unique<netlist_t>(*this);
+		m_netlist = m_pool.make_unique<netlist_t>(*this, name);
 
 		// Make sure save states are invalidated when a new version is deployed
 
 		m_state.save_item(this, m_dummy_version, pstring("V") + version());
 
 		// Initialize factory
-		devices::initialize_factory(m_setup->factory());
+		devices::initialize_factory(m_setup->parser().factory());
 
 		// Add default include file
 		using a = plib::psource_str_t<plib::psource_t>;
@@ -165,8 +164,8 @@ namespace netlist
 		"#define IND_U(ind) ((ind) * 1e-6)   \n"
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		setup().add_include<a>("netlist/devices/net_lib.h", content);
-		NETLIST_NAME(base)(*m_setup);
+		m_setup->parser().add_include<a>("netlist/devices/net_lib.h", content);
+		NETLIST_NAME(base)(m_setup->parser());
 	}
 
 
@@ -177,15 +176,6 @@ namespace netlist
 		log().debug("Stopping solver device ...\n");
 		if (m_solver != nullptr)
 			m_solver->stop();
-	}
-
-	detail::net_t *netlist_state_t::find_net(const pstring &name) const
-	{
-		for (const auto & net : m_nets)
-			if (net->name() == name)
-				return net.get();
-
-		return nullptr;
 	}
 
 	std::size_t netlist_state_t::find_net_id(const detail::net_t *net) const
@@ -285,9 +275,6 @@ namespace netlist
 
 	void netlist_state_t::reset()
 	{
-		//FIXME: never used ???
-		std::unordered_map<core_device_t *, bool> m;
-
 		// Reset all nets once !
 		log().verbose("Call reset on all nets:");
 		for (auto & n : nets())
@@ -534,7 +521,7 @@ namespace netlist
 		pstring alias = this->name() + "." + name;
 
 		// everything already fully qualified
-		state().setup().register_alias_nofqn(alias, term.name());
+		state().parser().register_alias_nofqn(alias, term.name());
 	}
 
 	void base_device_t::register_subalias(const pstring &name, const pstring &aliased)
@@ -543,17 +530,17 @@ namespace netlist
 		pstring aliased_fqn = this->name() + "." + aliased;
 
 		// everything already fully qualified
-		state().setup().register_alias_nofqn(alias, aliased_fqn);
+		state().parser().register_alias_nofqn(alias, aliased_fqn);
 	}
 
 	void base_device_t::connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2)
 	{
-		state().setup().register_link_fqn(t1.name(), t2.name());
+		state().parser().register_link_fqn(t1.name(), t2.name());
 	}
 
 	void base_device_t::connect(const pstring &t1, const pstring &t2)
 	{
-		state().setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
+		state().parser().register_link_fqn(name() + "." + t1, name() + "." + t2);
 	}
 
 
@@ -723,7 +710,7 @@ namespace netlist
 
 	detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
 			const state_e state, nldelegate delegate)
-	: device_object_t(dev, dev.name() + "." + aname)
+	: device_object_t(&dev, dev.name() + "." + aname)
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
 	#endif
@@ -845,10 +832,12 @@ namespace netlist
 	// Parameters ...
 	// ----------------------------------------------------------------------------------------
 
-	param_t::param_t(core_device_t &device, const pstring &name)
-		: device_object_t(device, device.name() + "." + name)
+	param_t::param_t(core_device_t *device, const pstring &name)
+		: device_object_t(device, (device ? device->name() + "." : "")  + name)
 	{
-		device.state().setup().register_param_t(this->name(), *this);
+		// if deviceless, it's the responsibility of the owner to register!
+		if (device != nullptr)
+			device->state().setup().register_param_t(*this);
 	}
 
 	param_t::param_type_t param_t::param_type() const noexcept(false)
@@ -877,9 +866,15 @@ namespace netlist
 	}
 
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
-	: param_t(device, name)
+	: param_t(&device, name)
 	{
 		m_param = device.state().setup().get_initial_param_val(this->name(),val);
+	}
+
+	param_str_t::param_str_t(netlist_state_t &state, const pstring &name, const pstring &val)
+	: param_t(nullptr, name)
+	{
+		m_param = state.setup().get_initial_param_val(this->name(),val);
 	}
 
 	void param_str_t::changed() noexcept
@@ -887,10 +882,9 @@ namespace netlist
 	}
 
 	param_ptr_t::param_ptr_t(core_device_t &device, const pstring &name, uint8_t * val)
-	: param_t(device, name)
+	: param_t(&device, name)
 	{
-		m_param = val; //device.setup().get_initial_param_val(this->name(),val);
-		//netlist().save(*this, m_param, "m_param");
+		m_param = val;
 	}
 
 	void param_model_t::changed() noexcept
@@ -899,24 +893,24 @@ namespace netlist
 
 	pstring param_model_t::type()
 	{
-		auto mod = state().setup().models().get_model(str());
+		auto mod = state().parser().models().get_model(str());
 		return mod.type();
 	}
 
 	pstring param_model_t::value_str(const pstring &entity)
 	{
-		return state().setup().models().get_model(str()).value_str(entity);
+		return state().parser().models().get_model(str()).value_str(entity);
 	}
 
 	nl_fptype param_model_t::value(const pstring &entity)
 	{
-		return state().setup().models().get_model(str()).value(entity);
+		return state().parser().models().get_model(str()).value(entity);
 	}
 
 
 	plib::unique_ptr<std::istream> param_data_t::stream()
 	{
-		return device().state().setup().get_data_stream(str());
+		return device().state().parser().get_data_stream(str());
 	}
 
 	bool detail::core_terminal_t::is_logic() const noexcept
@@ -963,5 +957,8 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 	// netlist_state_t
 	// ----------------------------------------------------------------------------------------
+
+	nlparse_t &netlist_state_t::parser() { return m_setup->parser(); }
+	const nlparse_t &netlist_state_t::parser() const { return m_setup->parser(); }
 
 } // namespace netlist

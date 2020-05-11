@@ -109,8 +109,9 @@ namespace netlist
 
 	// nlid_proxy.cpp
 
-	PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
+	PERRMSGV(MF_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
 	PERRMSGV(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE, 5, "D/A Proxy: Found multiple power terminals on device {1}: {2} {3} {4} {5}")
+	PERRMSGV(MF_NULLPTR_FAMILY_NP,                  1, "Encountered nullptr to family in {1}")
 
 	// nld_matrix_solver.cpp
 

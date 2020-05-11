@@ -226,6 +226,7 @@ namespace netlist
 	class analog_net_t;
 	class logic_net_t;
 	class setup_t;
+	class nlparse_t;
 	class netlist_t;
 	class netlist_state_t;
 	class core_device_t;
@@ -576,22 +577,25 @@ namespace netlist
 		///
 		/// Serves as the base class of all objects being owned by a device.
 		///
+		/// The class also supports device-less objects. In this case,
+		/// nullptr is passed in as the device object.
+		///
 
 		class device_object_t : public object_t
 		{
 		public:
 			/// \brief Constructor.
 			///
-			/// \param dev  device owning the object.
+			/// \param dev  pointer to device owning the object.
 			/// \param name string holding the name of the device
 
-			device_object_t(core_device_t &dev, const pstring &name);
+			device_object_t(core_device_t *dev, const pstring &name);
 
 			/// \brief returns reference to owning device.
 			/// \returns reference to owning device.
 
-			core_device_t &device() noexcept { return m_device; }
-			const core_device_t &device() const noexcept { return m_device; }
+			core_device_t &device() noexcept { return *m_device; }
+			const core_device_t &device() const noexcept { return *m_device; }
 
 			/// \brief The netlist owning the owner of this object.
 			/// \returns reference to netlist object.
@@ -603,7 +607,7 @@ namespace netlist
 			const netlist_t &exec() const noexcept;
 
 		private:
-			core_device_t & m_device;
+			core_device_t * m_device;
 		};
 
 		// -----------------------------------------------------------------------------
@@ -1047,14 +1051,16 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(core_device_t &device, const pstring &name);
+		param_t(core_device_t *device, const pstring &name);
 
 		PCOPYASSIGNMOVE(param_t, delete)
+		virtual ~param_t() noexcept = default;
 
 		param_type_t param_type() const noexcept(false);
 
+		virtual pstring valstr() const = 0;
+
 	protected:
-		virtual ~param_t() noexcept = default; // not intended to be destroyed
 
 		void update_param() noexcept;
 
@@ -1086,6 +1092,12 @@ namespace netlist
 		operator T() const noexcept { return m_param; }
 
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
+
+		pstring valstr() const override
+		{
+			return plib::pfmt("{}").e(static_cast<nl_fptype>(m_param));
+		}
+
 	private:
 		T m_param;
 	};
@@ -1099,6 +1111,12 @@ namespace netlist
 		T operator()() const noexcept { return T(m_param); }
 		operator T() const noexcept { return T(m_param); }
 		void set(const T &param) noexcept { set_and_update_param(m_param, static_cast<int>(param)); }
+
+		pstring valstr() const override
+		{
+			// returns the numerical value
+			return plib::pfmt("{}")(m_param);
+		}
 	private:
 		int m_param;
 	};
@@ -1112,12 +1130,20 @@ namespace netlist
 	// pointer parameter
 	// -----------------------------------------------------------------------------
 
+	// FIXME: not a core component -> legacy
 	class param_ptr_t final: public param_t
 	{
 	public:
 		param_ptr_t(core_device_t &device, const pstring &name, std::uint8_t* val);
 		std::uint8_t * operator()() const noexcept { return m_param; }
 		void set(std::uint8_t *param) noexcept { set_and_update_param(m_param, param); }
+
+		pstring valstr() const override
+		{
+			// returns something which errors
+			return pstring("PTRERROR");
+		}
+
 	private:
 		std::uint8_t* m_param;
 	};
@@ -1130,6 +1156,7 @@ namespace netlist
 	{
 	public:
 		param_str_t(core_device_t &device, const pstring &name, const pstring &val);
+		param_str_t(netlist_state_t &state, const pstring &name, const pstring &val);
 
 		const pstring &operator()() const noexcept { return str(); }
 		void set(const pstring &param)
@@ -1140,6 +1167,10 @@ namespace netlist
 				changed();
 				update_param();
 			}
+		}
+		pstring valstr() const override
+		{
+			return m_param;
 		}
 	protected:
 		virtual void changed() noexcept;
@@ -1398,7 +1429,7 @@ namespace netlist
 		public:
 			using entry_t = plib::pqentry_t<net_t *, netlist_time_ext>;
 			using base_queue = timed_queue<entry_t, false>;
-			explicit queue_t(netlist_t &nl);
+			explicit queue_t(netlist_t &nl, const pstring &name);
 			~queue_t() noexcept override = default;
 
 			queue_t(const queue_t &) = delete;
@@ -1433,8 +1464,7 @@ namespace netlist
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
-		netlist_state_t(const pstring &aname,
-			plib::unique_ptr<callbacks_t> &&callbacks);
+		netlist_state_t(const pstring &name, plib::unique_ptr<callbacks_t> &&callbacks);
 
 		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -1485,9 +1515,7 @@ namespace netlist
 			return tmp;
 		}
 
-		// logging and name
-
-		const pstring &name() const noexcept { return m_name; }
+		// logging
 
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
@@ -1589,6 +1617,9 @@ namespace netlist
 		setup_t &setup() noexcept { return *m_setup; }
 		const setup_t &setup() const noexcept { return *m_setup; }
 
+		nlparse_t &parser();
+		const nlparse_t &parser() const;
+
 		// FIXME: make a postload member and include code there
 		void rebuild_lists(); // must be called after post_load !
 
@@ -1646,16 +1677,15 @@ namespace netlist
 
 	private:
 
-		detail::net_t *find_net(const pstring &name) const; // FIXME: stale
-
 		nlmempool                           m_pool; // must be deleted last!
 
-		pstring                             m_name;
 		unique_pool_ptr<netlist_t>          m_netlist;
 		plib::unique_ptr<plib::dynlib_base> m_lib;
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
+
+		// FIXME: should only be available during device construcion
 		plib::unique_ptr<setup_t>           m_setup;
 
 		nets_collection_type                m_nets;
@@ -1716,7 +1746,7 @@ namespace netlist
 	{
 	public:
 
-		explicit netlist_t(netlist_state_t &state);
+		explicit netlist_t(netlist_state_t &state, const pstring &aname);
 
 		PCOPYASSIGNMOVE(netlist_t, delete)
 
@@ -1891,7 +1921,7 @@ namespace netlist
 
 	template <typename T>
 	param_num_t<T>::param_num_t(core_device_t &device, const pstring &name, const T val)
-	: param_t(device, name)
+	: param_t(&device, name)
 	{
 		//m_param = device.setup().get_initial_param_val(this->name(),val);
 		bool found = false;
@@ -1914,7 +1944,7 @@ namespace netlist
 
 	template <typename T>
 	param_enum_t<T>::param_enum_t(core_device_t &device, const pstring &name, const T val)
-	: param_t(device, name), m_param(val)
+	: param_t(&device, name), m_param(val)
 	{
 		bool found = false;
 		pstring p = this->get_initial(device, &found);
@@ -2115,22 +2145,22 @@ namespace netlist
 
 	inline netlist_state_t &detail::device_object_t::state() noexcept
 	{
-		return m_device.state();
+		return m_device->state();
 	}
 
 	inline const netlist_state_t &detail::device_object_t::state() const noexcept
 	{
-		return m_device.state();
+		return m_device->state();
 	}
 
 	inline netlist_t &detail::device_object_t::exec() noexcept
 	{
-		return m_device.exec();
+		return m_device->exec();
 	}
 
 	inline const netlist_t &detail::device_object_t::exec() const noexcept
 	{
-		return m_device.exec();
+		return m_device->exec();
 	}
 
 	template <typename T>

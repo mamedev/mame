@@ -19,9 +19,8 @@ namespace netlist
 	// nl_parse_t
 	// ----------------------------------------------------------------------------------------
 
-	nlparse_t::nlparse_t(setup_t &setup, log_type &log)
+	nlparse_t::nlparse_t(log_type &log)
 	: m_factory(log)
-	, m_setup(setup)
 	, m_log(log)
 	, m_frontier_cnt(0)
 	{ }
@@ -49,23 +48,14 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
-		const char * params_and_connections)
-	{
-		auto params(plib::psplit(pstring(params_and_connections), ",", false));
-		for (auto &i : params)
-			i = plib::trim(i);
-		register_dev(classname, name, params);
-	}
-
-	void nlparse_t::register_devx(const pstring &classname,
-		std::initializer_list<const char *> params_and_connections)
+	void nlparse_t::register_dev(const pstring &classname,
+		std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
-		const auto *i(params_and_connections.begin());
+		const auto *i(more_parameters.begin());
 		pstring name(*i);
 		++i;
-		for (; i != params_and_connections.end(); ++i)
+		for (; i != more_parameters.end(); ++i)
 		{
 			params.emplace_back(*i);
 		}
@@ -73,12 +63,24 @@ namespace netlist
 	}
 
 	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
-		const std::vector<pstring> &params_and_connections)
+		const std::vector<pstring> &params_and_connections,
+		factory::element_t **felem)
 	{
-		factory::element_t *f = m_setup.factory().factory_by_name(classname);
-		auto paramlist = plib::psplit(f->param_desc(), ",");
 
-		register_dev(classname, name);
+		auto *f = m_factory.factory_by_name(classname);
+
+		// make sure we parse macro library entries
+		f->macro_actions(*this, name);
+		pstring key = build_fqn(name);
+		if (device_exists(key))
+		{
+			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(name));
+			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(name));
+		}
+
+		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
+
+		auto paramlist = plib::psplit(f->param_desc(), ",");
 
 		if (!params_and_connections.empty())
 		{
@@ -87,7 +89,6 @@ namespace netlist
 
 			for (const pstring &tp : paramlist)
 			{
-				//printf("x %s %s\n", tp.c_str(), ptok->c_str());
 				if (plib::startsWith(tp, "+"))
 				{
 					if (ptok == ptok_end)
@@ -106,7 +107,7 @@ namespace netlist
 				else if (plib::startsWith(tp, "@"))
 				{
 					pstring term = tp.substr(1);
-					m_setup.log().debug("Link: {1} {2}\n", tp, term);
+					log().debug("Link: {1} {2}\n", tp, term);
 
 					register_link(name + "." + term, term);
 				}
@@ -134,27 +135,8 @@ namespace netlist
 				throw nl_exception(err);
 			}
 		}
-	}
-
-	void nlparse_t::register_dev(const pstring &classname, const pstring &name)
-	{
-		auto *f = m_factory.factory_by_name(classname);
-		if (f == nullptr)
-		{
-			log().fatal(MF_CLASS_1_NOT_FOUND(classname));
-			throw nl_exception(MF_CLASS_1_NOT_FOUND(classname));
-		}
-
-		// make sure we parse macro library entries
-		f->macro_actions(*this, name);
-		pstring key = build_fqn(name);
-		if (device_exists(key))
-		{
-			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(name));
-			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(name));
-		}
-
-		m_device_factory.insert(m_device_factory.end(), {key, f});
+		if (felem != nullptr)
+			*felem = f;
 	}
 
 	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
@@ -202,7 +184,7 @@ namespace netlist
 		m_namespace_stack.pop();
 	}
 
-	void nlparse_t::register_param_x(const pstring &param, const nl_fptype value)
+	void nlparse_t::register_param(const pstring &param, const nl_fptype value)
 	{
 		if (plib::abs(value - plib::floor(value)) > nlconst::magic(1e-30)
 			|| plib::abs(value) > nlconst::magic(1e9))
@@ -216,14 +198,18 @@ namespace netlist
 		pstring fqn = build_fqn(param);
 		pstring val(value);
 
+		//printf("RegParam %s %s\n", fqn.c_str(), val.c_str());
+
 		// strip " from stringified strings
 		if (plib::startsWith(value, "\"") && plib::endsWith(value, "\""))
 			val = value.substr(1, value.length() - 2);
 
-		auto idx = m_param_values.find(fqn);
-		if (idx == m_param_values.end())
+		// Replace "@." with the current namespace
+		val = plib::replace_all(val, "@.", namespace_prefix());
+		auto idx = m_abstract.m_param_values.find(fqn);
+		if (idx == m_abstract.m_param_values.end())
 		{
-			if (!m_param_values.insert({fqn, val}).second)
+			if (!m_abstract.m_param_values.insert({fqn, val}).second)
 			{
 				log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
 				throw nl_exception(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
@@ -233,16 +219,24 @@ namespace netlist
 		{
 			log().warning(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn, idx->second,
 					val));
-			m_param_values[fqn] = val;
+			m_abstract.m_param_values[fqn] = val;
 		}
 	}
 
-	void nlparse_t::register_lib_entry(const pstring &name, const pstring &sourcefile)
+	void nlparse_t::defparam(const pstring &name, const pstring &def)
 	{
-		m_factory.register_device(plib::make_unique<factory::library_element_t>(name, name, "", sourcefile));
+		//printf("Registering %s\n", name.c_str());
+		m_abstract.m_defparams.emplace_back(namespace_prefix() + name, def);
 	}
 
-	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT)
+	void nlparse_t::register_lib_entry(const pstring &name, const
+		pstring &paramdef, const pstring &sourcefile)
+	{
+		m_factory.add(plib::make_unique<factory::library_element_t>(name, paramdef, sourcefile));
+	}
+
+	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN,
+		const pstring &r_OUT)
 	{
 		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 		m_frontier_cnt++;
@@ -253,7 +247,7 @@ namespace netlist
 		pstring attfn = build_fqn(attach);
 		pstring front_fqn = build_fqn(frontier_name);
 		bool found = false;
-		for (auto & link  : m_links)
+		for (auto & link  : m_abstract.m_links)
 		{
 			if (link.first == attfn)
 			{
@@ -277,18 +271,22 @@ namespace netlist
 	void nlparse_t::truthtable_create(tt_desc &desc, const pstring &sourcefile)
 	{
 		auto fac = factory::truthtable_create(desc, sourcefile);
-		m_factory.register_device(std::move(fac));
+		m_factory.add(std::move(fac));
+	}
+
+	pstring nlparse_t::namespace_prefix() const
+	{
+		return (m_namespace_stack.empty() ? "" : m_namespace_stack.top() + ".");
 	}
 
 	pstring nlparse_t::build_fqn(const pstring &obj_name) const
 	{
-		return (m_namespace_stack.empty()) ? obj_name
-			: m_namespace_stack.top() + "." + obj_name;
+		return namespace_prefix() + obj_name;
 	}
 
 	void nlparse_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 	{
-		if (!m_alias.insert({alias, out}).second)
+		if (!m_abstract.m_alias.insert({alias, out}).second)
 		{
 			log().fatal(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
 			throw nl_exception(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
@@ -300,12 +298,12 @@ namespace netlist
 	{
 		link_t temp = link_t(sin, sout);
 		log().debug("link {1} <== {2}", sin, sout);
-		m_links.push_back(temp);
+		m_abstract.m_links.push_back(temp);
 	}
 
 	bool nlparse_t::device_exists(const pstring &name) const
 	{
-		for (const auto &d : m_device_factory)
+		for (const auto &d : m_abstract.m_device_factory)
 			if (d.first == name)
 				return true;
 		return false;
@@ -328,6 +326,43 @@ namespace netlist
 			add_define(defstr, "1");
 	}
 
+	void nlparse_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
+	{
+		log().debug("Creating dynamic logs ...");
+		for (const pstring &ll : loglist)
+		{
+			pstring name = "log_" + ll;
+
+			register_dev("LOG", name);
+			register_link(name + ".I", ll);
+		}
+	}
+
+	void nlparse_t::remove_connections(const pstring &pin)
+	{
+		// FIXME: check use_cases - remove_connections may be dead
+		pstring pinfn = build_fqn(pin);
+		bool found = false;
+
+		for (auto link = result().m_links.begin(); link != result().m_links.end(); )
+		{
+			if ((link->first == pinfn) || (link->second == pinfn))
+			{
+				log().verbose("removing connection: {1} <==> {2}\n", link->first, link->second);
+				link = result().m_links.erase(link);
+				found = true;
+			}
+			else
+				link++;
+		}
+		if (!found)
+		{
+			log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
+			throw nl_exception(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
+		}
+	}
+
+
 	// ----------------------------------------------------------------------------------------
 	// Sources
 	// ----------------------------------------------------------------------------------------
@@ -347,7 +382,7 @@ namespace netlist
 
 
 setup_t::setup_t(netlist_state_t &nlstate)
-	: nlparse_t(*this, nlstate.log())
+	: m_parser(nlstate.log())
 	, m_nlstate(nlstate)
 	, m_netlist_params(nullptr)
 	, m_proxy_cnt(0)
@@ -365,15 +400,45 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 		case detail::terminal_type::OUTPUT:
 			return "OUTPUT";
 	}
-	// FIXME: in.type() will have thrown already
-	// log().fatal(MF_UNKNOWN_OBJECT_TYPE_1(static_cast<unsigned>(in.type())));
 	return "Error"; // Tease gcc
 }
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
-	auto i = m_param_values.find(name);
-	return (i != m_param_values.end()) ? i->second : def;
+	auto i = m_parser.result().m_param_values.find(name);
+	pstring v = (i != m_parser.result().m_param_values.end()) ? i->second : def;
+
+	//printf("%s -> %s\n", name.c_str(), v.c_str());
+
+	auto sp(plib::psplit(v, std::vector<pstring>({"$(", ")"})));
+	std::size_t p(0);
+	v = "";
+	while (p < sp.size())
+	{
+		if (sp[p] == "$(")
+		{
+			p++;
+			pstring r;
+			while (p < sp.size() && sp[p] != ")")
+				r += sp[p++];
+			p++;
+			auto k = m_params.find(r);
+			if (k != m_params.end())
+			{
+				v = v + k->second.param().valstr();
+			}
+			else
+			{
+				v = v + "UNDEFINED_" + r;
+			}
+			//v = v + get_initial_param_val(r, "UNDEFINED_" + r);
+		}
+		else
+			v += sp[p++];
+
+	}
+
+	return v;
 }
 
 void setup_t::register_term(detail::core_terminal_t &term)
@@ -392,35 +457,12 @@ void setup_t::register_term(terminal_t &term, terminal_t &other_term)
 	m_connected_terminals.insert({&term, &other_term});
 }
 
-void setup_t::remove_connections(const pstring &pin)
+void setup_t::register_param_t(param_t &param)
 {
-	pstring pinfn = build_fqn(pin);
-	bool found = false;
-
-	for (auto link = m_links.begin(); link != m_links.end(); )
+	if (!m_params.insert({param.name(), param_ref_t(param.device(), param)}).second)
 	{
-		if ((link->first == pinfn) || (link->second == pinfn))
-		{
-			log().verbose("removing connection: {1} <==> {2}\n", link->first, link->second);
-			link = m_links.erase(link);
-			found = true;
-		}
-		else
-			link++;
-	}
-	if (!found)
-	{
-		log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
-		throw nl_exception(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
-	}
-}
-
-void setup_t::register_param_t(const pstring &name, param_t &param)
-{
-	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
-	{
-		log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
-		throw nl_exception(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
+		log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param.name()));
+		throw nl_exception(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param.name()));
 	}
 }
 
@@ -432,8 +474,8 @@ pstring setup_t::resolve_alias(const pstring &name) const
 	// FIXME: Detect endless loop
 	do {
 		ret = temp;
-		auto p = m_alias.find(ret);
-		temp = (p != m_alias.end() ? p->second : "");
+		auto p = m_parser.result().m_alias.find(ret);
+		temp = (p != m_parser.result().m_alias.end() ? p->second : "");
 	} while (temp != "" && temp != ret);
 
 	log().debug("{1}==>{2}\n", name, ret);
@@ -449,7 +491,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 	do {
 		ret = temp;
 		temp = "";
-		for (const auto &e : m_alias)
+		for (const auto &e : m_parser.result().m_alias)
 		{
 			// FIXME: this will resolve first one found
 			if (e.second == ret)
@@ -477,17 +519,15 @@ std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devna
 		}
 	}
 
-	for (const auto & t : m_alias)
+	for (const auto & t : m_parser.result().m_alias)
 	{
 		if (plib::startsWith(t.first, devname))
 		{
 			pstring tn(t.first.substr(devname.length()+1));
-			//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
 			if (tn.find('.') == pstring::npos)
 			{
 				terms.push_back(tn);
 				pstring resolved = resolve_alias(t.first);
-				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), resolved.c_str());
 				if (resolved != t.first)
 				{
 					auto found = std::find(terms.begin(), terms.end(), resolved.substr(devname.length()+1));
@@ -523,7 +563,6 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 		log().debug("Found input {1}\n", tname);
 	}
 
-	// FIXME: this should resolve any proxy
 	return term;
 }
 
@@ -561,20 +600,19 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
 	return term;
 }
 
-param_t *setup_t::find_param(const pstring &param_in, bool required) const
+param_ref_t setup_t::find_param(const pstring &param_in) const
 {
-	const pstring param_in_fqn = build_fqn(param_in);
+	// FIXME: examine use cases
+	const pstring param_in_fqn = m_parser.build_fqn(param_in);
 
 	const pstring outname(resolve_alias(param_in_fqn));
 	auto ret(m_params.find(outname));
-	if (ret == m_params.end() && required)
+	if (ret == m_params.end())
 	{
 		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
 		throw nl_exception(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
 	}
-	if (ret != m_params.end())
-		log().debug("Found parameter {1}\n", outname);
-	return (ret == m_params.end() ? nullptr : ret->second.param());
+	return ret->second;
 }
 
 
@@ -967,16 +1005,16 @@ void setup_t::resolve_inputs()
 		tries--;
 	}
 #else
-	while (!m_links.empty() && tries > 0)
+	while (!m_parser.result().m_links.empty() && tries > 0)
 	{
-		for (std::size_t i = 0; i < m_links.size(); )
+		for (std::size_t i = 0; i < m_parser.result().m_links.size(); )
 		{
-			const pstring t1s(m_links[i].first);
-			const pstring t2s(m_links[i].second);
+			const pstring t1s(m_parser.result().m_links[i].first);
+			const pstring t2s(m_parser.result().m_links[i].second);
 			detail::core_terminal_t *t1 = find_terminal(t1s);
 			detail::core_terminal_t *t2 = find_terminal(t2s);
 			if (connect(*t1, *t2))
-				m_links.erase(m_links.begin() + static_cast<std::ptrdiff_t>(i));
+				m_parser.result().m_links.erase(m_parser.result().m_links.begin() + static_cast<std::ptrdiff_t>(i));
 			else
 				i++;
 		}
@@ -985,8 +1023,8 @@ void setup_t::resolve_inputs()
 #endif
 	if (tries == 0)
 	{
-		for (auto & link : m_links)
-			log().warning(MF_CONNECTING_1_TO_2(setup().de_alias(link.first), setup().de_alias(link.second)));
+		for (auto & link : m_parser.result().m_links)
+			log().warning(MF_CONNECTING_1_TO_2(de_alias(link.first), de_alias(link.second)));
 
 		log().fatal(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
 		throw nl_exception(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
@@ -1016,7 +1054,7 @@ void setup_t::resolve_inputs()
 		}
 		else if (!term->has_net())
 		{
-			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
+			log().error(ME_TERMINAL_1_WITHOUT_NET(de_alias(term->name())));
 			err = true;
 		}
 		else if (!term->net().has_connections())
@@ -1039,18 +1077,9 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
-{
-	log().debug("Creating dynamic logs ...");
-	for (const pstring &ll : loglist)
-	{
-		pstring name = "log_" + ll;
-		auto nc = factory().factory_by_name("LOG")->make_device(m_nlstate.pool(), m_nlstate, name);
-		register_link(name + ".I", ll);
-		log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-		m_nlstate.register_device(nc->name(), std::move(nc));
-	}
-}
+
+log_type &setup_t::log() noexcept { return m_nlstate.log(); }
+const log_type &setup_t::log() const noexcept { return m_nlstate.log(); }
 
 // ----------------------------------------------------------------------------------------
 // Models
@@ -1276,7 +1305,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
 	family_type ft(family_type::CUSTOM);
 
-	auto mod(models().get_model(model));
+	auto mod(m_parser.models().get_model(model));
 	family_model_t modv(mod);
 
 	if (!ft.set_from_string(modv.m_TYPE()))
@@ -1333,16 +1362,24 @@ void setup_t::prepare_to_run()
 	if (envlog != "")
 	{
 		std::vector<pstring> loglist(plib::psplit(envlog, ":"));
-		register_dynamic_log_devices(loglist);
+		m_parser.register_dynamic_log_devices(loglist);
 	}
 
+	// create defparams!
+
+	for (auto & e : m_parser.result().m_defparams)
+	{
+		auto param(plib::make_unique<param_str_t>(nlstate(), e.first, e.second));
+		register_param_t(*param);
+		m_defparam_lifetime.push_back(std::move(param));
+	}
 
 	// make sure the solver and parameters are started first!
 
-	for (auto & e : m_device_factory)
+	for (auto & e : m_parser.result().m_device_factory)
 	{
-		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		if ( m_parser.factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				|| m_parser.factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			m_nlstate.register_device(e.first, e.second->make_device(nlstate().pool(), m_nlstate, e.first));
 		}
@@ -1355,16 +1392,16 @@ void setup_t::prepare_to_run()
 
 	// set default model parameters
 
-	models().register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
-	models().register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	m_parser.models().register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	m_parser.models().register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
 
 	// create devices
 
 	log().debug("Creating devices ...\n");
-	for (auto & e : m_device_factory)
+	for (auto & e : m_parser.result().m_device_factory)
 	{
-		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		if ( !m_parser.factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				&& !m_parser.factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = e.second->make_device(m_nlstate.pool(), m_nlstate, e.first);
 			m_nlstate.register_device(dev->name(), std::move(dev));
@@ -1373,7 +1410,7 @@ void setup_t::prepare_to_run()
 
 	int errcnt(0);
 	log().debug("Looking for unknown parameters ...\n");
-	for (auto &p : m_param_values)
+	for (auto &p : m_parser.result().m_param_values)
 	{
 		auto f = m_params.find(p.first);
 		if (f == m_params.end())
@@ -1402,8 +1439,8 @@ void setup_t::prepare_to_run()
 	{
 		if (use_deactivate)
 		{
-			auto p = m_param_values.find(d.second->name() + sHINT_NO_DEACTIVATE);
-			if (p != m_param_values.end())
+			auto p = m_parser.result().m_param_values.find(d.second->name() + sHINT_NO_DEACTIVATE);
+			if (p != m_parser.result().m_param_values.end())
 			{
 				//FIXME: check for errors ...
 				bool err(false);

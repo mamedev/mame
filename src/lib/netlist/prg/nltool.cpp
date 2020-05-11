@@ -70,14 +70,15 @@ public:
 			"raise exception on floating point errors. This is intended to be used during debugging."),
 
 		opt_grp5(*this,     "Options for convert command",  "These options are only used by the convert command."),
-		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
+		opt_type(*this,     "y", "type",        0,           std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
 
 		opt_grp6(*this,     "Options for validate command",  "These options are only used by the validate command."),
 		opt_extended_validation(*this, "", "extended",       "Identify issues with power terminals."),
 
-		opt_grp7(*this,     "Options for header command",  "These options are only used by the header command."),
-		opt_tabwidth(*this, "", "tab-width", 4,          "Tab width for output."),
-		opt_linewidth(*this,"", "line-width", 72,       "Line width for output."),
+		opt_grp7(*this,     "Options for header command",    "These options are only used by the header command."),
+		opt_tabwidth(*this, "", "tab-width", 4,              "Tab width for output."),
+		opt_linewidth(*this,"", "line-width", 72,            "Line width for output."),
+		opt_pattern(*this, "", "pattern",                    "Pattern to match against device names. If the device name contains pattern, the device will be included in the output. Multiple patterns can be specified, if none is given, all devices will be output."),
 
 		opt_ex1(*this,     "nltool -c run -t 3.5 -n cap_delay nl_examples/cdelay.c",
 				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
@@ -144,6 +145,7 @@ private:
 	plib::option_group  opt_grp7;
 	plib::option_num<unsigned> opt_tabwidth;
 	plib::option_num<unsigned> opt_linewidth;
+	plib::option_vec     opt_pattern;
 	plib::option_example opt_ex1;
 	plib::option_example opt_ex2;
 	plib::option_example opt_ex3;
@@ -242,8 +244,8 @@ class netlist_tool_t : public netlist::netlist_state_t
 {
 public:
 
-	netlist_tool_t(tool_app_t &app, const pstring &aname, const pstring &boostlib)
-	: netlist::netlist_state_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app, boostlib))
+	netlist_tool_t(tool_app_t &app, const pstring &name, const pstring &boostlib)
+	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t>(app, boostlib))
 	{
 	}
 
@@ -256,10 +258,10 @@ public:
 		// read the netlist ...
 
 		for (const auto & d : defines)
-			setup().add_define(d);
+			parser().add_define(d);
 
 		for (const auto & r : roms)
-			setup().register_source<netlist_data_folder_t>(r);
+			parser().register_source<netlist_data_folder_t>(r);
 
 #if 0
 		using a = plib::psource_str_t<plib::psource_t>;
@@ -280,11 +282,11 @@ public:
 #endif
 #endif
 		for (const auto & i : includes)
-			setup().add_include<netlist_data_folder_t>(i);
+			parser().add_include<netlist_data_folder_t>(i);
 
-		setup().register_source<netlist::source_file_t>(filename);
-		setup().include(name);
-		setup().register_dynamic_log_devices(logs);
+		parser().register_source<netlist::source_file_t>(filename);
+		parser().include(name);
+		parser().register_dynamic_log_devices(logs);
 
 		// start devices
 		setup().prepare_to_run();
@@ -369,30 +371,30 @@ struct input_t
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
 		m_time = netlist::netlist_time_ext::from_fp(t);
-		m_param = setup.find_param(pstring(buf.data()), true);
+		m_param = setup.find_param(pstring(buf.data()));
 	}
 
 	void setparam() const
 	{
-		switch (m_param->param_type())
+		switch (m_param.param().param_type())
 		{
 			case netlist::param_t::STRING:
 			case netlist::param_t::POINTER:
-				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
+				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param.param().name()));
 			case netlist::param_t::DOUBLE:
-				static_cast<netlist::param_fp_t*>(m_param)->set(m_value);
+				static_cast<netlist::param_fp_t*>(&m_param.param())->set(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(m_param)->set(static_cast<int>(m_value));
+				static_cast<netlist::param_int_t*>(&m_param.param())->set(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(m_param)->set(static_cast<bool>(m_value));
+				static_cast<netlist::param_logic_t*>(&m_param.param())->set(static_cast<bool>(m_value));
 				break;
 		}
 	}
 
 	netlist::netlist_time_ext m_time;
-	netlist::param_t *m_param;
+	netlist::param_ref_t m_param;
 	nl_fptype m_value;
 };
 
@@ -867,13 +869,16 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 
 void tool_app_t::create_header()
 {
+	if (opt_files().size() > 0)
+		throw netlist::nl_exception("Header doesn't support input files, but {1} where given", opt_files().size());
+
 	netlist_tool_t nt(*this, "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
-	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
-	nt.setup().include("dummy");
+	nt.parser().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
+	nt.parser().include("dummy");
 
 	pout("// license:GPL-2.0+\n");
 	pout("// copyright-holders:Couriersud\n");
@@ -889,16 +894,24 @@ void tool_app_t::create_header()
 
 	pstring last_source("");
 
-	for (auto &e : nt.setup().factory())
+	for (auto &e : nt.parser().factory())
 	{
-		if (last_source != e->sourcefile())
+		bool found(opt_pattern().size() == 0);
+
+		for (auto &p : opt_pattern())
+			found |= (e->name().find(p) != pstring::npos);
+
+		if (found)
 		{
-			last_source = e->sourcefile();
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
-			pout("{1}{2}\n", "// Source: ", plib::replace_all(e->sourcefile(), "../", ""));
-			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
+			if (last_source != e->sourcefile())
+			{
+				last_source = e->sourcefile();
+				pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
+				pout("{1}{2}\n", "// Source: ", plib::replace_all(e->sourcefile(), "../", ""));
+				pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
+			}
+			header_entry(e.get());
 		}
-		header_entry(e.get());
 	}
 	pout("#endif // __PLIB_PREPROCESSOR__\n");
 	pout("#endif\n");
@@ -913,11 +926,11 @@ void tool_app_t::create_docheader()
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
-	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
-	nt.setup().include("dummy");
+	nt.parser().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
+	nt.parser().include("dummy");
 
 	std::vector<pstring> devs;
-	for (auto &e : nt.setup().factory())
+	for (auto &e : nt.parser().factory())
 		devs.push_back(e->name());
 	std::sort(devs.begin(), devs.end(), [&](pstring &a, pstring &b) { return a < b; });
 
@@ -938,7 +951,7 @@ void tool_app_t::create_docheader()
 
 	pout("\n");
 
-	for (auto &e : nt.setup().factory())
+	for (auto &e : nt.parser().factory())
 	{
 		pout("//! [{1} csynopsis]\n", e->name());
 		header_entry(e.get());
@@ -954,7 +967,7 @@ void tool_app_t::create_docheader()
 	poutprefix("///", " @page '' "); // FIXME: snippets and pages need to be separate files
 	poutprefix("", "");
 
-	for (auto &e : nt.setup().factory())
+	for (auto &e : nt.parser().factory())
 	{
 		auto d(read_docsrc(e->sourcefile(), e->name()));
 
@@ -1035,19 +1048,22 @@ void tool_app_t::listdevices()
 	nt.log().info.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	netlist::factory::list_t &list = nt.setup().factory();
+	netlist::factory::list_t &list = nt.parser().factory();
 
-	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
-	nt.setup().include("dummy");
+	nt.parser().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
+	nt.parser().include("dummy");
 	nt.setup().prepare_to_run();
 
 	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
 
-	for (auto & f : list)
+	for (auto & fl : list)
 	{
-		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
+		pstring out = plib::pfmt("{1:-20} {2}(<id>")(fl->name())(fl->name());
 
-		f->macro_actions(nt.setup(), f->name() + "_lc");
+		netlist::factory::element_t *f;
+		nt.parser().register_dev(fl->name(), fl->name() + "_lc",
+			std::vector<pstring>(), &f);
+
 		auto d = f->make_device(nt.pool(), nt, f->name() + "_lc");
 		// get the list of terminals ...
 

@@ -240,9 +240,9 @@ namespace devices
 	class netlist_factory_truthtable_t : public factory::truthtable_base_element_t
 	{
 	public:
-		netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring  &sourcefile)
-		: truthtable_base_element_t(name, classname, def_param, sourcefile)
+		netlist_factory_truthtable_t(const pstring &name,
+			const pstring &def_param, const pstring  &sourcefile)
+		: truthtable_base_element_t(name, def_param, sourcefile)
 		{ }
 
 		unique_pool_ptr<core_device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
@@ -471,16 +471,16 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 namespace factory
 {
 
-	truthtable_base_element_t::truthtable_base_element_t(const pstring &name, const pstring &classname,
+	truthtable_base_element_t::truthtable_base_element_t(const pstring &name,
 			const pstring &def_param, const pstring &sourcefile)
-	: factory::element_t(name, classname, def_param, sourcefile)
+	: factory::element_t(name, def_param, sourcefile)
 	, m_family_name(NETLIST_DEFAULT_LOGIC_FAMILY)
 	{
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
-			ret = plib::make_unique<xtype>(desc.name, desc.classname, desc.def_param, s); } \
+			ret = plib::make_unique<xtype>(desc.name, desc.def_param, s); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \

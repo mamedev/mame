@@ -12,8 +12,6 @@
 
 #include "netlist/nl_setup.h"
 
-//#define NL_AUTO_DEVICES 1
-
 #ifdef RES_R
 #warning "Do not include rescap.h in a netlist environment"
 #endif
@@ -30,7 +28,7 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
-#ifdef NL_AUTO_DEVICES
+#if NL_AUTO_DEVICES
 #include "nld_devinc.h"
 
 #include "netlist/macro/nlm_cd4xxx.h"
@@ -52,6 +50,7 @@
 #include "nld_4006.h"
 #include "nld_4020.h"
 #include "nld_4066.h"
+#include "nld_4316.h"
 #include "nld_74107.h"
 #include "nld_74123.h"
 #include "nld_74153.h"

@@ -25,10 +25,10 @@
 
 #define NETLIB_DEVICE_IMPL_BASE(ns, p_alias, chip, p_name, p_def_param) \
 	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
-			(const pstring &classname) \
+			() \
 	{ \
 		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
-		return devtype::create(p_name, classname, p_def_param, __FILE__); \
+		return devtype::create(p_name, p_def_param, __FILE__); \
 	} \
 	\
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
@@ -47,10 +47,9 @@ namespace factory {
 	class element_t
 	{
 	public:
-		element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param);
-		element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile);
+		element_t(const pstring &name, const pstring &def_param);
+		element_t(const pstring &name, const pstring &def_param,
+			const pstring &sourcefile);
 		virtual ~element_t() = default;
 
 		PCOPYASSIGNMOVE(element_t, default)
@@ -66,13 +65,11 @@ namespace factory {
 		}
 
 		const pstring &name() const noexcept { return m_name; }
-		const pstring &classname() const noexcept { return m_classname; }
 		const pstring &param_desc() const noexcept { return m_def_param; }
 		const pstring &sourcefile() const noexcept { return m_sourcefile; }
 
 	private:
 		pstring m_name;                             ///< device name
-		pstring m_classname;                        ///< device class name
 		pstring m_def_param;                        ///< default parameter
 		pstring m_sourcefile;                       ///< source file
 	};
@@ -81,12 +78,11 @@ namespace factory {
 	class device_element_t : public element_t
 	{
 	public:
-		device_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: element_t(name, classname, def_param) { }
-		device_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile)
-		: element_t(name, classname, def_param, sourcefile) { }
+		device_element_t(const pstring &name, const pstring &def_param)
+		: element_t(name, def_param) { }
+		device_element_t(const pstring &name, const pstring &def_param,
+			const pstring &sourcefile)
+		: element_t(name, def_param, sourcefile) { }
 
 		unique_pool_ptr<core_device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
@@ -96,10 +92,9 @@ namespace factory {
 		}
 
 		static plib::unique_ptr<device_element_t<C>> create(const pstring &name,
-			const pstring &classname, const pstring &def_param,
-			const pstring &sourcefile)
+			const pstring &def_param, const pstring &sourcefile)
 		{
-			return plib::make_unique<device_element_t<C>>(name, classname, def_param, sourcefile);
+			return plib::make_unique<device_element_t<C>>(name, def_param, sourcefile);
 		}
 	};
 
@@ -112,13 +107,13 @@ namespace factory {
 		PCOPYASSIGNMOVE(list_t, delete)
 
 		template<class device_class>
-		void register_device(const pstring &name, const pstring &classname,
-			const pstring &def_param, const pstring &sourcefile)
+		void add(const pstring &name, const pstring &def_param,
+			const pstring &sourcefile)
 		{
-			register_device(device_element_t<device_class>::create(name, classname, def_param, sourcefile));
+			add(device_element_t<device_class>::create(name, def_param, sourcefile));
 		}
 
-		void register_device(plib::unique_ptr<element_t> &&factory) noexcept(false);
+		void add(plib::unique_ptr<element_t> &&factory) noexcept(false);
 
 		element_t * factory_by_name(const pstring &devname) noexcept(false);
 
@@ -136,13 +131,12 @@ namespace factory {
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = plib::unique_ptr<element_t> (*)(const pstring &classname);
+	using constructor_ptr_t = plib::unique_ptr<element_t> (*)();
 
 	template <typename T>
-	plib::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
-			const pstring &def_param)
+	plib::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &def_param)
 	{
-		return plib::make_unique<device_element_t<T>>(name, classname, def_param);
+		return plib::make_unique<device_element_t<T>>(name, def_param);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -153,9 +147,8 @@ namespace factory {
 	{
 	public:
 
-		library_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source)
+		library_element_t(const pstring &name, const pstring &def_param, const pstring &source)
+		: element_t(name, def_param, source)
 		{
 		}
 

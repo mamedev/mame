@@ -16,7 +16,7 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#ifndef NL_AUTO_DEVICES
+#if !NL_AUTO_DEVICES
 
 #define TTL_7400_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7400_GATE, name)

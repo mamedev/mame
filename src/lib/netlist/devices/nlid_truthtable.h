@@ -200,7 +200,6 @@ namespace devices
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
 		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
 
-		/* FIXME: check width */
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
 #endif
@@ -217,14 +216,13 @@ namespace factory
 	class truthtable_base_element_t : public factory::element_t
 	{
 	public:
-		truthtable_base_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile);
+		truthtable_base_element_t(const pstring &name,
+			const pstring &def_param, const pstring &sourcefile);
 
 		std::vector<pstring> m_desc;
 		pstring m_family_name;
 	};
 
-	// FIXME: the returned element is missing a pointer to the family ...
 	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, const pstring &sourcefile);
 
 } // namespace factory
