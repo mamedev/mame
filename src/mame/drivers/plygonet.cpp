@@ -27,10 +27,10 @@
     - EEPROM
     - TTL text plane
     - Controls
-    - Palletes
+    - Palettes
 
     Driver needs:
-    - Network at 580800 (see k056230.cpp for todo related to this device)
+    - Network at 580800 (K056230)
     - Polygon rasterization (K054009 + K054010)
     - Hook up PSAC2 (gfx decode for it is already present and correct)
     - Priorities.  From the original board it appears they're fixed, in front to back order:
