@@ -290,7 +290,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int xoffset, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -326,9 +326,6 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 	int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
 	int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
 	const int dx = flipx ? (-xzoom) : (xzoom);
-
-	x0 -= xoffset;
-	x1 -= xoffset;
 
 	int column = 0;
 	
@@ -621,8 +618,8 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 							uint32_t realsx = dst_x;
 							realsx -= usedxoffset>>16;
 							realsx = realsx * usedxzoom;
-							realsx += usedxoffset;
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, usedxoffset, use_shadow, realscanline, tileline, opaque);
+							//realsx += usedxoffset;
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -707,8 +704,8 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						uint32_t realsx = (sx + x * 8);
 						realsx -= usedxoffset>>16;
 						realsx = realsx * usedxzoom;
-						realsx += usedxoffset;
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, usedxoffset, use_shadow, realscanline, line, opaque);
+						//realsx += usedxoffset;
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
@@ -778,8 +775,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 	uint32_t inc2 = inc / xzoom;
 
-	printf("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
-
+	//printf("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
