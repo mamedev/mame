@@ -83,10 +83,11 @@ char *strncpyz(char *dest, const char *source, size_t len)
 //  extract_padded_string
 //-------------------------------------------------
 
-static std::string extract_padded_string(const char *source, size_t len)
+static std::string extract_padded_string(const char *source, size_t len, char pad)
 {
-	while ((len > 0) && (source[len - 1] == ' '))
+	while ((len > 0) && (source[len - 1] == pad))
 		len--;
+
 	return std::string(source, len);
 }
 
@@ -97,10 +98,10 @@ static std::string extract_padded_string(const char *source, size_t len)
 //  this in common code
 //-------------------------------------------------
 
-std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length)
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length, char pad)
 {
-	std::string filename = extract_padded_string(source, filename_length);
-	std::string extension = extract_padded_string(source + filename_length, extension_length);
+	std::string filename = extract_padded_string(source, filename_length, pad);
+	std::string extension = extract_padded_string(source + filename_length, extension_length, pad);
 	return extension.empty() ? filename : filename + "." + extension;
 }
 
