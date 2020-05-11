@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Driver for Williams/Midway Wolf-unit games.
+    Driver for Williams/Midway X-unit games.
 
 **************************************************************************/
 
