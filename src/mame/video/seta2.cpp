@@ -411,7 +411,7 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 	}
 }
 
-int seta2_state::calculate_global_xoffset(int special)
+int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
 {
 	/*
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
@@ -433,13 +433,13 @@ int seta2_state::calculate_global_xoffset(int special)
 
 	int global_xoffset = 0;
 
-	if (special)
+	if (nozoom_fixedpalette_fixedposition)
 		global_xoffset = 0x80;
 
 	return global_xoffset;
 }
 
-int seta2_state::calculate_global_yoffset(int special)
+int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
 {
 	// Sprites list
 	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
@@ -449,7 +449,7 @@ int seta2_state::calculate_global_yoffset(int special)
 	//global_yoffset += 1; // +2 for myangel / myangel2?
 	int global_yoffset = 0;
 
-	if (special)
+	if (nozoom_fixedpalette_fixedposition)
 		global_yoffset = -0x90;
 
 	return global_yoffset;
@@ -487,7 +487,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		int global_sizey = yoffs & 0xfc00;
 
 
-		int special = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
+		int nozoom_fixedpalette_fixedposition = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
 		bool opaque = num & 0x2000;
 		int use_global_size = num & 0x1000;
 		int use_shadow = num & 0x0800;
@@ -500,22 +500,25 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		if (yoffs & 0x200)
 			yoffs -= 0x400;
 
-		int global_xoffset = calculate_global_xoffset(special);
-		int global_yoffset = calculate_global_yoffset(special);
+		int global_xoffset = calculate_global_xoffset(nozoom_fixedpalette_fixedposition);
+		int global_yoffset = calculate_global_yoffset(nozoom_fixedpalette_fixedposition);
 		int usedscanline;
+		int usedxoffset;
 		uint32_t usedxzoom;
 
-		if (special)
+		if (nozoom_fixedpalette_fixedposition)
 		{
 			use_shadow = 0;
 		//  which_gfx = 4 << 8;
 			usedscanline = realscanline; // no zooming?
 			usedxzoom = 0x10000;
+			usedxoffset = 0;
 		}
 		else
 		{
 			usedscanline = scanline;
 			usedxzoom = xzoom;
+			usedxoffset = 0x800000;
 		}
 
 		// Number of single-sprites
@@ -618,6 +621,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						{
 							uint32_t realsx = dst_x;
 							realsx = realsx * usedxzoom;
+							realsx -= usedxoffset;
 							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
 						}
 					}
@@ -691,7 +695,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					int y = (line >> 3);
 					line &= 0x7;
 
-					if (special)
+					if (nozoom_fixedpalette_fixedposition)
 					{
 						// grdians map...
 						color = 0x7ff;
@@ -702,6 +706,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
 						uint32_t realsx = (sx + x * 8);
 						realsx = realsx * usedxzoom;
+						realsx -= usedxoffset;
 						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
 					}
 					
