@@ -290,7 +290,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -323,28 +323,35 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 
 	uint16_t* dest = &bitmap.pix16(screenline);
 
-	const int x0 = flipx ? (base_sx + 8 - 1) : (base_sx);
-	const int x1 = flipx ? (base_sx - 1) : (x0 + 8);
-	const int dx = flipx ? (-1) : (1);
+	int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
+	int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
+	const int dx = flipx ? (-xzoom) : (xzoom);
 
 	int column = 0;
+	
+	int minx = cliprect.min_x << 16;
+	int maxx = cliprect.max_x << 16;
+
 	for (int sx = x0; sx != x1; sx += dx)
 	{
 		uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
-		if (sx >= cliprect.min_x && sx <= cliprect.max_x)
+
+		if (sx >= minx && sx <= maxx)
 		{
+			int realsx = sx >> 16;
+
 			if (pen || opaque)
 			{
 				if (!shadow)
 				{
-					dest[sx] = (realcolor + pen) & 0x7fff;
+					dest[realsx] = (realcolor + pen) & 0x7fff;
 				}
 				else
 				{
 					int pen_shift = 15 - shadow;
 					int pen_mask = (1 << pen_shift) - 1;
-					dest[sx] = ((dest[sx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+					dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
 				}
 			}
 		}
@@ -403,8 +410,9 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 	}
 }
 
-int seta2_state::calculate_global_xoffset(int special)
+int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
 {
+	/*
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
 	if (global_xoffset & 0x400)
 		global_xoffset -= 0x800;
@@ -420,14 +428,17 @@ int seta2_state::calculate_global_xoffset(int special)
 	{
 		global_xoffset -= 0x14f;
 	}
+	*/
 
-	if (special)
+	int global_xoffset = 0;
+
+	if (nozoom_fixedpalette_fixedposition)
 		global_xoffset = 0x80;
 
 	return global_xoffset;
 }
 
-int seta2_state::calculate_global_yoffset(int special)
+int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
 {
 	// Sprites list
 	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
@@ -437,18 +448,15 @@ int seta2_state::calculate_global_yoffset(int special)
 	//global_yoffset += 1; // +2 for myangel / myangel2?
 	int global_yoffset = 0;
 
-	if (special)
+	if (nozoom_fixedpalette_fixedposition)
 		global_yoffset = -0x90;
 
 	return global_yoffset;
 }
 
 
-void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline)
+void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
 {
-	if (!m_vregs.found())
-		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
-
 	uint16_t* spriteram = m_spriteram;
 
 	uint16_t *s1 = m_private_spriteram.get();
@@ -472,7 +480,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		int global_sizey = yoffs & 0xfc00;
 
 
-		int special = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
+		int nozoom_fixedpalette_fixedposition = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
 		bool opaque = num & 0x2000;
 		int use_global_size = num & 0x1000;
 		int use_shadow = num & 0x0800;
@@ -485,18 +493,25 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		if (yoffs & 0x200)
 			yoffs -= 0x400;
 
-		int global_xoffset = calculate_global_xoffset(special);
-		int global_yoffset = calculate_global_yoffset(special);
+		int global_xoffset = calculate_global_xoffset(nozoom_fixedpalette_fixedposition);
+		int global_yoffset = calculate_global_yoffset(nozoom_fixedpalette_fixedposition);
 		int usedscanline;
-		if (special)
+		int usedxoffset;
+		uint32_t usedxzoom;
+
+		if (nozoom_fixedpalette_fixedposition)
 		{
 			use_shadow = 0;
 		//  which_gfx = 4 << 8;
 			usedscanline = realscanline; // no zooming?
+			usedxzoom = 0x10000;
+			usedxoffset = 0;
 		}
 		else
 		{
 			usedscanline = scanline;
+			usedxzoom = xzoom;
+			usedxoffset = xoffset;
 		}
 
 		// Number of single-sprites
@@ -597,7 +612,10 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, realscanline, tileline, opaque);
+							uint32_t realsx = dst_x;
+							realsx -= usedxoffset>>16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
+							realsx = realsx * usedxzoom;
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -670,7 +688,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					int y = (line >> 3);
 					line &= 0x7;
 
-					if (special)
+					if (nozoom_fixedpalette_fixedposition)
 					{
 						// grdians map...
 						color = 0x7ff;
@@ -679,7 +697,10 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					for (int x = 0; x <= sizex; x++)
 					{
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realscanline, line, opaque);
+						uint32_t realsx = (sx + x * 8);
+						realsx -= usedxoffset>>16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
+						realsx = realsx * usedxzoom;
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
@@ -707,29 +728,58 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 
 void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
+	if (!m_vregs.found())
+		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
+
+	//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
+
+	uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
+	yoffset &= 0x07ffffff;
+	yoffset = 0x07ffffff - yoffset;
+
+	uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
+	yzoom &= 0x07ffffff;
+	bool yzoominverted = false;
+	bool xzoominverted = false;
+
+	if (yzoom & 0x04000000)
+	{
+		yzoom = 0x8000000 - yzoom;
+		yzoominverted = true;
+	}
+
+
+	int xoffset = (m_vregs[0x12 / 2] << 16) | m_vregs[0x10 / 2];
+	xoffset &= 0x07ffffff;
+
+	if (xoffset & 0x04000000)
+		xoffset -= 0x08000000;
+
+	//xoffset = 0x07ffffff - xoffset;
+
+	uint32_t xzoom = (m_vregs[0x16 / 2] << 16) | m_vregs[0x14 / 2];
+
+	if (xzoom & 0x04000000)
+	{
+		xzoom = 0x8000000 - xzoom;
+		xzoominverted = true;
+	}
+
+
+	if (!xzoom)
+		return;
+
+	uint64_t inc = 0x100000000ULL;
+
+	uint32_t inc2 = inc / xzoom;
+
+	//printf("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		rectangle tempcliprect(cliprect);
 
 		tempcliprect.sety(y, y);
-
-		//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
-
-		// TODO the global yscroll should be applied here too as it can be sub-pixel for precision in zoomed cases
-
-		uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
-		yoffset &= 0x07ffffff;
-		yoffset = 0x07ffffff - yoffset;
-
-		uint32_t yzoom = (m_vregs[0x1e / 2] << 16) | m_vregs[0x1c / 2];
-		yzoom &= 0x07ffffff;
-		bool yzoominverted = false;
-
-		if (yzoom & 0x04000000)
-		{
-			yzoom = 0x8000000 - yzoom;
-			yzoominverted = true;
-		}
 
 		int yy;
 
@@ -751,7 +801,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		}
 
-		draw_sprites(bitmap, tempcliprect, yy, y);
+		draw_sprites_line(bitmap, tempcliprect, yy, y, xoffset, inc2, xzoominverted);
 	}
 }
 
