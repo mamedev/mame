@@ -290,7 +290,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int xoffset, int use_shadow, int screenline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -323,11 +323,13 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 
 	uint16_t* dest = &bitmap.pix16(screenline);
 
-	const int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
-	const int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
+	int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
+	int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
 	const int dx = flipx ? (-xzoom) : (xzoom);
 
-	
+	x0 -= xoffset;
+	x1 -= xoffset;
+
 	int column = 0;
 	
 	int minx = cliprect.min_x << 16;
@@ -465,9 +467,6 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	uint16_t *s1 = m_private_spriteram.get();
 
-	if (xoffset & 0x04000000)
-		xoffset -= 0x04000000;
-
 	int sprite_debug_count = 0;
 
 	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4,sprite_debug_count++)
@@ -518,7 +517,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		{
 			usedscanline = scanline;
 			usedxzoom = xzoom;
-			usedxoffset = 0x800000;
+			usedxoffset = xoffset;
 		}
 
 		// Number of single-sprites
@@ -620,9 +619,10 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
 							uint32_t realsx = dst_x;
+							realsx -= usedxoffset>>16;
 							realsx = realsx * usedxzoom;
-							realsx -= usedxoffset;
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
+							realsx += usedxoffset;
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, usedxoffset, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -705,9 +705,10 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					{
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
 						uint32_t realsx = (sx + x * 8);
+						realsx -= usedxoffset>>16;
 						realsx = realsx * usedxzoom;
-						realsx -= usedxoffset;
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
+						realsx += usedxoffset;
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, usedxoffset, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
@@ -753,9 +754,13 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 	}
 
 
-	uint32_t xoffset = (m_vregs[0x12 / 2] << 16) | m_vregs[0x10 / 2];
+	int xoffset = (m_vregs[0x12 / 2] << 16) | m_vregs[0x10 / 2];
 	xoffset &= 0x07ffffff;
-	xoffset = 0x07ffffff - xoffset;
+
+	if (xoffset & 0x04000000)
+		xoffset -= 0x08000000;
+
+	//xoffset = 0x07ffffff - xoffset;
 
 	uint32_t xzoom = (m_vregs[0x16 / 2] << 16) | m_vregs[0x14 / 2];
 
@@ -773,7 +778,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 	uint32_t inc2 = inc / xzoom;
 
-	//printf("xinc is %04x xoom %04x\n", inc2, xzoom);
+	printf("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
 
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
