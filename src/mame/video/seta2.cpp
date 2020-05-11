@@ -457,9 +457,6 @@ int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
 
 void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
 {
-	if (!m_vregs.found())
-		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
-
 	uint16_t* spriteram = m_spriteram;
 
 	uint16_t *s1 = m_private_spriteram.get();
@@ -731,6 +728,9 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 
 void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
+	if (!m_vregs.found())
+		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
+
 	//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 	uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
