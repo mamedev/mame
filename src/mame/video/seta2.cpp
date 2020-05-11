@@ -290,7 +290,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int screenline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, uint32_t xzoom, int use_shadow, int screenline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -323,19 +323,25 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 
 	uint16_t* dest = &bitmap.pix16(screenline);
 
-	const int x0 = flipx ? (base_sx + 0x80000 - 0x10000) : (base_sx);
-	const int x1 = flipx ? (base_sx - 0x10000) : (x0 + 0x80000);
-	const int dx = flipx ? (-0x10000) : (0x10000);
+	const int x0 = flipx ? (base_sx + (8*xzoom) - xzoom) : (base_sx);
+	const int x1 = flipx ? (base_sx - xzoom) : (x0 + (8*xzoom));
+	const int dx = flipx ? (-xzoom) : (xzoom);
 
+	
 	int column = 0;
+	
+	int minx = cliprect.min_x << 16;
+	int maxx = cliprect.max_x << 16;
+
 	for (int sx = x0; sx != x1; sx += dx)
 	{
 		uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
-		int realsx = sx >> 16;
 
-		if (realsx >= cliprect.min_x && realsx <= cliprect.max_x)
+		if (sx >= minx && sx <= maxx)
 		{
+			int realsx = sx >> 16;
+
 			if (pen || opaque)
 			{
 				if (!shadow)
@@ -407,6 +413,7 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 
 int seta2_state::calculate_global_xoffset(int special)
 {
+	/*
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
 	if (global_xoffset & 0x400)
 		global_xoffset -= 0x800;
@@ -422,6 +429,9 @@ int seta2_state::calculate_global_xoffset(int special)
 	{
 		global_xoffset -= 0x14f;
 	}
+	*/
+
+	int global_xoffset = 0;
 
 	if (special)
 		global_xoffset = 0x80;
@@ -446,7 +456,7 @@ int seta2_state::calculate_global_yoffset(int special)
 }
 
 
-void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, uint32_t xoffset, uint32_t xzoom, bool xzoominverted)
+void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
 {
 	if (!m_vregs.found())
 		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
@@ -454,6 +464,9 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 	uint16_t* spriteram = m_spriteram;
 
 	uint16_t *s1 = m_private_spriteram.get();
+
+	if (xoffset & 0x04000000)
+		xoffset -= 0x04000000;
 
 	int sprite_debug_count = 0;
 
@@ -490,15 +503,19 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		int global_xoffset = calculate_global_xoffset(special);
 		int global_yoffset = calculate_global_yoffset(special);
 		int usedscanline;
+		uint32_t usedxzoom;
+
 		if (special)
 		{
 			use_shadow = 0;
 		//  which_gfx = 4 << 8;
 			usedscanline = realscanline; // no zooming?
+			usedxzoom = 0x10000;
 		}
 		else
 		{
 			usedscanline = scanline;
+			usedxzoom = xzoom;
 		}
 
 		// Number of single-sprites
@@ -599,7 +616,9 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 						if ((dst_x >= firstcolumn - 8) && (dst_x <= lastcolumn)) // reelnquak reels are heavily glitched without this check
 						{
-							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x << 16, use_shadow, realscanline, tileline, opaque);
+							uint32_t realsx = dst_x;
+							realsx = realsx * usedxzoom;
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, tileline, opaque);
 						}
 					}
 				}
@@ -681,7 +700,9 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					for (int x = 0; x <= sizex; x++)
 					{
 						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, (sx + x * 8)<<16, use_shadow, realscanline, line, opaque);
+						uint32_t realsx = (sx + x * 8);
+						realsx = realsx * usedxzoom;
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
 					}
 					
 				}
@@ -747,7 +768,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 	uint32_t inc2 = inc / xzoom;
 
-	printf("xinc is %04x xoom %04x\n", inc2, xzoom);
+	//printf("xinc is %04x xoom %04x\n", inc2, xzoom);
 
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -776,7 +797,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 
 		}
 
-		draw_sprites_line(bitmap, tempcliprect, yy, y, xoffset, xzoom, xzoominverted);
+		draw_sprites_line(bitmap, tempcliprect, yy, y, xoffset, inc2, xzoominverted);
 	}
 }
 
