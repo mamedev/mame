@@ -3517,6 +3517,7 @@ EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
 EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
 EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
 Korea and Australia is missing.
+Actual build date Dec 19 2005.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
 EPR-?????  - No known dumps (Australia)
