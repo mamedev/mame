@@ -1031,6 +1031,121 @@ ROM_START( sfj )
 ROM_END
 
 
+ROM_START( sfjbl ) // main PCB is marked '17-51-1' on component side
+	ROM_REGION( 0x60000, "maincpu", 0 ) // only range 0x3c200-0x3c23f has minor differences from the original, to skip the disclaimer screen
+	ROM_LOAD16_BYTE("a-34.34.4a", 0x00000, 0x10000, CRC(116027d7) SHA1(6bcb117ee415aff4d8ea962d4eff4088ca94c251) )
+	ROM_LOAD16_BYTE("a-37.37.4c", 0x00001, 0x10000, CRC(d3cbd09e) SHA1(7274c603100132102de09e10d2129cfeb6c06369) )
+	ROM_LOAD16_BYTE("a-35.35.5a", 0x20000, 0x10000, CRC(5c31ea04) SHA1(6ae07c668ad97356b1b7163dbca9518e37dba42a) )
+	ROM_LOAD16_BYTE("a-38.38.5c", 0x20001, 0x10000, CRC(908d9e98) SHA1(bd2acd424864a79fb225ae5fa5bcbe3b9fdfe3a6) )
+	ROM_LOAD16_BYTE("a-36.36.6a", 0x40000, 0x08000, CRC(5ea75033) SHA1(c79d5eac8787a326546ae4d2506a8f8bcd72611f) )
+	ROM_LOAD16_BYTE("a-39.39.6c", 0x40001, 0x08000, CRC(4d0606cb) SHA1(27042925b94cd827d800f658062a914d7425c407) )
+	// original has 0xff filled ROM at 0x50000-0x5ffff
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // identical to the original
+	ROM_LOAD( "a-6.6.8f", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
+
+	ROM_REGION( 0x1000, "protcpu", 0 )
+	ROM_LOAD( "c8751h-88.5o", 0x0000, 0x1000, BAD_DUMP CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) ) // C8751H-88, not dumped yet for this PCB
+
+	ROM_REGION( 0x40000, "audio2", 0 )  // samples CPU, identical to the original, but with half size ROMs
+	ROM_LOAD( "a-2.2.6b", 0x00000, 0x10000, CRC(a3212da3) SHA1(4f95eb1dedbcca05016d92f62968ffce8173defe) )
+	ROM_LOAD( "a-1.1.6a", 0x10000, 0x10000, CRC(707d5f67) SHA1(355cecb1f45ada332b834bff824b84b0b3fb60b5) )
+	ROM_LOAD( "a-5.5.8a", 0x20000, 0x10000, CRC(e2574554) SHA1(9519d29c815b267145844524aad8c7b962450e8d) )
+	ROM_LOAD( "a-4.4.7a", 0x30000, 0x10000, CRC(af7ae326) SHA1(655f4eb2585e39ab3cf8c148ea48b8ebf41ec049) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) // identical to the original, but with half size ROMs
+	ROM_LOAD( "k-5.55.4g",  0x000000, 0x010000, CRC(7c90a53e) SHA1(a97507e17d61fdcd6af447cd6d1d7472d4606bba) ) // Background b planes 0-1
+	ROM_LOAD( "a-43.43.1h", 0x010000, 0x010000, CRC(0cfe888c) SHA1(a059f6bd9c4a6ffd5eb0f7628651ef7bf66c46e9) )
+	ROM_LOAD( "k-2.52.4e",  0x020000, 0x010000, CRC(b5263e4b) SHA1(d48af16273605ccbcb6ebc6f5004a221b47a5ad7) )
+	ROM_LOAD( "a-42.42.1g", 0x030000, 0x010000, CRC(d401b93e) SHA1(84a6ff40d4cd365303fd03794d264c09e4144b4c) )
+	ROM_LOAD( "k-6.56.5g",  0x040000, 0x010000, CRC(91f77551) SHA1(52570eeeee0f39a3583dcc2fafc6908178c686ce) ) // planes 2-3
+	ROM_LOAD( "a-41.41.1f", 0x050000, 0x010000, CRC(90c0115c) SHA1(a064f58d0a235453897ec71877e715d2a6a585b5) )
+	ROM_LOAD( "k-3.53.5e",  0x060000, 0x010000, CRC(c9dae6b9) SHA1(95fab99a5f3d6e610c632b3c9692030af3fd17d3) )
+	ROM_LOAD( "a-40.40.1e", 0x070000, 0x010000, CRC(c4e6a3b1) SHA1(5eb3a4ceee58567e0a2ec35f080dce1ae0e79361) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) // identical to the original, but with half size ROMs
+	ROM_LOAD( "k-8.58.4m",  0x000000, 0x010000, CRC(365c87bf) SHA1(bf2da41193ce08d048612fb5291e96eab91460e1) ) // Background m planes 0-1
+	ROM_LOAD( "a-46.46.1l", 0x010000, 0x010000, CRC(2559af76) SHA1(0450b82a59782639c55bbf1bab73148a3e698481) )
+	ROM_LOAD( "k-9.59.5m",  0x020000, 0x010000, CRC(0a14421a) SHA1(aa13ee4738b774d7cfa8c0b35dc51a27e964018d) )
+	ROM_LOAD( "a-47.47.1m", 0x030000, 0x010000, CRC(e97f19fa) SHA1(849da1dbcbbcfafb66ed80eab60a2a2e7f2d8ac7) )
+	ROM_LOAD( "k-10.60.6m", 0x040000, 0x010000, CRC(96e34f7d) SHA1(373bae1fcba249b4f23290304ba549c25b858d45) )
+	ROM_LOAD( "a-45.45.1k", 0x050000, 0x010000, CRC(bd5700b4) SHA1(9077e6783fe5e923574a6d0999e49e2a884b4e95) )
+	ROM_LOAD( "k-11.61.7m", 0x060000, 0x010000, CRC(22746035) SHA1(55efd91d88ab63e425961cb6eed23e3401060463) )
+	// original has 0xff filled ROM at 0x70000-0x7ffff
+	ROM_LOAD( "k-12.62.4r", 0x080000, 0x010000, CRC(643660c0) SHA1(4f57cafd36977733e95b45920f1390dded047c11) ) // planes 2-3
+	ROM_LOAD( "a-49.49.1q", 0x090000, 0x010000, CRC(63f7f181) SHA1(4c5ac7e4272f1a9c62791260c02ad29c6435b42d) )
+	ROM_LOAD( "k-13.63.5r", 0x0a0000, 0x010000, CRC(e8e113b1) SHA1(42b52ff462ad6f0429086f62bcd690d9e3a09a30) )
+	ROM_LOAD( "a-48.48.1p", 0x0b0000, 0x010000, CRC(8da0a11c) SHA1(51e25c6481410524e1be9b5f4cdebdf9d1db5c0f) )
+	ROM_LOAD( "k-14.64.6r", 0x0c0000, 0x010000, CRC(5990fda8) SHA1(c8539a59b57df648d219c4003cf4001b3d7bf7ec) )
+	ROM_LOAD( "a-50.50.1r", 0x0d0000, 0x010000, CRC(29ef5174) SHA1(e610850f69574adb8b0b1713715bec7dbc04a0c6) )
+	ROM_LOAD( "k-15.65.7r", 0x0e0000, 0x010000, CRC(301b4bcc) SHA1(8a3aed7838baa1dd3085fdbc963f5338e99234aa) )
+	// original has 0xff filled ROM at 0xf0000-0xfffff
+
+	ROM_REGION( 0x1c0000, "gfx3", 0 ) // identical to the original, but with half size ROMs
+	// Sprites planes 1-2
+	ROM_LOAD( "a-7.7.1b",    0x000000, 0x010000, CRC(2063e23c) SHA1(b856ab4ac4ca414e19ead4a60c81050db57b7d7b) )
+	ROM_LOAD( "a-8.8.1c",    0x010000, 0x010000, CRC(00af40c4) SHA1(554966188713cb80fce1089636cfbe3ea6b6b243) )
+	ROM_LOAD( "a-9.9.1d",    0x020000, 0x010000, CRC(92b791d8) SHA1(9eb382398db0dc7260348c6fb69aabcae6e8a9c0) )
+	ROM_LOAD( "a-10.10.1de", 0x030000, 0x010000, CRC(f4a8e86b) SHA1(b3039aac1eb0c52e7409b766872796c1df96327f) )
+	ROM_LOAD( "a-11.11.1ef", 0x040000, 0x010000, CRC(b2af5bfd) SHA1(ef9bcbd43d5fe08686e193f175d117a49b394caf) )
+	ROM_LOAD( "a-12.12.1f",  0x050000, 0x010000, CRC(a50bf0b9) SHA1(cf67fb1ff13c61fb5ad1cfb4736bd1a67d7a456f) )
+	ROM_LOAD( "a-13.13.1g",  0x060000, 0x010000, CRC(e7d297e3) SHA1(3a6c53a460f1f637a58e3e831f725b28fb981c43) )
+	ROM_LOAD( "a-14.14.1gh", 0x070000, 0x010000, CRC(02c037a9) SHA1(5de414aa5171bc84e8fc8ae82d85b761542c96bc) )
+	ROM_LOAD( "a-15.15.1h",  0x080000, 0x010000, CRC(222dbc94) SHA1(06d32ef02dd921e66fbd35f93a69f4d32bb98a03) )
+	ROM_LOAD( "a-16.16.1j",  0x090000, 0x010000, CRC(7c6481e0) SHA1(50b00478cf16757669928b13ca336bfd01e86722) )
+	ROM_LOAD( "a-17.17.1jk", 0x0a0000, 0x010000, CRC(6c19b324) SHA1(ac2dd74ec743b554b179d589d04c4a15b6cf75c8) )
+	ROM_LOAD( "a-18.18.1kl", 0x0b0000, 0x010000, CRC(38f6e7d8) SHA1(d193dd7e48502d4c80e97eacfd5c976110b93486) )
+	ROM_LOAD( "a-19.19.1l",  0x0c0000, 0x010000, CRC(6e521aea) SHA1(092e117fda00070d6361a72016a83afd5db5f3b6) )
+	// original has 0xff filled ROM at 0xd0000-0xdffff
+	// Sprites planes 2-3
+	ROM_LOAD( "a-21.21.3f",  0x0e0000, 0x010000, CRC(ee694c18) SHA1(97bf0fe4f5b70cae94ac8b0713dcbd6e5b253064) )
+	ROM_LOAD( "a-22.22.4f",  0x0f0000, 0x010000, CRC(2dc438a8) SHA1(fb402fecd5723df797ccbc8a3f5501619ae01fc7) )
+	ROM_LOAD( "a-25.25.3h",  0x100000, 0x010000, CRC(cc6cd84a) SHA1(e8073fdf385f8e8240473b36d5011ebc87405fa7) )
+	ROM_LOAD( "a-26.26.4h",  0x110000, 0x010000, CRC(be2eaac7) SHA1(42696e83be38790a65a2200aa88c9376f2e3fbf9) )
+	ROM_LOAD( "a-29.29.3k",  0x120000, 0x010000, CRC(7d90034d) SHA1(10b24598db634bcb4e349f84ad74cf36c5f8d9d6) )
+	ROM_LOAD( "a-30.30.4k",  0x130000, 0x010000, CRC(48ea345f) SHA1(c1beee4d6db95345e97eb57573c1a5b9ddd5cc41) )
+	ROM_LOAD( "a-32.32.3l",  0x140000, 0x010000, CRC(b9563911) SHA1(329e485dc580f8cbd0550e17817af151ef58f933) )
+	ROM_LOAD( "a-33.33.4l",  0x150000, 0x010000, CRC(61a9d0ea) SHA1(086d129e91ef13f7e001bd93e3862756b8febedf) )
+	ROM_LOAD( "a-24.24.6f",  0x160000, 0x010000, CRC(a21e27ff) SHA1(bddee3a925bc5bd000b70ab6a024e1a7fd419da9) )
+	ROM_LOAD( "a-23.23.5f",  0x170000, 0x010000, CRC(e77e3d75) SHA1(47397d04d1709f6aaf36b8f204560d7b7e28f3b4) )
+	ROM_LOAD( "a-28.28.6h",  0x180000, 0x010000, CRC(f08c974e) SHA1(a1050241892f613c79c4ea87304545d973f89807) )
+	ROM_LOAD( "a-27.27.5h",  0x190000, 0x010000, CRC(263f93b0) SHA1(6019b7a4f47da1f74cc76debe69ead975064817e) )
+	ROM_LOAD( "a-31.31.6k",  0x1a0000, 0x010000, CRC(eb8db0bf) SHA1(ccef46e4c9034f9729712826f3a0a48c15034d7c) )
+	// original has 0xff filled ROM at 0x1a0000-0x1affff
+
+	ROM_REGION( 0x004000, "gfx4", 0 )
+	ROM_LOAD( "a-3.3.6e", 0x000000, 0x004000, CRC(59416e03) SHA1(028e74e0b23c5063883d19f94da35719be4feada) ) // Characters planes 1-2, identical to the original
+	ROM_CONTINUE(         0x000000, 0x004000) // 0xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "tilerom", 0 )    // background tilemaps, identical to the original
+	ROM_LOAD( "k-7.57.7g",   0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
+	ROM_LOAD( "k-4.54.7e",   0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
+	ROM_LOAD( "k-17.67.10r", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
+	ROM_LOAD( "k-16.66.10m", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
+
+	ROM_REGION( 0x0320, "proms", 0 ) // not used by the emulation, 13g doesn't match the original
+	ROM_LOAD( "n82s129n.8m",  0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )
+	ROM_LOAD( "n82s129n.13g", 0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )
+	ROM_LOAD( "n82s129n.7m",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )
+	ROM_LOAD( "n82s123n.9p",  0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )
+
+	ROM_REGION( 0x1a00, "plds", 0 )
+	ROM_LOAD( "tibpal16l8-25cn.10g", 0x0000, 0x0104, CRC(b95bc9bc) SHA1(75c671dd0bef906bdec1f76fa8867d945502d3af) )
+	ROM_LOAD( "tibpal16l8-25cn.10j", 0x0200, 0x0104, CRC(d5e7fb3c) SHA1(4be2fa491e3b2cfd68917bf335bfecf4375e633f) )
+	ROM_LOAD( "tibpal16l8-25cn.11b", 0x0400, 0x0104, CRC(1db26b84) SHA1(1164d8ae135cad28067f8a711580a51be38724fb) )
+	ROM_LOAD( "tibpal16l8-25cn.11e", 0x0600, 0x0104, CRC(e419a33f) SHA1(81431743df314d5ff06b44ba203a7a3113becbab) )
+	ROM_LOAD( "tibpal16l8-25cn.12e", 0x0800, 0x0104, CRC(4803a097) SHA1(4264d98bbb8ea476e4fb6351fe0f08ca0fadaffb) )
+	ROM_LOAD( "tibpal16l8-25cn.12f", 0x0a00, 0x0104, CRC(40689e0e) SHA1(a30e1bf2f9d38a2be25ef3850089770d403f219b) )
+	ROM_LOAD( "tibpal16l8-25cn.16e", 0x0c00, 0x0104, CRC(9daca4f6) SHA1(7323c120a8d47304ccac509b671daa7565f6e601) )
+	ROM_LOAD( "tibpal16l8-25cn.3q",  0x0e00, 0x0104, CRC(e7bb2b87) SHA1(76cfbbf5af06a70d44230993447b2616babe16e4) )
+	ROM_LOAD( "tibpal16l8-25cn.6m",  0x1000, 0x0104, CRC(6675dcc7) SHA1(06b8e01a458e2bf4e24bbd6b0a0d0863406fb44a) )
+	ROM_LOAD( "tibpal16l8-25cn.7c",  0x1200, 0x0104, CRC(c8a1458f) SHA1(ca48afa619bc62191c1c690ea90a01b0fa2ce6d8) )
+	ROM_LOAD( "tibpal16l8-25cn.7e",  0x1400, 0x0104, CRC(858b1c21) SHA1(7672729dff67cf804300a6ad3bc802aa9f5081e6) )
+	ROM_LOAD( "tibpal16r4-25cn.7a",  0x1600, 0x0104, CRC(b3c22357) SHA1(aa0005471eb08cc4ba34acb35cde7a82712409e4) )
+	ROM_LOAD( "tibpal16r4-25cn.7d",  0x1800, 0x0104, CRC(29cdd190) SHA1(1b7383cda958f0cea53231c3b52d9040faee677d) )
+ROM_END
+
+
 ROM_START( sfan )
 	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("sfe-19.2a", 0x00000, 0x10000, CRC(8346c3ca) SHA1(404e26d210e453ef0f03b092d70c770106eed1d1) )
@@ -1300,10 +1415,11 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sfus, sfus, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfjan,sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfan, sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfw,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright
+GAME( 1987, sf,     0, sfus, sfus, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,   sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfjan, sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfjbl, sf, sfjp, sfjp, sf_state, empty_init, ROT0, "bootleg", "Street Fighter (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfan,  sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfp,   sf, sfp,  sfan, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfw,   sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom",  "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright
