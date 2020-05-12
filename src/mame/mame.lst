@@ -16641,7 +16641,8 @@ grndtour                        // (c) 1993
 iqblock                         // (c) 1993
 
 @source:iqunlim.cpp
-iqunlim                         // 199? IQ Unlimited (680x0)
+iqunlim                         // (c) 1995 Vtech / Integrated Systems Inc.
+iqunlimgr                       // (c) 1995 VTech / Integrated Systems Inc.
 
 @source:iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
