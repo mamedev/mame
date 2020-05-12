@@ -1223,6 +1223,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mgu",
 		"microkey",
 		"microsoft",
+		"microterm",
 		"mips",
 		"mit",
 		"mits",
@@ -2803,6 +2804,13 @@ files {
 	MAME_DIR .. "src/mame/includes/xbox_pci.h",
 }
 
+createMESSProjects(_target, _subtarget, "microterm")
+files {
+	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
+	MAME_DIR .. "src/mame/drivers/microterm.cpp",
+	MAME_DIR .. "src/mame/drivers/microterm_f8.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "mips")
 files {
 	MAME_DIR .. "src/mame/drivers/mips.cpp",
@@ -4281,7 +4289,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/emate.cpp",
 	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
-	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
@@ -4345,8 +4352,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/micromon.cpp",
 	MAME_DIR .. "src/mame/drivers/micronic.cpp",
 	MAME_DIR .. "src/mame/includes/micronic.h",
-	MAME_DIR .. "src/mame/drivers/microterm.cpp",
-	MAME_DIR .. "src/mame/drivers/microterm_f8.cpp",
 	MAME_DIR .. "src/mame/drivers/mightyframe.cpp",
 	MAME_DIR .. "src/mame/drivers/milwaukee.cpp",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
