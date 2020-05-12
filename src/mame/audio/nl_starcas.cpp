@@ -20,10 +20,6 @@
 //       should range from 7.5kHz -> 23.3kHz, while the laser VCO
 //       should be either 22kHz or 5.8kHz.
 //
-//    * There is a hack on the outputs of the 566 timer to prevent
-//       them from driving infinite current. This is a known
-//       limitation that should eventually be fixed in the device.
-//
 //    * Even at 384kHz, the highest frequency background sound is not
 //       quite as high pitched as some videos I've seen. The best spot
 //       to listen for background pitch is immediately after the
@@ -573,13 +569,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(R17.2, R15.2, R18.2, IC9.5, C12.2)
 	NET_C(C13.1, IC9.7)
 	NET_C(C12.1, IC9.6, R16.2)
-#if 0
 	NET_C(IC9.3, C14.1)
-#else
-	RES(RXX, 200)
-	NET_C(IC9.3, RXX.1)
-	NET_C(RXX.2, C14.1)
-#endif
 	NET_C(C14.2, D7.K, R19.1)
 	NET_C(R19.2, Q1.B)
 	NET_C(Q1.E, R21.2, D8.K)
@@ -657,13 +647,7 @@ static NETLIST_START(StarCastle_schematics)
 	NET_C(R39.2, R41.1, C22.1, R42.2, C23.2, IC17.5)
 	NET_C(Q4.C, R41.2)
 	NET_C(C23.1, IC17.6, R43.2)
-#if 0
 	NET_C(IC17.3, C25.1)
-#else
-	RES(RXX2, 200)
-	NET_C(IC17.3, RXX2.1)
-	NET_C(RXX2.2, C25.1)
-#endif
 	NET_C(C24.1, IC17.7)
 	NET_C(C25.2, D9.K, R44.1)
 	NET_C(R44.2, Q5.B)
