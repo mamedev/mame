@@ -134,5 +134,5 @@ ROM_START( iqunlimgr )
 	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, BAD_DUMP CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) ) // Seems underdumped
 ROM_END
 
-COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
-COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
