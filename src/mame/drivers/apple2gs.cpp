@@ -1079,6 +1079,7 @@ void apple2gs_state::adb_write_datareg(uint8_t data)
 					break;
 
 				case 0xf2:
+					adb_post_response_1(0x80);
 					break;
 
 				default:
