@@ -35,7 +35,11 @@ PSU ("permanent storage unit"?) is just a 256x4 battery-backed RAM (TC5501P)
 module, not sure why it was so expensive (~180DM).
 A chess clock accessory was also announced but unreleased.
 
-SciSys Super System IV is on similar hardware.
+SciSys Super System IV (AKA MK IV) is on similar hardware. It was supposed to
+be a modular chesscomputer, not only with accessory hardware like MK III, but
+also a module slot for the program. The box mentions other modules, such as a
+reversi program called "The Moor". The chesscomputer was discontinued soon after
+release, and none of the accessories or other games came out.
 
 TODO:
 - 6522 ACR register is initialized with 0xe3. Meaning: PA and PB inputs are set
@@ -43,17 +47,17 @@ TODO:
   it meant to write 0xe0. Maybe 6522 CA1 pin emulation is wrong? Documentation
   says it's edge-triggered, but here it's tied to VCC. I added a trivial hack to
   work around this, see rom defs.
-- 6522 timer runs too fast, currently worked around by clocking it at 1MHz. PB6/PB7
-  was measured 997Hz on real device, it's 1989Hz on MAME at 2MHz, both 50% duty cycle.
 - 2nd 7474 /2 clock divider on each 4000-7fff access, this also applies to 6522 clock
   (doesn't affect chess calculation speed, only I/O access, eg. beeper pitch).
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add chessboard lcd and printer unit
-- dump/add 1980 program revision, were the BTANB fixed?
+- dump/add ssystem3 1980 program revision, were the BTANB fixed?
+- ssystem4 softwarelist if a prototype cartridge is ever dumped
+- ssystem4 internal artwork (same button functions, different look)
 
-BTANB:
+BTANB (ssystem3):
 - If the TIME switch is held up, it will sometimes recognize the wrong input when
   another button is pressed. I assume they noticed this bug too late and tried to
   lessen the chance by adding a spring to the switch.
@@ -96,6 +100,9 @@ public:
 
 	// machine configs
 	void ssystem3(machine_config &config);
+	void ssystem4(machine_config &config);
+
+	void init_ssystem3() { m_xor_kludge = true; }
 
 protected:
 	virtual void machine_start() override;
@@ -107,11 +114,12 @@ private:
 	required_device<md4332b_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_shared_ptr<u8> m_nvram;
+	optional_shared_ptr<u8> m_nvram;
 	required_ioport_array<4+2> m_inputs;
 
 	// address maps
-	void main_map(address_map &map);
+	void ssystem3_map(address_map &map);
+	void ssystem4_map(address_map &map);
 
 	// I/O handlers
 	DECLARE_WRITE32_MEMBER(lcd_q_w) { m_lcd_q = data; }
@@ -126,6 +134,7 @@ private:
 	u8 m_control = 0;
 	u8 m_shift = 0;
 	u32 m_lcd_q = 0;
+	bool m_xor_kludge = false;
 };
 
 void ssystem3_state::machine_start()
@@ -176,6 +185,10 @@ READ8_MEMBER(ssystem3_state::input_r)
 		if (m_inp_mux & m_inputs[i]->read())
 			data |= 1 << (i+4);
 
+	// PA5-PA7: freq sel from _PA0
+	if (~m_inp_mux & 1)
+		data |= m_inputs[5]->read() & 0xe0;
+
 	return ~data;
 }
 
@@ -196,7 +209,7 @@ WRITE8_MEMBER(ssystem3_state::control_w)
 		m_shift = m_shift << 1 | m_lcd->do_r();
 
 		// weird TTL maze, I assume it's a hw kludge to fix a bug after the maskroms were already manufactured
-		u8 xorval = (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23))) ? 0x12 : 0;
+		u8 xorval = m_xor_kludge && (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23))) ? 0x12 : 0;
 
 		// update display
 		for (int i = 0; i < 4; i++)
@@ -226,12 +239,20 @@ READ8_MEMBER(ssystem3_state::control_r)
     Address Maps
 ******************************************************************************/
 
-void ssystem3_state::main_map(address_map &map)
+void ssystem3_state::ssystem3_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x3c00).ram();
 	map(0x4000, 0x40ff).mirror(0x1f00).ram().rw(FUNC(ssystem3_state::nvram_r), FUNC(ssystem3_state::nvram_w)).share("nvram");
 	map(0x6000, 0x600f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 	map(0x8000, 0x9fff).mirror(0x6000).rom();
+}
+
+void ssystem3_state::ssystem4_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x4400, 0x440f).m(m_via, FUNC(via6522_device::map));
+	map(0x4800, 0x48ff).noprw(); // no nvram
+	map(0xd000, 0xffff).rom();
 }
 
 
@@ -273,10 +294,21 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
-	PORT_START("IN.5") // accessories
+	PORT_START("IN.5") // accessories/diodes
 	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ssystem4 )
+	PORT_INCLUDE( ssystem3 )
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -285,19 +317,17 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void ssystem3_state::ssystem3(machine_config &config)
+void ssystem3_state::ssystem4(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 4_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem4_map);
 
-	VIA6522(config, m_via, 4_MHz_XTAL / 4); // WRONG! should be 2MHz
+	VIA6522(config, m_via, 4_MHz_XTAL / 2);
 	m_via->writepa_handler().set(FUNC(ssystem3_state::input_w));
 	m_via->readpa_handler().set(FUNC(ssystem3_state::input_r));
 	m_via->writepb_handler().set(FUNC(ssystem3_state::control_w));
 	m_via->readpb_handler().set(FUNC(ssystem3_state::control_r));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MD4332B(config, m_lcd);
@@ -309,7 +339,6 @@ void ssystem3_state::ssystem3(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(5, 9);
-	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.25);
 
 	config.set_default_layout(layout_saitek_ssystem3);
@@ -318,6 +347,19 @@ void ssystem3_state::ssystem3(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void ssystem3_state::ssystem3(machine_config &config)
+{
+	ssystem4(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	m_display->set_segmask(0xf, 0x7f); // 7segs are at expected positions
+	config.set_default_layout(layout_saitek_ssystem3);
 }
 
 
@@ -341,6 +383,19 @@ ROM_START( ssystem3 )
 	ROM_LOAD( "ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
 ROM_END
 
+ROM_START( ssystem4 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // roms in a cartridge
+	ROM_LOAD("c45021_ss4-lrom", 0xd000, 0x1000, CRC(fc86a4fc) SHA1(ee292925165d4bf7b948c60a81d95f7a4064e797) ) // 2332
+	ROM_LOAD("c45022_ss4-mrom", 0xe000, 0x1000, CRC(c6110af1) SHA1(4b63454a23b2fe6b5c8f3fa6718eb49770cb6907) ) // "
+	ROM_LOAD("c45023_ss4-hrom", 0xf000, 0x1000, CRC(ab4a4343) SHA1(6eeee7168e13dc1115cb5833f1938a8ea8c01d69) ) // "
+
+	// HACK! 6522 ACR register setup
+	ROM_FILL(0xd05b, 1, 0xe0) // was 0xe3
+
+	ROM_REGION( 53552, "screen", 0) // looks same, but different pinout
+	ROM_LOAD( "ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -349,5 +404,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ssystem3, 0,      0, ssystem3, ssystem3, ssystem3_state, empty_init, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
+CONS( 1979, ssystem3, 0,      0, ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ssystem4, 0,      0, ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

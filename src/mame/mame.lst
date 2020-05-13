@@ -35186,20 +35186,20 @@ safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 sag
 
 @source:sage2.cpp
-sage2                           //
+sage2
 
 @source:saitek_chesstrv.cpp
-chesstrv                        //
+chesstrv
 
 @source:saitek_corona.cpp
 corona
 coronaa
 
 @source:saitek_cp2000.cpp
-cp2000                          //
+cp2000
 
 @source:saitek_delta1.cpp
-ccdelta1                        //
+ccdelta1
 
 @source:saitek_exchess.cpp
 exchess
@@ -35224,15 +35224,16 @@ renaissa
 renaissaa
 
 @source:saitek_risc2500.cpp
-montreux                        //
-risc2500                        //
-risc2500a                       //
+montreux
+risc2500
+risc2500a
 
 @source:saitek_schess.cpp
 schess
 
 @source:saitek_ssystem3.cpp
-ssystem3                        // Chess Champion Super System III / MK III
+ssystem3
+ssystem4
 
 @source:saitek_stratos.cpp
 stratos
