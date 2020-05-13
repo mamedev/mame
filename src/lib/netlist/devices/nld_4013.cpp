@@ -20,10 +20,10 @@ namespace netlist
 	NETLIB_OBJECT(4013)
 	{
 		NETLIB_CONSTRUCTOR(4013)
-		, m_D(*this, "D")
+		, m_D(*this, "DATA")
 		, m_RESET(*this, "RESET")
 		, m_SET(*this, "SET")
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(4013, clk))
+		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(4013, clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
@@ -72,22 +72,22 @@ namespace netlist
 		{
 			register_subalias("1", "A.Q");
 			register_subalias("2", "A.QQ");
-			register_subalias("3", "A.CLK");
+			register_subalias("3", "A.CLOCK");
 			register_subalias("4", "A.RESET");
-			register_subalias("5", "A.D");
+			register_subalias("5", "A.DATA");
 			register_subalias("6", "A.SET");
-			register_subalias("7", "A.GND");
+			register_subalias("7", "A.VSS");
 
 			register_subalias("8", "B.SET");
-			register_subalias("9", "B.D");
+			register_subalias("9", "B.DATA");
 			register_subalias("10", "B.RESET");
-			register_subalias("11", "B.CLK");
+			register_subalias("11", "B.CLOCK");
 			register_subalias("12", "B.QQ");
 			register_subalias("13", "B.Q");
-			register_subalias("14", "A.VCC");
+			register_subalias("14", "A.VDD");
 
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
+			connect("A.VSS", "B.VSS");
+			connect("A.VDD", "B.VDD");
 		}
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
@@ -136,7 +136,7 @@ namespace netlist
 	{
 	}
 
-	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLK,+D,+RESET,+SET,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLOCK,+DATA,+RESET,+SET,@VDD,@VSS")
 	NETLIB_DEVICE_IMPL(CD4013_DIP, "CD4013_DIP", "")
 
 	} //namespace devices

@@ -44,12 +44,12 @@
 
 #include "netlist/nl_setup.h"
 
-#define CD4013(name, cCLK, cD, cRESET, cSET)                                   \
+#define CD4013(name, cCLOCK, cDATA, cRESET, cSET)                              \
 		NET_REGISTER_DEV(CD4013, name)                                         \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, VSS, VSS)                                            \
+		NET_CONNECT(name, VDD, VDD)                                            \
 		NET_CONNECT(name, CLK, cCLK)                                           \
-		NET_CONNECT(name, D,  cD)                                              \
+		NET_CONNECT(name, DATA,  cDATA)                                        \
 		NET_CONNECT(name, SET,  cSET)                                          \
 		NET_CONNECT(name, RESET,  cRESET)
 
