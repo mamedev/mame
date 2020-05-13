@@ -13,9 +13,11 @@
         * Road Runner (1985) [3 sets]
         * Road Blasters (1987) [10 sets]
 
-    Known bugs:
+    TODO:
         * indytemp: "Welcome" doesn't play at start (regression). Code for
           speech (0x46) is written but fails to play due to timing issues.
+        * is MOTHERBOARD_ALPHA actually 16KB, or maybe only for the LSI version?
+          see romsets of indytempc, roadblstcg
 
 ****************************************************************************
 
