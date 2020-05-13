@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "includes/pc1512.h"
+#include "ams40041.h"
 #include "screen.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 
 static const rgb_t PALETTE_1512[] =
@@ -65,6 +65,92 @@ enum
 
 
 //**************************************************************************
+//  AMS40041 DEVICE
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 VDU")
+
+//-------------------------------------------------
+//  ams40041_device - constructor
+//-------------------------------------------------
+
+ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
+	, m_char_rom(*this, DEVICE_SELF)
+	, m_lk(*this, "^LK") // hack
+{
+	m_clk_scale = 32;
+
+	set_char_width(8);
+	set_update_row_callback(*this, FUNC(ams40041_device::crtc_update_row));
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ams40041_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_horiz_char_total =  113;
+	m_horiz_disp       =  80;
+	m_horiz_sync_pos   =  90;
+	m_sync_width       =  10;
+	m_vert_char_total  =  127;
+	m_vert_total_adj   =  6;
+	m_vert_disp        =  100;
+	m_vert_sync_pos    =  112;
+	m_mode_control     =  2;
+
+	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+
+	// allocate memory
+	m_video_ram = std::make_unique<uint8_t[]>(0x10000);
+
+	// state saving
+	save_pointer(NAME(m_video_ram), 0x10000);
+	save_item(NAME(m_toggle));
+	save_item(NAME(m_lpen));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_cursor));
+	save_item(NAME(m_blink_ctr));
+	save_item(NAME(m_vdu_mode));
+	save_item(NAME(m_vdu_color));
+	save_item(NAME(m_vdu_plane));
+	save_item(NAME(m_vdu_rdsel));
+	save_item(NAME(m_vdu_border));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ams40041_device::device_reset()
+{
+	mc6845_device::device_reset();
+
+	m_toggle = 0;
+	m_lpen = 0;
+	m_blink = 0;
+	m_cursor = 0;
+	m_blink_ctr = 0;
+	m_vdu_mode = 0;
+	m_vdu_color = 0;
+	m_vdu_rdsel = 0;
+	m_vdu_plane = 0x0f;
+	m_vdu_border = 0;
+}
+
+
+//**************************************************************************
 //  VIDEO RAM ACCESS
 //**************************************************************************
 
@@ -72,7 +158,7 @@ enum
 //  video_ram_r -
 //-------------------------------------------------
 
-uint8_t pc1512_state::video_ram_r(offs_t offset)
+uint8_t ams40041_device::video_ram_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -100,7 +186,7 @@ uint8_t pc1512_state::video_ram_r(offs_t offset)
 //  video_ram_w -
 //-------------------------------------------------
 
-void pc1512_state::video_ram_w(offs_t offset, uint8_t data)
+void ams40041_device::video_ram_w(offs_t offset, uint8_t data)
 {
 	switch (get_display_mode(m_vdu_mode))
 	{
@@ -130,14 +216,14 @@ void pc1512_state::video_ram_w(offs_t offset, uint8_t data)
 //  vdu_r -
 //-------------------------------------------------
 
-uint8_t pc1512_state::vdu_r(offs_t offset)
+uint8_t ams40041_device::vdu_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	switch (offset)
 	{
 	case 1: case 3: case 5: case 7:
-		data = m_vdu->register_r();
+		data = register_r();
 		break;
 
 	case 0xa: // VDU Status
@@ -167,11 +253,11 @@ uint8_t pc1512_state::vdu_r(offs_t offset)
 		data |= 0x04;
 
 		// vertical sync
-		//data |= m_vdu->vsync_r();
+		//data |= vsync_r();
 		int flyback = 0;
 
-		if (m_screen->vpos() < VFP_LORES - 16) flyback = 1;
-		if (m_screen->vpos() > VFP_LORES + 200) flyback = 1;
+		if (screen().vpos() < VFP_LORES - 16) flyback = 1;
+		if (screen().vpos() > VFP_LORES + 200) flyback = 1;
 
 		data |= flyback << 3;
 		break;
@@ -185,16 +271,16 @@ uint8_t pc1512_state::vdu_r(offs_t offset)
 //  vdu_w -
 //-------------------------------------------------
 
-void pc1512_state::vdu_w(offs_t offset, uint8_t data)
+void ams40041_device::vdu_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
-		m_vdu->address_w(data);
+		address_w(data);
 		break;
 
 	case 1: case 3: case 5: case 7:
-		m_vdu->register_w(data);
+		register_w(data);
 		break;
 
 	case 8: // VDU Mode Control
@@ -213,7 +299,7 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("VDU Mode Control %02x\n", data);
+		LOG("VDU Mode Control %02x\n", data);
 
 		if ((get_display_mode(m_vdu_mode) != GRAPHICS_2) && (get_display_mode(data) == GRAPHICS_2))
 		{
@@ -232,18 +318,21 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 			{
 			case ALPHA_40:
 			case GRAPHICS_1:
-				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_unscaled_clock(XTAL(28'636'363)/32);
+				set_hpixels_per_column(8);
+				m_clk_scale = 32;
+				recompute_parameters(true);
 				break;
 
 			case ALPHA_80:
-				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_unscaled_clock(XTAL(28'636'363)/16);
+				set_hpixels_per_column(8);
+				m_clk_scale = 16;
+				recompute_parameters(true);
 				break;
 
 			case GRAPHICS_2:
-				m_vdu->set_hpixels_per_column(16);
-				m_vdu->set_unscaled_clock(XTAL(28'636'363)/32);
+				set_hpixels_per_column(16);
+				m_clk_scale = 32;
+				recompute_parameters(true);
 				break;
 			}
 		}
@@ -267,23 +356,23 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("VDU Colour Select %02x\n", data);
+		LOG("VDU Colour Select %02x\n", data);
 
 		m_vdu_color = data;
 		break;
 
 	case 0xb: // Clear Light Pen Latch
-		if (LOG) logerror("VDU Clear Light Pen Latch\n");
+		LOG("VDU Clear Light Pen Latch\n");
 
 		m_lpen = 0;
 		break;
 
 	case 0xc: // Set Light Pen Latch
-		if (LOG) logerror("VDU Set Light Pen Latch\n");
+		LOG("VDU Set Light Pen Latch\n");
 
 		if (!m_lpen)
 		{
-			m_vdu->assert_light_pen_input();
+			assert_light_pen_input();
 		}
 
 		m_lpen = 1;
@@ -305,7 +394,7 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("VDU Colour Plane Write %01x\n", data & 0x0f);
+		LOG("VDU Colour Plane Write %01x\n", data & 0x0f);
 
 		if (get_display_mode(m_vdu_mode) == GRAPHICS_2)
 		{
@@ -329,7 +418,7 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("VDU Colour Plane Read %u\n", data & 0x03);
+		LOG("VDU Colour Plane Read %u\n", data & 0x03);
 
 		if (get_display_mode(m_vdu_mode) == GRAPHICS_2)
 		{
@@ -353,7 +442,7 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 
 		*/
 
-		if (LOG) logerror("VDU Graphics Mode 2 Border %u\n", data & 0x0f);
+		LOG("VDU Graphics Mode 2 Border %u\n", data & 0x0f);
 
 		m_vdu_border = data;
 		break;
@@ -365,7 +454,7 @@ void pc1512_state::vdu_w(offs_t offset, uint8_t data)
 //  mc6845
 //-------------------------------------------------
 
-int pc1512_state::get_display_mode(uint8_t mode)
+int ams40041_device::get_display_mode(uint8_t mode)
 {
 	if (mode & MODE_GRAPHICS)
 	{
@@ -391,12 +480,12 @@ int pc1512_state::get_display_mode(uint8_t mode)
 	}
 }
 
-offs_t pc1512_state::get_char_rom_offset()
+offs_t ams40041_device::get_char_rom_offset()
 {
 	return ((m_lk->read() >> 5) & 0x03) << 11;
 }
 
-MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
+MC6845_UPDATE_ROW( ams40041_device::draw_alpha )
 {
 	offs_t char_rom_offset = get_char_rom_offset();
 	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
@@ -424,7 +513,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 		}
 
 		offs_t addr = char_rom_offset | (code << 3) | (ra & 0x07);
-		uint8_t data = m_char_rom->base()[addr & 0x1fff];
+		uint8_t data = m_char_rom[addr & 0x1fff];
 
 		if ((column == cursor_x) && m_cursor)
 		{
@@ -442,7 +531,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 	}
 }
 
-int pc1512_state::get_color(uint8_t data)
+int ams40041_device::get_color(uint8_t data)
 {
 	if (data == 0) return m_vdu_color & 0x0f;
 
@@ -465,7 +554,7 @@ int pc1512_state::get_color(uint8_t data)
 	return color;
 }
 
-MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
+MC6845_UPDATE_ROW( ams40041_device::draw_graphics_1 )
 {
 	if (y > 199) return;
 
@@ -485,7 +574,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 	}
 }
 
-MC6845_UPDATE_ROW( pc1512_state::draw_graphics_2 )
+MC6845_UPDATE_ROW( ams40041_device::draw_graphics_2 )
 {
 	if (y > 199) return;
 
@@ -508,7 +597,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_graphics_2 )
 	}
 }
 
-MC6845_UPDATE_ROW( pc1512_state::crtc_update_row )
+MC6845_UPDATE_ROW( ams40041_device::crtc_update_row )
 {
 	switch (get_display_mode(m_vdu_mode))
 	{
@@ -528,14 +617,7 @@ MC6845_UPDATE_ROW( pc1512_state::crtc_update_row )
 }
 
 
-void pc1512_state::video_start()
-{
-	// allocate memory
-	m_video_ram.allocate(0x10000);
-}
-
-
-uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ams40041_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdu_mode & MODE_ENABLE_VIDEO)
 	{
@@ -578,7 +660,7 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			break;
 		}
 
-		m_vdu->screen_update(screen, bitmap, cliprect);
+		mc6845_device::screen_update(screen, bitmap, cliprect);
 	}
 	else
 	{
@@ -586,25 +668,4 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 
 	return 0;
-}
-
-
-//-------------------------------------------------
-//  machine_config( pc1512 )
-//-------------------------------------------------
-
-void pc1512_state::pc1512_video(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(pc1512_state::screen_update));
-	m_screen->set_size(80*8, 24*8);
-	m_screen->set_visarea(0, 80*8-1, 0, 24*8-1);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_refresh_hz(50);
-
-	AMS40041(config, m_vdu, XTAL(28'636'363)/32);
-	m_vdu->set_screen(m_screen);
-	m_vdu->set_show_border_area(true);
-	m_vdu->set_char_width(8);
-	m_vdu->set_update_row_callback(FUNC(pc1512_state::crtc_update_row));
 }

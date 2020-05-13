@@ -23,8 +23,7 @@
 #include "machine/pc_fdc.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "video/mc6845.h"
-#include "screen.h"
+#include "video/ams40041.h"
 
 #include "formats/pc_dsk.h"
 
@@ -202,31 +201,11 @@ public:
 	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc1512_base_state(mconfig, type, tag)
 		, m_vdu(*this, AMS40041_TAG)
-		, m_video_ram(*this, "video_ram")
-		, m_char_rom(*this, AMS40041_TAG)
-		, m_screen(*this, SCREEN_TAG) { }
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	int get_display_mode(uint8_t mode);
-	offs_t get_char_rom_offset();
-	int get_color(uint8_t data);
-	MC6845_UPDATE_ROW(draw_alpha);
-	MC6845_UPDATE_ROW(draw_graphics_1);
-	MC6845_UPDATE_ROW(draw_graphics_2);
-	MC6845_UPDATE_ROW(crtc_update_row);
-
-	uint8_t video_ram_r(offs_t offset);
-	void video_ram_w(offs_t offset, uint8_t data);
-	uint8_t vdu_r(offs_t offset);
-	void vdu_w(offs_t offset, uint8_t data);
-
-	void pc1512_video(machine_config &config);
 	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
@@ -234,21 +213,6 @@ public:
 	void pc1512_mem(address_map &map);
 
 	required_device<ams40041_device> m_vdu;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	required_memory_region m_char_rom;
-	required_device<screen_device> m_screen;
-
-	// video state
-	int m_toggle;
-	int m_lpen;
-	int m_blink;
-	int m_cursor;
-	int m_blink_ctr;
-	uint8_t m_vdu_mode;
-	uint8_t m_vdu_color;
-	uint8_t m_vdu_plane;
-	uint8_t m_vdu_rdsel;
-	uint8_t m_vdu_border;
 };
 
 class pc1640_state : public pc1512_base_state
@@ -274,7 +238,5 @@ public:
 	void pc1640_io(address_map &map);
 	void pc1640_mem(address_map &map);
 };
-
-// ---------- defined in video/pc1512.c ----------
 
 #endif // MAME_INCLUDES_PC1512_H

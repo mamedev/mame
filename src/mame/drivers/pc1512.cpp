@@ -96,6 +96,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -610,7 +611,7 @@ uint8_t pc1640_state::io_r(offs_t offset)
 void pc1512_state::pc1512_mem(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
-	map(0xb8000, 0xbbfff).rw(FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
+	map(0xb8000, 0xbbfff).rw(m_vdu, FUNC(ams40041_device::video_ram_r), FUNC(ams40041_device::video_ram_w));
 	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -635,7 +636,7 @@ void pc1512_state::pc1512_io(address_map &map)
 	map(0x080, 0x083).w(FUNC(pc1512_state::dma_page_w));
 	map(0x0a1, 0x0a1).w(FUNC(pc1512_state::nmi_mask_w));
 	map(0x378, 0x37b).rw(FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
-	map(0x3d0, 0x3df).rw(FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
+	map(0x3d0, 0x3df).rw(m_vdu, FUNC(ams40041_device::vdu_r), FUNC(ams40041_device::vdu_w));
 	map(0x3f0, 0x3f7).m(m_fdc, FUNC(pc_fdc_xt_device::map));
 	map(0x3f8, 0x3ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
@@ -1092,18 +1093,6 @@ void pc1512_state::machine_start()
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		program.unmap_readwrite(ram_size, 0x9ffff);
 	}
-
-	// state saving
-	save_item(NAME(m_toggle));
-	save_item(NAME(m_lpen));
-	save_item(NAME(m_blink));
-	save_item(NAME(m_cursor));
-	save_item(NAME(m_blink_ctr));
-	save_item(NAME(m_vdu_mode));
-	save_item(NAME(m_vdu_color));
-	save_item(NAME(m_vdu_plane));
-	save_item(NAME(m_vdu_rdsel));
-	save_item(NAME(m_vdu_border));
 }
 
 void pc1512_base_state::machine_reset()
@@ -1119,18 +1108,7 @@ void pc1512_state::machine_reset()
 {
 	pc1512_base_state::machine_reset();
 
-	m_toggle = 0;
 	m_pit2 = 1;
-
-	m_lpen = 0;
-	m_blink = 0;
-	m_cursor = 0;
-	m_blink_ctr = 0;
-	m_vdu_mode = 0;
-	m_vdu_color = 0;
-	m_vdu_rdsel = 0;
-	m_vdu_plane = 0x0f;
-	m_vdu_border = 0;
 }
 
 
@@ -1163,7 +1141,13 @@ void pc1512_state::pc1512(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
-	pc1512_video(config);
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(28.636363_MHz_XTAL, 912, 0, 910, 262, 0, 260);
+	screen.set_screen_update(m_vdu, FUNC(ams40041_device::screen_update));
+
+	AMS40041(config, m_vdu, 28.636363_MHz_XTAL);
+	m_vdu->set_screen(SCREEN_TAG);
+	m_vdu->set_show_border_area(true);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -1332,10 +1316,10 @@ void pc1640_state::pc1640(machine_config &config)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc1640_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc1640_state::dack3_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
