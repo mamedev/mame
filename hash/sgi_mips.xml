@@ -1398,7 +1398,7 @@ license:CC0
 			<feature name="part_number" value="812-8101-011"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="hot_mix_volume_11" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+				<disk name="hot_mix_volume_11" sha1="fa371c5dd27f8ba4235e4200299d08b210491788" />
 			</diskarea>
 		</part>
 	</software>
@@ -1411,7 +1411,7 @@ license:CC0
 			<feature name="part_number" value="812-8101-012"/>
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
-				<disk name="hot_mix_volume_12" sha1="ee725db3a52ff482e03b7806889763619f584859" />
+				<disk name="hot_mix_volume_12" sha1="34f76d048973a2b4a7ae8471420f87ab2ac4d762" />
 			</diskarea>
 		</part>
 	</software>
@@ -1677,19 +1677,6 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_4_applications_august_1997" sha1="f727caed36fc2526732ddd2849bdae759c75f99d" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="apps_6_5_aug_01">
-		<description>IRIX 6.5 Applications August 2001</description>
-		<year>2001</year> <!-- 08/01 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0877-012"/>
-			<!-- Origin: private dump -->
-			<diskarea name="cdrom">
-				<disk name="irix_6_5_13_applications_august_2001" sha1="a73ae9f7d0c5e42b948580463c8bc2c741c9629a" />
 			</diskarea>
 		</part>
 	</software>
@@ -2074,6 +2061,7 @@ license:CC0
 		<year>1995</year> <!-- 02/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">
+			<!-- Also distributed as IRIX 5.3 for Indy R4000, R4400, R4600 100-200 MHz with P/N 812-0336-002 and identical contents -->
 			<feature name="part_number" value="812-0336-001"/>
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
@@ -2104,19 +2092,6 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="irix_5_3_for_indy_including_r5000" sha1="99361caca3d5b8211d57f4244adeff570fce4805" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="irix_5_3_d" cloneof="irix_5_3">
-		<description>IRIX 5.3 for Indy R4000, R4400, R4600 (100-200 MHz)</description>
-		<year>1995</year> <!-- 08/95 -->
-		<publisher>Silicon Graphics</publisher>
-		<part name="cdrom" interface="cdrom">
-			<feature name="part_number" value="812-0336-002"/>
-			<!-- Origin: jrra.zone -->
-			<diskarea name="cdrom">
-				<disk name="irix_5_3_for_indy" sha1="dcc05e3637e4ab20c4fceb43bded2f1f2bd64518" />
 			</diskarea>
 		</part>
 	</software>
