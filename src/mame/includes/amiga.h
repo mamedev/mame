@@ -366,12 +366,12 @@ public:
 			m_chip_ram.write(byteoffs >> 1, data);
 	}
 
-	DECLARE_READ16_MEMBER(chip_ram_r)
+	uint16_t chip_ram_r(offs_t offset, uint16_t mem_mask = ~0)
 	{
 		return read_chip_ram(offset & ~1) & mem_mask;
 	}
 
-	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	void chip_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		uint16_t val = read_chip_ram(offset & ~1) & ~mem_mask;
 		write_chip_ram(offset & ~1, val | data);

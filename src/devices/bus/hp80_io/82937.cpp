@@ -158,7 +158,7 @@ READ8_MEMBER(hp82937_io_card_device::dio_r)
 	if (m_dio_out) {
 		return 0xff;
 	} else {
-		return m_ieee488->read_dio();
+		return m_ieee488->dio_r();
 	}
 }
 
@@ -252,7 +252,7 @@ void hp82937_io_card_device::device_reset()
 
 void hp82937_io_card_device::update_data_out()
 {
-	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r() : 0xff);
+	m_ieee488->host_dio_w(m_dio_out ? m_cpu->p2_r() : 0xff);
 }
 
 void hp82937_io_card_device::update_signals()

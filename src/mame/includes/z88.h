@@ -67,7 +67,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(kb_r);
+	uint8_t kb_r(offs_t offset);
 	UPD65031_MEMORY_UPDATE(bankswitch_update);
 	UPD65031_SCREEN_UPDATE(lcd_update);
 

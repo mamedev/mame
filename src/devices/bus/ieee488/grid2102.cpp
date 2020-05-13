@@ -160,7 +160,7 @@ void grid210x_device::ieee488_dav(int state) {
         // read data and wait for transfer end
         int atn = m_bus->atn_r() ^ 1;
         m_bus->nrfd_w(this, 0);
-        uint8_t data = m_bus->read_dio() ^ 0xFF;
+        uint8_t data = m_bus->dio_r() ^ 0xFF;
         int eoi = m_bus->eoi_r() ^ 1;
         LOG_BYTES("grid210x_device byte recv %02x atn %d eoi %d\n", data, atn, eoi);
         m_last_recv_byte = data;
@@ -235,7 +235,7 @@ void grid210x_device::ieee488_dav(int state) {
 void grid210x_device::ieee488_nrfd(int state) {
     if (state == 1 && m_gpib_loop_state == GRID210X_GPIB_STATE_SEND_DATA_START) {
         // set dio and assert dav
-        m_bus->write_dio(m_byte_to_send ^ 0xFF);
+        m_bus->host_dio_w(m_byte_to_send ^ 0xFF);
         m_bus->eoi_w(this, m_send_eoi ^ 1);
         m_bus->dav_w(this, 0);
         m_bus->ndac_w(this, 1);

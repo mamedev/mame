@@ -45,15 +45,15 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port09_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
+	uint8_t port08_r();
+	uint8_t port09_r();
+	void port08_w(uint8_t data);
+	void port09_w(uint8_t data);
+	void port14_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
@@ -210,31 +210,31 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 // turns off IPL mode, removes boot rom from memory map
-WRITE8_MEMBER( altos5_state::port14_w )
+void altos5_state::port14_w(uint8_t data)
 {
 	m_ipl = 0;
 	setup_banks(2);
 }
 
-READ8_MEMBER(altos5_state::memory_read_byte)
+uint8_t altos5_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::memory_write_byte)
+void altos5_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(altos5_state::io_read_byte)
+uint8_t altos5_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(altos5_state::io_write_byte)
+void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -255,7 +255,7 @@ d2: unused configuration input (must be H to skip HD boot)
 d3: selected floppy is single(L) or double sided(H)
 d7: IRQ from FDC
 */
-READ8_MEMBER( altos5_state::port08_r )
+uint8_t altos5_state::port08_r()
 {
 	uint8_t data = m_port08 | 0x87;
 	if (m_floppy)
@@ -266,7 +266,7 @@ READ8_MEMBER( altos5_state::port08_r )
 /*
 d0: HD IRQ
 */
-READ8_MEMBER( altos5_state::port09_r )
+uint8_t altos5_state::port09_r()
 {
 	return m_port09 & 0xfe;
 }
@@ -276,7 +276,7 @@ d4: DDEN (H = double density)
 d5: DS (H = drive 2)
 d6: SS (H = side 2)
 */
-WRITE8_MEMBER( altos5_state::port08_w )
+void altos5_state::port08_w(uint8_t data)
 {
 	m_port08 = data & 0x70;
 
@@ -302,7 +302,7 @@ d3, 4: CPU bank select
 d5:    H = Write protect of common area
 d6, 7: DMA bank select (not emulated)
 */
-WRITE8_MEMBER( altos5_state::port09_w )
+void  altos5_state::port09_w(uint8_t data)
 {
 	m_port09 = data;
 	setup_banks(2);
