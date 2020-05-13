@@ -73,7 +73,7 @@ TIDY_DB = $(OBJ)/compile_commands.json
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++17 -I$(CURDIR)/.. -I$(CURDIR)/../.. 
+CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
 
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
@@ -174,6 +174,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74193.o \
 	$(NLOBJ)/devices/nld_74194.o \
 	$(NLOBJ)/devices/nld_74365.o \
+	$(NLOBJ)/devices/nld_74377.o \
 	$(NLOBJ)/devices/nld_74393.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
