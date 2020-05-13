@@ -157,10 +157,10 @@ protected:
 private:
 	void machine_reset() override;
 	void machine_start() override;
-	void low_w(u16 offset, u8 data);
-	void high_w(u16 offset, u8 data);
-	u8 low_r(u16 offset);
-	u8 high_r(u16 offset);
+	void low_w(offs_t offset, u8 data);
+	void high_w(offs_t offset, u8 data);
+	u8 low_r(offs_t offset);
+	u8 high_r(offs_t offset);
 };
 
 class super80r_state : public super80v_state
@@ -174,11 +174,11 @@ private:
 
 	void machine_reset() override;
 	void machine_start() override;
-	void low_w(u16 offset, u8 data);
-	void high_w(u16 offset, u8 data);
+	void low_w(offs_t offset, u8 data);
+	void high_w(offs_t offset, u8 data);
 	void super80r_map(address_map &map);
-	u8 low_r(u16 offset);
-	u8 high_r(u16 offset);
+	u8 low_r(offs_t offset);
+	u8 high_r(offs_t offset);
 };
 
 

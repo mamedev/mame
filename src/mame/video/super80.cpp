@@ -295,28 +295,28 @@ void super80_state::portf1_w(u8 data)
 ---------------------------------------------------------------*/
 
 // we place the colour ram at m_ram[0x9000], and the videoram at m_ram[0x8000].
-u8 super80r_state::low_r(u16 offset)
+u8 super80r_state::low_r(offs_t offset)
 {
 	return m_ram[offset+0x8000];
 }
 
-void super80r_state::low_w(u16 offset, u8 data)
+void super80r_state::low_w(offs_t offset, u8 data)
 {
 	m_ram[offset+0x8000] = data; // video
 }
 
-u8 super80r_state::high_r(u16 offset)
+u8 super80r_state::high_r(offs_t offset)
 {
 	return m_ram[offset+0x8800]; // video
 }
 
-void super80r_state::high_w(u16 offset, u8 data)
+void super80r_state::high_w(offs_t offset, u8 data)
 {
 	m_ram[offset+0x8800] = data; // video
 	m_ram[offset+0xf800] = data; // pcg
 }
 
-u8 super80v_state::low_r(u16 offset)
+u8 super80v_state::low_r(offs_t offset)
 {
 	if (BIT(m_portf0, 2))
 		return m_ram[offset+0x8000]; // video
@@ -324,7 +324,7 @@ u8 super80v_state::low_r(u16 offset)
 		return m_ram[offset+0x9000]; // colour
 }
 
-void super80v_state::low_w(u16 offset, u8 data)
+void super80v_state::low_w(offs_t offset, u8 data)
 {
 	if (BIT(m_portf0, 2))
 		m_ram[offset+0x8000] = data; // video
@@ -332,7 +332,7 @@ void super80v_state::low_w(u16 offset, u8 data)
 		m_ram[offset+0x9000] = data; // colour
 }
 
-u8 super80v_state::high_r(u16 offset)
+u8 super80v_state::high_r(offs_t offset)
 {
 	if (!BIT(m_portf0, 2))
 		return m_ram[offset+0x9800]; // colour
@@ -343,7 +343,7 @@ u8 super80v_state::high_r(u16 offset)
 		return m_p_chargen[offset]; // char rom
 }
 
-void super80v_state::high_w(u16 offset, u8 data)
+void super80v_state::high_w(offs_t offset, u8 data)
 {
 	if (!BIT(m_portf0, 2))
 		m_ram[offset+0x9800] = data; // colour
