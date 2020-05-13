@@ -52,7 +52,7 @@ ROM_END
 
 void a2bus_cffa2000_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", "hdd", false);
 
 // not yet, the core explodes
 //  SOFTWARE_LIST(config, "hdd_list").set_original("apple2gs_hdd");
