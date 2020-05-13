@@ -677,6 +677,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_intr, 0, sizeof(intr_state));
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
+	m_last_dma = 0;
 
 	m_timer[0].int_timer = timer_alloc(TIMER_INT0);
 	m_timer[1].int_timer = timer_alloc(TIMER_INT1);
