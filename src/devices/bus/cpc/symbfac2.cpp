@@ -133,27 +133,27 @@ READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
 		else
 		{
 			m_iohigh = true;
-			m_ide_data = m_ide->read_cs0(offset);
+			m_ide_data = m_ide->cs0_r(offset);
 			return m_ide_data & 0xff;
 		}
 	}
 	else
-		return m_ide->read_cs0(offset);
+		return m_ide->cs0_r(offset);
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::ide_cs0_w)
 {
-	m_ide->write_cs0(offset, data);
+	m_ide->cs0_w(offset, data);
 }
 
 READ8_MEMBER(cpc_symbiface2_device::ide_cs1_r)
 {
-	return m_ide->read_cs1(offset);
+	return m_ide->cs1_r(offset);
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 {
-	m_ide->write_cs1(offset, data);
+	m_ide->cs1_w(offset, data);
 }
 
 // RTC (Dallas DS1287A)

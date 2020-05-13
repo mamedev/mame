@@ -233,10 +233,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
-	DECLARE_READ8_MEMBER(mac_via_in_a);
-	DECLARE_READ8_MEMBER(mac_via_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b);
+	uint8_t mac_via_in_a();
+	uint8_t mac_via_in_b();
+	void mac_via_out_a(uint8_t data);
+	void mac_via_out_b(uint8_t data);
 	void mac128_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	int scan_keyboard();
@@ -690,12 +690,12 @@ READ16_MEMBER ( mac128_state::mac_autovector_r )
 	return 0;
 }
 
-READ8_MEMBER(mac128_state::mac_via_in_a)
+uint8_t mac128_state::mac_via_in_a()
 {
 	return 0x80;
 }
 
-READ8_MEMBER(mac128_state::mac_via_in_b)
+uint8_t mac128_state::mac_via_in_b()
 {
 	int val = 0x40;
 
@@ -713,7 +713,7 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 	return val;
 }
 
-WRITE8_MEMBER(mac128_state::mac_via_out_a)
+void mac128_state::mac_via_out_a(uint8_t data)
 {
 //  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
@@ -735,7 +735,7 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 	}
 }
 
-WRITE8_MEMBER(mac128_state::mac_via_out_b)
+void mac128_state::mac_via_out_b(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 

@@ -248,7 +248,7 @@ WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 
 READ16_MEMBER( buddha_device::ide_0_cs0_r )
 {
-	uint16_t data = m_ata_0->read_cs0((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
+	uint16_t data = m_ata_0->cs0_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
 	LOG("ide_0_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
@@ -263,12 +263,12 @@ WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
 
-	m_ata_0->write_cs0((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_0->cs0_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 READ16_MEMBER( buddha_device::ide_0_cs1_r )
 {
-	uint16_t data = m_ata_0->read_cs1((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
+	uint16_t data = m_ata_0->cs1_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
 	LOG("ide_0_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
@@ -283,12 +283,12 @@ WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
 
-	m_ata_0->write_cs1((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_0->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 READ16_MEMBER( buddha_device::ide_1_cs0_r )
 {
-	uint16_t data = m_ata_1->read_cs0((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
+	uint16_t data = m_ata_1->cs0_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
 	LOG("ide_1_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
@@ -303,12 +303,12 @@ WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
 
-	m_ata_1->write_cs0((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_1->cs0_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 READ16_MEMBER( buddha_device::ide_1_cs1_r )
 {
-	uint16_t data = m_ata_1->read_cs1((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
+	uint16_t data = m_ata_1->cs1_r((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
 	LOG("ide_1_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
@@ -323,7 +323,7 @@ WRITE16_MEMBER( buddha_device::ide_1_cs1_w )
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
 
-	m_ata_1->write_cs1((offset >> 1) & 0x07, data, mem_mask);
+	m_ata_1->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 } } } // namespace bus::amiga::zorro

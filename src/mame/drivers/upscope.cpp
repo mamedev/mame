@@ -55,13 +55,13 @@ private:
 	uint8_t m_nvram_address_latch;
 	uint8_t m_nvram_data_latch;
 
-	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
-	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
+	uint8_t upscope_cia_0_portb_r();
+	void upscope_cia_0_portb_w(uint8_t data);
+	uint8_t upscope_cia_1_porta_r();
+	void upscope_cia_1_porta_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	void lamps_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
 
 
 	void a500_mem(address_map &map);
@@ -99,12 +99,12 @@ void upscope_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( upscope_state::upscope_cia_0_portb_w )
+void upscope_state::upscope_cia_0_portb_w(uint8_t data)
 {
 	m_parallel_data = data;
 }
 
-READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
+uint8_t upscope_state::upscope_cia_0_portb_r()
 {
 	return m_nvram_data_latch;
 }
@@ -126,12 +126,12 @@ READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
  *
  *************************************/
 
-READ8_MEMBER( upscope_state::upscope_cia_1_porta_r )
+uint8_t upscope_state::upscope_cia_1_porta_r()
 {
 	return 0xf8 | (m_prev_cia1_porta & 0x07);
 }
 
-WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
+void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((m_prev_cia1_porta & 2) && !(data & 2))
@@ -185,7 +185,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 	m_prev_cia1_porta = data;
 }
 
-WRITE8_MEMBER( upscope_state::lamps_w )
+void upscope_state::lamps_w(uint8_t data)
 {
 	// 7-------  bubble light
 	// -6------  sight
@@ -197,7 +197,7 @@ WRITE8_MEMBER( upscope_state::lamps_w )
 	// -------0  enemy right
 }
 
-WRITE8_MEMBER( upscope_state::coin_counter_w )
+void upscope_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }

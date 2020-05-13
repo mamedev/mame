@@ -633,7 +633,7 @@ void lisa_state::init_COPS()
     CA1 (I) : COPS sending valid data
     CA2 (O) : VIA -> COPS handshake
 */
-WRITE8_MEMBER(lisa_state::COPS_via_out_a)
+void lisa_state::COPS_via_out_a(uint8_t data)
 {
 //    printf("VIA A = %02x\n", data);
 	m_COPS_command = data;
@@ -664,7 +664,7 @@ WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
     CB2 (O) : sound output
 */
 
-WRITE8_MEMBER(lisa_state::COPS_via_out_b)
+void lisa_state::COPS_via_out_b(uint8_t data)
 {
 	/* pull-up */
 	data |= (~ m_via0->read(via6522_device::VIA_DDRA)) & 0x01;

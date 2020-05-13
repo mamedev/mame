@@ -326,12 +326,12 @@ public:
 
 	DECLARE_READ16_MEMBER(konami_ide_r)
 	{
-		return swapendian_int16(m_ata->read_cs0(offset, mem_mask));
+		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
 	}
 
 	DECLARE_WRITE16_MEMBER(konami_ide_w)
 	{
-		m_ata->write_cs0(offset, swapendian_int16(data), mem_mask);
+		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
 	}
 
 private:

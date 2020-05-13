@@ -2,7 +2,7 @@
 // copyright-holders:Raphael Nabet
 /*********************************************************************
 
-    drivers/lisa.c
+    drivers/lisa.cpp
 
     Experimental LISA driver
 
