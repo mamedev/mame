@@ -17,6 +17,7 @@
 #define STARCAS_USE_NETLIST			(1)
 #define WOTW_USE_NETLIST			(1)
 
+// log to cinemat.csv for nltool playback/analysis
 #define ENABLE_NETLIST_LOGGING		(1)
 
 

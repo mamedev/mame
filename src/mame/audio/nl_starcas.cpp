@@ -30,6 +30,7 @@
 //
 
 #include "netlist/devices/net_lib.h"
+#include "nl_starcas.h"
 
 
 //
@@ -484,81 +485,203 @@ static NETLIST_START(StarCastle_schematics)
 	CAP(C45, CAP_P(470))	// disk
 	CAP(C46, CAP_P(470))	// disk
 	CAP(C47, CAP_U(0.005))	// disk
-    CAP(C48, CAP_U(0.33))	// film
+	CAP(C48, CAP_U(0.33))	// film
 
 //	DIODE(D1, "1N4003")		// not needed
 //	DIODE(D2, "1N4003")		// not needed
 //	DIODE(D3, "1N4003")		// not needed
 //	DIODE(D4, "1N4003")		// not needed
-    ZDIODE(D5, "1N5240B")	// OK
-    ZDIODE(D6, "1N5236B")	// OK
-    DIODE(D7, "1N914B")		// OK
-    DIODE(D8, "1N914B")		// OK
-    DIODE(D9, "1N914B")		// OK
-    DIODE(D10, "1N914B")	// OK
+	ZDIODE(D5, "1N5240B")
+	ZDIODE(D6, "1N5236B")
+	DIODE(D7, "1N914B")
+	DIODE(D8, "1N914B")
+	DIODE(D9, "1N914B")
+	DIODE(D10, "1N914B")
 
-	QBJT_EB(Q1, "2N3904")	// OK: NPN
-	QBJT_EB(Q2, "2N3904")	// OK: NPN
-	QBJT_EB(Q3, "2N3906")	// OK: PNP
-	QBJT_EB(Q4, "2N3904")	// OK: NPN
-	QBJT_EB(Q5, "2N3904")	// OK: NPN
-	QBJT_EB(Q6, "2N3906")	// OK: PNP
-	QBJT_EB(Q7, "2N3906")	// OK: PNP
-	QBJT_EB(Q8, "2N3906")	// OK: PNP
-	QBJT_EB(Q9, "2N3906")	// OK: PNP
-	QBJT_EB(Q10, "2N3906")	// OK: PNP
-	QBJT_EB(Q11, "2N3906")	// OK: PNP
-	QBJT_EB(Q12, "2N3906")	// OK: PNP
-	QBJT_EB(Q13, "2N3906")	// OK: PNP
-	QBJT_EB(Q14, "2N3906")	// OK: PNP
-	QBJT_EB(Q15, "2N3906")	// OK: PNP
-	QBJT_EB(Q16, "2N3906")	// OK: PNP
-	QBJT_EB(Q17, "2N6107")	// OK: PNP
-	QBJT_EB(Q18, "2N6292")	// OK: NPN
+	QBJT_EB(Q1, "2N3904")	// NPN
+	QBJT_EB(Q2, "2N3904")	// NPN
+	QBJT_EB(Q3, "2N3906")	// PNP
+	QBJT_EB(Q4, "2N3904")	// NPN
+	QBJT_EB(Q5, "2N3904")	// NPN
+	QBJT_EB(Q6, "2N3906")	// PNP
+	QBJT_EB(Q7, "2N3906")	// PNP
+	QBJT_EB(Q8, "2N3906")	// PNP
+	QBJT_EB(Q9, "2N3906")	// PNP
+	QBJT_EB(Q10, "2N3906")	// PNP
+	QBJT_EB(Q11, "2N3906")	// PNP
+	QBJT_EB(Q12, "2N3906")	// PNP
+	QBJT_EB(Q13, "2N3906")	// PNP
+	QBJT_EB(Q14, "2N3906")	// PNP
+	QBJT_EB(Q15, "2N3906")	// PNP
+	QBJT_EB(Q16, "2N3906")	// PNP
+	QBJT_EB(Q17, "2N6107")	// PNP
+	QBJT_EB(Q18, "2N6292")	// NPN
 
-//	TTL_7414_DIP(IC1)		// Schmidt Trigger -- not needed
-//	TTL_74LS164_DIP(IC2)	// 8-bit Shift Reg. -- not needed
-//	TTL_74LS377_DIP(IC3)	// Octal D Flip Flop -- not needed
+#if STARCAS_NETLIST_SHIFTREG
+
+	TTL_7414_DIP(IC1)		// Hex Inverter
+	NET_C(IC1.7, GND)
+	NET_C(IC1.14, I_V5)
+
+	TTL_74LS164_DIP(IC2)	// 8-bit Shift Reg.
+	NET_C(IC2.7, GND)
+	NET_C(IC2.14, I_V5)
+
+	TTL_74LS377_DIP(IC3)	// Octal D Flip Flop
+	NET_C(IC3.10, GND)
+	NET_C(IC3.20, I_V5)
+
+#endif
+
 //	TTL_7815_DIP(IC4)		// +15V Regulator -- not needed
 //	TTL_7915_DIP(IC5)		// -15V Regulator -- not needed
-	TTL_7406_DIP(IC6)		// OK? Hex Inverter -- currently using a clone of 7416, no open collector behavior
-	TL081_DIP(IC7)			// OK: Op. Amp.
-	TL081_DIP(IC8)			// OK: Op. Amp.
+
+	TTL_7406_DIP(IC6)		// Hex Inverter -- currently using a clone of 7416, no open collector behavior
+	NET_C(IC6.7, GND)
+	NET_C(IC6.14, I_V5)
+
+	TL081_DIP(IC7)			// Op. Amp.
+	NET_C(IC7.7, I_V15)
+	NET_C(IC7.4, I_VM15)
+
+	TL081_DIP(IC8)			// Op. Amp.
+	NET_C(IC8.7, I_V15)
+	NET_C(IC8.4, I_VM15)
+
 	LM566_DIP(IC9)			// 566 VCO
-	TTL_74LS163_DIP(IC10)	// OK: Binary Counter (schems say can sub a 74161)
-	TTL_74LS163_DIP(IC11)	// OK: Binary Counter (schems say can sub a 74161)
+
+	TTL_74LS163_DIP(IC10)	// Binary Counter (schems say can sub a 74161)
+	NET_C(IC10.8, GND)
+	NET_C(IC10.16, I_V5)
+
+	TTL_74LS163_DIP(IC11)	// Binary Counter (schems say can sub a 74161)
+	NET_C(IC11.8, GND)
+	NET_C(IC11.16, I_V5)
+
 	TTL_74LS393_DIP(IC12)	// Dual 4 Bit B.C.
+	NET_C(IC12.7, GND)
+	NET_C(IC12.14, I_V5)
+
 	TTL_74LS393_DIP(IC13)	// Dual 4 Bit B.C.
-	AMI_S2688(IC14)			// OK: Noise generator
-	TL081_DIP(IC15)			// OK: Op. Amp.
-	LM555_DIP(IC16)			// OK: Timer
+	NET_C(IC13.7, GND)
+	NET_C(IC13.14, I_V5)
+
+	AMI_S2688(IC14)			// Noise generator
+
+	TL081_DIP(IC15)			// Op. Amp.
+	NET_C(IC15.7, I_V15)
+	NET_C(IC15.4, I_VM15)
+
+	LM555_DIP(IC16)			// Timer
+
 	LM566_DIP(IC17)			// 566 VCO
-	CA3080_DIP(IC18)		// Trnscndt. Op. Amp. -- needed
-	CA3080_DIP(IC19)		// Trnscndt. Op. Amp. -- needed
-	CA3080_DIP(IC20)		// Trnscndt. Op. Amp. -- needed
-	CA3080_DIP(IC21)		// Trnscndt. Op. Amp. -- needed
-	CA3080_DIP(IC22)		// Trnscndt. Op. Amp. -- needed
-	LM555_DIP(IC23)			// OK: Timer
-	LM555_DIP(IC24)			// OK: Timer
-	TL081_DIP(IC25)			// OK: Op. Amp.
-	TL081_DIP(IC26)			// OK: Op. Amp.
-	TL081_DIP(IC27)			// OK: Op. Amp.
-	TTL_74LS107_DIP(IC28)	// OK: Dual J-K Flip Flop
+
+	CA3080_DIP(IC18)		// Trnscndt. Op. Amp.
+	NET_C(IC18.7, I_V15)
+	NET_C(IC18.4, I_VM15)
+
+	CA3080_DIP(IC19)		// Trnscndt. Op. Amp.
+	NET_C(IC19.7, I_V15)
+	NET_C(IC19.4, I_VM15)
+
+	CA3080_DIP(IC20)		// Trnscndt. Op. Amp.
+	NET_C(IC20.7, I_V15)
+	NET_C(IC20.4, I_VM15)
+
+	CA3080_DIP(IC21)		// Trnscndt. Op. Amp.
+	NET_C(IC21.7, I_V15)
+	NET_C(IC21.4, I_VM15)
+
+	CA3080_DIP(IC22)		// Trnscndt. Op. Amp.
+	NET_C(IC22.7, I_V15)
+	NET_C(IC22.4, I_VM15)
+
+	LM555_DIP(IC23)			// Timer
+
+	LM555_DIP(IC24)			// Timer
+
+	TL081_DIP(IC25)			// Op. Amp.
+	NET_C(IC25.7, I_V15)
+	NET_C(IC25.4, I_VM15)
+
+	TL081_DIP(IC26)			// Op. Amp.
+	NET_C(IC26.7, I_V15)
+	NET_C(IC26.4, I_VM15)
+
+	TL081_DIP(IC27)			// Op. Amp.
+	NET_C(IC27.7, I_V15)
+	NET_C(IC27.4, I_VM15)
+
+	TTL_74LS107_DIP(IC28)	// Dual J-K Flip Flop
+	NET_C(IC28.7, GND)
+	NET_C(IC28.14, I_V5)
+
+	//
+	// Sheet 1, shift register (top left)
+	//
+
+	NET_C(I_V5, R1.1)
+	ALIAS(HI, R1.2)
+
+#if STARCAS_NETLIST_SHIFTREG
+
+	NET_C(R1.2, IC2.9, IC2.2)
+	NET_C(I_OUT_7, IC1.13)
+	NET_C(IC1.12, IC1.1)
+	NET_C(IC1.2, IC2.1)
+	NET_C(I_OUT_4, IC1.9)
+	NET_C(IC1.8, IC1.5)
+	NET_C(IC1.6, IC2.8)
+	NET_C(I_OUT_0, IC1.11)
+	NET_C(IC1.10, IC1.3)
+	NET_C(IC1.4, IC3.11)
+
+	NET_C(IC2.3, IC3.3)
+	NET_C(IC2.4, IC3.4)
+	NET_C(IC2.5, IC3.7)
+	NET_C(IC2.6, IC3.8)
+	NET_C(IC2.10, IC3.13)
+	NET_C(IC2.11, IC3.14)
+	NET_C(IC2.12, IC3.17)
+	NET_C(IC2.13, IC3.18)
+	NET_C(GND, IC3.1)
+
+	ALIAS(FIREBALL_EN, IC3.2)
+	ALIAS(SHIELD_EN, IC3.5)
+	ALIAS(STAR_EN, IC3.6)
+	ALIAS(THRUST_EN, IC3.9)
+	ALIAS(BACKGROUND_EN, IC3.12)
+	ALIAS(BL2, IC3.15)
+	ALIAS(BL1, IC3.16)
+	ALIAS(BL0, IC3.19)
+
+#else
+
+	ALIAS(FIREBALL_EN, I_SHIFTREG_7)
+	ALIAS(SHIELD_EN, I_SHIFTREG_6)
+	ALIAS(STAR_EN, I_SHIFTREG_5)
+	ALIAS(THRUST_EN, I_SHIFTREG_4)
+	ALIAS(BACKGROUND_EN, I_SHIFTREG_3)
+	ALIAS(BL2, I_SHIFTREG_2)
+	ALIAS(BL1, I_SHIFTREG_1)
+	ALIAS(BL0, I_SHIFTREG_0)
+
+#endif
 
 	//
 	// Sheet 1, BACKGROUND (top portion)
 	//
 
-	NET_C(GND, D5.A, D6.K, D7.A, D8.A, R13.1, R16.1, R17.1, IC6.7, IC7.3, IC9.8)
-	NET_C(I_V5, R20.1, IC6.14)
-	NET_C(I_V15, R2.1, IC7.7, IC8.7)
-	NET_C(I_VM15, C13.2, R12.1, R18.1, R21.1, IC7.4, IC8.4, IC9.1)
+	NET_C(GND, D5.A, D6.K, D7.A, D8.A, R13.1, R16.1, R17.1, IC7.3, IC9.8)
+	NET_C(I_V5, R20.1)
+	NET_C(I_V15, R2.1)
+	NET_C(I_VM15, C13.2, R12.1, R18.1, R21.1, IC9.1)
 	NET_C(R2.2, D5.K, R3.1, R5.1, R7.1)
-	NET_C(I_SHIFTREG_2, IC6.9)
+	NET_C(BL2, IC6.9)
 	NET_C(IC6.8, R3.2, R4.1)
-	NET_C(I_SHIFTREG_1, IC6.11)
+	NET_C(BL1, IC6.11)
 	NET_C(IC6.10, R5.2, R6.1)
-	NET_C(I_SHIFTREG_0, IC6.13)
+	NET_C(BL0, IC6.13)
 	NET_C(IC6.12, R7.2, R8.1)
 	NET_C(R4.2, R6.2, R8.2, IC7.2, R9.1)
 	NET_C(IC7.6, R9.2, R10.1)
@@ -580,12 +703,10 @@ static NETLIST_START(StarCastle_schematics)
 	// Sheet 1, BACKGROUND (bottom portion)
 	//
 
-	NET_C(I_V5, R1.1)
-	ALIAS(HI, R1.2)
-	NET_C(GND, R27.1, IC10.4, IC10.5, IC10.6, IC10.8, IC11.3, IC11.4, IC11.8, IC12.7, IC12.12, IC13.7, IC13.12, IC28.4, IC28.7)
-	NET_C(I_V5, R22.1, IC10.16, IC11.16, IC12.14, IC13.14, IC28.14)
+	NET_C(GND, R27.1, IC10.4, IC10.5, IC10.6, IC11.3, IC11.4, IC12.12, IC13.12, IC28.4)
+	NET_C(I_V5, R22.1)
 	NET_C(CLK, IC10.2, IC11.2, IC13.1, IC28.12)
-	NET_C(I_SHIFTREG_3, IC6.1, IC13.2)
+	NET_C(BACKGROUND_EN, IC6.1, IC13.2)
 	NET_C(IC6.2, R22.2, IC10.1, IC11.1)
 	NET_C(HI, IC10.3, IC10.7, IC10.10, IC11.5, IC11.6, IC11.7)
 	NET_C(IC10.15, IC11.10)
@@ -603,8 +724,7 @@ static NETLIST_START(StarCastle_schematics)
 	//
 
 	NET_C(GND, C16.2, C17.2, R28.1, IC14.1, IC14.2)
-	NET_C(I_V15, C16.1, C17.1, IC14.4, IC15.7)
-	NET_C(I_VM15, IC15.4)
+	NET_C(I_V15, C16.1, C17.1, IC14.4)
 	NET_C(IC14.3, C18.2)
 	NET_C(C18.1, R28.2, IC15.3)
 	NET_C(IC15.6, IC15.2)
@@ -666,8 +786,7 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, C28.2, C29.2, R55.1, R56.1, R61.2, R62.1)
 	NET_C(I_V5, R52.1)
-	NET_C(I_V15, IC18.7)
-	NET_C(I_VM15, C27.2, R54.1, IC18.4)
+	NET_C(I_VM15, C27.2, R54.1)
 	NET_C(I_OUT_2, R52.2, R53.1)
 	NET_C(R53.2, Q6.B)
 	NET_C(Q6.E, V2_2)
@@ -687,8 +806,7 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, C31.2, C32.2, R66.1, R67.1, R72.2, R73.1)
 	NET_C(I_V5, R63.1)
-	NET_C(I_V15, IC19.7)
-	NET_C(I_VM15, C30.2, R65.1, IC19.4)
+	NET_C(I_VM15, C30.2, R65.1)
 	NET_C(I_OUT_1, R63.2, R64.1)
 	NET_C(R64.2, Q8.B)
 	NET_C(Q8.E, V2_2)
@@ -708,9 +826,8 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, R78.1, R79.1, R83.1, R84.1)
 	NET_C(I_V5, Q10.E, R74.1, R76.1)
-	NET_C(I_V15, IC20.7)
-	NET_C(I_VM15, C33.2, R77.1, IC20.4)
-	NET_C(I_SHIFTREG_7, R74.2, R75.1)
+	NET_C(I_VM15, C33.2, R77.1)
+	NET_C(FIREBALL_EN, R74.2, R75.1)
 	NET_C(R75.2, R76.2, Q10.B)
 	NET_C(Q10.C, R77.2, R78.2, Q11.E)
 	NET_C(R79.2, Q11.B)
@@ -727,9 +844,8 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, R92.1, R93.1, R97.1, R98.1)
 	NET_C(I_V5, R85.1, R87.1, R88.1, Q12.E)
-	NET_C(I_V15, IC21.7)
-	NET_C(I_VM15, R91.1, IC21.4)
-	NET_C(I_SHIFTREG_6, R85.2, R86.1)
+	NET_C(I_VM15, R91.1)
+	NET_C(SHIELD_EN, R85.2, R86.1)
 	NET_C(R86.2, R87.2, Q12.B)
 	NET_C(Q12.C, R90.1, Q13.E)
 	NET_C(SQUAREWAVE, R88.2, R89.1)
@@ -749,9 +865,8 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, R103.1, R104.1, C35.2, C36.2, R110.1, R111.1)
 	NET_C(I_V5, R99.1, R101.1, Q15.E)
-	NET_C(I_V15, IC22.7)
-	NET_C(I_VM15, C34.2, R102.1, IC22.4)
-	NET_C(I_SHIFTREG_4, R99.2, R100.1)
+	NET_C(I_VM15, C34.2, R102.1)
+	NET_C(THRUST_EN, R99.2, R100.1)
 	NET_C(R100.2, R101.2, Q15.B)
 	NET_C(Q15.C, R102.2, R103.2, Q16.E)
 	NET_C(R104.2, Q16.B)
@@ -770,7 +885,7 @@ static NETLIST_START(StarCastle_schematics)
 
 	NET_C(GND, C37.1, C38.1, C39.1, C40.1, C41.1, R119.1, IC23.1, IC24.1)
 	NET_C(I_V5, R112.1, R117.1, IC23.8, IC24.8)
-	NET_C(I_SHIFTREG_5, IC23.4, IC24.4)
+	NET_C(STAR_EN, IC23.4, IC24.4)
 	NET_C(R112.2, IC23.7, R113.1)
 	NET_C(R113.2, IC23.2, IC23.6, C37.2)
 	NET_C(C38.2, IC23.5)
@@ -788,8 +903,6 @@ static NETLIST_START(StarCastle_schematics)
 	//
 
 	NET_C(GND, R127.1, IC27.3, R128.1)
-	NET_C(I_V15, IC26.7, IC27.7)
-	NET_C(I_VM15, IC26.4, IC27.4)
 	NET_C(IC18.6, IC19.6, IC20.6, IC21.6, IC22.6, R127.2, IC26.3)
 	NET_C(IC26.2, IC26.6, C48.1)
 	NET_C(C48.2, R125.1)
@@ -802,8 +915,6 @@ static NETLIST_START(StarCastle_schematics)
 
 #if EMULATE_FINAL_AMP
 	NET_C(GND, C43.2, C47.2)
-	NET_C(I_V15, IC25.7)
-	NET_C(I_VM15, IC25.4)
 	NET_C(I_V25, C45.1, Q17.C)
 	NET_C(I_VM25, C46.2, Q18.C)
 	NET_C(C43.1, R121.1)
@@ -817,7 +928,7 @@ static NETLIST_START(StarCastle_schematics)
 #else
 	NET_C(GND, C47.2)
 	NET_C(C47.1, R128.2)
-	NET_C(GND, IC25.4, IC25.7, C46.1, C43.2, C45.2, C45.1, R124.1, R122.1, R121.1, R124.2, R120.1, R120.2, R121.2, R123.1, C43.1, IC25.3, R123.2, C46.2, C44.2, C44.1, R122.2, IC25.2)
+	NET_C(GND, C46.1, C43.2, C45.2, C45.1, R124.1, R122.1, R121.1, R124.2, R120.1, R120.2, R121.2, R123.1, C43.1, IC25.3, R123.2, C46.2, C44.2, C44.1, R122.2, IC25.2)
 	ALIAS(OUTPUT, C47.1)
 #endif
 
@@ -834,30 +945,47 @@ NETLIST_START(starcas)
 
 	// 192k is not high enough to make the laser and background pitches high enough
 	SOLVER(Solver, 384000)
-//	PARAM(Solver.ACCURACY, 1e-10)
-//	PARAM(Solver.NR_LOOPS, 300)
+//	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
+//	PARAM(Solver.VNTOL, 1e-4) // works and is sufficient
+//	PARAM(Solver.DYNAMIC_LTE, 1e-1) // Aggressive timestepping
 //	PARAM(Solver.METHOD, "MAT_CR")
-//	PARAM(Solver.PARALLEL, 0)
-//	PARAM(Solver.DYNAMIC_TS, 0)
-//	PARAM(Solver.DYNAMIC_LTE, 5e-4)
-//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
+//	PARAM(Solver.DYNAMIC_TS, 1)
+//	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2.5e-6)
+//	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
-	TTL_INPUT(I_SHIFTREG_0, 0)	// active high
-	TTL_INPUT(I_SHIFTREG_1, 0)	// active high
-	TTL_INPUT(I_SHIFTREG_2, 0)	// active high
-	TTL_INPUT(I_SHIFTREG_3, 1)	// active low
-	TTL_INPUT(I_SHIFTREG_4, 1)	// active low
-	TTL_INPUT(I_SHIFTREG_5, 0)	// active high
-	TTL_INPUT(I_SHIFTREG_6, 1)	// active low
-	TTL_INPUT(I_SHIFTREG_7, 1)	// active low
+#if STARCAS_NETLIST_SHIFTREG
+
+	TTL_INPUT(I_OUT_0, 0)		// active low
 	TTL_INPUT(I_OUT_1, 1)		// active low
 	TTL_INPUT(I_OUT_2, 1)		// active low
 	TTL_INPUT(I_OUT_3, 1)		// active low
+	TTL_INPUT(I_OUT_4, 0)		// active low
+	TTL_INPUT(I_OUT_7, 0)		// active low
+
+	NET_C(GND, I_OUT_0.GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND, I_OUT_4.GND, I_OUT_7.GND)
+	NET_C(I_V5, I_OUT_0.VCC, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC, I_OUT_4.VCC, I_OUT_7.VCC)
+
+#else
+
+	TTL_INPUT(I_SHIFTREG_0, 0)      // active high
+	TTL_INPUT(I_SHIFTREG_1, 0)      // active high
+	TTL_INPUT(I_SHIFTREG_2, 0)      // active high
+	TTL_INPUT(I_SHIFTREG_3, 1)      // active low
+	TTL_INPUT(I_SHIFTREG_4, 1)      // active low
+	TTL_INPUT(I_SHIFTREG_5, 0)      // active high
+	TTL_INPUT(I_SHIFTREG_6, 1)      // active low
+	TTL_INPUT(I_SHIFTREG_7, 1)      // active low
+
+	TTL_INPUT(I_OUT_1, 1)           // active low
+	TTL_INPUT(I_OUT_2, 1)           // active low
+	TTL_INPUT(I_OUT_3, 1)           // active low
 
 	NET_C(GND, I_SHIFTREG_0.GND, I_SHIFTREG_1.GND, I_SHIFTREG_2.GND, I_SHIFTREG_3.GND, I_SHIFTREG_4.GND, I_SHIFTREG_5.GND, I_SHIFTREG_6.GND, I_SHIFTREG_7.GND)
 	NET_C(I_V5, I_SHIFTREG_0.VCC, I_SHIFTREG_1.VCC, I_SHIFTREG_2.VCC, I_SHIFTREG_3.VCC, I_SHIFTREG_4.VCC, I_SHIFTREG_5.VCC, I_SHIFTREG_6.VCC, I_SHIFTREG_7.VCC)
 	NET_C(GND, I_OUT_1.GND, I_OUT_2.GND, I_OUT_3.GND)
 	NET_C(I_V5, I_OUT_1.VCC, I_OUT_2.VCC, I_OUT_3.VCC)
+
+#endif
 
 	LOCAL_SOURCE(CA3080)
 
