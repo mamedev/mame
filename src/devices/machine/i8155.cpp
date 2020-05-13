@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(I8156, i8156_device, "i8156", "Intel 8156 RAM, I/O & Timer")
 
 #define LOG_PORT (1U << 0)
 #define LOG_TIMER (1U << 1)
-#define VERBOSE (0)
+#define VERBOSE (LOG_PORT | LOG_TIMER)
 #include "logmacro.h"
 
 enum
@@ -245,10 +245,10 @@ inline uint8_t i8155_device::read_port(int port)
 
 inline void i8155_device::write_port(int port, uint8_t data)
 {
+	m_output[port] = data;
 	switch (get_port_mode(port))
 	{
 	case PORT_MODE_OUTPUT:
-		m_output[port] = data;
 		if (port == PORT_A)
 			m_out_pa_cb((offs_t)0, m_output[port]);
 		else if (port == PORT_B)

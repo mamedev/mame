@@ -112,7 +112,7 @@ void ams40041_device::device_start()
 	m_supports_transparent = false;
 
 	// allocate memory
-	m_video_ram = std::make_unique<uint8_t[]>(0x10000);
+	m_video_ram = make_unique_clear<uint8_t[]>(0x10000);
 
 	// state saving
 	save_pointer(NAME(m_video_ram), 0x10000);
