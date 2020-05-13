@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-Pulsar Little Big Board
+Pulsar Little Big Board (6000 series)
 
 2013-12-29 Skeleton driver.
 
@@ -56,32 +56,34 @@ public:
 	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
 	{ }
 
-
 	void pulsar(machine_config &config);
 
-	void init_pulsar();
-
-protected:
-	virtual void machine_reset() override;
-
 private:
-	TIMER_CALLBACK_MEMBER(pulsar_reset);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
+	u8 read_rom(u16 offset);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
+	bool m_boot_in_progress;
+	bool m_rom_in_map;
+	std::unique_ptr<u8[]> m_ram;
 	floppy_image_device *m_floppy;
 	required_device<z80_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -90,10 +92,10 @@ private:
 
 void pulsar_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankr("bankr0").bankw("bankw0");
-	map(0x0800, 0xf7ff).ram();
-	map(0xf800, 0xffff).bankr("bankr1").bankw("bankw1");
+	map(0x0000, 0xffff).lrw8(NAME([this](u16 offset)          { return m_ram[offset]; }),
+                             NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
+	map(0x0000, 0x07ff).lr8 (NAME([this](u16 offset)          { if(m_boot_in_progress) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0xf800, 0xffff).lr8 (NAME([this](u16 offset)          { return read_rom(offset); }));
 }
 
 void pulsar_state::io_map(address_map &map)
@@ -106,18 +108,17 @@ void pulsar_state::io_map(address_map &map)
 	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
 }
 
-
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
+u8 pulsar_state::read_rom(u16 offset)
 {
-	membank("bankr0")->set_entry(1);
+	if (m_rom_in_map)
+	{
+		if (!machine().side_effects_disabled())
+			m_boot_in_progress = false;
+		return m_rom[offset];
+	}
+	else
+		return m_ram[offset | 0xf800];
 }
-
-static const z80_daisy_config daisy_chain_intf[] =
-{
-	{ "dart" },
-	{ nullptr }
-};
 
 /*
 d0..d3 Drive select 0-3 (we only emulate 1 drive)
@@ -153,7 +154,7 @@ WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 	m_rtc->read_w(BIT(data, 4));
 	m_rtc->write_w(BIT(data, 5));
 	m_rtc->hold_w(BIT(data, 6));
-	membank("bankr1")->set_entry(BIT(data, 7));
+	m_rom_in_map = BIT(data, 7);
 }
 
 // d0..d3 Data lines to rtc
@@ -170,6 +171,12 @@ READ8_MEMBER( pulsar_state::ppi_pc_r )
 		data = m_floppy->twosid_r() << 7;
 	return m_rtc->data_r() | data;
 }
+
+static const z80_daisy_config daisy_chain_intf[] =
+{
+	{ "dart" },
+	{ nullptr }
+};
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -191,25 +198,19 @@ INPUT_PORTS_END
 
 void pulsar_state::machine_reset()
 {
-	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bankr1")->set_entry(1); // point at rom
-	membank("bankw1")->set_entry(0); // always write to ram
+	m_boot_in_progress = true;
+	m_rom_in_map = true;
 	m_rtc->cs_w(1); // always enabled
 }
 
-void pulsar_state::init_pulsar()
+void pulsar_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
+	m_ram = make_unique_clear<u8[]>(0x10000);
 
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-
-	membank("bankr1")->configure_entry(0, &main[0xf800]);
-	membank("bankr1")->configure_entry(1, &main[0x10000]);
-	membank("bankw1")->configure_entry(0, &main[0xf800]);
+	// register for savestates
+	save_pointer(NAME(m_ram), 0x10000);
+	save_item(NAME(m_boot_in_progress));
+	save_item(NAME(m_rom_in_map));
 }
 
 void pulsar_state::pulsar(machine_config &config)
@@ -255,14 +256,15 @@ void pulsar_state::pulsar(machine_config &config)
 
 /* ROM definition */
 ROM_START( pulsarlb )
-	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "mon7", "MP7A")
-	ROMX_LOAD( "mp7a.u2", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(0))
+	ROMX_LOAD( "mp7a.u2",   0x0000, 0x0800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon6", "LBOOT6") // Blank screen until floppy boots
-	ROMX_LOAD( "lboot6.u2", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
+	ROMX_LOAD( "lboot6.u2", 0x0000, 0x0800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY   FULLNAME            FLAGS
-COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar, pulsar_state, init_pulsar, "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY   FULLNAME                          FLAGS
+COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar, pulsar_state, empty_init, "Pulsar", "Little Big Board (6000 series)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+
