@@ -7,13 +7,13 @@
  *          with Set, Reset and Complementary Outputs
  *
  *          +--------------+
- *     CLR1 |1     ++    14| VCC
- *       D1 |2           13| CLR2
- *     CLK1 |3           12| D2
- *      PR1 |4    4013   11| CLK2
- *       Q1 |5           10| PR2
- *      Q1Q |6            9| Q2
- *      GND |7            8| Q2Q
+ *       Q1 |1     ++    14| VDD
+ *      Q1Q |2           13| Q2
+ *   CLOCK1 |3           12| Q2Q
+ *   RESET1 |4    4013   11| CLOCK2
+ *    DATA1 |5           10| RESET2
+ *     SET1 |6            9| DATA2
+ *      VSS |7            8| SET2
  *          +--------------+
  *
  *          +-----+-----+-----+---++---+-----+
