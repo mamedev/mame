@@ -216,63 +216,57 @@ static imgtoolerr_t dgndos_convert_lsn(uint8_t *entire_track, int lsn, int *head
 	return IMGTOOLERR_SUCCESS;
 }
 
-static int dgndos_is_sector_avaiable(uint8_t *entire_track, int lsn)
-{
-	int startbyte, startbit;
+#define ALLOCATE_BIT 1
+#define QUERY_BIT 0
+#define DEALLOCATE_BIT -1
 
-	startbyte = lsn / 8;
-	startbit = lsn % 8;
-
-	if( lsn > 1439 )
-	{
-		startbyte += 76;
-	}
-
-	return (entire_track[startbyte] & (1 << startbit)) == (1 << startbit);
-}
-
-#define ALLOCATE_BIT true
-#define DEALLOCATE_BIT false
-
-static imgtoolerr_t dgndos_set_reset_bitmap( uint8_t *entire_track, int lsn, bool set )
+static int dgndos_set_reset_bitmap( uint8_t *entire_track, int lsn, int set )
 {
 	int startbyte  = lsn / 8;
 	int startbit = lsn % 8;
 
 	if( lsn > 1439 ) startbyte += 76;
 
-	if(set)
+	if(set > QUERY_BIT) // ALLOCATE_BIT
 	{
+// 		0 = used, 1 = free
 		entire_track[startbyte] &= ~(1 << startbit);
 	}
-	else
+	else if( set < QUERY_BIT ) // DEALLOCATE_BIT
 	{
+// 		0 = used, 1 = free
 		entire_track[startbyte] |= (1 << startbit);
 	}
 
-	return IMGTOOLERR_SUCCESS;
+// 	0 = used, 1 = free
+	return (entire_track[startbyte] & (1 << startbit)) != 0;
 }
 
-static imgtoolerr_t dgndos_fat_allocate_sector(uint8_t *entire_track, int lsn)
+static int dgndos_is_sector_avaiable(uint8_t *entire_track, int lsn)
+{
+	return dgndos_set_reset_bitmap( entire_track, lsn, QUERY_BIT );
+}
+
+static int dgndos_fat_allocate_sector(uint8_t *entire_track, int lsn)
 {
 	return dgndos_set_reset_bitmap( entire_track, lsn, ALLOCATE_BIT );
 }
 
-static imgtoolerr_t dgndos_fat_deallocate_sector(uint8_t *entire_track, int lsn)
+static int dgndos_fat_deallocate_sector(uint8_t *entire_track, int lsn)
 {
 	return dgndos_set_reset_bitmap( entire_track, lsn, DEALLOCATE_BIT );
 }
 
-static imgtoolerr_t dgndos_fat_deallocate_span(uint8_t *entire_track, int lsn, int count)
+static int dgndos_fat_deallocate_span(uint8_t *entire_track, int lsn, int count)
 {
-	imgtoolerr_t err;
+	int value;
 
 	for( int i=lsn; i<lsn+count; i++)
 	{
-		err = dgndos_fat_deallocate_sector(entire_track, i);
+		value = dgndos_fat_deallocate_sector(entire_track, i);
 	}
 
-	return err;
+	return value;
 }
 
 //-------------------------------------------------
@@ -391,41 +385,46 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent *d
 	int i = 0;
 	int directory_entry_count = 0;
 
-	do
+	if( dgnent->header_block.block[i].count == 0 )
+	{
+		filesize == 0;
+		return IMGTOOLERR_SUCCESS;
+	}
+	
+	while( dgnent->header_block.block[i].count != 0 )
 	{
 		if( i==HEADER_EXTENTS_COUNT) break;
 
-		filesize += dgnent->header_block.block[i].count * 256;
+		filesize += dgnent->header_block.block[i++].count * 256;
 	}
-	while (dgnent->header_block.block[++i].count != 0 );
 
 	if(i == HEADER_EXTENTS_COUNT && (dgnent->flag_byte & DGNDOS_CONT_BIT))
 	{
 		err = get_dgndos_dirent(entire_track, dgnent->dngdos_last_or_next, cont_ent );
-		return err;
+		if (err) return err;
 
 		i = 0;
 
-		do
+		while (cont_ent.continuation_block.block[i].count != 0 )
 		{
 			if( directory_entry_count > MAX_DIRENTS ) return IMGTOOLERR_CORRUPTDIR;
 
 			if( i == CONT_EXTENTS_COUNT ) break;
 
-			filesize += cont_ent.continuation_block.block[i].count * 256;
+			filesize += cont_ent.continuation_block.block[i++].count * 256;
 
-			if( i == CONT_EXTENTS_COUNT-1 )
+			if( i == CONT_EXTENTS_COUNT ) // last extant
 			{
 				if( cont_ent.flag_byte & DGNDOS_CONT_BIT)
 				{
 					err = get_dgndos_dirent(entire_track, cont_ent.dngdos_last_or_next, cont_ent );
 					return err;
-					i = -1;
+					i = 0;
 					directory_entry_count++;
 				}
 			}
 		}
-		while (cont_ent.continuation_block.block[++i].count != 0 );
+		
 
 		filesize -= 256;
 		if( cont_ent.dngdos_last_or_next == 0 ) filesize += 256;
@@ -534,7 +533,20 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 		std::string fname = get_dirent_fname(dgnent);
 
 		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c", (char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'));
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c %03d/%02x (%03d/%03d), (%03d/%03d), (%03d/%03d), (%03d/%03d), %03d",
+			(char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'),
+			dgnenum->index-1,
+			dgnent.flag_byte,
+			big_endianize_int16(dgnent.header_block.block[0].lsn),
+			dgnent.header_block.block[0].count,
+			big_endianize_int16(dgnent.header_block.block[1].lsn),
+			dgnent.header_block.block[1].count,
+			big_endianize_int16(dgnent.header_block.block[2].lsn),
+			dgnent.header_block.block[2].count,
+			big_endianize_int16(dgnent.header_block.block[3].lsn),
+			dgnent.header_block.block[3].count,
+			dgnent.dngdos_last_or_next
+			);
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -724,8 +736,7 @@ static imgtoolerr_t dgndos_diskimage_deletefile(imgtool::partition &partition, c
 	{
 		if( ent.header_block.block[i].count != 0)
 		{
-			err = dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.header_block.block[i].lsn), ent.header_block.block[i].count);
-			if (err) return err;
+			dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.header_block.block[i].lsn), ent.header_block.block[i].count);
 
 			ent.header_block.block[i].lsn = 0;
 			ent.header_block.block[i].count = 0;
@@ -752,8 +763,7 @@ static imgtoolerr_t dgndos_diskimage_deletefile(imgtool::partition &partition, c
 		{
 			if(ent.continuation_block.block[i].count !=0)
 			{
-				err = dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.continuation_block.block[i].lsn), ent.continuation_block.block[i].count);
-				if (err) return err;
+				dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.continuation_block.block[i].lsn), ent.continuation_block.block[i].count);
 
 				ent.continuation_block.block[i].lsn = 0;
 				ent.continuation_block.block[i].count = 0;
@@ -867,8 +877,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 		err = dgndos_get_avaiable_sector( entire_track20, &new_lsn );
 		if(err) return err;
 
-		err = dgndos_fat_allocate_sector(entire_track20, new_lsn);
-		if(err) return err;
+		dgndos_fat_allocate_sector(entire_track20, new_lsn);
 
 		ent.header_block.block[0].lsn = big_endianize_int16(new_lsn);
 		ent.header_block.block[0].count = 1;
@@ -904,14 +913,18 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			err = dgndos_convert_lsn(entire_track20, first_lsn + current_sector_index, &head, &track, &sector );
 			if (err) return err;
 
-			if( sourcef.size() - written < 256 )
+			if( sourcef.size() - written > 256 )
+			{
+				write_count = 256;
+			}
+			else if( sourcef.size() - written == 256 )
+			{
+				write_count = 256;
+				last_sector_size = 0;
+			}
 			{
 				write_count = sourcef.size() - written;
 				last_sector_size = write_count;
-			}
-			else
-			{
-				write_count = 256;
 			}
 
 			err = imgtool_floppy_write_sector_from_stream(image, head, track, sector, 0, write_count, sourcef);
@@ -926,13 +939,24 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			int next_de = 0;
 
 			// yes, truncate this allocation block if necessary
-			for( int i = current_sector_index; i < ent.header_block.block[fat_block].count; i++)
+			if( ent.flag_byte & DGNDOS_ISCONT_BIT)
 			{
-				err = dgndos_fat_deallocate_sector(entire_track20, first_lsn + i);
-				if (err) return err;
+				for( int i = current_sector_index; i < ent.continuation_block.block[fat_block].count; i++)
+				{
+					dgndos_fat_deallocate_sector(entire_track20, first_lsn + i);
+				}
+				
+				ent.continuation_block.block[fat_block].count = current_sector_index;
 			}
-
-			ent.header_block.block[fat_block].count = current_sector_index - 1;
+			else
+			{
+				for( int i = current_sector_index; i < ent.header_block.block[fat_block].count; i++)
+				{
+					dgndos_fat_deallocate_sector(entire_track20, first_lsn + i);
+				}
+				
+				ent.header_block.block[fat_block].count = current_sector_index;
+			}
 
 			// flag if there are more DEs
 			if( ent.flag_byte & DGNDOS_CONT_BIT)
@@ -950,20 +974,24 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 				{
 					for( int i = fat_block; i < CONT_EXTENTS_COUNT; i++ )
 					{
-						err = dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.continuation_block.block[i].lsn), ent.continuation_block.block[i].count);
-						if (err) return err;
-						ent.continuation_block.block[i].lsn = 0;
-						ent.continuation_block.block[i].count = 0;
+						if( ent.continuation_block.block[i].count != 0 )
+						{
+							dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.continuation_block.block[i].lsn), ent.continuation_block.block[i].count);
+							ent.continuation_block.block[i].lsn = 0;
+							ent.continuation_block.block[i].count = 0;
+						}
 					}
 				}
 				else
 				{
 					for( int i = fat_block; i < HEADER_EXTENTS_COUNT; i++ )
 					{
-						err = dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.header_block.block[i].lsn), ent.header_block.block[i].count);
-						if (err) return err;
-						ent.header_block.block[i].lsn = big_endianize_int16(0);
-						ent.header_block.block[i].count = 0;
+						if( ent.header_block.block[i].count != 0 )
+						{
+							dgndos_fat_deallocate_span(entire_track20, big_endianize_int16(ent.header_block.block[i].lsn), ent.header_block.block[i].count);
+							ent.header_block.block[i].lsn = big_endianize_int16(0);
+							ent.header_block.block[i].count = 0;
+						}
 					}
 				}
 
@@ -1006,8 +1034,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 					ent.continuation_block.block[fat_block].count = sectors_avaiable;
 				}
 
-				err = dgndos_fat_allocate_sector( entire_track20, first_lsn + current_sector_index );
-				if (err) return err;
+				dgndos_fat_allocate_sector( entire_track20, first_lsn + current_sector_index );
 			}
 			else // this allocation list is full - check next allocation list
 			{
@@ -1068,6 +1095,10 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 		}
 	}
 	while( written < sourcef.size() );
+
+	ent.dngdos_last_or_next = last_sector_size;
+	err = put_dgndos_dirent(entire_track20, position, ent);
+	if (err) return err;
 
 	ferr = dgndos_put_directory_track( image, 20, entire_track20 );
 	if (ferr) return imgtool_floppy_error(ferr);
@@ -1142,7 +1173,7 @@ static imgtoolerr_t dgndos_diskimage_create(imgtool::image &image, imgtool::stre
 	uint8_t sector[512];
 	struct dgndos_dirent *ents;
 
-	heads = opts->lookup_int('H')-1;
+	heads = opts->lookup_int('H');
 	tracks = opts->lookup_int('T');
 	sectors = opts->lookup_int('S');
 	first_sector_id = opts->lookup_int('F');
@@ -1153,17 +1184,24 @@ static imgtoolerr_t dgndos_diskimage_create(imgtool::image &image, imgtool::stre
 	// create FAT sectors
 	memset( sector, 0, 512 );
 
-	total_sector_count = (tracks * sectors) + (heads * tracks * sectors);
+	total_sector_count = (heads * tracks * sectors);
 
 	for( int i=0; i<total_sector_count; i++ )
 	{
-		dgndos_set_reset_bitmap( sector, i, DEALLOCATE_BIT );
+		dgndos_fat_deallocate_sector(sector, i);
 	}
 
 	sector[0xfc] = tracks;
-	sector[0xfd] = heads ? (sectors) * 2 : (sectors);
+	sector[0xfd] = heads == 1 ? (sectors) : (sectors * 2);
 	sector[0xfe] = ~sector[0xfc];
 	sector[0xff] = ~sector[0xfd];
+
+	// allocate sectors
+	for( int i=0; i<18; i++ )
+	{
+		dgndos_fat_allocate_sector(sector, (20 * 18 * heads) + i);
+		dgndos_fat_allocate_sector(sector, (16 * 18 * heads) + i);
+	}
 
 	// write fat sectors
 	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(image), 0, 20, first_sector_id, 0, &sector[0], sector_bytes, 0);
@@ -1176,18 +1214,11 @@ static imgtoolerr_t dgndos_diskimage_create(imgtool::image &image, imgtool::stre
 	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(image), 0, 16, first_sector_id+1, 0, &sector[256], sector_bytes, 0);
 	if (err) return err;
 
-	// allocate sectors
-	for( int i=0; i<18; i++ )
-	{
-		dgndos_set_reset_bitmap( sector, (20 * (sectors) * heads) + (20 * (sectors)) + i, ALLOCATE_BIT );
-		dgndos_set_reset_bitmap( sector, (16 * (sectors) * heads) + (16 * (sectors)) + i, ALLOCATE_BIT );
-	}
-
 	// create empty directory entries
 	memset( sector, 0, 512 );
 	ents = (struct dgndos_dirent *)sector;
 
-	for( int i=0; i<9; i++ )
+	for( int i=0; i<10; i++ )
 	{
 		ents[i].flag_byte = 0x89;
 	}
