@@ -156,7 +156,8 @@
 #define LOG_BLITTER_STATS   0
 #define LOG_BLITTER_WRITE   0
 #define LOG_UNHANDLED_BLITS 0
-
+// use the new version in jag_blitter.cpp/.h if 0
+#define USE_LEGACY_BLITTER  1
 
 
 
@@ -543,9 +544,7 @@ if (++reps % 100 == 99)
 
 READ32_MEMBER( jaguar_state::blitter_r )
 {
-	return m_blitter->iobus_r(offset, mem_mask);
-
-	#if 0
+#if USE_LEGACY_BLITTER
 	switch (offset)
 	{
 		case B_CMD: /* B_CMD */
@@ -555,14 +554,15 @@ READ32_MEMBER( jaguar_state::blitter_r )
 			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
+	#else
+	return m_blitter->iobus_r(offset, mem_mask);
 	#endif
 }
 
 
 WRITE32_MEMBER( jaguar_state::blitter_w )
 {
-	m_blitter->iobus_w(offset, data, mem_mask);
-#if 0
+#if USE_LEGACY_BLITTER
 	COMBINE_DATA(&m_blitter_regs[offset]);
 	if ((offset == B_CMD) && ACCESSING_BITS_0_15)
 	{
@@ -574,7 +574,9 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 	}
 
 	if (LOG_BLITTER_WRITE)
-	logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
+		logerror("%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
+#else
+	m_blitter->iobus_w(offset, data, mem_mask);
 #endif
 }
 
