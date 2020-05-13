@@ -236,9 +236,9 @@ void super80_state::super80_map(address_map &map)
 {
 	map(0x0000, 0xbfff).lrw8(NAME([this](u16 offset)          { return m_ram[offset]; }),
                              NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
-	map(0x0000, 0x0fff).lr8 (NAME([this](u16 offset)          { if(m_boot_in_progress) offset |= 0xc000; return m_ram[offset]; }));
-	map(0xc000, 0xefff).lr8 (NAME([this](u16 offset)          { m_boot_in_progress = false; return m_ram[offset+0xc000]; }));
-	map(0xf000, 0xffff).lr8 (NAME([this](u16 offset)          { return m_ram[offset+0xf000]; }));
+	map(0x0000, 0x07ff).lr8 (NAME([this](u16 offset)          { if(m_boot_in_progress) offset |= 0xc000; return m_ram[offset]; }));
+	map(0xc000, 0xc7ff).lr8 (NAME([this](u16 offset)          { if (!machine().side_effects_disabled()) m_boot_in_progress = false; return m_ram[offset | 0xc000]; }));
+	map(0xc800, 0xffff).lr8 (NAME([this](u16 offset)          { return m_ram[offset+0xc800]; }));
 	map(0xc000, 0xffff).nopw();
 }
 
@@ -251,10 +251,11 @@ void super80_state::super80m_map(address_map &map)
 
 void super80v_state::super80v_map(address_map &map)
 {
-	map(0x0000, 0x0fff).lrw8(NAME([this](u16 offset)          { if(m_boot_in_progress) return m_rom[offset]; else return m_ram[offset]; }),
+	map(0x0000, 0x07ff).lrw8(NAME([this](u16 offset)          { if(m_boot_in_progress) return m_rom[offset]; else return m_ram[offset]; }),
                              NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
-	map(0x1000, 0xbfff).ram();
-	map(0xc000, 0xefff).lr8 (NAME([this](u16 offset)          { m_boot_in_progress = false; return m_rom[offset]; }));
+	map(0x0800, 0xbfff).ram();
+	map(0xc000, 0xc7ff).lr8 (NAME([this](u16 offset)          { if (!machine().side_effects_disabled()) m_boot_in_progress = false; return m_rom[offset]; }));
+	map(0xc800, 0xefff).lr8 (NAME([this](u16 offset)          { return m_rom[offset+0x0800]; }));
 	map(0xf000, 0xf7ff).lrw8(NAME([this](u16 offset)          { return super80v_state::low_r(offset); }),
                              NAME([this](u16 offset, u8 data) { super80v_state::low_w(offset, data); }));
 	map(0xf800, 0xffff).lrw8(NAME([this](u16 offset)          { return super80v_state::high_r(offset); }),
