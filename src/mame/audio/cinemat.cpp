@@ -22,7 +22,9 @@
 #include "includes/cinemat.h"
 
 #include "audio/nl_spacewar.h"
+#include "audio/nl_speedfrk.h"
 #include "audio/nl_starcas.h"
+#include "audio/nl_sundance.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -177,11 +179,11 @@ void spacewar_audio_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(spacewar))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0",      "I_OUT_0.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3",      "I_OUT_3.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4",      "I_OUT_4.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
 
@@ -275,9 +277,9 @@ void barrier_audio_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(barrier))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0",      "I_OUT_0.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1",      "I_OUT_1.IN",      0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2",      "I_OUT_2.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
 
@@ -338,6 +340,23 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
+#if SPEEDFRK_USE_NETLIST
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(speedfrk))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+
+#else
+
 	static const char *const sample_names[] =
 	{
 		"*speedfrk",
@@ -349,10 +368,13 @@ void speedfrk_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->set_channels(1);
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+#endif
 }
 
 void speedfrk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
+#if !SPEEDFRK_USE_NETLIST
 	// on the falling edge of bit 3, clock the inverse of bit 2 into the top of the shiftreg
 	if (falling_edge(curvals, oldvals, 3))
 		shiftreg16_clock((~curvals >> 2) & 1);
@@ -362,13 +384,17 @@ void speedfrk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 		m_samples->start(0, 0, true);
 	if (falling_edge(curvals, oldvals, 4))
 		m_samples->stop(0);
+#endif
 }
+
+#if !SPEEDFRK_USE_NETLIST
 
 void speedfrk_audio_device::shiftreg16_changed(u16 curvals, u16 oldvals)
 {
 	// not actually wired up
 }
 
+#endif
 
 
 /*************************************
@@ -458,6 +484,23 @@ void sundance_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
+#if SUNDANCE_USE_NETLIST
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(sundance))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(30000.0 * 4.0, 0.0);
+
+#else
+
 	static const char *const sample_names[] =
 	{
 		"*sundance",
@@ -474,10 +517,14 @@ void sundance_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+#endif
 }
 
 void sundance_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
+#if !SUNDANCE_USE_NETLIST
+
 	// bong - falling edge
 	if (falling_edge(curvals, oldvals, 0))
 		m_samples->start(0, 0);
@@ -501,6 +548,8 @@ void sundance_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 	// hatch - falling edge
 	if (falling_edge(curvals, oldvals, 7))
 		m_samples->start(5, 5);
+
+#endif
 }
 
 

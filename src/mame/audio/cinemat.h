@@ -12,6 +12,8 @@
 
 #define SPACEWAR_USE_NETLIST		(1)
 #define BARRIER_USE_NETLIST			(1)
+#define SPEEDFRK_USE_NETLIST		(1)
+#define SUNDANCE_USE_NETLIST		(1)
 #define STARCAS_USE_NETLIST			(1)
 #define WOTW_USE_NETLIST			(1)
 
@@ -119,7 +121,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void inputs_changed(u8 newvals, u8 oldvals) override;
+#if !SPEEDFRK_USE_NETLIST
 	virtual void shiftreg16_changed(u16 newvals, u16 oldvals) override;
+#endif
 };
 
 
