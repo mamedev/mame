@@ -20,7 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/pc1512kb.h"
-#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "video/ams40041.h"
@@ -34,7 +34,7 @@
 #define I8259A2_TAG     "ic109"
 #define I8253_TAG       "ic114"
 #define MC146818_TAG    "ic134"
-#define PC_FDC_XT_TAG   "ic112"
+#define UPD765A_TAG     "ic112"
 #define INS8250_TAG     "ic106"
 #define AMS40041_TAG    "ic126"
 #define CENTRONICS_TAG  "centronics"
@@ -52,15 +52,14 @@ public:
 		m_pic(*this, I8259A2_TAG),
 		m_pit(*this, I8253_TAG),
 		m_rtc(*this, MC146818_TAG),
-		m_fdc(*this, PC_FDC_XT_TAG),
+		m_fdc(*this, UPD765A_TAG),
 		m_uart(*this, INS8250_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_speaker(*this, "speaker"),
 		m_kb(*this, PC1512_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
-		m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
+		m_floppy(*this, UPD765A_TAG ":%u", 0U),
 		m_bus(*this, ISA_BUS_TAG),
 		m_lk(*this, "LK"),
 		m_pit1(0),
@@ -76,6 +75,7 @@ public:
 		m_nden(1),
 		m_dint(0),
 		m_ddrq(0),
+		m_dreset(1),
 		m_fdc_dsr(0),
 		m_neop(0),
 		m_ack_int_enable(1),
@@ -88,15 +88,14 @@ public:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
 	required_device<mc146818_device> m_rtc;
-	required_device<pc_fdc_xt_device> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ins8250_device> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	optional_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<isa8_device> m_bus;
 	required_ioport m_lk;
 
@@ -139,6 +138,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void drive_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
@@ -178,6 +178,7 @@ public:
 	int m_nden;
 	int m_dint;
 	int m_ddrq;
+	int m_dreset;
 	uint8_t m_fdc_dsr;
 	int m_neop;
 
