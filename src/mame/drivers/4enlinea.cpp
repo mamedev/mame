@@ -614,7 +614,7 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &_4enlinea_state::audio_map);
 	audiocpu.set_periodic_int(FUNC(_4enlinea_state::_4enlinea_audio_irq), attotime::from_hz(60)); //TODO
 
-	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
+	I2C_24C16(config, m_eeprom); // X24C16P
 
 	// FIXME: determine ISA bus clock
 	isa8_device &isa(ISA8(config, "isa", 0));
@@ -650,7 +650,7 @@ void _4enlinea_state::k7_olym(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D4464C-15L (6264) + battery
 
-	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
+	I2C_24C16(config, m_eeprom); // X24C16P
 
 	isa8_device &isa(ISA8(config, "isa", 0));
 	isa.set_memspace("maincpu", AS_PROGRAM);

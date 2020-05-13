@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus
+  macpci.cpp: second-generation Old World PowerMacs based on PCI instead of NuBus
 
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
 

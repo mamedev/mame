@@ -90,11 +90,11 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( vdg_videoram_r );
+	void ppi_pa_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
+	uint8_t vdg_videoram_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
@@ -138,10 +138,10 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(eprom_r);
-	DECLARE_WRITE8_MEMBER(eprom_w);
-	DECLARE_READ8_MEMBER(ext_r);
-	DECLARE_READ8_MEMBER(dos_r);
+	uint8_t eprom_r();
+	void eprom_w(uint8_t data);
+	uint8_t ext_r(offs_t offset);
+	uint8_t dos_r(offs_t offset);
 
 	/* eprom state */
 	int m_eprom;

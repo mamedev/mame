@@ -95,58 +95,57 @@ namespace analog
 	/// |  Y  |W     | Width scaling                                                         |-|100e-6||
 	///
 
-	class fet_model_t : public param_model_t
+	class fet_model_t
 	{
 	public:
-		fet_model_t(device_t &device, const pstring &name, const pstring &val)
-		: param_model_t(device, name, val)
-		, m_VTO(*this,  "VTO")
-		, m_N(*this,  "N")
-		, m_ISS(*this,  "IS")  // Haven't seen a model using ISS / ISD
-		, m_ISD(*this,  "IS")
-		, m_LD(*this,  "LD")
-		, m_L(*this, "L")
-		, m_W(*this, "W")
-		, m_TOX(*this, "TOX")
-		, m_KP(*this, "KP")
-		, m_UO(*this, "UO")
-		, m_PHI(*this, "PHI")
-		, m_NSUB(*this, "NSUB")
-		, m_GAMMA(*this, "GAMMA")
-		, m_LAMBDA(*this, "LAMBDA")
-		, m_RD(*this, "RD")
-		, m_RS(*this, "RS")
-		, m_CGSO(*this, "CGSO")
-		, m_CGDO(*this, "CGDO")
-		, m_CGBO(*this, "CGBO")
-		, m_CAPMOD(*this, "CAPMOD")
+		fet_model_t(param_model_t &model)
+		: m_VTO(model,  "VTO")
+		, m_N(model,  "N")
+		, m_ISS(model,  "IS")  // Haven't seen a model using ISS / ISD
+		, m_ISD(model,  "IS")
+		, m_LD(model,  "LD")
+		, m_L(model, "L")
+		, m_W(model, "W")
+		, m_TOX(model, "TOX")
+		, m_KP(model, "KP")
+		, m_UO(model, "UO")
+		, m_PHI(model, "PHI")
+		, m_NSUB(model, "NSUB")
+		, m_GAMMA(model, "GAMMA")
+		, m_LAMBDA(model, "LAMBDA")
+		, m_RD(model, "RD")
+		, m_RS(model, "RS")
+		, m_CGSO(model, "CGSO")
+		, m_CGDO(model, "CGDO")
+		, m_CGBO(model, "CGBO")
+		, m_CAPMOD(model, "CAPMOD")
 		{}
 
-		value_t m_VTO;      //!< Threshold voltage [V]
-		value_t m_N;        //!< Bulk diode emission coefficient
-		value_t m_ISS;      //!< Body diode saturation current
-		value_t m_ISD;      //!< Body diode saturation current
-		value_t m_LD;       //!< Lateral diffusion [m]
-		value_t m_L;        //!< Length scaling
-		value_t m_W;        //!< Width scaling
-		value_t m_TOX;      //!< Oxide thickness
-		value_t m_KP;       //!< Transconductance parameter [A/V²]
-		value_t m_UO;       //!< Surface mobility [cm²/V/s]
-		value_t m_PHI;      //!< Surface inversion potential [V]
-		value_t m_NSUB;     //!< Substrate doping [1/cm³]
-		value_t m_GAMMA;    //!< Bulk threshold parameter [V^½]
-		value_t m_LAMBDA;   //!< Channel-length modulation [1/V]
-		value_t m_RD;       //!< Drain ohmic resistance
-		value_t m_RS;       //!< Source ohmic resistance
-		value_t m_CGSO;     //!< Gate-source overlap capacitance per meter channel width
-		value_t m_CGDO;     //!< Gate-drain overlap capacitance per meter channel width
-		value_t m_CGBO;     //!< Gate-bulk overlap capacitance per meter channel width
-		value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
+		param_model_t::value_t m_VTO;      //!< Threshold voltage [V]
+		param_model_t::value_t m_N;        //!< Bulk diode emission coefficient
+		param_model_t::value_t m_ISS;      //!< Body diode saturation current
+		param_model_t::value_t m_ISD;      //!< Body diode saturation current
+		param_model_t::value_t m_LD;       //!< Lateral diffusion [m]
+		param_model_t::value_t m_L;        //!< Length scaling
+		param_model_t::value_t m_W;        //!< Width scaling
+		param_model_t::value_t m_TOX;      //!< Oxide thickness
+		param_model_t::value_t m_KP;       //!< Transconductance parameter [A/V²]
+		param_model_t::value_t m_UO;       //!< Surface mobility [cm²/V/s]
+		param_model_t::value_t m_PHI;      //!< Surface inversion potential [V]
+		param_model_t::value_t m_NSUB;     //!< Substrate doping [1/cm³]
+		param_model_t::value_t m_GAMMA;    //!< Bulk threshold parameter [V^½]
+		param_model_t::value_t m_LAMBDA;   //!< Channel-length modulation [1/V]
+		param_model_t::value_t m_RD;       //!< Drain ohmic resistance
+		param_model_t::value_t m_RS;       //!< Source ohmic resistance
+		param_model_t::value_t m_CGSO;     //!< Gate-source overlap capacitance per meter channel width
+		param_model_t::value_t m_CGDO;     //!< Gate-drain overlap capacitance per meter channel width
+		param_model_t::value_t m_CGBO;     //!< Gate-bulk overlap capacitance per meter channel width
+		param_model_t::value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
 	};
 
 	// Have a common start for mosfets
 
-	NETLIB_OBJECT(FET)
+	NETLIB_BASE_OBJECT(FET)
 	{
 	public:
 		enum q_type {
@@ -170,7 +169,7 @@ namespace analog
 		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
 	protected:
 
-		fet_model_t m_model;
+		param_model_t m_model;
 	private:
 		q_type m_qtype;
 	};
@@ -182,7 +181,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(MOSFET, FET)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(MOSFET, FET)
+		NETLIB_CONSTRUCTOR(MOSFET)
 		, m_DG(*this, "m_DG", true)
 		, m_SG(*this, "m_SG", true)
 		, m_SD(*this, "m_SD", true)
@@ -207,6 +206,7 @@ namespace analog
 		, m_capmod(2)
 		, m_Vgs(*this, "m_Vgs", nlconst::zero())
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
+		, m_modacc(m_model)
 	{
 			register_subalias("S", m_SG.P());   // Source
 			register_subalias("G", m_SG.N());   // Gate
@@ -220,8 +220,8 @@ namespace analog
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
 			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
 
-			m_capmod = m_model.m_CAPMOD;
-			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
+			m_capmod = m_modacc.m_CAPMOD;
+			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_modacc.m_VTO, m_polarity);
 			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value");
 
 			//
@@ -234,51 +234,51 @@ namespace analog
 			//  But couldn't find a formula for lambda anywhere
 			//
 
-			m_lambda = m_model.m_LAMBDA; // FIXME: m_lambda only set once
+			m_lambda = m_modacc.m_LAMBDA; // FIXME: m_lambda only set once
 
 			// calculate effective channel length
-			m_Leff = m_model.m_L - 2 * m_model.m_LD;
+			m_Leff = m_modacc.m_L - 2 * m_modacc.m_LD;
 			nl_assert_always(m_Leff > nlconst::zero(), "Effective Lateral diffusion would be negative for model");
 
-			nl_fptype Cox = (m_model.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : nlconst::zero();
+			nl_fptype Cox = (m_modacc.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_modacc.m_TOX) : nlconst::zero();
 
 			// calculate DC transconductance coefficient
-			if (m_model.m_KP > nlconst::zero())
-				m_beta = m_model.m_KP * m_model.m_W / m_Leff;
-			else if (Cox > nlconst::zero() && m_model.m_UO > nlconst::zero())
-				m_beta = m_model.m_UO * nlconst::magic(1e-4) * Cox * m_model.m_W / m_Leff;
+			if (m_modacc.m_KP > nlconst::zero())
+				m_beta = m_modacc.m_KP * m_modacc.m_W / m_Leff;
+			else if (Cox > nlconst::zero() && m_modacc.m_UO > nlconst::zero())
+				m_beta = m_modacc.m_UO * nlconst::magic(1e-4) * Cox * m_modacc.m_W / m_Leff;
 			else
-				m_beta = nlconst::magic(2e-5) * m_model.m_W / m_Leff;
+				m_beta = nlconst::magic(2e-5) * m_modacc.m_W / m_Leff;
 
 			//FIXME::UT can disappear
 			const nl_fptype Vt = constants::T0() * constants::k_b() / constants::Q_e();
 
 			// calculate surface potential if not given
 
-			if (m_model.m_PHI > nlconst::zero())
-				m_phi = m_model.m_PHI;
-			else if (m_model.m_NSUB > nlconst::zero())
+			if (m_modacc.m_PHI > nlconst::zero())
+				m_phi = m_modacc.m_PHI;
+			else if (m_modacc.m_NSUB > nlconst::zero())
 			{
-				nl_assert_always(m_model.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model");
-				m_phi = nlconst::two() * Vt * plib::log (m_model.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
+				nl_assert_always(m_modacc.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model");
+				m_phi = nlconst::two() * Vt * plib::log (m_modacc.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
 			}
 			else
 				m_phi = nlconst::magic(0.6);
 
 			// calculate bulk threshold if not given
-			if (m_model.m_GAMMA > nlconst::zero())
-				m_gamma = m_model.m_GAMMA;
+			if (m_modacc.m_GAMMA > nlconst::zero())
+				m_gamma = m_modacc.m_GAMMA;
 			else
 			{
-				if (Cox > nlconst::zero() && m_model.m_NSUB > nlconst::zero())
+				if (Cox > nlconst::zero() && m_modacc.m_NSUB > nlconst::zero())
 					m_gamma = plib::sqrt (nlconst::two()
 						* constants::Q_e() * constants::eps_Si() * constants::eps_0()
-						* m_model.m_NSUB * nlconst::magic(1e6)) / Cox;
+						* m_modacc.m_NSUB * nlconst::magic(1e6)) / Cox;
 				else
 					m_gamma = nlconst::zero();
 			}
 
-			m_vto = m_model.m_VTO;
+			m_vto = m_modacc.m_VTO;
 			// FIXME zero conversion
 			if(m_vto != nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
@@ -286,7 +286,7 @@ namespace analog
 			// FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
 			// specify VTO so skip this here.
 
-			m_CoxWL = Cox * m_model.m_W * m_Leff;
+			m_CoxWL = Cox * m_modacc.m_W * m_Leff;
 
 			//printf("Cox: %g\n", m_Cox);
 		}
@@ -317,9 +317,9 @@ namespace analog
 			NETLIB_NAME(FET)::reset();
 			// Bulk diodes
 
-			m_D_BD.set_param(m_model.m_ISD, m_model.m_N, exec().gmin(), constants::T0());
+			m_D_BD.set_param(m_modacc.m_ISD, m_modacc.m_N, exec().gmin(), constants::T0());
 			#if (!BODY_CONNECTED_TO_SOURCE)
-				m_D_BS.set_param(m_model.m_ISS, m_model.m_N, exec().gmin(), constants::T0());
+				m_D_BS.set_param(m_modacc.m_ISS, m_modacc.m_N, exec().gmin(), constants::T0());
 			#endif
 		}
 
@@ -362,6 +362,7 @@ namespace analog
 		int m_capmod;
 		state_var<nl_fptype> m_Vgs;
 		state_var<nl_fptype> m_Vgd;
+		fet_model_t m_modacc;
 
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
 			nl_fptype capval, nl_fptype V,
@@ -573,9 +574,9 @@ namespace analog
 			else
 				calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
 
-			set_cap(m_cap_gb, m_Cgb + m_model.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
-			set_cap(m_cap_gs, m_Cgs + m_model.m_CGSO * m_model.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
-			set_cap(m_cap_gd, m_Cgd + m_model.m_CGDO * m_model.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
+			set_cap(m_cap_gb, m_Cgb + m_modacc.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
+			set_cap(m_cap_gs, m_Cgs + m_modacc.m_CGSO * m_modacc.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
+			set_cap(m_cap_gd, m_Cgd + m_modacc.m_CGDO * m_modacc.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
 		}
 
 		// Source connected to body, Diode S-B shorted!

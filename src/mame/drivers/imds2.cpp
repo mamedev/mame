@@ -258,7 +258,7 @@ void imds2_state::imds2(machine_config &config)
 	I8085A(config, m_ipccpu, IPC_XTAL_Y2);  // CLK OUT = 4 MHz
 	m_ipccpu->set_addrmap(AS_PROGRAM, &imds2_state::ipc_mem_map);
 	m_ipccpu->set_addrmap(AS_IO, &imds2_state::ipc_io_map);
-	m_ipccpu->set_irq_acknowledge_callback("ipcsyspic", FUNC(pic8259_device::inta_cb));
+	m_ipccpu->in_inta_func().set("ipcsyspic", FUNC(pic8259_device::acknowledge));
 	//config.set_maximum_quantum(attotime::from_hz(100));
 
 	PIC8259(config, m_ipcsyspic, 0);
@@ -267,7 +267,7 @@ void imds2_state::imds2(machine_config &config)
 
 	PIC8259(config, m_ipclocpic, 0);
 	m_ipclocpic->out_int_callback().set(m_ipcsyspic, FUNC(pic8259_device::ir7_w));
-	m_ipclocpic->in_sp_callback().set_constant(1);
+	m_ipclocpic->in_sp_callback().set_constant(0);
 
 	PIT8253(config, m_ipctimer, 0);
 	m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);

@@ -5908,6 +5908,8 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_mem);
 }
 
+#define VIDEO_CLOCK         XTAL(32'000'000)
+
 void model3_state::add_base_devices(machine_config &config)
 {
 	M68000(config, m_audiocpu, 45.1584_MHz_XTAL / 4); // SCSP Clock / 2
@@ -5934,9 +5936,8 @@ void model3_state::add_base_devices(machine_config &config)
 	m_io->an_port_callback<7>().set_ioport("AN7");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_visarea(0, 495, 0, 383);
-	m_screen->set_size(512, 400);
+	// TODO: runs at 57.5 Hz-ish, same as Model 1/2/System 24?
+	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
 	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));
 
 	PALETTE(config, m_palette, palette_device::RGB_555);

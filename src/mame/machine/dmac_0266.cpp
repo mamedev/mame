@@ -20,7 +20,10 @@
 #include "emu.h"
 #include "dmac_0266.h"
 
-#define VERBOSE 0
+#define LOG_GENERAL (1U << 0)
+#define LOG_DATA    (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 DMA Controller")
@@ -28,7 +31,7 @@ DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 DMA Cont
 dmac_0266_device::dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DMAC_0266, tag, owner, clock)
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 32)
-	, m_eop(*this)
+	, m_int(*this)
 	, m_dma_r(*this)
 	, m_dma_w(*this)
 {
@@ -46,23 +49,24 @@ void dmac_0266_device::map(address_map &map)
 
 void dmac_0266_device::device_start()
 {
-	m_eop.resolve_safe();
+	m_int.resolve_safe();
 
 	m_dma_r.resolve_safe(0);
 	m_dma_w.resolve_safe();
 
+	save_item(NAME(m_control));
 	save_item(NAME(m_status));
 	save_item(NAME(m_tcount));
 	save_item(NAME(m_tag));
 	save_item(NAME(m_offset));
 	save_item(NAME(m_map));
 
-	save_item(NAME(m_eop_state));
+	save_item(NAME(m_int_state));
 	save_item(NAME(m_drq_state));
 
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac_0266_device::dma_check), this));
 
-	m_eop_state = false;
+	m_int_state = false;
 	m_drq_state = false;
 }
 
@@ -78,13 +82,22 @@ void dmac_0266_device::soft_reset()
 {
 	// soft reset does not clear map entries
 	m_control = 0;
-	m_status = 0;
+	m_status &= INTERRUPT;
 	m_tcount = 0;
 	m_tag = 0;
 	m_offset = 0;
 
-	set_eop(false);
 	m_dma_check->enable(false);
+}
+
+void dmac_0266_device::irq_w(int state)
+{
+	if (state)
+		m_status |= INTERRUPT;
+	else
+		m_status &= ~INTERRUPT;
+
+	set_int(state);
 }
 
 void dmac_0266_device::drq_w(int state)
@@ -95,12 +108,12 @@ void dmac_0266_device::drq_w(int state)
 		m_dma_check->adjust(attotime::zero);
 }
 
-void dmac_0266_device::set_eop(bool eop_state)
+void dmac_0266_device::set_int(bool int_state)
 {
-	if (eop_state != m_eop_state)
+	if (int_state != m_int_state)
 	{
-		m_eop_state = eop_state;
-		m_eop(eop_state);
+		m_int_state = int_state;
+		m_int(int_state);
 	}
 }
 
@@ -110,7 +123,7 @@ void dmac_0266_device::control_w(u32 data)
 
 	if (!(data & RESET))
 	{
-		if ((data ^ m_status) & ENABLE)
+		if ((data ^ m_control) & ENABLE)
 		{
 			if (data & ENABLE)
 			{
@@ -124,7 +137,6 @@ void dmac_0266_device::control_w(u32 data)
 		}
 
 		m_control = data;
-		m_status = data & (ENABLE | DIRECTION);
 	}
 	else
 		soft_reset();
@@ -137,7 +149,7 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 		return;
 
 	// check enabled
-	if (!(m_status & ENABLE))
+	if (!(m_control & ENABLE))
 		return;
 
 	// check transfer count
@@ -146,17 +158,13 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 
 	u32 const address = (m_map[m_tag & 0x7f] << 12) | (m_offset & 0xfff);
 
-	// assert eop during last transfer
-	if (m_tcount == 1)
-		set_eop(true);
-
 	// perform dma transfer
-	if (m_status & DIRECTION)
+	if (m_control & DIRECTION)
 	{
 		// device to memory
 		u8 const data = m_dma_r();
 
-		LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
+		LOGMASKED(LOG_DATA, "dma_r data 0x%02x address 0x%08x\n", data, address);
 
 		m_bus->write_byte(address, data);
 	}
@@ -165,7 +173,7 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 		// memory to device
 		u8 const data = m_bus->read_byte(address);
 
-		LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
+		LOGMASKED(LOG_DATA, "dma_w data 0x%02x address 0x%08x\n", data, address);
 
 		m_dma_w(data);
 	}
@@ -187,10 +195,8 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 	if (!m_tcount)
 	{
 		LOG("transfer complete\n");
-		m_status &= ~ENABLE;
-		m_status |= INTERRUPT | TCZERO;
-
-		set_eop(false);
+		m_control &= ~ENABLE;
+		m_status |= TCZERO;
 	}
 	else
 		m_dma_check->adjust(attotime::zero);

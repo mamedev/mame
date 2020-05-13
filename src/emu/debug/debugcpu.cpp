@@ -1146,8 +1146,15 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	assert(m_livecpu == nullptr);
 	m_livecpu = device;
 
+	// can't stop on a device without a state interface
+	if (m_execution_state == exec_state::STOPPED && dynamic_cast<device_state_interface *>(device) == nullptr)
+	{
+		if (m_stop_when_not_device == nullptr)
+			m_stop_when_not_device = device;
+		m_execution_state = exec_state::RUNNING;
+	}
 	// if we're a new device, stop now
-	if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device)
+	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing())
 	{
 		m_stop_when_not_device = nullptr;
 		m_execution_state = exec_state::STOPPED;
@@ -1183,7 +1190,10 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		}
 		// check for debug keypresses
 		if (m_machine.ui_input().pressed(IPT_UI_DEBUG_BREAK))
+		{
+			m_visiblecpu->debug()->ignore(false);
 			m_visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
+		}
 	}
 }
 

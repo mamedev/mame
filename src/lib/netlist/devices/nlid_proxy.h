@@ -23,7 +23,7 @@ namespace devices
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(base_proxy)
+	class nld_base_proxy : public device_t
 	{
 	public:
 		nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
@@ -44,7 +44,7 @@ namespace devices
 	// nld_a_to_d_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(base_a_to_d_proxy, base_proxy)
+	class nld_base_a_to_d_proxy : public nld_base_proxy
 	{
 	public:
 		virtual logic_output_t &out() noexcept = 0;
@@ -55,7 +55,7 @@ namespace devices
 
 	};
 
-	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
+	class nld_a_to_d_proxy : public nld_base_a_to_d_proxy
 	{
 	public:
 		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
@@ -81,7 +81,7 @@ namespace devices
 	// nld_base_d_to_a_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
+	class nld_base_d_to_a_proxy : public nld_base_proxy
 	{
 	public:
 		// only used in setup
@@ -93,7 +93,7 @@ namespace devices
 
 	};
 
-	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
+	class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 	{
 	public:
 		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,

@@ -140,8 +140,8 @@ Language:
 |   XX   | 80-084360(US)     | Handy Manny                                                                               |
 |        | 80-084362(NL)     | Handy Manny                                                                               |
 |        | 80-084363(UK)     | Handy Manny                                                                               |
-|        | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
-|        | 80-084365(FR)     | Manny Et Ses Outils                                                                       |
+|   XX   | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
+|   XX   | 80-084365(FR)     | Manny et ses outils                                                                       |
 |        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)                                                           |
 |        | 80-084367(SP)     | Manny Manitas                                                                             |
 +========+===================+===========================================================================================+
@@ -187,20 +187,20 @@ Language:
 |        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
 |   XX   | 80-084483(UK)     | The Princess and the Frog                                                                 |
 |   XX   | 80-084484(GE)     | Kuess den Frosch                                                                          |
-|        | 80-084485(FR)     | La Princesse Et La Grenouille                                                             |
+|   XX   | 80-084485(FR)     | La Princesse Et La Grenouille - Le grand rêve de Tiana                                    |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
 +========+===================+===========================================================================================+
 |   XX   | 80-084500(US)     | Shrek Forever After                                                                       |
 |        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                               |
 |        | 80-084503(UK)     | Shrek Forever After                                                                       |
 |   XX   | 80-084504(GE)     | Fuer immer Shrek                                                                          |
-|        | 80-084505(FR)     | Shrek 4 - Il Etait une Fin                                                                |
+|   XX   | 80-084505(FR)     | Shrek 4 - Il était une fin                                                                |
 |        | 80-084507(SP)     | Shrek Felices para siempre                                                                |
 +========+===================+===========================================================================================+
 |        | 80-084520(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
 |        | 80-084540(US)     | Super Why to the Rescue! The Beach Day Mystery                                            |
-|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery   (pocket version)                         |
+|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery (pocket version)                           |
 +========+===================+===========================================================================================+
 |        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
@@ -473,7 +473,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="hmannym" cloneof="doram" supported="no">
+	<software name="hmannym" supported="no">
 		<description>Disney Handy Manny (USA, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -482,6 +482,33 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- From a multi-game cart found on a on-store demo console -->
+	<software name="hmannymg" cloneof="hmannym" supported="no">
+		<description>Disney Meister Manny's Werkzeugkiste (Germany)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084364(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Meister Mannys Werkzeugkiste (Motion) (GER).bin" size="8388608" crc="e7832bf7" sha1="e0a0d1158dabc6b9fed07b28e697e1877ed7eda0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hmannymf" cloneof="hmannym" supported="no">
+		<description>Disney Manny et ses outils (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084365(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084365 - MannyEtSesOutils (MOTION) (FR).bin" size="8388608" crc="a664071e" sha1="6900419492aa7424290b3db4b37c47b14a17ab61" />
 			</dataarea>
 		</part>
 	</software>
@@ -826,6 +853,18 @@ Language:
 		</part>
 	</software>
 
+	<software name="prinfrogmf" cloneof="prinfrogm" supported="no">
+		<description>Disney La Princesse Et La Grenouille - Le grand rêve de Tiana (France)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084485(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="084485 - LaPrincesseEtLaGrenouille (MOTION) (FR).bin" size="8388608" crc="1e1e84a2" sha1="01543d05122809e6bb5e8bdac213eedc22f442bd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scoobyffmf" supported="no">
 		<description>Scooby-Doo! - Panique à Funland (France)</description>
 		<year>2008</year> <!-- (s08) -->
@@ -882,6 +921,20 @@ Language:
 			<dataarea name="rom" size="0x1000000">
 				<rom name="vsmile84504.blob1.bin" size="0x0800000" crc="3f1c79e2" sha1="1b12b9b379dd942356e6ee6594c8b80dbb9db781" offset="0x0000000" />
 				<rom name="vsmile84504.blob2.bin" size="0x0800000" crc="78cf731b" sha1="9b1d1eed7bd216f4feca3160c31912b7c81e4efd" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not boot, just loops on the intro -->
+	<software name="shrekfamf" cloneof="shrekfam" supported="no">
+		<description>Shrek 4 - Il était une fin (France)</description>
+		<year>2010?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084505(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob1.bin" size="0x0800000" crc="bb3d3e09" sha1="539f0948ec1dad3b2465990fcf053f2cacc7e766" offset="0x0000000" />
+				<rom name="084505 - Shrek 4 (MOTION) (FR)_blob2.bin" size="0x0800000" crc="7c633e07" sha1="a07b2439473be97bc1a785ae4050297ae0e5244a" offset="0x0800000" />
 			</dataarea>
 		</part>
 	</software>

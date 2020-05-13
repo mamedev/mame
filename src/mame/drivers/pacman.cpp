@@ -3563,17 +3563,21 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void pacman_state::maketrax(machine_config &config)
+void pacman_state::crush2(machine_config &config)
 {
 	pacman(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
+
+	m_mainlatch->q_out_cb<7>().set_nop(); // coin counter not hooked up here
 }
 
 void pacman_state::korosuke(machine_config &config)
 {
-	maketrax(config);
+	pacman(config);
+
 	// 8K on original boards
 	m_mainlatch->q_out_cb<7>().set_nop(); // outputs 4-7 go to protection chip at 6P
+
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
 }
 
 void pacman_state::pengojpm(machine_config &config)
@@ -3875,11 +3879,13 @@ void pacman_state::crush4(machine_config &config)
 
 	/* basic machine hardware */
 	m_gfxdecode->set_info(gfx_crush4);
+
+	m_mainlatch->q_out_cb<7>().set_nop(); // coin counter is not hooked up here
 }
 
 void pacman_state::crushs(machine_config &config)
 {
-	pacman(config);
+	crush2(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacman_state::crushs_map);
@@ -7661,21 +7667,21 @@ GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot
 
 GAME( 1985, shootbul, 0,        pacman,   shootbul, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Shoot the Bull", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, crush,    0,        maketrax, maketrax, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crush2,   crush,    pacman,   maketrax, pacman_state,  empty_init,    ROT90,  "Alpha Denshi Co. / Kural Esco Electric, Ltd.", "Crush Roller (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crush3,   crush,    maketrax, maketrax, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crush4,   crush,    pacman,   maketrax, pacman_state,  init_eyes,     ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush,    0,        korosuke, maketrax, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush2,   crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "Alpha Denshi Co. / Kural Esco Electric, Ltd.", "Crush Roller (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush3,   crush,    korosuke, maketrax, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush4,   crush,    crush2,   maketrax, pacman_state,  init_eyes,     ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crush5,   crush,    crush4,   crush4,   pacman_state,  empty_init,    ROT90,  "Alpha Denshi Co. / Kural TWT", "Crush Roller (set 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, maketrax, crush,    maketrax, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, maketrxb, crush,    maketrax, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, maketrax, crush,    korosuke, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, maketrxb, crush,    korosuke, maketrax, pacman_state,  init_maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, korosuke, crush,    korosuke, korosuke, pacman_state,  init_maketrax, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
-GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl,  crush,    pacman,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl2, crush,    maketrax, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl3, crush,    maketrax, mbrush,   pacman_state,  init_maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushrlf, crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (Famare SA PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl,  crush,    crush2,   maketrax, pacman_state,  empty_init,    ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl2, crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl3, crush,    korosuke, mbrush,   pacman_state,  init_maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushs,   crush,    crushs,   crushs,   pacman_state,  empty_init,    ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
-GAME( 1981, mbrush,   crush,    maketrax, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, paintrlr, crush,    pacman,   paintrlr, pacman_state,  empty_init,    ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mbrush,   crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, paintrlr, crush,    crush2,   paintrlr, pacman_state,  empty_init,    ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  init_eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     pacman_state,  init_eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 2)", MACHINE_SUPPORTS_SAVE )

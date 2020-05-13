@@ -7,7 +7,6 @@
 
 #include "nld_74174.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -26,7 +25,12 @@ namespace devices
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_clrq = 0;
+			m_data = 0xFF;
+		}
 		NETLIB_UPDATEI();
 
 		NETLIB_HANDLERI(sub)
@@ -42,7 +46,8 @@ namespace devices
 			}
 		}
 
-	protected:
+		friend class NETLIB_NAME(74174_dip);
+	private:
 		logic_input_t m_CLK;
 		object_array_t<logic_output_t, 6> m_Q;
 
@@ -54,35 +59,39 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(74174_dip, 74174)
+	NETLIB_OBJECT(74174_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(74174_dip, 74174)
+		NETLIB_CONSTRUCTOR(74174_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1",  m_CLRQ);
-			register_subalias("9",  m_CLK);
+			register_subalias("1",  A.m_CLRQ);
+			register_subalias("9",  A.m_CLK);
 
-			register_subalias("3",  m_D[0]);
-			register_subalias("2",  m_Q[0]);
+			register_subalias("3",  A.m_D[0]);
+			register_subalias("2",  A.m_Q[0]);
 
-			register_subalias("4",  m_D[1]);
-			register_subalias("5",  m_Q[1]);
+			register_subalias("4",  A.m_D[1]);
+			register_subalias("5",  A.m_Q[1]);
 
-			register_subalias("6",  m_D[2]);
-			register_subalias("7",  m_Q[2]);
+			register_subalias("6",  A.m_D[2]);
+			register_subalias("7",  A.m_Q[2]);
 
-			register_subalias("11", m_D[3]);
-			register_subalias("10", m_Q[3]);
+			register_subalias("11", A.m_D[3]);
+			register_subalias("10", A.m_Q[3]);
 
-			register_subalias("13", m_D[4]);
-			register_subalias("12", m_Q[4]);
+			register_subalias("13", A.m_D[4]);
+			register_subalias("12", A.m_Q[4]);
 
-			register_subalias("14", m_D[5]);
-			register_subalias("15", m_Q[5]);
+			register_subalias("14", A.m_D[5]);
+			register_subalias("15", A.m_Q[5]);
 
-			register_subalias("8", "GND");
-			register_subalias("16", "VCC");
-
+			register_subalias("8", "A.GND");
+			register_subalias("16", "A.VCC");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(74174) A;
 	};
 
 	NETLIB_UPDATE(74174)
@@ -105,14 +114,6 @@ namespace devices
 			m_data = d;
 			m_CLK.activate_lh();
 		}
-	}
-
-
-	NETLIB_RESET(74174)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_clrq = 0;
-		m_data = 0xFF;
 	}
 
 	NETLIB_DEVICE_IMPL(74174,   "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")

@@ -16,15 +16,15 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
-#ifndef NL_AUTO_DEVICES
+#if !NL_AUTO_DEVICES
 
-#define MC14584B_GATE(name)                                                   \
+#define MC14584B_GATE(name)                                                    \
 		NET_REGISTER_DEV(MC14584B_GATE, name)
 
-#define MC14584B_DIP(name)                                                    \
+#define MC14584B_DIP(name)                                                     \
 		NET_REGISTER_DEV(MC14584B_DIP, name)
 
-#define NE566_DIP(name)                                                         \
+#define NE566_DIP(name)                                                        \
 		NET_REGISTER_DEV(NE566_DIP, name)
 
 #endif

@@ -203,9 +203,9 @@ READ16_MEMBER(gsan_state::cf_regs_r)
 	offset *= 2;
 	u16 data = 0;
 	if (ACCESSING_BITS_0_7)
-		data |= m_ata->read_cs0(offset, 0xff) & 0xff;
+		data |= m_ata->cs0_r(offset, 0xff) & 0xff;
 	if (ACCESSING_BITS_8_15)
-		data |= (m_ata->read_cs0(offset + 1, 0xff) << 8);
+		data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
 	return data;
 }
 
@@ -213,20 +213,20 @@ WRITE16_MEMBER(gsan_state::cf_regs_w)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
-		m_ata->write_cs0(offset, data & 0xff, 0xff);
+		m_ata->cs0_w(offset, data & 0xff, 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_ata->write_cs0(offset + 1, data >> 8, 0xff);
+		m_ata->cs0_w(offset + 1, data >> 8, 0xff);
 }
 
 READ16_MEMBER(gsan_state::cf_data_r)
 {
-	u16 data = m_ata->read_cs0(0, 0xffff);
+	u16 data = m_ata->cs0_r(0, 0xffff);
 	return data;
 }
 
 WRITE16_MEMBER(gsan_state::cf_data_w)
 {
-	m_ata->write_cs0(0, data, 0xffff);
+	m_ata->cs0_w(0, data, 0xffff);
 }
 
 // misc I/O

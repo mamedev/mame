@@ -252,9 +252,9 @@ READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 		if (first && ((offset & 0x0010)==0))
 		{
 			if (cs1fx)
-				atavalue = m_ata->read_cs0(reg);
+				atavalue = m_ata->cs0_r(reg);
 			else
-				atavalue = m_ata->read_cs1(reg);
+				atavalue = m_ata->cs1_r(reg);
 			LOGMASKED(LOG_ATA, "%s %02x -> %04x\n", cs1fx? "cs1" : "cs3", reg, atavalue);
 		}
 
@@ -420,9 +420,9 @@ void nouspikel_ide_card_device::write(offs_t offset, uint8_t data)
 			LOGMASKED(LOG_ATA, "%s %02x <- %04x\n", cs1fx? "cs1" : "cs3", reg, atavalue);
 
 			if (cs1fx)
-				m_ata->write_cs0(reg, atavalue);
+				m_ata->cs0_w(reg, atavalue);
 			else
-				m_ata->write_cs1(reg, atavalue);
+				m_ata->cs1_w(reg, atavalue);
 		}
 	}
 }

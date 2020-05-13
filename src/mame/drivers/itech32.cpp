@@ -17,7 +17,7 @@
         * Driver's Edge (1 set)
         * World Class Bowling (14 sets)
         * Street Fighter: The Movie (5 sets)
-        * Shuffleshot (3 sets)
+        * Shuffleshot (5 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
         * Golden Tee Golf '98 (6 sets)
@@ -2381,7 +2381,7 @@ ROM_START( hotmemry11 ) /* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_LOAD16_BYTE( "hotmem_v1.srom0", 0x000000, 0x80000, CRC(c18b76cd) SHA1(2d9ddda3b1d199289792c2e8b8add4a0f35c4a48) )
 ROM_END
 
-ROM_START( wcbowldx )   /* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
+ROM_START( wcbowldx )   /* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament v1.40 set, but tournament features have be removed/disabled */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcbd_prom0_2.00.prom0", 0x00000, 0x20000, CRC(280df7f0) SHA1(dacffe8fc21263093b0f4a4fbf444abd49afbff1) )
 	ROM_LOAD32_BYTE( "wcbd_prom1_2.00.prom1", 0x00001, 0x20000, CRC(526eded0) SHA1(106d5503ed4db2411e1f3446d613eac525a8a9cc) )
@@ -2419,8 +2419,8 @@ ROM_END
 
 ROM_START( wcbowl140 )  /* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
-	ROM_LOAD32_BYTE( "wcbf_prom0_1.40.prom0", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) )
-	ROM_LOAD32_BYTE( "wcbf_prom1_1.40.prom1", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
+	ROM_LOAD32_BYTE( "wcbf_prom0_1.40.prom0", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) ) /* First WCB set to contain the Flash Bowling */
+	ROM_LOAD32_BYTE( "wcbf_prom1_1.40.prom1", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) ) /* Has BLUE background like the WCB Deluxe set */
 	ROM_LOAD32_BYTE( "wcbf_prom2_1.40.prom2", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
 	ROM_LOAD32_BYTE( "wcbf_prom3_1.40.prom3", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
 
@@ -2458,8 +2458,8 @@ ROM_END
 
 ROM_START( wcbowl130 )  /* Version 1.30 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
-	ROM_LOAD32_BYTE( "wcb_prom0_v1.30t.prom0", 0x00000, 0x20000, NO_DUMP ) /* found as 3 loose chips missing WCB PROM0 V1.30T ROM */
-	ROM_LOAD32_BYTE( "wcb_prom1_v1.30t.prom1", 0x00001, 0x20000, CRC(f4b8e7c3) SHA1(29471a464e783e820d7cde356b49d26b9394f513) )
+	ROM_LOAD32_BYTE( "wcb_prom0_v1.30t.prom0", 0x00000, 0x20000, CRC(fbcde4e0) SHA1(8174c045686305c398f0414e2dea666ee4f9d668) ) /* Does NOT contain the Flash Bowling variation game */
+	ROM_LOAD32_BYTE( "wcb_prom1_v1.30t.prom1", 0x00001, 0x20000, CRC(f4b8e7c3) SHA1(29471a464e783e820d7cde356b49d26b9394f513) ) /* Has RED background like other WCB sets */
 	ROM_LOAD32_BYTE( "wcb_prom2_v1.30t.prom2", 0x00002, 0x20000, CRC(f441afae) SHA1(31d619e63f951cfb08481474f08d278aeaa15c46) )
 	ROM_LOAD32_BYTE( "wcb_prom3_v1.30t.prom3", 0x00003, 0x20000, CRC(47e26d4b) SHA1(44459daef1ffe19640b26adcf122dfcd4a327a68) )
 
@@ -3115,22 +3115,22 @@ ROM_START( shufshot )   /* Version 1.40 (PCB P/N 1083 Rev 2) */
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
-	ROM_LOAD32_BYTE( "shf_grom0_1.grm0_1", 0x000001, 0x80000, CRC(155e48a2) SHA1(187d65423ff9a3d6b6c34c885a1b2397fa5371cf) )
-	ROM_LOAD32_BYTE( "shf_grom0_2.grm0_2", 0x000002, 0x80000, CRC(9f2b470d) SHA1(012e917856042cbe00d476e3220a7f9c841bd199) )
-	ROM_LOAD32_BYTE( "shf_grom0_3.grm0_3", 0x000003, 0x80000, CRC(3855a16a) SHA1(f8c03efab87ddcb6940f657ad1f0138ceaa2118e) )
-	ROM_LOAD32_BYTE( "shf_grom1_0.grm1_0", 0x200000, 0x80000, CRC(ed140389) SHA1(f438a887b44a277f81e954bef73ac478eaff58c8) )
-	ROM_LOAD32_BYTE( "shf_grom1_1.grm1_1", 0x200001, 0x80000, CRC(bd2ffbca) SHA1(667692ce61a4896ceecf2a2bb37f742f175a6152) )
-	ROM_LOAD32_BYTE( "shf_grom1_2.grm1_2", 0x200002, 0x80000, CRC(c6de4187) SHA1(4854604330bb14f862abe22d755e08b54e0b1a04) )
-	ROM_LOAD32_BYTE( "shf_grom1_3.grm1_3", 0x200003, 0x80000, CRC(0c707aa2) SHA1(1da83523e04eeae4dbc8748a31a074331bf975d1) )
-	ROM_LOAD32_BYTE( "shf_grom2_0.grm2_0", 0x400000, 0x80000, CRC(529b4259) SHA1(4f98f28c83c3f8f822ea45d31be526af4a504cbc) )
-	ROM_LOAD32_BYTE( "shf_grom2_1.grm2_1", 0x400001, 0x80000, CRC(4b52ab1a) SHA1(5c438df7f2edea8f4d8734408fd94acf9d340755) )
-	ROM_LOAD32_BYTE( "shf_grom2_2.grm2_2", 0x400002, 0x80000, CRC(f45fad03) SHA1(3ff062928ef5bcdce8748ddd972c5da67207227a) )
-	ROM_LOAD32_BYTE( "shf_grom2_3.grm2_3", 0x400003, 0x80000, CRC(1bcb26c8) SHA1(49e730c56c4a3171a2962fa65f3b16481590c636) )
-	ROM_LOAD32_BYTE( "shf_grom3_0.grm3_0", 0x600000, 0x80000, CRC(a29763db) SHA1(e2154fb3e400aba300f1a23d53504588426dfbfe) )
-	ROM_LOAD32_BYTE( "shf_grom3_1.grm3_1", 0x600001, 0x80000, CRC(c757084c) SHA1(6f78ee13c68afd635aa3871cddf7207a19d4039b) )
-	ROM_LOAD32_BYTE( "shf_grom3_2.grm3_2", 0x600002, 0x80000, CRC(2971cb25) SHA1(5f0508ebff1bf66ee0f78addfa09a43f8fff9a36) )
-	ROM_LOAD32_BYTE( "shf_grom3_3.grm3_3", 0x600003, 0x80000, CRC(4fcbee51) SHA1(4e2ec4475986c3916c4566b2bc007f41a8c13609) )
+	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
+	ROM_LOAD32_BYTE( "shf_grom0_1.grm0_1",  0x000001, 0x80000, CRC(155e48a2) SHA1(187d65423ff9a3d6b6c34c885a1b2397fa5371cf) )
+	ROM_LOAD32_BYTE( "shf_grom0_2.grm0_2",  0x000002, 0x80000, CRC(9f2b470d) SHA1(012e917856042cbe00d476e3220a7f9c841bd199) )
+	ROM_LOAD32_BYTE( "shf_grom0_3.grm0_3",  0x000003, 0x80000, CRC(3855a16a) SHA1(f8c03efab87ddcb6940f657ad1f0138ceaa2118e) )
+	ROM_LOAD32_BYTE( "shf_grom1_0.grm1_0",  0x200000, 0x80000, CRC(ed140389) SHA1(f438a887b44a277f81e954bef73ac478eaff58c8) )
+	ROM_LOAD32_BYTE( "shf_grom1_1.grm1_1",  0x200001, 0x80000, CRC(bd2ffbca) SHA1(667692ce61a4896ceecf2a2bb37f742f175a6152) )
+	ROM_LOAD32_BYTE( "shf_grom1_2.grm1_2",  0x200002, 0x80000, CRC(c6de4187) SHA1(4854604330bb14f862abe22d755e08b54e0b1a04) )
+	ROM_LOAD32_BYTE( "shf_grom1_3.grm1_3",  0x200003, 0x80000, CRC(0c707aa2) SHA1(1da83523e04eeae4dbc8748a31a074331bf975d1) )
+	ROM_LOAD32_BYTE( "shf_grom2_0.grm2_0",  0x400000, 0x80000, CRC(529b4259) SHA1(4f98f28c83c3f8f822ea45d31be526af4a504cbc) )
+	ROM_LOAD32_BYTE( "shf_grom2_1.grm2_1",  0x400001, 0x80000, CRC(4b52ab1a) SHA1(5c438df7f2edea8f4d8734408fd94acf9d340755) )
+	ROM_LOAD32_BYTE( "shf_grom2_2.grm2_2",  0x400002, 0x80000, CRC(f45fad03) SHA1(3ff062928ef5bcdce8748ddd972c5da67207227a) )
+	ROM_LOAD32_BYTE( "shf_grom2_3.grm2_3",  0x400003, 0x80000, CRC(1bcb26c8) SHA1(49e730c56c4a3171a2962fa65f3b16481590c636) )
+	ROM_LOAD32_BYTE( "shfa_grom3_0.grm3_0", 0x600000, 0x80000, CRC(c5afc9d1) SHA1(db1f1559b26d2a7c21486f005fffae16e74af1c6) ) /* although different CRC32 values, they match programs internal checksum values */
+	ROM_LOAD32_BYTE( "shfa_grom3_1.grm3_1", 0x600001, 0x80000, CRC(70dd7b68) SHA1(305bfcefb24f68bed4055c0e8819c31c95f7f853) ) /* changed with version 1.38 on IT dev CD */
+	ROM_LOAD32_BYTE( "shfa_grom3_2.grm3_2", 0x600002, 0x80000, CRC(da56512d) SHA1(dce114b079ff06693a8ec8247c3d4e87969d686f) )
+	ROM_LOAD32_BYTE( "shfa_grom3_3.grm3_3", 0x600003, 0x80000, CRC(21727c50) SHA1(db7f16f045f04b3bcb4b968344bc2eb641658add) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "shf_srom0.srom0", 0x000000, 0x80000, CRC(9a3cb6c9) SHA1(2af3ce3b1cd7688199195a66cf01bb83775d42fa) )
@@ -3144,6 +3144,76 @@ ROM_START( shufshot139 )   /* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "shot_prom1_v1.39.prom1", 0x00001, 0x20000, CRC(f9d120c5) SHA1(f94216f1fb6d810ddee98479e83f0719b30b768f) )
 	ROM_LOAD32_BYTE( "shot_prom2_v1.39.prom2", 0x00002, 0x20000, CRC(9f12414d) SHA1(c1120079173f7ed6118f7105443afd7d38d8af94) )
 	ROM_LOAD32_BYTE( "shot_prom3_v1.39.prom3", 0x00003, 0x20000, CRC(108a69be) SHA1(1b2ebe4767be084707522a90f009d3a70e03d578) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
+	ROM_LOAD32_BYTE( "shf_grom0_1.grm0_1",  0x000001, 0x80000, CRC(155e48a2) SHA1(187d65423ff9a3d6b6c34c885a1b2397fa5371cf) )
+	ROM_LOAD32_BYTE( "shf_grom0_2.grm0_2",  0x000002, 0x80000, CRC(9f2b470d) SHA1(012e917856042cbe00d476e3220a7f9c841bd199) )
+	ROM_LOAD32_BYTE( "shf_grom0_3.grm0_3",  0x000003, 0x80000, CRC(3855a16a) SHA1(f8c03efab87ddcb6940f657ad1f0138ceaa2118e) )
+	ROM_LOAD32_BYTE( "shf_grom1_0.grm1_0",  0x200000, 0x80000, CRC(ed140389) SHA1(f438a887b44a277f81e954bef73ac478eaff58c8) )
+	ROM_LOAD32_BYTE( "shf_grom1_1.grm1_1",  0x200001, 0x80000, CRC(bd2ffbca) SHA1(667692ce61a4896ceecf2a2bb37f742f175a6152) )
+	ROM_LOAD32_BYTE( "shf_grom1_2.grm1_2",  0x200002, 0x80000, CRC(c6de4187) SHA1(4854604330bb14f862abe22d755e08b54e0b1a04) )
+	ROM_LOAD32_BYTE( "shf_grom1_3.grm1_3",  0x200003, 0x80000, CRC(0c707aa2) SHA1(1da83523e04eeae4dbc8748a31a074331bf975d1) )
+	ROM_LOAD32_BYTE( "shf_grom2_0.grm2_0",  0x400000, 0x80000, CRC(529b4259) SHA1(4f98f28c83c3f8f822ea45d31be526af4a504cbc) )
+	ROM_LOAD32_BYTE( "shf_grom2_1.grm2_1",  0x400001, 0x80000, CRC(4b52ab1a) SHA1(5c438df7f2edea8f4d8734408fd94acf9d340755) )
+	ROM_LOAD32_BYTE( "shf_grom2_2.grm2_2",  0x400002, 0x80000, CRC(f45fad03) SHA1(3ff062928ef5bcdce8748ddd972c5da67207227a) )
+	ROM_LOAD32_BYTE( "shf_grom2_3.grm2_3",  0x400003, 0x80000, CRC(1bcb26c8) SHA1(49e730c56c4a3171a2962fa65f3b16481590c636) )
+	ROM_LOAD32_BYTE( "shfa_grom3_0.grm3_0", 0x600000, 0x80000, CRC(c5afc9d1) SHA1(db1f1559b26d2a7c21486f005fffae16e74af1c6) ) /* although different CRC32 values, they match programs internal checksum values */
+	ROM_LOAD32_BYTE( "shfa_grom3_1.grm3_1", 0x600001, 0x80000, CRC(70dd7b68) SHA1(305bfcefb24f68bed4055c0e8819c31c95f7f853) ) /* changed with version 1.38 on IT dev CD */
+	ROM_LOAD32_BYTE( "shfa_grom3_2.grm3_2", 0x600002, 0x80000, CRC(da56512d) SHA1(dce114b079ff06693a8ec8247c3d4e87969d686f) )
+	ROM_LOAD32_BYTE( "shfa_grom3_3.grm3_3", 0x600003, 0x80000, CRC(21727c50) SHA1(db7f16f045f04b3bcb4b968344bc2eb641658add) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "shf_srom0.srom0", 0x000000, 0x80000, CRC(9a3cb6c9) SHA1(2af3ce3b1cd7688199195a66cf01bb83775d42fa) )
+	ROM_LOAD16_BYTE( "shf_srom1.srom1", 0x200000, 0x80000, CRC(8c89948a) SHA1(1054eca5de352c17f34f31ef16297ba6177a37ba) )
+ROM_END
+
+
+ROM_START( shufshot138 )   /* Version 1.38 (PCB P/N 1083 Rev 2) - Not offically released? - found on dev CD */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "shot_prom0_v1.38.prom0", 0x00000, 0x20000, CRC(68f823ff) SHA1(f9de8e45dd87e39bb256963cd356cbb9f985f3e8) )
+	ROM_LOAD32_BYTE( "shot_prom1_v1.38.prom1", 0x00001, 0x20000, CRC(bdd9a8e9) SHA1(b4c0d3ab5ed66c7f43f309236708df355385ec5e) )
+	ROM_LOAD32_BYTE( "shot_prom2_v1.38.prom2", 0x00002, 0x20000, CRC(92008e13) SHA1(2ed7cde67131e4baf1c127004d61d433d983467e) )
+	ROM_LOAD32_BYTE( "shot_prom3_v1.38.prom3", 0x00003, 0x20000, CRC(723cb9a5) SHA1(2ac209053bce245130b6056fe0ebe048596ae3b4) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
+	ROM_LOAD32_BYTE( "shf_grom0_1.grm0_1",  0x000001, 0x80000, CRC(155e48a2) SHA1(187d65423ff9a3d6b6c34c885a1b2397fa5371cf) )
+	ROM_LOAD32_BYTE( "shf_grom0_2.grm0_2",  0x000002, 0x80000, CRC(9f2b470d) SHA1(012e917856042cbe00d476e3220a7f9c841bd199) )
+	ROM_LOAD32_BYTE( "shf_grom0_3.grm0_3",  0x000003, 0x80000, CRC(3855a16a) SHA1(f8c03efab87ddcb6940f657ad1f0138ceaa2118e) )
+	ROM_LOAD32_BYTE( "shf_grom1_0.grm1_0",  0x200000, 0x80000, CRC(ed140389) SHA1(f438a887b44a277f81e954bef73ac478eaff58c8) )
+	ROM_LOAD32_BYTE( "shf_grom1_1.grm1_1",  0x200001, 0x80000, CRC(bd2ffbca) SHA1(667692ce61a4896ceecf2a2bb37f742f175a6152) )
+	ROM_LOAD32_BYTE( "shf_grom1_2.grm1_2",  0x200002, 0x80000, CRC(c6de4187) SHA1(4854604330bb14f862abe22d755e08b54e0b1a04) )
+	ROM_LOAD32_BYTE( "shf_grom1_3.grm1_3",  0x200003, 0x80000, CRC(0c707aa2) SHA1(1da83523e04eeae4dbc8748a31a074331bf975d1) )
+	ROM_LOAD32_BYTE( "shf_grom2_0.grm2_0",  0x400000, 0x80000, CRC(529b4259) SHA1(4f98f28c83c3f8f822ea45d31be526af4a504cbc) )
+	ROM_LOAD32_BYTE( "shf_grom2_1.grm2_1",  0x400001, 0x80000, CRC(4b52ab1a) SHA1(5c438df7f2edea8f4d8734408fd94acf9d340755) )
+	ROM_LOAD32_BYTE( "shf_grom2_2.grm2_2",  0x400002, 0x80000, CRC(f45fad03) SHA1(3ff062928ef5bcdce8748ddd972c5da67207227a) )
+	ROM_LOAD32_BYTE( "shf_grom2_3.grm2_3",  0x400003, 0x80000, CRC(1bcb26c8) SHA1(49e730c56c4a3171a2962fa65f3b16481590c636) )
+	ROM_LOAD32_BYTE( "shfa_grom3_0.grm3_0", 0x600000, 0x80000, CRC(c5afc9d1) SHA1(db1f1559b26d2a7c21486f005fffae16e74af1c6) ) /* although different CRC32 values, they match programs internal checksum values */
+	ROM_LOAD32_BYTE( "shfa_grom3_1.grm3_1", 0x600001, 0x80000, CRC(70dd7b68) SHA1(305bfcefb24f68bed4055c0e8819c31c95f7f853) ) /* changed with version 1.38 on IT dev CD */
+	ROM_LOAD32_BYTE( "shfa_grom3_2.grm3_2", 0x600002, 0x80000, CRC(da56512d) SHA1(dce114b079ff06693a8ec8247c3d4e87969d686f) )
+	ROM_LOAD32_BYTE( "shfa_grom3_3.grm3_3", 0x600003, 0x80000, CRC(21727c50) SHA1(db7f16f045f04b3bcb4b968344bc2eb641658add) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "shf_srom0.srom0", 0x000000, 0x80000, CRC(9a3cb6c9) SHA1(2af3ce3b1cd7688199195a66cf01bb83775d42fa) )
+	ROM_LOAD16_BYTE( "shf_srom1.srom1", 0x200000, 0x80000, CRC(8c89948a) SHA1(1054eca5de352c17f34f31ef16297ba6177a37ba) )
+ROM_END
+
+
+ROM_START( shufshot137 )   /* Version 1.37 (PCB P/N 1083 Rev 2) */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "shot_prom0_v1.37.prom0", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
+	ROM_LOAD32_BYTE( "shot_prom1_v1.37.prom1", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
+	ROM_LOAD32_BYTE( "shot_prom2_v1.37.prom2", 0x00002, 0x20000, CRC(e0df3025) SHA1(edff5c5c4486981ac0783f337a0845854d0217f0) )
+	ROM_LOAD32_BYTE( "shot_prom3_v1.37.prom3", 0x00003, 0x20000, CRC(efa66ad8) SHA1(d8dc754529284e6c06b912e226c8a4520aab49fc) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
@@ -3173,12 +3243,12 @@ ROM_START( shufshot139 )   /* Version 1.39 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot137 )   /* Version 1.37 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot135 )   /* Version 1.35 (PCB P/N 1083 Rev 2) - Not offically released? - found on dev CD  */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
-	ROM_LOAD32_BYTE( "shot_prom0_v1.37.prom0", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
-	ROM_LOAD32_BYTE( "shot_prom1_v1.37.prom1", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
-	ROM_LOAD32_BYTE( "shot_prom2_v1.37.prom2", 0x00002, 0x20000, CRC(e0df3025) SHA1(edff5c5c4486981ac0783f337a0845854d0217f0) )
-	ROM_LOAD32_BYTE( "shot_prom3_v1.37.prom3", 0x00003, 0x20000, CRC(efa66ad8) SHA1(d8dc754529284e6c06b912e226c8a4520aab49fc) )
+	ROM_LOAD32_BYTE( "shot_prom0_v1.35.prom0", 0x00000, 0x20000, CRC(1a1d510c) SHA1(b1919beee499fb4e213a987ad796742dbfbd540b) )
+	ROM_LOAD32_BYTE( "shot_prom1_v1.35.prom1", 0x00001, 0x20000, CRC(5d7d5017) SHA1(8330339bd45c30066650a2a6cc7e12f365c91608) )
+	ROM_LOAD32_BYTE( "shot_prom2_v1.35.prom2", 0x00002, 0x20000, CRC(6f27b111) SHA1(9f9a95948662003edee2aeb2230b64e6401b4e49) )
+	ROM_LOAD32_BYTE( "shot_prom3_v1.35.prom3", 0x00003, 0x20000, CRC(bf6fabbb) SHA1(3f52791b974a6170fad492c0270270f5712c8506) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
@@ -4770,6 +4840,9 @@ GAME( 1995, wcbowl13j,    wcbowl,   bloodstm, wcbowlj,  itech32_state,  init_wcb
 GAME( 1995, wcbowl12,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl11,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.0)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1999, wcbowldx,     wcbowl,   sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1997, wcbowl140,    wcbowl,   tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1997, wcbowl130,    wcbowl,   tourny,   wcbowlo,  itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.30)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
@@ -4777,10 +4850,9 @@ GAME( 1995, sftmj114,     sftm,     sftm,     sftm,     itech32_state,  init_sft
 GAME( 1995, sftmj112,     sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot138,  shufshot, sftm,     shufshto, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.38)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, wcbowl130,    wcbowldx, tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.30)" , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 *** missing program ROM PROM0 */
-GAME( 1997, wcbowl140,    wcbowldx, tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1999, wcbowldx,     0,        sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1997, shufshot135,  shufshot, sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.35)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 
 /*
     The following naming conventions are used:

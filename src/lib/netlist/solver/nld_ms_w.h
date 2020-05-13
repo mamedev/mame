@@ -54,8 +54,6 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_w_t: public matrix_solver_ext_t<FT, SIZE>
 	{
-		friend class matrix_solver_t;
-
 	public:
 		using float_ext_type = FT;
 		using float_type = FT;

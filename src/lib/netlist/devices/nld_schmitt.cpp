@@ -28,34 +28,33 @@ namespace netlist
 		 *
 		 */
 
-		class schmitt_trigger_model_t : public param_model_t
+		class schmitt_trigger_model_t
 		{
 		public:
-			schmitt_trigger_model_t(device_t &device, const pstring &name, const pstring &val)
-				: param_model_t(device, name, val)
-				, m_VTP(*this, "VTP")
-				, m_VTM(*this, "VTM")
-				, m_VI(*this, "VI")
-				, m_RI(*this, "RI")
-				, m_VOH(*this, "VOH")
-				, m_ROH(*this, "ROH")
-				, m_VOL(*this, "VOL")
-				, m_ROL(*this, "ROL")
-				, m_TPLH(*this, "TPLH")
-				, m_TPHL(*this, "TPHL")
+			schmitt_trigger_model_t(param_model_t &model)
+				: m_VTP(model, "VTP")
+				, m_VTM(model, "VTM")
+				, m_VI(model, "VI")
+				, m_RI(model, "RI")
+				, m_VOH(model, "VOH")
+				, m_ROH(model, "ROH")
+				, m_VOL(model, "VOL")
+				, m_ROL(model, "ROL")
+				, m_TPLH(model, "TPLH")
+				, m_TPHL(model, "TPHL")
 			{
 			}
 
-			value_t m_VTP;
-			value_t m_VTM;
-			value_t m_VI;
-			value_t m_RI;
-			value_t m_VOH;
-			value_t m_ROH;
-			value_t m_VOL;
-			value_t m_ROL;
-			value_t m_TPLH;
-			value_t m_TPHL;
+			param_model_t::value_t m_VTP;
+			param_model_t::value_t m_VTM;
+			param_model_t::value_t m_VI;
+			param_model_t::value_t m_RI;
+			param_model_t::value_t m_VOH;
+			param_model_t::value_t m_ROH;
+			param_model_t::value_t m_VOL;
+			param_model_t::value_t m_ROL;
+			param_model_t::value_t m_TPLH;
+			param_model_t::value_t m_TPHL;
 		};
 
 		NETLIB_OBJECT(schmitt_trigger)
@@ -65,7 +64,8 @@ namespace netlist
 				, m_supply(*this)
 				, m_RVI(*this, "RVI")
 				, m_RVO(*this, "RVO")
-				, m_model(*this, "MODEL", "TTL_7414_GATE")
+				, m_stmodel(*this, "STMODEL", "TTL_7414_GATE")
+				, m_modacc(m_stmodel)
 				, m_last_state(*this, "m_last_var", 1)
 			{
 				register_subalias("Q", m_RVO.P());
@@ -81,8 +81,8 @@ namespace netlist
 				m_last_state = 1;
 				m_RVI.reset();
 				m_RVO.reset();
-				m_RVI.set_G_V_I(plib::reciprocal(m_model.m_RI()), m_model.m_VI, nlconst::zero());
-				m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
+				m_RVI.set_G_V_I(plib::reciprocal(m_modacc.m_RI()), m_modacc.m_VI, nlconst::zero());
+				m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 			}
 
 			NETLIB_UPDATEI()
@@ -90,23 +90,23 @@ namespace netlist
 				const auto va(m_A.Q_Analog() - m_supply.GND().Q_Analog());
 				if (m_last_state)
 				{
-					if (va < m_model.m_VTM)
+					if (va < m_modacc.m_VTM)
 					{
 						m_last_state = 0;
 						m_RVO.change_state([this]()
 						{
-							m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROH()), m_model.m_VOH, nlconst::zero());
+							m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROH()), m_modacc.m_VOH, nlconst::zero());
 						});
 					}
 				}
 				else
 				{
-					if (va > m_model.m_VTP)
+					if (va > m_modacc.m_VTP)
 					{
 						m_last_state = 1;
 						m_RVO.change_state([this]()
 						{
-							m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
+							m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 						});
 					}
 				}
@@ -117,11 +117,12 @@ namespace netlist
 			NETLIB_NAME(power_pins) m_supply;
 			analog::NETLIB_SUB(twoterm) m_RVI;
 			analog::NETLIB_SUB(twoterm) m_RVO;
-			schmitt_trigger_model_t m_model;
+			param_model_t m_stmodel;
+			schmitt_trigger_model_t m_modacc;
 			state_var<int> m_last_state;
 		};
 
-		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "MODEL")
+		NETLIB_DEVICE_IMPL(schmitt_trigger, "SCHMITT_TRIGGER", "STMODEL")
 
 	} // namespace devices
 } // namespace netlist

@@ -108,7 +108,7 @@ public:
 	// construction/destruction
 	ad_60mc01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	static constexpr feature_type unemulated_features() { return feature::SOUND; }
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // TODO: fix interrupts, missing music?
 
 	void sound_command_w(uint8_t data) { m_soundlatch->write(data); }
 
@@ -124,6 +124,8 @@ private:
 
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
+
+	INTERRUPT_GEN_MEMBER(sound_irq) { m_audiocpu->set_input_line(0, HOLD_LINE); }
 };
 
 #endif // MAME_AUDIO_AD_SOUND_BOARDS_H

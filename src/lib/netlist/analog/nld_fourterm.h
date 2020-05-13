@@ -15,7 +15,7 @@
 // ----------------------------------------------------------------------------------------
 
 #define VCCS(name, G)                                                         \
-		NET_REGISTER_DEVEXT(VCCS, G)
+		NET_REGISTER_DEVEXT(VCCS, name, G)
 
 #define CCCS(name, G)                                                         \
 		NET_REGISTER_DEVEXT(CCCS, name, G)

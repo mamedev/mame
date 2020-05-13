@@ -33,7 +33,7 @@ namespace analog {
 	//
 	//   RI = 1 / NETLIST_GMIN
 	//
-	NETLIB_OBJECT(VCCS)
+	NETLIB_BASE_OBJECT(VCCS)
 	{
 	public:
 		NETLIB_CONSTRUCTOR_EX(VCCS, nl_fptype ri = nlconst::magic(1e9))
@@ -91,7 +91,7 @@ namespace analog {
 	NETLIB_OBJECT_DERIVED(LVCCS, VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(LVCCS, VCCS)
+		NETLIB_CONSTRUCTOR(LVCCS)
 		, m_cur_limit(*this, "CURLIM", nlconst::magic(1000.0))
 		, m_vi(nlconst::zero())
 		{
@@ -137,7 +137,7 @@ namespace analog {
 	NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_PASS(CCCS, VCCS, nlconst::one())
+		NETLIB_CONSTRUCTOR_PASS(CCCS, nlconst::one())
 		{
 			set_gfac(-plib::reciprocal(m_RI()));
 		}
@@ -179,7 +179,7 @@ namespace analog {
 	NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS)
+		NETLIB_CONSTRUCTOR(VCVS)
 		, m_RO(*this, "RO", nlconst::one())
 		, m_OP2(*this, "_OP2", &m_ON2)
 		, m_ON2(*this, "_ON2", &m_OP2)
@@ -231,7 +231,7 @@ namespace analog {
 	NETLIB_OBJECT_DERIVED(CCVS, VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED_PASS(CCVS, VCCS, nlconst::one())
+		NETLIB_CONSTRUCTOR_PASS(CCVS, nlconst::one())
 		, m_RO(*this, "RO", nlconst::one())
 		, m_OP2(*this, "_OP2", &m_ON2)
 		, m_ON2(*this, "_ON2", &m_OP2)

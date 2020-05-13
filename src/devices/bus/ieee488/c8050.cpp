@@ -274,7 +274,7 @@ READ8_MEMBER( c8050_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 WRITE8_MEMBER( c8050_device::dio_w )

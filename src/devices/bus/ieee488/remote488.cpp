@@ -707,7 +707,7 @@ void remote488_device::update_ah_fsm()
 				if (m_bus->dav_r()) {
 					m_ah_state = REM_AH_ACRS;
 				} else if (!m_waiting_cp) {
-					uint8_t dio = ~m_bus->read_dio();
+					uint8_t dio = ~m_bus->dio_r();
 
 					if (!m_bus->eoi_r()) {
 						send_update(MSG_END_BYTE , dio);

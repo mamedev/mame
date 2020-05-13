@@ -1334,6 +1334,21 @@ ROM_START( pitbosssc ) /* ROMs at U9 and U11 are localized for California, denot
 	ROM_LOAD( "pitbosssc-key", 0x000000, 0x000022, BAD_DUMP CRC(77249fe0) SHA1(719f66742147cb8e5720250ce744e5eb4983ab82) )
 ROM_END
 
+ROM_START( pitbosssm ) /* ROMs at U9 and U11 are localized for Minnesota, denoted by the "-2" in the label */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9221-12_u9-2.u9",   0x00000, 0x10000, CRC(d06163ae) SHA1(d6bb002dfee61153a8fd7190e34a538ad3d7c47f) ) /* 9221-12-02  010892 */
+	ROM_LOAD( "9221-12_u10-0.u10", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-12_u11-2.u11", 0x20000, 0x10000, CRC(bb5233bd) SHA1(49a277fd2115661b498040fb7e20be0db3691c8c) )
+	ROM_LOAD( "9221-12_u12-0.u12", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) )
+	ROM_LOAD( "9221-12_u13-0.u13", 0x40000, 0x10000, CRC(93880b55) SHA1(1bf48bb25ef85a5474d63d1a4912f46772b6be62) )
+	ROM_LOAD( "9221-12_u14-0.u14", 0x50000, 0x10000, CRC(128b4dff) SHA1(945825d654b1dce2e71b4f8613029651c7641fac) )
+	ROM_LOAD( "9221-12_u15-0.u15", 0x60000, 0x10000, CRC(b5beeaa9) SHA1(99db48f83d09616617b585b60614f5819f5dc607) )
+	ROM_LOAD( "9221-12_u16-0.u16", 0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "pitbosssc-key", 0x000000, 0x000022, BAD_DUMP CRC(77249fe0) SHA1(719f66742147cb8e5720250ce744e5eb4983ab82) )
+ROM_END
+
 ROM_START( pbss330 ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-01 U1-RO1 C1993 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9233-00-01_u9-r0",  0x00000, 0x10000, CRC(887da433) SHA1(2950803cef75e0d337fbcedaeea994ec82c9db71) ) /* 9233-00-01  072893 */
@@ -2420,7 +2435,8 @@ GAME( 1988, pitboss2,  0,        crt250, pitboss2,  meritm_state, empty_init, RO
 GAME( 1988, spitboss,  0,        crt250, spitboss,  meritm_state, empty_init, ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosss,  0,        crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosssa, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssm, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-02, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
 GAME( 1994, mtjpoker,  0,        crt250_crt252_crt258, mtjpoker,   meritm_state, empty_init, ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )

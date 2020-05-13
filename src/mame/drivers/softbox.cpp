@@ -170,12 +170,12 @@ INPUT_PORTS_END
 
 READ8_MEMBER( softbox_state::ppi0_pa_r )
 {
-	return m_ieee->read_dio() ^ 0xff;
+	return m_ieee->dio_r() ^ 0xff;
 }
 
 WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 {
-	m_ieee->write_dio(data ^ 0xff);
+	m_ieee->host_dio_w(data ^ 0xff);
 }
 
 //-------------------------------------------------

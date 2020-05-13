@@ -14057,7 +14057,7 @@ Double Bonus Poker   P323A     99.10%
 	ROM_LOAD( "xm00006p.u66",   0x00000, 0x10000, CRC(b464ee79) SHA1(8768e52c66881c8f327055124ff31bcad79fd027) ) /*  03/08/96   @ IGT  L96-0684  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2294.u77",  0x00000, 0x8000, CRC(2f707abc) SHA1(3ed14b165cc1c6ad1a0c8ceddbe6d10666de7a1e) ) /* Custom The Orleans graphics */
+	ROM_LOAD( "mro-cg2294.u77",  0x00000, 0x8000, CRC(2f707abc) SHA1(3ed14b165cc1c6ad1a0c8ceddbe6d10666de7a1e) ) /* Custom The Orleans card backs - 09/13/96   @ IGT  L96-2292 */
 	ROM_LOAD( "mgo-cg2294.u78",  0x08000, 0x8000, CRC(3dc48f1a) SHA1(d0c4861eba3f37064c6a1b62488764e18a762461) ) /* Compatible with XM00001P, XM00002P, XM00003P & XM00006P */
 	ROM_LOAD( "mbo-cg2294.u79",  0x10000, 0x8000, CRC(ce8aebdb) SHA1(0c08561016aeadee95e843299cccff3114d839e2) )
 	ROM_LOAD( "mxo-cg2294.u80",  0x18000, 0x8000, CRC(5fba4c90) SHA1(259359b11af9a554364ae90989a23fc2c848d16c) )

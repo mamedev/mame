@@ -157,7 +157,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 	<software name="stvaratt">
 		<description>Stava rätt på nytt sätt (version 8481)</description>
 		<year>19??</year>
-		<publisher>Esselte Stadium</publisher>
+		<publisher>Esselte Studium</publisher>
 		<info name="serial" value="24-34298-X" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2178838">
@@ -169,7 +169,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 	<software name="mattev1">
 		<description>Matematikverkstad I (beta, nät/skollicens)</description>
 		<year>1987</year>
-		<publisher>Esselte Stadium</publisher>
+		<publisher>Esselte Studium</publisher>
 		<info name="serial" value="24-33777" />
 		<info name="release" value="19870806" />
 		<part name="flop1" interface="floppy_5_25">
@@ -182,7 +182,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 	<software name="video">
 		<description>Video-butiken (enanvändare)</description>
 		<year>1986</year>
-		<publisher>Esselte Stadium</publisher>
+		<publisher>Esselte Studium</publisher>
 		<info name="serial" value="24-33070" />
 		<info name="release" value="19860916" />
 		<part name="flop1" interface="floppy_5_25">
@@ -202,7 +202,7 @@ Systemskiva för hårdskiveenhet [version 7242]
 	<software name="statett">
 		<description>StatEtt - Analys</description>
 		<year>1990</year>
-		<publisher>Esselte Stadium</publisher>
+		<publisher>Esselte Studium</publisher>
 		<info name="serial" value="24-35831" />
 		<info name="release" value="19900101" />
 		<part name="flop1" interface="floppy_5_25">
@@ -216,11 +216,117 @@ Systemskiva för hårdskiveenhet [version 7242]
 	<software name="raknrattd" cloneof="raknratt">
 		<description>Räkna lätt, räkna rätt (demo, version 6175)</description>
 		<year>19??</year>
-		<publisher>Esselte Stadium</publisher>
+		<publisher>Esselte Studium</publisher>
 		<info name="serial" value="24-4408-7" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2209405">
 				<rom name="Rakna latt, rakna ratt demo.mfm" size="2209405" crc="acc2bf39" sha1="f08288227e1ea1586976163ba42499aa13244c95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stilplus">
+		<description>Stil-Plus (alfa 1.0, nät/skollicens)</description>
+		<year>1989</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-35456" />
+		<info name="release" value="19890530" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217678">
+				<rom name="StilPlus.mfm" size="2217678" crc="b16bb821" sha1="d965a865e3f97d7d256c89176948ef371d65254b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="action1">
+		<description>Action1 Glosprogram (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Almqvist &amp; Wiksell Läromedel AB</publisher>
+		<info name="serial" value="24-33584" />
+		<info name="release" value="19870114" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209365">
+				<rom name="Action1 Glosprogram.mfm" size="2209365" crc="1e2a96a1" sha1="098842f0571c0b9beb64295bef5ded29e5ce6add"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coulomb">
+		<description>Coulombs lag (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33772" />
+		<info name="release" value="19870731" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209453">
+				<rom name="Coulombs lag.mfm" size="2209453" crc="16e9749c" sha1="adc4658eaa24cdaf4f261f2a1848b98435155d0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kinetik">
+		<description>Kinetik (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34652" />
+		<info name="release" value="19870823" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209459">
+				<rom name="Kinetik.mfm" size="2209459" crc="c906fa1d" sha1="a6e9411dcc1935cb17a65c7eb162fc127eb1f9a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jordskift">
+		<description>Jorden skiftas, folket skingras (nät/skollicens)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33799" />
+		<info name="release" value="19871105" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209529">
+				<rom name="Jorden skiftas, folket skingras.mfm" size="2209529" crc="b1df76ea" sha1="6d6e2fd20ccc4cec2999932168f8a82221f16c47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a hardware key which isn't dumped -->
+	<software name="skvallra">
+		<description>Får dataregister skvallra? (enanvändare)</description>
+		<year>1985</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34112" />
+		<info name="release" value="19851029" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209468">
+				<rom name="Far dataregister skvallra.mfm" size="2209468" crc="06fc17bc" sha1="7de8a56025058f2a5298ee0dfa1db32c7f335643"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skvallrak" cloneof="skvallra">
+		<description>Får dataregister skvallra? (komplement)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34820" />
+		<info name="release" value="19860904" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2152177">
+				<rom name="Far dataregister skvallra (Komplement).mfm" size="2152177" crc="9fa1f31a" sha1="8e0eb4e26d4167193f2b4504f014cf14a8ab8c65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a hardware key which isn't dumped -->
+	<software name="kommunik">
+		<description>Datorn i kommunikation (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33828" />
+		<info name="release" value="19861006" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209396">
+				<rom name="Datorn i kommunikation.mfm" size="2209396" crc="780900ce" sha1="923cbefe3ac449d64f1a5ef50f69f59f3a33e438"/>
 			</dataarea>
 		</part>
 	</software>

@@ -256,6 +256,7 @@ emu3.cpp
 enmirage.cpp
 ep64.cpp
 epic14e.cpp
+ergo201.cpp
 esprit.cpp
 esq1.cpp
 esq5505.cpp
@@ -342,6 +343,10 @@ gp2x.cpp
 gp32.cpp
 grfd2301.cpp
 gridcomp.cpp
+gs6502.cpp
+gs6809.cpp
+gscpm.cpp
+gsz80.cpp
 h01x.cpp
 h19.cpp
 h8.cpp

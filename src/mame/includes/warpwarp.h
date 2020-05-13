@@ -39,6 +39,7 @@ public:
 	void warpwarp(machine_config &config);
 	void geebee(machine_config &config);
 	void navarone(machine_config &config);
+	void sos(machine_config &config);
 	void kaitei(machine_config &config);
 	void bombbee(machine_config &config);
 	void geebeeb(machine_config &config);
@@ -107,6 +108,7 @@ private:
 	void warpwarp_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(navarone);
 	void navarone_palette(palette_device &palette) const;
+	void sos_palette(palette_device &palette) const;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(geebee_get_tile_info);

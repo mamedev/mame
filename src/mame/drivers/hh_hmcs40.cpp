@@ -82,6 +82,8 @@
  *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Advanced Portachess
 
+ *B55     HD44860  1987, Saitek Pro Bridge 100
+
  *A04     HD44868  1984, SciSys Rapier
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
  *A12     HD44868  1985, SciSys MK 10 / Pocket Chess

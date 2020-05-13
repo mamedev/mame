@@ -173,13 +173,13 @@ uint8_t c64_ide64_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sp
 
 		if (io1_offset >= 0x20 && io1_offset < 0x28)
 		{
-			m_ata_data = m_ata->read_cs0(offset & 0x07);
+			m_ata_data = m_ata->cs0_r(offset & 0x07);
 
 			data = m_ata_data & 0xff;
 		}
 		else if (io1_offset >= 0x28 && io1_offset < 0x30)
 		{
-			m_ata_data = m_ata->read_cs1(offset & 0x07);
+			m_ata_data = m_ata->cs1_r(offset & 0x07);
 
 			data = m_ata_data & 0xff;
 		}
@@ -276,13 +276,13 @@ void c64_ide64_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2
 		{
 			m_ata_data = (m_ata_data & 0xff00) | data;
 
-			m_ata->write_cs0(offset & 0x07, m_ata_data);
+			m_ata->cs0_w(offset & 0x07, m_ata_data);
 		}
 		else if (io1_offset >= 0x28 && io1_offset < 0x30)
 		{
 			m_ata_data = (m_ata_data & 0xff00) | data;
 
-			m_ata->write_cs1(offset & 0x07, m_ata_data);
+			m_ata->cs1_w(offset & 0x07, m_ata_data);
 		}
 		else if (io1_offset == 0x31)
 		{

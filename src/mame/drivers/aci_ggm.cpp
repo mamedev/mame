@@ -20,7 +20,7 @@ Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
 - *Gruenfeld Edition - Master Chess Openings
 - *Morphy Edition - Master Chess
-- *Capablanca Edition - Master Chess Endgame
+- Capablanca Edition - Master Chess Endgame
 - Sandy Edition - Master Chess (German language version of Morphy)
 - Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel

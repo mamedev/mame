@@ -84,7 +84,7 @@ static const gfx_layout dealemcharlayout =
 
 
 static GFXDECODE_START( gfx_dealem )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 16 )
 GFXDECODE_END
 
 

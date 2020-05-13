@@ -14,6 +14,7 @@
 namespace netlist {
 namespace factory {
 
+	// FIXME: this doesn't do anything, check how to remove
 	class NETLIB_NAME(wrapper) : public device_t
 	{
 	public:
@@ -26,16 +27,14 @@ namespace factory {
 		NETLIB_UPDATEI() { }
 	};
 
-	element_t::element_t(const pstring &name, const pstring &classname,
-			const pstring &def_param, const pstring &sourcefile)
-		: m_name(name), m_classname(classname), m_def_param(def_param),
+	element_t::element_t(const pstring &name, const pstring &def_param, const pstring &sourcefile)
+		: m_name(name), m_def_param(def_param),
 		  m_sourcefile(sourcefile)
 	{
 	}
 
-	element_t::element_t(const pstring &name, const pstring &classname,
-			const pstring &def_param)
-		: m_name(name), m_classname(classname), m_def_param(def_param),
+	element_t::element_t(const pstring &name, const pstring &def_param)
+		: m_name(name), m_def_param(def_param),
 		  m_sourcefile("<unknown>")
 	{
 	}
@@ -49,7 +48,7 @@ namespace factory {
 	{
 	}
 
-	void list_t::register_device(plib::unique_ptr<element_t> &&factory)
+	void list_t::add(plib::unique_ptr<element_t> &&factory)
 	{
 		for (auto & e : *this)
 			if (e->name() == factory->name())
@@ -76,7 +75,7 @@ namespace factory {
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	unique_pool_ptr<device_t> library_element_t::make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name)
+	unique_pool_ptr<core_device_t> library_element_t::make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name)
 	{
 		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
 	}

@@ -1,10 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "nlm_ttl74xx.h"
 
-#include "netlist/devices/nld_schmitt.h"
-#include "netlist/devices/nld_system.h"
-
+#include "netlist/devices/net_lib.h"
 
 /*
  *  DM7400: Quad 2-Input NAND Gates
@@ -800,11 +797,13 @@ NETLIST_END()
  *
  */
 
+#if !NL_AUTO_DEVICES
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74279A(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279A, name)
 #define TTL_74279B(name)                                                         \
 		NET_REGISTER_DEV(TTL_74279B, name)
+#endif
 #endif
 
 static NETLIST_START(TTL_74279_DIP)

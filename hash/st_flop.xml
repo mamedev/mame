@@ -4294,6 +4294,41 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sf2" supported="no">
+		<description>Street Fighter II: The World Warrior (Euro)</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="2131682">
+				<rom name="Street Fighter 2 Disk 1.mfm" size="2131682" crc="2712b1aa" sha1="9fc407a84590f18d2c5225e3ad25cc9800281936" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="2141960">
+				<rom name="Street Fighter 2 Disk 2.mfm" size="2141960" crc="9d569238" sha1="658ea036f65fa9ff0b9ec06cec40c3a36860de51" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="2139383">
+				<rom name="Street Fighter 2 Disk 3.mfm" size="2139383" crc="526ec0bd" sha1="a13c85ec80e06b35055ca70b85f6c519e44e8fd4" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="2139380">
+				<rom name="Street Fighter 2 Disk 4.mfm" size="2139380" crc="eda4a515" sha1="be40cb13b26bd22f3b10fc798fd1803ef675287d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strider" supported="no">
 		<!-- SPS (CAPS) release 3193 -->
 		<description>Strider (Euro, Les Chevaliers)</description>

@@ -15269,7 +15269,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn">
+	<software name="guardlgnu" cloneof="guardlgn" supported="no">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15288,7 +15288,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn">
+	<software name="guardlgn" supported="no">
 		<description>The Guardian Legend (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -15307,7 +15307,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn">
+	<software name="guardic" cloneof="guardlgn" supported="no">
 		<description>Guardic Gaiden (Jpn)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -25010,7 +25010,7 @@ license:CC0
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-28"/>
 		<info name="release" value="19900629"/>
-		<info name="alt_title" value="燃えろ!! 柔道うぉり・ーず"/>
+		<info name="alt_title" value="燃えろ!! 柔道うおりあ〜ず"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jf17" />
 			<feature name="pcb" value="JALECO-JF-17" />
@@ -45048,6 +45048,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="bwram" size="8192"> <!-- TODO: verify on cart, but without it game doesn't start or continue after title screen -->
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -75764,7 +75767,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="sf3_9">
+	<software name="sf3_9" cloneof="sf3">
 		<description>Street Fighter III (Asia, 9 characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

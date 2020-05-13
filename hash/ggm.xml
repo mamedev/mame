@@ -23,6 +23,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="capa">
+		<description>Capablanca Edition - Master Chess Endgame</description>
+		<year>1981</year>
+		<publisher>Applied Concept</publisher>
+		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x02" />
+			<feature name="ram" value="1" /> <!-- HM6116LP-3 @ 0x800-0xfff -->
+			<dataarea name="rom" size="0x10000">
+				<rom name="7092-02" offset="0x6000" size="0x2000" crc="a792e8e2" sha1="b63e709cb953456e1c8b088225f7f385c433b8f9" /> <!-- D2764 -->
+				<rom name="7093-02" offset="0xe000" size="0x2000" crc="1142fb05" sha1="6ae463701b136e4af35b13f20063811526ca16dd" /> <!-- " -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sandy">
 		<description>Sandy Edition - Master Chess</description>
 		<year>1981</year>

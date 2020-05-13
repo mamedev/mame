@@ -3,7 +3,6 @@
 
 /*
 
-
 IQ Unlimited - GERMAN:
       +------------------------------------------------------------------------------+
       |                                                                              |
@@ -126,8 +125,14 @@ void iqunlim_state::iqunlim(machine_config &config)
 }
 
 ROM_START( iqunlim )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
+	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06122-006.bin", 0x000000, 0x400000, CRC(811b1b19) SHA1(bac99ce408ed0a3b6449db88b363293b46ce69b9) )
 ROM_END
 
-COMP( 19??, iqunlim, 0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "Video Technology", "VTech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)
+ROM_START( iqunlimgr )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, BAD_DUMP CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) ) // Seems underdumped
+ROM_END
+
+COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.

@@ -2781,7 +2781,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/scnxx562.h,MACHINES["SCN_PCI"] = true
+--@src/devices/machine/scn_pci.h,MACHINES["SCN_PCI"] = true
 ---------------------------------------------------
 
 if (MACHINES["SCN_PCI"]~=null) then

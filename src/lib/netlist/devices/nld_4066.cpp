@@ -9,7 +9,6 @@
 
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
-#include "nlid_system.h"
 
 // This is an experimental approach to implement the analog switch.
 // This will make the switch a 3 terminal element which is completely
@@ -31,8 +30,7 @@ namespace netlist
 	{
 	NETLIB_OBJECT(CD4066_GATE)
 	{
-		NETLIB_CONSTRUCTOR(CD4066_GATE)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE, "CD4XXX")
 		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "R")
 		, m_control(*this, "CTL")
@@ -84,8 +82,7 @@ namespace netlist
 
 	NETLIB_OBJECT(CD4066_GATE_DYNAMIC)
 	{
-		NETLIB_CONSTRUCTOR(CD4066_GATE_DYNAMIC)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE_DYNAMIC, "CD4XXX")
 		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "R", true)
 		, m_DUM1(*this, "_DUM1", true)

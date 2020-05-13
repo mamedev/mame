@@ -571,7 +571,7 @@ void z88_state::machine_reset()
 	m_bank_type[0] = m_bank_type[1] = m_bank_type[2] = m_bank_type[3] = 0;
 }
 
-READ8_MEMBER(z88_state::kb_r)
+uint8_t z88_state::kb_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 

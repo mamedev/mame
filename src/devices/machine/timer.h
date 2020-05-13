@@ -85,7 +85,7 @@ public:
 	bool enabled() const { return m_timer->enabled(); }
 
 	// property setters
-	void set_param(int param) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->set_param(param); }
+	void set_param(int param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
 	void set_ptr(void *ptr) { m_ptr = ptr; }
 	void enable(bool enable = true) const { m_timer->enable(enable); }
 
@@ -93,7 +93,8 @@ public:
 	void reset() { adjust(attotime::never, 0, attotime::never); }
 	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const
 	{
-		assert(m_type == TIMER_TYPE_GENERIC);
+		if(m_type != TIMER_TYPE_GENERIC)
+			fatalerror("Cannot adjust a non-generic timer.\n");
 		m_timer->adjust(duration, param, period);
 	}
 

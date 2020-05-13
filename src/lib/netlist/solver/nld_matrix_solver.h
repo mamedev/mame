@@ -329,7 +329,6 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_ext_t: public matrix_solver_t
 	{
-		friend class matrix_solver_t;
 	public:
 
 		using float_type = FT;

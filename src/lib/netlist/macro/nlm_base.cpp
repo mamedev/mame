@@ -75,15 +75,22 @@ NETLIST_END()
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(family_models)
-	NET_MODEL("FAMILY _(TYPE=CUSTOM IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130.0)")
+
+	// FAMILIES always need a type. UNKNOWN below will break
+	NET_MODEL("FAMILY _(TYPE=UNKNOWN IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130.0)")
 	NET_MODEL("OPAMP _()")
 	NET_MODEL("SCHMITT_TRIGGER _()")
 
-	// TTL: 	FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130)
+	NET_MODEL("74XX FAMILY(TYPE=TTL IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130)")
 
-	NET_MODEL("74XXOC FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
-	NET_MODEL("74XX FAMILY(TYPE=TTL)")
-	NET_MODEL("CD4XXX FAMILY(TYPE=CD4XXX)")
+	// CMOS
+	// low input 1.5 , high input trigger 3.5 at 5V supply
+	// output offsets, low for CMOS, thus 0.05
+	// output currents: see https://www.classe.cornell.edu/~ib38/teaching/p360/lectures/wk09/l26/EE2301Exp3F10.pdf
+	// typical CMOS may sink 0.4mA while output stays <= 0.4V
+	NET_MODEL("CD4XXX FAMILY(TYPE=CMOS IVL=0.3 IVH=0.7 OVL=0.05 OVH=0.05 ORL=500 ORH=500)")
+
+	NET_MODEL("74XXOC FAMILY(TYPE=TTL IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
 NETLIST_END()
 
 /* ----------------------------------------------------------------------------

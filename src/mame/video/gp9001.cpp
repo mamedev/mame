@@ -719,7 +719,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				else       sy = sy_base + dim_y;
 				for (int dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
 				{
-					clk += 64; // 64? cycle per each tile
+					clk += 32; // 32? cycle per each tile; TODO: verify from real hardware
 					if (clk > clk_max)
 						return;
 

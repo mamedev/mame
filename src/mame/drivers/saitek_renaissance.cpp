@@ -22,7 +22,7 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- LCD (need SED150x device + SVG screen)
+- LCD (need SVG screen)
 - not sure about comm/module leds
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
@@ -36,6 +36,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
+#include "video/sed1500.h"
 
 #include "speaker.h"
 
@@ -211,7 +212,7 @@ void ren_state::main_map(address_map &map)
 	map(0x2400, 0x2400).w(FUNC(ren_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(ren_state::control_r), FUNC(ren_state::control_w));
 	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x607f).nopw(); // lcd
+	map(0x6000, 0x607f).w("lcd", FUNC(sed1502_device::write));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -291,6 +292,7 @@ void ren_state::ren(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
+	SED1502(config, "lcd", 32768);
 	PWM_DISPLAY(config, m_display).set_size(9+1, 9);
 	config.set_default_layout(layout_saitek_renaissance);
 

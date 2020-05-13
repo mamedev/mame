@@ -88,7 +88,7 @@ void md_seprom_codemast_device::device_add_mconfig(machine_config &config)
 
 void md_seprom_mm96_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C16A(config, m_i2cmem);
+	I2C_24C16(config, m_i2cmem); // 24C16A
 }
 
 

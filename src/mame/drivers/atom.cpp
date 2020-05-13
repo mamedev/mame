@@ -183,7 +183,7 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
      eprom_r - EPROM slot select read
 -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::eprom_r )
+uint8_t atomeb_state::eprom_r()
 {
 	return m_eprom;
 }
@@ -192,7 +192,7 @@ READ8_MEMBER( atomeb_state::eprom_r )
      eprom_w - EPROM slot select write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( atomeb_state::eprom_w )
+void atomeb_state::eprom_w(uint8_t data)
 {
 	/*
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER( atomeb_state::eprom_w )
  ext_r - read external roms at 0xa000
  -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::ext_r )
+uint8_t atomeb_state::ext_r(offs_t offset)
 {
 	if (m_ext[m_eprom & 0x0f]->exists())
 		return m_ext[m_eprom & 0x0f]->read_rom(offset);
@@ -229,7 +229,7 @@ READ8_MEMBER( atomeb_state::ext_r )
  dor_r - read DOS roms at 0xe000
  -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::dos_r )
+uint8_t atomeb_state::dos_r(offs_t offset)
 {
 	if (m_e0->exists() && !BIT(m_eprom, 7))
 		return m_e0->read_rom(offset);
@@ -452,7 +452,7 @@ INPUT_PORTS_END
     I8255 interface
 -------------------------------------------------*/
 
-WRITE8_MEMBER( atom_state::ppi_pa_w )
+void atom_state::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER( atom_state::ppi_pa_w )
 	m_vdg->gm2_w(BIT(data, 7));
 }
 
-READ8_MEMBER( atom_state::ppi_pb_r )
+uint8_t atom_state::ppi_pb_r()
 {
 	/*
 
@@ -517,7 +517,7 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 	return data;
 }
 
-READ8_MEMBER( atom_state::ppi_pc_r )
+uint8_t atom_state::ppi_pc_r()
 {
 	/*
 
@@ -551,7 +551,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( atom_state::ppi_pc_w )
+void atom_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -629,7 +629,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
     mc6847 interface
 -------------------------------------------------*/
 
-READ8_MEMBER( atom_state::vdg_videoram_r )
+uint8_t atom_state::vdg_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

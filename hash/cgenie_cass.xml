@@ -1643,7 +1643,7 @@ Screen-Printer (standalone)
 		<info name="usage" value="Type SYSTEM and load with POLEPO, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14362">
-				<rom name="polepo.cas" size="14362" crc="cfd0d6ce" sha1="35658b20373f4ec0673a6aa81f161101dd916cea" />
+				<rom name="polepo.cas" size="14362" crc="cfd0d6ce" sha1="bfced1e2d8128d38b4657c330ff67037759de832" />
 			</dataarea>
 		</part>
 	</software>

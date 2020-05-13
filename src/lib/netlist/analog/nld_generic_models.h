@@ -45,7 +45,7 @@ namespace analog
 	class generic_capacitor<capacitor_e::VARIABLE_CAPACITY>
 	{
 	public:
-		generic_capacitor(device_t &dev, const pstring &name)
+		generic_capacitor(core_device_t &dev, const pstring &name)
 		: m_h(dev, name + ".m_h", nlconst::zero())
 		, m_c(dev, name + ".m_c", nlconst::zero())
 		, m_v(dev, name + ".m_v", nlconst::zero())
@@ -133,7 +133,7 @@ namespace analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(device_t &dev, const pstring &name)
+		generic_capacitor_const(core_device_t &dev, const pstring &name)
 		: m_gmin(nlconst::zero())
 		{
 			plib::unused_var(dev, name);
@@ -210,7 +210,7 @@ namespace analog
 	class generic_diode
 	{
 	public:
-		generic_diode(device_t &dev, const pstring &name)
+		generic_diode(core_device_t &dev, const pstring &name)
 		: m_Vd(dev, name + ".m_Vd", nlconst::diode_start_voltage())
 		, m_Id(dev, name + ".m_Id", nlconst::zero())
 		, m_G(dev,  name + ".m_G", nlconst::cgminalt())

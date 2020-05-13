@@ -11,7 +11,6 @@
 
 #include "nld_7497.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -42,7 +41,13 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_rate = 0;
+			m_lastclock = 0;
+		}
+
 		NETLIB_UPDATEI();
 
 		NETLIB_HANDLERI(noop) { }
@@ -50,7 +55,8 @@ namespace netlist
 		NETLIB_HANDLERI(clr);
 		NETLIB_HANDLERI(clk_strb);
 
-	protected:
+		friend class NETLIB_NAME(7497_dip);
+	private:
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
 		logic_input_t m_STRBQ;
@@ -87,13 +93,6 @@ namespace netlist
 			return a;
 		}
 	};
-
-	NETLIB_RESET(7497)
-	{
-		m_cnt = 0;
-		m_rate = 0;
-		m_lastclock = 0;
-	}
 
 	NETLIB_UPDATE(7497)
 	{
@@ -147,28 +146,33 @@ namespace netlist
 
 	}
 
-	NETLIB_OBJECT_DERIVED(7497_dip, 7497)
+	NETLIB_OBJECT(7497_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7497_dip, 7497)
+		NETLIB_CONSTRUCTOR(7497_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_B[4]);  // B0
-			register_subalias("2", m_B[1]);  // B4
-			register_subalias("3", m_B[0]);  // B5
-			register_subalias("4", m_B[5]);  // B0
-			register_subalias("5", m_ZQ);
-			register_subalias("6", m_Y);
-			register_subalias("7", m_ENOUTQ);
-			register_subalias("8", "GND");
+			register_subalias("1", A.m_B[4]);  // B0
+			register_subalias("2", A.m_B[1]);  // B4
+			register_subalias("3", A.m_B[0]);  // B5
+			register_subalias("4", A.m_B[5]);  // B0
+			register_subalias("5", A.m_ZQ);
+			register_subalias("6", A.m_Y);
+			register_subalias("7", A.m_ENOUTQ);
+			register_subalias("8", "A.GND");
 
-			register_subalias("9", m_CLK);
-			register_subalias("10", m_STRBQ);
-			register_subalias("11", m_UNITYQ);
-			register_subalias("12", m_ENQ);
-			register_subalias("13", m_CLR);
-			register_subalias("14", m_B[3]); // B2
-			register_subalias("15", m_B[2]); // B3
-			register_subalias("16", "VCC");
+			register_subalias("9", A.m_CLK);
+			register_subalias("10", A.m_STRBQ);
+			register_subalias("11", A.m_UNITYQ);
+			register_subalias("12", A.m_ENQ);
+			register_subalias("13", A.m_CLR);
+			register_subalias("14", A.m_B[3]); // B2
+			register_subalias("15", A.m_B[2]); // B3
+			register_subalias("16", "A.VCC");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(7497) A;
 	};
 
 

@@ -120,11 +120,11 @@ private:
 	DECLARE_WRITE16_MEMBER(bankedarea_w);
 	DECLARE_WRITE8_MEMBER(led_out_w);
 	DECLARE_WRITE8_MEMBER(fifo_out_w);
-	DECLARE_READ8_MEMBER(via_pa_r);
-	DECLARE_WRITE8_MEMBER(via_pa_w);
+	uint8_t via_pa_r();
+	void via_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_WRITE8_MEMBER(via_pb_w);
+	uint8_t via_pb_r();
+	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
@@ -296,13 +296,13 @@ WRITE8_MEMBER(lwriter_state::fifo_out_w)
 }
 
 /* via stuff */
-READ8_MEMBER(lwriter_state::via_pa_r)
+uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER(lwriter_state::via_pa_w)
+void lwriter_state::via_pa_w(uint8_t data)
 {
 	logerror(" VIA: Port A written with data of 0x%02x!\n", data);
 }
@@ -312,13 +312,13 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
 	logerror(" VIA: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER(lwriter_state::via_pb_r)
+uint8_t lwriter_state::via_pb_r()
 {
 	logerror(" VIA: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER(lwriter_state::via_pb_w)
+void lwriter_state::via_pb_w(uint8_t data)
 {
 	logerror(" VIA: Port B written with data of 0x%02x!\n", data);
 	/* Like early Mac models which had VIA A4 control overlaying, the

@@ -15,7 +15,7 @@ namespace netlist
 	{
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
+		NETLIB_CONSTRUCTOR(r2r_dac)
 		, m_VIN(*this, "VIN", nlconst::one())
 		, m_R(*this, "R", nlconst::one())
 		, m_num(*this, "N", 1)

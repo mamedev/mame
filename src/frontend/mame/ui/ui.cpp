@@ -1383,7 +1383,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			void *param = (void *)&exec.device();
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
-			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+			m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 100, 1000, 4000, 10, param));
 		}
 		for (device_sound_interface &snd : sound_interface_iterator(machine.root_device()))
 		{
@@ -1392,7 +1392,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 			{
 				void *param = (void *)&snd.device();
 				std::string str = string_format(_("Overclock %1$s sound"), snd.device().tag());
-				m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 10, 1000, 2000, 1, param));
+				m_sliders.push_back(slider_alloc(SLIDER_ID_OVERCLOCK + slider_index++, str.c_str(), 100, 1000, 4000, 10, param));
 			}
 		}
 	}
@@ -1660,7 +1660,7 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 	}
 
 	if (str)
-		*str = string_format(_("%1$.3ffps"), screen->frame_period().as_hz());
+		*str = string_format(_("%1$.3f" UTF8_NBSP "Hz"), screen->frame_period().as_hz());
 	refresh = screen->frame_period().as_hz();
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }

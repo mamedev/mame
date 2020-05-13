@@ -202,8 +202,6 @@ namespace plib {
 				timer &m_m;
 			};
 
-			friend struct guard_t;
-
 			timer() : m_time(0), m_count(0) { }
 
 			type operator()() const { return m_time; }

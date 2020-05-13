@@ -53,7 +53,7 @@ private:
 	DECLARE_WRITE16_MEMBER(mmuaddr_w);
 	DECLARE_READ16_MEMBER(mmuflags_r);
 	DECLARE_WRITE16_MEMBER(mmuflags_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	u8 get_slave_ack(offs_t offset);
 	DECLARE_READ16_MEMBER(fault_r);
 	DECLARE_READ16_MEMBER(errlo_r);
 	DECLARE_READ16_MEMBER(errhi_r);
@@ -495,7 +495,7 @@ WRITE16_MEMBER(altos8600_state::mode_w)
 		m_user = true;
 }
 
-READ8_MEMBER(altos8600_state::get_slave_ack)
+u8 altos8600_state::get_slave_ack(offs_t offset)
 {
 	if(offset == 2)
 		return m_pic[1]->acknowledge();

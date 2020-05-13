@@ -484,6 +484,18 @@ namespace plib {
 			{
 				m_if_flag ^= (1 << m_if_level);
 			}
+			else if (lti[0] == "#elif")
+			{
+				m_if_flag ^= (1 << m_if_level);
+				lt = replace_macros(lt);
+				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(5), m_expr_sep, true, true)));
+				auto val = static_cast<int>(prepro_expr(t, 255));
+				t.skip_ws();
+				if (!t.eod())
+					error("found unprocessed content at end of line");
+				if (val == 0)
+					m_if_flag |= (1 << m_if_level);
+			}
 			else if (lti[0] == "#endif")
 			{
 				m_if_flag &= ~(1 << m_if_level);
@@ -573,6 +585,19 @@ namespace plib {
 							r += args.next_ws();
 						m_defines.insert({n, define_t(n, r)});
 					}
+				}
+			}
+			else if (lti[0] == "#undef")
+			{
+				if (m_if_flag == 0)
+				{
+					if (lti.size() < 2)
+						error("undef needs at least one argument");
+					auto args(simple_iter<ppreprocessor>(this, tokenize(lt.substr(7), m_expr_sep, false, false)));
+					pstring n = args.next();
+					if (!is_valid_token(n))
+						error("undef expected identifier");
+					m_defines.erase(n);
 				}
 			}
 			else

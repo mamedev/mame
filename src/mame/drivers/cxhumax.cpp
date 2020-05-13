@@ -1062,7 +1062,7 @@ void cxhumax_state::cxhumax(machine_config &config)
 
 
 	INTEL_28F320J3D(config, "flash");
-	I2CMEM(config, "eeprom", 0).set_data_size(0x2000);
+	I2C_24C64(config, "eeprom", 0); // 24LC64
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

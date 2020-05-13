@@ -122,18 +122,18 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	void via1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
 	DECLARE_WRITE_LINE_MEMBER( write_ndac );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
 
-	DECLARE_WRITE8_MEMBER( via2_pa_w );
-	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	void via2_pa_w(uint8_t data);
+	void via2_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
-	DECLARE_WRITE8_MEMBER( via3_pb_w );
+	void via3_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
 }
 
 
-WRITE8_MEMBER( victor9k_state::via1_pa_w )
+void victor9k_state::via1_pa_w(uint8_t data)
 {
 	/*
 
@@ -395,7 +395,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 
 	// IEEE-488
-	m_ieee488->write_dio(data);
+	m_ieee488->host_dio_w(data);
 }
 
 DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
@@ -410,7 +410,7 @@ DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_ndac )
 	m_via1->write_ca2(state);
 }
 
-WRITE8_MEMBER( victor9k_state::via1_pb_w )
+void victor9k_state::via1_pb_w(uint8_t data)
 {
 	/*
 
@@ -452,7 +452,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
-WRITE8_MEMBER( victor9k_state::via2_pa_w )
+void victor9k_state::via2_pa_w(uint8_t data)
 {
 	/*
 
@@ -477,7 +477,7 @@ void victor9k_state::update_kback()
 	m_kb->kback_w(kback);
 }
 
-WRITE8_MEMBER( victor9k_state::via2_pb_w )
+void victor9k_state::via2_pb_w(uint8_t data)
 {
 	/*
 
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
     CB2    J5-50
 */
 
-WRITE8_MEMBER( victor9k_state::via3_pb_w )
+void victor9k_state::via3_pb_w(uint8_t data)
 {
 	// codec clock output
 	m_ssda->rx_clk_w(!BIT(data, 7));

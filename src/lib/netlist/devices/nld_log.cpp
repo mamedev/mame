@@ -51,7 +51,7 @@ namespace netlist
 
 	NETLIB_OBJECT_DERIVED(logD, log)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(logD, log)
+		NETLIB_CONSTRUCTOR(logD)
 		, m_I2(*this, "I2")
 		{
 		}

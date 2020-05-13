@@ -141,7 +141,7 @@ void bbc_state::set_pixel_lookup()
 }
 
 
-WRITE8_MEMBER(bbc_state::video_ula_w)
+void bbc_state::video_ula_w(offs_t offset, uint8_t data)
 {
 	// Make sure vpos is never <0
 	int vpos = m_screen->vpos();

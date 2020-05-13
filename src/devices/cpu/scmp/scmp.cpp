@@ -312,7 +312,7 @@ void scmp_device::execute_one(int opcode)
 						m_AC = 0xff;
 						break;
 			// Others are illegal
-			default :   m_icount -= 1;
+			default :   m_icount -= 5;
 						illegal (opcode);
 						break;
 		}
@@ -444,7 +444,7 @@ void scmp_device::execute_one(int opcode)
 						m_icount -= 5;
 						break;
 			// Others are illegal
-			default :   m_icount -= 1;
+			default :   m_icount -= 5;
 						illegal (opcode);
 						break;
 		}
@@ -455,6 +455,7 @@ void scmp_device::execute_one(int opcode)
 /***************************************************************************
     COMMON EXECUTION
 ***************************************************************************/
+
 void scmp_device::take_interrupt()
 {
 	uint16_t tmp = ADD12(m_PC.w.l,-1); // We fix PC so at return it goes to current location

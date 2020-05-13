@@ -26,8 +26,6 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<FT, SIZE>
 	{
-		friend class matrix_solver_t;
-
 	public:
 
 		using float_type = FT;

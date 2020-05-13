@@ -1115,7 +1115,7 @@ void twinkle_state::twinklex(machine_config &config)
 void twinkle_state::twinklei(machine_config &config)
 {
 	twinkle(config);
-	I2CMEM(config, "security", 0).set_data_size(0x100);
+	I2C_M24C02(config, "security", 0); // M24C02-W
 }
 
 static INPUT_PORTS_START( twinkle )

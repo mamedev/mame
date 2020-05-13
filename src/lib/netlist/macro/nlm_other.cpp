@@ -1,8 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "nlm_other.h"
 
-#include "netlist/devices/nld_system.h"
 #include "netlist/devices/net_lib.h"
 
 /*
@@ -45,7 +43,7 @@ NETLIST_END()
 
 //- Identifier:  NE566_DIP
 //- Title: NE566 Voltage Controlled Oscillator
-//-Description: The LM566CN is a general purpose voltage controlled oscillator
+//- Description: The LM566CN is a general purpose voltage controlled oscillator
 //-    which may be used to generate square and triangula waves, the frequency
 //-    of which is a very linear function of a control voltage. The frequency
 //-    is also a function of an external resistor and capacitor.
@@ -93,10 +91,11 @@ static NETLIST_START(NE566_DIP)
 	VCVS(VO, 1)
 	DIODE(DC, "D")
 	DIODE(DM, "D")
-	RES(ROSQ, 5200)
+	RES(ROD, 5200)
+	RES(ROU, 200)
 
 	PARAM(VO.RO, 50)
-	PARAM(COMP.FAMILY, "FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.1 ORL=50 ORH=50)")
+	PARAM(COMP.MODEL, "FAMILY(TYPE=CUSTOM IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.1 ORL=50 ORH=50)")
 	PARAM(SW.GOFF, 0) // This has to be zero to block current sources
 
 	NET_C(CI2.IN, VI.OP)
@@ -133,15 +132,16 @@ static NETLIST_START(NE566_DIP)
 	// Square output wave
 	AFUNC(FO, 2, "min(A1-1,A0 + 5)")
 	NET_C(COMP.QQ, FO.A0)
-	NET_C(FO.Q, ROSQ.1)
+	NET_C(FO.Q, ROU.1)
+	NET_C(ROU.2, ROD.1)
 
-	NET_C(COMP.GND, SW.GND, VI.ON, VI.IN, CI1.ON, CI2.ON, VO.IN, VO.ON, R2.2, ROSQ.2)
+	NET_C(COMP.GND, SW.GND, VI.ON, VI.IN, CI1.ON, CI2.ON, VO.IN, VO.ON, R2.2, ROD.2)
 	NET_C(COMP.VCC, SW.VCC, R1.2)
 	NET_C(COMP.IP, R1.1, R2.1, R3.1)
 	NET_C(COMP.Q, R3.2)
 
 	ALIAS(1, VI.ON) // GND
-	ALIAS(3, FO.Q) // Square out
+	ALIAS(3, ROD.1) // Square out
 	ALIAS(4, VO.OP) // Diag out
 	ALIAS(5, VI.IP) // VC
 	ALIAS(6, CI1.IP) // R1
@@ -159,7 +159,7 @@ NETLIST_START(otheric_lib)
 		TT_LINE(" 0 | 1 |100")
 		TT_LINE(" 1 | 0 |100")
 		// 2.1V negative going and 2.7V positive going at 5V
-		TT_FAMILY("FAMILY(IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
+		TT_FAMILY("FAMILY(TYPE=CMOS IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
 	TRUTHTABLE_END()
 
 	LOCAL_LIB_ENTRY(MC14584B_DIP)

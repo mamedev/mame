@@ -26,12 +26,12 @@ DOC = $(SRC)/documentation
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
 #TIDY_FLAGSX += -cppcoreguidelines-owning-memory,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
 TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
-#TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
-TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
+TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
+#TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
@@ -40,8 +40,8 @@ TIDY_FLAGSX += -modernize-use-trailing-return-type,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
-TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,
-TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
+TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
+#TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
 
 space :=
 space +=
@@ -73,7 +73,10 @@ TIDY_DB = $(OBJ)/compile_commands.json
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../.. $(CEXTRAFLAGS)
+CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../.. 
+
+
+CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl $(EXTRALIBS)
 
@@ -82,6 +85,8 @@ LD = @g++
 MD = @mkdir
 RM = @rm
 CLANG_TIDY = clang-tidy-11
+DEPENDCC=$(CC)
+
 
 ifndef FAST
 FAST=1
@@ -279,17 +284,20 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
 
 clang:
-	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 nvcc:
-	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc OBJ=obj/nvcc \
-		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
+	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
+		OBJ=obj/nvcc CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda \
+		--expt-relaxed-constexpr --default-stream per-thread --restrict" \
+		DEPENDCC=g++
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
@@ -328,7 +336,7 @@ $(DEPEND): maketree $(SOURCES)
 	@echo creating $(DEPEND)
 	@rm -f $(DEPEND)
 	@for i in $(SOURCES); do \
-		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
+		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
 	done
 
 depend: $(DEPEND)

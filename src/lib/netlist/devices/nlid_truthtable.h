@@ -38,10 +38,8 @@ namespace devices
 	template<> struct uint_for_size<8> { using type = uint_least64_t; };
 
 	template<std::size_t m_NI, std::size_t m_NO>
-	NETLIB_OBJECT(truthtable_t)
+	class NETLIB_NAME(truthtable_t) : public device_t
 	{
-	private:
-		detail::family_setter_t m_fam;
 	public:
 
 		using type_t = typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type;
@@ -63,10 +61,9 @@ namespace devices
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name,
-				const logic_family_desc_t &fam,
+				const pstring &model,
 				truthtable_t &ttp, const std::vector<pstring> &desc)
-		: device_t(owner, name)
-		, m_fam(*this, fam)
+		: device_t(owner, name, model)
 #if USE_TT_ALTERNATIVE
 		, m_state(*this, "m_state", 0)
 #endif
@@ -203,7 +200,6 @@ namespace devices
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
 		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
 
-		/* FIXME: check width */
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
 #endif
@@ -220,15 +216,13 @@ namespace factory
 	class truthtable_base_element_t : public factory::element_t
 	{
 	public:
-		truthtable_base_element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param, const pstring &sourcefile);
+		truthtable_base_element_t(const pstring &name,
+			const pstring &def_param, const pstring &sourcefile);
 
 		std::vector<pstring> m_desc;
 		pstring m_family_name;
-		const logic_family_desc_t *m_family_desc;
 	};
 
-	// FIXME: the returned element is missing a pointer to the family ...
 	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, const pstring &sourcefile);
 
 } // namespace factory

@@ -288,6 +288,11 @@ void nscsi_full_device::step(bool timeout)
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_state = IDLE;
 		LOG("scsi bus reset\n");
+		scsi_state = scsi_substate = IDLE;
+		buf_control_rpos = buf_control_wpos = 0;
+		scsi_identify = 0;
+		data_buffer_size = 0;
+		data_buffer_pos = 0;
 		return;
 	}
 

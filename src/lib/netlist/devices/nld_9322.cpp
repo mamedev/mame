@@ -7,7 +7,6 @@
 
 #include "nld_9322.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -73,10 +72,11 @@ namespace netlist
 
 		NETLIB_UPDATEI();
 
+		friend class NETLIB_NAME(9322_dip);
 	public:
 		logic_input_t m_SELECT;
 		logic_input_t m_STROBE;
-	protected:
+	private:
 		NETLIB_SUB(9322_selector) m_1;
 		NETLIB_SUB(9322_selector) m_2;
 		NETLIB_SUB(9322_selector) m_3;
@@ -84,28 +84,34 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT_DERIVED(9322_dip, 9322)
+	NETLIB_OBJECT(9322_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(9322_dip, 9322)
+		NETLIB_CONSTRUCTOR(9322_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_SELECT);
-			register_subalias("2", m_1.m_A);
-			register_subalias("3", m_1.m_B);
-			register_subalias("4", m_1.m_Y);
-			register_subalias("5", m_2.m_A);
-			register_subalias("6", m_2.m_B);
-			register_subalias("7", m_2.m_Y);
-			register_subalias("8", "GND");
+			register_subalias("1", A.m_SELECT);
+			register_subalias("2", A.m_1.m_A);
+			register_subalias("3", A.m_1.m_B);
+			register_subalias("4", A.m_1.m_Y);
+			register_subalias("5", A.m_2.m_A);
+			register_subalias("6", A.m_2.m_B);
+			register_subalias("7", A.m_2.m_Y);
+			register_subalias("8", "A.GND");
 
-			register_subalias("9",  m_3.m_Y);
-			register_subalias("10", m_3.m_B);
-			register_subalias("11", m_3.m_A);
-			register_subalias("12", m_4.m_Y);
-			register_subalias("13", m_4.m_B);
-			register_subalias("14", m_4.m_A);
-			register_subalias("15", m_STROBE);
-			register_subalias("16", "VCC");
+			register_subalias("9",  A.m_3.m_Y);
+			register_subalias("10", A.m_3.m_B);
+			register_subalias("11", A.m_3.m_A);
+			register_subalias("12", A.m_4.m_Y);
+			register_subalias("13", A.m_4.m_B);
+			register_subalias("14", A.m_4.m_A);
+			register_subalias("15", A.m_STROBE);
+			register_subalias("16", "A.VCC");
 		}
+
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(9322) A;
 	};
 
 	// FIXME: Timing

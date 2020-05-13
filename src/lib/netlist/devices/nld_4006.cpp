@@ -6,7 +6,7 @@
  */
 
 #include "nld_4006.h"
-#include "nlid_system.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -14,18 +14,13 @@ namespace netlist
 	{
 	NETLIB_OBJECT(CD4006)
 	{
-		NETLIB_CONSTRUCTOR(CD4006)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR_MODEL(CD4006, "CD4XXX")
 		, m_CLOCK(*this, "CLOCK")
 		, m_I(*this, {"D1", "D2", "D3", "D4"})
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D3P5"})
 		, m_d(*this, "m_d", 0)
 		, m_last_clock(*this, "m_last_clock", 0)
 		, m_supply(*this, "VDD", "VSS")
-		{
-		}
-
-		NETLIB_RESETI()
 		{
 		}
 
@@ -61,7 +56,8 @@ namespace netlist
 			}
 		}
 
-	protected:
+		friend class NETLIB_NAME(CD4006_dip);
+	private:
 		logic_input_t m_CLOCK;
 		object_array_t<logic_input_t, 4>  m_I;
 		object_array_t<logic_output_t, 7> m_Q;
@@ -70,27 +66,31 @@ namespace netlist
 		nld_power_pins m_supply;
 	};
 
-	NETLIB_OBJECT_DERIVED(CD4006_dip, CD4006)
+	NETLIB_OBJECT(CD4006_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(CD4006_dip, CD4006)
+		NETLIB_CONSTRUCTOR(CD4006_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_I[0]);
-			register_subalias("2", m_Q[1]);
-			register_subalias("3", m_CLOCK);
-			register_subalias("4", m_I[1]);
-			register_subalias("5", m_I[2]);
-			register_subalias("6", m_I[3]);
-			register_subalias("7", "VSS");
+			register_subalias("1", A.m_I[0]);
+			register_subalias("2", A.m_Q[1]);
+			register_subalias("3", A.m_CLOCK);
+			register_subalias("4", A.m_I[1]);
+			register_subalias("5", A.m_I[2]);
+			register_subalias("6", A.m_I[3]);
+			register_subalias("7", "A.VSS");
 
-			register_subalias("8", m_Q[5]);
-			register_subalias("9", m_Q[6]);
-			register_subalias("10", m_Q[4]);
-			register_subalias("11", m_Q[2]);
-			register_subalias("12", m_Q[3]);
-			register_subalias("13", m_Q[0]);
-			register_subalias("14", "VDD");
+			register_subalias("8", A.m_Q[5]);
+			register_subalias("9", A.m_Q[6]);
+			register_subalias("10", A.m_Q[4]);
+			register_subalias("11", A.m_Q[2]);
+			register_subalias("12", A.m_Q[3]);
+			register_subalias("13", A.m_Q[0]);
+			register_subalias("14", "A.VDD");
 
 		}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(CD4006) A;
 	};
 
 	NETLIB_DEVICE_IMPL(CD4006, "CD4006", "+CLOCK,+D1,+D2,+D3,+D4,+D1P4,+D1P4S,+D2P4,+D2P5,+D3P4,+D4P4,+D3P5,@VCC,@GND")

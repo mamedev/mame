@@ -6,8 +6,10 @@ license:CC0
 
 <!-- define elements -->
 
+	<element name="lcdw"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcdm"><rect><color red="0.37" green="0.42" blue="0.43" /></rect></element>
+	<element name="lcda"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 	<element name="static_red"><rect><color red="0.7" green="0.13" blue="0.12" /></rect></element>
-	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
 	<element name="ledr" defstate="0">
@@ -454,14 +456,10 @@ license:CC0
 
 	<!-- lcd panel -->
 
-		<screen tag="screen">
-			<bounds x="86.5" y="9.5" width="24.25" height="2.5" />
-		</screen>
-
-		<bezel element="static_lcd"><bounds x="86" y="8.5" width="25.25" height="1.1" /></bezel>
-		<bezel element="static_lcd"><bounds x="86" y="11.9" width="25.25" height="1.1" /></bezel>
-		<bezel element="static_lcd"><bounds x="86" y="8.5" width="0.6" height="3.5" /></bezel>
-		<bezel element="static_lcd"><bounds x="110.65" y="8.5" width="0.6" height="3.5" /></bezel>
+		<element ref="lcdw"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
+		<screen tag="screen"><bounds x="86.5" y="9.5" width="24.25" height="2.5" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
+		<element ref="lcda" blend="add"><bounds x="86" y="8.5" width="25.25" height="4.5" /></element>
 
 	<!-- right side buttons -->
 

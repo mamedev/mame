@@ -1,1194 +1,1054 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
-/**
- * This driver describes Namco's System22 and System Super22 hardware.
- *
- * driver provided with thanks to:
- * - hap
- * - pstroffo@yahoo.com (Phil Stroffolino)
- * - R. Belmont
- * - trackmaster@gmx.net (Bjorn Sunder)
- * - team vivanonno
- *
- * TODO:
- * - finish slave DSP emulation
- * - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
- * - alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
- *   of some of the gfx chips on the fly
- * - C139 for linked cabinets, as well as in RR fullscale
- * - confirm DSP and MCU clocks and their IRQ timing
- * - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
- * - where is the steering wheel motor torque output for dirtdash?
- * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
- *       it used to be much worse with the legacy_poly_manager
- * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
- * - improve ss22 lighting:
- *       + mountains in alpinr2b selection screen
- *       + ridgerac waving flag shadowing
- *       + cybrcomm enemies should flash white when you shoot them, probably lighting related
- *       + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
- * - improve ss22 spot:
- *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
- *       + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
- *       + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
- * - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snowmelting effect)
- * - support for text layer video partial updates after posirq, alpinesa does raster effects on it
- * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
- * - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
- * - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
- * - cybrcycc speed dial needle is missing
- * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
- * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom? - need to verify the pointrom dumps
- * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
- *       czram contents is rather odd here and partly cleared (probably the cause?):
- *        $0000-$0d7f - gradual increase from $00-$7c
- *        $0d80-$0fff - $73, huh, why lower?
- *        $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
- *        $1a00-$0dff - $77
- *        $1e00-$1fff - $78
- *
- * - lots of smaller issues
- *
- **********************************************************************************************************
- * Input
- *      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
- *
- * Output Devices
- *      - Prop Cycle fan (outputs noted at the right MCU port)
- *      - lamps/LEDs on some cabinets
- *      - time crisis has force feedback for the guns
- *
- * Notes:
- *      The "dipswitch" settings are ignored in many games - this isn't a bug.  For example, Prop Cycle software
- *      explicitly clears the chunk of work RAM used to cache the 8 bit dipswitch value immediately after
- *      populating it.  This is apparently done to hide secret debug routines from release versions of games.
- *
- * Self Test Info:
- *    Prop Cycle DSP tests:
- *        MD ROM-PROGRAM      (not-yet-working)
- *        MD-DOWNLOAD       - confirms that main CPU can upload custom code to master DSP
- *        MD-EXTERNAL-RAM   - tests private RAM used by master DSP
- *        C-RAM CHECK BY MD - tests communications RAM, shared by master DSP and main CPU
- *        PDP LOOP TEST     - exercises multi-command DMA transfer
- *        PDP BLOCK MOVE    - exercises DMA block transfer
- *        POINT RAM         - RAM test for "Point RAM" (not directly accessible by any CPU)
- *        CUSTOM IC STATUS  - currently hacked to always report "good"
- *        SD ROM-PRG        - confirms that master DSP can upload custom code to run on slave DSP
- *        SD EXTERNAL-RAM   - tests private RAM used by slave DSP
- *        DATA FLOW TEST 1    (not-yet-working)
- *        DATA FLOW TEST 2    (not-yet-working)
- *        POINT ROM TEST    - checksums the "Point ROMs"
- *
- *    Ridge Racer (Japan) tests:
- *        TEST 1a: MD-EXTERNAL-RAM
- *        TEST 1b: C-RAM CHECK BY MD
- *        TEST 2:  (not-yet-working)
- *        TEST 3:  SD EXTERNAL-RAM
- *        TEST 4:  DATA FLOW TEST 1 (not-yet-working)
- *        TEST 5:  DATA FLOW TEST 2 (not-yet-working)
- *        TEST 6:  POINT RAM
- *
- * IO MCU:
- * - generates sound/music
- * - provides input port management (copying to shared RAM)
- * - coinage handling in most games
- * - manages external physical devices (i.e. lamps, fans, force feedback)
- * - C74 is sound MCU, Mitsubishi M37702 MCU with mask ROM
- * - some external subroutines for C74 are also embedded
- *
- * Master DSP:
- * - S22 has two TI320C25 DSP (printed as C71)
- * - the master DSP provides display list parsing
- *
- * Slave DSP:
- * - serves as a calculation engine for lighting
- *
- * Communications RAM
- * - seen as 32 bit memory by main 68k CPU
- * - seen as 16 bit memory by master DSP (addr 0x8000..0xffff); upper/lower word is selectable
- * - not addressable by slave DSP
- *
- * Point ROMs
- * - encodes 3d model data
- * - not directly addressable by any CPU
- *
- * Point RAM
- * - same address space as Point ROMs
- * - not directly addressable by any CPU
- *
- * Link Feature:
- * - some (typically racing) games may be linked together
- * - serial controller is C139 SCI (same as System21).
- *
- * System Super22
- * - different memory map
- * - different CPU controller register layout
- * - sound CPU uses external ROM (i.e. pr1data.8k) instead of internal BIOS (C74)
- * - additional 2d sprite layer
- * - Point RAM starts at 0xf80000 rather than 0xf00000
- * - "PDP" device, for automated block memory transfers (dsp ram, point ram)
- *
- **********************************************************************************************************
- * SYSTEM22 Known Custom Chips
- *
- * CPU PCB:
- *
- *  C71 TI TMS320C25 DSP
- *  C71 WEYW40116 (TMS320C25 Main/Sub DSP)
- *  C71 D72260FN 980 FE-5CA891W
- *
- *  M5M5178AP-25 (CPU 16R, 17R, 19R, 20R) DSP Work RAM (8K x 8bit x 2 x 2)
- *
- *  C74 Mitsubishi M37702 MCU
- *  C74 159 408600 (OLD SUB)
- *  C74 159 543100 (NEW SUB)
- *  C74 159 414600 (OLD I/O)
- *  C74 159 437600 (NEW I/O)
- *
- * C195 (Shared SRAM Controller)
- * C196 CPP x 6
- * C199 (CPU 18K) x 1
- * C317 IDC (CPU 15E) x 1 (S21B)
- * C337 PFP x 1
- * C342 x 1 (S21B)
- * C352 (32ch PCM)
- * C353 x 1
- *
- *
- * VIDEO PCB:
- *
- * C304 - 4 chips on SS22 Video PCB
- * C305 (Palette)
- * C335
- *  9C, 10C
- *  12D, 12E
- *  14C
- * C300
- *  18B, 18C, 20B, 20C, 22B, 22C
- * Cxxx
- *  34R, 35R
- *
- * TI TBP28L22N (256 x 8bit PROM)
- *  VIDEO 2D, 3D, 4D (RGB Gamma LUT ROM)
- *
- *  RR1.GAM (for Ridge Racer 1/2, Rave Racer)
- **********************************************************************************************************
- *
- *Namco Super System 22 Hardware Overview (last updated 21st
- *December 2012 at 7:15pm)
- *---------------------------------------
- *
- *This document covers all the known Namco Super System 22 games, including....
- *Air Combat 22    (C) Namco, 1995
- *Alpine Racer 1   (C) Namco, 1994
- *Alpine Racer 2   (C) Namco, 1996
- *Alpine Surfer    (C) Namco, 1996
- *Aqua Jet         (C) Namco, 1996
- *Armadillo Racing (C) Namco, 1996 (an undumped prototype/test or early version exists using a different ROM PCB)
- *Cyber Cycles     (C) Namco, 1995
- *Dirt Dash        (C) Namco, 1995
- *Prop Cycle       (C) Namco, 1996
- *Time Crisis      (C) Namco, 1995
- *Tokyo Wars       (C) Namco, 1996
- *
- *The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
- *some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools
- *the video board as these are known to run hot and commonly fail, especially now the system is many years old.
- *
- *CPU PCB   - There are four known revisions of this PCB. Three of them have an extra connector for an
- *            auxiliary PCB. One of the others doesn't have that connector but is are otherwise identical.
- *            All PCBs can be swapped to any game and it will work. However, ALL required IC's must be swapped.
- *            This includes Program ROM PCB, socketed Keycus IC, socketed DATA ROM and socketed WAVE ROM(s).
- *            On most games the EEPROM will re-init itself on bootup. On the others, the EEPROM can re-init itself
- *            to defaults by holding down SERVICE + TEST on power-up. All games are swappable to ANY CPU PCB and will
- *            run ok (all dumped games have been swapped/tested and work fine)
- *DSP PCB   - There is only 1 revision of this PCB. All games use the exact same PCB. The DSP PCB can be swapped to
- *            any other game and works fine (all dumped games tested). Note that some games use different parts of the
- *            DSP PCB and some do more thorough tests on bootup so an old DSP PCB that works fine in one game may come
- *            up as faulty in a different SS22 game.
- *MROM PCB  - These PCB's have many SOP44 ROMs on them and are identical for each game, but the contents of the ROMs
- *            and the number of ROMs vary per game. (a few of the dumped games have had their surface mounted ROMs
- *            swapped to other PCBs and worked fine)
- *FLASH PCB - Flash ROM board used only for a prototype or early version of Armadillo Racing and contains many TSOP56
- *            16M FlashROMs
- *VIDEO PCB - There are three known revisions of this PCB. They're mostly identical apart from some component shuffling
- *            and in the earlier versions (A & B), an Altera FPGA chip is used instead of a Namco custom chip.
- *            All revisions of the Video PCBs are swappable and fully compatible with any SS22 game. The Altera FPGA runs
- *            very hot and almost always fails even if heatsinked! Revision C is the most reliable.
- *MOTHER PCB- There are probably 3 revisions of this PCB, but only the original revision and (C) are documented here.
- *            The differences are very minor, just the amount of connectors on the PCB. The Mother PCB is swappable to
- *            any game as long as the required connectors for that game are present on the PCB. (all dumped games tested
- *            and worked fine using any MOTHER PCB)
- *
- *Each game has a 2 or 3 digit letter code assigned to it. Then a number 1 or 2, Then a Rev. A/B/C/D which denotes the
- *software revision.
- *The 1 denotes a Japanese version. 2 denotes a World version. So far there are no other numbers used other than 1 or 2.
- *For World versions, usually only the main program uses a '2', the rest of the ROM labels use the Japanese region code '1'.
- *There is one exception so far. The World version of Alpine Racer 2, which uses a World version DATA ROM, and also one
- *of the WAVE ROMs is a World version, but one Japanese WAVE ROM is also used.
- *See the CPU PCB, Program ROM Daughterboard and MROM PCB texts below for more details on ROM usage.
- *
- *CPU PCB
- *-------
- *1st Revision
- *SYSTEM SUPER22 CPU PCB 8646960102 (8646970102)
- *
- *2nd Revision
- *SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972600)
- *
- *3rd Revision
- *SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972601) <-- very minor?
- *
- *4th Revision
- *SYSTEM SUPER22 CPU(B) PCB 8646962601 (8646972601) <-- very minor?
- *|--------------------------------------------------------------|
- *|      J6                         JC410               3771     |
- *|  N341256(x4)                                           DSW(4)|
- *|                               |-------|                     |--|
- *|                               |MC68EC |                     |  |
- *|                               |020FG25|                     |  |
- *|   *1                          |-------|                     |  |
- *|           DSW(8)        SS22C2         |------|             |  |
- *|                                        | C383 |             |  |
- *|   CAT28C64    KEYCUS    SS22C1         |      |             |  |
- *|                                        |------|             |  |
- *|              |-------|                                      |  |
- *|     N341256  |       |                 |------|             |  |
- *| *3  N341256  | C405  |                 | 139  |             |--|
- *|              |       |       CY7C182   |      |              |
- *| *2           |-------|                 |------|              |
- *|                                                             |--|
- *|        40.000MHz                         137                |  |
- *|                                                             |  |
- *|              DATA.8K         JP1        49.152MHz           |  |
- *|     |------|                 |-------|             4558     |  |
- *|     | C352 |      JP2        |M37710 |                      |  |
- *|     |      |                 |S4BFP  |                      |  |
- *|     |------|                 |-------|                      |  |
- *|LED(x8)                                                      |  |
- *|        J11         SS22C4                MB87078            |  |
- *|      WAVEA.2L                                      4558     |--|
- *| JP3                                                          |
- *|      WAVEB.1L                LC78815M      LC78815M          |
- *|--------------------------------------------------------------|
- *(logic chips omitted from the PCB layout)
- *
- *Notes:
- *      J6           : Custom Namco connector for plug-in program ROM PCB
- *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 mask ROMs)
- *      JC410        : Custom Namco connector for Optional plug-in Auxiliary PCB (e.g. Gun Control PCB used in Time Crisis
- *                     etc)
- *                     The connector is populated only on the 2nd revision CPU (B) PCB 8646962600 (8646972600)
- *                     and 3rd Revision CPU (B) PCB 8646962600 (8646972601)
- *      JP1          : Jumper for configuration of M37710 (tied to pins 26 & 27 of M37710). Set to 1-2
- *      JP2          : Jumper for configuration of DATA ROM. Set to 1-2 (labelled '4M'), alt. setting 2-3 (labelled '1M/2M')
- *      JP3          : Jumper for configuration of WAVE ROM. Set to 2-3 (labelled '42P32M'), alt. setting 1-2
- *                     (labelled 'OTHER'). 'OTHER' is used when the WAVE ROMs are 16MBit. If the WAVE ROMs are 32MBit
- *                     (i.e. JP3 = 2-3), they're programmed in BYTE mode.
- *      M37710       : Mitsubishi M37710 CPU. Used on SS22 as the sound CPU. Does not have internal ROM (QFP80)
- *      MB87078      : Fujitsu MB87078 electronic volume control IC (SOIC24)
- *      4558         : Op Amp (SOIC8)
- *      LC78815M     : Sanyo LC78815M 2-channel 16-bit D/A converter (x2, SOIC20)
- *      3771         : Fujitsu MB3771 master reset IC (SOIC8)
- *      DSW(4)       : 4 position DIP Switch (1,2,3 are ON, 4 is OFF)
- *      DSW(8)       : 8 position DIP Switch (All OFF)
- *      N341256      : NKK N341256 32k x8 SRAM (x6, SOJ28)
- *      CY7C182      : Cypress 8k x9 SRAM (SOJ28)
- *      MC68EC020FG25: Main CPU, Motorola 68EC020FG25 (QFP100), running at 24.576MHz. Clock source is Namco
- *                     custom clock divider 137. 68EC020 clock = Master Clock of 49.152MHz / 2
- *      C383         : Namco custom C383 (QFP100)
- *      139          : Namco custom 139 Serial Controller Interface IC (QFP64). NOTE! On some PCB's this chip
- *                     has been replaced by a custom C422 chip, though the PCB number is the same. Which means probably
- *                     the function of this chip matches 139
- *      137          : Namco custom clock divider IC (DIP28)
- *      C405         : Namco custom C405 (QFP176)
- *      C352         : Namco custom C352 PCM sound chip (QFP100), clock is 24.576MHz (49.152/2), from pin 6 of C137
- *      SS22C1       : PALCE 22V10H (PLCC28, labelled 'SS22C1')
- *      SS22C2       : PALCE 22V10H (PLCC28, labelled 'SS22C2')
- *      SS22C4       : PALCE 22V10H (PLCC28, labelled 'SS22C4')
- *      CAT28C64     : Catalyst Semiconductor Inc. CAT28C64 8k x8 EEPROM (DIP28)
- *      LEDS         : 8 LEDs of various colors flash (in various pretty patterns) when the CPU PCB is active.
- *      KEYCUS       : Namco custom (DIP32)
- *                                         Air Combat 22    = none
- *                                         Alpine Racer 1   = C391
- *                                         Alpine Racer 2   = C434
- *                                         Alpine Surfer    = C425
- *                                         Aqua Jet         = C429
- *                                         Armadillo Racing = C433
- *                                         Cyber Cycles     = C389
- *                                         Dirt Dash        = C418
- *                                         Prop Cycle       = C428
- *                                         Time Crisis      = C419
- *                                         Tokyo Wars       = C424
- *
- *     *1            : Unpopulated position for PAL16V8 (PLCC20)
- *     *2            : Unpopulated position for Fujitsu MB86601 (QFP100)
- *     *3            : Unpopulated position for 32MHz OSC
- *     DATA.8K       : ST Microelectronics M27C4096 256k x16 EPROM (DIP40, labelled with the gamecode + 'DATA')
- *                     Game                EPROM label
- *                     -------------------------------
- *                     Air Combat 22      'ACS1 DATA'
- *                     Alpine Racer 1     'AR1 DATA B'
- *                     Alpine Racer 2     'ARS2 DATA'
- *                     Alpine Surfer      'AF1 DATA'
- *                     Aqua Jet           'AJ1 DATA'
- *                     Armadillo Racing   'AM1 DATA'
- *                     Cyber Cycles       'CB1 DATA B'
- *                     Dirt Dash          'DT1 DATA A'
- *                     Prop Cycle         'PR1 DATA'
- *                     Time Crisis        'TS1 DATA'
- *                     Tokyo Wars         'TW1 DATA'
- *
- *     WAVEA.2L   \
- *     WAVEB.1L   /  : 16M/32M WAVE mask ROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
- *                     Game                Wave A        Wave B        Type
- *                     ----------------------------------------------------------------------------
- *                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M mask ROMs
- *                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M mask ROM
- *                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M mask ROMs
- *                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M mask ROM
- *                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M mask ROMs
- *                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M mask ROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
- *                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
- *                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M mask ROMs
- *                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M mask ROM
- *                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
- *                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M mask ROM
- *
- *
- *PROGRAM ROM Daughterboard PCB
- *-----------------------------
- *This PCB holds the main program ROMs. There is a small sticker on each PCB stating the game code and software revision.
- *The actual ROMs are not marked with any codes except the manufacturer's part number.
- *There are 4 known types of program daughterboards used on SS22 games (so far). The most common is the first type.
- *The PCB is very small (approx 2" x 3") containing one custom connector and some FlashROMs, and a PAL (in some cases).
- *The ones that contain a PAL are approx 3" x 3".
- *
- *Type 1
- *SYSTEM SUPER22 MPM(F) PCB 8646961600 (8646971600)
- *|-------------------------|
- *|                         |
- *|                         |
- *| ROM1  ROM2  ROM3  ROM4  |
- *|                         |
- *|                         |
- *|  |-------------------|  |
- *|  |-------------------|  |
- *|-------------------------|
- *Notes:
- *      ROMx: Intel E28F008SA 8MBit FlashROM (x4, TSOP40)
- *
- *      This PCB is used on:
- *                          Game          Software revision
- *                          -------------------------------
- *                          Air Combat 22    'ACS1 Ver.B'
- *                          Alpine Racer     'AR2 Ver.C'
- *                          Alpine Racer     'AR2 Ver.D'
- *                          Aqua Jet         'AJ2 Ver.B'
- *                          Armadillo Racing 'AM1 Ver.A'
- *                          Cyber Cycles     'CB2 Ver.C'
- *                          Prop Cycle       'PR2 Ver.A'
- *                          Time Crisis      'TS2 Ver.B'
- *                          Tokyo Wars       'TW2 Ver.A'
- *
- *Type 2
- *SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
- *|-------------------------|
- *|                         |
- *|                         |
- *|      ROM1     ROM2      |
- *|                         |
- *|                         |
- *|                         |
- *|  |-------------------|  |
- *|  |-------------------|  |
- *|-------------------------|
- *Notes:
- *      ROMx: Intel E28F016SA 16MBit FlashROMs (x2, TSOP56)
- *
- *      This PCB is used on:
- *                          Game          Software revision
- *                          -------------------------------
- *                          Time Crisis   'TS2 Ver.A'
- *                          Dirt Dash     'DT2 Ver.A'
- *
- *Type 3
- *SYSTEM SUPER22 MPM(F16X4) PCB 8646962901 (8646972901)
- *|-------------------------|
- *|SS22P1B                  |
- *|                         |
- *|        IC4_LM    IC5_UU |
- *|                         |
- *|                         |
- *|  IC2_LL     IC3_UM      |
- *|                         |
- *|                         |
- *|  |-------------------|  |
- *|  |-------------------|  |
- *|-------------------------|
- *Notes:
- *      ICx*   : Intel E28F016SA 16MBit FlashROMs (x4, TSOP56)
- *      SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
- *
- *      This PCB is used on:
- *                          Game           Software revision
- *                          -------------------------------
- *                          Alpine Racer 2 'ARS2 Ver.B'
- *
- *Type 4
- *SYSTEM SUPER22 MPM(F16X4F) PCB 8646963500 (8646973500)
- *SYSTEM SUPER22 MPM(F16X4F) PCB 8646963501 (8646973501) <-- very minor?
- *|-------------------------|
- *|SS22P1B                  |
- *|                         |
- *|                         |
- *| IC2_LL     IC4_UM       |
- *|                         |
- *|      IC3_LM      IC5_UU |
- *|                         |
- *|                         |
- *|  |-------------------|  |
- *|  |-------------------|  |
- *|-------------------------|
- *Notes:
- *      ICx    : Fujitsu 29F016 16MBit FlashROMs (x4, TSOP48)
- *      SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
- *               There is a small mod on this PAL as follows....
- *               - Pin 8 is lifted and the pad on the PCB at pin 8
- *                 is tied to pin 16 of the PAL (no other pins are lifted)
- *               - The lifted pin 8 is tied to the MPM PCB connector on pin 1
- *                 That pin traces to pin 6 (OUTPUT Y) of a 74F08 at 15F on the CPU board
- *                 Pins 4 (INPUT A) & 5 (INPUT B) of the 74F08 at 15F trace to Namco custom
- *                 IC C383 pins 53 (A INPUT) & 52 (B INPUT)
- *
- *      This PCB is used on:
- *                          Game           Software revision
- *                          --------------------------------
- *                          Alpine Surfer  'AF2 Ver.A'   note: with PAL modification and using 8646963500 PCB
- *                          Alpine Racer 2 'ARS2 Ver.A'  note: without PAL modification and using 8646963501 PCB
- *
- *
- *Auxillary PCB (connector JC410 on the CPU PCB is used only for Time Crisis)
- *-------------
- *V159 GUN POINT PCB 244790102 (2447970102)
- *|---------------------------------|
- *|                                 |
- *|                      25.175MHz  |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                               J2|
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                                 |
- *|                J1               |
- *|---------------------------------|
- *Notes:
- *      There isn't much on this PCB other than 2 connectors and an oscillator plus a large amount of logic chips.
- *      J1 : Connector joining Gun PCB to a connector on the metal box (which joins to the gun interface PCB in the
- *           cab which supplies 24V for the solenoid in the guns)
- *      J2 : Connector joining to the CPU PCB (to JC410)
- *
- *
- *DSP PCB
- *-------
- *SYSTEM SUPER22 DSP PCB 8646960302 (8646970302)
- *  |--------------------------------------------------------------|
- *  | N341256     |-------|   SS22D1    N341256     |-------|      |
- *  | N341256     |       |             N341256     |       |      |
- *  | |---------| | C71   |                         | C405  |     |--|
- *|--||         | |       |                         |       |     |  |
- *|  ||  C396   | |-------|                         |-------|     |  |
- *|  ||         |                                                 |  |
- *|J ||         |           N341256                 |-------|     |  |
- *|D ||---------|           N341256                 |       |     |  |
- *|3 | |-------|                          N341256   | C405  |     |  |
- *|  | |       |                                    |       |     |  |
- *|  | | C71   |  |---------|                       |-------|     |  |
- *|--| |       |  |         |             |------|                |  |
- *  |  |-------|  |  342    |             | C379 |                |--|
- *  |  |------|   |         |             |      |                 |
- *  |  | C199 |   |         |             |------|  N341256        |
- *  |  |      |   |---------|                       N341256       |--|
- *  |  |------|                                                   |  |
- *  |   |-----|      SS22D5  SS22D4B    40MHz     |---------|     |  |
- *  |   |C353 |                                   |         |     |  |
- *  |   |-----|                                   |  C300   |     |  |
- *  |LED(x8)         SS22D2  SS22D3               |         |     |  |
- *  |   |-----|                                   |         |     |  |
- *  |   | 402 |  |---------|                      |---------|     |  |
- *  |   |-----|  |         |                                      |  |
- *  |            |  C403   |    KM681000   KM681000   KM681000    |  |
- *  |   |-----|  |         |                                      |--|
- *  |   | 402 |  |         |    KM681000   KM681000   KM681000     |
- *  |   |-----|  |---------|                                       |
- *  |--------------------------------------------------------------|
- *(logic chips omitted from the PCB layout)
- *
- *Notes:
- *      JD3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known as a
- *                     'DHD harness'
- *      N341256      : NKK N341256 32k x8 SRAM (x9, SOJ28)
- *      KM681000     : Samsung Electronics KM681000 128k x8 SRAM (x6, SOP32)
- *      342          : Namco custom 342  (QFP160)
- *      402          : Namco custom 402  (x2, TQFP144)
- *      C71          : Namco custom C71, actually a Texas Instruments 320C25 DSP (x2, PLCC68)
- *      C199         : Namco custom C199 (QFP100)
- *      C300         : Namco custom C300 (QFP160)
- *      C353         : Namco custom C353 (QFP120)
- *      C379         : Namco custom C379 (QFP64)
- *      C396         : Namco custom C396 (QFP160)
- *      C403         : Namco custom C403 (QFP136)
- *      C405         : Namco custom C396 (x2, QFP176)
- *      SS22D1       : PALCE 20V8H (PLCC28, labelled 'SS22D1')
- *      SS22D2       : PALCE 16V8H (PLCC20, labelled 'SS22D2')
- *      SS22D3       : PALCE 16V8H (PLCC20, labelled 'SS22D3')
- *      SS22D4B      : PALCE 16V8H (PLCC20, labelled 'SS22D4B')
- *      SS22D5       : PALCE 16V8H (PLCC20, labelled 'SS22D5')
- *      LEDS         : 8 red LEDs flash (in various pretty patterns) when the DSP PCB is active.
- *
- *
- *ROM PCB (type 1)
- *-------
- *SYSTEM SUPER22 MROM PCB 8646960400 (8646970400)
- *  |--------------------------------------------------------------|
- *  | SS22M3      TC551001(x3)                                     |
- *  | JP13                                 CG7.19D    CG5.19B      |
- *  |  PTR-L0.18K  PTR-M0.18J  PTR-U0.18F                          |
- *|--|                                     CG6.18D    CG4.18B      |
- *|  | PTR-L1.16K  PTR-M1.16J  PTR-U1.16F                   CG6.18A|
- *|  |                                     CG5.16D    CG3.16B      |
- *|J | PTR-L2.15K  PTR-M2.15J  PTR-U2.15F                   CG7.15A|
- *|R |                                     CG4.14D    CG2.14B      |
- *|4 | PTR-L3.14K  PTR-M3.14J  PTR-U3.14F                      JP1 |
- *|  |  SCG0.12L              SCG0.12F JP4 CG3.13D    CG1.13B  JP2 |
- *|  |                                 JP5                     JP3 |
- *|--|              SCG7.10J           JP6 CG2.12D    CG0.12B      |
- *  |   SCG1.10L              SCG1.10F                      SS22M1 |
- *  |                                      CG1.10D    SS22M2       |
- *  |                                                              |
- *  |   SCG2.8L     JP10      SCG2.8F      CG0.8D                 |--|
- *|--|              JP11                                          |  |
- *|  |              JP12                                          |  |
- *|  |  SCG3.7L               SCG3.7F      SS22M2     CCR-L.7B    |  |
- *|J |                                                            |  |
- *|R |                                                CCR-H.5B    |  |
- *|3 |  SCG4.5L               SCG4.5F                             |  |
- *|  |              JP7                                           |  |
- *|  |              JP8                                           |  |
- *|--|  SCG5.3L     JP9       SCG5.3F      CCR-L.3D               |  |
- *  |                                                             |--|
- *  |               SCG7.1J                CCR-H.1D                |
- *  |   SCG6.1L               SCG6.1F                              |
- *  |--------------------------------------------------------------|
- *(logic chips omitted from the PCB layout)
- *
- *Notes:
- *      Namco SS22 MROM PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
- *      The Japanese region code '1' is appended to all game codes on all MROMs.
- *
- *      JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
- *                     as a 'DHD harness'
- *      SS22M1       : PALCE 16V8H (PLCC20, labelled 'SS22M1')
- *      SS22M2       : PALCE 20V8H (x2, PLCC28, labelled 'SS22M2')
- *      SS22M3       : PALCE 16V8H (PLCC20, labelled 'SS22M3')
- *      TC551001     : Toshiba TC551001 128k x8 SRAM (SOP32)
- *      JP1, JP2, JP3: Jumpers to configure CG* ROMs.  Hardwired to '16M' on the PCB. Alt. setting '32M'
- *      JP4, JP5, JP6: Jumpers to configure CG* ROMs.  Hardwired to '16M' on the PCB. Alt. setting '32M'
- *      JP7, JP8, JP9: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
- *   JP10, JP11, JP12: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
- *      JP13         : Jumper  to configure PTR* ROMs. Hardwired to '4M'  on the PCB. Alt. setting '8M'
- *
- *Game               ROMs populated
- *---------------------------------------------------------
- *Air Combat 22      ACS1CCRH.5B, ACS1CCRH.1D    4M SOP32
- *                   ACS1CCRL.7B, ACS1CCRL.3D   16M SOP44
- *                   ACS1CG0.12B, ACS1CG0.8D        "
- *                   ACS1CG1.13B, ACS1CG1.10D       "
- *                   ACS1CG2.14B, ACS1CG2.12D       "
- *                   ACS1CG3.16B, ACS1CG3.13D       "
- *                   ACS1CG4.18B, ACS1CG4.14D       "
- *                   ACS1CG5.19B, ACS1CG5.16D       "
- *                   ACS1CG6.18A, ACS1CG6.18D       "
- *                   ACS1CG7.15A, ACS1CG7.19D       "
- *                   ACS1SCG0.12F,ACS1SCG0.12L      "
- *                   ACS1SCG1.10F,ACS1SCG1.10L      "
- *                   ACS1PTRU0.18F               4M SOP32
- *                   ACS1PTRU1.16F                  "
- *                   ACS1PTRU2.15F                  "
- *                   ACS1PTRU3.14F                  "
- *                   ACS1PTRM0.18J                  "
- *                   ACS1PTRM1.16J                  "
- *                   ACS1PTRM2.15J                  "
- *                   ACS1PTRM3.14J                  "
- *                   ACS1PTRL0.18K                  "
- *                   ACS1PTRL1.16K                  "
- *                   ACS1PTRL2.15K                  "
- *                   ACS1PTRL3.14K                  "
- *
- *Alpine Racer 1     AR1CCRH.5B, AR1CCRH.1D      4M SOP32
- *                   AR1CCRL.7B, AR1CCRL.3D     16M SOP44
- *                   AR1CG0.12B, AR1CG0.8D          "
- *                   AR1CG1.13B, AR1CG1.10D         "
- *                   AR1CG2.14B, AR1CG2.12D         "
- *                   AR1CG3.16B, AR1CG3.13D         "
- *                   AR1CG4.18B, AR1CG4.14D         "
- *                   AR1CG5.19B, AR1CG5.16D         "
- *                   AR1CG6.18A, AR1CG6.18D         "
- *                   AR1CG7.15A, AR1CG7.19D         "
- *                   AR1SCG0.12F,AR1SCG0.12L        "
- *                   AR1SCG1.10F,AR1SCG1.10L        "
- *                   AR1PTRU0.18F                4M SOP32
- *                   AR1PTRU1.16F                   "
- *                   AR1PTRU2.15F                   "
- *                   AR1PTRU3.14F                   "
- *                   AR1PTRM0.18J                   "
- *                   AR1PTRM1.16J                   "
- *                   AR1PTRM2.15J                   "
- *                   AR1PTRM3.14J                   "
- *                   AR1PTRL0.18K                   "
- *                   AR1PTRL1.16K                   "
- *                   AR1PTRL2.15K                   "
- *                   AR1PTRL3.14K                   "
- *
- *Alpine Racer 2     ARS1CCRH.5B, ARS1CCRH.1D    4M SOP32
- *                   ARS1CCRL.7B, ARS1CCRL.3D   16M SOP44
- *                   ARS1CG0.12B, ARS1CG0.8D        "
- *                   ARS1CG1.13B, ARS1CG1.10D       "
- *                   ARS1CG2.14B, ARS1CG2.12D       "
- *                   ARS1CG3.16B, ARS1CG3.13D       "
- *                   ARS1CG4.18B, ARS1CG4.14D       "
- *                   ARS1CG5.19B, ARS1CG5.16D       "
- *                   ARS1SCG0.12F,ARS1SCG0.12L      "
- *                   ARS1PTRU0.18F               4M SOP32
- *                   ARS1PTRU1.16F                  "
- *                   ARS1PTRU2.15F                  "
- *                   ARS1PTRU3.14F                  "
- *                   ARS1PTRM0.18J                  "
- *                   ARS1PTRM1.16J                  "
- *                   ARS1PTRM2.15J                  "
- *                   ARS1PTRM3.14J                  "
- *                   ARS1PTRL0.18K                  "
- *                   ARS1PTRL1.16K                  "
- *                   ARS1PTRL2.15K                  "
- *                   ARS1PTRL3.14K                  "
- *
- *Alpine Surfer      AF1CCRH.5B, AF1CCRH.1D      4M SOP32
- *                   AF1CCRL.7B, AF1CCRL.3D     16M SOP44
- *                   AF1CG0.12B, AF1CG0.8D          "
- *                   AF1CG1.13B, AF1CG1.10D         "
- *                   AF1CG2.14B, AF1CG2.12D         "
- *                   AF1CG3.16B, AF1CG3.13D         "
- *                   AF1CG4.18B, AF1CG4.14D         "
- *                   AF1SCG0B.12F,AF1SCG0B.12L      "
- *                   AF1PTRU0.18F                4M SOP32
- *                   AF1PTRU1.16F                   "
- *                   AF1PTRM0.18J                   "
- *                   AF1PTRM1.16J                   "
- *                   AF1PTRL0.18K                   "
- *                   AF1PTRL1.16K                   "
- *
- *Aqua Jet           AJ1CCRH.5B, AJ1CCRH.1D      4M SOP32
- *                   AJ1CCRL.7B, AJ1CCRL.3D     16M SOP44
- *                   AJ1CG0.12B, AJ1CG0.8D          "
- *                   AJ1CG1.13B, AJ1CG1.10D         "
- *                   AJ1CG2.14B, AJ1CG2.12D         "
- *                   AJ1CG3.16B, AJ1CG3.13D         "
- *                   AJ1CG4.18B, AJ1CG4.14D         "
- *                   AJ1CG5.19B, AJ1CG5.16D         "
- *                   AJ1CG6.18A, AJ1CG6.18D         "
- *                   AJ1CG7.15A, AJ1CG7.19D         "
- *                   AJ1SCG0.12F,AJ1SCG0.12L        "
- *                   AJ1SCG1.10F,AJ1SCG1.10L        "
- *                   AJ1SCG2.8F, AJ1SCG2.8L         "
- *                   AJ1PTRU0.18F                4M SOP32
- *                   AJ1PTRU1.16F                   "
- *                   AJ1PTRU2.15F                   "
- *                   AJ1PTRU3.14F                   "
- *                   AJ1PTRM0.18J                   "
- *                   AJ1PTRM1.16J                   "
- *                   AJ1PTRM2.15J                   "
- *                   AJ1PTRM3.14J                   "
- *                   AJ1PTRL0.18K                   "
- *                   AJ1PTRL1.16K                   "
- *                   AJ1PTRL2.15K                   "
- *                   AJ1PTRL3.14K                   "
- *
- *Armadillo Racing   AM1CCRH.5B, AM1CCRH.1D      4M SOP32
- *                   AM1CCRL.7B, AM1CCRL.3D     16M SOP44
- *                   AM1CG0.12B, AM1CG0.8D          "
- *                   AM1CG1.13B, AM1CG1.10D         "
- *                   AM1CG2.14B, AM1CG2.12D         "
- *                   AM1CG3.16B, AM1CG3.13D         "
- *                   AM1CG4.18B, AM1CG4.14D         "
- *                   AM1CG5.19B, AM1CG5.16D         "
- *                   AM1CG6.18A, AM1CG6.18D         "
- *                   AM1CG7.15A, AM1CG7.19D         "
- *                   AM1SCG0.12F,AM1SCG0.12L        "
- *                   AM1SCG1.10F,AM1SCG1.10L        "
- *                   AM1PTRU0.18F                4M SOP32
- *                   AM1PTRU1.16F                   "
- *                   AM1PTRU2.15F                   "
- *                   AM1PTRU3.14F                   "
- *                   AM1PTRM0.18J                   "
- *                   AM1PTRM1.16J                   "
- *                   AM1PTRM2.15J                   "
- *                   AM1PTRM3.14J                   "
- *                   AM1PTRL0.18K                   "
- *                   AM1PTRL1.16K                   "
- *                   AM1PTRL2.15K                   "
- *                   AM1PTRL3.14K                   "
- *
- *Cyber Cycles       CB1CCRH.5B, CB1CCRH.1D      4M SOP32
- *                   CB1CCRL.7B, CB1CCRL.3D     16M SOP44
- *                   CB1CG0.12B, CB1CG0.8D          "
- *                   CB1CG1.13B, CB1CG1.10D         "
- *                   CB1CG2.14B, CB1CG2.12D         "
- *                   CB1CG3.16B, CB1CG3.13D         "
- *                   CB1CG4.18B, CB1CG4.14D         "
- *                   CB1CG5.19B, CB1CG5.16D         "
- *                   CB1CG6.18A, CB1CG6.18D         "
- *                   CB1SCG0.12F,CB1SCG0.12L        "
- *                   CB1SCG1.10F,CB1SCG1.10L        "
- *                   CB1PTRU0.18F                4M SOP32
- *                   CB1PTRU1.16F                   "
- *                   CB1PTRU2.15F                   "
- *                   CB1PTRU3.14F                   "
- *                   CB1PTRM0.18J                   "
- *                   CB1PTRM1.16J                   "
- *                   CB1PTRM2.15J                   "
- *                   CB1PTRM3.14J                   "
- *                   CB1PTRL0.18K                   "
- *                   CB1PTRL1.16K                   "
- *                   CB1PTRL2.15K                   "
- *                   CB1PTRL3.14K                   "
- *
- *Dirt Dash          DT1CCRH.5B, DT1CCRH.1D      4M SOP32
- *                   DT1CCRL.7B, DT1CCRL.3D     16M SOP44
- *                   DT1CG0.12B, DT1CG0.8D          "
- *                   DT1CG1.13B, DT1CG1.10D         "
- *                   DT1CG2.14B, DT1CG2.12D         "
- *                   DT1CG3.16B, DT1CG3.13D         "
- *                   DT1CG4.18B, DT1CG4.14D         "
- *                   DT1CG5.19B, DT1CG5.16D         "
- *                   DT1CG6.18A, DT1CG6.18D         "
- *                   DT1CG7.15A, DT1CG7.19D         "
- *                   DT1SCG0.12F,DT1SCG0.12L        "
- *                   DT1SCG1.10F,DT1SCG1.10L        "
- *                   DT1PTRU0.18F                4M SOP32
- *                   DT1PTRU1.16F                   "
- *                   DT1PTRU2.15F                   "
- *                   DT1PTRU3.14F                   "
- *                   DT1PTRM0.18J                   "
- *                   DT1PTRM1.16J                   "
- *                   DT1PTRM2.15J                   "
- *                   DT1PTRM3.14J                   "
- *                   DT1PTRL0.18K                   "
- *                   DT1PTRL1.16K                   "
- *                   DT1PTRL2.15K                   "
- *                   DT1PTRL3.14K                   "
- *
- *Prop Cycle         PR1CCRH.5B, PR1CCRH.1D      4M SOP32
- *                   PR1CCRL.7B, PR1CCRL.3D     16M SOP44
- *                   PR1CG0.12B, PR1CG0.8D          "
- *                   PR1CG1.13B, PR1CG1.10D         "
- *                   PR1CG2.14B, PR1CG2.12D         "
- *                   PR1CG3.16B, PR1CG3.13D         "
- *                   PR1CG4.18B, PR1CG4.14D         "
- *                   PR1CG5.19B, PR1CG5.16D         "
- *                   PR1CG6.18A, PR1CG6.18D         "
- *                   PR1CG7.15A, PR1CG7.19D         "
- *                   PR1SCG0.12F,PR1SCG0.12L        "
- *                   PR1SCG1.10F,PR1SCG1.10L        "
- *                   PR1PTRU0.18F                4M SOP32
- *                   PR1PTRU1.16F                   "
- *                   PR1PTRU2.15F                   "
- *                   PR1PTRM0.18J                   "
- *                   PR1PTRM1.16J                   "
- *                   PR1PTRM2.15J                   "
- *                   PR1PTRL0.18K                   "
- *                   PR1PTRL1.16K                   "
- *                   PR1PTRL2.15K                   "
- *
- *Time Crisis        TS1CCRH.5B, TS1CCRH.1D      4M SOP32
- *                   TS1CCRL.7B, TS1CCRL.3D     16M SOP44
- *                   TS1CG0.12B, TS1CG0.8D          "
- *                   TS1CG1.13B, TS1CG1.10D         "
- *                   TS1CG2.14B, TS1CG2.12D         "
- *                   TS1CG3.16B, TS1CG3.13D         "
- *                   TS1CG4.18B, TS1CG4.14D         "
- *                   TS1CG5.19B, TS1CG5.16D         "
- *                   TS1CG6.18A, TS1CG6.18D         "
- *                   TS1CG7.15A, TS1CG7.19D         "
- *                   TS1SCG0.12F,TS1SCG0.12L        "
- *                   TS1SCG1.10F,TS1SCG1.10L        "
- *                   TS1SCG2.8F, TS1SCG2.8L         "
- *                   TS1SCG3.7F, TS1SCG3.7L         "
- *                   TS1SCG4.5F, TS1SCG4.5L         "
- *                   TS1SCG5.3F, TS1SCG5.3L         "
- *                   TS1PTRU0.18F                4M SOP32
- *                   TS1PTRU1.16F                   "
- *                   TS1PTRU2.15F                   "
- *                   TS1PTRM0.18J                   "
- *                   TS1PTRM1.16J                   "
- *                   TS1PTRM2.15J                   "
- *                   TS1PTRL0.18K                   "
- *                   TS1PTRL1.16K                   "
- *                   TS1PTRL2.15K                   "
- *
- *Tokyo Wars         TW1CCRH.5B, TW1CCRH.1D      4M SOP32
- *                   TW1CCRL.7B, TW1CCRL.3D     16M SOP44
- *                   TW1CG0.12B, TW1CG0.8D          "
- *                   TW1CG1.13B, TW1CG1.10D         "
- *                   TW1CG2.14B, TW1CG2.12D         "
- *                   TW1CG3.16B, TW1CG3.13D         "
- *                   TW1CG4.18B, TW1CG4.14D         "
- *                   TW1CG5.19B, TW1CG5.16D         "
- *                   TW1CG6.18A, TW1CG6.18D         "
- *                   TW1CG7.15A, TW1CG7.19D         "
- *                   TW1SCG0.12F,TW1SCG0.12L        "
- *                   TW1SCG1.10F,TW1SCG1.10L        "
- *                   TW1SCG2.8F, TW1SCG2.8L         "
- *                   TW1SCG3.7F, TW1SCG3.7L         "
- *                   TW1PTRU0.18F                4M SOP32
- *                   TW1PTRU1.16F                   "
- *                   TW1PTRU2.15F                   "
- *                   TW1PTRU3.14F                   "
- *                   TW1PTRM0.18J                   "
- *                   TW1PTRM1.16J                   "
- *                   TW1PTRM2.15J                   "
- *                   TW1PTRM3.14J                   "
- *                   TW1PTRL0.18K                   "
- *                   TW1PTRL1.16K                   "
- *                   TW1PTRL2.15K                   "
- *                   TW1PTRL3.14K                   "
- *
- *
- *ROM PCB (type 2)
- *-------
- *SS22DS FLASH PCB 8650961300 (8650971300)
- *  |--------------------------------------------------------------|
- *  |     F13M  F13L                      F12J   F12E    |------|  |
- *  |                                                    |ALTERA|  |
- *  |     F12M  F12L                                     |EPMXXXX  |
- *|--|                                    F11J   F11E    |------|  |
- *|  | HM628128 F11L                                               |
- *|  | HM628128                                             DSF4   |
- *|J | HM628128 F9L                       F9J     F9E              |
- *|R |                                                             |
- *|4 | DSF5A                                                       |
- *|  |                                    F8J     F8E              |
- *|  |                                                             |
- *|--|                                                    SS22DSF3 |
- *  |           F7L   F7M                 F7J     F7E              |
- *  |                                                              |
- *  |                                                              |
- *  |                                     F6J     F6E     SS22DSF3|--|
- *|--|                                                            |  |
- *|  |                                                            |  |
- *|  |          F5L   F5M                 F5J     F5E             |  |
- *|J |                                                            |  |
- *|R |                                                            |  |
- *|3 |                                    F4J     F4E             |  |
- *|  |                                                            |  |
- *|  |          F3L   F3M                                         |  |
- *|--|                                                            |  |
- *  | SS22DSF2                            F2J     F2E             |--|
- *  |                                                              |
- *  | SS22DSF2  F1L   F1M                 F1J     F1E              |
- *  |--------------------------------------------------------------|
- *(logic chips omitted from the PCB layout)
- *
- *Notes:
- *      Namco SS22 FLASH PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
- *
- *      JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
- *                     as a 'DHD harness'
- *      EPMXXXX      : Altera EPM??? (PLCC84, unknown chip model, possibly EPM7064, sticker on top of it blocking ID markings)
- *      DSF5A        : PALCE 16V8H (PLCC20, labelled 'DSF5A')
- *      DSF4         : PALCE 16V8H (PLCC20, labelled 'DSF4')
- *      SS22DSF3     : EPM7032 (x2, PLCC44, labelled 'SS22DSF3')
- *      SS22DSF2     : EPM7032 (x2, PLCC44, labelled 'SS22DSF2')
- *      HM628128     : Hitachi HM628128 128k x8 SRAM (TSOP32)
- *
- *Game               ROMs populated (All Intel E28F016SA TSOP56 16M FlashROMs)
- *-----------------------------------------------------------------
- *Armadillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH
- *ROMs (prototype or
- *early test version)F4E, F4J, F5E, F5J, F6E, F6J, \
- *                   F7E, F7J, F8E, F8J, F9E, F9J, \ CGx ROMs
- *                   F11E, F11J, F12E, F12J        /
- *
- *                   F1L, F1M, F3L, F3M, F5L, F5M, \
- *                   F7L, F7M                      / SCGx ROMs
- *
- *                   F9L, F11L, F12L, F13L,        \
- *                   F12M, F13M                    / PTR ROMs
- *
- *
- *VIDEO PCB
- *---------
- *1st Revision
- *SYSTEM SUPER22 VIDEO 8646960204 (8646970204)
- *
- *2nd Revision
- *SYSTEM SUPER22 VIDEO(B) 8646961200 (8646971200)
- *
- *3rd Revision (PCB layout shown below)
- *SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
- *  |--------------------------------------------------------------|
- *  |                                                              |
- *  |                    HM534251BJ-8(x22)                         |
- *  |                                                   |-----|   |--|
- *  |  |---------| |---------| |---------| |---------|  |C401 |   |  |
- *  |  |         | |         | |         | |         |  |-----|   |  |
- *  |  |   304   | |   304   | |   304   | |   304   |            |  |
- *  |  |         | |         | |         | |         |  |-----|   |  |
- *  |  |         | |         | |         | |         |  |C400 |   |  |
- *  |  |---------| |---------| |---------| |---------|  |-----|   |  |
- *  |  N341256      |-----| |-----| |-----| |-----|               |  |
- *  |  N341256      |C407 | |C401 | |C401 | |C401 |  |---------|  |  |
- *  |               |-----| |-----| |-----| |-----|  |         |  |  |
- *  |   |---------|                                  |  C399   |  |--|
- *  |   |         |         |-----| |-----| |-----|  |         |   |
- *  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
- *  |   |         |         |-----| |-----| |-----|  |---------|  |--|
- *|--|  |         |                    |-----|            N341256 |  |
- *|  |  |---------|                    |C406 |  |-----|   N341256 |  |
- *|  |  |-----|                        |-----|  |C381 |           |  |
- *|J |  |C381 |                |---------|      |-----|           |  |
- *|V |  |-----|      N341256   |         |                LC321664|  |
- *|3 |     51.2MHz   N341256   |  C404   |      |---------|       |  |
- *|  | |---------| |---------| |         |      |         |       |  |
- *|  | |         | |         | |         |      |  C361   |       |  |
- *|--| |  C374   | |  C395   | |---------|      |         |       |  |
- *  |  |         | |         | N341256          |         |       |--|
- *  |  |         | |         | N341256          |---------|        |
- *  |  |---------| |---------| N341256                    CXD1178Q |
- *  |--------------------------------------------------------------|
- *(logic chips omitted from the PCB layout)
- *
- *Notes:
- *      JV3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known
- *                     as a 'DHD harness'
- *      N341256      : NKK N341256 32k x8 SRAM (x9, SOJ28)
- *      HM534251BJ-8 : Hitachi HM534251BJ-8 256k x4 FASTPAGE DRAM (x22, SOJ28)
- *      LC321664     : Sanyo LC321664 64k x16 DRAM (SOJ40)
- *      CXD1178Q     : Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
- *      304          : Namco custom 304  (x4, QFP120)
- *      C361         : Namco custom C361 (QFP120)
- *      C374         : Namco custom C374 (QFP160)
- *      C381         : Namco custom C381 (x2, QFP144)
- *      C387         : Namco custom C387 (QFP160)
- *      C395         : Namco custom C395 (QFP168)
- *      C399         : Namco custom C399 (QFP160)
- *      C400         : Namco custom C400 (x4, QFP100)
- *                     - x3 on 1st Revision
- *      C401         : Namco custom C401 (x4, QFP64)
- *                     - x5 on 1st Revision
- *      C404         : Namco custom C404 (QFP208)
- *      C406         : Namco custom C406 (TQFP120)
- *      C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
- *                                                     Altera EPM7064 PLCC84 FPGA labelled 'SS22V1B'
- *                                                     The Altera chip runs very hot and fails quite often.
- *                                                     Even if a heatsink is added to the chip it still fails.
- *                                                     The failure of this chip is the primary cause of
- *                                                     video faults on Namco Super System 22 PCBs.
- *                                                     (Second reason for video faults is generally attributed
- *                                                     to failure of RAM on this PCB and/or the DSP PCB)
- *
- *
- *Motherboard PCB
- *---------------
- *1st Revision
- *SYSTEM SUPER22 MOTHER PCB 8646960602 (8646970602)
- *
- *2nd Revision
- *SYSTEM SUPER22 MOTHER(B) PCB (number not known)
- *
- *3rd Revision
- *SYSTEM SUPER22 MOTHER(C) PCB 8646960602 (8646970602)
- *|------------------------------------------------------------------|
- *| J1                  J2           J4           J6           J8    |
- *|           J10                           J5   IC2     J7          |
- *|                     J3          IC3          IC1              J9 |
- *|                                                                  |
- *| JC2 |---------------------|        |---------------------|JC1    |
- *|     |---------------------|        |---------------------|       |
- *|                                                                  |
- *| JD2 |---------------------|        |---------------------|JD1    |
- *|     |---------------------|        |---------------------|       |
- *|                                                                  |
- *|                                    |---------------------|JR1    |
- *|                                    |---------------------|       |
- *|                                                                  |
- *| JV2 |---------------------|        |---------------------|JV1    |
- *|     |---------------------|        |---------------------|       |
- *|------------------------------------------------------------------|
- *Notes:
- *      IC1     : LB1233 (DIP8)
- *      IC2, IC3: LB1235 (DIP8)
- *
- *      JC1, JC2: Connectors to plug in CPU PCB
- *      JD1, JD2: Connectors to plug in DSP PCB
- *      JR1     : Connector  to plug in MROM PCB
- *      JV1, JV2: Connectors to plug in VIDEO PCB
- *
- *      J1 : 9 pin power input socket   Pin  Use
- *                                     -----------
- *                                      1    +5V
- *                                      2    +5V
- *                                      3    +5V
- *                                      4    NC
- *                                      5    Ground
- *                                      6    Ground
- *                                      7    Ground
- *                                      8    NC
- *                                      9    +12V
- *
- *      J2 : 9 pin link connector   Pin  Use
- *                                  --------------
- *                                   1   Ring In+
- *                                   2   Ring In-
- *                                   3   Ring Out2+
- *                                   4   Ground
- *                                   5   /RXD+ (NC)
- *                                   6   /RXD- (NC)
- *                                   7   /TXD  (NC)
- *                                   8   GND   (NC)
- *                                   9   +5V   (NC)
- *
- *      J3 : 9 pin socket   Pin  Use
- *                          -------------------
- *                           1   Service Credit
- *                           2   Test
- *                           3   NC
- *                           4   +12V
- *                           5   Counter
- *                           6   NC
- *                           7   Ground
- *                           8   Coin Sw
- *                           9   NC
- *
- *      J4 : 8 pin connector  Pin  Use
- *                            -------------------------------------
- *                             1   Start
- *                             2   Left Select
- *                             3   Right Select
- *                             4   Safety Free Controls (Ski's etc)
- *                             5   Safety Lock Controls (Ski's etc)
- *                             6   NC
- *                             7   Ground
- *                             8   Ground
- *
- *      J5 : 15 pin socket   Pin  Use
- *                           ---------------
- *                            1   Relay1
- *                            2   Relay1
- *                            3   Mute
- *                            4   Mid Light
- *                            5   Left Light
- *                            6   Right Light
- *                            7   NC
- *                            8   NC
- *                            9   NC
- *                            10  NC
- *                            11  NC
- *                            12  NC
- *                            13  +12V
- *                            14  +5V
- *                            15  NC
- *
- *      J6 : 12 pin audio output connector  Pin  Use
- *                                          ----------
- *                                           1   SPKL+
- *                                           2   SPKL-
- *                                           3   SPKR+
- *                                           4   SPKR-
- *                                           5   NC
- *                                           6   NC
- *                                           7   NC
- *                                           8   NC
- *                                           9   NC
- *                                           10  NC
- *                                           11  NC
- *                                           12  NC
- *
- *      J7 : 12 pin analog controls socket   Pin  Use
- *                                           ---------------------------
- *                                            1   +5V
- *                                            2   5K Ohm Potentiometer 1 (Side Swing on Alpine Racer, Alpine Surfer etc)
- *                                            3   5K Ohm Potentiometer 2 (Tilt on Alpine Racer, Alpine Surfer etc)
- *                                            4   GND                    (Other games may use more/different pots or no pots)
- *                                            5   NC
- *                                            6   NC
- *                                            7   NC
- *                                            8   NC
- *                                            9   NC
- *                                            10  NC
- *                                            11  NC
- *                                            12  NC
- *
- *      J8 : 10 pin connector (not used?)
- *
- *      J9 : 6 pin video output socket   Pin  Use
- *                                       ---------
- *                                        1   Red
- *                                        2   Green
- *                                        3   Blue
- *                                        4   Composite Sync (VSync 15kHz interlaced)
- *                                        5   Ground
- *                                        6   NC
- *
- *      J10: 16 pin flat cable connector (only populated on Mother(C) PCB, use not known)
- *
- *
- *AMP PCB
- *-------
- *SYSTEM SUPER22 AMP(4) PCB 8647960100 (8647970100) (sticker 'AMP(2) PCB 8647961100')
- *|-----------------------------------|
- *|J1  J2   LA4705  J3   *1    *2   J5|
- *|                                   |
- *|-----------------------------------|
- *Notes:
- *      LA4705: 2-channel 15W Power Amp
- *      J1    : 3 pin power input socket   Pin  Use
- *                                         -----------
- *                                          1   +12V
- *                                          2   Ground
- *                                          3   NC
- *
- *      J2    : 4 pin dual speaker output socket   Pin  Use
- *                                                 ---------
- *                                                  1   SP1+
- *                                                  2   SP1-
- *                                                  3   SP2+
- *                                                  4   SP2-
- *
- *      J3    : 8 pin sound data input connector from Mother PCB J6   Pin  Use
- *                                                                    ----------
- *                                                                     1   SPKL+
- *                                                                     2   SPKL-
- *                                                                     3   SPKR+
- *                                                                     4   SPKR-
- *                                                                     5   NC
- *                                                                     6   NC
- *                                                                     7   NC
- *                                                                     8   NC
- *
- *      *1    : Unpopulated position for a 2nd LA4705 Power Amp
- *      *2    : J4 - Unpopulated position for another 4 pin dual speaker output socket
- *      J5    : 2 pin connector used for sound mute  Pin  Use
- *                                                   -----------
- *                                                    1   Mute
- *                                                    2   Ground
- */
+/***********************************************************************************************************
+
+This driver describes Namco's System22 and System Super22* hardware.
+*: Namco calls it that, more commonly known as "Super System 22"
+
+driver provided with thanks to:
+- hap
+- pstroffo@yahoo.com (Phil Stroffolino)
+- R. Belmont
+- trackmaster@gmx.net (Bjorn Sunder)
+- team vivanonno
+
+TODO:
+- finish slave DSP emulation
+- emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
+- alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
+  of some of the gfx chips on the fly. This is probably due to the PAL modification on the PROGRAM ROM PCB. Check
+  the modification details of the TYPE 4 Program ROM PCB below.
+- C139 for linked cabinets, as well as in RR fullscale
+- confirm DSP and MCU IRQ timing
+- EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
+- where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on the MOTHER PCB at J2 Pin 7 /TXD
+- texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
+      it used to be much worse with the legacy_poly_manager
+- find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
+- improve ss22 lighting:
+      + mountains in alpinr2b selection screen
+      + ridgerac waving flag shadowing
+      + cybrcomm enemies should flash white when you shoot them, probably lighting related
+      + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
+- improve ss22 spot:
+      + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
+      + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
+      + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
+- PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
+- support for text layer video partial updates after posirq, alpinesa does raster effects on it
+- alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
+- ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
+- there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
+- cybrcycc speed dial needle is missing
+- global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
+- ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
+      czram contents is rather odd here and partly cleared (probably the cause?):
+       $0000-$0d7f - gradual increase from $00-$7c
+       $0d80-$0fff - $73, huh, why lower?
+       $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
+       $1a00-$0dff - $77
+       $1e00-$1fff - $78
+
+- lots of smaller issues
+
+***********************************************************************************************************
+Input
+     - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
+
+Output Devices
+     - Prop Cycle fan (outputs noted at the right MCU port)
+     - lamps/LEDs on some cabinets
+     - time crisis has force feedback for the guns
+
+Notes:
+     The "dipswitch" settings are ignored in many games - this isn't a bug.  For example, Prop Cycle software
+     explicitly clears the chunk of work RAM used to cache the 8 bit dipswitch value immediately after
+     populating it.  This is apparently done to hide secret debug routines from release versions of games.
+
+Self Test Info:
+    Prop Cycle DSP tests:
+       MD ROM-PROGRAM      (not-yet-working)
+       MD-DOWNLOAD       - confirms that main CPU can upload custom code to master DSP
+       MD-EXTERNAL-RAM   - tests private RAM used by master DSP
+       C-RAM CHECK BY MD - tests communications RAM, shared by master DSP and main CPU
+       PDP LOOP TEST     - exercises multi-command DMA transfer
+       PDP BLOCK MOVE    - exercises DMA block transfer
+       POINT RAM         - RAM test for "Point RAM" (not directly accessible by any CPU)
+       CUSTOM IC STATUS  - currently hacked to always report "good"
+       SD ROM-PRG        - confirms that master DSP can upload custom code to run on slave DSP
+       SD EXTERNAL-RAM   - tests private RAM used by slave DSP
+       DATA FLOW TEST 1    (not-yet-working)
+       DATA FLOW TEST 2    (not-yet-working)
+       POINT ROM TEST    - checksums the "Point ROMs"
+
+    Ridge Racer (Japan) tests:
+       TEST 1a: MD-EXTERNAL-RAM
+       TEST 1b: C-RAM CHECK BY MD
+       TEST 2:  (not-yet-working)
+       TEST 3:  SD EXTERNAL-RAM
+       TEST 4:  DATA FLOW TEST 1 (not-yet-working)
+       TEST 5:  DATA FLOW TEST 2 (not-yet-working)
+       TEST 6:  POINT RAM
+
+IO MCU:
+- generates sound/music
+- provides input port management (copying to shared RAM)
+- coinage handling in most games
+- manages external physical devices (i.e. lamps, fans, force feedback)
+- C74 is sound MCU, Mitsubishi M37702 MCU with mask ROM
+- some external subroutines for C74 are also embedded
+
+Master DSP:
+- S22 has two TI320C25 DSP (printed as C71)
+- the master DSP provides display list parsing
+
+Slave DSP:
+- serves as a calculation engine for lighting
+
+Communications RAM
+- seen as 32 bit memory by main 68k CPU
+- seen as 16 bit memory by master DSP (addr 0x8000..0xffff); upper/lower word is selectable
+- not addressable by slave DSP
+
+Point ROMs
+- encodes 3d model data
+- not directly addressable by any CPU
+
+Point RAM
+- same address space as Point ROMs
+- not directly addressable by any CPU
+
+Link Feature:
+- some (typically racing) games may be linked together
+- serial controller is C139 SCI (same as System21).
+
+System Super22
+- different memory map
+- different CPU controller register layout
+- sound CPU uses external ROM (i.e. pr1data.8k) instead of internal BIOS (C74)
+- additional 2d sprite layer
+- Point RAM starts at 0xf80000 rather than 0xf00000
+- "PDP" device, for automated block memory transfers (dsp ram, point ram)
+
+***********************************************************************************************************
+SYSTEM22 Known Custom Chips
+
+CPU PCB:
+
+C71 TI TMS320C25 DSP
+C71 WEYW40116 (TMS320C25 Main/Sub DSP)
+C71 D72260FN 980 FE-5CA891W
+
+M5M5178AP-25 (CPU 16R, 17R, 19R, 20R) DSP Work RAM (8K x 8bit x 2 x 2)
+
+C74 Mitsubishi M37702 MCU
+C74 159 408600 (OLD SUB)
+C74 159 543100 (NEW SUB)
+C74 159 414600 (OLD I/O)
+C74 159 437600 (NEW I/O)
+
+C195 (Shared SRAM Controller)
+C196 CPP x 6
+C199 (CPU 18K) x 1
+C317 IDC (CPU 15E) x 1 (S21B)
+C337 PFP x 1
+C342 x 1 (S21B)
+C352 (32ch PCM)
+C353 x 1
+
+
+VIDEO PCB:
+
+C304 - 4 chips on SS22 Video PCB
+C305 (Palette)
+C335
+9C, 10C
+12D, 12E
+14C
+C300
+18B, 18C, 20B, 20C, 22B, 22C
+Cxxx
+34R, 35R
+
+TI TBP28L22N (256 x 8bit PROM)
+VIDEO 2D, 3D, 4D (RGB Gamma LUT ROM)
+
+RR1.GAM (for Ridge Racer 1/2, Rave Racer)
+
+***********************************************************************************************************
+***********************************************************************************************************
+
+Namco Super System 22
+Hardware Overview by Guru
+-------------------------
+
+This document covers all the known Namco Super System 22 games, including....
+Air Combat 22    (C) Namco, 1995
+Alpine Racer 1   (C) Namco, 1994
+Alpine Racer 2   (C) Namco, 1996
+Alpine Surfer    (C) Namco, 1996
+Aqua Jet         (C) Namco, 1996
+Armadillo Racing (C) Namco, 1996 (an undumped prototype/test or early version exists using a different ROM PCB)
+Cyber Cycles     (C) Namco, 1995
+Dirt Dash        (C) Namco, 1995
+Prop Cycle       (C) Namco, 1996
+Time Crisis      (C) Namco, 1995
+Tokyo Wars       (C) Namco, 1996
+
+The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
+some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools
+the video board as these are known to run hot and commonly fail, especially now the system is many years old.
+
+CPU PCB   - There are four known revisions of this PCB. Three of them have an extra connector for an
+            auxiliary PCB. One of the others doesn't have that connector but is are otherwise identical.
+            All PCBs can be swapped to any game and it will work. However, ALL required IC's must be swapped.
+            This includes Program ROM PCB, socketed Keycus IC, socketed DATA ROM and socketed WAVE ROM(s).
+            On most games the EEPROM will re-init itself on bootup. On the others, the EEPROM can re-init itself
+            to defaults by holding down SERVICE + TEST on power-up. All games are swappable to ANY CPU PCB and will
+            run ok (all dumped games have been swapped/tested and work fine)
+DSP PCB   - There is only 1 revision of this PCB. All games use the exact same PCB. The DSP PCB can be swapped to
+            any other game and works fine (all dumped games tested). Note that some games use different parts of the
+            DSP PCB and some do more thorough tests on bootup so an old DSP PCB that works fine in one game may come
+            up as faulty in a different SS22 game.
+MROM PCB  - These PCB's have many SOP44 ROMs on them and are identical for each game, but the contents of the ROMs
+            and the number of ROMs vary per game. (a few of the dumped games have had their surface mounted ROMs
+            swapped to other PCBs and worked fine)
+FLASH PCB - Flash ROM board used only for a prototype or early version of Armadillo Racing and contains many TSOP56
+            16M FlashROMs
+VIDEO PCB - There are three known revisions of this PCB. They're mostly identical apart from some component shuffling
+            and in the earlier versions (A & B), an Altera FPGA chip is used instead of a Namco custom chip.
+            All revisions of the Video PCBs are swappable and fully compatible with any SS22 game. The Altera FPGA runs
+            very hot and almost always fails even if heatsinked! Revision C is the most reliable.
+MOTHER PCB- There are probably 3 revisions of this PCB, but only the original revision and (C) are documented here.
+            The differences are very minor, just the amount of connectors on the PCB. The Mother PCB is swappable to
+            any game as long as the required connectors for that game are present on the PCB. (all dumped games tested
+            and worked fine using any MOTHER PCB)
+
+Each game has a 2 or 3 digit letter code assigned to it. Then a number 1 or 2, Then a Rev. A/B/C/D which denotes the
+software revision.
+The 1 denotes a Japanese version. 2 denotes a World version. So far there are no other numbers used other than 1 or 2.
+For World versions, usually only the main program uses a '2', the rest of the ROM labels use the Japanese region code '1'.
+There is one exception so far. The World version of Alpine Racer 2, which uses a World version DATA ROM, and also one
+of the WAVE ROMs is a World version, but one Japanese WAVE ROM is also used.
+See the CPU PCB, Program ROM Daughterboard and MROM PCB texts below for more details on ROM usage.
+
+CPU PCB
+-------
+1st Revision
+SYSTEM SUPER22 CPU PCB 8646960102 (8646970102)
+
+2nd Revision
+SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972600)
+
+3rd Revision
+SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972601) <-- very minor?
+
+4th Revision
+SYSTEM SUPER22 CPU(B) PCB 8646962601 (8646972601) <-- very minor?
+|--------------------------------------------------------------|
+|      J6                         JC410               3771     |
+|  N341256(x4)                                           DSW(4)|
+|                               |-------|                     |--|
+|                               |MC68EC |                     |  |
+|                               |020FG25|                     |  |
+|   *1                          |-------|                     |  |
+|           DSW(8)        SS22C2         |------|             |  |
+|                                        | C383 |             |  |
+|   CAT28C64    KEYCUS    SS22C1         |      |             |  |
+|                                        |------|             |  |
+|              |-------|                                      |  |
+|     N341256  |       |                 |------|             |  |
+| *3  N341256  | C405  |                 | 139  |             |--|
+|              |       |       CY7C182   |      |              |
+| *2           |-------|                 |------|              |
+|                                                             |--|
+|        40.000MHz                         137                |  |
+|                                                             |  |
+|              DATA.8K         JP1        49.152MHz           |  |
+|     |------|                 |-------|             4558     |  |
+|     | C352 |      JP2        |M37710 |                      |  |
+|     |      |                 |S4BFP  |                      |  |
+|     |------|                 |-------|                      |  |
+|LED(x8)                                                      |  |
+|        J11         SS22C4                MB87078            |  |
+|      WAVEA.2L                                      4558     |--|
+| JP3                                                          |
+|      WAVEB.1L                LC78815M      LC78815M          |
+|--------------------------------------------------------------|
+(logic chips omitted from the PCB layout)
+
+Notes:
+      J6           : Custom Namco connector for plug-in program ROM PCB
+      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 mask ROMs)
+      JC410        : Custom Namco connector for Optional plug-in Auxiliary PCB (e.g. Gun Control PCB used in Time Crisis
+                     etc)
+                     The connector is populated only on the 2nd revision CPU (B) PCB 8646962600 (8646972600)
+                     and 3rd Revision CPU (B) PCB 8646962600 (8646972601)
+      JP1          : Jumper for configuration of M37710 (tied to pins 26 & 27 of M37710). Set to 1-2
+      JP2          : Jumper for configuration of DATA ROM. Set to 1-2 (labelled '4M'), alt. setting 2-3 (labelled '1M/2M')
+      JP3          : Jumper for configuration of WAVE ROM. Set to 2-3 (labelled '42P32M'), alt. setting 1-2
+                     (labelled 'OTHER'). 'OTHER' is used when the WAVE ROMs are 16MBit. If the WAVE ROMs are 32MBit
+                     (i.e. JP3 = 2-3), they're programmed in BYTE mode.
+      M37710       : Mitsubishi M37710 MCU. Clock input 16.384MHz [49.152/3]. Used on SS22 as the sound CPU. Does not have internal ROM (QFP80)
+      MB87078      : Fujitsu MB87078 electronic volume control IC (SOIC24)
+      4558         : Op Amp (SOIC8)
+      LC78815M     : Sanyo LC78815M 2-channel 16-bit D/A converter (x2, SOIC20)
+      3771         : Fujitsu MB3771 master reset IC (SOIC8)
+      DSW(4)       : 4 position DIP Switch (1,2,3 are ON, 4 is OFF). Silkscreen on PCB "SW1"
+      DSW(8)       : 8 position DIP Switch (All OFF). Silkscreen on PCB "SW4"
+      N341256      : NKK N341256 32k x8 SRAM (x6, SOJ28)
+      CY7C182      : Cypress 8k x9 SRAM (SOJ28)
+      MC68EC020FG25: Main CPU, Motorola 68EC020FG25 (QFP100), running at 24.576MHz. Clock source is Namco
+                     custom clock divider 137. 68EC020 clock = Master Clock of 49.152MHz / 2
+      C383         : Namco custom C383 (QFP100)
+      139          : Namco custom 139 Serial Controller Interface IC (QFP64). NOTE! On some PCB's this chip
+                     has been replaced by a custom C422 chip, though the PCB number is the same. Which means probably
+                     the function of this chip matches 139
+      137          : Namco custom clock divider IC (DIP28)
+      C405         : Namco custom C405 (QFP176)
+      C352         : Namco custom C352 PCM sound chip (QFP100), clock is 24.576MHz (49.152/2), from pin 6 of C137
+      SS22C1       : PALCE 22V10H (PLCC28, labelled 'SS22C1')
+      SS22C2       : PALCE 22V10H (PLCC28, labelled 'SS22C2')
+      SS22C4       : PALCE 22V10H (PLCC28, labelled 'SS22C4')
+      CAT28C64     : Catalyst Semiconductor Inc. CAT28C64 8k x8 EEPROM (DIP28)
+      LEDS         : 8 LEDs of various colors flash (in various pretty patterns) when the CPU PCB is active.
+      KEYCUS       : Namco custom (DIP32)
+                                         Air Combat 22    = none
+                                         Alpine Racer 1   = C391
+                                         Alpine Racer 2   = C434
+                                         Alpine Surfer    = C425
+                                         Aqua Jet         = C429
+                                         Armadillo Racing = C433
+                                         Cyber Cycles     = C389
+                                         Dirt Dash        = C418
+                                         Prop Cycle       = C428
+                                         Time Crisis      = C419
+                                         Tokyo Wars       = C424
+
+     *1            : Unpopulated position for PAL16V8 (PLCC20)
+     *2            : Unpopulated position for Fujitsu MB86601 (QFP100)
+     *3            : Unpopulated position for 32MHz OSC
+     DATA.8K       : ST Microelectronics M27C4096 256k x16 EPROM (DIP40, labelled with the gamecode + 'DATA')
+                     Game                EPROM label
+                     -------------------------------
+                     Air Combat 22      'ACS1 DATA'
+                     Alpine Racer 1     'AR1 DATA B'
+                     Alpine Racer 2     'ARS2 DATA'
+                     Alpine Surfer      'AF1 DATA'
+                     Aqua Jet           'AJ1 DATA'
+                     Armadillo Racing   'AM1 DATA'
+                     Cyber Cycles       'CB1 DATA B'
+                     Dirt Dash          'DT1 DATA A'
+                     Prop Cycle         'PR1 DATA'
+                     Time Crisis        'TS1 DATA'
+                     Tokyo Wars         'TW1 DATA'
+
+     WAVEA.2L   \
+     WAVEB.1L   /  : 16M/32M WAVE mask ROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
+                     Game                Wave A        Wave B        Type
+                     ----------------------------------------------------------------------------
+                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M mask ROMs
+                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M mask ROM
+                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M mask ROMs
+                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M mask ROM
+                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M mask ROMs
+                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M mask ROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
+                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M mask ROMs
+                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M mask ROM
+                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M mask ROM
+
+
+PROGRAM ROM Daughterboard PCB
+-----------------------------
+This PCB holds the main program ROMs. There is a small sticker on each PCB stating the game code and software revision.
+The actual ROMs are not marked with any codes except the manufacturer's part number.
+There are 4 known types of program daughterboards used on SS22 games (so far). The most common is the first type.
+The PCB is very small (approx 2" x 3") containing one custom connector and some FlashROMs, and a PAL (in some cases).
+The ones that contain a PAL are approx 3" x 3".
+
+Type 1
+SYSTEM SUPER22 MPM(F) PCB 8646961600 (8646971600)
+|-------------------------|
+|                         |
+|                         |
+| ROM1  ROM2  ROM3  ROM4  |
+|                         |
+|                         |
+|  |-------------------|  |
+|  |-------------------|  |
+|-------------------------|
+Notes:
+      ROMx: Intel E28F008SA 8MBit FlashROM (x4, TSOP40)
+
+      This PCB is used on:
+                          Game          Software revision
+                          -------------------------------
+                          Air Combat 22    'ACS1 Ver.B'
+                          Alpine Racer     'AR2 Ver.C'
+                          Alpine Racer     'AR2 Ver.D'
+                          Aqua Jet         'AJ2 Ver.B'
+                          Armadillo Racing 'AM1 Ver.A'
+                          Cyber Cycles     'CB2 Ver.C'
+                          Prop Cycle       'PR2 Ver.A'
+                          Time Crisis      'TS2 Ver.B'
+                          Tokyo Wars       'TW2 Ver.A'
+
+Type 2
+SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
+|-------------------------|
+|                         |
+|                         |
+|      ROM1     ROM2      |
+|                         |
+|                         |
+|                         |
+|  |-------------------|  |
+|  |-------------------|  |
+|-------------------------|
+Notes:
+      ROMx: Intel E28F016SA 16MBit FlashROMs (x2, TSOP56)
+
+      This PCB is used on:
+                          Game          Software revision
+                          -------------------------------
+                          Time Crisis   'TS2 Ver.A'
+                          Dirt Dash     'DT1 Ver.A'
+                          Dirt Dash     'DT2 Ver.A'
+
+Type 3
+SYSTEM SUPER22 MPM(F16X4) PCB 8646962901 (8646972901)
+|-------------------------|
+|SS22P1B                  |
+|                         |
+|        IC4_LM    IC5_UU |
+|                         |
+|                         |
+|  IC2_LL     IC3_UM      |
+|                         |
+|                         |
+|  |-------------------|  |
+|  |-------------------|  |
+|-------------------------|
+Notes:
+      ICx*   : Intel E28F016SA 16MBit FlashROMs (x4, TSOP56)
+      SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
+
+      This PCB is used on:
+                          Game           Software revision
+                          -------------------------------
+                          Alpine Racer 2 'ARS2 Ver.B'
+
+Type 4
+SYSTEM SUPER22 MPM(F16X4F) PCB 8646963500 (8646973500)
+SYSTEM SUPER22 MPM(F16X4F) PCB 8646963501 (8646973501) <-- very minor?
+|-------------------------|
+|SS22P1B                  |
+|                         |
+|                         |
+| IC2_LL     IC4_UM       |
+|                         |
+|      IC3_LM      IC5_UU |
+|                         |
+|                         |
+|  |-------------------|  |
+|  |-------------------|  |
+|-------------------------|
+Notes:
+      ICx    : Fujitsu 29F016 16MBit FlashROMs (x4, TSOP48)
+      SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
+               There is a small mod on this PAL as follows....
+               - Pin 8 (I7) is lifted and the pad on the PCB at pin 8
+                 is tied to pin 16 (IO4) of the PAL (no other pins are lifted).
+                 In other words, the input signal at pin 8 on the PCB goes directly to output pin 16.
+               - The lifted pin 8 (I7) is tied to the MPM PCB connector on pin 1
+                 That pin traces to pin 6 (OUTPUT Y) of a 74F08 at 15F on the CPU board
+                 Pins 4 (INPUT A) & 5 (INPUT B) of the 74F08 at 15F trace to Namco custom
+                 IC C383 pins 53 (A INPUT) & 52 (B INPUT)
+
+      This PCB is used on:
+                          Game           Software revision
+                          --------------------------------
+                          Alpine Surfer  'AF2 Ver.A'   note: with PAL modification and using 8646963500 PCB
+                          Alpine Racer 2 'ARS2 Ver.A'  note: without PAL modification and using 8646963501 PCB
+
+
+Auxillary PCB (connector JC410 on the CPU PCB is used only for Time Crisis)
+-------------
+V159 GUN POINT PCB 244790102 (2447970102)
+|---------------------------------|
+|                                 |
+|                      25.175MHz  |
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                               J2|
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                                 |
+|                J1               |
+|---------------------------------|
+Notes:
+      There isn't much on this PCB other than 2 connectors and an oscillator plus a large amount of logic chips.
+      J1 : Connector joining Gun PCB to a connector on the metal box. That joins to the gun interface PCB in the
+           cab which supplies 24V for the solenoid in the guns.
+      J2 : Connector joining to the CPU PCB (to JC410)
+
+
+DSP PCB
+-------
+SYSTEM SUPER22 DSP PCB 8646960302 (8646970302)
+  |--------------------------------------------------------------|
+  | N341256     |-------|   SS22D1    N341256     |-------|      |
+  | N341256     |       |             N341256     |       |      |
+  | |---------| | C71   |                         | C405  |     |--|
+|--||         | |       |                         |       |     |  |
+|  ||  C396   | |-------|                         |-------|     |  |
+|  ||         |                                                 |  |
+|J ||         |           N341256                 |-------|     |  |
+|D ||---------|           N341256                 |       |     |  |
+|3 | |-------|                          N341256   | C405  |     |  |
+|  | |       |                                    |       |     |  |
+|  | | C71   |  |---------|                       |-------|     |  |
+|--| |       |  |         |             |------|                |  |
+  |  |-------|  |  342    |             | C379 |                |--|
+  |  |------|   |         |             |      |                 |
+  |  | C199 |   |         |             |------|  N341256        |
+  |  |      |   |---------|                       N341256       |--|
+  |  |------|                                                   |  |
+  |   |-----|      SS22D5  SS22D4B    40MHz     |---------|     |  |
+  |   |C353 |                                   |         |     |  |
+  |   |-----|                                   |  C300   |     |  |
+  |LED(x8)         SS22D2  SS22D3               |         |     |  |
+  |   |-----|                                   |         |     |  |
+  |   | 402 |  |---------|                      |---------|     |  |
+  |   |-----|  |         |                                      |  |
+  |            |  C403   |    KM681000   KM681000   KM681000    |  |
+  |   |-----|  |         |                                      |--|
+  |   | 402 |  |         |    KM681000   KM681000   KM681000     |
+  |   |-----|  |---------|                                       |
+  |--------------------------------------------------------------|
+(logic chips omitted from the PCB layout)
+
+Notes:
+      JD3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known as a
+                     'DHD harness'
+      N341256      : NKK N341256 32k x8 SRAM (x9, SOJ28)
+      KM681000     : Samsung Electronics KM681000 128k x8 SRAM (x6, SOP32)
+      342          : Namco custom 342  (QFP160)
+      402          : Namco custom 402  (x2, TQFP144)
+      C71          : Namco custom C71, actually a Texas Instruments 320C25 DSP (x2, PLCC68). Clock input 40.000MHz
+      C199         : Namco custom C199 (QFP100)
+      C300         : Namco custom C300 (QFP160)
+      C353         : Namco custom C353 (QFP120)
+      C379         : Namco custom C379 (QFP64)
+      C396         : Namco custom C396 (QFP160)
+      C403         : Namco custom C403 (QFP136)
+      C405         : Namco custom C396 (x2, QFP176)
+      SS22D1       : PALCE 20V8H (PLCC28, labelled 'SS22D1')
+      SS22D2       : PALCE 16V8H (PLCC20, labelled 'SS22D2')
+      SS22D3       : PALCE 16V8H (PLCC20, labelled 'SS22D3')
+      SS22D4B      : PALCE 16V8H (PLCC20, labelled 'SS22D4B')
+      SS22D5       : PALCE 16V8H (PLCC20, labelled 'SS22D5')
+      LEDS         : 8 red LEDs flash (in various pretty patterns) when the DSP PCB is active.
+
+
+ROM PCB (type 1)
+-------
+SYSTEM SUPER22 MROM PCB 8646960400 (8646970400)
+  |--------------------------------------------------------------|
+  | SS22M3      TC551001(x3)                                     |
+  | JP13                                 CG7.19D    CG5.19B      |
+  |  PTR-L0.18K  PTR-M0.18J  PTR-U0.18F                          |
+|--|                                     CG6.18D    CG4.18B      |
+|  | PTR-L1.16K  PTR-M1.16J  PTR-U1.16F                   CG6.18A|
+|  |                                     CG5.16D    CG3.16B      |
+|J | PTR-L2.15K  PTR-M2.15J  PTR-U2.15F                   CG7.15A|
+|R |                                     CG4.14D    CG2.14B      |
+|4 | PTR-L3.14K  PTR-M3.14J  PTR-U3.14F                      JP1 |
+|  |  SCG0.12L              SCG0.12F JP4 CG3.13D    CG1.13B  JP2 |
+|  |                                 JP5                     JP3 |
+|--|              SCG7.10J           JP6 CG2.12D    CG0.12B      |
+  |   SCG1.10L              SCG1.10F                      SS22M1 |
+  |                                      CG1.10D    SS22M2       |
+  |                                                              |
+  |   SCG2.8L     JP10      SCG2.8F      CG0.8D                 |--|
+|--|              JP11                                          |  |
+|  |              JP12                                          |  |
+|  |  SCG3.7L               SCG3.7F      SS22M2     CCR-L.7B    |  |
+|J |                                                            |  |
+|R |                                                CCR-H.5B    |  |
+|3 |  SCG4.5L               SCG4.5F                             |  |
+|  |              JP7                                           |  |
+|  |              JP8                                           |  |
+|--|  SCG5.3L     JP9       SCG5.3F      CCR-L.3D               |  |
+  |                                                             |--|
+  |               SCG7.1J                CCR-H.1D                |
+  |   SCG6.1L               SCG6.1F                              |
+  |--------------------------------------------------------------|
+(logic chips omitted from the PCB layout)
+
+Notes:
+      Namco SS22 MROM PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
+      The Japanese region code '1' is appended to all game codes on all MROMs.
+
+      JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
+                     as a 'DHD harness'
+      SS22M1       : PALCE 16V8H (PLCC20, labelled 'SS22M1')
+      SS22M2       : PALCE 20V8H (x2, PLCC28, labelled 'SS22M2')
+      SS22M3       : PALCE 16V8H (PLCC20, labelled 'SS22M3')
+      TC551001     : Toshiba TC551001 128k x8 SRAM (SOP32)
+      JP1, JP2, JP3: Jumpers to configure CG* ROMs.  Hardwired to '16M' on the PCB. Alt. setting '32M'
+      JP4, JP5, JP6: Jumpers to configure CG* ROMs.  Hardwired to '16M' on the PCB. Alt. setting '32M'
+      JP7, JP8, JP9: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
+   JP10, JP11, JP12: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
+      JP13         : Jumper  to configure PTR* ROMs. Hardwired to '4M'  on the PCB. Alt. setting '8M'
+
+Game               ROMs populated
+-------------------------------------------------------------------------------------------------
+Air Combat 22      ACS1CCRH.5B, ACS1CCRH.1D                                              4M SOP32
+                   ACS1CCRL.7B, ACS1CCRL.3D                                             16M SOP44
+                   ACS1CG0.12B, ACS1CG0.8D, ACS1CG1.13B,  ACS1CG1.10D, ACS1CG2.14B           "
+                   ACS1CG2.12D, ACS1CG3.16B, ACS1CG3.13D, ACS1CG4.18B, ACS1CG4.14D           "
+                   ACS1CG5.19B, ACS1CG5.16D, ACS1CG6.18A, ACS1CG6.18D, ACS1CG7.15A           "
+                   ACS1CG7.19D, ACS1SCG0.12F, ACS1SCG0.12L, ACS1SCG1.10F, ACS1SCG1.10L       "
+                   ACS1PTRU0.18F, ACS1PTRU1.16F, ACS1PTRU2.15F, ACS1PTRU3.14F            4M SOP32
+                   ACS1PTRM0.18J, ACS1PTRM1.16J, ACS1PTRM2.15J, ACS1PTRM3.14J                "
+                   ACS1PTRL0.18K, ACS1PTRL1.16K, ACS1PTRL2.15K, ACS1PTRL3.14K                "
+
+Alpine Racer 1     AR1CCRH.5B, AR1CCRH.1D                                                4M SOP32
+                   AR1CCRL.7B, AR1CCRL.3D, AR1CG0.12B, AR1CG0.8D, AR1CG1.13B            16M SOP44
+                   AR1CG1.10D, AR1CG2.14B, AR1CG2.12D, AR1CG3.16B, AR1CG3.13D                "
+                   AR1CG4.18B, AR1CG4.14D, AR1CG5.19B, AR1CG5.16D, AR1CG6.18A                "
+                   AR1CG6.18D, AR1CG7.15A, AR1CG7.19D, AR1SCG0.12F, AR1SCG0.12L              "
+                   AR1SCG1.10F, AR1SCG1.10L                                                  "
+                   AR1PTRU0.18F, AR1PTRU1.16F, AR1PTRU2.15F, AR1PTRU3.14F                4M SOP32
+                   AR1PTRM0.18J, AR1PTRM1.16J, AR1PTRM2.15J, AR1PTRM3.14J                    "
+                   AR1PTRL0.18K, AR1PTRL1.16K, AR1PTRL2.15K, AR1PTRL3.14K                    "
+
+Alpine Racer 2     ARS1CCRH.5B, ARS1CCRH.1D                                              4M SOP32
+                   ARS1CCRL.7B, ARS1CCRL.3D, ARS1CG0.12B, ARS1CG0.8D, ARS1CG1.13B       16M SOP44
+                   ARS1CG1.10D, ARS1CG2.14B, ARS1CG2.12D, ARS1CG3.16B, ARS1CG3.13D           "
+                   ARS1CG4.18B, ARS1CG4.14D, ARS1CG5.19B, ARS1CG5.16D, ARS1SCG0.12F          "
+                   ARS1SCG0.12L                                                              "
+                   ARS1PTRU0.18F, ARS1PTRU1.16F, ARS1PTRU2.15F, ARS1PTRU3.14F            4M SOP32
+                   ARS1PTRM0.18J, ARS1PTRM1.16J, ARS1PTRM2.15J, ARS1PTRM3.14J                "
+                   ARS1PTRL0.18K, ARS1PTRL1.16K, ARS1PTRL2.15K, ARS1PTRL3.14K                "
+
+Alpine Surfer      AF1CCRH.5B, AF1CCRH.1D                                                4M SOP32
+                   AF1CCRL.7B, AF1CCRL.3D, AF1CG0.12B, AF1CG0.8D, AF1CG1.13B            16M SOP44
+                   AF1CG1.10D, AF1CG2.14B, AF1CG2.12D, AF1CG3.16B, AF1CG3.13D                "
+                   AF1CG4.18B, AF1CG4.14D, AF1SCG0B.12F,AF1SCG0B.12L                         "
+                   AF1PTRU0.18F, AF1PTRU1.16F, AF1PTRM0.18J, AF1PTRM1.16J                4M SOP32
+                   AF1PTRL0.18K, AF1PTRL1.16K                                                "
+
+Aqua Jet           AJ1CCRH.5B, AJ1CCRH.1D                                                4M SOP32
+                   AJ1CCRL.7B, AJ1CCRL.3D, AJ1CG0.12B, AJ1CG0.8D, AJ1CG1.13B            16M SOP44
+                   AJ1CG1.10D, AJ1CG2.14B, AJ1CG2.12D  AJ1CG3.16B, AJ1CG3.13D                "
+                   AJ1CG4.18B, AJ1CG4.14D, AJ1CG5.19B, AJ1CG5.16D, AJ1CG6.18A                "
+                   AJ1CG6.18D, AJ1CG7.15A, AJ1CG7.19D, AJ1SCG0.12F, AJ1SCG0.12L              "
+                   AJ1SCG1.10F,AJ1SCG1.10L, AJ1SCG2.8F, AJ1SCG2.8L                           "
+                   AJ1PTRU0.18F, AJ1PTRU1.16F, AJ1PTRU2.15F, AJ1PTRU3.14F                4M SOP32
+                   AJ1PTRM0.18J, AJ1PTRM1.16J, AJ1PTRM2.15J, AJ1PTRM3.14J                    "
+                   AJ1PTRL0.18K, AJ1PTRL1.16K, AJ1PTRL2.15K, AJ1PTRL3.14K                    "
+
+Armadillo Racing   AM1CCRH.5B, AM1CCRH.1D                                                4M SOP32
+                   AM1CCRL.7B, AM1CCRL.3D, AM1CG0.12B, AM1CG0.8D, AM1CG1.13B            16M SOP44
+                   AM1CG1.10D, AM1CG2.14B, AM1CG2.12D, AM1CG3.16B, AM1CG3.13D                "
+                   AM1CG4.18B, AM1CG4.14D, AM1CG5.19B, AM1CG5.16D, AM1CG6.18A                "
+                   AM1CG6.18D, AM1CG7.15A, AM1CG7.19D, AM1SCG0.12F,AM1SCG0.12L               "
+                   AM1SCG1.10F,AM1SCG1.10L                                                   "
+                   AM1PTRU0.18F, AM1PTRU1.16F, AM1PTRU2.15F, AM1PTRU3.14F                4M SOP32
+                   AM1PTRM0.18J, AM1PTRM1.16J, AM1PTRM2.15J, AM1PTRM3.14J                    "
+                   AM1PTRL0.18K, AM1PTRL1.16K, AM1PTRL2.15K, AM1PTRL3.14K                    "
+
+Cyber Cycles       CB1CCRH.5B, CB1CCRH.1D                                                4M SOP32
+                   CB1CCRL.7B, CB1CCRL.3D, CB1CG0.12B, CB1CG0.8D, CB1CG1.13B            16M SOP44
+                   CB1CG1.10D, CB1CG2.14B, CB1CG2.12D, CB1CG3.16B, CB1CG3.13D                "
+                   CB1CG4.18B, CB1CG4.14D, CB1CG5.19B, CB1CG5.16D, CB1CG6.18A                "
+                   CB1CG6.18D, CB1SCG0.12F,CB1SCG0.12L, CB1SCG1.10F,CB1SCG1.10L              "
+                   CB1PTRU0.18F, CB1PTRU1.16F, CB1PTRU2.15F, CB1PTRU3.14F                4M SOP32
+                   CB1PTRM0.18J, CB1PTRM1.16J, CB1PTRM2.15J, CB1PTRM3.14J                    "
+                   CB1PTRL0.18K, CB1PTRL1.16K, CB1PTRL2.15K, CB1PTRL3.14K                    "
+
+Dirt Dash          DT1CCRH.5B, DT1CCRH.1D                                                4M SOP32
+                   DT1CCRL.7B, DT1CCRL.3D, DT1CG0.12B, DT1CG0.8D, DT1CG1.13B            16M SOP44
+                   DT1CG1.10D, DT1CG2.14B, DT1CG2.12D, DT1CG3.16B, DT1CG3.13D                "
+                   DT1CG4.18B, DT1CG4.14D, DT1CG5.19B, DT1CG5.16D, DT1CG6.18A                "
+                   DT1CG6.18D, DT1CG7.15A, DT1CG7.19D, DT1SCG0.12F,DT1SCG0.12L               "
+                   DT1SCG1.10F,DT1SCG1.10L                                                   "
+                   DT1PTRU0.18F, DT1PTRU1.16F, DT1PTRU2.15F, DT1PTRM0.18J                4M SOP32
+                   DT1PTRM1.16J, DT1PTRM2.15J, DT1PTRL0.18K, DT1PTRL1.16K, DT1PTRL2.15K      "
+
+Prop Cycle         PR1CCRH.5B, PR1CCRH.1D                                                4M SOP32
+                   PR1CCRL.7B, PR1CCRL.3D, PR1CG0.12B, PR1CG0.8D, PR1CG1.13B            16M SOP44
+                   PR1CG1.10D, PR1CG2.14B, PR1CG2.12D, PR1CG3.16B, PR1CG3.13D                "
+                   PR1CG4.18B, PR1CG4.14D, PR1CG5.19B, PR1CG5.16D, PR1CG6.18A                "
+                   PR1CG6.18D, PR1CG7.15A, PR1CG7.19D, PR1SCG0.12F,PR1SCG0.12L               "
+                   PR1SCG1.10F,PR1SCG1.10L                                                   "
+                   PR1PTRU0.18F, PR1PTRU1.16F, PR1PTRU2.15F, PR1PTRM0.18J                4M SOP32
+                   PR1PTRM1.16J, PR1PTRM2.15J, PR1PTRL0.18K, PR1PTRL1.16K, PR1PTRL2.15K      "
+
+Time Crisis        TS1CCRH.5B, TS1CCRH.1D                                                4M SOP32
+                   TS1CCRL.7B, TS1CCRL.3D, TS1CG0.12B, TS1CG0.8D, TS1CG1.13B            16M SOP44
+                   TS1CG1.10D, TS1CG2.14B, TS1CG2.12D, TS1CG3.16B, TS1CG3.13D                "
+                   TS1CG4.18B, TS1CG4.14D, TS1CG5.19B, TS1CG5.16D, TS1CG6.18A                "
+                   TS1CG6.18D, TS1CG7.15A, TS1CG7.19D, TS1SCG0.12F,TS1SCG0.12L               "
+                   TS1SCG1.10F,TS1SCG1.10L, TS1SCG2.8F, TS1SCG2.8L, TS1SCG3.7F               "
+                   TS1SCG3.7L, TS1SCG4.5F, TS1SCG4.5L, TS1SCG5.3F, TS1SCG5.3L                "
+                   TS1PTRU0.18F, TS1PTRU1.16F, TS1PTRU2.15F, TS1PTRM0.18J                4M SOP32
+                   TS1PTRM1.16J, TS1PTRM2.15J, TS1PTRL0.18K, TS1PTRL1.16K, TS1PTRL2.15K      "
+
+Tokyo Wars         TW1CCRH.5B, TW1CCRH.1D                                                4M SOP32
+                   TW1CCRL.7B, TW1CCRL.3D, TW1CG0.12B, TW1CG0.8D, TW1CG1.13B            16M SOP44
+                   TW1CG1.10D, TW1CG2.14B, TW1CG2.12D, TW1CG3.16B, TW1CG3.13D                "
+                   TW1CG4.18B, TW1CG4.14D, TW1CG5.19B, TW1CG5.16D, TW1CG6.18A                "
+                   TW1CG6.18D, TW1CG7.15A, TW1CG7.19D, TW1SCG0.12F,TW1SCG0.12L               "
+                   TW1SCG1.10F,TW1SCG1.10L, TW1SCG2.8F, TW1SCG2.8L, TW1SCG3.7F, TW1SCG3.7L   "
+                   TW1PTRU0.18F, TW1PTRU1.16F, TW1PTRU2.15F, TW1PTRU3.14F                  4M SOP32
+                   TW1PTRM0.18J, TW1PTRM1.16J, TW1PTRM2.15J, TW1PTRM3.14J                    "
+                   TW1PTRL0.18K, TW1PTRL1.16K, TW1PTRL2.15K, TW1PTRL3.14K                    "
+
+
+ROM PCB (type 2)
+-------
+SS22DS FLASH PCB 8650961300 (8650971300)
+  |--------------------------------------------------------------|
+  |     F13M  F13L                      F12J   F12E    |------|  |
+  |                                                    |ALTERA|  |
+  |     F12M  F12L                                     |EPMXXXX  |
+|--|                                    F11J   F11E    |------|  |
+|  | HM628128 F11L                                               |
+|  | HM628128                                             DSF4   |
+|J | HM628128 F9L                       F9J     F9E              |
+|R |                                                             |
+|4 | DSF5A                                                       |
+|  |                                    F8J     F8E              |
+|  |                                                             |
+|--|                                                    SS22DSF3 |
+  |           F7L   F7M                 F7J     F7E              |
+  |                                                              |
+  |                                                              |
+  |                                     F6J     F6E     SS22DSF3|--|
+|--|                                                            |  |
+|  |                                                            |  |
+|  |          F5L   F5M                 F5J     F5E             |  |
+|J |                                                            |  |
+|R |                                                            |  |
+|3 |                                    F4J     F4E             |  |
+|  |                                                            |  |
+|  |          F3L   F3M                                         |  |
+|--|                                                            |  |
+  | SS22DSF2                            F2J     F2E             |--|
+  |                                                              |
+  | SS22DSF2  F1L   F1M                 F1J     F1E              |
+  |--------------------------------------------------------------|
+(logic chips omitted from the PCB layout)
+
+Notes:
+      Namco SS22 FLASH PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
+
+      JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
+                     as a 'DHD harness'
+      EPMXXXX      : Altera EPM??? (PLCC84, unknown chip model, possibly EPM7064, sticker on top of it blocking ID markings)
+      DSF5A        : PALCE 16V8H (PLCC20, labelled 'DSF5A')
+      DSF4         : PALCE 16V8H (PLCC20, labelled 'DSF4')
+      SS22DSF3     : EPM7032 (x2, PLCC44, labelled 'SS22DSF3')
+      SS22DSF2     : EPM7032 (x2, PLCC44, labelled 'SS22DSF2')
+      HM628128     : Hitachi HM628128 128k x8 SRAM (TSOP32)
+
+Game               ROMs populated (All Intel E28F016SA TSOP56 16M FlashROMs)
+-----------------------------------------------------------------
+Armadillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH
+ROMs (prototype or
+early test version)F4E, F4J, F5E, F5J, F6E, F6J, \
+                   F7E, F7J, F8E, F8J, F9E, F9J, \ CGx ROMs
+                   F11E, F11J, F12E, F12J        /
+
+                   F1L, F1M, F3L, F3M, F5L, F5M, \
+                   F7L, F7M                      / SCGx ROMs
+
+                   F9L, F11L, F12L, F13L,        \
+                   F12M, F13M                    / PTR ROMs
+
+
+VIDEO PCB
+---------
+1st Revision
+SYSTEM SUPER22 VIDEO 8646960204 (8646970204)
+
+2nd Revision
+SYSTEM SUPER22 VIDEO(B) 8646961200 (8646971200)
+
+3rd Revision (PCB layout shown below)
+SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
+  |--------------------------------------------------------------|
+  |                                                              |
+  |                    HM534251BJ-8(x22)                         |
+  |                                                   |-----|   |--|
+  |  |---------| |---------| |---------| |---------|  |C401 |   |  |
+  |  |         | |         | |         | |         |  |-----|   |  |
+  |  |   304   | |   304   | |   304   | |   304   |            |  |
+  |  |         | |         | |         | |         |  |-----|   |  |
+  |  |         | |         | |         | |         |  |C400 |   |  |
+  |  |---------| |---------| |---------| |---------|  |-----|   |  |
+  |  N341256      |-----| |-----| |-----| |-----|               |  |
+  |  N341256      |C407 | |C401 | |C401 | |C401 |  |---------|  |  |
+  |               |-----| |-----| |-----| |-----|  |         |  |  |
+  |   |---------|                                  |  C399   |  |--|
+  |   |         |         |-----| |-----| |-----|  |         |   |
+  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
+  |   |         |         |-----| |-----| |-----|  |---------|  |--|
+|--|  |         |                    |-----|            N341256 |  |
+|  |  |---------|                    |C406 |  |-----|   N341256 |  |
+|  |  |-----|                        |-----|  |C381 |           |  |
+|J |  |C381 |                |---------|      |-----|           |  |
+|V |  |-----|      N341256   |         |                LC321664|  |
+|3 |     51.2MHz   N341256   |  C404   |      |---------|       |  |
+|  | |---------| |---------| |         |      |         |       |  |
+|  | |         | |         | |         |      |  C361   |       |  |
+|--| |  C374   | |  C395   | |---------|      |         |       |  |
+  |  |         | |         | N341256          |         |       |--|
+  |  |         | |         | N341256          |---------|        |
+  |  |---------| |---------| N341256                    CXD1178Q |
+  |--------------------------------------------------------------|
+(logic chips omitted from the PCB layout)
+
+Notes:
+      JV3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known
+                     as a 'DHD harness'
+      N341256      : NKK N341256 32k x8 SRAM (x9, SOJ28)
+      HM534251BJ-8 : Hitachi HM534251BJ-8 256k x4 FASTPAGE DRAM (x22, SOJ28)
+      LC321664     : Sanyo LC321664 64k x16 DRAM (SOJ40)
+      CXD1178Q     : Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
+      304          : Namco custom 304  (x4, QFP120)
+      C361         : Namco custom C361 (QFP120)
+      C374         : Namco custom C374 (QFP160)
+      C381         : Namco custom C381 (x2, QFP144)
+      C387         : Namco custom C387 (QFP160)
+      C395         : Namco custom C395 (QFP168)
+      C399         : Namco custom C399 (QFP160)
+      C400         : Namco custom C400 (x4, QFP100)
+                     - x3 on 1st Revision
+      C401         : Namco custom C401 (x4, QFP64)
+                     - x5 on 1st Revision
+      C404         : Namco custom C404 (QFP208)
+      C406         : Namco custom C406 (TQFP120)
+      C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
+                                                     Altera EPM7064 PLCC84 FPGA labelled 'SS22V1B'
+                                                     The Altera chip runs very hot and fails quite often.
+                                                     Even if a heatsink is added to the chip it still fails.
+                                                     The failure of this chip is the primary cause of
+                                                     video faults on Namco Super System 22 PCBs.
+                                                     (Second reason for video faults is generally attributed
+                                                     to failure of RAM on this PCB and/or the DSP PCB)
+
+
+Motherboard PCB
+---------------
+1st Revision
+SYSTEM SUPER22 MOTHER PCB 8646960602 (8646970602)
+
+2nd Revision
+SYSTEM SUPER22 MOTHER(B) PCB (number not known)
+
+3rd Revision
+SYSTEM SUPER22 MOTHER(C) PCB 8646960602 (8646970602)
+|------------------------------------------------------------------|
+| J1                  J2           J4           J6           J8    |
+|           J10                           J5   IC2     J7          |
+|                     J3          IC3          IC1              J9 |
+|                                                                  |
+| JC2 |---------------------|        |---------------------|JC1    |
+|     |---------------------|        |---------------------|       |
+|                                                                  |
+| JD2 |---------------------|        |---------------------|JD1    |
+|     |---------------------|        |---------------------|       |
+|                                                                  |
+|                                    |---------------------|JR1    |
+|                                    |---------------------|       |
+|                                                                  |
+| JV2 |---------------------|        |---------------------|JV1    |
+|     |---------------------|        |---------------------|       |
+|------------------------------------------------------------------|
+Notes:
+      IC1     : LB1233 (DIP8)
+      IC2, IC3: LB1235 (DIP8)
+
+      JC1, JC2: Connectors to plug in CPU PCB
+      JD1, JD2: Connectors to plug in DSP PCB
+      JR1     : Connector  to plug in MROM PCB
+      JV1, JV2: Connectors to plug in VIDEO PCB
+
+      J1 : 9 pin power input socket   Pin  Use
+                                     -----------
+                                      1    +5V
+                                      2    +5V
+                                      3    +5V
+                                      4    +5V
+                                      5    Ground
+                                      6    Ground
+                                      7    Ground
+                                      8    Ground
+                                      9    +12V
+
+      J2 : 9 pin link connector   Pin  Use
+                                  --------------
+                                   1   Ring In+
+                                   2   Ring In-
+                                   3   Ring Out2+
+                                   4   Ground
+                                   5   /RXD+
+                                   6   /RXD-
+                                   7   /TXD (Note: Steering wheel motor torque data on Dirt Dash is output via serial link here which is connected to a Motor/Feedback PCB)
+                                   8   GND
+                                   9   +5V
+
+      J3 : 9 pin socket   Pin  Use
+                          -------------------
+                           1   Service Credit
+                           2   Test
+                           3   NC
+                           4   +12V
+                           5   Counter
+                           6   Ground
+                           7   Ground
+                           8   Coin 1
+                           9   Coin 2
+
+      J4 : 8 pin connector   Use Per Game (usually game-specific buttons/switches)
+                 Pin    -----------------------------------------------------------------------------------------------------------------------------------------------
+                        Game    ACOM22      ALPINER12      ALPINESURF     AQUAJET     ARMADILLO   CYBERCYCL    DIRTDASH     PROPCYCL     TIMECRIS     TOKYOWARS
+                -------------------------------------------------------------------------------------------------------------------------------------------------------
+                  1             Missile     Start          Start          Start       %           View/Start   View         -            Trigger      View/Start
+                  2             Gun         Left Select    Left Select    -           -           -            Shift Up     -            Pedal        Right Trigger
+                  3             Start       Right Select   Right Select   -           -           -            Shift Down   Pedal A      -            Left Trigger
+                  4             -           Safety Free    Safety Free    -           -           -            -            Pedal B      -            DX Cab->GND
+                  5             -           Safety Lock    Safety Lock    -           -           -            -            Start        -            -
+                  6             -           -              -              -           -           -            SD Cab->GND  -            -            -
+                  7 GND  -->>
+                  8 GND  -->>
+
+                  Notes: %: Armadillo Start Button will be on this connector somewhere, probably at pin 1.
+
+
+      J5 : 15 pin socket   Use Per Game (usually game-specific relays/lamps)
+                 Pin    -----------------------------------------------------------------------------------------------------------------------------------------------
+                        Game    ACOM22       ALPINER12     ALPINESURF   AQUAJET        ARMADILLO   CYBERCYCL    DIRTDASH     PROPCYCL     TIMECRIS     TOKYOWARS
+                -------------------------------------------------------------------------------------------------------------------------------------------------------
+                  1             Start Lamp   Relay (Dir)   Relay        -              %           1st Lamp     Freeze       Fan          Gun Opto     View/Start Lamp
+                  2             Mute         Relay (Motor) Relay        Fan            -           2nd Lamp     Mute         Start Lamp   -            Hit Lamp
+                  3             -            Mute          -            -              -           3rd Lamp     ^            -            -            Woofer Control
+                  4             -            Start Lamp    Start Lamp   Start Lamp     -           4th Lamp     -            -            -            -
+                  5             -            Left Lamp     Left Lamp    -              -           Red Lamp     -            -            -            -
+                  6             -            Right Lamp    Right Lamp   -              -           Yellow Lamp  -            -            -            Seat Motion Valve ->DX Cab
+                  7             -            -             -            Valve Solenoid -           Green Lamp   -            -            -            -
+                  8             -            -             -            -              -           Lead Lamp    -            -            -            Trigger Lamp Right
+                  9             -            -             -            -              -           View Lamp    -            -            -            Trigger Lamp Left
+                  10            -            -             -            -              -           #            -            -            -            Mute
+                  11  NC   -->>
+                  12  NC   -->>
+                  13  +12V -->>
+                  14  +5V  -->>
+                  15  GND  -->>
+
+                  Notes: %: Armadillo Start Lamp will be on this connector somewhere.
+                         ^: Dirt Dash DX valve solenoid will be on this connector somewhere.
+                         #: Cyber Cycles lamp test shows a blue lamp but the manual does not mention it or show the wiring and it doesn't exist on the cabinet.
+
+      J6 : 12 pin audio output connector   Pin  Use
+           All signals connect to          ----------
+           4-Channel Audio PCB              1   SPKL+
+           8647960100 (8647970100)          2   SPKL-
+                                            3   SPKR+
+                                            4   SPKR-
+                                            5   Audio (Gas Tank speaker on Cyber Cycles & Aquajet, Sub Woofer on Dirt Dash, Air Combat 22 & Tokyo Wars)
+                                            6   Ground
+                                            7   Audio (Aux)
+                                            8   Ground
+                                            9   NC
+                                            10  Ground
+                                            11  Ground
+                                            12  +12V
+
+      J7 : 12 pin analog controls socket   Use (usually game-specific potentiometers, either 1K or 5K)
+                 Pin    -----------------------------------------------------------------------------------------------------------------------------------------------
+                        Game    ACOM22        ALPINER12    ALPINESURF   AQUAJET       ARMADILLO   CYBERCYCL    DIRTDASH     PROPCYCL     TIMECRIS     TOKYOWARS
+                -------------------------------------------------------------------------------------------------------------------------------------------------------
+                  1  +5V  -->>
+                  2             Left/Right    Swing        Side         Swing         -           Bank         Steering     Left/Right   -            Gas
+                  3             Up/Down       Edge         Tilt         Gas           -           Gas          Gas          Up/Down      -            -
+                  4  GND  -->>
+                  5  +5V  -->>
+                  6             Throttle      -            -            Control Arm   -           Brake        Brake        -            -            Forward Pedal
+                  7             -             -            -            -             -           -            -            -            -            Backward Pedal
+                  8  GND  -->>
+                  9  NC   -->>
+                  10 NC   -->>
+                  11 NC   -->>
+                  12 GND  -->>
+
+      J8 : 10 pin connector (not used by any games)
+
+      J9 : 6 pin video output socket   Pin  Use
+                                       ---------
+                                        1   Red
+                                        2   Green
+                                        3   Blue
+                                        4   Composite Sync (VSync 15kHz interlaced)
+                                        5   Ground
+                                        6   NC
+
+      J10: 16 pin flat cable connector, only populated on Mother(C) PCB.  (Prop Cycle: B5=Pedal Phase B, A5=Pedal Phase A). Might be used on Armadillo Racing for the Trackball?
+
+
+AMP PCB
+-------
+SYSTEM SUPER22 AMP(4) PCB 8647960100 (8647970100) (sticker 'AMP(2) PCB 8647961100')
+|-----------------------------------|
+|J1  J2   LA4705  J3   *1    *2   J5|
+|                                   |
+|-----------------------------------|
+Notes:
+      LA4705: 2-channel 15W Power Amp
+      J1    : 3 pin power input socket   Pin  Use
+                                         -----------
+                                          1   +12V
+                                          2   Ground
+                                          3   NC
+
+      J2    : 4 pin dual speaker output socket   Pin  Use
+                                                 ---------
+                                                  1   SP1+
+                                                  2   SP1-
+                                                  3   SP2+
+                                                  4   SP2-
+
+      J3    : 8 pin sound data input connector from Mother PCB J6   Pin  Use
+                                                                    ----------
+                                                                     1   SPKL+
+                                                                     2   SPKL-
+                                                                     3   SPKR+
+                                                                     4   SPKR-
+                                                                     5   NC
+                                                                     6   NC
+                                                                     7   NC
+                                                                     8   NC
+
+      *1    : Unpopulated position for a 2nd LA4705 Power Amp
+      *2    : J4 - Unpopulated position for another 4 pin dual speaker output socket
+      J5    : 2 pin connector used for sound mute   Pin  Use
+                                                    -----------
+                                                     1   Mute
+                                                     2   Ground
+*/
 
 #include "emu.h"
 #include "includes/namcos22.h"
@@ -3452,9 +3312,9 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
-	PORT_CONFSETTING(      0x0200, "Deluxe" ) // car suspension valves
+	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )   // Connector J4 pin 6 on MOTHER PCB (open for DX, grounded for SD)
+	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )  // In SD mode, the Game Options / Cabinet Motion item can't be selected or changed
+	PORT_CONFSETTING(      0x0200, "Deluxe" ) // car suspension valves i.e. motion cabinet
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -4861,11 +4721,9 @@ ROM_START( propcycl )
 	ROM_LOAD( "pr1ptrl0.18k", 0x80000*0, 0x80000,CRC(fddb27a2) SHA1(6e837b45e3f9ed7ca3d1a457d0f0124de5618d1f) )
 	ROM_LOAD( "pr1ptrl1.16k", 0x80000*1, 0x80000,CRC(6964dd06) SHA1(f38a550165504693d20892a7dcfaf01db19b04ef) )
 	ROM_LOAD( "pr1ptrl2.15k", 0x80000*2, 0x80000,CRC(4d7ed1d4) SHA1(8f72864a06ff8962e640cb36d062bddf5d110308) )
-
 	ROM_LOAD( "pr1ptrm0.18j", 0x80000*3, 0x80000,CRC(b6f204b7) SHA1(3b34f240b399b6406faaf338ae0ab536247e64a6) )
 	ROM_LOAD( "pr1ptrm1.16j", 0x80000*4, 0x80000,CRC(949588b7) SHA1(fdaf50ff2496200b9c981efc18b035f3c0a96ace) )
 	ROM_LOAD( "pr1ptrm2.15j", 0x80000*5, 0x80000,CRC(dc1cef0a) SHA1(8cbc02cf73fac3cc110b676d77602ae628385eae) )
-
 	ROM_LOAD( "pr1ptru0.18f", 0x80000*6, 0x80000,CRC(5d66a7c4) SHA1(c9ed1c18724192d45c1f6b40096f15d02baf2401) )
 	ROM_LOAD( "pr1ptru1.16f", 0x80000*7, 0x80000,CRC(e9a3f72b) SHA1(f967e1adf8eee4fffdf4288d36a93c5bb4f9a126) )
 	ROM_LOAD( "pr1ptru2.15f", 0x80000*8, 0x80000,CRC(c346a842) SHA1(299bc0a30d0e74d8adfa3dc605aebf6439f5bc18) )
@@ -4915,12 +4773,10 @@ ROM_START( airco22b )
 	ROM_LOAD( "acs1ptl1.16k", 0x80000*0x1, 0x80000,CRC(e583b975) SHA1(beb0cc2b44bc69af057c2bb744cd7e1b95de577a) )
 	ROM_LOAD( "acs1ptl2.15k", 0x80000*0x2, 0x80000,CRC(802d737a) SHA1(3d99a369db70d13fb87c2ff26c82b4b39afe94d9) )
 	ROM_LOAD( "acs1ptl3.14k", 0x80000*0x3, 0x80000,CRC(fe556ecb) SHA1(9d9dbbb4f1d3688fb763001834640d79d9987d47) )
-
 	ROM_LOAD( "acs1ptm0.18j", 0x80000*0x4, 0x80000,CRC(949b6c58) SHA1(6ea016551b10f5d5764921dcc5a4b81d2b93d701) )
 	ROM_LOAD( "acs1ptm1.16j", 0x80000*0x5, 0x80000,CRC(8b2b99d9) SHA1(89c3545c4035509307728a9577018c1100ce3a54) )
 	ROM_LOAD( "acs1ptm2.15j", 0x80000*0x6, 0x80000,CRC(f1515080) SHA1(27a87217a140477a6840a610c95ae57abc0d01a6) )
 	ROM_LOAD( "acs1ptm3.14j", 0x80000*0x7, 0x80000,CRC(e364f4aa) SHA1(3af6a864765871664cccad82c4795f677be68d51) )
-
 	ROM_LOAD( "acs1ptu0.18f", 0x80000*0x8, 0x80000,CRC(746b3084) SHA1(73397d1f22300fb3a81a0a068da4d0a8cfdc0a36) )
 	ROM_LOAD( "acs1ptu1.16f", 0x80000*0x9, 0x80000,CRC(b44f1d3b) SHA1(f3f1a85c082053653e4da7d7f01f1baef1a013c8) )
 	ROM_LOAD( "acs1ptu2.15f", 0x80000*0xa, 0x80000,CRC(fdd2d778) SHA1(0269f971d778e908a1efb5a63b08fb3365d98c2a) )
@@ -5026,12 +4882,10 @@ ROM_START( alpinerd )
 	ROM_LOAD( "ar1ptrl1.16k", 0x80000*0x1, 0x80000,CRC(8739b09c) SHA1(cd603c4dc2f9ffc4185f891eb83e4c383c564294) )
 	ROM_LOAD( "ar1ptrl2.15k", 0x80000*0x2, 0x80000,CRC(bda693a9) SHA1(fe71dd3c63198737aa2d39527f0004e977e3be20) )
 	ROM_LOAD( "ar1ptrl3.14k", 0x80000*0x3, 0x80000,CRC(82797405) SHA1(2f205fee2d33e183c80a906fb38900167c011240) )
-
 	ROM_LOAD( "ar1ptrm0.18j", 0x80000*0x4, 0x80000,CRC(64bd6620) SHA1(2e33ff22208805ece304128be8887646fc890f6d) )
 	ROM_LOAD( "ar1ptrm1.16j", 0x80000*0x5, 0x80000,CRC(2232f0a5) SHA1(3fccf6d4a0c4100cc85e3051024d659c4a1c769e) )
 	ROM_LOAD( "ar1ptrm2.15j", 0x80000*0x6, 0x80000,CRC(8ee14e6f) SHA1(f6f1cbb748b109b365255378c18e710ba6270c1c) )
 	ROM_LOAD( "ar1ptrm3.14j", 0x80000*0x7, 0x80000,CRC(1094a970) SHA1(d41b10f48e1ef312bcaf09f27fabc7252c30e648) )
-
 	ROM_LOAD( "ar1ptru0.18f", 0x80000*0x8, 0x80000,CRC(26d88467) SHA1(d528f989fab4dd5ac1aec9b596a05fbadcc0587a) )
 	ROM_LOAD( "ar1ptru1.16f", 0x80000*0x9, 0x80000,CRC(c5e2c208) SHA1(152fde0b95a5df8c781e4a83577cfbbc7672ae0d) )
 	ROM_LOAD( "ar1ptru2.15f", 0x80000*0xa, 0x80000,CRC(1321ec59) SHA1(dbd3687a4c6b1aa0b18e336f99dabb9010d36639) )
@@ -5083,12 +4937,10 @@ ROM_START( alpinerc )
 	ROM_LOAD( "ar1ptrl1.16k", 0x80000*0x1, 0x80000,CRC(8739b09c) SHA1(cd603c4dc2f9ffc4185f891eb83e4c383c564294) )
 	ROM_LOAD( "ar1ptrl2.15k", 0x80000*0x2, 0x80000,CRC(bda693a9) SHA1(fe71dd3c63198737aa2d39527f0004e977e3be20) )
 	ROM_LOAD( "ar1ptrl3.14k", 0x80000*0x3, 0x80000,CRC(82797405) SHA1(2f205fee2d33e183c80a906fb38900167c011240) )
-
 	ROM_LOAD( "ar1ptrm0.18j", 0x80000*0x4, 0x80000,CRC(64bd6620) SHA1(2e33ff22208805ece304128be8887646fc890f6d) )
 	ROM_LOAD( "ar1ptrm1.16j", 0x80000*0x5, 0x80000,CRC(2232f0a5) SHA1(3fccf6d4a0c4100cc85e3051024d659c4a1c769e) )
 	ROM_LOAD( "ar1ptrm2.15j", 0x80000*0x6, 0x80000,CRC(8ee14e6f) SHA1(f6f1cbb748b109b365255378c18e710ba6270c1c) )
 	ROM_LOAD( "ar1ptrm3.14j", 0x80000*0x7, 0x80000,CRC(1094a970) SHA1(d41b10f48e1ef312bcaf09f27fabc7252c30e648) )
-
 	ROM_LOAD( "ar1ptru0.18f", 0x80000*0x8, 0x80000,CRC(26d88467) SHA1(d528f989fab4dd5ac1aec9b596a05fbadcc0587a) )
 	ROM_LOAD( "ar1ptru1.16f", 0x80000*0x9, 0x80000,CRC(c5e2c208) SHA1(152fde0b95a5df8c781e4a83577cfbbc7672ae0d) )
 	ROM_LOAD( "ar1ptru2.15f", 0x80000*0xa, 0x80000,CRC(1321ec59) SHA1(dbd3687a4c6b1aa0b18e336f99dabb9010d36639) )
@@ -5138,12 +4990,10 @@ ROM_START( alpinr2b )
 	ROM_LOAD( "ars1ptrl1.16k", 0x080000, 0x080000, CRC(8bdb4970) SHA1(a504cd4beca4bedd1a7a228c83dd6b844ca3a1e0) )
 	ROM_LOAD( "ars1ptrl2.15k", 0x100000, 0x080000, CRC(ec993a4f) SHA1(883f64e3e8d951415e9cef589c354eba9406c0aa) )
 	ROM_LOAD( "ars1ptrl3.14k", 0x180000, 0x080000, CRC(4d453f3c) SHA1(7a82e5d8f974d9e56d0031b35e73647fe6aeec2e) )
-
 	ROM_LOAD( "ars1ptrm0.18j", 0x200000, 0x080000, CRC(d1bdc524) SHA1(b898bb38de397551ada4da4677dd733bf8fa5010) )
 	ROM_LOAD( "ars1ptrm1.16j", 0x280000, 0x080000, CRC(86b81c81) SHA1(45096abf46794f06a4b647f5e4222798d8467632) )
 	ROM_LOAD( "ars1ptrm2.15j", 0x300000, 0x080000, CRC(24116b83) SHA1(41c6a880abce7b543c409fda767682b2537b0d99) )
 	ROM_LOAD( "ars1ptrm3.14j", 0x380000, 0x080000, CRC(772bede3) SHA1(f9565b7a40f0bbf11081d619fe5a46feafce2e56) )
-
 	ROM_LOAD( "ars1ptru0.18f", 0x400000, 0x080000, CRC(a4cf197a) SHA1(ee78cc259e87395df75179bbe5b6e521e762b582) )
 	ROM_LOAD( "ars1ptru1.16f", 0x480000, 0x080000, CRC(1deb1fc0) SHA1(bfd1dfcaccf5a0f851b6757995fa7195452a3965) )
 	ROM_LOAD( "ars1ptru2.15f", 0x500000, 0x080000, CRC(bcfad0ba) SHA1(bee7f2f9ecd2b289c6706e19fa86863913b286b5) )
@@ -5193,12 +5043,10 @@ ROM_START( alpinr2a )
 	ROM_LOAD( "ars1ptrl1.16k", 0x080000, 0x080000, CRC(8bdb4970) SHA1(a504cd4beca4bedd1a7a228c83dd6b844ca3a1e0) )
 	ROM_LOAD( "ars1ptrl2.15k", 0x100000, 0x080000, CRC(ec993a4f) SHA1(883f64e3e8d951415e9cef589c354eba9406c0aa) )
 	ROM_LOAD( "ars1ptrl3.14k", 0x180000, 0x080000, CRC(4d453f3c) SHA1(7a82e5d8f974d9e56d0031b35e73647fe6aeec2e) )
-
 	ROM_LOAD( "ars1ptrm0.18j", 0x200000, 0x080000, CRC(d1bdc524) SHA1(b898bb38de397551ada4da4677dd733bf8fa5010) )
 	ROM_LOAD( "ars1ptrm1.16j", 0x280000, 0x080000, CRC(86b81c81) SHA1(45096abf46794f06a4b647f5e4222798d8467632) )
 	ROM_LOAD( "ars1ptrm2.15j", 0x300000, 0x080000, CRC(24116b83) SHA1(41c6a880abce7b543c409fda767682b2537b0d99) )
 	ROM_LOAD( "ars1ptrm3.14j", 0x380000, 0x080000, CRC(772bede3) SHA1(f9565b7a40f0bbf11081d619fe5a46feafce2e56) )
-
 	ROM_LOAD( "ars1ptru0.18f", 0x400000, 0x080000, CRC(a4cf197a) SHA1(ee78cc259e87395df75179bbe5b6e521e762b582) )
 	ROM_LOAD( "ars1ptru1.16f", 0x480000, 0x080000, CRC(1deb1fc0) SHA1(bfd1dfcaccf5a0f851b6757995fa7195452a3965) )
 	ROM_LOAD( "ars1ptru2.15f", 0x500000, 0x080000, CRC(bcfad0ba) SHA1(bee7f2f9ecd2b289c6706e19fa86863913b286b5) )
@@ -5455,21 +5303,68 @@ ROM_START( dirtdash )
 	ROM_LOAD( "dt1ccrh.1d",   0x200000, 0x080000, CRC(af257064) SHA1(0da561d9f8824618c00209ccef6146e9f3ad72bb) )
 
 	ROM_REGION( 0x480000, "pointrom", 0 ) /* 3d model data */
-	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, BAD_DUMP CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
-	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, BAD_DUMP CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
-	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, BAD_DUMP CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
-	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, BAD_DUMP CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
-	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, BAD_DUMP CRC(d68541fc) SHA1(6b00079bd8f2db26e71968de289cea93458aebe9) )
-	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, BAD_DUMP CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
-	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, BAD_DUMP CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
-	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, BAD_DUMP CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
-	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, BAD_DUMP CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
+	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
+	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
+	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
+	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
+	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, CRC(f620fd41) SHA1(18cf6e11eb68da1b7f7fcc32562dc952c247de65) )
+	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
+	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
+	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
+	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "dt1wavea.2l",  0x000000, 0x400000, CRC(cbd52e40) SHA1(dc995dd919548c96a90efb0375e5b5f1055e05cb) )
 	ROM_LOAD( "dt1waveb.1l",  0x800000, 0x400000, CRC(6b736f94) SHA1(ac3715480aa9a9c2dec099607f89859bb3b73a6a) )
 ROM_END
 
+ROM_START( dirtdashj )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_WORD_SWAP( "dt1vera.1",    0x000002, 0x200000, CRC(057b280b) SHA1(e7f038c1b3c7520d32c9962cc00104bcf65d60f6) )
+	ROM_LOAD32_WORD_SWAP( "dt1vera.2",    0x000000, 0x200000, CRC(82f822d2) SHA1(170cf326903fe7b4e203b181124de609826b8e1f) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "dt1scg0.12f",  0x000000, 0x200000, CRC(a09b5760) SHA1(3dd54ebebf9da1de76874a1adf491ed15849e1b1) )
+	ROM_LOAD( "dt1scg1.10f",  0x200000, 0x200000, CRC(f9ac8111) SHA1(814074ae8cc81c6c1201d764a84dd95fe914f19c) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "dt1cg0.8d",    0x000000, 0x200000, CRC(10ab95e0) SHA1(ffde1f00ac3e82a36fbcfa060c6b97c92dfcfc8b) )
+	ROM_LOAD( "dt1cg1.10d",   0x200000, 0x200000, CRC(d9f1ba53) SHA1(5a1095b726c55001cc1d4c695adc38097e6a0201) )
+	ROM_LOAD( "dt1cg2.12d",   0x400000, 0x200000, CRC(bd8b1e0b) SHA1(fcd94e33a0cbd17c9308cb8952e3c618ab56f9fc) )
+	ROM_LOAD( "dt1cg3.13d",   0x600000, 0x200000, CRC(ba960663) SHA1(e98149bc4652ea7933ac47d760a6f7e6489f15e2) )
+	ROM_LOAD( "dt1cg4.14d",   0x800000, 0x200000, CRC(424b9652) SHA1(fa8865110db03559740c4e633e123d1a009782c4) )
+	ROM_LOAD( "dt1cg5.16d",   0xa00000, 0x200000, CRC(29516626) SHA1(1f12c5dc3975b88dc60d87d0409bf311837e9fa4) )
+	ROM_LOAD( "dt1cg6.18d",   0xc00000, 0x200000, CRC(e6fa7180) SHA1(85316cde282cff1f913cf9f155cfa36adcc1108e) )
+	ROM_LOAD( "dt1cg7.19d",   0xe00000, 0x200000, CRC(2ca19153) SHA1(c82403c8b40bf85daedf610b1bc7bfea9dfc6206) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "dt1ccrl.3d",   0x000000, 0x200000, CRC(e536b313) SHA1(7357da993d2bb3fcc8c1c2feb53689ad368cd80a) )
+	ROM_LOAD( "dt1ccrh.1d",   0x200000, 0x080000, CRC(af257064) SHA1(0da561d9f8824618c00209ccef6146e9f3ad72bb) )
+
+	ROM_REGION( 0x480000, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
+	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
+	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
+	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
+	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, CRC(f620fd41) SHA1(18cf6e11eb68da1b7f7fcc32562dc952c247de65) )
+	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
+	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
+	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
+	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
+	ROM_LOAD( "dt1wavea.2l",  0x000000, 0x400000, CRC(cbd52e40) SHA1(dc995dd919548c96a90efb0375e5b5f1055e05cb) )
+	ROM_LOAD( "dt1waveb.1l",  0x800000, 0x400000, CRC(6b736f94) SHA1(ac3715480aa9a9c2dec099607f89859bb3b73a6a) )
+ROM_END
 
 ROM_START( aquajet )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
@@ -5792,36 +5687,37 @@ void namcos22s_state::init_dirtdash()
 
 /*********************************************************************************************/
 
-/*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,     CLASS,          INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
+/*     YEAR, NAME,     PARENT,   MACHINE,   INPUT,     CLASS,           INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, RR3 means USA?
-GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
-GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state, init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
-GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state, init_cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
-GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state, init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state, init_acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
-GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
-GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state, init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, RR3 means USA?
+GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
+GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
+GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
+GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state,  init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state,  init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state,  init_raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
+GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state,  init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
+GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state,  init_victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
-GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22s_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22s_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22s_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22s_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22s_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
-GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22s_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
-GAME( 1997, adillor,  0,         adillor,   adillor,   namcos22s_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41
+GAME( 1994, alpinerd,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b,  0,        airco22b,  airco22,   namcos22s_state, init_airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc,  0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, dirtdash,  0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, dirtdashj, dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
+GAME( 1995, timecris,  0,        timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa, timecris, timecris,  timecris,  namcos22s_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl,  0,        propcycl,  propcycl,  namcos22s_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, alpinesa,  0,        alpinesa,  alpiner,   namcos22s_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
+GAME( 1996, tokyowar,  0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
+GAME( 1996, aquajet,   0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a,  alpinr2b, alpine,    alpiner,   namcos22s_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
+GAME( 1997, adillor,   0,        adillor,   adillor,   namcos22s_state, init_adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41

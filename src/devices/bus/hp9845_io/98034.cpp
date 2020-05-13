@@ -245,7 +245,7 @@ READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
 
 READ8_MEMBER(hp98034_io_card_device::hpib_data_r)
 {
-	return ~m_ieee488->read_dio();
+	return ~m_ieee488->dio_r();
 }
 
 READ8_MEMBER(hp98034_io_card_device::idr_r)
@@ -331,7 +331,7 @@ void hp98034_io_card_device::update_data_out()
 	if (m_clr_hpib) {
 		m_data_out = 0;
 	}
-	m_ieee488->write_dio(~m_data_out);
+	m_ieee488->host_dio_w(~m_data_out);
 }
 
 void hp98034_io_card_device::update_ctrl_out()

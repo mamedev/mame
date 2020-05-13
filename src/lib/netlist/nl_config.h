@@ -178,6 +178,10 @@ static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000LL;
 
 static constexpr const int NETLIST_CLOCK = 1'000'000'000;
 
+// FIXME: need a better solution for global constants.
+
+static constexpr const char *NETLIST_DEFAULT_LOGIC_FAMILY = "74XX";
+
 /// \brief  Floating point types used
 ///
 /// nl_fptype is the floating point type used throughout the

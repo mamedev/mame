@@ -7,7 +7,6 @@
 
 #include "nld_7483.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -36,12 +35,16 @@ namespace netlist
 		, m_power_pins(*this)
 		{
 		}
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_lastr = 0;
+		}
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(upd_a);
 		NETLIB_HANDLERI(upd_b);
 
-	protected:
+		friend class NETLIB_NAME(7483_dip);
+	private:
 		logic_input_t m_C0;
 		logic_input_t m_A1;
 		logic_input_t m_A2;
@@ -64,36 +67,34 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(7483_dip, 7483)
+	NETLIB_OBJECT(7483_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(7483_dip, 7483)
+		NETLIB_CONSTRUCTOR(7483_dip)
+		, A(*this, "A")
 		{
-			register_subalias("1", m_A4);
-			register_subalias("2", m_S3);
-			register_subalias("3", m_A3);
-			register_subalias("4", m_B3);
-			register_subalias("5", "VCC");
-			register_subalias("6", m_S2);
-			register_subalias("7", m_B2);
-			register_subalias("8", m_A2);
+			register_subalias("1", A.m_A4);
+			register_subalias("2", A.m_S3);
+			register_subalias("3", A.m_A3);
+			register_subalias("4", A.m_B3);
+			register_subalias("5", "A.VCC");
+			register_subalias("6", A.m_S2);
+			register_subalias("7", A.m_B2);
+			register_subalias("8", A.m_A2);
 
-			register_subalias("9", m_S1);
-			register_subalias("10", m_A1);
-			register_subalias("11", m_B1);
-			register_subalias("12", "GND");
-			register_subalias("13", m_C0);
-			register_subalias("14", m_C4);
-			register_subalias("15", m_S4);
-			register_subalias("16", m_B4);
+			register_subalias("9", A.m_S1);
+			register_subalias("10", A.m_A1);
+			register_subalias("11", A.m_B1);
+			register_subalias("12", "A.GND");
+			register_subalias("13", A.m_C0);
+			register_subalias("14", A.m_C4);
+			register_subalias("15", A.m_S4);
+			register_subalias("16", A.m_B4);
 		}
-		//NETLIB_RESETI();
-		//NETLIB_UPDATEI();
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(7483) A;
 	};
-
-	NETLIB_RESET(7483)
-	{
-		m_lastr = 0;
-	}
 
 	NETLIB_HANDLER(7483, upd_a)
 	{

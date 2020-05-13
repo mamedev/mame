@@ -63,7 +63,6 @@ protected:
 	uint16_t m_kb_counter;
 	uint8_t m_enable_nmi;
 	optional_shared_ptr<uint8_t> m_sys_register;
-	uint8_t m_tcsr_value;
 	uint8_t m_stby_pwr;
 	uint8_t m_pulse;
 
@@ -85,9 +84,6 @@ protected:
 	void update_banks();
 	void port2_w(offs_t offset, uint8_t data, uint8_t ddr);
 	uint8_t port2_r();
-	void tcsr_w(uint8_t data);
-	uint8_t tcsr_r();
-	uint8_t rcp5c_r();
 	uint8_t port5_r();
 	void port6_w(uint8_t data);
 	uint8_t port6_r();

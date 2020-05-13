@@ -7,7 +7,6 @@
 
 #include "nld_82S16.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
 
 namespace netlist
 {
@@ -30,7 +29,15 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			for (std::size_t i=0; i<4; i++)
+			{
+				m_ram[i] = 0;
+			}
+			m_addr = 0;
+			m_enq = 0;
+		}
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(addr)
 		{
@@ -66,8 +73,8 @@ namespace netlist
 			}
 		}
 
-
-	protected:
+		friend class NETLIB_NAME(82S16_dip);
+	private:
 		object_array_t<logic_input_t, 8> m_A;
 		logic_input_t m_CE1Q;
 		logic_input_t m_CE2Q;
@@ -82,31 +89,36 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)
+	NETLIB_OBJECT(82S16_dip)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(82S16_dip, 82S16)
+		NETLIB_CONSTRUCTOR(82S16_dip)
+		, A(*this, "A")
 		{
-			register_subalias("2",     m_A[0]);
-			register_subalias("1",     m_A[1]);
-			register_subalias("15",    m_A[2]);
-			register_subalias("14",    m_A[3]);
-			register_subalias("7",     m_A[4]);
-			register_subalias("9",     m_A[5]);
-			register_subalias("10",    m_A[6]);
-			register_subalias("11",    m_A[7]);
+			register_subalias("2",     A.m_A[0]);
+			register_subalias("1",     A.m_A[1]);
+			register_subalias("15",    A.m_A[2]);
+			register_subalias("14",    A.m_A[3]);
+			register_subalias("7",     A.m_A[4]);
+			register_subalias("9",     A.m_A[5]);
+			register_subalias("10",    A.m_A[6]);
+			register_subalias("11",    A.m_A[7]);
 
-			register_subalias("3",     m_CE1Q);
-			register_subalias("4",     m_CE2Q);
-			register_subalias("5",     m_CE3Q);
+			register_subalias("3",     A.m_CE1Q);
+			register_subalias("4",     A.m_CE2Q);
+			register_subalias("5",     A.m_CE3Q);
 
-			register_subalias("12",    m_WEQ);
-			register_subalias("13",    m_DIN);
+			register_subalias("12",    A.m_WEQ);
+			register_subalias("13",    A.m_DIN);
 
-			register_subalias("6",     m_DOUTQ);
+			register_subalias("6",     A.m_DOUTQ);
 
-			register_subalias("8",     "GND");
-			register_subalias("16",    "VCC");
+			register_subalias("8",     "A.GND");
+			register_subalias("16",    "A.VCC");
 		}
+		NETLIB_RESETI() {}
+		NETLIB_UPDATEI() {}
+	private:
+		NETLIB_SUB(82S16) A;
 	};
 
 	// FIXME: timing!
@@ -124,16 +136,6 @@ namespace netlist
 			}
 			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}
-	}
-
-	NETLIB_RESET(82S16)
-	{
-		for (std::size_t i=0; i<4; i++)
-		{
-			m_ram[i] = 0;
-		}
-		m_addr = 0;
-		m_enq = 0;
 	}
 
 	NETLIB_DEVICE_IMPL(82S16,     "TTL_82S16",     "")

@@ -115,10 +115,33 @@ namespace netlist
 			return ret;
 		}
 	};
-
+#if 1
+	NETLIB_OBJECT(NE555_dip)
+	{
+		NETLIB_CONSTRUCTOR(NE555_dip)
+		, A(*this, "A")
+		{
+			register_subalias("1", "A.GND");      // Pin 1
+			register_subalias("2", "A.TRIG");     // Pin 2
+			register_subalias("3", "A.OUT");      // Pin 3
+			register_subalias("4", "A.RESET");    // Pin 4
+			register_subalias("5", "A.CONT");     // Pin 5
+			register_subalias("6", "A.THRESH");   // Pin 6
+			register_subalias("7", "A.DISCH");    // Pin 7
+			register_subalias("8", "A.VCC");      // Pin 8
+		}
+		// FIXME: R_base needs to be removed from the code base
+		// The reset on R_Base executed after NE555 reset will
+		// overwrite values.
+		NETLIB_RESETI() { A.reset(); }
+		NETLIB_UPDATEI() {  }
+	private:
+		NETLIB_SUB(NE555) A;
+	};
+#else
 	NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(NE555_dip, NE555)
+		NETLIB_CONSTRUCTOR_DERIVED(NE555_dip)
 		{
 			register_subalias("1", "GND");      // Pin 1
 			register_subalias("2", "TRIG");     // Pin 2
@@ -130,15 +153,17 @@ namespace netlist
 			register_subalias("8", "VCC");      // Pin 8
 		}
 	};
+#endif
 
 	NETLIB_RESET(NE555)
 	{
+#if 0
 		m_R1.reset();
 		m_R2.reset();
 		m_R3.reset();
 		m_ROUT.reset();
 		m_RDIS.reset();
-
+#endif
 		/* FIXME make resistances a parameter, properly model other variants */
 		m_R1.set_R(nlconst::magic(5000));
 		m_R2.set_R(nlconst::magic(5000));

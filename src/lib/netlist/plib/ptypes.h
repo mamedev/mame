@@ -69,6 +69,10 @@ namespace plib
 
 	template<typename T> struct is_floating_point : public std::is_floating_point<T> { };
 
+	template< class T >
+	struct is_arithmetic : std::integral_constant<bool,
+		plib::is_integral<T>::value || plib::is_floating_point<T>::value> {};
+
 #if PUSE_FLOAT128
 	template<> struct is_floating_point<FLOAT128> { static constexpr bool value = true; };
 	template<> struct numeric_limits<FLOAT128>

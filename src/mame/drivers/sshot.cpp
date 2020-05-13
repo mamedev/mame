@@ -348,7 +348,7 @@ GFXDECODE_END
 void supershot_state::supershot(machine_config &config)
 {
 	/* basic machine hardware */
-	SCMP(config, m_maincpu, XTAL(11'289'000)/4);
+	INS8060(config, m_maincpu, XTAL(11'289'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supershot_state::supershot_map);
 
 	/* video hardware */
