@@ -13,7 +13,7 @@
     68EC020 @ 16 MHz
     Motorola XC56156-40 DSP @ 40 MHz
     Z80 + K054539 for sound
-    Network to connect up to 4 PCBs.
+    K056230 for network (up to four players)
 
     Video hardware:
     TTL text plane similar to Run and Gun.
@@ -25,15 +25,14 @@
     - 68020 memory map
     - Z80 + sound system
     - EEPROM
-    - service switch
     - TTL text plane
+    - Controls
+    - Palettes
 
     Driver needs:
-    - Handle network at 580800 so game starts
+    - Network at 580800 (K056230)
     - Polygon rasterization (K054009 + K054010)
     - Hook up PSAC2 (gfx decode for it is already present and correct)
-    - Palettes
-    - Controls
     - Priorities.  From the original board it appears they're fixed, in front to back order:
       (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
 
@@ -68,6 +67,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+//#include "machine/k056230.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "screen.h"
@@ -104,7 +104,7 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 		    D23 = BRMAS        - 68k bus error mask
 		    D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
 		    D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
-		    D20 = L3MAS        - L3 interrupt mask (network)
+		    D20 = L3MAS        - L3 interrupt mask (056230)
 		    D19 = VFLIP        - Flip video vertically
 		    D18 = HFLIP        - Flip video horizontally
 		    D17 = COIN2        - Coin counter 2
@@ -125,10 +125,10 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 }
 
 
-/* irqs 3, 5, and 7 have valid vectors                */
-/* irq 3 is network.  don't generate if you don't emulate the network h/w! */
-/* irq 5 is vblank */
-/* irq 7 does nothing (it jsrs to a rts and then rte) */
+/* irqs 3, 5, and 7 have valid vectors                
+   irq 3 is network. currently disabled for reasons above
+   irq 5 is vblank 
+   irq 7 does nothing (it jsrs to a rts and then rte) */
 INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 {
 	if (m_sys1 & 0x20)
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( polygonet )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 1, unused
-	PORT_DIPNAME( 0x30, 0x00, "Player Color" ) /* 0x10(SW1), 0x20(SW2).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_DIPNAME( 0x30, 0x00, "Player Color/Network ID" ) // 0x10(SW1), 0x20(SW2). It's mapped on the JAMMA connector and plugs into an external switch mech.
 	PORT_DIPSETTING(    0x00, "Red" )
 	PORT_DIPSETTING(    0x10, "Yellow" )
 	PORT_DIPSETTING(    0x20, "Green" )

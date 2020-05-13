@@ -104,6 +104,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
+//#include "machine/k056230.h"
 #include "sound/k056800.h"
 #include "rendlay.h"
 #include "speaker.h"
@@ -1053,8 +1054,6 @@ void konamigx_state::gx_type1_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xdc0000, 0xdc1fff).ram();         // LAN RAM? (Racin' Force has, Open Golf doesn't)
-	map(0xdd0000, 0xdd00ff).nopr().nopw(); // LAN board
 	map(0xdda000, 0xddafff).portw("ADC-WRPORT");
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
 	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
@@ -1067,6 +1066,13 @@ void konamigx_state::gx_type1_map(address_map &map)
 	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
 	map(0xf80000, 0xf80fff).ram(); // chip 21Q / S
 	map(0xfc0000, 0xfc00ff).ram(); // chip 22N / S
+}
+
+void konamigx_state::racinfrc_map(address_map &map)
+{
+	gx_type1_map(map);
+	map(0xdc0000, 0xdc1fff).ram();         // 056230 RAM?
+	map(0xdd0000, 0xdd00ff).nopr().nopw(); // 056230 regs?
 }
 
 void konamigx_state::gx_type2_map(address_map &map)
@@ -1848,7 +1854,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_k055673->set_config(K055673_LAYOUT_GX, -53, -23);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
 	adc0834_device &adc(ADC0834(config, "adc0834", 0));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
@@ -3568,9 +3574,11 @@ A20   A24       A06
                                  A12
                                  A11
                    D03 A05       A10
-                   D02 A04       A09
+    056230         D02 A04       A09
                                  A08
 --------------------------------------
+
+Note: Konami Custom 056230 is only specific to Racin' Force
 
 */
 
@@ -3969,16 +3977,16 @@ void konamigx_state::init_posthack()
 
 
 /**********************************************************************************/
-/*     year  ROM       parent    machine   inp       init */
+//     year  ROM       parent    machine   inp       init
 
-/* dummy parent for the BIOS */
+// dummy parent for the BIOS
 GAME( 1994, konamigx,  0,        konamigx_bios, common, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-/* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
-/* and optional LAN capability (only on Racin' Force - chips aren't present on the golf games) */
-/* needs the ROZ layer to be playable */
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   Type 1: standard with an add-on 53936 on the ROM board, analog inputs, 
+   and optional 056230 networking for Racin' Force only.
+   needs the ROZ layer to be playable
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
@@ -3987,10 +3995,10 @@ GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_p
 GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, ggreats2,  opengolf, opengolf,      ggreats2, konamigx_state, init_posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-/* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
-/* these games work and are playable with minor graphics glitches */
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   Type 2: totally stock, sometimes with funny protection chips on the ROM board
+   these games work and are playable with minor graphics glitches
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 GAME( 1994, le2,       konamigx, le2,          le2,  konamigx_state, init_konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, le2u,      le2,      le2,          le2u, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
@@ -4017,17 +4025,17 @@ GAME( 1996, daiskiss,  konamigx, konamigx,      gokuparo, konamigx_state, init_k
 
 GAME( 1996, tokkae,    konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-/* protection controls player ship direction in attract mode - doesn't impact playability */
+// protection controls player ship direction in attract mode - doesn't impact playability
 GAME( 1996, salmndr2,  konamigx, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, salmndr2a, salmndr2, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 
-/* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
+// bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection)
 GAME( 1997, winspike,  konamigx, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikej, winspike, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-/* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   Type 3: dual monitor output and 53936 on the ROM board, external palette RAM
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 GAME( 1994, soccerss,  konamigx, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver EAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes EAA to EEPROM, but should be version EAC according to labels
 GAME( 1994, soccerssu, soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver UAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes UAA to EEPROM, but should be version UAC according to labels
@@ -4035,9 +4043,9 @@ GAME( 1994, soccerssj, soccerss, gxtype3, type3, konamigx_state, init_posthack, 
 GAME( 1994, soccerssja,soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, soccerssa, soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-/* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
