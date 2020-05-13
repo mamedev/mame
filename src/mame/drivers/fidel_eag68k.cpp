@@ -11,10 +11,16 @@ Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 TODO:
 - unemulated waitstates with DTACK
 - EAG USART is not emulated
+- V10 CPU emulation is too slow, MAME 68040 opcode timing is same as 68030 but in
+  reality it is much faster, same goes for V11 of course (see note below)
 - V11 CPU should be M68EC060, not yet emulated. Now using M68EC040 in its place
-  at twice the frequency due to lack of superscalar.
-- V11 beeper is too high pitched, related to wrong CPU type too? But even at 72MHz
-  it's still wrong, so maybe waitstates or clock divider on I/O access.
+- V11 beeper is too high pitched, related to wrong CPU type too?
+  maybe waitstates or clock divider on I/O access.
+
+Currently(May 2020) when compared to the real chesscomputers, to get closer to the
+actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
+with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
+Right to overclock maincpu.
 
 *******************************************************************************
 
@@ -705,7 +711,7 @@ void eag_state::eagv11(machine_config &config)
 	eagv7(config);
 
 	/* basic machine hardware */
-	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2*2); // wrong! should be M68EC060 @ 72MHz
+	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2); // wrong! should be M68EC060
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
 	m_maincpu->set_periodic_int(FUNC(eag_state::irq2_line_hold), attotime::from_hz(600));
 
@@ -840,5 +846,5 @@ CONS( 1989, feagv5,    feagv2,  0, eagv5,    eag,      eagv5_state,    init_eag,
 CONS( 1990, feagv7,    feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv7a,   feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv9,    feagv2,  0, eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 2002, feagv11,   feagv2,  0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+CONS( 1990, feagv10,   feagv2,  0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 2002, feagv11,   feagv2,  0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
