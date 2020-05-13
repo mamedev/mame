@@ -296,7 +296,7 @@ static NETLIST_START(TTL_7414_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.Q,   /*    Y1 |2           13| A6   */ F.A,
 		B.A,   /*    A2 |3           12| Y6   */ F.Q,
 		B.Q,   /*    Y2 |4    7414   11| A5   */ E.A,
@@ -319,7 +319,7 @@ static NETLIST_START(TTL_74LS14_DIP)
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
-		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		A.A,   /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.Q,   /*    Y1 |2           13| A6   */ F.A,
 		B.A,   /*    A2 |3           12| Y6   */ F.Q,
 		B.Q,   /*    Y2 |4   74LS14  11| A5   */ E.A,
