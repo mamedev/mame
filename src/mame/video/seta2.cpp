@@ -95,8 +95,8 @@
 
     Offset:     Bits:                   Value:
 
-    0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as ssv.c?)
-    8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as ssv.c?)
+    0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as ssv.cpp?)
+    8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as ssv.cpp?)
 
     10                                  Offxet X low bits (sub pixels)
     12                                  Offset X high bits (pixels)
