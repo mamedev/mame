@@ -63,9 +63,10 @@ void eurit_state::eurit30(machine_config &config)
 {
 	M37730S2(config, m_maincpu, 4'096'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurit_state::mem_map);
+	m_maincpu->p4_in_cb().set("lcdc", FUNC(hd44780_device::db_r)); // not actually used for input?
 	m_maincpu->p4_out_cb().set("lcdc", FUNC(hd44780_device::db_w));
 	m_maincpu->p6_out_cb().set("lcdc", FUNC(hd44780_device::e_w)).bit(6);
-	m_maincpu->p6_out_cb().append("lcdc", FUNC(hd44780_device::rw_w)).bit(5);
+	m_maincpu->p6_out_cb().append("lcdc", FUNC(hd44780_device::rw_w)).bit(5); // not actually used for read mode?
 	m_maincpu->p6_out_cb().append("lcdc", FUNC(hd44780_device::rs_w)).bit(4);
 
 	am79c30a_device &dsc(AM79C30A(config, "dsc", 12'288'000));
@@ -84,7 +85,6 @@ void eurit_state::eurit30(machine_config &config)
 	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
-	lcdc.set_busy_factor(0.01);
 }
 
 
