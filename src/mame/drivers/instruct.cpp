@@ -165,11 +165,13 @@ READ8_MEMBER( instruct_state::portfd_r )
 // read keyboard
 READ8_MEMBER( instruct_state::portfe_r )
 {
+	u8 data = 15;
+
 	for (uint8_t i = 0; i < 6; i++)
 		if (BIT(m_digit, i))
-			return m_io_keyboard[i]->read();
+			data &= m_io_keyboard[i]->read();
 
-	return 0xf;
+	return data;
 }
 
 
