@@ -15,9 +15,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(_84_porta_r);
-	DECLARE_WRITE8_MEMBER(_84_porta_w);
-	DECLARE_WRITE8_MEMBER(_84_portc_w);
+	uint8_t _84_porta_r();
+	void _84_porta_w(uint8_t data);
+	void _84_portc_w(uint8_t data);
 
 protected:
 	DECLARE_READ8_MEMBER(video_color_r);

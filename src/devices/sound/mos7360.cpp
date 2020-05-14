@@ -818,7 +818,7 @@ void mos7360_device::soundport_w(int offset, int data)
 //  read - register read
 //-------------------------------------------------
 
-uint8_t mos7360_device::read(address_space &space, offs_t offset, int &cs0, int &cs1)
+uint8_t mos7360_device::read(offs_t offset, int &cs0, int &cs1)
 {
 	uint8_t val = m_last_data;
 
@@ -902,7 +902,7 @@ uint8_t mos7360_device::read(address_space &space, offs_t offset, int &cs0, int 
 //  write - register write
 //-------------------------------------------------
 
-void mos7360_device::write(address_space &space, offs_t offset, uint8_t data, int &cs0, int &cs1)
+void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 {
 	int old;
 

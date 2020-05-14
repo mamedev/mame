@@ -230,16 +230,16 @@ protected:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_READ16_MEMBER( berr_r );
 	DECLARE_WRITE16_MEMBER( berr_w );
-	DECLARE_READ8_MEMBER( ikbd_port1_r );
-	DECLARE_READ8_MEMBER( ikbd_port2_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port2_w );
-	DECLARE_WRITE8_MEMBER( ikbd_port3_w );
-	DECLARE_READ8_MEMBER( ikbd_port4_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
+	uint8_t ikbd_port1_r();
+	uint8_t ikbd_port2_r();
+	void ikbd_port2_w(uint8_t data);
+	void ikbd_port3_w(uint8_t data);
+	uint8_t ikbd_port4_r();
+	void ikbd_port4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
+	void psg_pa_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 
@@ -474,7 +474,7 @@ public:
 	DECLARE_READ16_MEMBER( config_r );
 	DECLARE_WRITE16_MEMBER( lcd_control_w );
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
+	void psg_pa_w(uint8_t data);
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	void stbook_map(address_map &map);
 protected:

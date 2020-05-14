@@ -681,6 +681,23 @@ void mappy_state::superpac_cpu2_map(address_map &map)
 	map(0xe000, 0xffff).rom();
 }
 
+/*
+   The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
+   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
+   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
+   to locations not used by the sound hardware).
+   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
+   However, removing the 15XX from the board causes sound to disappear completely, so
+   the 15XX may still play some part in conveying speech to the DAC.
+*/
+
+void mappy_state::grobda_cpu2_map(address_map &map)
+{
+	superpac_cpu2_map(map);
+
+	map(0x0002, 0x0002).w("dac", FUNC(dac_byte_interface::data_w));
+}
+
 void mappy_state::phozon_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the main CPU + sound registers */
@@ -1401,6 +1418,8 @@ void mappy_state::grobda(machine_config &config)
 {
 	superpac_common(config);
 
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::grobda_cpu2_map);
+
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
@@ -2053,23 +2072,6 @@ ROM_START( motos )
 ROM_END
 
 
-
-void mappy_state::init_grobda()
-{
-	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
-	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
-	   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
-	   to locations not used by the sound hardware).
-	   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
-	   However, removing the 15XX from the board causes sound to disappear completely, so
-	   the 15XX may still play some part in conveying speech to the DAC.
-	  */
-	write8_delegate dac_w(*this);
-	dac_w.set(*m_dac, FUNC(dac_byte_interface::data_w));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, dac_w);
-}
-
-
 void mappy_state::init_digdug2()
 {
 	/* appears to not use the watchdog */
@@ -2083,9 +2085,9 @@ GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state, empty_init,  
 GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
 GAME( 1983, phozon,    0,        phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )

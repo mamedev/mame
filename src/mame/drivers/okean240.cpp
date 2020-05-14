@@ -91,15 +91,15 @@ private:
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
 	DECLARE_READ8_MEMBER(term_status_r);
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_READ8_MEMBER(okean240_port40_r);
-	DECLARE_READ8_MEMBER(okean240_port41_r);
-	DECLARE_WRITE8_MEMBER(okean240_port42_w);
-	DECLARE_READ8_MEMBER(okean240a_port40_r);
-	DECLARE_READ8_MEMBER(okean240a_port41_r);
-	DECLARE_READ8_MEMBER(okean240a_port42_r);
+	uint8_t term_r();
+	uint8_t okean240_port40_r();
+	uint8_t okean240_port41_r();
+	void okean240_port42_w(uint8_t data);
+	uint8_t okean240a_port40_r();
+	uint8_t okean240a_port41_r();
+	uint8_t okean240a_port42_r();
 	void kbd_put(u8 data);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void scroll_w(uint8_t data);
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void okean240_io(address_map &map);
@@ -154,20 +154,20 @@ READ8_MEMBER(okean240_state::term_status_r)
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER(okean240_state::okean240_port40_r)
+uint8_t okean240_state::okean240_port40_r()
 {
 	// port 40 (get ascii key value)
-	return term_r(space, offset);
+	return term_r();
 }
 
-READ8_MEMBER(okean240_state::okean240_port41_r)
+uint8_t okean240_state::okean240_port41_r()
 {
 	// port 41 bit 1 (test rom status bit)
 	m_tog ^= 6;
 	return m_tog;
 }
 
-READ8_MEMBER(okean240_state::okean240a_port40_r)
+uint8_t okean240_state::okean240a_port40_r()
 {
 	// port 40 (get a column)
 	for (uint8_t i = 0; i < 11; i++)
@@ -184,7 +184,7 @@ READ8_MEMBER(okean240_state::okean240a_port40_r)
 	return 0;
 }
 
-READ8_MEMBER(okean240_state::okean240a_port41_r)
+uint8_t okean240_state::okean240a_port41_r()
 {
 	// port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
 	{
@@ -193,7 +193,7 @@ READ8_MEMBER(okean240_state::okean240a_port41_r)
 	}
 }
 
-READ8_MEMBER(okean240_state::okean240a_port42_r)
+uint8_t okean240_state::okean240a_port42_r()
 {
 	// port 42 (get a row)
 	for (uint8_t i = 0; i < 11; i++)
@@ -206,21 +206,21 @@ READ8_MEMBER(okean240_state::okean240a_port42_r)
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
-WRITE8_MEMBER(okean240_state::okean240_port42_w)
+void okean240_state::okean240_port42_w(uint8_t data)
 {
 // okean240: port 42 bit 7
 // okean240a: port 42 bit 4
 }
 
 // for test rom
-READ8_MEMBER(okean240_state::term_r)
+uint8_t okean240_state::term_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER(okean240_state::scroll_w)
+void okean240_state::scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }

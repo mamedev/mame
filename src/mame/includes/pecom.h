@@ -48,7 +48,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef2_r);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE8_MEMBER( sc_w );
+	void sc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
 	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);

@@ -207,7 +207,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_hi_w );
 
 	/* DSK board */
-	DECLARE_WRITE32_MEMBER(hddsk_update_pif);
+	void hddsk_update_pif(uint32_t data);
 
 	/* DS III/IV board */
 	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
@@ -262,12 +262,12 @@ protected:
 
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
-	DECLARE_WRITE32_MEMBER(hdds3sdsp_serial_tx_callback);
-	DECLARE_READ32_MEMBER(hdds3sdsp_serial_rx_callback);
+	void hdds3sdsp_serial_tx_callback(uint32_t data);
+	uint32_t hdds3sdsp_serial_rx_callback();
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3xdsp_timer_enable_callback);
-	DECLARE_WRITE32_MEMBER(hdds3xdsp_serial_tx_callback);
-	DECLARE_READ32_MEMBER(hdds3xdsp_serial_rx_callback);
+	void hdds3xdsp_serial_tx_callback(uint32_t data);
+	uint32_t hdds3xdsp_serial_rx_callback();
 
 
 	void adsp_data_map(address_map &map);

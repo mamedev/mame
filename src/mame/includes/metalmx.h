@@ -47,7 +47,7 @@ private:
 	DECLARE_READ32_MEMBER(host_vram_r);
 	DECLARE_WRITE32_MEMBER(host_vram_w);
 	DECLARE_WRITE32_MEMBER(timer_w);
-	DECLARE_WRITE8_MEMBER(cage_irq_callback);
+	void cage_irq_callback(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

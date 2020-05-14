@@ -40,7 +40,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 }
 
 
-WRITE8_MEMBER(dragrace_state::speed1_w)
+void dragrace_state::speed1_w(uint8_t data)
 {
 	unsigned freq = ~data & 0x1f;
 	m_discrete->write(DRAGRACE_MOTOR1_DATA, freq);
@@ -49,7 +49,7 @@ WRITE8_MEMBER(dragrace_state::speed1_w)
 	output().set_value("tachometer", freq);
 }
 
-WRITE8_MEMBER(dragrace_state::speed2_w)
+void dragrace_state::speed2_w(uint8_t data)
 {
 	unsigned freq = ~data & 0x1f;
 	m_discrete->write(DRAGRACE_MOTOR2_DATA, freq);

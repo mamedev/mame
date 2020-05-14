@@ -86,9 +86,9 @@ public:
 	void pcm(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( pcm_85_r );
+	uint8_t pcm_85_r();
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
-	DECLARE_WRITE8_MEMBER( pcm_85_w );
+	void pcm_85_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pcm_io(address_map &map);
@@ -139,7 +139,7 @@ There is also a HALT LED, connected directly to the processor.
 */
 
 
-READ8_MEMBER( pcm_state::pcm_85_r )
+uint8_t pcm_state::pcm_85_r()
 {
 	uint8_t data = m_85 & 0x7f;
 
@@ -149,7 +149,7 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcm_state::pcm_85_w )
+void pcm_state::pcm_85_w(uint8_t data)
 {
 	if (BIT(data, 5))
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);

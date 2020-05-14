@@ -846,13 +846,13 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_txa)
 
 
 
-READ8_MEMBER(sc4_state::bfm_sc4_duart_input_r)
+uint8_t sc4_state::bfm_sc4_duart_input_r()
 {
 	//  printf("bfm_sc4_duart_input_r\n");
 	return m_optic_pattern;
 }
 
-WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
+void sc4_state::bfm_sc4_duart_output_w(uint8_t data)
 {
 //  logerror("bfm_sc4_duart_output_w\n");
 	m_reel56_latch = data;
@@ -876,13 +876,13 @@ WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 	logerror("m68307_duart_tx %02x\n", state);
 }
 
-READ8_MEMBER(sc4_state::m68307_duart_input_r)
+uint8_t sc4_state::m68307_duart_input_r()
 {
 	logerror("m68307_duart_input_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
+void sc4_state::m68307_duart_output_w(uint8_t data)
 {
 	logerror("m68307_duart_output_w %02x\n", data);
 }

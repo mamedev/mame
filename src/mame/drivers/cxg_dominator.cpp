@@ -71,10 +71,10 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE64_MEMBER(lcd_s_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void lcd_s_w(offs_t offset, u64 data);
+	void control_w(u8 data);
+	void leds_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 };
 
 void dominator_state::machine_start()
@@ -91,7 +91,7 @@ void dominator_state::machine_start()
 
 // LC7582 LCD
 
-WRITE64_MEMBER(dominator_state::lcd_s_w)
+void dominator_state::lcd_s_w(offs_t offset, u64 data)
 {
 	u8 d[4];
 
@@ -115,7 +115,7 @@ WRITE64_MEMBER(dominator_state::lcd_s_w)
 
 // TTL
 
-WRITE8_MEMBER(dominator_state::control_w)
+void dominator_state::control_w(u8 data)
 {
 	// d0: LC7582 DATA
 	// d1: LC7582 CLK
@@ -128,13 +128,13 @@ WRITE8_MEMBER(dominator_state::control_w)
 	m_dac->write(BIT(data, 3));
 }
 
-WRITE8_MEMBER(dominator_state::leds_w)
+void dominator_state::leds_w(offs_t offset, u8 data)
 {
 	// led data
 	m_display->matrix(1 << offset, data);
 }
 
-READ8_MEMBER(dominator_state::input_r)
+u8 dominator_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 

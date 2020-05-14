@@ -355,7 +355,7 @@ WRITE32_MEMBER(metalmx_state::sound_data_w)
 		m_cage->main_w(data >> 16);
 }
 
-WRITE8_MEMBER(metalmx_state::cage_irq_callback)
+void metalmx_state::cage_irq_callback(uint8_t data)
 {
 	/* TODO */
 }

@@ -515,7 +515,7 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(rtc_w);
 
-	DECLARE_READ8_MEMBER(read_video_ram_r);
+	uint8_t read_video_ram_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
 
 	DECLARE_READ8_MEMBER(diagnostic_r);
@@ -574,7 +574,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE8_MEMBER(bitrate_counter_w);
+	void bitrate_counter_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
 	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
 
@@ -1437,7 +1437,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::dbrg_ft_w)
 	m_mpsc->txca_w(state);
 }
 
-WRITE8_MEMBER(rainbow_base_state::bitrate_counter_w)
+void rainbow_base_state::bitrate_counter_w(uint8_t data)
 {
 	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
 	bool kbd_rxtxc = BIT(data, 1);
@@ -2520,7 +2520,7 @@ WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
 }
 // --------- END OF Z80 --------------------
 
-READ8_MEMBER(rainbow_base_state::read_video_ram_r)
+uint8_t rainbow_base_state::read_video_ram_r(offs_t offset)
 {
 	return m_p_ram[offset];
 }

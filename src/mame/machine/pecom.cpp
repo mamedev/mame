@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(pecom_state::q_w)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER(pecom_state::sc_w )
+void pecom_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{

@@ -64,10 +64,10 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(via_in_a);
-	DECLARE_WRITE8_MEMBER(via_out_a);
-	DECLARE_READ8_MEMBER(via_in_b);
-	DECLARE_WRITE8_MEMBER(via_out_b);
+	uint8_t via_in_a();
+	void via_out_a(uint8_t data);
+	uint8_t via_in_b();
+	void via_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
 	DECLARE_WRITE_LINE_MEMBER(ioc_interrupt);

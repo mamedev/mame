@@ -42,17 +42,17 @@ WRITE16_MEMBER(pushman_state::bballs_mcu_comm_w)
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pa_w)
+void pushman_state::mcu_pa_w(uint8_t data)
 {
 	m_mcu_output = (m_mcu_output & 0xff00) | (u16(data) & 0x00ff);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pb_w)
+void pushman_state::mcu_pb_w(uint8_t data)
 {
 	m_mcu_output = (m_mcu_output & 0x00ff) | (u16(data) << 8);
 }
 
-WRITE8_MEMBER(pushman_state::mcu_pc_w)
+void pushman_state::mcu_pc_w(uint8_t data)
 {
 	if (BIT(data, 0))
 	{

@@ -66,7 +66,7 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 }
 
 
-READ8_MEMBER(runaway_state::runaway_pot_r)
+uint8_t runaway_state::runaway_pot_r(offs_t offset)
 {
 	return (ioport("7000")->read() << (7 - offset)) & 0x80;
 }
