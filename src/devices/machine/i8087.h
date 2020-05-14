@@ -19,8 +19,8 @@ public:
 	auto irq() { return m_int_handler.bind(); }
 	auto busy() { return m_busy_handler.bind(); }
 
-	DECLARE_WRITE32_MEMBER(insn_w); // the real 8087 sniffs the bus watching for esc, can't do that here so provide a poke spot
-	DECLARE_WRITE32_MEMBER(addr_w);
+	void insn_w(uint32_t data); // the real 8087 sniffs the bus watching for esc, can't do that here so provide a poke spot
+	void addr_w(uint32_t data);
 
 protected:
 	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

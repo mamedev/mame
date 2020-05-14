@@ -83,7 +83,7 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(uint8_t data);
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
 	DECLARE_READ8_MEMBER(palette_r);
@@ -92,11 +92,11 @@ private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vram_bank_r);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	void mux_w(uint8_t data);
 	DECLARE_READ8_MEMBER(in_mux_r);
 	DECLARE_READ8_MEMBER(in_mux_type_r);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void lamps_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
@@ -169,7 +169,7 @@ uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER( dblcrown_state::bank_w)
+void dblcrown_state::bank_w(uint8_t data)
 {
 	m_bank = data;
 	membank("rom_bank")->set_entry(m_bank & 0x1f);
@@ -251,7 +251,7 @@ WRITE8_MEMBER( dblcrown_state::vram_bank_w)
 		printf("vram bank = %02x\n",data);
 }
 
-WRITE8_MEMBER( dblcrown_state::mux_w)
+void dblcrown_state::mux_w(uint8_t data)
 {
 	m_mux_data = data;
 }
@@ -305,7 +305,7 @@ WRITE8_MEMBER( dblcrown_state::output_w )
 }
 
 
-WRITE8_MEMBER( dblcrown_state::lamps_w )
+void dblcrown_state::lamps_w(uint8_t data)
 {
 /*  bits
   7654 3210

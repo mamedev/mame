@@ -154,7 +154,7 @@ WRITE8_MEMBER(scv_rom32ram8_device::write_cart)
 		m_ram[offset & 0x1fff] = data;
 }
 
-WRITE8_MEMBER(scv_rom32ram8_device::write_bank)
+void scv_rom32ram8_device::write_bank(uint8_t data)
 {
 	m_ram_enabled = BIT(data, 5);
 }
@@ -165,7 +165,7 @@ READ8_MEMBER(scv_rom64_device::read_cart)
 	return m_rom[offset + (m_bank_base * 0x8000)];
 }
 
-WRITE8_MEMBER(scv_rom64_device::write_bank)
+void scv_rom64_device::write_bank(uint8_t data)
 {
 	m_bank_base = BIT(data, 5);
 }
@@ -176,7 +176,7 @@ READ8_MEMBER(scv_rom128_device::read_cart)
 	return m_rom[offset + (m_bank_base * 0x8000)];
 }
 
-WRITE8_MEMBER(scv_rom128_device::write_bank)
+void scv_rom128_device::write_bank(uint8_t data)
 {
 	m_bank_base = (data >> 5) & 0x03;
 }
@@ -196,7 +196,7 @@ WRITE8_MEMBER(scv_rom128ram4_device::write_cart)
 		m_ram[offset & 0xfff] = data;
 }
 
-WRITE8_MEMBER(scv_rom128ram4_device::write_bank)
+void scv_rom128ram4_device::write_bank(uint8_t data)
 {
 	m_bank_base = (data >> 5) & 0x03;
 	m_ram_enabled = BIT(data, 6);

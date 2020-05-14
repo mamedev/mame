@@ -48,10 +48,10 @@ public:
 	void junior(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(junior_riot_a_r);
-	DECLARE_READ8_MEMBER(junior_riot_b_r);
-	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
-	DECLARE_WRITE8_MEMBER(junior_riot_b_w);
+	uint8_t junior_riot_a_r();
+	uint8_t junior_riot_b_r();
+	void junior_riot_a_w(uint8_t data);
+	void junior_riot_b_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -136,7 +136,7 @@ INPUT_PORTS_END
 
 
 
-READ8_MEMBER( junior_state::junior_riot_a_r )
+uint8_t junior_state::junior_riot_a_r()
 {
 	uint8_t data = 0xff;
 
@@ -154,7 +154,7 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 }
 
 
-READ8_MEMBER( junior_state::junior_riot_b_r )
+uint8_t junior_state::junior_riot_b_r()
 {
 	if ( m_port_b & 0x20 )
 		return 0xFF;
@@ -164,7 +164,7 @@ READ8_MEMBER( junior_state::junior_riot_b_r )
 }
 
 
-WRITE8_MEMBER( junior_state::junior_riot_a_w )
+void junior_state::junior_riot_a_w(uint8_t data)
 {
 	uint8_t idx = ( m_port_b >> 1 ) & 0x0f;
 
@@ -178,7 +178,7 @@ WRITE8_MEMBER( junior_state::junior_riot_a_w )
 }
 
 
-WRITE8_MEMBER( junior_state::junior_riot_b_w )
+void junior_state::junior_riot_b_w(uint8_t data)
 {
 	uint8_t idx = ( data >> 1 ) & 0x0f;
 
