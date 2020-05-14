@@ -7,6 +7,7 @@
     More data at :
         http://www.nostalcomp.cz/pdfka/savia84.pdf
         http://www.nostalcomp.cz/savia.php
+        (use archive.org)
 
     05/02/2011 Skeleton driver.
     11/10/2011 Found a new rom. Working [Robbbert]
@@ -54,9 +55,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_kbd;
-	uint8_t m_seg;
 	uint8_t m_digit;
+	uint8_t m_seg;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
@@ -140,7 +140,7 @@ void savia84_state::machine_reset()
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
 	m_seg = ~data;
-	m_display->matrix(m_digit, m_seg);
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
@@ -155,22 +155,14 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 
 WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard scanning row; set digit to display
 {
-	m_digit = 0;
-	m_kbd = data & 15;
-	if (m_kbd == 0)
-		m_digit = 1;
-	else
-	if ((m_kbd > 1) && (m_kbd < 9))
-		m_digit = m_kbd;
-	if (m_digit)
-		m_digit = 1 << (m_digit-1);
-	m_display->matrix(m_digit, m_seg);
+	m_digit = data & 15;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 {
-	if (m_kbd < 9)
-		return m_io_keyboard[m_kbd]->read();
+	if (m_digit < 9)
+		return m_io_keyboard[m_digit]->read();
 	else
 		return 0xff;
 }
@@ -184,8 +176,8 @@ void savia84_state::savia84(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_savia84);
-	PWM_DISPLAY(config, m_display).set_size(8, 7);
-	m_display->set_segmask(0xff, 0x7f);
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1fd, 0x7f);
 
 	/* Devices */
 	I8255(config, m_ppi8255);
@@ -206,5 +198,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
-COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
+COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "J.T. Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
