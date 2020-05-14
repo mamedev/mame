@@ -104,7 +104,7 @@ void eacc_state::eacc_mem(address_map &map)
 	map.global_mask(0xc7ff); // A11,A12,A13 not connected
 	map(0x0000, 0x001f).ram().share("nvram"); // inside cpu, battery-backed
 	map(0x0020, 0x007f).ram(); // inside cpu
-	map(0x4000, 0x47ff).rom().mirror(0x8000);
+	map(0x4000, 0x47ff).rom().mirror(0x8000).region("maincpu",0);
 	map(0x8000, 0x8003).mirror(0x7fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
@@ -277,8 +277,8 @@ void eacc_state::eacc(machine_config &config)
 ******************************************************************************/
 
 ROM_START(eacc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("eacc.bin", 0x4000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
+	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_LOAD("eacc.bin", 0x0000, 0x0800, CRC(287a63c0) SHA1(f61b397d33ea40e5742e34d5f5468572125e8b39) )
 ROM_END
 
 
