@@ -1149,7 +1149,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Sound scratches during intro, tiles aren't shown during gameplay-->
+	<!-- boot OK, voice samples scratching at gal intro, tiles aren't shown on gameplay -->
 	<software name="animjv3" supported="no">
 		<description>Animahjong V3</description>
 		<year>1993</year>
@@ -1265,7 +1265,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Weapon menu has random horizontal lines-->
+	<!-- boot OK, weapon menu has random horizontal lines -->
 	<software name="aquales" supported="partial">
 		<description>Aquales</description>
 		<year>1991</year>
@@ -1501,7 +1501,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Huge GFX glitches-->
+	<!-- boot OK, has huge layer alignment issues in-game -->
 	<software name="atomrobo" supported="no">
 		<description>Atomic Robo-Kid</description>
 		<year>1990</year>
@@ -2354,7 +2354,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Minor GFX glitches (transparen pen on game over, doesn't clear text screen at initial loading?)-->
+	<!-- boot OK, gameplay/game over screens have transparen pen issues -->
 	<software name="butasan" supported="partial">
 		<description>Video Game Anthology Vol. 6 - Butasan</description>
 		<year>1993</year>
@@ -2586,9 +2586,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-<!-- issues with interlaced title screen, but is fine in-game -->
-	<!--Intro and title screens have various issues-->
-	<software name="carat" supported="no">
+	<!-- boot OK, misaligned intro/title screens (interlace), fine in-game -->
+	<software name="carat" supported="partial">
 		<description>Carat</description>
 		<year>1993</year>
 		<publisher>サイバーテックカスタム (Cybertech Custom)</publisher>
@@ -2702,9 +2701,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- rather flickery, and time limit seems short... -->
-	<!--Has raster issues, fixed?-->
-	<software name="chasehq" supported="yes">
+	<!-- boot OK, slightly misaligned raster effects -->
+	<software name="chasehq" supported="partial">
 		<description>Chase H.Q.</description>
 		<year>1992</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -2775,8 +2773,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Dies after initial logo-->
-	<software name="choujin" supported="partial">
+	<!-- Dies after initial X logo -->
+	<software name="choujin" supported="no">
 		<description>Choujin</description>
 		<year>1992</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -2849,7 +2847,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--Title screen has wrong scroll effect, no "get ready" sample at first life/first stage?-->
+	<!-- boot OK, Title screen has wrong scroll effect, no "get ready" sample at first life/first stage? -->
 	<software name="codezero" supported="partial">
 		<description>Code-Zero</description>
 		<year>1991</year>
@@ -3593,8 +3591,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Intro seems glitchy, moans at user disk creation-->
-	<software name="dbringer" supported="partial">
+	<software name="dbringer">
 		<description>Death Bringer</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -3778,12 +3775,11 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- Make user disk is needed to play this game. -->
-	<!--Dies at disk swap?-->
-	<software name="dios" supported="no">
+	<software name="dios">
 		<description>Dios</description>
 		<year>1990</year>
 		<publisher>ザインソフト (Zain Soft)</publisher>
+		<info name="usage" value="Make user disk is needed to play this game." />
 		<info name="alt_title" value="ディオス" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -4267,7 +4263,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Sprites are Y 8 pixels off -->
+	<!-- boot OK, vertically misaligned sprites -->
 	<software name="dbuster" supported="partial">
 		<description>Video Game Anthology vol. 7 - Dragon Buster</description>
 		<year>1993</year>
@@ -4648,8 +4644,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Slightly offset gun shots when aiming to the left?-->
-	<software name="dynduke" supported="yes">
+	<!-- Misaligned main sprite, no stage 1 backgrounds (regressed?) -->
+	<software name="dynduke" supported="no">
 		<description>Dynamite Duke</description>
 		<year>1990</year>
 		<publisher>ヘルツ (Hertz)</publisher>
@@ -4733,8 +4729,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Can't start a play?-->
-	<software name="emerald" supported="yes">
+	<!-- can't disk swap (Abort, Retry, Fail) -->
+	<software name="emerald" supported="no">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
 		<publisher>システムハウスオー (System House Oh!)</publisher>
@@ -4863,7 +4859,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Cannot change disk at boot (drive 2 disk C)-->
+	<!-- loading Abort after selecting generals and first text -->
 	<software name="eurosens" supported="no">
 		<description>Europa Sensen</description>
 		<year>1992</year>
@@ -4914,12 +4910,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Exciting Hour", Set drive 1 to boot "Syusse Oozumou". -->
-	<!--Minor sprite-sprite priorities when doing jump throw-->
+	<!-- Exciting Hour: minor sprite-sprite priority issue when doing jump throw -->
+	<!-- Syusse Oozumou: boot OK -->
 	<software name="excthour" supported="partial">
 		<description>Video Game Anthology Vol. 8 - Exciting Hour / Syusse Oozumou</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="usage" value="This format is multi boot disk. Set drive 0 to boot Exciting Hour, Set drive 1 to boot Syusse Oozumou" />
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.8 - エキサイティングアワー / 出世大相撲" />
 		<info name="release" value="19940225" />
 		<part name="flop1" interface="floppy_5_25">
