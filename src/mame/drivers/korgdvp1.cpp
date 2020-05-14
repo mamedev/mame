@@ -25,6 +25,12 @@ public:
 	void dvp1(machine_config &config);
 
 private:
+	u8 inputs_r();
+	u8 dsp_int_r();
+	void control_w(u8 data);
+	void leds_w(offs_t offset, u8 data);
+	void dsp_w(offs_t offset, u8 data);
+
 	void main_map(address_map &map);
 
 	required_device<upd7810_device> m_maincpu;
@@ -32,10 +38,47 @@ private:
 };
 
 
+u8 korgdvp1_state::inputs_r()
+{
+	return 0xff;
+}
+
+u8 korgdvp1_state::dsp_int_r()
+{
+	// PB3 = BUSY
+	// PB6 = INT0
+	// PB7 = INT1
+	return 0xff;
+}
+
+void korgdvp1_state::control_w(u8 data)
+{
+	// PB0, PB1 = input select (HC139)
+	// PB2 = MUTE
+	// PB4 = DSP RES
+	// PB5 = ROM/RAM
+}
+
+void korgdvp1_state::leds_w(offs_t offset, u8 data)
+{
+	for (int i = 0; i < 8; i++)
+		if (BIT(offset, i))
+			logerror("%s: Writing %02X to A%d LEDs\n", machine().describe_context(), data, i);
+}
+
+void korgdvp1_state::dsp_w(offs_t offset, u8 data)
+{
+	for (int i = 0; i < 2; i++)
+		if (!BIT(offset, 9 - i))
+			logerror("%s: Writing %02X to DSP %d\n", machine().describe_context(), data, i + 1);
+}
+
 void korgdvp1_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x87ff).mirror(0x1800).ram().share("nvram");
+	map(0xa000, 0xa0ff).mirror(0x1f00).w(FUNC(korgdvp1_state::leds_w));
+	map(0xc000, 0xc000).select(0x300).mirror(0x1cff).w(FUNC(korgdvp1_state::dsp_w));
 }
 
 
@@ -46,6 +89,9 @@ void korgdvp1_state::dvp1(machine_config &config)
 {
 	UPD7810(config, m_maincpu, 12_MHz_XTAL); // µPD7811-161-36 (according to parts list) but with both mode pins pulled up
 	m_maincpu->set_addrmap(AS_PROGRAM, &korgdvp1_state::main_map);
+	m_maincpu->pa_in_cb().set(FUNC(korgdvp1_state::inputs_r));
+	m_maincpu->pb_in_cb().set(FUNC(korgdvp1_state::dsp_int_r));
+	m_maincpu->pb_out_cb().set(FUNC(korgdvp1_state::control_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3V lithium battery
 
