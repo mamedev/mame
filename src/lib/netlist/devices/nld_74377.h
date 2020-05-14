@@ -53,17 +53,9 @@
 
 #include "netlist/nl_setup.h"
 
+
 #define TTL_74377_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74377_GATE, name)
-
-#define TTL_74377_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74377_DIP, name)
-
-#define TTL_74378_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74378_DIP, name)
-
-#define TTL_74379_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74379_DIP, name)
 
 
 #endif /* NLD_74377_H_ */

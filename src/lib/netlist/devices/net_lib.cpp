@@ -127,9 +127,7 @@ namespace devices
 		LIB_ENTRY(74193)
 		LIB_ENTRY(74194)
 		LIB_ENTRY(74365)
-		LIB_ENTRY(74377_dip)
-		LIB_ENTRY(74378_dip)
-		LIB_ENTRY(74379_dip)
+		LIB_ENTRY(74377_GATE)
 		LIB_ENTRY(74393)
 		LIB_ENTRY(74393_dip)
 		//ENTRY(74279,              TTL_74279,              "") // only dip available

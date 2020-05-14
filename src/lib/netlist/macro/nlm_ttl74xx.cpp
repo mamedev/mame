@@ -829,6 +829,93 @@ static NETLIST_START(TTL_74279_DIP)
 NETLIST_END()
 
 /*
+ *  DM74377: Octal D Flip-Flop With Enable
+ *  DM74378: Hex D Flip-Flop With Enable
+ *  DM74379: 4-bit D Flip-Flop With Enable
+ *
+ */
+
+static NETLIST_START(TTL_74377_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+	TTL_74377_GATE(E)
+	TTL_74377_GATE(F)
+	TTL_74377_GATE(G)
+	TTL_74377_GATE(H)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC, G.VCC, H.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND, G.GND, H.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP, G.CP, H.CP)
+	NET_C(A.E, B.E, C.E, D.E, E.E, F.E, G.E, H.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    20| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           19| Q7   */ H.Q,
+		A.D,  /*    D0 |3           18| D7   */ H.D,
+		B.D,  /*    D1 |4   74377   17| D6   */ G.D,
+		B.Q,  /*    Q1 |5           16| Q6   */ G.Q,
+		C.Q,  /*    Q2 |6           15| Q5   */ F.Q,
+		C.D,  /*    D2 |7           14| D5   */ F.D,
+		D.D,  /*    D3 |8           13| D4   */ E.D,
+		D.Q,  /*    Q3 |9           12| Q4   */ E.D,
+		A.GND,/*   GND |10          11| CP   */ A.CP
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74378_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+	TTL_74377_GATE(E)
+	TTL_74377_GATE(F)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP, E.CP, F.CP)
+	NET_C(A.E, B.E, C.E, D.E, E.E, F.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           15| Q5   */ F.Q,
+		A.D,  /*    D0 |3           14| D5   */ F.D,
+		B.D,  /*    D1 |4   74378   13| D4   */ E.D,
+		B.Q,  /*    Q1 |5           12| Q4   */ E.Q,
+		C.D,  /*    D2 |6           11| D3   */ D.D,
+		C.Q,  /*    Q2 |7           10| Q3   */ D.Q,
+		A.GND,/*   GND |8            9| CP   */ A.CP
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74379_DIP)
+	TTL_74377_GATE(A)
+	TTL_74377_GATE(B)
+	TTL_74377_GATE(C)
+	TTL_74377_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+	NET_C(A.CP, B.CP, C.CP, D.CP)
+	NET_C(A.E, B.E, C.E, D.E)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*    /E |1     ++    16| VCC  */ A.VCC,
+		A.Q,  /*    Q0 |2           15| Q3   */ D.Q,
+		A.QQ, /*   /Q0 |3           14| /Q3  */ D.QQ,
+		A.D,  /*    D0 |4   74379   13| D3   */ D.D,
+		B.D,  /*    D1 |5           12| D2   */ D.D,
+		B.QQ, /*   /Q1 |6           11| /Q2  */ D.QQ,
+		B.Q,  /*    Q1 |7           10| Q2   */ D.Q,
+		A.GND,/*   GND |8            9| CP   */ A.CP
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM9312: One of Eight Line Data Selectors/Multiplexers
  *
  *          +--------------+
@@ -1434,5 +1521,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
+	LOCAL_LIB_ENTRY(TTL_74377_DIP)
+	LOCAL_LIB_ENTRY(TTL_74378_DIP)
+	LOCAL_LIB_ENTRY(TTL_74379_DIP)
 	LOCAL_LIB_ENTRY(DM9312_DIP)
 NETLIST_END()
