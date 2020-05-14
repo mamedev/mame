@@ -109,6 +109,8 @@ namespace devices
 		LIB_ENTRY(74107A)    // FIXME: implement missing DIP
 		LIB_ENTRY(74123)
 		LIB_ENTRY(74123_dip)
+		LIB_ENTRY(74125)
+		LIB_ENTRY(74126)
 		LIB_ENTRY(74153)
 		LIB_ENTRY(74153_dip)
 		LIB_ENTRY(74161)

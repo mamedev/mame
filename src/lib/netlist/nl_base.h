@@ -627,11 +627,16 @@ namespace netlist
 			/// Going forward setting this to 8 will allow 8-bit signal
 			/// busses to be used in netlist, e.g. for more complex memory
 			/// arrangements.
-			static constexpr const unsigned int INP_BITS = 1;
+			/// Mimimum value is 2 here to support tristate output on proxies.
+			static constexpr const unsigned int INP_BITS = 2;
 
 			static constexpr const unsigned int INP_MASK = (1 << INP_BITS) - 1;
 			static constexpr const unsigned int INP_HL_SHIFT = 0;
 			static constexpr const unsigned int INP_LH_SHIFT = INP_BITS;
+
+			static constexpr netlist_sig_t OUT_TRISTATE() { return INP_MASK; }
+
+			static_assert(INP_BITS * 2 <= sizeof(netlist_sig_t) * 8, "netlist_sig_t size not sufficient");
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,
@@ -747,14 +752,10 @@ namespace netlist
 
 			// setup stuff
 
-			void add_terminal(core_terminal_t &terminal) noexcept(false);
-			void remove_terminal(core_terminal_t &terminal) noexcept(false);
-
 			bool is_logic() const noexcept;
 			bool is_analog() const noexcept;
 
 			void rebuild_list();     // rebuild m_list after a load
-			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
 
@@ -1019,6 +1020,47 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
+	// tristate_output_t
+	// -----------------------------------------------------------------------------
+
+	class tristate_output_t : public logic_output_t
+	{
+	public:
+
+		tristate_output_t(device_t &dev, const pstring &aname,
+			netlist_time ts_off_on, netlist_time ts_on_off)
+		: logic_output_t(dev, aname)
+		, m_last_logic(dev, name() + "." + "m_last_logic", 2) // force change
+		, m_tristate(dev, name() + "." + "m_tristate", 2) // force change
+		, m_ts_off_on(ts_off_on)
+		, m_ts_on_off(ts_on_off)
+		{}
+
+		void push(netlist_sig_t newQ, netlist_time delay) noexcept
+		{
+			if (!m_tristate)
+				logic_output_t::push(newQ, delay);
+			m_last_logic = newQ;
+		}
+
+		void set_tristate(bool v) noexcept
+		{
+			if (v != m_tristate)
+			{
+				logic_output_t::push(v ? OUT_TRISTATE() : m_last_logic, v ? m_ts_off_on : m_ts_on_off);
+				m_tristate = v;
+			}
+		}
+
+	private:
+		using logic_output_t::initial;
+		using logic_output_t::set_Q_time;
+		state_var<netlist_sig_t> m_last_logic;
+		state_var<netlist_sig_t> m_tristate;
+		const netlist_time m_ts_off_on;
+		const netlist_time m_ts_on_off;
+	};
+	// -----------------------------------------------------------------------------
 	// analog_output_t
 	// -----------------------------------------------------------------------------
 
@@ -1161,22 +1203,22 @@ namespace netlist
 		const pstring &operator()() const noexcept { return str(); }
 		void set(const pstring &param)
 		{
-			if (m_param != param)
+			if (*m_param != param)
 			{
-				m_param = param;
+				*m_param = param;
 				changed();
 				update_param();
 			}
 		}
 		pstring valstr() const override
 		{
-			return m_param;
+			return *m_param;
 		}
 	protected:
 		virtual void changed() noexcept;
-		const pstring &str() const noexcept { return m_param; }
+		const pstring &str() const noexcept { return *m_param; }
 	private:
-		pstring m_param;
+		plib::unique_ptr<pstring> m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -2021,6 +2063,8 @@ namespace netlist
 
 	inline void detail::net_t::push_to_queue(netlist_time delay) noexcept
 	{
+		// FIXME: checking for has_connection doesn't have any noticable effect
+		//        on performance.
 		if (has_connections())
 		{
 			m_next_scheduled_time = exec().time() + delay;
