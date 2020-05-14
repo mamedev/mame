@@ -794,7 +794,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="ajax" supported="no">
+	<!-- boot OK, has video glitches on first stage, Ajax title logo on background -->
+	<software name="ajax" supported="partial">
 		<description>Ajax</description>
 		<year>1989</year>
 		<publisher>コナミ (Konami)</publisher>
@@ -3186,7 +3187,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="daimakai" supported="no">
+	<!-- boot OK, setting mode 2 causes no sprites (offset?), stage 3-2 has slight priority issue with moving platforms -->
+	<software name="daimakai" supported="partial">
 		<description>Dai Makaimura</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
@@ -6013,7 +6015,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="granada">
+	<!-- boot OK -->
+	<software name="granada" supported="yes">
 		<description>Granada</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
@@ -9862,7 +9865,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="nemesis" supported="no">
+	<!-- boot OK, raster effect are one line off (overscan on top/bottom) -->
+	<software name="nemesis" supported="partial">
 		<description>Nemesis '90 Kai</description>
 		<year>1993</year>
 		<publisher>SPS</publisher>
@@ -10539,7 +10543,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="phalanx">
+	<!-- boot OK, has one line of garbage on bottom of screen -->
+	<software name="phalanx" supported="partial">
 		<description>Phalanx</description>
 		<year>1991</year>
 		<publisher>Zoom</publisher>
@@ -13896,7 +13901,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="tf2">
+	<!-- boot OK -->
+	<software name="tf2" supported="yes">
 		<description>Thunder Force II</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
@@ -17069,7 +17075,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<software name="matier">
+	<!-- boot OK -->
+	<software name="matier" supported="yes">
 		<description>Matier v2.11B</description>
 		<year>1995</year>
 		<publisher>Meteor Art Technology</publisher>
@@ -21852,11 +21859,9 @@ sold through Takeru vending machines -->
 	</software>
 
 
-
-<!-- Distributed with Magazine Book from "The World of X68000". There are winner of a
- "The first all japan X68000 art festival (第1回全日本X68000芸術祭)" among programmers. -->
-
 	<software name="formulaxa" cloneof="formulax">
+		<!-- Distributed with Magazine Book from "The World of X68000". There are winner of a
+		 "The first all japan X68000 art festival (第1回全日本X68000芸術祭)" among programmers. -->
 		<description>The World of X68000 - Formula X</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -22201,7 +22206,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="amheroes">
+	<!-- boot OK -->
+	<software name="amheroes" supported="yes">
 		<description>American Heroes - BF92 Extra Version</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22213,7 +22219,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="amheroesa" cloneof="amheroes">
+	<!-- boot OK -->
+	<software name="amheroesa" cloneof="amheroes" supported="yes">
 		<description>American Heroes - BF92 Extra Version (Alt?)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24912,7 +24919,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="formulax">
+	<!-- boot OK -->
+	<software name="formulax" supported="yes">
 		<description>Formula X</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24959,7 +24967,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="fourfall">
+	<!-- boot OK -->
+	<software name="fourfall" supported="yes">
 		<description>Four'll Fall</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25218,7 +25227,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gardislg">
+	<!-- boot OK -->
+	<software name="gardislg" supported="yes">
 		<description>Gardis Light (v2.10)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28024,6 +28034,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="oraorabl">
 		<description>Ora Ora Ball</description>
 		<year>1995</year>
@@ -28402,7 +28413,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="putiplin">
+	<!-- boot OK -->
+	<software name="putiplin" supported="yes">
 		<description>Mahou no Shooter Puti 'n Plin</description>
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28414,8 +28426,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This was released by the author in early 200x with an 'Aspect Ratio Patch' to fix display in emulators -->
-	<software name="putiplina" cloneof="putiplin">
+	<!-- boot OK -->
+	<software name="putiplina" cloneof="putiplin" supported="yes">
+		<!-- This was released by the author in early 200x with an 'Aspect Ratio Patch' to fix display in emulators -->
 		<description>Mahou no Shooter Puti 'n Plin (ARP version)</description>
 		<year>200?</year>
 		<publisher>&lt;doujin&gt;</publisher>
