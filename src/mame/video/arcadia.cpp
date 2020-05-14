@@ -6,7 +6,7 @@ Consolidation and enhancement of documentation by Manfred Schneider based on pre
 
  Schematics, manuals and anything you can desire for at http://amigan.1emu.net/
 
- TODO: find a dump of the characther ROM
+ TODO: find a dump of the character ROM
              convert the drawing code to tilemap
 
   emulation of signetics 2637 video/audio device

@@ -71,7 +71,7 @@ Language:
 |        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)|
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
 |   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                  |
-|   XX   | 80-084145(FR)     | Spider-Man and ses amis - Missions Secrètes                                               |
+|   XX   | 80-084145(FR)     | Spider-Man & ses amis - Missions Secrètes                                                 |
 |        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas (no # on label)                                    |
 +========+===================+===========================================================================================+
 |   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
@@ -918,7 +918,7 @@ Language:
 	</software>
 
 	<software name="spidermnmf" cloneof="spidermnmg" supported="no">
-		<description>Marvel Spider-Man and ses amis - Missions Secrètes (France)</description>
+		<description>Marvel Spider-Man &amp; ses amis - Missions Secrètes (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084145(FR)" />
