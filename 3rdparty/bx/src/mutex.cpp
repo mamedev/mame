@@ -158,4 +158,26 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_MUTEX_H_HEADER_GUARD
+#else
+
+namespace bx
+{
+	Mutex::Mutex()
+	{
+	}
+
+	Mutex::~Mutex()
+	{
+	}
+
+	void Mutex::lock()
+	{
+	}
+
+	void Mutex::unlock()
+	{
+	}
+
+} // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING
