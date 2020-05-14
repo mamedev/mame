@@ -217,7 +217,17 @@ void hotblock_state::hotblock(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+// Seems the newer set, as it supports both English and Spanish on the test mode.
 ROM_START( hotblock )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "1.ic4", 0x000000, 0x080000, CRC(82b839d6) SHA1(9cd88f002d56491d39ca26abbf0873da43c5d127) )
+	ROM_LOAD( "2.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8.ic10", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( hotblocka )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "hotblk5.ic4", 0x000000, 0x080000, CRC(5f90f776) SHA1(5ca74714a7d264b4fafaad07dc11e57308828d30) )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
@@ -228,7 +238,7 @@ ROM_END
 
 // PCB with different layout and four PLDs (one of them with its surface scratched out) instead of one PLD and a CPLD.
 // This set doesn't auto clear the I2CMEM device and the high scores are invalid by default, so we load it from a ROM file.
-ROM_START( hotblocka )
+ROM_START( hotblockb )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "1.bin", 0x000000, 0x080000, CRC(1c22fad7) SHA1(9e9a32dfaa41e550920688ae1438105333566039) )
 	ROM_LOAD( "2.bin", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
@@ -241,16 +251,6 @@ ROM_START( hotblocka )
 	ROM_LOAD( "palce16v8.1", 0x117, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8.2", 0x345, 0x117, NO_DUMP )
 	ROM_LOAD( "pld.3",       0x45c, 0x117, NO_DUMP ) // Type unknown, surface scratched out
-ROM_END
-
-// On this set, the real PCB shows the string "Wall Street" on the title screen, but it's missing on MAME
-ROM_START( hotblockb )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "1.ic4", 0x000000, 0x080000, CRC(82b839d6) SHA1(9cd88f002d56491d39ca26abbf0873da43c5d127) )
-	ROM_LOAD( "2.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
-
-	ROM_REGION( 0x117, "plds", 0 )
-	ROM_LOAD( "gal16v8.ic10", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 GAME( 1993, hotblock,         0, hotblock, hotblock, hotblock_state, empty_init, ROT0, "NIX?", "Hot Blocks - Tetrix II (set 1)", MACHINE_SUPPORTS_SAVE )
