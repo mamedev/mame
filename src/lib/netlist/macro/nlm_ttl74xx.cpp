@@ -907,9 +907,9 @@ static NETLIST_START(TTL_74379_DIP)
 		A.Q,  /*    Q0 |2           15| Q3   */ D.Q,
 		A.QQ, /*   /Q0 |3           14| /Q3  */ D.QQ,
 		A.D,  /*    D0 |4   74379   13| D3   */ D.D,
-		B.D,  /*    D1 |5           12| D2   */ D.D,
-		B.QQ, /*   /Q1 |6           11| /Q2  */ D.QQ,
-		B.Q,  /*    Q1 |7           10| Q2   */ D.Q,
+		B.D,  /*    D1 |5           12| D2   */ C.D,
+		B.QQ, /*   /Q1 |6           11| /Q2  */ C.QQ,
+		B.Q,  /*    Q1 |7           10| Q2   */ C.Q,
 		A.GND,/*   GND |8            9| CP   */ A.CP
 			  /*       +--------------+      */
 	)
