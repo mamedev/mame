@@ -12,6 +12,7 @@ CPU    :    TMP68301*
 
 Video  :    DX-101
             DX-102 x3
+            or X1-020 (for P0-113A PCBs)
 
 Sound  :    X1-010
             or OKI M9810 (for EVA2 & EVA3 PCBs)
@@ -55,6 +56,9 @@ TODO:
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
+
+gundamex:
+- slowdowns, music tempo is incorrect
 
 mj4simai:
 - test mode doesn't work correctly, the grid is ok but when you press a key to go to the
@@ -2324,20 +2328,23 @@ void seta2_state::gundamex(machine_config &config)
 	// video hardware
 	m_screen->set_visarea(0x00, 0x180-1, 0x000, 0x0e0-1);
 
-	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/6f-znVzcrmg
+	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/zJi_d463UQE
 }
 
 
 void seta2_state::grdians(machine_config &config)
 {
+	/*
+		CPU/Sound clock is possibly 32.53047MHz / 2 or 50MHz / 3, selectable/differs per PCB?
+		reference :
+		https://youtu.be/qj-TyKyAAVY (high pitch)
+		https://youtu.be/Ung9XeLisV0 (low pitch)
+	*/
 	seta2(config);
-	m_maincpu->set_clock(XTAL(32'530'470)/2); // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::grdians_map);
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x130-1, 0x00, 0xe8 -1);
-
-	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/Ung9XeLisV0
 }
 
 
