@@ -58,10 +58,10 @@ struct dgndos_direnum
 #define MAX_BITMAP_SIZE 512
 
 #define DGNDOS_DELETED_BIT	0x80
-#define DGNDOS_CONT_BIT 0x20
+#define DGNDOS_CONTINUED_BIT 0x20			// byte at offset 0x18 give next entry number
 #define DGNDOS_END_BIT 0x08
 #define DGNDOS_PROTECT_BIT 0x02
-#define DGNDOS_ISCONT_BIT 0x01
+#define DGNDOS_CONTINUATION_BIT 0x01        // this is a continuation block
 
 //-------------------------------------------------
 //  get_dgndos_dirent
@@ -109,7 +109,7 @@ static std::string get_dirent_fname(const dgndos_dirent &ent)
 static bool dgndos_real_file( dgndos_dirent &ent )
 {
 	if( ent.flag_byte & DGNDOS_DELETED_BIT) return false;
-	if( ent.flag_byte & DGNDOS_ISCONT_BIT) return false;
+	if( ent.flag_byte & DGNDOS_CONTINUATION_BIT) return false;
 
 	return true;
 }
@@ -129,12 +129,11 @@ static imgtoolerr_t lookup_dgndos_file(uint8_t *entire_track, const char *fname,
 		do
 		{
 			err = get_dgndos_dirent( entire_track, i++, ent );
-
 			if( err ) return err;
+
+			if( ent.flag_byte & DGNDOS_END_BIT ) return IMGTOOLERR_FILENOTFOUND;
 		}
 		while( ! dgndos_real_file(ent) );
-
-		if( ent.flag_byte & DGNDOS_END_BIT ) return IMGTOOLERR_FILENOTFOUND;
 
 		fnamebuf = get_dirent_fname(ent);
 	}
@@ -390,7 +389,7 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent *d
 		filesize == 0;
 		return IMGTOOLERR_SUCCESS;
 	}
-	
+
 	while( dgnent->header_block.block[i].count != 0 )
 	{
 		if( i==HEADER_EXTENTS_COUNT) break;
@@ -398,7 +397,7 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent *d
 		filesize += dgnent->header_block.block[i++].count * 256;
 	}
 
-	if(i == HEADER_EXTENTS_COUNT && (dgnent->flag_byte & DGNDOS_CONT_BIT))
+	if(i == HEADER_EXTENTS_COUNT && (dgnent->flag_byte & DGNDOS_CONTINUED_BIT))
 	{
 		err = get_dgndos_dirent(entire_track, dgnent->dngdos_last_or_next, cont_ent );
 		if (err) return err;
@@ -415,7 +414,7 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent *d
 
 			if( i == CONT_EXTENTS_COUNT ) // last extant
 			{
-				if( cont_ent.flag_byte & DGNDOS_CONT_BIT)
+				if( cont_ent.flag_byte & DGNDOS_CONTINUED_BIT)
 				{
 					err = get_dgndos_dirent(entire_track, cont_ent.dngdos_last_or_next, cont_ent );
 					return err;
@@ -424,7 +423,7 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent *d
 				}
 			}
 		}
-		
+
 
 		filesize -= 256;
 		if( cont_ent.dngdos_last_or_next == 0 ) filesize += 256;
@@ -533,20 +532,7 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 		std::string fname = get_dirent_fname(dgnent);
 
 		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c %03d/%02x (%03d/%03d), (%03d/%03d), (%03d/%03d), (%03d/%03d), %03d",
-			(char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'),
-			dgnenum->index-1,
-			dgnent.flag_byte,
-			big_endianize_int16(dgnent.header_block.block[0].lsn),
-			dgnent.header_block.block[0].count,
-			big_endianize_int16(dgnent.header_block.block[1].lsn),
-			dgnent.header_block.block[1].count,
-			big_endianize_int16(dgnent.header_block.block[2].lsn),
-			dgnent.header_block.block[2].count,
-			big_endianize_int16(dgnent.header_block.block[3].lsn),
-			dgnent.header_block.block[3].count,
-			dgnent.dngdos_last_or_next
-			);
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c", (char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'));
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -590,113 +576,100 @@ static imgtoolerr_t dgndos_diskimage_readfile(imgtool::partition &partition, con
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
-	dgndos_dirent cont_ent;
-	size_t block_size;
-	int i = 0;
-	int directory_entry_count = 0;
+	dgndos_dirent ent;
 	imgtool::image &image(partition.image());
+	int directory_entry_count = 0;
 	int head, track, sector;
+	int position;
+	int extent = 0;
+	int block_size;
+	int done;
+	int lsn;
+	int count;
+	int i;
 
 	uint8_t entire_track20[18*256];
 
 	ferr = dgndos_get_directory_track( image, 20, entire_track20 );
 	if (ferr) return imgtool_floppy_error(ferr);
 
-	err = lookup_dgndos_file(entire_track20, fname, cont_ent);
+	err = lookup_dgndos_file(entire_track20, fname, ent, &position);
 	if (err) return err;
 
 	do
 	{
-		if( i==HEADER_EXTENTS_COUNT ) break;
+		if(directory_entry_count>MAX_DIRENTS) return IMGTOOLERR_CORRUPTDIR;
 
-		for( int j=big_endianize_int16(cont_ent.header_block.block[i].lsn); j<big_endianize_int16(cont_ent.header_block.block[i].lsn) + cont_ent.header_block.block[i].count; j++ )
-		{
-			block_size = 256;
-			err = dgndos_convert_lsn(entire_track20, j, &head, &track, &sector );
-			if(err) return err;
+		lsn = big_endianize_int16( ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[extent].lsn : ent.header_block.block[extent].lsn );
+		count = ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[extent].count : ent.header_block.block[extent].count;
 
-			// special case last sector in extent
-			if( j == big_endianize_int16(cont_ent.header_block.block[i].lsn) + cont_ent.header_block.block[i].count - 1)
-			{
-				// is this the last sector of the file
-				if( i==3 && (cont_ent.flag_byte & DGNDOS_CONT_BIT))
-				{
-					// There is another block
-				}
-				else if( cont_ent.header_block.block[i+1].count != 0 )
-				{
-					// There is another block
-				}
-				else
-				{
-					// This is the last block
-					if( cont_ent.dngdos_last_or_next == 0 ) block_size = 256;
-					else block_size = cont_ent.dngdos_last_or_next;
-				}
-			}
-
-			err = imgtool_floppy_read_sector_to_stream(image, head, track, sector, 0, block_size, destf);
-			if (err) return err;
-		}
-	}
-	while (cont_ent.header_block.block[++i].count != 0 );
-
-	if(i == HEADER_EXTENTS_COUNT && (cont_ent.flag_byte & DGNDOS_CONT_BIT))
-	{
-		err = get_dgndos_dirent(entire_track20, cont_ent.dngdos_last_or_next, cont_ent );
-		if(err) return err;
+		if( count == 0 ) break;
 
 		i = 0;
 
-		do
+		// read in most of extent
+		while (i < count - 1)
 		{
-			if( directory_entry_count > MAX_DIRENTS ) return IMGTOOLERR_CORRUPTDIR;
+			err = dgndos_convert_lsn(entire_track20, lsn + i, &head, &track, &sector );
+			if(err) return err;
 
-			if( i == CONT_EXTENTS_COUNT ) break;
+			err = imgtool_floppy_read_sector_to_stream(image, head, track, sector, 0, 256, destf);
+			if (err) return err;
 
-			for( int j=big_endianize_int16(cont_ent.continuation_block.block[i].lsn); j<big_endianize_int16(cont_ent.continuation_block.block[i].lsn) + cont_ent.continuation_block.block[i].count; j++ )
+			i++;
+		}
+
+		block_size = 256;
+		done = false;
+
+		if( extent < (ent.flag_byte & DGNDOS_CONTINUATION_BIT ? CONT_EXTENTS_COUNT : HEADER_EXTENTS_COUNT) - 1 )
+		{
+			if( (ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[extent+1].count : ent.header_block.block[extent+1].count) == 0 )
 			{
-				block_size = 256;
-				err = dgndos_convert_lsn(entire_track20, j, &head, &track, &sector );
-				if(err) return err;
 
-				// special case last sector in extent
-				if( j == big_endianize_int16(cont_ent.continuation_block.block[i].lsn) + cont_ent.continuation_block.block[i].count - 1)
-				{
-					// is this the last sector of the file
-					if( i==6 && (cont_ent.flag_byte & DGNDOS_CONT_BIT))
-					{
-						// There is another block
-					}
-					else if( cont_ent.continuation_block.block[i+1].count != 0 )
-					{
-						// There is another block
-					}
-					else
-					{
-						// This is the last block
-						if( cont_ent.dngdos_last_or_next == 0 ) block_size = 256;
-						else block_size = cont_ent.dngdos_last_or_next;
-					}
-				}
+				if( ent.dngdos_last_or_next == 0 )
+					block_size = 256;
+				else
+					block_size = ent.dngdos_last_or_next;
 
-				err = imgtool_floppy_read_sector_to_stream(image, head, track, sector, 0, block_size, destf);
-			}
-
-			if( i == CONT_EXTENTS_COUNT-1 )
-			{
-				if( cont_ent.flag_byte & DGNDOS_CONT_BIT)
-				{
-					err = get_dgndos_dirent(entire_track20, cont_ent.dngdos_last_or_next, cont_ent );
-					if(err) return err;
-
-					i = -1;
-					directory_entry_count++;
-				}
+				done = true;
 			}
 		}
-		while (cont_ent.continuation_block.block[++i].count != 0 );
+		else if( extent == (ent.flag_byte & DGNDOS_CONTINUATION_BIT ? CONT_EXTENTS_COUNT : HEADER_EXTENTS_COUNT) - 1)
+		{
+			if( !(ent.flag_byte & DGNDOS_CONTINUED_BIT) )
+			{
+				if( ent.dngdos_last_or_next == 0 )
+					block_size = 256;
+				else
+					block_size = ent.dngdos_last_or_next;
+
+				done = true;
+			}
+		}
+
+		err = dgndos_convert_lsn(entire_track20, lsn + i, &head, &track, &sector );
+		if(err) return err;
+
+		err = imgtool_floppy_read_sector_to_stream(image, head, track, sector, 0, block_size, destf);
+		if (err) return err;
+
+		extent++;
+
+		if( extent == (ent.flag_byte & DGNDOS_CONTINUATION_BIT ? CONT_EXTENTS_COUNT : HEADER_EXTENTS_COUNT) )
+		{
+			if( ent.flag_byte & DGNDOS_CONTINUED_BIT)
+			{
+				position = ent.dngdos_last_or_next;
+				err = get_dgndos_dirent(entire_track20, ent.dngdos_last_or_next, ent );
+				if(err) return err;
+
+				extent = 0;
+				directory_entry_count++;
+			}
+		}
 	}
+	while( !done );
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -744,7 +717,7 @@ static imgtoolerr_t dgndos_diskimage_deletefile(imgtool::partition &partition, c
 		else break;
 	}
 
-	int continue_flag = ent.flag_byte & DGNDOS_ISCONT_BIT;
+	int continue_flag = ent.flag_byte & DGNDOS_CONTINUED_BIT;
 	int continue_dirent_index = ent.dngdos_last_or_next;
 
 	ent.dngdos_last_or_next = 0;
@@ -772,7 +745,7 @@ static imgtoolerr_t dgndos_diskimage_deletefile(imgtool::partition &partition, c
 		}
 
 		ent.flag_byte |= DGNDOS_DELETED_BIT;
-		continue_flag = ent.flag_byte & DGNDOS_ISCONT_BIT;
+		continue_flag = ent.flag_byte & DGNDOS_CONTINUED_BIT;
 		continue_dirent_index = ent.dngdos_last_or_next;
 
 		ent.dngdos_last_or_next = 0;
@@ -839,14 +812,9 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 	uint64_t written = 0;
 	int fat_block, block_index, first_lsn, sectors_avaiable, current_sector_index;
 	int last_sector_size = 0;
-	uint64_t freespace = 0;
-
-	err = dgndos_diskimage_freespace(partition, &freespace);
-	if (err) return err;
+	int bitmap_count;
 
 	if( sourcef.size() == 0 ) return IMGTOOLERR_BUFFERTOOSMALL;
-
-	if (sourcef.size() > freespace) return IMGTOOLERR_NOSPACE;
 
 	uint8_t entire_track20[18*256];
 	uint8_t entire_track16[18*256];
@@ -859,6 +827,9 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 	if (ferr) return imgtool_floppy_error(ferr);
 
 	write_20_to_16 = memcmp(entire_track20, entire_track16, 18*256 );
+
+	err =  dgndos_get_geometry(entire_track20, &bitmap_count, nullptr, nullptr, nullptr);
+	if(err) return err;
 
 	// find directory entry with same file name
 	err = lookup_dgndos_file(entire_track20, fname, ent, &position);
@@ -881,6 +852,9 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 
 		ent.header_block.block[0].lsn = big_endianize_int16(new_lsn);
 		ent.header_block.block[0].count = 1;
+
+		err = put_dgndos_dirent(entire_track20, position, ent);
+		if(err) return err;
 	}
 	else
 	{
@@ -922,6 +896,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 				write_count = 256;
 				last_sector_size = 0;
 			}
+			else
 			{
 				write_count = sourcef.size() - written;
 				last_sector_size = write_count;
@@ -939,13 +914,13 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			int next_de = 0;
 
 			// yes, truncate this allocation block if necessary
-			if( ent.flag_byte & DGNDOS_ISCONT_BIT)
+			if( ent.flag_byte & DGNDOS_CONTINUATION_BIT)
 			{
 				for( int i = current_sector_index; i < ent.continuation_block.block[fat_block].count; i++)
 				{
 					dgndos_fat_deallocate_sector(entire_track20, first_lsn + i);
 				}
-				
+
 				ent.continuation_block.block[fat_block].count = current_sector_index;
 			}
 			else
@@ -954,12 +929,12 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 				{
 					dgndos_fat_deallocate_sector(entire_track20, first_lsn + i);
 				}
-				
+
 				ent.header_block.block[fat_block].count = current_sector_index;
 			}
 
 			// flag if there are more DEs
-			if( ent.flag_byte & DGNDOS_CONT_BIT)
+			if( ent.flag_byte & DGNDOS_CONTINUED_BIT)
 			{
 				next_de = ent.dngdos_last_or_next;
 			}
@@ -970,7 +945,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 				fat_block++;
 				first_fat_block = fat_block;
 
-				if( ent.flag_byte & DGNDOS_ISCONT_BIT)
+				if( ent.flag_byte & DGNDOS_CONTINUED_BIT)
 				{
 					for( int i = fat_block; i < CONT_EXTENTS_COUNT; i++ )
 					{
@@ -996,7 +971,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 				}
 
 				// delete DE if all blocks were cleared and it is a continued DE
-				if( (first_fat_block == 0) && (ent.flag_byte & DGNDOS_ISCONT_BIT) )
+				if( (first_fat_block == 0) && (ent.flag_byte & DGNDOS_CONTINUATION_BIT) )
 				{
 					ent.flag_byte |= DGNDOS_DELETED_BIT;
 				}
@@ -1010,7 +985,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 					if (err) return err;
 
 					// flag if there are more DEs
-					if( ent.flag_byte & DGNDOS_CONT_BIT)
+					if( ent.flag_byte & DGNDOS_CONTINUED_BIT)
 					{
 						next_de = ent.dngdos_last_or_next;
 						fat_block = -1;
@@ -1021,17 +996,17 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 		}
 		else // more to write - check if I can extend the allocation count
 		{
-			if( (current_sector_index < 255) && (dgndos_is_sector_avaiable( entire_track20, first_lsn + current_sector_index )) )
+			if( (current_sector_index < 255) && (first_lsn + current_sector_index < bitmap_count) && (dgndos_is_sector_avaiable( entire_track20, first_lsn + current_sector_index )) )
 			{
 				sectors_avaiable++;
 
-				if( ent.flag_byte & DGNDOS_CONT_BIT )
+				if( ent.flag_byte & DGNDOS_CONTINUATION_BIT )
 				{
-					ent.header_block.block[fat_block].count = sectors_avaiable;
+					ent.continuation_block.block[fat_block].count = sectors_avaiable;
 				}
 				else
 				{
-					ent.continuation_block.block[fat_block].count = sectors_avaiable;
+					ent.header_block.block[fat_block].count = sectors_avaiable;
 				}
 
 				dgndos_fat_allocate_sector( entire_track20, first_lsn + current_sector_index );
@@ -1040,56 +1015,74 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			{
 				fat_block++;
 
-				if( fat_block == (ent.flag_byte & DGNDOS_ISCONT_BIT ? CONT_EXTENTS_COUNT : HEADER_EXTENTS_COUNT))
+				if( fat_block == (ent.flag_byte & DGNDOS_CONTINUATION_BIT ? CONT_EXTENTS_COUNT : HEADER_EXTENTS_COUNT))
 				{
-					// need a or another continuation directory entry
-					int save_position = position;
+					if( ent.flag_byte & DGNDOS_CONTINUED_BIT)
+					{
+						// go to next directory entry.
+						err = put_dgndos_dirent(entire_track20, position, ent);
+						if (err) return err;
 
-					err = dgndos_get_avaiable_dirent_position( entire_track20, &position );
-					if (err) return err;
+						err = get_dgndos_dirent(entire_track20, ent.dngdos_last_or_next, ent);
+						if (err) return err;
 
-					ent.flag_byte |= DGNDOS_ISCONT_BIT;
-					ent.dngdos_last_or_next = position;
-					err = put_dgndos_dirent(entire_track20, save_position, ent);
-					if (err) return err;
+						fat_block = 0;
+					}
+					else
+					{
+						// need a or another continuation directory entry
+						int save_position = position, new_lsn;
 
-					err = get_dgndos_dirent(entire_track20, position, ent);
-					if (err) return err;
+						err = put_dgndos_dirent(entire_track20, position, ent);
+						if (err) return err;
 
-					memset( (void *)&ent, 0, sizeof(dgndos_dirent) );
-					ent.flag_byte |= DGNDOS_CONT_BIT;
-					fat_block = 0;
+						err = dgndos_get_avaiable_dirent_position( entire_track20, &position );
+						if (err) return err;
+
+						ent.flag_byte |= DGNDOS_CONTINUED_BIT;
+						ent.dngdos_last_or_next = position;
+						err = put_dgndos_dirent(entire_track20, save_position, ent);
+						if (err) return err;
+
+						err = get_dgndos_dirent(entire_track20, position, ent);
+						if (err) return err;
+
+						memset( (void *)&ent, 0, sizeof(dgndos_dirent) );
+						ent.flag_byte |= DGNDOS_CONTINUATION_BIT;
+						fat_block = 0;
+
+						err = dgndos_get_avaiable_sector( entire_track20, &new_lsn );
+						if(err) return err;
+
+					}
 				}
 
-				first_lsn = ent.flag_byte & DGNDOS_CONT_BIT ? big_endianize_int16(ent.continuation_block.block[fat_block].lsn) : big_endianize_int16(ent.header_block.block[fat_block].lsn);
-				sectors_avaiable = ent.flag_byte & DGNDOS_CONT_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count;
+				sectors_avaiable = ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count;
 
 				// check if this block is empty
 				if( sectors_avaiable == 0)
 				{
-					int lsn;
+					int new_lsn;
 
-					err = dgndos_get_avaiable_sector( entire_track20, &lsn );
-					if (err)
-					{
-						// directory track is cached, and un-written. So aborting leaves disk image in correct state
-						return err;
-					}
+					err = dgndos_get_avaiable_sector( entire_track20, &new_lsn );
+					if (err) return err;
 
-					if( ent.flag_byte & DGNDOS_CONT_BIT )
+					if( ent.flag_byte & DGNDOS_CONTINUATION_BIT)
 					{
-						ent.continuation_block.block[fat_block].lsn = big_endianize_int16(lsn);
+						ent.continuation_block.block[fat_block].lsn = big_endianize_int16(new_lsn);
 						ent.continuation_block.block[fat_block].count = 1;
 					}
 					else
 					{
-						ent.header_block.block[fat_block].lsn = big_endianize_int16(lsn);
+						ent.header_block.block[fat_block].lsn = big_endianize_int16(new_lsn);
 						ent.header_block.block[fat_block].count = 1;
 					}
+
+					dgndos_fat_allocate_sector(entire_track20, new_lsn);
 				}
 
-				first_lsn = ent.flag_byte & DGNDOS_CONT_BIT ? big_endianize_int16(ent.continuation_block.block[fat_block].lsn) : big_endianize_int16(ent.header_block.block[fat_block].lsn);
-				sectors_avaiable = ent.flag_byte & DGNDOS_CONT_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count;
+				first_lsn = ent.flag_byte & DGNDOS_CONTINUATION_BIT ? big_endianize_int16(ent.continuation_block.block[fat_block].lsn) : big_endianize_int16(ent.header_block.block[fat_block].lsn);
+				sectors_avaiable = ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count;
 				current_sector_index = 0;
 			}
 		}
