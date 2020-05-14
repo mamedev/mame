@@ -191,11 +191,11 @@ INPUT_PORTS_END
 void hotblock_state::hotblock(machine_config &config)
 {
 	// Basic machine hardware
-	V20(config, m_maincpu, 24_MHz_XTAL / 3); // Unknown clock
+	V20(config, m_maincpu, 24_MHz_XTAL / 3); // Unknown clock // Some boards may use an 8088
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-	I2C_24C02(config, "i2cmem", 0); // 24C02B1
+	I2C_24C02(config, "i2cmem", 0); // 24C02B1 // Some boards may use a 24C04, but using just half its capacity
 
 	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 
@@ -211,7 +211,7 @@ void hotblock_state::hotblock(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 24));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 24)); // Some boards may use a YM2149
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
