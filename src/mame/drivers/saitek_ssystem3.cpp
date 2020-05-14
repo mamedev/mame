@@ -55,7 +55,6 @@ TODO:
 - dump/add chessboard lcd and printer unit
 - dump/add ssystem3 1980 program revision, were the BTANB fixed?
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
-- ssystem4 internal artwork (same button functions, different look)
 
 BTANB (ssystem3):
 - If the TIME switch is held up, it will sometimes recognize the wrong input when
@@ -80,6 +79,7 @@ BTANB (ssystem3):
 
 // internal artwork
 #include "saitek_ssystem3.lh" // clickable
+#include "saitek_ssystem4.lh" // clickable
 
 
 namespace {
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("F 6 / Knight / Clock")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_LEFT) PORT_NAME("E 5 / Bishop / Left")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE / Interrupt")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_I) PORT_NAME("CE / Interrupt")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
@@ -303,6 +303,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssystem4 )
 	PORT_INCLUDE( ssystem3 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C.Square")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C.Board")
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
@@ -341,7 +345,7 @@ void ssystem3_state::ssystem4(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(5, 9);
 	m_display->set_bri_levels(0.25);
 
-	config.set_default_layout(layout_saitek_ssystem3);
+	config.set_default_layout(layout_saitek_ssystem4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
