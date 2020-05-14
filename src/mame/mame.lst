@@ -16223,7 +16223,9 @@ terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
 terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
 
 @source:hotblock.cpp
-hotblock                        // (c) 1993 Nics? / Nix?
+hotblock                        // (c) 1993 Nics? / NIX?
+hotblocka                       // (c) 1993 Nics? / NIX?
+hotblockb                       // (c) 1993 Nics? / NIX?
 
 @source:hotstuff.cpp
 hotstuff                        //
