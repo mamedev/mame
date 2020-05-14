@@ -5,8 +5,9 @@
 	Atari Jaguar "Blitter" device
 	
 	TODO:
+    - Stub device, port/rewrite from jagblit;
 	- actual codename/chip part number;
-	- has different revs;
+	- has different revs, encapsulate;
 
 ***************************************************************************/
 
