@@ -18849,6 +18849,9 @@ korg707                         //
 dss1                            //
 dssmsrk                         //
 
+@source:korgdvp1.cpp
+dvp1                            //
+
 @source:korgdw8k.cpp
 dw8000                          //
 dw8000ex                        //
