@@ -43,7 +43,7 @@ HD44780_PIXEL_UPDATE(eurit_state::lcd_pixel_update)
 
 void eurit_state::mem_map(address_map &map)
 {
-	map(0x000480, 0x007fff).ram();
+	map(0x000480, 0x007fff).ram(); // probably NVRAM (0x000480 counts seconds for software RTC)
 	map(0x008000, 0x00ffff).rom().region("firmware", 0x8000);
 	map(0x040000, 0x05ffff).rom().region("firmware", 0);
 	map(0x0c0000, 0x0c0007).rw("dsc", FUNC(am79c30a_device::read), FUNC(am79c30a_device::write));
@@ -61,7 +61,7 @@ void eurit_state::palette_init(palette_device &palette)
 
 void eurit_state::eurit30(machine_config &config)
 {
-	M37730S2(config, m_maincpu, 8'000'000); // type and clock unknown
+	M37730S2(config, m_maincpu, 4'096'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurit_state::mem_map);
 	m_maincpu->p4_out_cb().set("lcdc", FUNC(hd44780_device::db_w));
 	m_maincpu->p6_out_cb().set("lcdc", FUNC(hd44780_device::e_w)).bit(6);
