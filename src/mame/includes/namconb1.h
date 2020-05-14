@@ -14,6 +14,7 @@
 #include "machine/namcomcu.h"
 #include "machine/timer.h"
 #include "screen.h"
+#include "video/bufsprite.h"
 #include "video/namco_c116.h"
 #include "video/namco_c355spr.h"
 #include "video/namco_c123tmap.h"
@@ -65,6 +66,11 @@ public:
 	void init_outfxies();
 	void init_gslgr94u();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	int m_gametype;
 	enum
@@ -101,17 +107,17 @@ private:
 	optional_ioport m_light0_y;
 	optional_ioport m_light1_x;
 	optional_ioport m_light1_y;
-	required_shared_ptr<uint32_t> m_spritebank32;
-	optional_shared_ptr<uint32_t> m_tilebank32;
-	optional_shared_ptr<uint32_t> m_rozbank32;
-	required_shared_ptr<uint16_t> m_namconb_shareram;
+	required_device<buffered_spriteram32_device> m_spritebank32;
+	optional_shared_ptr<u32> m_tilebank32;
+	optional_shared_ptr<u32> m_rozbank32;
+	required_shared_ptr<u16> m_namconb_shareram;
 
-	uint8_t m_vbl_irq_level;
-	uint8_t m_pos_irq_level;
-	uint8_t m_unk_irq_level;
-	uint16_t m_count;
-	uint8_t m_port6;
-	uint32_t m_tilemap_tile_bank[4];
+	u8 m_vbl_irq_level;
+	u8 m_pos_irq_level;
+	u8 m_unk_irq_level;
+	u16 m_count;
+	u8 m_port6;
+	u32 m_tilemap_tile_bank[4];
 
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);
@@ -127,17 +133,13 @@ private:
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
 	DECLARE_READ8_MEMBER(port7_r);
-	template <int Bit> uint16_t dac_bit_r();
+	template <int Bit> u16 dac_bit_r();
 
 	DECLARE_WRITE32_MEMBER(rozbank32_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(namconb1);
-	DECLARE_VIDEO_START(machbrkr);
-	DECLARE_VIDEO_START(outfxies);
-	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ);
-	uint32_t screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
@@ -146,11 +148,11 @@ private:
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile_machbrkr(int code);
 	int NB2objcode2tile_outfxies(int code);
-	void NB1TilemapCB(uint16_t code, int *tile, int *mask);
-	void NB2TilemapCB_machbrkr(uint16_t code, int *tile, int *mask);
-	void NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask);
-	void NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int which);
-	void NB2RozCB_outfxies(uint16_t code, int *tile, int *mask, int which);
+	void NB1TilemapCB(u16 code, int *tile, int *mask);
+	void NB2TilemapCB_machbrkr(u16 code, int *tile, int *mask);
+	void NB2TilemapCB_outfxies(u16 code, int *tile, int *mask);
+	void NB2RozCB_machbrkr(u16 code, int *tile, int *mask, int which);
+	void NB2RozCB_outfxies(u16 code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
 	void namconb1_am(address_map &map);
 	void namconb2_am(address_map &map);
