@@ -46,7 +46,6 @@ ToDo:
 - Dump Telcon and Gemini BIOSes
 - Emulate the Co-Power-88 expansion (allows PC-DOS, CP/M-86, etc. to be used)
 - Probably lots of other things
-- Press F3 and screen turns into garbage. This breakage started in the 0.198 to 0.199 cycle.
 
 
 *************************************************************************************************************/
