@@ -165,7 +165,7 @@ void eurit_state::eurit30(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eurit_state::palette_init), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
 }
@@ -177,4 +177,4 @@ ROM_START(eurit30)
 ROM_END
 
 
-SYST(1996, eurit30, 0, 0, eurit30, eurit30, eurit_state, empty_init, "Ascom", "Eurit 30", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+SYST(1996, eurit30, 0, 0, eurit30, eurit30, eurit_state, empty_init, "Ascom", "Eurit 30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
