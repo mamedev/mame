@@ -70,8 +70,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_data;
 
-	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_READ8_MEMBER(mcu_port1_r);
+	void mcu_port1_w(uint8_t data);
+	uint8_t mcu_port1_r();
 
 
 	uint32_t screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
@@ -87,13 +87,13 @@ private:
 	DECLARE_WRITE8_MEMBER(hostmem_w);
 };
 
-WRITE8_MEMBER(goldart_state::mcu_port1_w)
+void goldart_state::mcu_port1_w(uint8_t data)
 {
 	logerror("%s: mcu_port1_w %02x\n", machine().describe_context(), data);
 	m_port1 = data;
 }
 
-READ8_MEMBER(goldart_state::mcu_port1_r)
+uint8_t goldart_state::mcu_port1_r()
 {
 	uint8_t ret = m_port1;
 	logerror("%s: mcu_port1_r %02x\n", machine().describe_context(), ret);

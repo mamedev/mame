@@ -170,7 +170,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
 	inline uint32_t tmnt2_get_word( uint32_t addr );
 	void tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data );
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	K051960_CB_MEMBER(mia_sprite_callback);
 	K051960_CB_MEMBER(tmnt_sprite_callback);
 	K051960_CB_MEMBER(punkshot_sprite_callback);

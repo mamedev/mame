@@ -270,18 +270,18 @@ protected:
 	u16 read_inputs();
 	void update_display();
 	void update_sound();
-	DECLARE_READ8_MEMBER(speech_r);
+	u8 speech_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(pia0_pb_w);
-	DECLARE_READ8_MEMBER(pia0_pa_r);
+	void pia0_pa_w(u8 data);
+	void pia0_pb_w(u8 data);
+	u8 pia0_pa_r();
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_READ_LINE_MEMBER(pia0_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia0_cb1_r);
-	DECLARE_WRITE8_MEMBER(pia1_pa_w);
-	DECLARE_WRITE8_MEMBER(pia1_pb_w);
-	DECLARE_READ8_MEMBER(pia1_pb_r);
+	void pia1_pa_w(u8 data);
+	void pia1_pb_w(u8 data);
+	u8 pia1_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 
 	u8 m_led_data;
@@ -398,7 +398,7 @@ void csc_state::update_sound()
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
-READ8_MEMBER(csc_state::speech_r)
+u8 csc_state::speech_r(offs_t offset)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -406,13 +406,13 @@ READ8_MEMBER(csc_state::speech_r)
 
 // 6821 PIA 0
 
-READ8_MEMBER(csc_state::pia0_pa_r)
+u8 csc_state::pia0_pa_r()
 {
 	// d0-d5: button row 0-5
 	return (read_inputs() & 0x3f) | 0xc0;
 }
 
-WRITE8_MEMBER(csc_state::pia0_pa_w)
+void csc_state::pia0_pa_w(u8 data)
 {
 	// d6,d7: 7442 A0,A1
 	m_inp_mux = (m_inp_mux & ~3) | (data >> 6 & 3);
@@ -420,7 +420,7 @@ WRITE8_MEMBER(csc_state::pia0_pa_w)
 	update_sound();
 }
 
-WRITE8_MEMBER(csc_state::pia0_pb_w)
+void csc_state::pia0_pb_w(u8 data)
 {
 	// d0-d7: led row data
 	m_led_data = data;
@@ -458,7 +458,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 
 // 6821 PIA 1
 
-WRITE8_MEMBER(csc_state::pia1_pa_w)
+void csc_state::pia1_pa_w(u8 data)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(data & 0x3f);
@@ -468,7 +468,7 @@ WRITE8_MEMBER(csc_state::pia1_pa_w)
 	update_display();
 }
 
-WRITE8_MEMBER(csc_state::pia1_pb_w)
+void csc_state::pia1_pb_w(u8 data)
 {
 	// d0: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -481,7 +481,7 @@ WRITE8_MEMBER(csc_state::pia1_pb_w)
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
 }
 
-READ8_MEMBER(csc_state::pia1_pb_r)
+u8 csc_state::pia1_pb_r()
 {
 	// d2: printer?
 	u8 data = 0x04;

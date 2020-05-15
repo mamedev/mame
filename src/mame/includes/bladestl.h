@@ -42,7 +42,7 @@ public:
 	/* devices */
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bladestl_port_B_w);
+	void bladestl_port_B_w(uint8_t data);
 	DECLARE_READ8_MEMBER(bladestl_speech_busy_r);
 	DECLARE_WRITE8_MEMBER(bladestl_speech_ctrl_w);
 	void bladestl_palette(palette_device &palette) const;

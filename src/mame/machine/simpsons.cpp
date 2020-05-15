@@ -58,7 +58,7 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( simpsons_state::banking_callback )
+void simpsons_state::banking_callback(u8 data)
 {
 	membank("bank1")->set_entry(data & 0x3f);
 }

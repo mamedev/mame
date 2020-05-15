@@ -46,10 +46,10 @@ public:
 	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);
 	DECLARE_READ8_MEMBER(mars_ppi8255_1_r);
 	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
-	DECLARE_READ8_MEMBER(scramble_portB_r);
-	DECLARE_READ8_MEMBER(hustler_portB_r);
-	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
+	uint8_t scramble_portB_r();
+	uint8_t hustler_portB_r();
+	void hotshock_sh_irqtrigger_w(uint8_t data);
+	uint8_t hotshock_soundlatch_r();
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(harem_decrypt_clk_w);
 	DECLARE_WRITE8_MEMBER(harem_decrypt_rst_w);
 	DECLARE_READ8_MEMBER(harem_digitalker_intr_r);
-	DECLARE_WRITE8_MEMBER(harem_digitalker_control_w);
+	void harem_digitalker_control_w(uint8_t data);
 
 	void init_cavelon();
 	void init_mariner();
@@ -96,8 +96,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cavelon_banksw_w );
 	DECLARE_READ8_MEMBER( hunchbks_mirror_r );
 	DECLARE_WRITE8_MEMBER( hunchbks_mirror_w );
-	DECLARE_WRITE8_MEMBER( scramble_sh_irqtrigger_w );
-	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
+	void scramble_sh_irqtrigger_w(uint8_t data);
+	void mrkougar_sh_irqtrigger_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 
 	void scramble(machine_config &config);

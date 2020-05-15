@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE16_MEMBER(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE16_MEMBER(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE8_MEMBER(wecleman_K00723216_bank_w);
-	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
+	void wecleman_volume_callback(uint8_t data);
 	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
 

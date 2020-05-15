@@ -76,7 +76,7 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "speaker.h"
 
 
-READ8_MEMBER(megazone_state::megazone_port_a_r)
+uint8_t megazone_state::megazone_port_a_r()
 {
 	int clock, timer;
 
@@ -95,7 +95,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 	return (timer << 4) | m_i8039_status;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_port_b_w)
+void megazone_state::megazone_port_b_w(uint8_t data)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -110,12 +110,12 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
+void megazone_state::megazone_i8039_irq_w(uint8_t data)
 {
 	m_daccpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
+void megazone_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	if ((data & 0x80) == 0)
 		m_daccpu->set_input_line(0, CLEAR_LINE);

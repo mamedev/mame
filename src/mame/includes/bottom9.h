@@ -62,8 +62,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bottom9_sound_interrupt);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
-	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);

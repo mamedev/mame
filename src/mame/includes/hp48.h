@@ -113,16 +113,16 @@ private:
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER(mem_reset);
-	DECLARE_WRITE32_MEMBER(mem_config);
-	DECLARE_WRITE32_MEMBER(mem_unconfig);
-	DECLARE_READ32_MEMBER(mem_id);
+	void mem_config(uint32_t data);
+	void mem_unconfig(uint32_t data);
+	uint32_t mem_id();
 
 	/* CRC computation */
-	DECLARE_WRITE32_MEMBER(mem_crc);
+	void mem_crc(offs_t offset, uint32_t data);
 
 	/* IN/OUT registers */
-	DECLARE_READ32_MEMBER(reg_in);
-	DECLARE_WRITE32_MEMBER(reg_out);
+	uint32_t reg_in();
+	void reg_out(uint32_t data);
 
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER(rsi);

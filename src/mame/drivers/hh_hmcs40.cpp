@@ -271,15 +271,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void bambball(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bambball_state::plate_w)
+void bambball_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x(,D0-D3): vfd plate
 	int shift = (offset - 1) * 4;
@@ -290,7 +290,7 @@ WRITE8_MEMBER(bambball_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(bambball_state::grid_w)
+void bambball_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -302,10 +302,10 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + 1, data & 0xf);
+	plate_w(3 + 1, data & 0xf);
 }
 
-READ8_MEMBER(bambball_state::input_r)
+u8 bambball_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -396,9 +396,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void bmboxing(machine_config &config);
 };
 
@@ -411,7 +411,7 @@ void bmboxing_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bmboxing_state::plate_w)
+void bmboxing_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x: vfd plate
 	int shift = (offset - 1) * 4;
@@ -419,7 +419,7 @@ WRITE8_MEMBER(bmboxing_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bmboxing_state::grid_w)
+void bmboxing_state::grid_w(u16 data)
 {
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
@@ -432,7 +432,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 	update_display();
 }
 
-READ8_MEMBER(bmboxing_state::input_r)
+u8 bmboxing_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -543,8 +543,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -560,7 +560,7 @@ void bfriskyt_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bfriskyt_state::plate_w)
+void bfriskyt_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -568,7 +568,7 @@ WRITE8_MEMBER(bfriskyt_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bfriskyt_state::grid_w)
+void bfriskyt_state::grid_w(u16 data)
 {
 	// D6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -677,15 +677,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void packmon(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(packmon_state::plate_w)
+void packmon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -697,7 +697,7 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(packmon_state::grid_w)
+void packmon_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -709,10 +709,10 @@ WRITE16_MEMBER(packmon_state::grid_w)
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 9-12 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
-READ16_MEMBER(packmon_state::input_r)
+u16 packmon_state::input_r()
 {
 	// D5: multiplexed inputs
 	return read_inputs(5) & 0x20;
@@ -794,8 +794,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -804,7 +804,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(bzaxxon_state::plate_w)
+void bzaxxon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
@@ -816,7 +816,7 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bzaxxon_state::grid_w)
+void bzaxxon_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -833,7 +833,7 @@ WRITE16_MEMBER(bzaxxon_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0-D2: plate 7-9 (update display there)
-	plate_w(space, 4, data & 7);
+	plate_w(4, data & 7);
 }
 
 void bzaxxon_state::update_int1()
@@ -919,8 +919,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -929,7 +929,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(zackman_state::plate_w)
+void zackman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D0,D1): vfd plate
 	int shift = offset * 4;
@@ -941,7 +941,7 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(zackman_state::grid_w)
+void zackman_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -958,7 +958,7 @@ WRITE16_MEMBER(zackman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0,D1: plate 12,13 (update display there)
-	plate_w(space, 7, data & 3);
+	plate_w(7, data & 3);
 }
 
 void zackman_state::update_int0()
@@ -1044,8 +1044,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -1061,7 +1061,7 @@ void bpengo_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bpengo_state::plate_w)
+void bpengo_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -1069,7 +1069,7 @@ WRITE8_MEMBER(bpengo_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bpengo_state::grid_w)
+void bpengo_state::grid_w(u16 data)
 {
 	// D10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1177,8 +1177,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -1194,7 +1194,7 @@ void bbtime_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bbtime_state::plate_w)
+void bbtime_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
@@ -1202,7 +1202,7 @@ WRITE8_MEMBER(bbtime_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(bbtime_state::grid_w)
+void bbtime_state::grid_w(u16 data)
 {
 	// D3: speaker out
 	m_speaker->level_w(data >> 3 & 1);
@@ -1305,14 +1305,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void bdoramon(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bdoramon_state::plate_w)
+void bdoramon_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -1324,7 +1324,7 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bdoramon_state::grid_w)
+void bdoramon_state::grid_w(u16 data)
 {
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1333,7 +1333,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D3: plate 15-18 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
 // config
@@ -1414,14 +1414,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void bultrman(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bultrman_state::plate_w)
+void bultrman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D2): vfd plate
 	int shift = offset * 4;
@@ -1433,7 +1433,7 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(bultrman_state::grid_w)
+void bultrman_state::grid_w(u16 data)
 {
 	// D7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1442,7 +1442,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	plate_w(space, 4, data & 7);
+	plate_w(4, data & 7);
 }
 
 // config
@@ -1516,8 +1516,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void machiman(machine_config &config);
 };
 
@@ -1529,7 +1529,7 @@ void machiman_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(machiman_state::plate_w)
+void machiman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x,R6012: vfd plate
 	int shift = (offset == 6) ? 16 : offset * 4;
@@ -1537,7 +1537,7 @@ WRITE8_MEMBER(machiman_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(machiman_state::grid_w)
+void machiman_state::grid_w(u16 data)
 {
 	// D13: speaker out
 	m_speaker->level_w(data >> 13 & 1);
@@ -1626,13 +1626,13 @@ public:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE16_MEMBER(speaker_w);
+	void sound_w(u8 data);
+	void sound2_w(u8 data);
+	void speaker_w(u16 data);
 	void pairmtch(machine_config &config);
 };
 
@@ -1643,7 +1643,7 @@ void pairmtch_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(pairmtch_state::plate_w)
+void pairmtch_state::plate_w(offs_t offset, u8 data)
 {
 	// R2x,R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 8 : (offset-2) * 4;
@@ -1651,7 +1651,7 @@ WRITE8_MEMBER(pairmtch_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(pairmtch_state::grid_w)
+void pairmtch_state::grid_w(u16 data)
 {
 	// D7: sound reset (to audiocpu reset line)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -1667,13 +1667,13 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 	update_display();
 }
 
-READ8_MEMBER(pairmtch_state::input_r)
+u8 pairmtch_state::input_r()
 {
 	// R4x: multiplexed inputs
 	return read_inputs(2);
 }
 
-WRITE8_MEMBER(pairmtch_state::sound_w)
+void pairmtch_state::sound_w(u8 data)
 {
 	// R5x: soundlatch (to audiocpu R2x)
 	m_soundlatch[0]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
@@ -1681,13 +1681,13 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 
 // handlers: audiocpu side
 
-WRITE8_MEMBER(pairmtch_state::sound2_w)
+void pairmtch_state::sound2_w(u8 data)
 {
 	// R2x: soundlatch (to maincpu R5x)
 	m_soundlatch[1]->write(bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
-WRITE16_MEMBER(pairmtch_state::speaker_w)
+void pairmtch_state::speaker_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -1793,15 +1793,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void alnattck(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(alnattck_state::plate_w)
+void alnattck_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -1812,7 +1812,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(alnattck_state::grid_w)
+void alnattck_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -1824,10 +1824,10 @@ WRITE16_MEMBER(alnattck_state::grid_w)
 	m_grid = data >> 6 & 0x3ff;
 
 	// D0-D3: plate 16-19 (update display there)
-	plate_w(space, 4, data & 0xf);
+	plate_w(4, data & 0xf);
 }
 
-READ16_MEMBER(alnattck_state::input_r)
+u16 alnattck_state::input_r()
 {
 	// D5: multiplexed inputs
 	return read_inputs(7) & 0x20;
@@ -1917,8 +1917,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
@@ -1962,7 +1962,7 @@ void cdkong_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(cdkong_state::plate_w)
+void cdkong_state::plate_w(offs_t offset, u8 data)
 {
 	// R13: speaker on
 	m_r[offset] = data;
@@ -1974,7 +1974,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cdkong_state::grid_w)
+void cdkong_state::grid_w(u16 data)
 {
 	// D3: speaker out
 	m_d = data;
@@ -2073,9 +2073,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE16_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(u16 data);
+	u8 input_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
 	void cgalaxn(machine_config &config);
@@ -2097,7 +2097,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	update_display();
 }
 
-WRITE8_MEMBER(cgalaxn_state::grid_w)
+void cgalaxn_state::grid_w(offs_t offset, u8 data)
 {
 	// R10,R11: input mux
 	if (offset == 1)
@@ -2109,7 +2109,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cgalaxn_state::plate_w)
+void cgalaxn_state::plate_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2121,7 +2121,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 	update_display();
 }
 
-READ8_MEMBER(cgalaxn_state::input_r)
+u8 cgalaxn_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(2);
@@ -2215,15 +2215,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void cpacman(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(cpacman_state::plate_w)
+void cpacman_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x(,D1,D2): vfd plate
 	int shift = (offset - 1) * 4;
@@ -2235,7 +2235,7 @@ WRITE8_MEMBER(cpacman_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(cpacman_state::grid_w)
+void cpacman_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2247,10 +2247,10 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + 1, data >> 1 & 3);
+	plate_w(6 + 1, data >> 1 & 3);
 }
 
-READ8_MEMBER(cpacman_state::input_r)
+u8 cpacman_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(3);
@@ -2351,15 +2351,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void cmspacmn(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(cmspacmn_state::plate_w)
+void cmspacmn_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x(,D0,D1): vfd plate
 	int shift = (offset - 1) * 4;
@@ -2371,7 +2371,7 @@ WRITE8_MEMBER(cmspacmn_state::plate_w)
 	m_display->matrix(grid, u64(BIT(m_plate,15)) << 32 | plate);
 }
 
-WRITE16_MEMBER(cmspacmn_state::grid_w)
+void cmspacmn_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -2383,10 +2383,10 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + 1, data & 3);
+	plate_w(6 + 1, data & 3);
 }
 
-READ8_MEMBER(cmspacmn_state::input_r)
+u8 cmspacmn_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(3);
@@ -2476,9 +2476,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u8 input_r();
 	void egalaxn2(machine_config &config);
 };
 
@@ -2491,7 +2491,7 @@ void egalaxn2_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(egalaxn2_state::grid_w)
+void egalaxn2_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2504,7 +2504,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(egalaxn2_state::plate_w)
+void egalaxn2_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R6x: vfd plate
 	int shift = (offset - 1) * 4;
@@ -2512,7 +2512,7 @@ WRITE8_MEMBER(egalaxn2_state::plate_w)
 	update_display();
 }
 
-READ8_MEMBER(egalaxn2_state::input_r)
+u8 egalaxn2_state::input_r()
 {
 	// R0x: multiplexed inputs
 	return read_inputs(4);
@@ -2702,9 +2702,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void einvader2(machine_config &config);
 };
 
@@ -2715,7 +2715,7 @@ void einvader2_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(einvader2_state::plate_w)
+void einvader2_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -2723,7 +2723,7 @@ WRITE8_MEMBER(einvader2_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(einvader2_state::grid_w)
+void einvader2_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2736,7 +2736,7 @@ WRITE16_MEMBER(einvader2_state::grid_w)
 	update_display();
 }
 
-READ16_MEMBER(einvader2_state::input_r)
+u16 einvader2_state::input_r()
 {
 	// D13-D15: multiplexed inputs
 	return read_inputs(3) << 13;
@@ -2827,14 +2827,14 @@ public:
 	required_device<cop411_cpu_device> m_audiocpu;
 
 	virtual void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	u8 m_cop_irq;
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(cop_irq_w);
-	DECLARE_READ8_MEMBER(cop_latch_r);
-	DECLARE_READ8_MEMBER(cop_ack_r);
+	void cop_irq_w(u8 data);
+	u8 cop_latch_r();
+	u8 cop_ack_r();
 
 	void update_int();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
@@ -2861,7 +2861,7 @@ void eturtles_state::update_display()
 	m_display->matrix(grid, plate | (grid >> 5 & 8)); // grid 8 also forces plate 3 high
 }
 
-WRITE8_MEMBER(eturtles_state::plate_w)
+void eturtles_state::plate_w(offs_t offset, u8 data)
 {
 	m_r[offset] = data;
 
@@ -2871,7 +2871,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(eturtles_state::grid_w)
+void eturtles_state::grid_w(u16 data)
 {
 	m_d = data;
 
@@ -2904,20 +2904,20 @@ WRITE_LINE_MEMBER(eturtles_state::speaker_w)
 	m_speaker->level_w(!state);
 }
 
-WRITE8_MEMBER(eturtles_state::cop_irq_w)
+void eturtles_state::cop_irq_w(u8 data)
 {
 	// D0: maincpu INT0 (active low)
 	m_cop_irq = ~data & 1;
 	update_int();
 }
 
-READ8_MEMBER(eturtles_state::cop_latch_r)
+u8 eturtles_state::cop_latch_r()
 {
 	// L0-L3: soundlatch from maincpu R0x
 	return m_r[0];
 }
 
-READ8_MEMBER(eturtles_state::cop_ack_r)
+u8 eturtles_state::cop_ack_r()
 {
 	// G0: ack from maincpu D0
 	return m_d & 1;
@@ -3026,7 +3026,7 @@ public:
 	{ }
 
 	virtual void update_display() override;
-	DECLARE_READ8_MEMBER(cop_data_r);
+	u8 cop_data_r();
 	void estargte(machine_config &config);
 };
 
@@ -3039,7 +3039,7 @@ void estargte_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-READ8_MEMBER(estargte_state::cop_data_r)
+u8 estargte_state::cop_data_r()
 {
 	// L0-L3: soundlatch from maincpu R0x
 	// L7: ack from maincpu D0
@@ -3149,15 +3149,15 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
 	void ghalien(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(ghalien_state::plate_w)
+void ghalien_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D10-D13): vfd plate
 	int shift = offset * 4;
@@ -3169,7 +3169,7 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(ghalien_state::grid_w)
+void ghalien_state::grid_w(u16 data)
 {
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
@@ -3181,10 +3181,10 @@ WRITE16_MEMBER(ghalien_state::grid_w)
 	m_grid = data & 0x3ff;
 
 	// D10-D13: more plates (update display there)
-	plate_w(space, 4, data >> 10 & 0xf);
+	plate_w(4, data >> 10 & 0xf);
 }
 
-READ16_MEMBER(ghalien_state::input_r)
+u16 ghalien_state::input_r()
 {
 	// D15: multiplexed inputs
 	return read_inputs(7) & 0x8000;
@@ -3276,8 +3276,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -3286,7 +3286,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(gckong_state::plate_w)
+void gckong_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x(,D0,D1): vfd plate
 	int shift = offset * 4;
@@ -3298,7 +3298,7 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	m_display->matrix(grid, plate);
 }
 
-WRITE16_MEMBER(gckong_state::grid_w)
+void gckong_state::grid_w(u16 data)
 {
 	// D2: speaker out
 	m_speaker->level_w(data >> 2 & 1);
@@ -3315,7 +3315,7 @@ WRITE16_MEMBER(gckong_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 4, data & 3);
+	plate_w(4, data & 3);
 }
 
 void gckong_state::update_int1()
@@ -3405,8 +3405,8 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -3415,7 +3415,7 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(gdigdug_state::plate_w)
+void gdigdug_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D0-D3): vfd plate
 	int shift = offset * 4;
@@ -3426,7 +3426,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(gdigdug_state::grid_w)
+void gdigdug_state::grid_w(u16 data)
 {
 	// D6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -3443,7 +3443,7 @@ WRITE16_MEMBER(gdigdug_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 7, data & 0xf);
+	plate_w(7, data & 0xf);
 }
 
 void gdigdug_state::update_int1()
@@ -3536,10 +3536,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	void speaker_w(u8 data);
+	u8 input_r();
 	void mwcbaseb(machine_config &config);
 };
 
@@ -3551,7 +3551,7 @@ void mwcbaseb_state::update_display()
 	m_display->matrix(grid, m_plate);
 }
 
-WRITE8_MEMBER(mwcbaseb_state::plate_w)
+void mwcbaseb_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x,R6x: vfd plate
 	int shift = (offset == 6) ? 12 : (offset - 1) * 4;
@@ -3559,7 +3559,7 @@ WRITE8_MEMBER(mwcbaseb_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(mwcbaseb_state::grid_w)
+void mwcbaseb_state::grid_w(u16 data)
 {
 	// D9-D15: input mux
 	m_inp_mux = data >> 9 & 0x7f;
@@ -3569,13 +3569,13 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(mwcbaseb_state::speaker_w)
+void mwcbaseb_state::speaker_w(u8 data)
 {
 	// R50,R51+R52(tied together): speaker out
 	m_speaker->level_w(data & 7);
 }
 
-READ8_MEMBER(mwcbaseb_state::input_r)
+u8 mwcbaseb_state::input_r()
 {
 	// R4x: multiplexed inputs
 	return read_inputs(7);
@@ -3710,8 +3710,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -3727,7 +3727,7 @@ void msthawk_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(msthawk_state::plate_w)
+void msthawk_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -3735,7 +3735,7 @@ WRITE8_MEMBER(msthawk_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(msthawk_state::grid_w)
+void msthawk_state::grid_w(u16 data)
 {
 	// D5: speaker out
 	m_speaker->level_w(data >> 5 & 1);
@@ -3842,14 +3842,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void pbqbert(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(pbqbert_state::plate_w)
+void pbqbert_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R6x(,D8): vfd plate
 	int shift = offset * 4;
@@ -3860,7 +3860,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(pbqbert_state::grid_w)
+void pbqbert_state::grid_w(u16 data)
 {
 	// D14: speaker out
 	m_speaker->level_w(data >> 14 & 1);
@@ -3869,7 +3869,7 @@ WRITE16_MEMBER(pbqbert_state::grid_w)
 	m_grid = data & 0xff;
 
 	// D8: plate 25 (update display there)
-	plate_w(space, 7, data >> 8 & 1);
+	plate_w(7, data >> 8 & 1);
 }
 
 // config
@@ -3942,8 +3942,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int1();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
@@ -3959,7 +3959,7 @@ void tmtron_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(tmtron_state::plate_w)
+void tmtron_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -3967,7 +3967,7 @@ WRITE8_MEMBER(tmtron_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(tmtron_state::grid_w)
+void tmtron_state::grid_w(u16 data)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -4068,8 +4068,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 
 	void update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
@@ -4085,7 +4085,7 @@ void kingman_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(kingman_state::plate_w)
+void kingman_state::plate_w(offs_t offset, u8 data)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -4093,7 +4093,7 @@ WRITE8_MEMBER(kingman_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(kingman_state::grid_w)
+void kingman_state::grid_w(u16 data)
 {
 	// D6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -4197,14 +4197,14 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
 	void vinvader(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(vinvader_state::plate_w)
+void vinvader_state::plate_w(offs_t offset, u8 data)
 {
 	// R1x-R3x(,D4-D6): vfd plate
 	int shift = (offset - 1) * 4;
@@ -4215,7 +4215,7 @@ WRITE8_MEMBER(vinvader_state::plate_w)
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE16_MEMBER(vinvader_state::grid_w)
+void vinvader_state::grid_w(u16 data)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
@@ -4224,7 +4224,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + 1, data >> 4 & 7);
+	plate_w(3 + 1, data >> 4 & 7);
 }
 
 // config

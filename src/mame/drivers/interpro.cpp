@@ -453,7 +453,7 @@ READ32_MEMBER(interpro_state::unmapped_r)
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 
 	return space.unmap();
@@ -467,7 +467,7 @@ WRITE32_MEMBER(interpro_state::unmapped_w)
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 }
 
@@ -481,7 +481,7 @@ READ32_MEMBER(sapphire_state::unmapped_r)
 			m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 			// tell ioga to raise a bus error
-			m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+			m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 		}
 
 	return space.unmap();
@@ -496,7 +496,7 @@ WRITE32_MEMBER(sapphire_state::unmapped_w)
 		m_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
 
 		// tell ioga to raise a bus error
-		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+		m_ioga->bus_error(interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
 	}
 }
 

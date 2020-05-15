@@ -333,7 +333,7 @@ bool clipper_device::memory_translate(int spacenum, int intention, offs_t &addre
 	return ((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address);
 }
 
-WRITE16_MEMBER(clipper_device::set_exception)
+void clipper_device::set_exception(u16 data)
 {
 	LOGMASKED(LOG_EXCEPTION, "external exception 0x%04x triggered\n", data);
 

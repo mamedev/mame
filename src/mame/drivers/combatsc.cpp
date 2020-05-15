@@ -329,7 +329,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_voice_reset_w)
 	m_upd7759->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
+void combatsc_state::combatsc_portA_w(uint8_t data)
 {
 	/* unknown. always write 0 */
 }

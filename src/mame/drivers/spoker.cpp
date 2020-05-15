@@ -97,11 +97,11 @@ private:
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	void nmi_and_coins_w(uint8_t data);
+	void leds_w(uint8_t data);
 
 	// spk116it and spk115it specific
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
+	void video_and_leds_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(magic_w);
 	DECLARE_READ8_MEMBER(magic_r);
 
@@ -182,7 +182,7 @@ static void show_out(running_machine &machine,  uint8_t *out)
 #endif
 }
 
-WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
+void spoker_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((data) & (0x22))
 	{
@@ -206,7 +206,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::video_and_leds_w)
+void spoker_state::video_and_leds_w(uint8_t data)
 {
 	m_leds[4] = BIT(data, 0); // start?
 	m_leds[5] = BIT(data, 2); // l_bet?
@@ -218,7 +218,7 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::leds_w)
+void spoker_state::leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);  // stop_1
 	m_leds[1] = BIT(data, 1);  // stop_2

@@ -120,7 +120,7 @@ uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SAA5050_INTERFACE( trom_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc800c_state::char_ram_r )
+uint8_t abc800c_state::char_ram_r(offs_t offset)
 {
 	int row = offset / 40;
 	int col = offset % 40;

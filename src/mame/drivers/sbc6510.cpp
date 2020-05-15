@@ -74,12 +74,12 @@ public:
 	void sbc6510(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(a2_r);
-	DECLARE_WRITE8_MEMBER(a2_w);
-	DECLARE_READ8_MEMBER(psg_a_r);
-	DECLARE_READ8_MEMBER(psg_b_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(key_r);
+	uint8_t a2_r();
+	void a2_w(uint8_t data);
+	uint8_t psg_a_r();
+	uint8_t psg_b_r();
+	void key_w(uint8_t data);
+	uint8_t key_r();
 
 	void sbc6510_mem(address_map &map);
 	void sbc6510_video_data(address_map &map);
@@ -213,12 +213,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::a2_r )
+uint8_t sbc6510_state::a2_r()
 {
 	return m_2;
 }
 
-WRITE8_MEMBER( sbc6510_state::a2_w )
+void sbc6510_state::a2_w(uint8_t data)
 {
 	m_2 = data;
 	m_terminal->write(data);
@@ -233,17 +233,17 @@ void sbc6510_state::machine_reset()
 {
 }
 
-READ8_MEMBER( sbc6510_state::psg_a_r )
+uint8_t sbc6510_state::psg_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sbc6510_state::psg_b_r )
+uint8_t sbc6510_state::psg_b_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER( sbc6510_state::key_r )
+uint8_t sbc6510_state::key_r()
 {
 	u8 i, data=0;
 
@@ -254,7 +254,7 @@ READ8_MEMBER( sbc6510_state::key_r )
 	return ~data;
 }
 
-WRITE8_MEMBER( sbc6510_state::key_w )
+void sbc6510_state::key_w(uint8_t data)
 {
 	m_key_row = data;
 }

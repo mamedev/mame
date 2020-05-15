@@ -238,7 +238,7 @@ void rollerg_state::machine_reset()
 	m_readzoomroms = 0;
 }
 
-WRITE8_MEMBER( rollerg_state::banking_callback )
+void rollerg_state::banking_callback(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }

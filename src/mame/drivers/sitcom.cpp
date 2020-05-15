@@ -71,13 +71,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
-	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { m_digits[(D << 2) | offset] = data; }
+	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa);
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb);
+	virtual void update_ppi_pa(uint8_t data);
+	virtual void update_ppi_pb(uint8_t data);
 
 	void sitcom_bank(address_map &map);
 	void sitcom_io(address_map &map);
@@ -123,8 +123,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa) override;
-	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb) override;
+	virtual void update_ppi_pa(uint8_t data) override;
+	virtual void update_ppi_pb(uint8_t data) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -224,13 +224,13 @@ void sitcom_state::machine_reset()
 	m_bank->set_bank(0);
 }
 
-WRITE8_MEMBER( sitcom_state::update_ppi_pa )
+void sitcom_state::update_ppi_pa(uint8_t data)
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[0][i] = BIT(data, i);
 }
 
-WRITE8_MEMBER( sitcom_state::update_ppi_pb )
+void sitcom_state::update_ppi_pb(uint8_t data)
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[1][i] = BIT(data, i);
@@ -250,7 +250,7 @@ INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
 }
 
 
-WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
+void sitcom_timer_state::update_ppi_pa(uint8_t data)
 {
 	if (!m_dac_cs && !m_dac_wr)
 		update_dac(data);
@@ -258,7 +258,7 @@ WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
 	m_ds2->data_w(data & 0x7f);
 }
 
-WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
+void sitcom_timer_state::update_ppi_pb(uint8_t data)
 {
 	if (!m_dac_cs && !BIT(data, 0))
 		update_dac(m_ppi->pa_r());

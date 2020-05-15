@@ -86,7 +86,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
+void bladestl_state::bladestl_port_B_w(uint8_t data)
 {
 	// bits 3-5 = ROM bank select
 	m_upd7759->set_rom_bank((data & 0x38) >> 3);

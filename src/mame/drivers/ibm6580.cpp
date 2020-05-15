@@ -162,10 +162,10 @@ private:
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
-	DECLARE_READ8_MEMBER(ppi_c_r);
+	uint8_t ppi_a_r();
+	void led_w(uint8_t data);
+	void ppi_c_w(uint8_t data);
+	uint8_t ppi_c_r();
 
 	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
@@ -178,8 +178,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(floppy_hdl);
 	DECLARE_WRITE8_MEMBER(dmapg_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -355,7 +355,7 @@ WRITE16_MEMBER(ibm6580_state::unk_latch_w)
 	m_p40 |= 0x10;
 }
 
-WRITE8_MEMBER(ibm6580_state::led_w)
+void ibm6580_state::led_w(uint8_t data)
 {
 	output().set_value("led5", BIT(data, 7));
 	output().set_value("led6", BIT(data, 6));
@@ -417,7 +417,7 @@ WRITE8_MEMBER(ibm6580_state::led_w)
 	}
 }
 
-WRITE8_MEMBER(ibm6580_state::ppi_c_w)
+void ibm6580_state::ppi_c_w(uint8_t data)
 {
 	LOG("PPI Port C <- %02x\n", data);
 
@@ -433,7 +433,7 @@ WRITE8_MEMBER(ibm6580_state::ppi_c_w)
 	m_kbd->ack_w(BIT(data, 5));
 }
 
-READ8_MEMBER(ibm6580_state::ppi_c_r)
+uint8_t ibm6580_state::ppi_c_r()
 {
 	uint8_t data = 0;
 
@@ -444,7 +444,7 @@ READ8_MEMBER(ibm6580_state::ppi_c_r)
 	return data;
 }
 
-READ8_MEMBER(ibm6580_state::ppi_a_r)
+uint8_t ibm6580_state::ppi_a_r()
 {
 	uint8_t data = m_kb_fifo.dequeue();
 
@@ -486,13 +486,13 @@ WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(ibm6580_state::memory_read_byte)
+uint8_t ibm6580_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(ibm6580_state::memory_write_byte)
+void ibm6580_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);

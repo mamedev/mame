@@ -248,15 +248,15 @@ private:
 	DECLARE_WRITE8_MEMBER(crt250_questions_bank_w);
 	DECLARE_WRITE8_MEMBER(ds1644_w);
 	DECLARE_READ8_MEMBER(ds1644_r);
-	DECLARE_READ8_MEMBER(_8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(crt250_port_b_w);
-	DECLARE_WRITE8_MEMBER(ay8930_port_b_w);
-	DECLARE_READ8_MEMBER(audio_pio_port_a_r);
-	DECLARE_READ8_MEMBER(audio_pio_port_b_r);
-	DECLARE_WRITE8_MEMBER(audio_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(audio_pio_port_b_w);
-	DECLARE_WRITE8_MEMBER(io_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(io_pio_port_b_w);
+	uint8_t _8255_port_c_r();
+	void crt250_port_b_w(uint8_t data);
+	void ay8930_port_b_w(uint8_t data);
+	uint8_t audio_pio_port_a_r();
+	uint8_t audio_pio_port_b_r();
+	void audio_pio_port_a_w(uint8_t data);
+	void audio_pio_port_b_w(uint8_t data);
+	void io_pio_port_a_w(uint8_t data);
+	void io_pio_port_b_w(uint8_t data);
 
 	DECLARE_MACHINE_START(crt250_questions);
 	DECLARE_MACHINE_START(crt250_crt252_crt258);
@@ -876,13 +876,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::_8255_port_c_r)
+uint8_t meritm_state::_8255_port_c_r()
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 }
 
-WRITE8_MEMBER(meritm_state::crt250_port_b_w)
+void meritm_state::crt250_port_b_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -905,7 +905,7 @@ WRITE8_MEMBER(meritm_state::crt250_port_b_w)
  Port B: Bits 0,1 used
 */
 
-WRITE8_MEMBER(meritm_state::ay8930_port_b_w)
+void meritm_state::ay8930_port_b_w(uint8_t data)
 {
 	// lamps
 }
@@ -916,7 +916,7 @@ WRITE8_MEMBER(meritm_state::ay8930_port_b_w)
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::audio_pio_port_a_r)
+uint8_t meritm_state::audio_pio_port_a_r()
 {
 	/*
 
@@ -936,7 +936,7 @@ READ8_MEMBER(meritm_state::audio_pio_port_a_r)
 	return m_vint;
 }
 
-READ8_MEMBER(meritm_state::audio_pio_port_b_r)
+uint8_t meritm_state::audio_pio_port_b_r()
 {
 	/*
 
@@ -956,7 +956,7 @@ READ8_MEMBER(meritm_state::audio_pio_port_b_r)
 	return m_ds1204->read_dq();
 }
 
-WRITE8_MEMBER(meritm_state::audio_pio_port_a_w)
+void meritm_state::audio_pio_port_a_w(uint8_t data)
 {
 	/*
 
@@ -977,7 +977,7 @@ WRITE8_MEMBER(meritm_state::audio_pio_port_a_w)
 	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
 }
 
-WRITE8_MEMBER(meritm_state::audio_pio_port_b_w)
+void meritm_state::audio_pio_port_b_w(uint8_t data)
 {
 	/*
 
@@ -999,7 +999,7 @@ WRITE8_MEMBER(meritm_state::audio_pio_port_b_w)
 	m_ds1204->write_dq(data & 0x01);
 }
 
-WRITE8_MEMBER(meritm_state::io_pio_port_a_w)
+void meritm_state::io_pio_port_a_w(uint8_t data)
 {
 	/*
 
@@ -1017,7 +1017,7 @@ WRITE8_MEMBER(meritm_state::io_pio_port_a_w)
 	*/
 }
 
-WRITE8_MEMBER(meritm_state::io_pio_port_b_w)
+void meritm_state::io_pio_port_b_w(uint8_t data)
 {
 	/*
 

@@ -32,7 +32,7 @@ as is.
  driver by Pierpaolo Prazzoli
 
 Notes:
-- Hardware is similar to the one in gameplan.c
+- Hardware is similar to the one in gameplan.cpp
 
 */
 
@@ -46,7 +46,7 @@ Notes:
 #include "speaker.h"
 
 
-READ8_MEMBER(gameplan_state::trvquest_question_r)
+uint8_t gameplan_state::trvquest_question_r(offs_t offset)
 {
 	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
 }

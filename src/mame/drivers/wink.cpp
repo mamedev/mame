@@ -63,7 +63,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_READ8_MEMBER(prot_r);
 	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_READ8_MEMBER(sound_r);
+	uint8_t sound_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -361,7 +361,7 @@ static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
-READ8_MEMBER(wink_state::sound_r)
+uint8_t wink_state::sound_r()
 {
 	return m_sound_flag;
 }

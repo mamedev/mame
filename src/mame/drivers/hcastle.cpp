@@ -158,7 +158,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(hcastle_state::volume_callback)
+void hcastle_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

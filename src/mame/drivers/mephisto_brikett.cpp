@@ -144,7 +144,7 @@ private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(sound_r);
 
-	DECLARE_WRITE8_MEMBER(esb_w);
+	void esb_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(esb_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
@@ -269,7 +269,7 @@ READ8_MEMBER(brikett_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(brikett_state::esb_w)
+void brikett_state::esb_w(u8 data)
 {
 	// CDP1852 SR + DO0-DO7 goes to external port, to chessboard
 	if (!m_inputs[5].read_safe(0))

@@ -45,7 +45,7 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(ironhors_state::filter_w)
+void ironhors_state::filter_w(uint8_t data)
 {
 	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
 	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
@@ -433,11 +433,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 	}
 }
 
-READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
-{
-	return m_soundlatch->read();
-}
-
 void ironhors_state::farwest(machine_config &config)
 {
 	ironhors(config);
@@ -453,7 +448,7 @@ void ironhors_state::farwest(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(ironhors_state::screen_update_farwest));
 
-	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(FUNC(ironhors_state::farwest_soundlatch_r));
+	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 

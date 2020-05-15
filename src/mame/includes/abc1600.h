@@ -117,11 +117,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
 
-	DECLARE_READ8_MEMBER( cio_pa_r );
-	DECLARE_READ8_MEMBER( cio_pb_r );
-	DECLARE_WRITE8_MEMBER( cio_pb_w );
-	DECLARE_READ8_MEMBER( cio_pc_r );
-	DECLARE_WRITE8_MEMBER( cio_pc_w );
+	uint8_t cio_pa_r();
+	uint8_t cio_pb_r();
+	void cio_pb_w(uint8_t data);
+	uint8_t cio_pc_r();
+	void cio_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 

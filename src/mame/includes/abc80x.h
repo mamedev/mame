@@ -211,7 +211,7 @@ public:
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
+	uint8_t char_ram_r(offs_t offset);
 	void abc800c_palette(palette_device &palette) const;
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);

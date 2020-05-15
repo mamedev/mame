@@ -484,7 +484,7 @@ static const char *const gaplus_sample_names[] =
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::out_lamps0)
+void gaplus_state::out_lamps0(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0);
 	m_lamps[1] = BIT(data, 1);
@@ -492,7 +492,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps0)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-WRITE8_MEMBER(gaplus_state::out_lamps1)
+void gaplus_state::out_lamps1(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
