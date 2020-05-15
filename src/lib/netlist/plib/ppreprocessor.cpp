@@ -556,7 +556,14 @@ namespace plib {
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
-					if (args.next_ws() == "(")
+					auto prevdef = get_define(n);
+					if (lti.size() == 2)
+					{
+						if (prevdef != nullptr && prevdef->m_replace != "")
+							error("redefinition of " + n);
+						m_defines.insert({n, define_t(n, "")});
+					}
+					else if (args.next_ws() == "(")
 					{
 						define_t def(n);
 						def.m_has_params = true;
@@ -576,6 +583,8 @@ namespace plib {
 						while (!args.eod())
 							r += args.next_ws();
 						def.m_replace = r;
+						if (prevdef != nullptr && prevdef->m_replace != r)
+							error("redefinition of " + n);
 						m_defines.insert({n, def});
 					}
 					else
@@ -583,6 +592,8 @@ namespace plib {
 						pstring r;
 						while (!args.eod())
 							r += args.next_ws();
+						if (prevdef != nullptr && prevdef->m_replace != r)
+							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, r)});
 					}
 				}
