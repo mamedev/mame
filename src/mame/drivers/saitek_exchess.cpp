@@ -14,10 +14,12 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+
 #include "screen.h"
 
 // internal artwork
