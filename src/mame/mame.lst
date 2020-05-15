@@ -11137,6 +11137,7 @@ vsav                            // 19/05/1997 (c) 1997 (Euro)
 vsav2                           // 13/09/1997 (c) 1997 (Japan)
 vsav2d                          //
 vsava                           // 19/05/1997 (c) 1997 (Asia)
+vsavb                           // 19/05/1997 (c) 1997 (Brazil)
 vsavd                           //
 vsavh                           // 19/05/1997 (c) 1997 (Hispanic)
 vsavj                           // 19/05/1997 (c) 1997 (Japan)
@@ -16223,7 +16224,9 @@ terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
 terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
 
 @source:hotblock.cpp
-hotblock                        // (c) 1993 Nics? / Nix?
+hotblock                        // (c) 1993 Nics? / NIX?
+hotblocka                       // (c) 1993 Nics? / NIX?
+hotblockb                       // (c) 1993 Nics? / NIX?
 
 @source:hotstuff.cpp
 hotstuff                        //
@@ -18848,6 +18851,9 @@ korg707                         //
 @source:korgdss1.cpp
 dss1                            //
 dssmsrk                         //
+
+@source:korgdvp1.cpp
+dvp1                            //
 
 @source:korgdw8k.cpp
 dw8000                          //
@@ -22159,6 +22165,7 @@ mephisto2a
 mephisto2e
 mephisto3
 mephisto3b
+mephistoj
 
 @source:mephisto_glasgow.cpp
 amsterd                         // Amsterdam

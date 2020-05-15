@@ -157,7 +157,7 @@ READ_LINE_MEMBER(comx_expansion_slot_device::ef4_r)
 //  sc_w - state code/N0-N2 write
 //-------------------------------------------------
 
-WRITE8_MEMBER(comx_expansion_slot_device::sc_w)
+void comx_expansion_slot_device::sc_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 		m_card->comx_sc_w(offset, data);

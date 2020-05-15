@@ -140,10 +140,10 @@ protected:
 	void port3f_w(u8 data);
 	u8 port3e_r();
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<mc6845_device> m_crtc;

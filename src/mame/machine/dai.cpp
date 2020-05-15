@@ -53,7 +53,7 @@ void dai_state::dai_update_memory(int dai_rom_bank)
 }
 
 
-READ8_MEMBER(dai_state::dai_keyboard_r)
+uint8_t dai_state::dai_keyboard_r()
 {
 	uint8_t data = 0x00;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -67,7 +67,7 @@ READ8_MEMBER(dai_state::dai_keyboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(dai_state::dai_keyboard_w)
+void dai_state::dai_keyboard_w(uint8_t data)
 {
 	m_keyboard_scan_mask = data;
 }

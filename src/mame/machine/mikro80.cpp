@@ -30,7 +30,7 @@ void mikro80_state::init_radio99()
 	m_key_mask = 0xff;
 }
 
-READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
+uint8_t mikro80_state::mikro80_8255_portb_r()
 {
 	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
@@ -44,17 +44,17 @@ READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
 	return key & m_key_mask;
 }
 
-READ8_MEMBER(mikro80_state::mikro80_8255_portc_r)
+uint8_t mikro80_state::mikro80_8255_portc_r()
 {
 	return m_io_line8->read();
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_8255_porta_w)
+void mikro80_state::mikro80_8255_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_8255_portc_w)
+void mikro80_state::mikro80_8255_portc_w(uint8_t data)
 {
 }
 

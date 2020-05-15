@@ -65,7 +65,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -91,7 +91,7 @@ public:
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(uint8_t data) override;
 
 private:
 	uint8_t m_bank_base;
@@ -108,7 +108,7 @@ public:
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -131,7 +131,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides

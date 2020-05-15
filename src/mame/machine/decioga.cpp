@@ -164,13 +164,13 @@ void dec_ioga_device::set_dma_space(address_space *space)
 	m_maincpu_space = space;
 }
 
-READ16_MEMBER(dec_ioga_device::lance_dma_r)
+u16 dec_ioga_device::lance_dma_r(offs_t offset)
 {
 	LOGMASKED(LOG_LANCE_DMA, "lance_dma_r: %08x (phys %08x)\n", offset, (offset<<1) + (m_dmaptrs[2]>>3));
 	return m_maincpu_space->read_word((offset<<1) + (m_dmaptrs[2]>>3));
 }
 
-WRITE16_MEMBER(dec_ioga_device::lance_dma_w)
+void dec_ioga_device::lance_dma_w(offs_t offset, u16 data)
 {
 	LOGMASKED(LOG_LANCE_DMA, "lance_dma_w: %04x to %08x\n", data, offset);
 	m_maincpu_space->write_word((offset<<1) + (m_dmaptrs[2]>>3), data);

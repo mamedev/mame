@@ -42,7 +42,7 @@ private:
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	void port_a_w(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(music_w);
 	DECLARE_WRITE8_MEMBER(pg1_w);
@@ -223,7 +223,7 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( ht6000_state::port_a_w )
+void ht6000_state::port_a_w(uint8_t data)
 {
 	logerror("port_a_w: %02x\n", data);
 	m_port_a = data;

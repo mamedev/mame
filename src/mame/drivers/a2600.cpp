@@ -115,7 +115,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	/* 0x300 - 0x3ff already masked out */
 }
 
-WRITE8_MEMBER(a2600_base_state::switch_A_w)
+void a2600_base_state::switch_A_w(uint8_t data)
 {
 	/* Left controller port */
 	m_joy1->joy_w( data >> 4 );
@@ -131,7 +131,7 @@ WRITE8_MEMBER(a2600_base_state::switch_A_w)
 //  }
 }
 
-READ8_MEMBER(a2600_base_state::switch_A_r)
+uint8_t a2600_base_state::switch_A_r()
 {
 	uint8_t val = 0;
 
@@ -144,7 +144,7 @@ READ8_MEMBER(a2600_base_state::switch_A_r)
 	return val;
 }
 
-WRITE8_MEMBER(a2600_base_state::switch_B_w)
+void a2600_base_state::switch_B_w(uint8_t data)
 {
 }
 
@@ -152,13 +152,7 @@ WRITE_LINE_MEMBER(a2600_base_state::irq_callback)
 {
 }
 
-READ8_MEMBER(a2600_base_state::riot_input_port_8_r)
-{
-	return m_swb->read();
-}
-
-
-READ16_MEMBER(a2600_base_state::a2600_read_input_port)
+uint16_t a2600_base_state::a2600_read_input_port(offs_t offset)
 {
 	switch (offset)
 	{
@@ -192,7 +186,7 @@ READ16_MEMBER(a2600_base_state::a2600_read_input_port)
    Q-Bert's Qubes (NTSC,F6) at 0x1594
    Berzerk at 0xF093.
 */
-READ8_MEMBER(a2600_base_state::a2600_get_databus_contents)
+uint8_t a2600_base_state::a2600_get_databus_contents(offs_t offset)
 {
 	uint16_t  last_address, prev_address;
 	uint8_t   last_byte, prev_byte;
@@ -230,11 +224,9 @@ static const rectangle visarea[4] = {
 };
 #endif
 
-WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback)
+void a2600_base_state::a2600_tia_vsync_callback(uint16_t data)
 {
-	int i;
-
-	for ( i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
+	for ( int i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
@@ -247,11 +239,9 @@ WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback)
 	}
 }
 
-WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback_pal)
+void a2600_base_state::a2600_tia_vsync_callback_pal(uint16_t data)
 {
-	int i;
-
-	for ( i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
+	for ( int i = 0; i < ARRAY_LENGTH(supported_screen_heights); i++ )
 	{
 		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
 		{
@@ -530,14 +520,14 @@ void a2600_state::a2600(machine_config &config)
 	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->in_pb_callback().set_ioport("SWB");
 	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
@@ -575,14 +565,14 @@ void a2600_state::a2600p(machine_config &config)
 	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->in_pb_callback().set_ioport("SWB");
 	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif

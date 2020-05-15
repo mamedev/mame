@@ -47,6 +47,11 @@ namespace analog
 	// nld_Q - Base classes
 	// -----------------------------------------------------------------------------
 
+	enum class bjt_type {
+		BJT_NPN,
+		BJT_PNP
+	};
+
 	/// \brief Class representing the bjt model parameters.
 	///
 	///  This is the model representation of the bjt model. Typically, SPICE uses
@@ -101,7 +106,8 @@ namespace analog
 	{
 	public:
 		bjt_model_t(param_model_t &model)
-		: m_IS (model, "IS")
+		: m_type((model.type() == "NPN") ? bjt_type::BJT_NPN : bjt_type::BJT_PNP)
+		, m_IS (model, "IS")
 		, m_BF (model, "BF")
 		, m_NF (model, "NF")
 		, m_BR (model, "BR")
@@ -110,6 +116,7 @@ namespace analog
 		, m_CJC(model, "CJC")
 		{}
 
+		bjt_type m_type;
 		param_model_t::value_t m_IS;  //!< transport saturation current
 		param_model_t::value_t m_BF;  //!< ideal maximum forward beta
 		param_model_t::value_t m_NF;  //!< forward current emission coefficient
@@ -125,14 +132,10 @@ namespace analog
 	NETLIB_BASE_OBJECT(QBJT)
 	{
 	public:
-		enum q_type {
-			BJT_NPN,
-			BJT_PNP
-		};
 
 		NETLIB_CONSTRUCTOR_EX(QBJT, const pstring &model = "NPN")
 		, m_model(*this, "MODEL", model)
-		, m_qtype(BJT_NPN)
+		, m_qtype(bjt_type::BJT_NPN)
 		{
 		}
 
@@ -141,14 +144,14 @@ namespace analog
 		//NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-		q_type qtype() const noexcept { return m_qtype; }
-		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
-		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
+		bjt_type qtype() const noexcept { return m_qtype; }
+		bool is_qtype(bjt_type atype) const noexcept { return m_qtype == atype; }
+		void set_qtype(bjt_type atype) noexcept { m_qtype = atype; }
 	protected:
 
 		param_model_t m_model;
 	private:
-		q_type m_qtype;
+		bjt_type m_qtype;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -172,13 +175,14 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
 		NETLIB_CONSTRUCTOR(QBJT_switch)
-			, m_RB(*this, "m_RB", true)
-			, m_RC(*this, "m_RC", true)
-			, m_BC(*this, "m_BC", true)
-			, m_gB(nlconst::cgmin())
-			, m_gC(nlconst::cgmin())
-			, m_V(nlconst::zero())
-			, m_state_on(*this, "m_state_on", 0U)
+		, m_modacc(m_model)
+		, m_RB(*this, "m_RB", true)
+		, m_RC(*this, "m_RC", true)
+		, m_BC(*this, "m_BC", true)
+		, m_gB(nlconst::cgmin())
+		, m_gC(nlconst::cgmin())
+		, m_V(nlconst::zero())
+		, m_state_on(*this, "m_state_on", 0U)
 		{
 			register_subalias("B", m_RB.P());
 			register_subalias("E", m_RB.N());
@@ -195,6 +199,7 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
+		bjt_model_t m_modacc;
 		nld_twoterm m_RB;
 		nld_twoterm m_RC;
 		nld_twoterm m_BC;
@@ -314,15 +319,13 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		bjt_model_t model(m_model);
-
-		nl_fptype IS = model.m_IS;
-		nl_fptype BF = model.m_BF;
-		nl_fptype NF = model.m_NF;
-		//nl_fptype VJE = model.dValue("VJE", 0.75);
+		nl_fptype IS = m_modacc.m_IS;
+		nl_fptype BF = m_modacc.m_BF;
+		nl_fptype NF = m_modacc.m_NF;
+		//nl_fptype VJE = m_modacc.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype(m_modacc.m_type);
 
 		nl_fptype alpha = BF / (nlconst::one() + BF);
 
@@ -347,7 +350,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	{
-		const nl_fptype m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const nl_fptype m = (is_qtype( bjt_type::BJT_NPN) ? 1 : -1);
 
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
@@ -398,7 +401,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity(qtype() == BJT_NPN ? nlconst::one() : -nlconst::one());
+		const nl_fptype polarity(qtype() == bjt_type::BJT_NPN ? nlconst::one() : -nlconst::one());
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
@@ -430,10 +433,10 @@ namespace analog
 		nl_fptype NF = m_modacc.m_NF;
 		nl_fptype BR = m_modacc.m_BR;
 		nl_fptype NR = m_modacc.m_NR;
-		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
+		//nl_fptype VJE = m_m_modacc.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
+		set_qtype(m_modacc.m_type);
 
 		m_alpha_f = BF / (nlconst::one() + BF);
 		m_alpha_r = BR / (nlconst::one() + BR);

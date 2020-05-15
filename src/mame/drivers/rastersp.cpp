@@ -129,8 +129,8 @@ private:
 	DECLARE_WRITE32_MEMBER(dsp_486_int_w);
 	DECLARE_READ32_MEMBER(dsp_speedup_r);
 	DECLARE_WRITE32_MEMBER(dsp_speedup_w);
-	DECLARE_READ32_MEMBER(ncr53c700_read);
-	DECLARE_WRITE32_MEMBER(ncr53c700_write);
+	uint32_t ncr53c700_read(offs_t offset, uint32_t mem_mask = ~0);
+	void ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	TIMER_CALLBACK_MEMBER(tms_timer1);
@@ -842,12 +842,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ32_MEMBER(rastersp_state::ncr53c700_read)
+uint32_t rastersp_state::ncr53c700_read(offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
 }
 
-WRITE32_MEMBER(rastersp_state::ncr53c700_write)
+void rastersp_state::ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }

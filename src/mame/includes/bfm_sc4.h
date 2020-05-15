@@ -182,12 +182,12 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
+	uint8_t bfm_sc4_duart_input_r();
+	void bfm_sc4_duart_output_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
-	DECLARE_READ8_MEMBER(m68307_duart_input_r);
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
+	uint8_t m68307_duart_input_r();
+	void m68307_duart_output_w(uint8_t data);
 
 	void init_sc4();
 	void init_sc4mbus();

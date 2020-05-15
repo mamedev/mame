@@ -45,6 +45,7 @@ namespace plib {
 		, m_stat_cur_alloc(0)
 		, m_stat_max_alloc(0)
 		{
+			icount()++;
 		}
 
 		PCOPYASSIGNMOVE(mempool, delete)
@@ -61,6 +62,11 @@ namespace plib {
 				}
 				aligned_arena::free(b);
 				//::operator delete(b->m_data);
+			}
+			if (icount()-- == 1)
+			{
+				if (sinfo().size() != 0)
+					plib::perrlogger("Still found {} info blocks after last mempool deleted\n", sinfo().size());
 			}
 		}
 
@@ -229,6 +235,12 @@ namespace plib {
 		{
 			static std::unordered_map<void *, info> spinfo;
 			return spinfo;
+		}
+
+		static std::size_t &icount()
+		{
+			static std::size_t count = 0;
+			return count;
 		}
 
 		size_t m_min_alloc;

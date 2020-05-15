@@ -91,9 +91,9 @@ void grid210x_device::device_start() {
 
 void grid210x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) {
     if (m_floppy_loop_state == GRID210X_STATE_READING_DATA) {
-        uint8_t data[io_size];
+        std::unique_ptr<uint8_t[]> data(new uint8_t[io_size]);
         fseek(floppy_sector_number * 512, SEEK_SET);
-        fread(data, io_size);
+        fread(data.get(), io_size);
         for (int i = 0; i < io_size; i++) {
             m_output_data_buffer.push(data[i]);
         }

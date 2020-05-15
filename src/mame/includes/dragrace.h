@@ -51,8 +51,8 @@ public:
 	void dragrace(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(speed1_w);
-	DECLARE_WRITE8_MEMBER(speed2_w);
+	void speed1_w(uint8_t data);
+	void speed2_w(uint8_t data);
 	DECLARE_READ8_MEMBER(dragrace_input_r);
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);

@@ -521,7 +521,7 @@ void st_state::mouse_tick()
 //  ikbd_port1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::ikbd_port1_r )
+uint8_t st_state::ikbd_port1_r()
 {
 	/*
 
@@ -565,7 +565,7 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 //  ikbd_port2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::ikbd_port2_r )
+uint8_t st_state::ikbd_port2_r()
 {
 	/*
 
@@ -592,7 +592,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 //  ikbd_port2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::ikbd_port2_w )
+void st_state::ikbd_port2_w(uint8_t data)
 {
 	/*
 
@@ -618,7 +618,7 @@ WRITE8_MEMBER( st_state::ikbd_port2_w )
 //  ikbd_port3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::ikbd_port3_w )
+void st_state::ikbd_port3_w(uint8_t data)
 {
 	/*
 
@@ -647,7 +647,7 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
 //  ikbd_port4_r -
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::ikbd_port4_r )
+uint8_t st_state::ikbd_port4_r()
 {
 	/*
 
@@ -681,7 +681,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 //  ikbd_port4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::ikbd_port4_w )
+void st_state::ikbd_port4_w(uint8_t data)
 {
 	/*
 
@@ -1698,7 +1698,7 @@ INPUT_PORTS_END
 //  ay8910_interface psg_intf
 //-------------------------------------------------
 
-WRITE8_MEMBER( st_state::psg_pa_w )
+void st_state::psg_pa_w(uint8_t data)
 {
 	/*
 
@@ -1742,7 +1742,7 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 //  ay8910_interface stbook_psg_intf
 //-------------------------------------------------
 
-WRITE8_MEMBER( stbook_state::psg_pa_w )
+void stbook_state::psg_pa_w(uint8_t data)
 {
 	/*
 

@@ -120,11 +120,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin3_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin4_interrupt_clear_w);
-	DECLARE_WRITE8_MEMBER(pia_0_port_a_w);
-	DECLARE_WRITE8_MEMBER(pia_0_port_b_w);
-	DECLARE_READ8_MEMBER(pia_0_port_b_r);
-	DECLARE_READ8_MEMBER(pia_1_port_a_r);
-	DECLARE_READ8_MEMBER(pia_1_port_b_r);
+	void pia_0_port_a_w(uint8_t data);
+	void pia_0_port_b_w(uint8_t data);
+	uint8_t pia_0_port_b_r();
+	uint8_t pia_1_port_a_r();
+	uint8_t pia_1_port_b_r();
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2s_2_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(ttl7474_2u_1_q_cb);
@@ -132,7 +132,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
 	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
 
-	DECLARE_WRITE8_MEMBER(ttl74148_3s_cb);
+	void ttl74148_3s_cb(uint8_t data);
 
 	void timer_tick();
 	void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy);

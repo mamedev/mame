@@ -563,7 +563,7 @@ WRITE_LINE_MEMBER(mpu4_state::ic2_o3_callback)
 
 /* 6821 PIA handlers */
 /* IC3, lamp data lines + alpha numeric display */
-WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
+void mpu4_state::pia_ic3_porta_w(uint8_t data)
 {
 	int i;
 	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", machine().describe_context(),data));
@@ -585,7 +585,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
 	}
 }
 
-WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
+void mpu4_state::pia_ic3_portb_w(uint8_t data)
 {
 	int i;
 	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", machine().describe_context(),data));
@@ -714,7 +714,7 @@ void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
-WRITE8_MEMBER(mpu4_state::pia_ic4_porta_w)
+void mpu4_state::pia_ic4_porta_w(uint8_t data)
 {
 	if(m_ic23_active)
 	{
@@ -733,7 +733,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic4_porta_w)
 	}
 }
 
-WRITE8_MEMBER(mpu4_state::pia_ic4_portb_w)
+void mpu4_state::pia_ic4_portb_w(uint8_t data)
 {
 	if (m_reel_mux)
 	{
@@ -749,7 +749,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic4_portb_w)
 	}
 }
 
-READ8_MEMBER(mpu4_state::pia_ic4_portb_r)
+uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	/// TODO: this shouldn't be clocked from a read callback
 	if ( m_serial_data )
@@ -824,7 +824,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic4_cb2_w)
 }
 
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
-READ8_MEMBER(mpu4_state::pia_ic5_porta_r)
+uint8_t mpu4_state::pia_ic5_porta_r()
 {
 	if (m_lamp_extender == LARGE_CARD_A)
 	{
@@ -861,7 +861,7 @@ READ8_MEMBER(mpu4_state::pia_ic5_porta_r)
 	}
 }
 
-WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
+void mpu4_state::pia_ic5_porta_w(uint8_t data)
 {
 	int i;
 	if (m_hopper == HOPPER_NONDUART_A)
@@ -1020,7 +1020,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 	}
 }
 
-WRITE8_MEMBER(mpu4_state::pia_ic5_portb_w)
+void mpu4_state::pia_ic5_portb_w(uint8_t data)
 {
 	if (m_hopper == HOPPER_NONDUART_B)
 	{
@@ -1033,7 +1033,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_portb_w)
 	}
 
 }
-READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
+uint8_t mpu4_state::pia_ic5_portb_r()
 {
 	if (m_hopper == HOPPER_NONDUART_B)
 	{/*
@@ -1141,7 +1141,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic5_cb2_w)
 
 
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
-WRITE8_MEMBER(mpu4_state::pia_ic6_portb_w)
+void mpu4_state::pia_ic6_portb_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", machine().describe_context(),data));
 
@@ -1162,7 +1162,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic6_portb_w)
 }
 
 
-WRITE8_MEMBER(mpu4_state::pia_ic6_porta_w)
+void mpu4_state::pia_ic6_porta_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Write A %2x\n", machine().describe_context(),data));
 	if (m_mod_number <4)
@@ -1198,7 +1198,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 
 
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
-WRITE8_MEMBER(mpu4_state::pia_ic7_porta_w)
+void mpu4_state::pia_ic7_porta_w(uint8_t data)
 {
 	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", machine().describe_context(),data));
 	if (m_reel_mux == SEVEN_REEL)
@@ -1217,7 +1217,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic7_porta_w)
 	}
 }
 
-WRITE8_MEMBER(mpu4_state::pia_ic7_portb_w)
+void mpu4_state::pia_ic7_portb_w(uint8_t data)
 {
 	if (m_hopper == HOPPER_DUART_A)
 	{
@@ -1231,7 +1231,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic7_portb_w)
 	m_mmtr_data = data;
 }
 
-READ8_MEMBER(mpu4_state::pia_ic7_portb_r)
+uint8_t mpu4_state::pia_ic7_portb_r()
 {
 /* The meters are connected to a voltage drop sensor, where current
 flowing through them also passes through pin B7, meaning that when
@@ -1276,7 +1276,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic7_cb2_w)
 
 
 /* IC8, Inputs, TRIACS, alpha clock */
-READ8_MEMBER(mpu4_state::pia_ic8_porta_r)
+uint8_t mpu4_state::pia_ic8_porta_r()
 {
 	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", machine().describe_context()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
@@ -1294,7 +1294,7 @@ READ8_MEMBER(mpu4_state::pia_ic8_porta_r)
 }
 
 
-WRITE8_MEMBER(mpu4_state::pia_ic8_portb_w)
+void mpu4_state::pia_ic8_portb_w(uint8_t data)
 {
 	if (m_hopper == HOPPER_DUART_B)
 	{
@@ -1331,13 +1331,13 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 
 // universal sampled sound program card PCB 683077
 // Sampled sound card, using a PIA and PTM for timing and data handling
-WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
+void mpu4_state::pia_gb_porta_w(uint8_t data)
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
 	m_msm6376->write(data);
 }
 
-WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
+void mpu4_state::pia_gb_portb_w(uint8_t data)
 {
 	int changed = m_expansion_latch^data;
 
@@ -1366,7 +1366,7 @@ WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
 	m_msm6376->ch2_w(data&0x02);
 	m_msm6376->st_w(data&0x01);
 }
-READ8_MEMBER(mpu4_state::pia_gb_portb_r)
+uint8_t mpu4_state::pia_gb_portb_r()
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",machine().describe_context()));
 	int data=0;

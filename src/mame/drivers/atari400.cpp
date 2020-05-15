@@ -285,17 +285,17 @@ private:
 
 	DECLARE_MACHINE_RESET(a400);
 
-	DECLARE_WRITE8_MEMBER(gtia_cb);
+	void gtia_cb(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
-	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
+	void a600xl_pia_pb_w(uint8_t data);
+	void a800xl_pia_pb_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(read_d5xx);    // at least one cart type can enable/disable roms when reading
 	DECLARE_WRITE8_MEMBER(disable_cart);
 
 	// these are needed to handle carts which can disable ROM without
 	// installing/disinstalling continuously RAM and ROM (with e.g. big
-	// preformance hit in Williams carts)
+	// performance hit in Williams carts)
 	DECLARE_READ8_MEMBER(special_read_8000);
 	DECLARE_WRITE8_MEMBER(special_write_8000);
 	DECLARE_READ8_MEMBER(special_read_a000);
@@ -2078,7 +2078,7 @@ MACHINE_START_MEMBER( a400_state, a5200 )
  *
  **************************************************************/
 
-WRITE8_MEMBER(a400_state::gtia_cb)
+void a400_state::gtia_cb(uint8_t data)
 {
 	m_dac->write(BIT(data, 3));
 }
@@ -2089,12 +2089,12 @@ WRITE8_MEMBER(a400_state::gtia_cb)
  *
  **************************************************************/
 
-WRITE8_MEMBER(a400_state::a600xl_pia_pb_w)
+void a400_state::a600xl_pia_pb_w(uint8_t data)
 {
 	m_mmu = data;
 }
 
-WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
+void a400_state::a800xl_pia_pb_w(uint8_t data)
 {
 	if (m_pia->port_b_z_mask() != 0xff)
 	{

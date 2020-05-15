@@ -43,14 +43,14 @@ WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
 	m_z80_latch = data;
 }
 
-READ8_MEMBER(blktiger_state::blktiger_from_main_r)
+uint8_t blktiger_state::blktiger_from_main_r()
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return m_z80_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
+void blktiger_state::blktiger_to_main_w(uint8_t data)
 {
 	//printf("%02x write\n",data);
 	m_i8751_latch = data;

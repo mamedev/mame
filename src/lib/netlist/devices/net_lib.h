@@ -64,6 +64,7 @@
 #include "nld_74193.h"
 #include "nld_74194.h"
 #include "nld_74365.h"
+#include "nld_74377.h"
 #include "nld_74393.h"
 #include "nld_7448.h"
 #include "nld_7450.h"

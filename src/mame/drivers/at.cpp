@@ -241,10 +241,10 @@ private:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_READ16_MEMBER( wd7600_ior );
-	DECLARE_WRITE16_MEMBER( wd7600_iow );
+	uint16_t wd7600_ior(offs_t offset);
+	void wd7600_iow(offs_t offset, uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
-	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
+	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
 	void megapc_io(address_map &map);
 	void megapc_map(address_map &map);
@@ -383,7 +383,7 @@ void at_vrom_fix_state::init_megapcpla()
 	ROM[0x3ffff] = 0x41;  // to correct checksum
 }
 
-READ16_MEMBER( megapc_state::wd7600_ior )
+uint16_t megapc_state::wd7600_ior(offs_t offset)
 {
 	if (offset < 4)
 		return m_isabus->dack_r(offset);
@@ -391,7 +391,7 @@ READ16_MEMBER( megapc_state::wd7600_ior )
 		return m_isabus->dack16_r(offset);
 }
 
-WRITE16_MEMBER( megapc_state::wd7600_iow )
+void megapc_state::wd7600_iow(offs_t offset, uint16_t data)
 {
 	if (offset < 4)
 		m_isabus->dack_w(offset, data);

@@ -299,8 +299,8 @@ private:
 	required_device<dac_word_interface> m_dac;
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
-	DECLARE_READ8_MEMBER(duart_input);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	uint8_t duart_input();
+	void duart_output(uint8_t data);
 	DECLARE_READ8_MEMBER(nvram_recall);
 	DECLARE_WRITE8_MEMBER(led_write);
 	DECLARE_WRITE8_MEMBER(nvram_store);
@@ -338,7 +338,7 @@ WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
-READ8_MEMBER(dectalk_state::duart_input)
+uint8_t dectalk_state::duart_input()
 {
 	uint8_t data = 0;
 	data |= m_duart_inport&0xf;
@@ -348,7 +348,7 @@ READ8_MEMBER(dectalk_state::duart_input)
 	return data;
 }
 
-WRITE8_MEMBER(dectalk_state::duart_output)
+void dectalk_state::duart_output(uint8_t data)
 {
 	m_duart_outport = data;
 #ifdef SERIAL_TO_STDERR

@@ -131,7 +131,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vcs80_state::vcs80_keyboard_tick)
 	m_keyclk = !m_keyclk;
 }
 
-READ8_MEMBER( vcs80_state::pio_pa_r )
+uint8_t vcs80_state::pio_pa_r()
 {
 	/*
 
@@ -164,7 +164,7 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vcs80_state::pio_pb_w )
+void vcs80_state::pio_pb_w(uint8_t data)
 {
 	/*
 

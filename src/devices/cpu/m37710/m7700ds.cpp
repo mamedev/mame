@@ -319,9 +319,9 @@ offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	uint32_t flags = 0;
 
 	offs_t address = pc;
-	u32 pb = pc & 0xffff0000;
+	u32 pg = pc & 0xff0000;
 	pc &= 0xffff;
-	address = pc | pb;
+	address = pc | pg;
 
 	instruction = opcodes.r8(address);
 
@@ -370,13 +370,13 @@ offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case RELB:
 			varS = opcodes.r8(address + 1);
 			length++;
-			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+			util::stream_format(stream, " %06x (%s)", pg | ((pc + length + varS)&0xffff), int_8_str(varS));
 			break;
 		case RELW:
 		case PER :
 			var = opcodes.r16(address + 1);
 			length += 2;
-			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_16_str(var));
+			util::stream_format(stream, " %06x (%s)", pg | ((pc + length + var)&0xffff), int_16_str(var));
 			break;
 		case IMM :
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
@@ -395,13 +395,13 @@ offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			{
 				varS = opcodes.r8(address + 4);
 				length += 4;
-				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", opcodes.r16(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%04x, $%02x, %06x (%s)", opcodes.r16(address + 2), opcodes.r8(address + 1), pg | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
 				varS = opcodes.r8(address + 3);
 				length += 3;
-				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", opcodes.r8(address + 2), opcodes.r8(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%02x, $%02x, %06x (%s)", opcodes.r8(address + 2), opcodes.r8(address + 1), pg | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case BBCA:
@@ -409,13 +409,13 @@ offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			{
 				length += 5;
 				varS = opcodes.r8(address + 5);
-				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", opcodes.r16(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%04x, $%04x, %06x (%s)", opcodes.r16(address + 3), opcodes.r16(address + 1), pg | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			else
 			{
 				length += 4;
 				varS = opcodes.r8(address + 4);
-				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", opcodes.r8(address + 3), opcodes.r16(address + 1), pb | ((pc + length + varS)&0xffff), int_8_str(varS));
+				util::stream_format(stream, " #$%02x, $%04x, %06x (%s)", opcodes.r8(address + 3), opcodes.r16(address + 1), pg | ((pc + length + varS)&0xffff), int_8_str(varS));
 			}
 			break;
 		case LDM4:

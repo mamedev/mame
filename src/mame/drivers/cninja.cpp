@@ -682,13 +682,13 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
+void cninja_state::sound_bankswitch_w(uint8_t data)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);
 }
 
-WRITE8_MEMBER(cninja_state::cninjabl2_oki_bank_w)
+void cninja_state::cninjabl2_oki_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 7);
 }

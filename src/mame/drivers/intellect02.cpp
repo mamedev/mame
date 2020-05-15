@@ -88,9 +88,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void digit_w(u8 data);
+	void control_w(u8 data);
 
 	u8 m_digit_data;
 	u8 m_led_select;
@@ -128,7 +128,7 @@ void intel02_state::update_display()
 	m_display->matrix(m_led_select, m_digit_data);
 }
 
-READ8_MEMBER(intel02_state::input_r)
+u8 intel02_state::input_r()
 {
 	// d0-d3: buttons through a maze of logic gates
 	// basically giving each button its own 4-bit scancode
@@ -138,14 +138,14 @@ READ8_MEMBER(intel02_state::input_r)
 	return data | (~m_inputs[1]->read() << 4 & 0xf0);
 }
 
-WRITE8_MEMBER(intel02_state::digit_w)
+void intel02_state::digit_w(u8 data)
 {
 	// d0-d6: digit segment data, d7: N/C
 	m_digit_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(intel02_state::control_w)
+void intel02_state::control_w(u8 data)
 {
 	// d0-d5: select digit/leds
 	m_led_select = data;

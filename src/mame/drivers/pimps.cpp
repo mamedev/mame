@@ -4,7 +4,7 @@
 
 P.I.M.P.S. (Personal Interactive MicroProcessor System)
 
-06/12/2009 Skeleton driver.
+2009-12-06 Skeleton driver.
 
 No schematics or hardware info available.
 
@@ -57,7 +57,7 @@ Assembler:
  8-bit values MUST contain two hex digits or one quoted character. 16-bit
  constants MUST contain four hex digits or two quoted characters.
 
- Use 'S' instead if 'SP', eg: LXI S,$1000
+ Use 'S' instead of 'SP', eg: LXI S,$1000
 
  Only EQU, DB, DW and END directives are supported. An END statement is
  REQUIRED (otherwise you get the message '?tab-ful' as it fills the symbol

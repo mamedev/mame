@@ -53,7 +53,7 @@
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(shootout_state::bankswitch_w)
+void shootout_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -73,7 +73,7 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_maincpu->spin_until_time(attotime::from_usec(200));
 }
 
-WRITE8_MEMBER(shootout_state::flipscreen_w)
+void shootout_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 }

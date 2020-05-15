@@ -7,6 +7,7 @@
     More data at :
         http://www.nostalcomp.cz/pdfka/savia84.pdf
         http://www.nostalcomp.cz/savia.php
+        (use archive.org)
 
     05/02/2011 Skeleton driver.
     11/10/2011 Found a new rom. Working [Robbbert]
@@ -23,14 +24,12 @@
     Here is a test program. Copy the text and Paste into the emulator.
     -1800^3E^55^D3^F9^76^XX1800^
 
-    ToDo:
-    - Make better artwork
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "video/pwm.h"
 #include "savia84.lh"
 
 
@@ -41,7 +40,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi8255(*this, "ppi8255")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 		{ }
 
 	void savia84(machine_config &config);
@@ -55,15 +55,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_kbd;
-	uint8_t m_segment;
 	uint8_t m_digit;
-	uint8_t m_digit_last;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	uint8_t m_seg;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
-	output_finder<9> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<9> m_io_keyboard;
 };
 
 void savia84_state::mem_map(address_map &map)
@@ -135,17 +132,10 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-void savia84_state::machine_reset()
-{
-	m_digit_last = 0;
-}
-
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
-	m_segment = ~data & 0x7f;
-	if (m_digit && (m_digit != m_digit_last))
-		m_digits[m_digit] = m_segment;
-	m_digit_last = m_digit;
+	m_seg = ~data;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
@@ -160,23 +150,14 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 
 WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard scanning row; set digit to display
 {
-	m_digit = 0;
-	m_kbd = data & 15;
-	if (m_kbd == 0)
-		m_digit = 1;
-	else
-	if ((m_kbd > 1) && (m_kbd < 9))
-		m_digit = m_kbd;
+	m_digit = data & 15;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 {
-	if (m_kbd < 9)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%d",m_kbd);
-		return ioport(kbdrow)->read();
-	}
+	if (m_digit < 9)
+		return m_io_keyboard[m_digit]->read();
 	else
 		return 0xff;
 }
@@ -190,6 +171,8 @@ void savia84_state::savia84(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_savia84);
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1fd, 0x7f);
 
 	/* Devices */
 	I8255(config, m_ppi8255);
@@ -201,7 +184,7 @@ void savia84_state::savia84(machine_config &config)
 
 /* ROM definition */
 ROM_START( savia84 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD("savia84.bin", 0x0000, 0x0800, CRC(fa8f1fcf) SHA1(b08404469ed988d96c0413416b6a66f3e5b997a3))
 
 	// Note - the below is a bad dump and does not work
@@ -210,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
-COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
+COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, empty_init, "J.T. Hyan", "Savia 84", MACHINE_NO_SOUND_HW)

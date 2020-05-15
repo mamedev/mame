@@ -48,10 +48,10 @@ private:
 
 	int m_ccnt_old_val;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 	DECLARE_READ8_MEMBER(sound_cpu_command_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void flipscreen_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(textram_w);

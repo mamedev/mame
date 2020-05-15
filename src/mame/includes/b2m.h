@@ -46,14 +46,14 @@ public:
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);
-	DECLARE_WRITE8_MEMBER(b2m_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(b2m_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(b2m_8255_portc_w);
-	DECLARE_READ8_MEMBER(b2m_8255_portb_r);
-	DECLARE_WRITE8_MEMBER(b2m_ext_8255_portc_w);
-	DECLARE_READ8_MEMBER(b2m_romdisk_porta_r);
-	DECLARE_WRITE8_MEMBER(b2m_romdisk_portb_w);
-	DECLARE_WRITE8_MEMBER(b2m_romdisk_portc_w);
+	void b2m_8255_porta_w(uint8_t data);
+	void b2m_8255_portb_w(uint8_t data);
+	void b2m_8255_portc_w(uint8_t data);
+	uint8_t b2m_8255_portb_r();
+	void b2m_ext_8255_portc_w(uint8_t data);
+	uint8_t b2m_romdisk_porta_r();
+	void b2m_romdisk_portb_w(uint8_t data);
+	void b2m_romdisk_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(b2m_fdc_drq);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 

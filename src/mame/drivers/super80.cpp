@@ -642,25 +642,25 @@ WRITE_LINE_MEMBER( super80v_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(super80v_state::memory_read_byte)
+uint8_t super80v_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80v_state::memory_write_byte)
+void super80v_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super80v_state::io_read_byte)
+uint8_t super80v_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80v_state::io_write_byte)
+void super80v_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

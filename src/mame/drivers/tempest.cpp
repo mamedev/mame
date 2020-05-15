@@ -326,8 +326,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
 	DECLARE_WRITE8_MEMBER(tempest_led_w);
 	DECLARE_WRITE8_MEMBER(tempest_coin_w);
-	DECLARE_READ8_MEMBER(input_port_1_bit_r);
-	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+	uint8_t input_port_1_bit_r(offs_t offset);
+	uint8_t input_port_2_bit_r(offs_t offset);
 
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
@@ -399,13 +399,13 @@ READ_LINE_MEMBER(tempest_state::clock_r)
 }
 
 
-READ8_MEMBER(tempest_state::input_port_1_bit_r)
+uint8_t tempest_state::input_port_1_bit_r(offs_t offset)
 {
 	return (m_in1->read() & (1 << offset)) ? 0 : 228;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_2_bit_r)
+uint8_t tempest_state::input_port_2_bit_r(offs_t offset)
 {
 	return (m_in2->read() & (1 << offset)) ? 0 : 228;
 }

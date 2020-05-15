@@ -40,7 +40,7 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
 
-WRITE8_MEMBER( mbee_state::pio_port_b_w )
+void mbee_state::pio_port_b_w(uint8_t data)
 {
 /*  PIO port B - d5..d2 not emulated
     d7 interrupt from network or rtc or vsync or not used (see config switch)
@@ -101,7 +101,7 @@ WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
 
-READ8_MEMBER( mbee_state::fdc_status_r )
+uint8_t mbee_state::fdc_status_r()
 {
 /*  d7 indicate if IRQ or DRQ is occurring (1=happening)
     d6..d0 not used */
@@ -109,7 +109,7 @@ READ8_MEMBER( mbee_state::fdc_status_r )
 	return m_fdc_rq ? 0xff : 0x7f;
 }
 
-WRITE8_MEMBER( mbee_state::fdc_motor_w )
+void mbee_state::fdc_motor_w(uint8_t data)
 {
 /*  d7..d4 not used
     d3 density (1=MFM)
@@ -190,7 +190,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	timer_set(attotime::from_hz(50), TIMER_MBEE_NEWKB);
 }
 
-READ8_MEMBER( mbee_state::port18_r )
+uint8_t mbee_state::port18_r()
 {
 	uint8_t i, data = m_mbee256_q[0]; // get oldest key
 
@@ -211,13 +211,13 @@ READ8_MEMBER( mbee_state::port18_r )
 
 ************************************************************/
 
-READ8_MEMBER( mbee_state::speed_low_r )
+uint8_t mbee_state::speed_low_r()
 {
 	m_maincpu->set_unscaled_clock(3375000);
 	return 0xff;
 }
 
-READ8_MEMBER( mbee_state::speed_high_r )
+uint8_t mbee_state::speed_high_r()
 {
 	m_maincpu->set_unscaled_clock(6750000);
 	return 0xff;
@@ -231,17 +231,17 @@ READ8_MEMBER( mbee_state::speed_high_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::port04_w )  // address
+void mbee_state::port04_w(uint8_t data)  // address
 {
 	m_rtc->write(0, data);
 }
 
-WRITE8_MEMBER( mbee_state::port06_w )  // write
+void mbee_state::port06_w(uint8_t data)  // write
 {
 	m_rtc->write(1, data);
 }
 
-READ8_MEMBER( mbee_state::port07_r )   // read
+uint8_t mbee_state::port07_r()   // read
 {
 	return m_rtc->read(1);
 }
@@ -309,8 +309,8 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(*this, FUNC(mbee_state::video_low_r)));
-					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(*this, FUNC(mbee_state::video_high_r)));
+					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8sm_delegate(*this, FUNC(mbee_state::video_low_r)));
+					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8sm_delegate(*this, FUNC(mbee_state::video_high_r)));
 				}
 				else
 				{
@@ -341,8 +341,8 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(*this, FUNC(mbee_state::video_low_w)));
-					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(*this, FUNC(mbee_state::video_high_w)));
+					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8sm_delegate(*this, FUNC(mbee_state::video_low_w)));
+					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8sm_delegate(*this, FUNC(mbee_state::video_high_w)));
 				}
 				else
 				{
@@ -360,7 +360,7 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	}
 }
 
-WRITE8_MEMBER( mbee_state::mbee256_50_w )
+void mbee_state::mbee256_50_w(uint8_t data)
 {
 	setup_banks(data, 0, 7);
 }
@@ -378,7 +378,7 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::mbee128_50_w )
+void mbee_state::mbee128_50_w(uint8_t data)
 {
 	setup_banks(data, 0, 3);
 }
@@ -399,7 +399,7 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::port0a_w )
+void mbee_state::port0a_w(uint8_t data)
 {
 	m_0a = data;
 
@@ -407,7 +407,7 @@ WRITE8_MEMBER( mbee_state::port0a_w )
 		m_pak->set_entry(data & 15);
 }
 
-READ8_MEMBER( mbee_state::telcom_low_r )
+uint8_t mbee_state::telcom_low_r()
 {
 /* Read of port 0A - set Telcom rom to first half */
 	if (m_telcom)
@@ -416,7 +416,7 @@ READ8_MEMBER( mbee_state::telcom_low_r )
 	return m_0a;
 }
 
-READ8_MEMBER( mbee_state::telcom_high_r )
+uint8_t mbee_state::telcom_high_r()
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
 	if (m_telcom)

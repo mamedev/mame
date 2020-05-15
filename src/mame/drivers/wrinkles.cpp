@@ -42,8 +42,8 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(sensor_w);
-	DECLARE_READ8_MEMBER(sensor_r);
+	void sensor_w(u8 data);
+	u8 sensor_r();
 };
 
 void wrinkles_state::machine_start()
@@ -56,11 +56,11 @@ void wrinkles_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(wrinkles_state::sensor_w)
+void wrinkles_state::sensor_w(u8 data)
 {
 }
 
-READ8_MEMBER(wrinkles_state::sensor_r)
+u8 wrinkles_state::sensor_r()
 {
 	// sensors here
 	// d1: hold down for power-off?

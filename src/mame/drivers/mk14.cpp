@@ -39,6 +39,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "mk14.lh"
 
@@ -49,11 +50,11 @@ public:
 	mk14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_keyboard(*this, "X.%u", 0)
 		, m_cass(*this, "cassette")
 		, m_dac(*this, "dac")
-		, m_digits(*this, "digit%u", 0U)
-	{ }
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
+		{ }
 
 	void mk14(machine_config &config);
 
@@ -65,13 +66,11 @@ private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_device<scmp_device> m_maincpu;
-	required_ioport_array<8> m_keyboard;
 	required_device<cassette_image_device> m_cass;
 	required_device<dac_bit_interface> m_dac;
-	output_finder<8> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 /*
@@ -95,7 +94,7 @@ F00-FFF  256 bytes RAM (Standard) / VDU RAM  Decoded by 1111
 READ8_MEMBER( mk14_state::keyboard_r )
 {
 	if (offset < 8)
-		return m_keyboard[offset]->read();
+		return m_io_keyboard[offset]->read();
 	else
 		return 0xff;
 }
@@ -103,7 +102,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 WRITE8_MEMBER( mk14_state::display_w )
 {
 	if (offset < 8 )
-		m_digits[offset] = data;
+		m_display->matrix(1<<offset, data);
 	else
 	{
 		//logerror("write %02x to %02x\n",data,offset);
@@ -125,49 +124,49 @@ void mk14_state::mem_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( mk14 )
-	PORT_START("X.0")
+	PORT_START("X0")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")    PORT_CODE(KEYCODE_A)      PORT_CHAR('A')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")    PORT_CODE(KEYCODE_8)      PORT_CHAR('8')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")    PORT_CODE(KEYCODE_0)      PORT_CHAR('0')
-	PORT_START("X.1")
+	PORT_START("X1")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")    PORT_CODE(KEYCODE_B)      PORT_CHAR('B')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")    PORT_CODE(KEYCODE_9)      PORT_CHAR('9')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")    PORT_CODE(KEYCODE_1)      PORT_CHAR('1')
-	PORT_START("X.2")
+	PORT_START("X2")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")    PORT_CODE(KEYCODE_C)      PORT_CHAR('C')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GO")   PORT_CODE(KEYCODE_X)      PORT_CHAR('X')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")    PORT_CODE(KEYCODE_2)      PORT_CHAR('2')
-	PORT_START("X.3")
+	PORT_START("X3")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")    PORT_CODE(KEYCODE_D)      PORT_CHAR('D')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM")  PORT_CODE(KEYCODE_UP)     PORT_CHAR('^')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")    PORT_CODE(KEYCODE_3)      PORT_CHAR('3')
-	PORT_START("X.4")
+	PORT_START("X4")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AB")   PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")    PORT_CODE(KEYCODE_4)      PORT_CHAR('4')
-	PORT_START("X.5")
+	PORT_START("X5")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")    PORT_CODE(KEYCODE_5)      PORT_CHAR('5')
-	PORT_START("X.6")
+	PORT_START("X6")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")    PORT_CODE(KEYCODE_E)      PORT_CHAR('E')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")    PORT_CODE(KEYCODE_6)      PORT_CHAR('6')
-	PORT_START("X.7")
+	PORT_START("X7")
 		PORT_BIT(0x0F, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")    PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TERM") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
@@ -190,15 +189,6 @@ READ_LINE_MEMBER( mk14_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-void mk14_state::machine_reset()
-{
-}
-
-void mk14_state::machine_start()
-{
-	m_digits.resolve();
-}
-
 void mk14_state::mk14(machine_config &config)
 {
 	/* basic machine hardware */
@@ -214,6 +204,8 @@ void mk14_state::mk14(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_mk14);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	// sound
 	SPEAKER(config, "speaker").front_center();

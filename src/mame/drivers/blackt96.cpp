@@ -108,11 +108,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(tx_vram_w);
 
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_a_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port_b_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_b_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port_c_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_c_w);
+	void blackt96_soundio_port_a_w(uint8_t data);
+	uint8_t blackt96_soundio_port_b_r();
+	void blackt96_soundio_port_b_w(uint8_t data);
+	uint8_t blackt96_soundio_port_c_r();
+	void blackt96_soundio_port_c_w(uint8_t data);
 
 	DECLARE_READ16_MEMBER( random_r ) // todo, get rid of this once we work out where reads are from
 	{
@@ -393,33 +393,33 @@ static GFXDECODE_START( gfx_blackt96 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_a_w)
+void blackt96_state::blackt96_soundio_port_a_w(uint8_t data)
 {
 	// soundbank
 	logerror("%s: blackt96_soundio_port_a_w (set soundbank %02x)\n", machine().describe_context().c_str(), data);
 	m_oki1bank->set_entry(data & 0x07);
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port_b_r)
+uint8_t blackt96_state::blackt96_soundio_port_b_r()
 {
 	//logerror("%s: blackt96_soundio_port_b_r (data read is %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 	return m_port_b_latch;
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_b_w)
+void blackt96_state::blackt96_soundio_port_b_w(uint8_t data)
 {
 	m_port_b_latch = data;
 	//logerror("%s: blackt96_soundio_port_b_w (set latch to %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port_c_r)
+uint8_t blackt96_state::blackt96_soundio_port_c_r()
 {
 	// bit 0x40 = sound command ready?
 	if (m_soundcmd_ready) return 0x40;
 	return 0x00;
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_c_w)
+void blackt96_state::blackt96_soundio_port_c_w(uint8_t data)
 {
 //  logerror("%s: blackt96_soundio_port_c_w (PREV DATA %02x CURR DATA %02x)\n", machine().describe_context().c_str(), m_port_c_data, data);
 	// data & 0x80 unuused?

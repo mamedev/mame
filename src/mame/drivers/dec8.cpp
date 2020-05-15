@@ -725,27 +725,27 @@ void dec8_state::csilver_s_map(address_map &map)
 
 */
 
-READ8_MEMBER(dec8_state::i8751_port0_r)
+uint8_t dec8_state::i8751_port0_r()
 {
 	return m_i8751_port0;
 }
 
-WRITE8_MEMBER(dec8_state::i8751_port0_w)
+void dec8_state::i8751_port0_w(uint8_t data)
 {
 	m_i8751_port0 = data;
 }
 
-READ8_MEMBER(dec8_state::i8751_port1_r)
+uint8_t dec8_state::i8751_port1_r()
 {
 	return m_i8751_port1;
 }
 
-WRITE8_MEMBER(dec8_state::i8751_port1_w)
+void dec8_state::i8751_port1_w(uint8_t data)
 {
 	m_i8751_port1 = data;
 }
 
-WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
+void dec8_state::gondo_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -763,7 +763,7 @@ WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
 	m_i8751_p2 = data;
 }
 
-WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
+void dec8_state::shackled_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -796,7 +796,7 @@ WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
     Super Real Darwin is similar but only appears to have a single port
 */
 
-WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
+void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data & 0x10) == 0)

@@ -485,7 +485,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
-WRITE8_MEMBER( comx35_state::sc_w )
+void comx35_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{

@@ -46,8 +46,8 @@ private:
 
 	DECLARE_READ8_MEMBER( pio_r );
 	DECLARE_WRITE8_MEMBER( pio_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pa_r();
+	void pio_pb_w(uint8_t data);
 
 	uint8_t mem_r(offs_t offset)
 	{

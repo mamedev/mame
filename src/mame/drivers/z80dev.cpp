@@ -136,7 +136,7 @@ void z80dev_state::z80dev(machine_config &config)
 
 /* ROM definition */
 ROM_START( z80dev )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "z80dev.bin", 0x0000, 0x0800, CRC(dd5b9cd9) SHA1(97c176fcb63674f0592851b7858cb706886b5857))
 ROM_END
 

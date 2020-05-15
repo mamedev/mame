@@ -172,10 +172,10 @@ private:
 	DECLARE_WRITE8_MEMBER(decocass_e900_w);
 
 
-	DECLARE_WRITE8_MEMBER(i8041_p1_w);
-	DECLARE_READ8_MEMBER(i8041_p1_r);
-	DECLARE_WRITE8_MEMBER(i8041_p2_w);
-	DECLARE_READ8_MEMBER(i8041_p2_r);
+	void i8041_p1_w(uint8_t data);
+	uint8_t i8041_p1_r();
+	void i8041_p2_w(uint8_t data);
+	uint8_t i8041_p2_r();
 
 	void decocass_machine_state_save_init();
 
