@@ -14,7 +14,6 @@
 #include "machine/namcomcu.h"
 #include "machine/timer.h"
 #include "screen.h"
-#include "video/bufsprite.h"
 #include "video/namco_c116.h"
 #include "video/namco_c355spr.h"
 #include "video/namco_c123tmap.h"
@@ -107,7 +106,7 @@ private:
 	optional_ioport m_light0_y;
 	optional_ioport m_light1_x;
 	optional_ioport m_light1_y;
-	required_device<buffered_spriteram32_device> m_spritebank32;
+	required_shared_ptr<u32> m_spritebank32;
 	optional_shared_ptr<u32> m_tilebank32;
 	optional_shared_ptr<u32> m_rozbank32;
 	required_shared_ptr<u16> m_namconb_shareram;
@@ -118,6 +117,7 @@ private:
 	u16 m_count;
 	u8 m_port6;
 	u32 m_tilemap_tile_bank[4];
+	std::unique_ptr<u32[]> m_spritebank32_delayed;
 
 	DECLARE_READ32_MEMBER(randgen_r);
 	DECLARE_WRITE32_MEMBER(srand_w);

@@ -980,13 +980,10 @@ void namconb1_state::namconb1(machine_config &config)
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namconb1_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
 
-	BUFFERED_SPRITERAM32(config, m_spritebank32);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK / 8, 384, 0, 288, 264, 0, 224);
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb1));
-	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
-	m_screen->screen_vblank().append(m_spritebank32, FUNC(buffered_spriteram32_device::vblank_copy_rising));
+	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);

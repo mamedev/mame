@@ -5,6 +5,8 @@
 #include "emu.h"
 #include "includes/namconb1.h"
 
+#include <algorithm>
+
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
@@ -105,6 +107,16 @@ void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bi
 	}
 } /* video_update_common */
 
+WRITE_LINE_MEMBER(namconb1_state::screen_vblank)
+{
+	m_c355spr->vblank(state);
+	if (state)
+	{
+		const u32 size = m_spritebank32.bytes() / 4;
+		std::copy_n(&m_spritebank32[0], size, &m_spritebank32_delayed[0]);
+	}
+}
+
 /************************************************************************************************/
 
 u32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -128,13 +140,16 @@ u32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &
 
 int namconb1_state::NB1objcode2tile(int code)
 {
-	int bank = nth_word32(m_spritebank32->buffer(), code >> 11);
+	int bank = nth_word32(m_spritebank32_delayed.get(), code >> 11);
 	return (code & 0x7ff) | (bank << 11);
 }
 
 void namconb1_state::video_start()
 {
+	const u32 size = m_spritebank32.bytes() / 4;
+	m_spritebank32_delayed = make_unique_clear<u32[]>(size);
 	save_item(NAME(m_tilemap_tile_bank));
+	save_pointer(NAME(m_spritebank32_delayed), size);
 } /* namconb1 */
 
 /****************************************************************************************************/
@@ -172,7 +187,7 @@ u32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &
 
 int namconb1_state::NB2objcode2tile_machbrkr(int code)
 {
-	int bank = nth_byte32(m_spritebank32->buffer(), (code >> 11) & 0xf);
+	int bank = nth_byte32(m_spritebank32_delayed.get(), (code >> 11) & 0xf);
 	code &= 0x7ff;
 	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 2, 1, 0) << 11;
 	return code;
@@ -180,7 +195,7 @@ int namconb1_state::NB2objcode2tile_machbrkr(int code)
 
 int namconb1_state::NB2objcode2tile_outfxies(int code)
 {
-	int bank = nth_byte32(m_spritebank32->buffer(), (code >> 11) & 0xf);
+	int bank = nth_byte32(m_spritebank32_delayed.get(), (code >> 11) & 0xf);
 	code &= 0x7ff;
 	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 1, 2, 0) << 11;
 	return code;
