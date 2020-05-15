@@ -10,9 +10,8 @@
 CPU    :    TMP68301*
             or ColdFire + H8/3007 + PIC12C508 (for EVA2 & EVA3 PCBs)
 
-Video  :    DX-101
+Video  :    DX-101 or X1-020 (for P0-113A & P0-121A PCBs, compatible?)
             DX-102 x3
-            or X1-020 (for P0-113A PCBs)
 
 Sound  :    X1-010
             or OKI M9810 (for EVA2 & EVA3 PCBs)
