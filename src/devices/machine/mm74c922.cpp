@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16-Key Encoder")
+DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C922 16-Key Encoder")
 DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encoder")
 
 
