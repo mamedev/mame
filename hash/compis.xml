@@ -330,4 +330,96 @@ Systemskiva för hårdskiveenhet [version 7242]
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="matett">
+		<description>MätEtt (enanvändare)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33748" />
+		<info name="release" value="19870831" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209452">
+				<rom name="matett.mfm" size="2209452" crc="f3c96357" sha1="4f8ca5fef4f22ad73a1101ab971118730fff102f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a hardware key which isn't dumped -->
+	<software name="millikan">
+		<description>Millikans försök (enanvändare)</description>
+		<year>1987</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-33764" />
+		<info name="release" value="19870729" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209538">
+				<rom name="Millikans forsok.mfm" size="2209538" crc="40e161ad" sha1="704f1c23f02206c5e28166cf149bb39f7c24bb45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ritett">
+		<description>RitEtt (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34250" />
+		<info name="release" value="19860404" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217597">
+				<rom name="RitEtt.mfm" size="2217597" crc="e7cf88d0" sha1="225396bc29cb2ba158949a9286fcee9201617265"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datmatte">
+		<description>Datorn i matematik (nät/skollicens)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34175" />
+		<info name="release" value="19861003" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217631">
+				<rom name="Datorn i matematik.mfm" size="2217631" crc="0a19fc5b" sha1="5d764656e8428c3767bf3cc1a2e3ce6c0451df88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matenergi">
+		<description>Mät energi (enanvändare)</description>
+		<year>1986</year>
+		<publisher>Esselte Studium</publisher>
+		<info name="serial" value="24-34051" />
+		<info name="release" value="19860701" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209441">
+				<rom name="Mat energi.mfm" size="2209441" crc="5e6b2fcb" sha1="91d79cc4f190a7069a54abd818922540e915837c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="latinet">
+		<description>Internationella ord från latinet (nät/skollicens)</description>
+		<year>1988</year>
+		<publisher>Almqvist &amp; Wiksell</publisher>
+		<info name="serial" value="21-98004" />
+		<info name="release" value="19880101" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209554">
+				<rom name="Internationella ord fran latinet.mfm" size="2209554" crc="55de0713" sha1="0c117ffdd0c1e83ee0f0ad28cf792986b6655ba7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grekiskan">
+		<description>Internationella ord från grekiskan (nät/skollicens)</description>
+		<year>1988</year>
+		<publisher>Almqvist &amp; Wiksell</publisher>
+		<info name="serial" value="21-98006" />
+		<info name="release" value="19880101" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2217724">
+				<rom name="Internationella ord fran grekiskan.mfm" size="2217724" crc="bb4e2e86" sha1="be6651cc0728b07d636b069324dd1d77ed10f470"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
