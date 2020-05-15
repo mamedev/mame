@@ -284,8 +284,8 @@ WRITE8_MEMBER(scv_cart_slot_device::write_cart)
  write_bank
  -------------------------------------------------*/
 
-WRITE8_MEMBER(scv_cart_slot_device::write_bank)
+void scv_cart_slot_device::write_bank(uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data);
+		m_cart->write_bank(data);
 }

@@ -7,7 +7,7 @@
 
 /* Register Access */
 
-WRITE8_MEMBER( cidelsa_state::cdp1869_w )
+void cidelsa_state::cdp1869_w(offs_t offset, uint8_t data)
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 
@@ -130,7 +130,7 @@ void cidelsa_state::video_start()
 
 /* AY-3-8910 */
 
-WRITE8_MEMBER( draco_state::psg_pb_w )
+void draco_state::psg_pb_w(uint8_t data)
 {
 	/*
 

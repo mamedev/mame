@@ -297,7 +297,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
-	DECLARE_WRITE8_MEMBER(cat_duart_output);
+	void cat_duart_output(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
 
 	DECLARE_READ16_MEMBER(cat_floppy_control_r);
@@ -1032,7 +1032,7 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects 
  * OP6: TD01 "
  * OP7: TD00 "
  */
-WRITE8_MEMBER(cat_state::cat_duart_output)
+void cat_state::cat_duart_output(uint8_t data)
 {
 #ifdef DEBUG_DUART_OUTPUT_LINES
 	fprintf(stderr,"Duart output io lines changed to: %02X\n", data);

@@ -56,7 +56,7 @@ namespace solver
 			log().fatal(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
 			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(m_fb_sync.name(), m_Q_sync.name()));
 		}
-		setup_base(nets);
+		setup_base(anetlist.setup(), nets);
 
 		// now setup the matrix
 		setup_matrix();
@@ -67,7 +67,7 @@ namespace solver
 		return &state().setup().get_connected_terminal(*term)->net();
 	}
 
-	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
+	void matrix_solver_t::setup_base(setup_t &setup, const analog_net_t::list_t &nets)
 	{
 		log().debug("New solver setup\n");
 		std::vector<core_device_t *> step_devices;
@@ -125,7 +125,7 @@ namespace solver
 								net_proxy_output = net_proxy_output_u.get();
 								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}
-							net_proxy_output->net().add_terminal(*p);
+							setup.add_terminal(net_proxy_output->net(), *p);
 							// FIXME: repeated calling - kind of brute force
 							net_proxy_output->net().rebuild_list();
 							log().debug("Added input {1}", net_proxy_output->name());
@@ -581,7 +581,7 @@ namespace solver
 		{
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());
-			log().verbose("       ==> {1} nets", this->m_terms.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
+			log().verbose("       ==> {1} nets", this->m_terms.size());
 			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
 			log().verbose("       has {1} timestep elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",

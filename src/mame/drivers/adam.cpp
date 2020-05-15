@@ -701,7 +701,7 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 //  m6801_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p1_w )
+void adam_state::m6801_p1_w(uint8_t data)
 {
 	/*
 
@@ -726,7 +726,7 @@ WRITE8_MEMBER( adam_state::m6801_p1_w )
 //  m6801_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p2_r )
+uint8_t adam_state::m6801_p2_r()
 {
 	/*
 
@@ -753,7 +753,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 //  m6801_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p2_w )
+void adam_state::m6801_p2_w(uint8_t data)
 {
 	/*
 
@@ -782,7 +782,7 @@ WRITE8_MEMBER( adam_state::m6801_p2_w )
 //  m6801_p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p3_r )
+uint8_t adam_state::m6801_p3_r()
 {
 	/*
 
@@ -807,7 +807,7 @@ READ8_MEMBER( adam_state::m6801_p3_r )
 //  m6801_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p3_w )
+void adam_state::m6801_p3_w(uint8_t data)
 {
 	/*
 
@@ -832,7 +832,7 @@ WRITE8_MEMBER( adam_state::m6801_p3_w )
 //  m6801_p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p4_w )
+void adam_state::m6801_p4_w(uint8_t data)
 {
 	/*
 

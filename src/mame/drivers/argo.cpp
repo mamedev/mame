@@ -70,7 +70,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(z0_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	void argo_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(dma_r);
+	uint8_t dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(argo_state::z0_w)
 	// read - incoming 2514Hz
 }
 
-READ8_MEMBER(argo_state::dma_r)
+uint8_t argo_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);

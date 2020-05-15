@@ -55,8 +55,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);
-	DECLARE_READ8_MEMBER(blktiger_from_main_r);
-	DECLARE_WRITE8_MEMBER(blktiger_to_main_w);
+	uint8_t blktiger_from_main_r();
+	void blktiger_to_main_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(blktiger_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(blktiger_coinlockout_w);
 	DECLARE_WRITE8_MEMBER(blktiger_txvideoram_w);

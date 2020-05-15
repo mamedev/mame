@@ -479,6 +479,7 @@ void hd44780_device::control_write(u8 data)
 			logerror("HD44780: function set cannot be executed after other instructions unless the interface data length is changed\n");
 			return;
 		}
+		m_first_cmd = true;
 
 		m_char_size = BIT(m_ir, 2) ? 10 : 8;
 		m_data_len  = BIT(m_ir, 4) ? 8 : 4;

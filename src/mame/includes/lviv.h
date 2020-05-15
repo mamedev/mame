@@ -46,22 +46,22 @@ private:
 	void lviv_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(ppi_0_porta_r);
-	DECLARE_READ8_MEMBER(ppi_0_portb_r);
-	DECLARE_READ8_MEMBER(ppi_0_portc_r);
-	DECLARE_READ8_MEMBER(ppi_1_porta_r);
-	DECLARE_READ8_MEMBER(ppi_1_portb_r);
-	DECLARE_READ8_MEMBER(ppi_1_portc_r);
+	uint8_t ppi_0_porta_r();
+	uint8_t ppi_0_portb_r();
+	uint8_t ppi_0_portc_r();
+	uint8_t ppi_1_porta_r();
+	uint8_t ppi_1_portb_r();
+	uint8_t ppi_1_portc_r();
 
-	DECLARE_WRITE8_MEMBER(ppi_0_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_0_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_0_portc_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_1_portc_w);
+	void ppi_0_porta_w(uint8_t data);
+	void ppi_0_portb_w(uint8_t data);
+	void ppi_0_portc_w(uint8_t data);
+	void ppi_1_porta_w(uint8_t data);
+	void ppi_1_portb_w(uint8_t data);
+	void ppi_1_portc_w(uint8_t data);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 

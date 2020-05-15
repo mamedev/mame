@@ -51,23 +51,23 @@ private:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void qs1000_p1_w(uint8_t data);
+	void qs1000_p2_w(uint8_t data);
+	void qs1000_p3_w(uint8_t data);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vega_map(address_map &map);
 };
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p1_w )
+void vegaeo_state::qs1000_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p2_w )
+void vegaeo_state::qs1000_p2_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
+void vegaeo_state::qs1000_p3_w(uint8_t data)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?

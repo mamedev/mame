@@ -96,7 +96,7 @@ Stephh's Notes:
  *
  *************************************/
 
-READ8_MEMBER(jack_state::timer_r)
+uint8_t jack_state::timer_r()
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */

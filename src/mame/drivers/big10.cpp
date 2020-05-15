@@ -78,12 +78,7 @@ public:
 	void big10(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
-	void main_io(address_map &map);
-	void main_map(address_map &map);
-
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	virtual void machine_start() override { save_item(NAME(m_mux_data)); m_lamp.resolve(); }
 
 private:
 	uint8_t m_mux_data;
@@ -91,6 +86,12 @@ private:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
 	output_finder<> m_lamp;
+
+	void main_io(address_map &map);
+	void main_map(address_map &map);
+
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
 };
 
 
@@ -103,14 +104,14 @@ private:
 ****************************************/
 
 
-WRITE8_MEMBER(big10_state::mux_w)
+void big10_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 	m_hopper->motor_w(BIT(data, 6));
 	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
-READ8_MEMBER(big10_state::mux_r)
+uint8_t big10_state::mux_r()
 {
 	uint8_t result = 0xff;
 	for (int b = 0; b < 6; b++)

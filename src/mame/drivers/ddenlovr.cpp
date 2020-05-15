@@ -287,8 +287,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_mask2_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(unk16_r);
-	DECLARE_WRITE8_MEMBER(ddenlovr_select2_w);
-	DECLARE_READ8_MEMBER(rongrong_input2_r);
+	void ddenlovr_select2_w(uint8_t data);
+	uint8_t rongrong_input2_r();
 	DECLARE_READ16_MEMBER(quiz365_input2_r);
 	DECLARE_WRITE8_MEMBER(quiz365_coincounter_w);
 	DECLARE_READ16_MEMBER(quiz365_protection_r);
@@ -303,10 +303,10 @@ private:
 	DECLARE_WRITE8_MEMBER(nettoqc_coincounter_w);
 	DECLARE_READ16_MEMBER(ultrchmp_protection2_r);
 	DECLARE_WRITE16_MEMBER(ultrchmp_protection2_w);
-	DECLARE_READ8_MEMBER(rongrong_input_r);
-	DECLARE_WRITE8_MEMBER(rongrong_select_w);
+	uint8_t rongrong_input_r();
+	void rongrong_select_w(uint8_t data);
 	DECLARE_READ8_MEMBER(magic_r);
-	DECLARE_WRITE8_MEMBER(mmpanic_rombank_w);
+	void mmpanic_rombank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mmpanic_blitter2_w);
 	DECLARE_WRITE_LINE_MEMBER(mmpanic_blitter_irq);
 	DECLARE_WRITE8_MEMBER(mmpanic_leds_w);
@@ -316,16 +316,16 @@ private:
 	DECLARE_READ8_MEMBER(funkyfig_busy_r);
 	DECLARE_WRITE8_MEMBER(funkyfig_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(funkyfig_blitter_irq);
-	DECLARE_WRITE8_MEMBER(funkyfig_rombank_w);
-	DECLARE_READ8_MEMBER(funkyfig_dsw_r);
+	void funkyfig_rombank_w(uint8_t data);
+	uint8_t funkyfig_dsw_r();
 	DECLARE_READ8_MEMBER(funkyfig_coin_r);
 	DECLARE_READ8_MEMBER(funkyfig_key_r);
 	DECLARE_WRITE8_MEMBER(funkyfig_lockout_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_rombank_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_keyb_w);
+	void hanakanz_rombank_w(uint8_t data);
+	void hanakanz_keyb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(hanakanz_dsw_w);
 	DECLARE_READ8_MEMBER(hanakanz_keyb_r);
-	DECLARE_READ8_MEMBER(hanakanz_dsw_r);
+	uint8_t hanakanz_dsw_r();
 	DECLARE_READ8_MEMBER(hanakanz_busy_r);
 	DECLARE_READ8_MEMBER(hanakanz_gfxrom_r);
 	DECLARE_WRITE8_MEMBER(hanakanz_coincounter_w);
@@ -341,13 +341,13 @@ private:
 	DECLARE_READ8_MEMBER(mjchuuka_gfxrom_1_r);
 	DECLARE_WRITE8_MEMBER(mjchuuka_palette_w);
 	DECLARE_WRITE8_MEMBER(mjchuuka_coincounter_w);
-	DECLARE_WRITE8_MEMBER(mjmyster_rambank_w);
+	void mjmyster_rambank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mjmyster_select2_w);
 	DECLARE_READ8_MEMBER(mjmyster_coins_r);
 	DECLARE_READ8_MEMBER(mjmyster_keyb_r);
 	DECLARE_READ8_MEMBER(mjmyster_dsw_r);
 	DECLARE_WRITE8_MEMBER(mjmyster_coincounter_w);
-	DECLARE_WRITE8_MEMBER(hginga_rombank_w);
+	void hginga_rombank_w(uint8_t data);
 	DECLARE_READ8_MEMBER(hginga_protection_r);
 	DECLARE_WRITE8_MEMBER(hginga_input_w);
 	DECLARE_READ8_MEMBER(hginga_coins_r);
@@ -360,9 +360,9 @@ private:
 	DECLARE_WRITE8_MEMBER(hgokou_input_w);
 	DECLARE_READ8_MEMBER(hgokou_protection_r);
 	DECLARE_READ8_MEMBER(hgokbang_input_r);
-	DECLARE_WRITE8_MEMBER(hparadis_select_w);
+	void hparadis_select_w(uint8_t data);
 	DECLARE_READ8_MEMBER(hparadis_input_r);
-	DECLARE_READ8_MEMBER(hparadis_dsw_r);
+	uint8_t hparadis_dsw_r();
 	DECLARE_WRITE8_MEMBER(hparadis_coin_w);
 	DECLARE_READ8_MEMBER(mjmywrld_coins_r);
 	DECLARE_READ16_MEMBER(akamaru_protection1_r);
@@ -373,7 +373,7 @@ private:
 	DECLARE_READ16_MEMBER(akamaru_dsw_r);
 	DECLARE_READ16_MEMBER(akamaru_blitter_r);
 	DECLARE_READ16_MEMBER(akamaru_e0010d_r);
-	DECLARE_WRITE8_MEMBER(mjflove_rombank_w);
+	void mjflove_rombank_w(uint8_t data);
 	DECLARE_READ8_MEMBER(mjflove_protection_r);
 	DECLARE_READ8_MEMBER(mjflove_keyb_r);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_blitter_irq);
@@ -384,8 +384,8 @@ private:
 	DECLARE_WRITE8_MEMBER(mjgnight_protection_w);
 	DECLARE_WRITE8_MEMBER(mjgnight_coincounter_w);
 	DECLARE_READ8_MEMBER(sryudens_keyb_r);
-	DECLARE_WRITE8_MEMBER(sryudens_coincounter_w);
-	DECLARE_WRITE8_MEMBER(sryudens_rambank_w);
+	void sryudens_coincounter_w(uint8_t data);
+	void sryudens_rambank_w(uint8_t data);
 	DECLARE_READ8_MEMBER(daimyojn_keyb1_r);
 	DECLARE_READ8_MEMBER(daimyojn_keyb2_r);
 	DECLARE_WRITE8_MEMBER(daimyojn_protection_w);
@@ -405,21 +405,21 @@ private:
 	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
 	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
 	DECLARE_VIDEO_START(htengoku);
-	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
-	DECLARE_READ8_MEMBER(htengoku_dsw_r);
+	void htengoku_dsw_w(uint8_t data);
+	uint8_t htengoku_dsw_r();
 	DECLARE_WRITE8_MEMBER(quizchq_oki_bank_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_oki_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank1_w);
 	DECLARE_WRITE_LINE_MEMBER(quiz365_oki_bank2_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_select_w);
-	DECLARE_READ8_MEMBER(quiz365_input_r);
+	void ddenlovr_select_w(uint8_t data);
+	uint8_t quiz365_input_r();
 	DECLARE_WRITE8_MEMBER(nettoqc_oki_bank_w);
 	DECLARE_WRITE8_MEMBER(hanakanz_oki_bank_w);
-	DECLARE_WRITE8_MEMBER(mjchuuka_oki_bank_w);
-	DECLARE_READ8_MEMBER(hginga_dsw_r);
+	void mjchuuka_oki_bank_w(uint8_t data);
+	uint8_t hginga_dsw_r();
 	DECLARE_WRITE8_MEMBER(mjflove_okibank_w);
 	DECLARE_WRITE8_MEMBER(jongtei_okibank_w);
-	DECLARE_READ8_MEMBER(seljan2_dsw_r);
+	uint8_t seljan2_dsw_r();
 	DECLARE_WRITE8_MEMBER(daimyojn_okibank_w);
 
 	void ddenlovr_flipscreen_w( uint8_t data );
@@ -1868,17 +1868,17 @@ READ16_MEMBER(ddenlovr_state::unk16_r)
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_select_w )
+void ddenlovr_state::ddenlovr_select_w(uint8_t data)
 {
 	m_dsw_sel = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_select2_w)
+void ddenlovr_state::ddenlovr_select2_w(uint8_t data)
 {
 	m_input_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
+uint8_t ddenlovr_state::rongrong_input2_r()
 {
 //  logerror("%04x: input2_r offset %d select %x\n", m_maincpu->pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
@@ -1892,7 +1892,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
 }
 
 
-READ8_MEMBER(ddenlovr_state::quiz365_input_r )
+uint8_t ddenlovr_state::quiz365_input_r()
 {
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
@@ -2263,7 +2263,7 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
                                 Rong Rong
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::rongrong_input_r)
+uint8_t ddenlovr_state::rongrong_input_r()
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW2")->read();
@@ -2273,7 +2273,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::rongrong_select_w)
+void ddenlovr_state::rongrong_select_w(uint8_t data)
 {
 //logerror("%04x: rongrong_select_w %02x\n",m_maincpu->pc(),data);
 
@@ -2387,7 +2387,7 @@ READ8_MEMBER(ddenlovr_state::magic_r)
 	return 0x01;
 }
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_rombank_w)
+void ddenlovr_state::mmpanic_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x7);
 	/* Bit 4? */
@@ -2550,7 +2550,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_blitter_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
-WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
+void ddenlovr_state::funkyfig_rombank_w(uint8_t data)
 {
 	m_dsw_sel = data;
 
@@ -2559,7 +2559,7 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
-READ8_MEMBER(ddenlovr_state::funkyfig_dsw_r)
+uint8_t ddenlovr_state::funkyfig_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
@@ -2658,7 +2658,7 @@ void ddenlovr_state::funkyfig_sound_portmap(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_rombank_w)
+void ddenlovr_state::hanakanz_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 	membank("bank2")->set_entry(((data & 0xf0) >> 4));
@@ -2673,7 +2673,7 @@ void ddenlovr_state::hanakanz_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_keyb_w)
+void ddenlovr_state::hanakanz_keyb_w(uint8_t data)
 {
 	m_keyb = data;
 }
@@ -2697,7 +2697,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_keyb_r)
 	return val;
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_dsw_r)
+uint8_t ddenlovr_state::hanakanz_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
@@ -3007,7 +3007,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjchuuka_oki_bank_w )
+void ddenlovr_state::mjchuuka_oki_bank_w(uint8_t data)
 {
 	// data & 0x08 ?
 	m_oki->set_rom_bank(data & 1);
@@ -3113,7 +3113,7 @@ void ddenlovr_state::mjmyster_map(address_map &map)
 	map(0xf200, 0xffff).nopw();                    // ""
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjmyster_rambank_w)
+void ddenlovr_state::mjmyster_rambank_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x07);
 	//logerror("%04x: rambank = %02x\n", m_maincpu->pc(), data);
@@ -3218,7 +3218,7 @@ void ddenlovr_state::mjmyster_portmap(address_map &map)
                             Hanafuda Hana Ginga
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hginga_rombank_w)
+void ddenlovr_state::hginga_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x7);
 	m_hginga_rombank = data;
@@ -3245,7 +3245,7 @@ void ddenlovr_state::hginga_map(address_map &map)
 	map(0xf700, 0xf706).nopw();
 }
 
-READ8_MEMBER(ddenlovr_state::hginga_dsw_r )
+uint8_t ddenlovr_state::hginga_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW4")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW3")->read();
@@ -3552,7 +3552,7 @@ void ddenlovr_state::hgokbang_portmap(address_map &map)
                             Super Hana Paradise
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hparadis_select_w)
+void ddenlovr_state::hparadis_select_w(uint8_t data)
 {
 	m_dsw_sel = data;
 	m_keyb = 0;
@@ -3580,7 +3580,7 @@ READ8_MEMBER(ddenlovr_state::hparadis_input_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::hparadis_dsw_r)
+uint8_t ddenlovr_state::hparadis_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW2")->read();
@@ -3782,7 +3782,7 @@ void ddenlovr_state::akamaru_map(address_map &map)
                           Mahjong Fantasic Love
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::mjflove_rombank_w)
+void ddenlovr_state::mjflove_rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0xf);
 	// bit 4 enables palette ram
@@ -3988,7 +3988,7 @@ READ8_MEMBER(ddenlovr_state::sryudens_keyb_r)
 	return val;
 }
 
-WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
+void ddenlovr_state::sryudens_coincounter_w(uint8_t data)
 {
 	// bit 0 = coin counter
 	// bit 1 = out counter
@@ -4008,7 +4008,7 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
+void ddenlovr_state::sryudens_rambank_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x0f);
 	//logerror("%04x: rambank = %02x\n", m_maincpu->pc(), data);
@@ -4135,7 +4135,7 @@ WRITE8_MEMBER(ddenlovr_state::seljan2_palette_w)
 		logerror("%s: warning, palette_w with palette disabled, %04x <- %02x\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(ddenlovr_state::seljan2_dsw_r )
+uint8_t ddenlovr_state::seljan2_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
@@ -4222,12 +4222,12 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_select_w)
 	m_keyb = 0;
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_dsw_w)
+void ddenlovr_state::htengoku_dsw_w(uint8_t data)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::htengoku_dsw_r)
+uint8_t ddenlovr_state::htengoku_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();

@@ -1333,7 +1333,7 @@ TIMER_CALLBACK_MEMBER(harddriv_state::xsdp_sport1_irq_off_callback)
 }
 
 
-WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
+void harddriv_state::hdds3sdsp_serial_tx_callback(uint32_t data)
 {
 	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
@@ -1345,7 +1345,7 @@ WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
 }
 
 
-READ32_MEMBER(harddriv_state::hdds3sdsp_serial_rx_callback)
+uint32_t harddriv_state::hdds3sdsp_serial_rx_callback()
 {
 	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return 0xff;
@@ -1354,7 +1354,7 @@ READ32_MEMBER(harddriv_state::hdds3sdsp_serial_rx_callback)
 }
 
 
-WRITE32_MEMBER(harddriv_state::hdds3xdsp_serial_tx_callback)
+void harddriv_state::hdds3xdsp_serial_tx_callback(uint32_t data)
 {
 	if ((m_ds3xdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
@@ -1363,7 +1363,7 @@ WRITE32_MEMBER(harddriv_state::hdds3xdsp_serial_tx_callback)
 }
 
 
-READ32_MEMBER(harddriv_state::hdds3xdsp_serial_rx_callback)
+uint32_t harddriv_state::hdds3xdsp_serial_rx_callback()
 {
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
@@ -1515,7 +1515,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_program_w )
  *
  *************************************/
 
-WRITE32_MEMBER(harddriv_state::hddsk_update_pif)
+void harddriv_state::hddsk_update_pif(uint32_t data)
 {
 	m_sound_int_state = ((data & DSP32_OUTPUT_PIF) != 0);
 	update_interrupts();

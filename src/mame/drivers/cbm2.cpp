@@ -162,31 +162,31 @@ public:
 	DECLARE_READ8_MEMBER( ext_read );
 	DECLARE_WRITE8_MEMBER( ext_write );
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r();
+	uint8_t sid_poty_r();
 
-	DECLARE_READ8_MEMBER( tpi1_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
-	DECLARE_READ8_MEMBER( tpi1_pb_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pb_w );
+	uint8_t tpi1_pa_r();
+	void tpi1_pa_w(uint8_t data);
+	uint8_t tpi1_pb_r();
+	void tpi1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
 
-	DECLARE_WRITE8_MEMBER( tpi2_pa_w );
-	DECLARE_WRITE8_MEMBER( tpi2_pb_w );
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	void tpi2_pa_w(uint8_t data);
+	void tpi2_pb_w(uint8_t data);
+	uint8_t tpi2_pc_r();
 
-	DECLARE_READ8_MEMBER( cia_pa_r );
-	DECLARE_WRITE8_MEMBER( cia_pa_w );
-	DECLARE_READ8_MEMBER( cia_pb_r );
+	uint8_t cia_pa_r();
+	void cia_pa_w(uint8_t data);
+	uint8_t cia_pb_r();
 
-	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
-	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
-	DECLARE_WRITE8_MEMBER( ext_tpi_pc_w );
+	uint8_t ext_tpi_pb_r();
+	void ext_tpi_pb_w(uint8_t data);
+	void ext_tpi_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
-	DECLARE_READ8_MEMBER( ext_cia_pb_r );
-	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
+	uint8_t ext_cia_pb_r();
+	void ext_cia_pb_w(uint8_t data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -240,7 +240,7 @@ public:
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	uint8_t tpi2_pc_r();
 	void b256hp(machine_config &config);
 	void b128hp(machine_config &config);
 	void cbm710(machine_config &config);
@@ -296,8 +296,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
 
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
+	uint8_t tpi2_pc_r();
+	void tpi2_pc_w(uint8_t data);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_p500);
 	// video state
@@ -1441,7 +1441,7 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::sid_potx_r )
+uint8_t cbm2_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
@@ -1468,7 +1468,7 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( cbm2_state::sid_poty_r )
+uint8_t cbm2_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
@@ -1500,7 +1500,7 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::tpi1_pa_r )
+uint8_t cbm2_state::tpi1_pa_r()
 {
 	/*
 
@@ -1530,7 +1530,7 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
+void cbm2_state::tpi1_pa_w(uint8_t data)
 {
 	/*
 
@@ -1561,7 +1561,7 @@ WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 	m_ieee2->nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( cbm2_state::tpi1_pb_r )
+uint8_t cbm2_state::tpi1_pb_r()
 {
 	/*
 
@@ -1594,7 +1594,7 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
+void cbm2_state::tpi1_pb_w(uint8_t data)
 {
 	/*
 
@@ -1671,17 +1671,17 @@ uint8_t cbm2_state::read_keyboard()
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi2_pa_w )
+void cbm2_state::tpi2_pa_w(uint8_t data)
 {
 	m_tpi2_pa = data;
 }
 
-WRITE8_MEMBER( cbm2_state::tpi2_pb_w )
+void cbm2_state::tpi2_pb_w(uint8_t data)
 {
 	m_tpi2_pb = data;
 }
 
-READ8_MEMBER( cbm2_state::tpi2_pc_r )
+uint8_t cbm2_state::tpi2_pc_r()
 {
 	/*
 
@@ -1701,7 +1701,7 @@ READ8_MEMBER( cbm2_state::tpi2_pc_r )
 	return (m_ntsc << 6) | (read_keyboard() & 0x3f);
 }
 
-READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
+uint8_t cbm2hp_state::tpi2_pc_r()
 {
 	/*
 
@@ -1721,7 +1721,7 @@ READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
 	return read_keyboard();
 }
 
-READ8_MEMBER( p500_state::tpi2_pc_r )
+uint8_t p500_state::tpi2_pc_r()
 {
 	/*
 
@@ -1741,7 +1741,7 @@ READ8_MEMBER( p500_state::tpi2_pc_r )
 	return read_keyboard();
 }
 
-WRITE8_MEMBER( p500_state::tpi2_pc_w )
+void p500_state::tpi2_pc_w(uint8_t data)
 {
 	/*
 
@@ -1765,7 +1765,7 @@ WRITE8_MEMBER( p500_state::tpi2_pc_w )
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::cia_pa_r )
+uint8_t cbm2_state::cia_pa_r()
 {
 	/*
 
@@ -1797,7 +1797,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::cia_pa_w )
+void cbm2_state::cia_pa_w(uint8_t data)
 {
 	/*
 
@@ -1824,7 +1824,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	m_cia_pa = data;
 }
 
-READ8_MEMBER( cbm2_state::cia_pb_r )
+uint8_t cbm2_state::cia_pb_r()
 {
 	/*
 
@@ -1876,7 +1876,7 @@ void cbm2_state::set_busy2(int state)
 	}
 }
 
-READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
+uint8_t cbm2_state::ext_tpi_pb_r()
 {
 	/*
 
@@ -1907,7 +1907,7 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
+void cbm2_state::ext_tpi_pb_w(uint8_t data)
 {
 	/*
 
@@ -1936,7 +1936,7 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 	m_ext_cia->flag_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
+void cbm2_state::ext_tpi_pc_w(uint8_t data)
 {
 	/*
 
@@ -1969,7 +1969,7 @@ WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
 	m_tpi1->i3_w(!state);
 }
 
-READ8_MEMBER( cbm2_state::ext_cia_pb_r )
+uint8_t cbm2_state::ext_cia_pb_r()
 {
 	/*
 
@@ -2000,7 +2000,7 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
+void cbm2_state::ext_cia_pb_w(uint8_t data)
 {
 	/*
 

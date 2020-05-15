@@ -42,7 +42,6 @@ public:
 	void superpac(machine_config &config);
 	void todruaga(machine_config &config);
 
-	void init_grobda();
 	void init_digdug2();
 
 protected:
@@ -104,6 +103,7 @@ private:
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
+	void grobda_cpu2_map(address_map &map);
 	void mappy_cpu1_map(address_map &map);
 	void mappy_cpu2_map(address_map &map);
 	void phozon_cpu1_map(address_map &map);

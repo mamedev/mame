@@ -96,16 +96,16 @@ private:
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE64_MEMBER(lcd_seg_w);
+	void lcd_seg_w(u64 data);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(cb_mux_w);
-	DECLARE_WRITE8_MEMBER(cb_leds_w);
-	DECLARE_READ8_MEMBER(cb_r);
+	void cb_mux_w(u8 data);
+	void cb_leds_w(u8 data);
+	u8 cb_r();
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	u8 input_r();
+	void input_w(u8 data);
+	void lcd_w(u8 data);
 
 	u8 m_cb_mux = 0;
 	u8 m_led_data = 0;
@@ -131,7 +131,7 @@ void sphinx40_state::machine_start()
 
 // HD61603 LCD
 
-WRITE64_MEMBER(sphinx40_state::lcd_seg_w)
+void sphinx40_state::lcd_seg_w(u64 data)
 {
 	// output individual segments
 	for (int i = 0; i < 64; i++)
@@ -153,14 +153,14 @@ void sphinx40_state::update_display()
 	m_display->matrix(m_cb_mux, m_led_data);
 }
 
-WRITE8_MEMBER(sphinx40_state::cb_mux_w)
+void sphinx40_state::cb_mux_w(u8 data)
 {
 	// PA0-PA7: chessboard input/led mux
 	m_cb_mux = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(sphinx40_state::cb_leds_w)
+void sphinx40_state::cb_leds_w(u8 data)
 {
 	// PB0-PB7: chessboard leds
 	m_led_data = ~data;
@@ -170,7 +170,7 @@ WRITE8_MEMBER(sphinx40_state::cb_leds_w)
 
 // TTL
 
-READ8_MEMBER(sphinx40_state::cb_r)
+u8 sphinx40_state::cb_r()
 {
 	u8 data = 0;
 
@@ -182,13 +182,13 @@ READ8_MEMBER(sphinx40_state::cb_r)
 	return data;
 }
 
-WRITE8_MEMBER(sphinx40_state::input_w)
+void sphinx40_state::input_w(u8 data)
 {
 	// d0-d3: input mux (buttons)
 	m_inp_mux = ~data & 0xf;
 }
 
-READ8_MEMBER(sphinx40_state::input_r)
+u8 sphinx40_state::input_r()
 {
 	u8 data = 0;
 
@@ -200,7 +200,7 @@ READ8_MEMBER(sphinx40_state::input_r)
 	return ~data & 0x1f;
 }
 
-WRITE8_MEMBER(sphinx40_state::lcd_w)
+void sphinx40_state::lcd_w(u8 data)
 {
 	// d0-d3: HD61603 data
 	m_lcd->data_w(data & 0xf);

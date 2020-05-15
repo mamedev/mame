@@ -123,11 +123,11 @@ private:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
+	uint8_t dec0_mcu_port0_r();
+	void dec0_mcu_port0_w(uint8_t data);
+	void dec0_mcu_port1_w(uint8_t data);
+	void dec0_mcu_port2_w(uint8_t data);
+	void dec0_mcu_port3_w(uint8_t data);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
 	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);

@@ -44,7 +44,7 @@ private:
 	DECLARE_WRITE8_MEMBER(digital_w);
 	DECLARE_WRITE16_MEMBER(foodf_paletteram_w);
 	void foodf_set_flip(int flip);
-	DECLARE_READ8_MEMBER(pot_r);
+	uint8_t pot_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);

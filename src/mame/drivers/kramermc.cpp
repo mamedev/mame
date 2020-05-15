@@ -84,9 +84,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	void port_a_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_videoram;
@@ -187,18 +187,18 @@ static INPUT_PORTS_START( kramermc )
 		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-READ8_MEMBER(kramermc_state::port_a_r)
+uint8_t kramermc_state::port_a_r()
 {
 	return m_porta;
 }
 
-READ8_MEMBER(kramermc_state::port_b_r)
+uint8_t kramermc_state::port_b_r()
 {
 	u8 key_row = (m_porta >> 1) & 7;
 	return m_io_keyboard[key_row]->read();
 }
 
-WRITE8_MEMBER(kramermc_state::port_a_w)
+void kramermc_state::port_a_w(uint8_t data)
 {
 	m_porta = data;
 	m_speaker->level_w(BIT(data, 5));

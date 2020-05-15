@@ -326,7 +326,7 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(foodf_state::pot_r)
+uint8_t foodf_state::pot_r(offs_t offset)
 {
 	return (ioport("DSW")->read() >> offset) << 7;
 }

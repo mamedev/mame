@@ -74,8 +74,8 @@ private:
 	DECLARE_WRITE8_MEMBER(madalien_output_w);
 	DECLARE_WRITE8_MEMBER(madalien_videoram_w);
 	DECLARE_WRITE8_MEMBER(madalien_charram_w);
-	DECLARE_WRITE8_MEMBER(madalien_portA_w);
-	DECLARE_WRITE8_MEMBER(madalien_portB_w);
+	void madalien_portA_w(uint8_t data);
+	void madalien_portB_w(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(scan_mode0);
 	TILEMAP_MAPPER_MEMBER(scan_mode1);
 	TILEMAP_MAPPER_MEMBER(scan_mode2);

@@ -118,7 +118,7 @@ namespace devices
 		logic_input_t m_I;
 		analog::NETLIB_NAME(twoterm) m_RP;
 		analog::NETLIB_NAME(twoterm) m_RN;
-		state_var<int> m_last_state;
+		state_var<netlist_sig_t> m_last_state;
 	};
 
 } // namespace devices

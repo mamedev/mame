@@ -114,8 +114,8 @@ private:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( ppi_control_r );
 	DECLARE_WRITE8_MEMBER( ppi_control_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
@@ -127,8 +127,8 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_bd_w);
 	DECLARE_WRITE8_MEMBER(pio_ac_w);
 	DECLARE_WRITE8_MEMBER(pio_bc_w);
-	DECLARE_READ8_MEMBER(sby_r);
-	DECLARE_WRITE8_MEMBER(ald_w);
+	uint8_t sby_r();
+	void ald_w(uint8_t data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void ace_io(address_map &map);
@@ -626,7 +626,7 @@ uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER(ace_state::sby_r)
+uint8_t ace_state::sby_r()
 {
 	/*
 
@@ -646,7 +646,7 @@ READ8_MEMBER(ace_state::sby_r)
 	return m_sp0256->sby_r();
 }
 
-WRITE8_MEMBER(ace_state::ald_w)
+void ace_state::ald_w(uint8_t data)
 {
 	/*
 
@@ -673,7 +673,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::pio_pa_r )
+uint8_t ace_state::pio_pa_r()
 {
 	/*
 
@@ -693,7 +693,7 @@ READ8_MEMBER( ace_state::pio_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( ace_state::pio_pa_w )
+void ace_state::pio_pa_w(uint8_t data)
 {
 	/*
 

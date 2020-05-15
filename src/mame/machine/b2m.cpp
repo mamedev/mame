@@ -146,24 +146,24 @@ WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_porta_w)
+void b2m_state::b2m_8255_porta_w(uint8_t data)
 {
 	m_b2m_8255_porta = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portb_w)
+void b2m_state::b2m_8255_portb_w(uint8_t data)
 {
 	m_b2m_video_scroll = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portc_w)
+void b2m_state::b2m_8255_portc_w(uint8_t data)
 {
 	m_b2m_8255_portc = data;
 	b2m_set_bank(m_b2m_8255_portc & 7);
 	m_b2m_video_page = (m_b2m_8255_portc >> 7) & 1;
 }
 
-READ8_MEMBER(b2m_state::b2m_8255_portb_r)
+uint8_t b2m_state::b2m_8255_portb_r()
 {
 	return m_b2m_video_scroll;
 }
@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 }
 
 
-WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
+void b2m_state::b2m_ext_8255_portc_w(uint8_t data)
 {
 	uint8_t drive = ((data >> 1) & 1) ^ 1;
 	uint8_t side  = (data  & 1) ^ 1;
@@ -207,18 +207,18 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	}
 }
 
-READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
+uint8_t b2m_state::b2m_romdisk_porta_r()
 {
 	uint8_t *romdisk = memregion("maincpu")->base() + 0x12000;
 	return romdisk[m_b2m_romdisk_msb*256+m_b2m_romdisk_lsb];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portb_w)
+void b2m_state::b2m_romdisk_portb_w(uint8_t data)
 {
 	m_b2m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
+void b2m_state::b2m_romdisk_portc_w(uint8_t data)
 {
 	m_b2m_romdisk_msb = data & 0x7f;
 }

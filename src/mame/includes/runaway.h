@@ -36,7 +36,7 @@ private:
 	DECLARE_WRITE8_MEMBER(runaway_paletteram_w);
 	DECLARE_WRITE8_MEMBER(runaway_video_ram_w);
 	DECLARE_WRITE_LINE_MEMBER(tile_bank_w);
-	DECLARE_READ8_MEMBER(runaway_pot_r);
+	uint8_t runaway_pot_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(runaway_get_tile_info);
 	TILE_GET_INFO_MEMBER(qwak_get_tile_info);
 	DECLARE_VIDEO_START(qwak);

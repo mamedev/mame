@@ -92,8 +92,8 @@ private:
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	DECLARE_READ8_MEMBER(r6532_porta_r);
-	DECLARE_WRITE8_MEMBER(r6532_porta_w);
+	uint8_t r6532_porta_r();
+	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();

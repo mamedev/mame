@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 
-Hegener + Glaser Mephisto (I)/1X/II/ESB II/III
+Hegener + Glaser Mephisto (I)/1X/II/ESB II/III/Junior
 The base device is nicknamed the "Brikett"
 
 Mephisto is the 1st chess computer by H+G, chess engine by Thomas Nitsche & Elmar Henne.
@@ -19,12 +19,20 @@ Hardware notes:
 - 8*MWS5101L3 (256x4 RAM)
 - 4-digit 7seg LCD
 - piezo, TTL, 16-button keypad
+- module slot
 
 2nd model (Mephisto II 1982, Mephisto III): (listed differences)
 - PCB label: DH 4005-101 01
 - CDP1802ACE @ 6.144MHz, later serials also seen with 1806 CPU
 - 2 XTALs (3.579MHz and 6.144MHz), lower speed when running on battery
 - 2*TC5514P (1KBx4 RAM), unpopulated on some Mephisto III
+
+Mephisto Junior: (listed differences)
+- 2 PCBs: RAWE 003010 B(computer), RAWE 003010 A(LCD/keypad)
+  (RAWE = Rawe Datentechnik GmbH)
+- CDP1802ACE @ 4.194MHz
+- 1KB RAM (2*MWS5114E1), 8KB ROM (SMM2365C)
+- no module slot, I/O chip, or external port
 
 Mephisto program module:
 - PCB label: DF 4003-B
@@ -74,6 +82,7 @@ is completely different, based on a 68000.
 #include "mephisto_1.lh" // clickable
 #include "mephisto_esb2.lh" // clickable
 #include "mephisto_3.lh" // clickable
+#include "mephisto_junior.lh" // clickable
 
 
 namespace {
@@ -97,6 +106,7 @@ public:
 
 	// machine configs
 	void mephisto(machine_config &config);
+	void mephistoj(machine_config &config);
 	void mephisto2(machine_config &config);
 	void mephisto2e(machine_config &config);
 	void mephisto3(machine_config &config);
@@ -108,7 +118,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cdp1802_device> m_maincpu;
-	required_device<cdp1852_device> m_extport;
+	optional_device<cdp1852_device> m_extport;
 	optional_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -117,10 +127,12 @@ private:
 
 	// address maps
 	void mephisto_map(address_map &map);
+	void mephistoj_map(address_map &map);
 	void mephisto2_map(address_map &map);
 	void mephisto2e_map(address_map &map);
 	void mephisto3_map(address_map &map);
 	void mephisto_io(address_map &map);
+	void mephistoj_io(address_map &map);
 
 	void set_cpu_freq();
 
@@ -180,11 +192,15 @@ void brikett_state::machine_reset()
 
 void brikett_state::set_cpu_freq()
 {
+	u8 inp = m_inputs[4]->read();
+	if (~inp & 0x40)
+		return;
+	inp = inp >> 4 & inp;
+
 	// 2nd hardware model has 2 XTALs, it will increase CPU voltage (and speed) when running on mains power,
 	// the 3.579545MHz XTAL is still used for IRQ. Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz
 	// and a newer CDP1805CE CPU by Hobby Computer Centrale on request.
 	// (It is unexpected that the 1805 accepts such a high overclock, but tests show that it is indeed twice faster)
-	u8 inp = m_inputs[4]->read() >> 4 & m_inputs[4]->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 12_MHz_XTAL : ((inp & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL));
 }
 
@@ -307,6 +323,12 @@ void brikett_state::mephisto_map(address_map &map)
 	map(0xfff0, 0xffff).r(FUNC(brikett_state::input_r));
 }
 
+void brikett_state::mephistoj_map(address_map &map)
+{
+	mephisto_map(map);
+	map(0x0000, 0x1fff).rom();
+}
+
 void brikett_state::mephisto2_map(address_map &map)
 {
 	mephisto_map(map);
@@ -333,6 +355,11 @@ void brikett_state::mephisto_io(address_map &map)
 	map(0x02, 0x02).w(m_extport, FUNC(cdp1852_device::write));
 }
 
+void brikett_state::mephistoj_io(address_map &map)
+{
+	map(0x01, 0x01).r(FUNC(brikett_state::sound_r));
+}
+
 
 
 /******************************************************************************
@@ -343,11 +370,11 @@ static INPUT_PORTS_START( mephisto )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A / 1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("ENT")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("ENT")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B / 2 / Pawn")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("STA") // enter move
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("STA") // enter move
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C / 3 / Knight")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LEV")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D / 4 / Bishop")
@@ -368,12 +395,22 @@ static INPUT_PORTS_START( mephisto )
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-	PORT_CONFNAME( 0x30, 0x00, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
-	PORT_CONFSETTING(    0x00, "1st Model (1980)" )
-	PORT_CONFSETTING(    0x30, "2nd Model (1982)" )
+	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
+	PORT_CONFSETTING(    0x40, "1st Model (1980)" )
+	PORT_CONFSETTING(    0x70, "2nd Model (1982)" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mephistoj )
+	PORT_INCLUDE( mephisto )
+
+	PORT_MODIFY("IN.4") // 1 XTAL
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephisto2e )
@@ -387,6 +424,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephisto3 )
 	PORT_INCLUDE( mephisto2e )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("ENT")
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
@@ -404,7 +444,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )
-	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -413,14 +453,39 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void brikett_state::mephisto(machine_config &config)
+void brikett_state::mephistoj(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL); // see set_cpu_freq
-	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto_map);
-	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephisto_io);
+	CDP1802(config, m_maincpu, 4.194304_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoj_map);
+	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
 	m_maincpu->q_cb().set(FUNC(brikett_state::q_w)).invert();
+
+	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x10000); // through SAJ300T
+	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_mephisto_junior);
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+
+	TIMER(config, m_speaker_off).configure_generic(FUNC(brikett_state::speaker_off));
+}
+
+void brikett_state::mephisto(machine_config &config)
+{
+	mephistoj(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(3.579545_MHz_XTAL); // see set_cpu_freq
+	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto_map);
+	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephisto_io);
 	m_maincpu->tpb_cb().set(m_extport, FUNC(cdp1852_device::clock_w));
 	m_maincpu->ef1_cb().set_constant(0); // external port
 	m_maincpu->ef3_cb().set_constant(0); // external port, but unused
@@ -432,17 +497,7 @@ void brikett_state::mephisto(machine_config &config)
 	m_extport->mode_cb().set_constant(1);
 	m_extport->do_cb().set_nop();
 
-	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_mephisto_1);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-
-	TIMER(config, m_speaker_off).configure_generic(FUNC(brikett_state::speaker_off));
 }
 
 void brikett_state::mephisto2(machine_config &config)
@@ -498,12 +553,16 @@ ROM_START( mephisto )
 	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // "
 ROM_END
 
-
 ROM_START( mephisto1x )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("3-2911_adi.1", 0x0000, 0x1000, CRC(0d62fa67) SHA1(b4bd934fec595f37f99b74eb341d220c511c07a5) ) // CM3200-2
 	ROM_LOAD("3-2501_adj.2", 0x1000, 0x1000, CRC(4e1b67ae) SHA1(4fded3ed1a1e168dedc07eea4086fa31805252d9) ) // "
 	ROM_LOAD("3-2841_adk.3", 0x2000, 0x1000, CRC(5dd05a5d) SHA1(372ed83a936fb0720b68590ca6ff4a02c80f4bab) ) // "
+ROM_END
+
+ROM_START( mephistoj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("smm2365c.7", 0x0000, 0x2000, CRC(f2f46583) SHA1(960b6f781e4c3d98db85a1bb4f90df4a133f06ba) ) // SMM2365C, no label
 ROM_END
 
 
@@ -553,6 +612,7 @@ ROM_END
 CONS( 1980, mephisto,   0,         0, mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1981, mephisto1x, 0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, mephistoj,  0,         0, mephistoj,  mephistoj,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // there's also a "Mephisto Junior" from 1990
 
 CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

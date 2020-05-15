@@ -446,9 +446,10 @@ void tool_app_t::run()
 				opt_logs(),
 				m_defines, opt_rfolders(), opt_includes());
 
+		// Inputs must be read before reset -> will clear setup and parser
+		inps = read_input(nt.setup(), opt_inp());
 		nt.exec().reset();
 
-		inps = read_input(nt.setup(), opt_inp());
 		ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
 	}
 

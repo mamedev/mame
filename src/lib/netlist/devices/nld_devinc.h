@@ -427,6 +427,12 @@
 	NET_REGISTER_DEVEXT(TTL_74365, name, pG1Q, pG2Q, pA1, pA2, pA3, pA4, pA5, pA6)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_74377.cpp
+// ---------------------------------------------------------------------
+#define TTL_74377_GATE(name)                                           \
+	NET_REGISTER_DEVEXT(TTL_74377_GATE, name)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_74393.cpp
 // ---------------------------------------------------------------------
 #define TTL_74393(name, pCP, pMR)                                      \
@@ -878,6 +884,15 @@
 
 #define TTL_74279_DIP(name)                                            \
 	NET_REGISTER_DEVEXT(TTL_74279_DIP, name)
+
+#define TTL_74377_DIP(name)                                            \
+	NET_REGISTER_DEVEXT(TTL_74377_DIP, name)
+
+#define TTL_74378_DIP(name)                                            \
+	NET_REGISTER_DEVEXT(TTL_74378_DIP, name)
+
+#define TTL_74379_DIP(name)                                            \
+	NET_REGISTER_DEVEXT(TTL_74379_DIP, name)
 
 #define DM9312_DIP(name)                                               \
 	NET_REGISTER_DEVEXT(DM9312_DIP, name)

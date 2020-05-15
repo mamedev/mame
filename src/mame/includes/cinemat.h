@@ -77,7 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
 	DECLARE_READ8_MEMBER(speedfrk_gear_r);
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w);
-	DECLARE_READ8_MEMBER(joystick_read);
+	uint8_t joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
 	uint32_t screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -250,10 +250,10 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(synced_sound_w);
 	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
-	DECLARE_READ8_MEMBER(sound_porta_r);
-	DECLARE_READ8_MEMBER(sound_portb_r);
-	DECLARE_WRITE8_MEMBER(sound_portb_w);
-	DECLARE_WRITE8_MEMBER(sound_output_w);
+	uint8_t sound_porta_r();
+	uint8_t sound_portb_r();
+	void sound_portb_w(uint8_t data);
+	void sound_output_w(uint8_t data);
 
 	virtual void sound_start() override;
 	virtual void sound_reset() override;

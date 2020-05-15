@@ -27,7 +27,7 @@ public:
 protected:
 	void at_softlists(machine_config &config);
 
-	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void boot_state_w(uint8_t data);
 
 	void tx_config(device_t *device);
 	void sb_config(device_t *device);
@@ -40,7 +40,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(at586_state::boot_state_w)
+void at586_state::boot_state_w(uint8_t data)
 {
 	logerror("Boot state %02x\n", data);
 	printf("[%02X]",data);

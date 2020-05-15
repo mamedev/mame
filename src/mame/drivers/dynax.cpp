@@ -1108,12 +1108,12 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 }
 
 
-WRITE8_MEMBER(dynax_state::tenkai_dswsel_w)
+void dynax_state::tenkai_dswsel_w(uint8_t data)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(dynax_state::tenkai_dsw_r)
+uint8_t dynax_state::tenkai_dsw_r()
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
@@ -1151,28 +1151,28 @@ void dynax_state::tenkai_update_rombank()
 //  logerror("rombank = %02x\n", m_rombank);
 }
 
-READ8_MEMBER(dynax_state::tenkai_p3_r)
+uint8_t dynax_state::tenkai_p3_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p3_w)
+void dynax_state::tenkai_p3_w(uint8_t data)
 {
 	m_rombank = ((data & 0x04) << 1) | (m_rombank & 0x07);
 	tenkai_update_rombank();
 }
-WRITE8_MEMBER(dynax_state::tenkai_p4_w)
+void dynax_state::tenkai_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x08) | ((data & 0x0e) >> 1);
 	tenkai_update_rombank();
 }
 
-READ8_MEMBER(dynax_state::tenkai_p5_r)
+uint8_t dynax_state::tenkai_p5_r()
 {
 	return m_tenkai_p5_val;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p6_w)
+void dynax_state::tenkai_p6_w(uint8_t data)
 {
 	m_tenkai_p5_val &= 0x0f;
 
@@ -1180,7 +1180,7 @@ WRITE8_MEMBER(dynax_state::tenkai_p6_w)
 		m_tenkai_p5_val |= (1 << 4);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p7_w)
+void dynax_state::tenkai_p7_w(uint8_t data)
 {
 	m_tenkai_p5_val &= 0xf0;
 
@@ -1188,13 +1188,13 @@ WRITE8_MEMBER(dynax_state::tenkai_p7_w)
 		m_tenkai_p5_val |= (1 << 3);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p8_w)
+void dynax_state::tenkai_p8_w(uint8_t data)
 {
 	m_rombank = ((data & 0x08) << 1) | (m_rombank & 0x0f);
 	tenkai_update_rombank();
 }
 
-READ8_MEMBER(dynax_state::tenkai_p8_r)
+uint8_t dynax_state::tenkai_p8_r()
 {
 	return 0x00;
 }
@@ -1297,7 +1297,7 @@ WRITE8_MEMBER(dynax_state::gekisha_hopper_w)
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
 }
 
-WRITE8_MEMBER(dynax_state::gekisha_p4_w)
+void dynax_state::gekisha_p4_w(uint8_t data)
 {
 	m_bankdev->set_bank((data >> 2) & 3);
 }

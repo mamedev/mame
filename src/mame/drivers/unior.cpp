@@ -69,19 +69,19 @@ public:
 	void unior(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(ppi0_b_r);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
-	DECLARE_READ8_MEMBER(ppi1_a_r);
-	DECLARE_READ8_MEMBER(ppi1_b_r);
-	DECLARE_READ8_MEMBER(ppi1_c_r);
-	DECLARE_WRITE8_MEMBER(ppi1_a_w);
-	DECLARE_WRITE8_MEMBER(ppi1_c_w);
+	void vram_w(offs_t offset, uint8_t data);
+	void scroll_w(uint8_t data);
+	uint8_t ppi0_b_r();
+	void ppi0_b_w(uint8_t data);
+	uint8_t ppi1_a_r();
+	uint8_t ppi1_b_r();
+	uint8_t ppi1_c_r();
+	void ppi1_a_w(uint8_t data);
+	void ppi1_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	void unior_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(dma_r);
+	uint8_t dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -262,13 +262,13 @@ static GFXDECODE_START( gfx_unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( unior_state::vram_w )
+void unior_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_p_vram[offset] = data;
 }
 
 // pulses a 1 to scroll
-WRITE8_MEMBER( unior_state::scroll_w )
+void unior_state::scroll_w(uint8_t data)
 {
 	if (data)
 		memmove(m_p_vram, m_p_vram+80, 24*80);
@@ -353,22 +353,22 @@ WRITE_LINE_MEMBER(unior_state::ctc_z1_w)
 }
 
 
-READ8_MEMBER( unior_state::ppi0_b_r )
+uint8_t unior_state::ppi0_b_r()
 {
 	return 0;
 }
 
 // Bit 4 - cassette relay?
-WRITE8_MEMBER( unior_state::ppi0_b_w )
+void unior_state::ppi0_b_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( unior_state::ppi1_a_r )
+uint8_t unior_state::ppi1_a_r()
 {
 	return m_4c;
 }
 
-READ8_MEMBER( unior_state::ppi1_b_r )
+uint8_t unior_state::ppi1_b_r()
 {
 	u8 t = m_4c & 15;
 	if (t < 11)
@@ -377,12 +377,12 @@ READ8_MEMBER( unior_state::ppi1_b_r )
 		return 0xff;
 }
 
-READ8_MEMBER( unior_state::ppi1_c_r )
+uint8_t unior_state::ppi1_c_r()
 {
 	return m_4e;
 }
 
-WRITE8_MEMBER( unior_state::ppi1_a_w )
+void unior_state::ppi1_a_w(uint8_t data)
 {
 	m_4c = data;
 }
@@ -394,7 +394,7 @@ d5 = unknown
 d6 = connect to A7 of the palette prom
 d7 = not used
 */
-WRITE8_MEMBER( unior_state::ppi1_c_w )
+void unior_state::ppi1_c_w(uint8_t data)
 {
 	m_4e = data;
 	m_pit->write_gate2(BIT(data, 4));
@@ -406,7 +406,7 @@ WRITE8_MEMBER( unior_state::ppi1_c_w )
 
 *************************************************/
 
-READ8_MEMBER(unior_state::dma_r)
+uint8_t unior_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);

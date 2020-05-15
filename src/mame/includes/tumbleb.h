@@ -104,11 +104,11 @@ protected:
 	DECLARE_READ16_MEMBER(semibase_unknown_r);
 	DECLARE_WRITE16_MEMBER(jumpkids_sound_w);
 	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
-	DECLARE_WRITE8_MEMBER(oki_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(jumpkids_oki_bank_w);
-	DECLARE_WRITE8_MEMBER(prot_p0_w);
-	DECLARE_WRITE8_MEMBER(prot_p1_w);
-	DECLARE_WRITE8_MEMBER(prot_p2_w);
+	void oki_sound_bank_w(uint8_t data);
+	void jumpkids_oki_bank_w(uint8_t data);
+	void prot_p0_w(uint8_t data);
+	void prot_p1_w(uint8_t data);
+	void prot_p2_w(uint8_t data);
 	DECLARE_READ16_MEMBER(bcstory_1a0_read);
 	DECLARE_WRITE16_MEMBER(bcstory_tilebank_w);
 	DECLARE_WRITE16_MEMBER(chokchok_tilebank_w);

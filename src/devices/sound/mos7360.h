@@ -83,8 +83,8 @@ public:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	uint8_t read(address_space &space, offs_t offset, int &cs0, int &cs1);
-	void write(address_space &space, offs_t offset, uint8_t data, int &cs0, int &cs1);
+	uint8_t read(offs_t offset, int &cs0, int &cs1);
+	void write(offs_t offset, uint8_t data, int &cs0, int &cs1);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

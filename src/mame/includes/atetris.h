@@ -81,9 +81,9 @@ public:
 	void atetrisb3(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(mcu_bus_r);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
-	DECLARE_WRITE8_MEMBER(mcu_reg_w);
+	uint8_t mcu_bus_r();
+	void mcu_p2_w(uint8_t data);
+	void mcu_reg_w(offs_t offset, uint8_t data);
 
 	void atetrisb3_map(address_map &map);
 

@@ -850,7 +850,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
+void tumbleb_state::oki_sound_bank_w(uint8_t data)
 {
 	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
@@ -899,7 +899,7 @@ void tumbleb_state::jumpkids_main_map(address_map &map)
 	map(0x342400, 0x34247f).nopw();
 }
 
-WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
+void tumbleb_state::jumpkids_oki_bank_w(uint8_t data)
 {
 	uint8_t* sound1 = memregion("oki")->base();
 	uint8_t* sound2 = memregion("oki2")->base();
@@ -921,7 +921,7 @@ void tumbleb_state::jumpkids_sound_map(address_map &map)
 /* Semicom AT89C52 MCU */
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_p0_w)
+void tumbleb_state::prot_p0_w(uint8_t data)
 {
 	uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 	word = (word & 0xff00) | (data << 0);
@@ -929,14 +929,14 @@ WRITE8_MEMBER(tumbleb_state::prot_p0_w)
 }
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_p1_w)
+void tumbleb_state::prot_p1_w(uint8_t data)
 {
 	uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 	word = (word & 0x00ff) | (data << 8);
 	m_mainram[(m_protbase/2) + m_semicom_prot_offset] = word;
 }
 
-WRITE8_MEMBER(tumbleb_state::prot_p2_w)
+void tumbleb_state::prot_p2_w(uint8_t data)
 {
 	m_semicom_prot_offset = data;
 }

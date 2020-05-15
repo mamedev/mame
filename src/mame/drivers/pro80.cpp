@@ -27,8 +27,8 @@ Then press W to save. To load, press L. If it says r at the end, it indicates a 
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "pro80.lh"
 
@@ -40,8 +40,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "LINE%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "LINE%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void pro80(machine_config &config);
@@ -59,11 +59,10 @@ private:
 	uint8_t m_cass_in;
 	uint16_t m_cass_data[4];
 	void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport_array<6> m_io_keyboard;
-	output_finder<6> m_digits;
+	required_device<pwm_display_device> m_display;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
@@ -95,7 +94,7 @@ WRITE8_MEMBER( pro80_state::segment_w )
 	{
 		for (u8 i = 0; i < 6; i++)
 			if (!BIT(m_digit_sel, i))
-				m_digits[i] = data;
+				m_display->matrix(1<<i, data);
 
 		m_digit_sel = 0;
 	}
@@ -182,6 +181,8 @@ void pro80_state::pro80(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0x3f, 0xff);
 
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
 
@@ -196,7 +197,7 @@ void pro80_state::pro80(machine_config &config)
 
 /* ROM definition */
 ROM_START( pro80 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	// This rom dump is taken out of manual for this machine
 	ROM_LOAD( "pro80.bin", 0x0000, 0x0400, CRC(1bf6e0a5) SHA1(eb45816337e08ed8c30b589fc24960dc98b94db2))
 ROM_END

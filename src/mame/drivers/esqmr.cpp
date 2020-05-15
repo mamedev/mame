@@ -231,7 +231,7 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	u16 esq5506_read_adc();
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 
@@ -265,7 +265,7 @@ WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
 {
 }
 
-READ16_MEMBER(esqmr_state::esq5506_read_adc)
+u16 esqmr_state::esq5506_read_adc()
 {
 	return 0;
 }

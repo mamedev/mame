@@ -78,7 +78,7 @@ public:
 	void update_icount(netlist::netlist_time_ext time) noexcept;
 	void check_mame_abort_slice() noexcept;
 
-	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
+	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
 
 	int m_icount;
 
@@ -99,7 +99,7 @@ protected:
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const { }
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const { }
 
 	// device_t overrides
 	virtual void device_config_complete() override;
@@ -178,7 +178,7 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -238,7 +238,7 @@ public:
 
 protected:
 	// netlist_mame_device
-	virtual void nl_register_devices(netlist::setup_t &lsetup) const override;
+	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -269,7 +269,7 @@ public:
 	}
 
 	virtual void custom_netlist_additions(netlist::netlist_state_t &nlstate) { }
-	virtual void pre_parse_action(netlist::netlist_state_t &nlstate) { }
+	virtual void pre_parse_action(netlist::nlparse_t &parser) { }
 	virtual void validity_helper(validity_checker &valid,
 		netlist::netlist_state_t &nlstate) const { }
 

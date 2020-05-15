@@ -301,7 +301,7 @@ void boogwing_state::machine_reset()
 	m_priority = 0;
 }
 
-WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
+void boogwing_state::sound_bankswitch_w(uint8_t data)
 {
 	m_oki[1]->set_rom_bank((data & 2) >> 1);
 	m_oki[0]->set_rom_bank(data & 1);

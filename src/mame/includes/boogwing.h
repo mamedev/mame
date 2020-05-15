@@ -51,7 +51,7 @@ public:
 	bitmap_ind16 m_temp_bitmap;
 	bitmap_ind16 m_alpha_tmap_bitmap;
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(priority_w);
 	void init_boogwing();
 	virtual void machine_reset() override;

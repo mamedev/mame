@@ -176,7 +176,7 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 		m_audionmi->in_w<0>(BIT(data, 0));
 }
 
-WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
+void btime_state::ay_audio_nmi_enable_w(uint8_t data)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
