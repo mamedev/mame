@@ -82,7 +82,7 @@ private:
 	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
 	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
-	DECLARE_WRITE8_MEMBER(out_lamps);
+	void out_lamps(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);

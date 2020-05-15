@@ -618,7 +618,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
  *
  *************************************/
 
-WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
+void midvunit_state::midvplus_xf1_w(uint8_t data)
 {
 //  osd_printf_debug("xf1_w = %d\n", data);
 

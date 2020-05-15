@@ -656,12 +656,12 @@ WRITE16_MEMBER(namcos2_state::dpram_word_w)
 }
 
 
-READ8_MEMBER(namcos2_state::dpram_byte_r)
+uint8_t namcos2_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos2_state::dpram_byte_w)
+void namcos2_state::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }

@@ -50,8 +50,8 @@ private:
 	DECLARE_WRITE8_MEMBER(int_ack2_w);
 	DECLARE_WRITE8_MEMBER(watchdog1_w);
 	DECLARE_WRITE8_MEMBER(watchdog2_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(cus115_w);
 	DECLARE_WRITE8_MEMBER(videoram1_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);

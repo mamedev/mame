@@ -1311,7 +1311,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mappy_state::out_lamps)
+void mappy_state::out_lamps(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);
 	m_leds[1] = BIT(data, 1);

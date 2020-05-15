@@ -71,7 +71,7 @@ private:
 	DECLARE_READ16_MEMBER(winrun_table_r);
 	DECLARE_WRITE16_MEMBER(winrun_dsp_complete_w);
 	DECLARE_WRITE16_MEMBER(winrun_dsp_render_w);
-	DECLARE_READ16_MEMBER(winrun_poly_reset_r);
+	uint16_t winrun_poly_reset_r();
 	DECLARE_WRITE16_MEMBER(winrun_dsp_pointrom_addr_w);
 	DECLARE_READ16_MEMBER(winrun_dsp_pointrom_data_r);
 

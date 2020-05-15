@@ -92,14 +92,14 @@ private:
 	DECLARE_WRITE8_MEMBER(irq_disable_w);
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	void toypop_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(dipA_l);
-	DECLARE_READ8_MEMBER(dipA_h);
-	DECLARE_READ8_MEMBER(dipB_l);
-	DECLARE_READ8_MEMBER(dipB_h);
+	uint8_t dipA_l();
+	uint8_t dipA_h();
+	uint8_t dipB_l();
+	uint8_t dipB_h();
 	//DECLARE_WRITE8_MEMBER(out_coin0);
 	//DECLARE_WRITE8_MEMBER(out_coin1);
 	DECLARE_WRITE8_MEMBER(pal_bank_w);
-	DECLARE_WRITE8_MEMBER(flip);
+	void flip(uint8_t data);
 	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(slave_shared_r);
 	DECLARE_WRITE8_MEMBER(slave_shared_w);
@@ -370,12 +370,12 @@ WRITE8_MEMBER(namcos16_state::bg_rmw_w)
 	m_bgvram[offset] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-READ8_MEMBER(namcos16_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
-READ8_MEMBER(namcos16_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
-READ8_MEMBER(namcos16_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
-READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
+uint8_t namcos16_state::dipA_l() { return ioport("DSW1")->read(); }                // dips A
+uint8_t namcos16_state::dipA_h() { return ioport("DSW1")->read() >> 4; }           // dips A
+uint8_t namcos16_state::dipB_l() { return ioport("DSW2")->read(); }                // dips B
+uint8_t namcos16_state::dipB_h() { return ioport("DSW2")->read() >> 4; }           // dips B
 
-WRITE8_MEMBER(namcos16_state::flip)
+void namcos16_state::flip(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }

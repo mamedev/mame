@@ -96,11 +96,11 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 
 
-	DECLARE_WRITE8_MEMBER(ay1_porta_w);
-	DECLARE_READ8_MEMBER(ay1_porta_r);
+	void ay1_porta_w(uint8_t data);
+	uint8_t ay1_porta_r();
 
-	DECLARE_WRITE8_MEMBER(ay2_porta_w);
-	DECLARE_READ8_MEMBER(ay2_porta_r);
+	void ay2_porta_w(uint8_t data);
+	uint8_t ay2_porta_r();
 
 	DECLARE_READ8_MEMBER(spyhuntertec_in2_r);
 	DECLARE_READ8_MEMBER(spyhuntertec_in3_r);
@@ -121,12 +121,12 @@ private:
 	void spyhuntertec_sound_portmap(address_map &map);
 };
 
-WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
+void spyhuntertec_state::ay1_porta_w(uint8_t data)
 {
 //  printf("ay1_porta_w %02x\n", data);
 }
 
-READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
+uint8_t spyhuntertec_state::ay1_porta_r()
 {
 //  printf("ay1_porta_r\n");
 	return 0;
@@ -145,7 +145,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
 	reset_analog_timer();
 }
 
-WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
+void spyhuntertec_state::ay2_porta_w(uint8_t data)
 {
 	// d7: latch analog counter on falling edge, d0 selects which one
 	if (~data & m_analog_select & 0x80)
@@ -157,7 +157,7 @@ WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 	m_analog_select = data;
 }
 
-READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
+uint8_t spyhuntertec_state::ay2_porta_r()
 {
 // read often, even if port is set to output mode
 // maybe latches something?

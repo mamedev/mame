@@ -351,8 +351,8 @@ private:
 
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
 	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
@@ -366,8 +366,8 @@ private:
 
 	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
@@ -514,12 +514,12 @@ WRITE16_MEMBER(namcos21_state::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namcos21_state::dpram_byte_r)
+uint8_t namcos21_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos21_state::dpram_byte_w)
+void namcos21_state::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -770,7 +770,7 @@ WRITE8_MEMBER( namcos21_state::sound_bankselect_w )
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namcos21_state::sound_reset_w)
+void namcos21_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -785,7 +785,7 @@ WRITE8_MEMBER(namcos21_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos21_state::system_reset_w)
+void namcos21_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
