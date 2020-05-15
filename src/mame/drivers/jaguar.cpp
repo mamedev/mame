@@ -459,8 +459,8 @@ void jaguar_state::machine_reset()
 	dsp_resume();
 
 	/* halt the CPUs */
-	m_gpu->ctrl_w(G_CTRL, 0);
-	m_dsp->ctrl_w(D_CTRL, 0);
+	m_gpu->go_w(false);
+	m_dsp->go_w(false);
 
 	/* set blitter idle flag */
 	m_blitter_status = 1;
@@ -640,8 +640,8 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 		dsp_resume();
 
 		/* halt the CPUs */
-		m_gpu->ctrl_w(G_CTRL, 0);
-		m_dsp->ctrl_w(D_CTRL, 0);
+		m_gpu->go_w(false);
+		m_dsp->go_w(false);
 	}
 
 	/* adjust banking */
@@ -663,16 +663,13 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 
 READ32_MEMBER(jaguar_state::gpuctrl_r)
 {
-	return m_gpu->ctrl_r(offset);
+	return m_gpu->iobus_r(offset, mem_mask);
 }
-
 
 WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 {
-	m_gpu->ctrl_w(offset, data, mem_mask);
+	m_gpu->iobus_w(offset, data, mem_mask);
 }
-
-
 
 /*************************************
  *
@@ -682,15 +679,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 
 READ32_MEMBER(jaguar_state::dspctrl_r)
 {
-	return m_dsp->ctrl_r(offset);
+	return m_dsp->iobus_r(offset, mem_mask);
 }
-
 
 WRITE32_MEMBER(jaguar_state::dspctrl_w)
 {
-	m_dsp->ctrl_w(offset, data, mem_mask);
+	m_dsp->iobus_w(offset, data, mem_mask);
 }
-
 
 /*************************************
  *
@@ -1119,7 +1114,7 @@ void jaguar_state::console_base_map(address_map &map)
 	map(0xe00000, 0xe1ffff).rom().region("mainrom", 0);
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
 	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
 	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
@@ -1141,7 +1136,7 @@ void jaguar_state::jaguar_map(address_map &map)
 void jaguar_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffd, 0xfffffd).lr8([] () -> u8 { return 0x40; }, "level6");
+	map(0xfffff5, 0xfffff5).lr8([] () -> u8 { return 0x40; }, "level2");
 }
 
 /*
@@ -1451,7 +1446,7 @@ void jaguar_state::console_base_gpu_map(address_map &map)
 	map(0xe00000, 0xe1ffff).r(FUNC(jaguar_state::rom_base_r));
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
@@ -1764,18 +1759,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
+void jaguar_state::video_config(machine_config &config, const XTAL clock)
+{
+	JAGUARGPU(config, m_gpu, clock);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+
+	JAGUARDSP(config, m_dsp, clock);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	
+	// TODO: Tom 
+	// TODO: Object Processor
+	
+	JAG_BLITTER(config, m_blitter, clock);
+}
+
 void jaguar_state::cojagr3k(machine_config &config)
 {
 	/* basic machine hardware */
 	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
-	JAGUARGPU(config, m_gpu, COJAG_CLOCK/2);
-	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	video_config(config, COJAG_CLOCK/2);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_map);
-
-	JAGUARDSP(config, m_dsp, COJAG_CLOCK/2);
-	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -1803,6 +1808,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	
+	// TODO: subwoofer speaker
 }
 
 void jaguar_state::cojagr3k_rom(machine_config &config)
@@ -1832,12 +1839,8 @@ void jaguar_state::jaguar(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
-	JAGUARGPU(config, m_gpu, JAGUAR_CLOCK);
-	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	video_config(config, JAGUAR_CLOCK);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
-
-	JAGUARDSP(config, m_dsp, JAGUAR_CLOCK);
-	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
 
 //  MCFG_NVRAM_HANDLER(jaguar)
@@ -1902,6 +1905,7 @@ void jaguar_state::fix_endian( void *base, uint32_t size )
 
 void jaguar_state::init_jaguar()
 {
+	m_is_cojag = false;
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
 
