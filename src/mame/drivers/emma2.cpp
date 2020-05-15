@@ -39,7 +39,6 @@ and 16k of static RAM.
 
 To Do:
 - Cassette LED doesn't work.
-- Display should blank if PB0 not being pulsed.
 - Code up the expansion unit (rom is there but no schematic exists)
 - Need software.
 
