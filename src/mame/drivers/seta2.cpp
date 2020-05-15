@@ -2284,7 +2284,7 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 
 void seta2_state::seta2(machine_config &config)
 {
-	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // verified for most of PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::mj4simai_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 
@@ -2307,16 +2307,28 @@ void seta2_state::seta2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	x1_010_device &x1snd(X1_010(config, "x1snd", XTAL(50'000'000)/3));   // clock?
+	x1_010_device &x1snd(X1_010(config, "x1snd", XTAL(50'000'000)/3));   // verified for most of PCBs
 	x1snd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	x1snd.set_addrmap(0, &seta2_state::x1_map);
+}
+
+/*
+	P0-113A PCB has different sound/cpu input clock (32.53047MHz / 2, common input clock is 50MHz / 3)
+	reference:
+	https://youtu.be/zJi_d463UQE (gundamex)
+	https://youtu.be/Ung9XeLisV0 (grdiansa)
+*/
+void seta2_state::seta2_32m(machine_config &config)
+{
+	m_maincpu->set_clock(XTAL(32'530'470)/2);
+	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2);
 }
 
 
 void seta2_state::gundamex(machine_config &config)
 {
 	seta2(config);
-	m_maincpu->set_clock(XTAL(32'530'470)/2); // verified
+	seta2_32m(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
 	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
@@ -2326,24 +2338,24 @@ void seta2_state::gundamex(machine_config &config)
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x180-1, 0x000, 0x0e0-1);
-
-	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/zJi_d463UQE
 }
 
-
+// run in P-FG01-1 PCB, uses common input clock for sound/cpu - 32.53047MHz XTAL not populated
+// reference: https://youtu.be/qj-TyKyAAVY
 void seta2_state::grdians(machine_config &config)
 {
-	/*
-		CPU/Sound clock is possibly 32.53047MHz / 2 or 50MHz / 3, selectable/differs per PCB?
-		reference :
-		https://youtu.be/qj-TyKyAAVY (high pitch)
-		https://youtu.be/Ung9XeLisV0 (low pitch)
-	*/
 	seta2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::grdians_map);
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x130-1, 0x00, 0xe8 -1);
+}
+
+// run in P0-113A PCB, different sound/cpu input clock compared to P-FG01-1 PCB, same as gundamex?
+void seta2_state::grdiansa(machine_config &config)
+{
+	grdians(config);
+	seta2_32m(config);
 }
 
 
@@ -4391,7 +4403,7 @@ ROM_END
 GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                         0 )
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, grdiansa,  grdians,  grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
 
