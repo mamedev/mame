@@ -55,6 +55,7 @@ Z1000G
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
+#include "video/pwm.h"
 #include "datum.lh"
 
 
@@ -66,9 +67,9 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_pia2(*this, "pia2")
 		, m_acia(*this, "acia")
-		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void datum(machine_config &config);
@@ -82,13 +83,12 @@ private:
 	void datum_mem(address_map &map);
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<acia6850_device> m_acia;
-	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
-	output_finder<16> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<4> m_io_keyboard;
 };
 
 
@@ -162,7 +162,7 @@ void datum_state::machine_reset()
 READ8_MEMBER( datum_state::pa_r )
 {
 	if (m_keydata < 4)
-		return m_keyboard[m_keydata]->read();
+		return m_io_keyboard[m_keydata]->read();
 
 	return 0xff;
 }
@@ -173,7 +173,7 @@ WRITE8_MEMBER( datum_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
+		m_display->matrix(1<<m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
 		m_keydata = 0;
 	}
 
@@ -196,6 +196,8 @@ void datum_state::datum(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_datum);
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x3f0, 0x7f);
 
 	/* Devices */
 	PIA6821(config, m_pia1, 0); // keyboard & display
