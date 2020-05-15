@@ -328,6 +328,12 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, float _b);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b);
+
+	///
+	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c);
 
 	///
