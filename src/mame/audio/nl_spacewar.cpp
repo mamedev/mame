@@ -28,22 +28,13 @@
 //       from the noise source at all times to the summing amp.
 //       Suspecting this is a typo in the schematics.
 //
-//    * The 2N6426 Darlington transistors are not properly emulated.
-//       Currently they are modeled as a pair of 2N3904s. A pspice
-//       model ported into the netlist schema creates a very poor
-//       balance with the background noise.
-//
-//    * The TL182 analog switch is cobbled together from a pair of
-//       CD4066 gates and a pair of inverters on the inputs. This
-//       seems to work but perhaps should be properly added as a
-//       system model.
-//
 //    * Unsure if Barrier should have the noisy background like
 //       Space Wars. Space Wars has a hard overall mute to suppress
 //       it when the game isn't running, but Barrier does not.
 //
 
 #include "netlist/devices/net_lib.h"
+#include "nl_cinemat_common.h"
 
 
 //
@@ -57,87 +48,6 @@
 // The final amplifier is documented but not emulated.
 //
 #define EMULATE_FINAL_AMP	0
-
-
-//
-// Substitutes/models
-//
-
-NETLIST_START(_TL182_DIP)
-	CD4066_GATE(A)
-	CD4066_GATE(B)
-
-	NET_C(A.VDD, B.VDD)
-	NET_C(A.VSS, B.VSS)
-
-	PARAM(A.BASER, 270.0)
-	PARAM(B.BASER, 270.0)
-
-    RES(VR, 100)
-	NC_PIN(NC)
-
-	TTL_7406_GATE(AINV)
-	TTL_7406_GATE(BINV)
-	NET_C(AINV.VCC, BINV.VCC, A.VDD)
-	NET_C(AINV.GND, BINV.GND, A.VSS)
-	NET_C(AINV.Y, A.CTL)
-	NET_C(BINV.Y, B.CTL)
-
-	DIPPINS(   /*      +--------------+      */
-		A.R.1, /*   1S |1     ++    14| 2S   */ B.R.1,
-		A.R.2, /*   1D |2           13| 2D   */ B.R.2,
-		 NC.I, /*   NC |3           12| NC   */ NC.I,
-		 NC.I, /*   NC |4   TL182   11| NC   */ NC.I,
-	   AINV.A, /*   1A |5           10| 2A   */ BINV.A,
-		 VR.1, /*  VCC |6            9| VEE  */ VR.2,
-		A.VDD, /*  VLL |7            8| VREF */ A.VSS
-			   /*      +--------------+      */
-	)
-NETLIST_END()
-
-#define TL182_DIP(name) SUBMODEL(_TL182_DIP, name)
-
-
-#if 0
-
-//
-// This model causes the background noise level to domainate all other sounds?
-//
-
-// Model dervied from https://www.onsemi.com/support/design-resources/models?rpn=2N6284
-NETLIST_START(_QBJT_2N6426)
-	QBJT_EB(Q1, "NPN(IS=1.73583e-11 BF=831.056 NF=1.05532 VAF=957.147 IKF=0.101183 ISE=1.65383e-10 NE=1.59909 BR=2.763 NR=1.03428 VAR=4.18534 IKR=0.0674174 ISC=1.00007e-13 NC=2.00765 RB=22.2759 IRB=0.208089 RBM=22.2759 RE=0.0002 RC=0.001 XTB=2.12676 XTI=1.82449 EG=1.05 CJE=2.62709e-10 VJE=0.95 MJE=0.23 TF=1e-09 XTF=1 VTF=10 ITF=0.01 CJC=3.59851e-10 VJC=0.845279 MJC=0.23 XCJC=0.9 FC=0.5 TR=1e-07 PTF=0 KF=0 AF=1)")
-	QBJT_EB(Q2, "NPN(IS=1.73583e-11 BF=831.056 NF=1.05532 VAF=957.147 IKF=0.101183 ISE=1.65383e-10 NE=1.59909 BR=2.763 NR=1.03428 VAR=4.18534 IKR=0.0674174 ISC=1.00007e-13 NC=2.00765 RB=22.2759 IRB=0.208089 RBM=22.2759 RE=0.0002 RC=0.001 XTB=2.12676 XTI=1.82449 EG=1.05 CJE=2.62709e-10 VJE=0.95 MJE=0.23 TF=1e-09 XTF=1 VTF=10 ITF=0.01 CJC=0 VJC=0.845279 MJC=0.23 XCJC=0.9 FC=0.5 TR=1e-07 PTF=0 KF=0 AF=1)")	// NPN
-	DIODE(D1, "D(IS=1e-12 RS=10.8089 N=1.00809 XTI=3.00809 CJO=0 VJ=0.75 M=0.33 FC=0.5)")
-	RES(R1, RES_K(8))
-	RES(R2, 50)
-
-	ALIAS(B, Q1.B)
-	ALIAS(C, Q1.C)
-	ALIAS(E, Q2.E)
-	NET_C(Q1.C, Q2.C, D1.K)
-	NET_C(Q1.B, R1.1)
-	NET_C(Q2.E, D1.A, R2.2)
-	NET_C(Q1.E, Q2.B, R1.2, R2.1)
-NETLIST_END()
-
-#else
-
-// super brain-dead model I threw together from a pair of 2N3904
-NETLIST_START(_QBJT_2N6426)
-	QBJT_EB(Q1, "NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")	// 2N3904 NPN
-	QBJT_EB(Q2, "NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")	// 2N3904 NPN
-
-	ALIAS(B, Q1.B)
-	ALIAS(C, Q1.C)
-	ALIAS(E, Q2.E)
-	NET_C(Q1.C, Q2.C)
-	NET_C(Q1.E, Q2.B)
-NETLIST_END()
-
-#endif
-
-#define QBJT_2N6426(name) SUBMODEL(_QBJT_2N6426, name)
 
 
 //
@@ -168,18 +78,6 @@ NETLIST_START(SpaceWars_schematics)
 #else // (SOUND_VARIANT == VARIANT_BARRIER)
 NETLIST_START(Barrier_schematics)
 #endif
-
-	// SPICE model taken directly from Fairchild Semiconductor datasheet
-	NET_MODEL("2N3904 NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259 Ise=6.734 Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75 Tr=239.5n f=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)")
-
-	// SPICE model taken directly from Fairchild Semiconductor datasheet
-	NET_MODEL("2N3906 PNP(Is=1.41f Xti=3 Eg=1.11 Vaf=18.7 Bf=180.7 Ne=1.5 Ise=0 Ikf=80m Xtb=1.5 Br=4.977 Nc=2 Isc=0 Ikr=0 Rc=2.5 Cjc=9.728p Mjc=.5776 Vjc=.75 Fc=.5 Cje=8.063p Mje=.3677 Vje=.75 Tr=33.42n Tf=179.3p Itf=.4 Vtf=4 Xtf=6 Rb=10)")
-
-	// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N6107
-	NET_MODEL("2N6107 PNP(IS=7.62308e-14 BF=6692.56 NF=0.85 VAF=10 IKF=0.032192 ISE=2.07832e-13 NE=2.41828 BR=15.6629 NR=1.5 VAR=1.44572 IKR=0.32192 ISC=4.75e-16 NC=3.9375 RB=7.19824 IRB=0.1 RBM=0.1 RE=0.0001 RC=0.355458 XTB=0.1 XTI=2.97595 EG=1.206 CJE=1.84157e-10 VJE=0.99 MJE=0.347177 TF=6.63757e-09 XTF=1.50003 VTF=1.0001 ITF=1 CJC=1.06717e-10 VJC=0.942679 MJC=0.245405 XCJC=0.8 FC=0.533334 CJS=0 VJS=0.75 MJS=0.5 TR=1.32755e-07 PTF=0 KF=0 AF=1)")
-
-	// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N6292
-	NET_MODEL("2N6292 NPN(IS=9.3092e-13 BF=2021.8 NF=0.85 VAF=63.2399 IKF=1 ISE=1.92869e-13 NE=1.97024 BR=40.0703 NR=1.5 VAR=0.89955 IKR=10 ISC=4.92338e-16 NC=3.9992 RB=6.98677 IRB=0.1 RBM=0.1 RE=0.0001 RC=0.326141 XTB=0.1 XTI=2.86739 EG=1.206 CJE=1.84157e-10 VJE=0.99 MJE=0.347174 TF=6.73756e-09 XTF=1.49917 VTF=0.997395 ITF=0.998426 CJC=1.06717e-10 VJC=0.942694 MJC=0.245406 XCJC=0.8 FC=0.533405 CJS=0 VJS=0.75 MJS=0.5 TR=6.0671e-08 PTF=0 KF=0 AF=1)")
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V15, 15)
@@ -276,20 +174,20 @@ NETLIST_START(Barrier_schematics)
 	CAP(C23, CAP_U(0.1))
 #endif
 
-	DIODE(CR1, "1N914")
-	DIODE(CR2, "1N914")
-	DIODE(CR3, "1N914")
-	DIODE(CR4, "1N914")
-	DIODE(CR5, "1N914")
-	DIODE(CR6, "1N914")
+	D_1N914(CR1)
+	D_1N914(CR2)
+	D_1N914(CR3)
+	D_1N914(CR4)
+	D_1N914(CR5)
+	D_1N914(CR6)
 
-	QBJT_EB(Q1, "2N3906")	// PNP
-	QBJT_EB(Q2, "2N3904")	// NPN
-	QBJT_2N6426(Q3)			// NPN Darlington
-	QBJT_EB(Q4, "2N6292")	// NPN
-	QBJT_EB(Q5, "2N6107")	// PNP
-	QBJT_2N6426(Q6)			// NPN Darlington
-	QBJT_EB(Q7, "2N3904")	// NPN
+	Q_2N3906(Q1)	// PNP
+	Q_2N3904(Q2)	// NPN
+	Q_2N6426(Q3)	// NPN Darlington
+	Q_2N6292(Q4)	// NPN
+	Q_2N6107(Q5)	// PNP
+	Q_2N6426(Q6)	// NPN Darlington
+	Q_2N3904(Q7)	// NPN
 
 	TL081_DIP(U1)			// Op. Amp.
 	NET_C(U1.4, I_VM15)
@@ -511,8 +409,7 @@ NETLIST_START(barrier)
 	NET_C(I_V5, I_OUT_3.VCC, I_OUT_4.VCC)
 #endif
 
-	LOCAL_SOURCE(_TL182_DIP)
-	LOCAL_SOURCE(_QBJT_2N6426)
+	CINEMAT_LOCAL_MODELS
 
 #if (SOUND_VARIANT == VARIANT_SPACEWARS)
 	LOCAL_SOURCE(SpaceWars_schematics)
