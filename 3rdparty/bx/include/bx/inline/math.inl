@@ -492,6 +492,26 @@ namespace bx
 		};
 	}
 
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b)
+	{
+		return
+		{
+			_a.x / _b.x,
+			_a.y / _b.y,
+			_a.z / _b.z,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b)
+	{
+		return
+		{
+			_a.x / _b,
+			_a.y / _b,
+			_a.z / _b,
+		};
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c)
 	{
 		return add(mul(_a, _b), _c);
