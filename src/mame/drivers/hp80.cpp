@@ -2433,7 +2433,7 @@ ROM_START(hp86b_004)
 	ROM_LOAD("chrgen.bin" , 0 , 0x500 , CRC(c7d04292) SHA1(b86ed801ee9f7a57b259374b8a9810572cb03230))
 ROM_END
 
-COMP( 1980, hp85, 0, 0, hp85, hp85, hp85_state, empty_init, "HP", "HP 85", 0)
-COMP( 1983, hp86b,0, 0, hp86, hp86, hp86_state, empty_init, "HP", "HP 86B",0)
-COMP( 1983, hp86b_001, 0, 0, hp86, hp86_001, hp86_int_state, empty_init, "HP", "HP 86B Opt 001",0)
-COMP( 1983, hp86b_004, 0, 0, hp86, hp86_004, hp86_int_state, empty_init, "HP", "HP 86B Opt 004",0)
+COMP( 1980, hp85,      0,     0, hp85, hp85,     hp85_state,     empty_init, "HP", "HP 85", 0)
+COMP( 1983, hp86b,     0,     0, hp86, hp86,     hp86_state,     empty_init, "HP", "HP 86B",0)
+COMP( 1983, hp86b_001, hp86b, 0, hp86, hp86_001, hp86_int_state, empty_init, "HP", "HP 86B Opt 001",0)
+COMP( 1983, hp86b_004, hp86b, 0, hp86, hp86_004, hp86_int_state, empty_init, "HP", "HP 86B Opt 004",0)
