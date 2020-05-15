@@ -57,7 +57,6 @@ private:
 
 	uint8_t m_digit;
 	uint8_t m_seg;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
@@ -132,10 +131,6 @@ static INPUT_PORTS_START( savia84 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 INPUT_PORTS_END
 
-
-void savia84_state::machine_reset()
-{
-}
 
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
