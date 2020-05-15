@@ -82,6 +82,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	void datum_mem(address_map &map);
 	uint8_t m_keydata;
+	uint8_t m_seg;
 	virtual void machine_reset() override;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -156,6 +157,7 @@ INPUT_CHANGED_MEMBER( datum_state::trigger_nmi )
 void datum_state::machine_reset()
 {
 	m_keydata = 0;
+	m_seg = 0;
 }
 
 // read keyboard
@@ -170,21 +172,15 @@ READ8_MEMBER( datum_state::pa_r )
 // write display segments
 WRITE8_MEMBER( datum_state::pa_w )
 {
-	data ^= 0xff;
-	if (m_keydata > 3)
-	{
-		m_display->matrix(1<<m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
-		m_keydata = 0;
-	}
-
-	return;
+	m_seg = bitswap<8>(~data, 7, 0, 5, 6, 4, 2, 1, 3);
+	m_display->matrix(1<<m_keydata, m_seg);
 }
 
 // select keyboard row, select a digit
 WRITE8_MEMBER( datum_state::pb_w )
 {
 	m_keydata = bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3) & 15;
-	return;
+	m_display->matrix(1<<m_keydata, m_seg);
 }
 
 

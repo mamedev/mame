@@ -79,6 +79,7 @@ private:
 	void mem_map(address_map &map);
 
 	uint8_t m_digit;
+	uint8_t m_seg;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via;
@@ -153,13 +154,14 @@ WRITE8_MEMBER( emma2_state::digit_w )
 {
 	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
 
-	data &= 7;
-	m_digit = data;
+	m_digit = data & 7;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 WRITE8_MEMBER( emma2_state::segment_w )
 {
-	m_display->matrix(1<<m_digit, data);
+	m_seg = data;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 READ8_MEMBER( emma2_state::keyboard_r )
@@ -171,6 +173,7 @@ READ8_MEMBER( emma2_state::keyboard_r )
 
 void emma2_state::machine_reset()
 {
+	m_seg = 0;
 	m_digit = 0;
 }
 
