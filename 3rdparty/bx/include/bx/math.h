@@ -257,6 +257,9 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);
 
+	/// Returns reciprocal of _a.
+	BX_CONSTEXPR_FUNC float rcp(float _a);
+
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	BX_CONST_FUNC float mod(float _a, float _b);
@@ -369,7 +372,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC Vec3 max(const Vec3 _a, const Vec3 _b);
 
-	///
+	/// Returns component wise reciprocal of _a.
 	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a);
 
 	///
