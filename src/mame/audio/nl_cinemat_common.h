@@ -1,7 +1,7 @@
 // license:CC0
 // copyright-holders:Aaron Giles,Couriersud
 #ifndef MAME_AUDIO_NL_CINEMAT_COMMON_H
-#define MAME_AUDIO_NL_CINEMAT_COMMON_H 1
+#define MAME_AUDIO_NL_CINEMAT_COMMON_H
 
 
 //
