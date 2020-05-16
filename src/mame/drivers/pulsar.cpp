@@ -61,6 +61,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
+		, m_ram(*this, "mainram")
 	{ }
 
 	void pulsar(machine_config &config);
@@ -73,14 +74,12 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
-	u8 read_rom(u16 offset);
+	u8 read_rom(offs_t offset);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_boot_in_progress;
 	bool m_rom_in_map;
-	std::unique_ptr<u8[]> m_ram;
 	floppy_image_device *m_floppy;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -88,14 +87,14 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_shared_ptr<u8> m_ram;
 };
 
 void pulsar_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).lrw8(NAME([this](u16 offset)          { return m_ram[offset]; }),
-                             NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
-	map(0x0000, 0x07ff).lr8 (NAME([this](u16 offset)          { if(m_boot_in_progress) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0xf800, 0xffff).lr8 (NAME([this](u16 offset)          { return read_rom(offset); }));
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xf800, 0xffff).r(FUNC(pulsar_state::read_rom));
 }
 
 void pulsar_state::io_map(address_map &map)
@@ -108,16 +107,12 @@ void pulsar_state::io_map(address_map &map)
 	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
 }
 
-u8 pulsar_state::read_rom(u16 offset)
+u8 pulsar_state::read_rom(offs_t offset)
 {
 	if (m_rom_in_map)
-	{
-		if (!machine().side_effects_disabled())
-			m_boot_in_progress = false;
 		return m_rom[offset];
-	}
 	else
-		return m_ram[offset | 0xf800];
+		return m_ram[offset+0xf800];
 }
 
 /*
@@ -198,18 +193,30 @@ INPUT_PORTS_END
 
 void pulsar_state::machine_reset()
 {
-	m_boot_in_progress = true;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+
 	m_rom_in_map = true;
 	m_rtc->cs_w(1); // always enabled
 }
 
 void pulsar_state::machine_start()
 {
-	m_ram = make_unique_clear<u8[]>(0x10000);
-
 	// register for savestates
-	save_pointer(NAME(m_ram), 0x10000);
-	save_item(NAME(m_boot_in_progress));
 	save_item(NAME(m_rom_in_map));
 }
 
