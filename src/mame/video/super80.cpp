@@ -63,6 +63,8 @@ void super80_state::screen_vblank_super80m(bool state)
 
 uint32_t super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	address_space& program = m_maincpu->space(AS_PROGRAM);
+
 	m_cass_led = BIT(m_portf0, 5);
 
 	const uint8_t options = m_io_config->read();
@@ -90,7 +92,7 @@ uint32_t super80_state::screen_update_super80(screen_device &screen, bitmap_ind1
 				uint8_t chr = 32;
 				if (screen_on)
 				{
-					chr = m_ram[ma | x] & 0x7f;
+					chr = program.read_byte(ma | x) & 0x7f;
 					if ((chr >= 0x61) && (chr <= 0x7a))
 						chr &= 0x1f;
 					else
@@ -118,6 +120,7 @@ uint32_t super80_state::screen_update_super80(screen_device &screen, bitmap_ind1
 
 uint32_t super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	address_space& program = m_maincpu->space(AS_PROGRAM);
 	m_cass_led = BIT(m_portf0, 5);
 
 	const uint8_t options = m_io_config->read();
@@ -144,7 +147,7 @@ uint32_t super80_state::screen_update_super80d(screen_device &screen, bitmap_ind
 			{
 				uint8_t chr = 32;
 				if (screen_on)
-					chr = m_ram[ma | x];
+					chr = program.read_byte(ma | x);
 
 				// get pattern of pixels for that character scanline
 				const uint8_t gfx = m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
@@ -167,6 +170,7 @@ uint32_t super80_state::screen_update_super80d(screen_device &screen, bitmap_ind
 
 uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	address_space& program = m_maincpu->space(AS_PROGRAM);
 	m_cass_led = BIT(m_portf0, 5);
 
 	const uint8_t options = m_io_config->read();
@@ -193,7 +197,7 @@ uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind
 			{
 				uint8_t chr = 32;
 				if (screen_on)
-					chr = m_ram[ma | x];
+					chr = program.read_byte(ma | x);
 
 				// get pattern of pixels for that character scanline
 				const uint8_t gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
@@ -216,6 +220,7 @@ uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind
 
 uint32_t super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	address_space& program = m_maincpu->space(AS_PROGRAM);
 	m_cass_led = BIT(m_portf0, 5);
 
 	const uint8_t options = m_io_config->read();
@@ -246,12 +251,12 @@ uint32_t super80_state::screen_update_super80m(screen_device &screen, bitmap_ind
 			{
 				uint8_t chr = 32;
 				if (screen_on)
-					chr = m_ram[ma | x];
+					chr = program.read_byte(ma | x);
 
 				uint8_t bg = 0;
 				if (!(options & 0x40))
 				{
-					const uint8_t col = m_ram[0xfe00 | ma | x]; // byte of colour to display
+					const uint8_t col = program.read_byte(0xfe00 | ma | x); // byte of colour to display
 					fg = m_palette_index + (col & 0x0f);
 					bg = m_palette_index + (col >> 4);
 				}
@@ -294,51 +299,51 @@ void super80_state::portf1_w(u8 data)
 
 ---------------------------------------------------------------*/
 
-// we place the colour ram at m_ram[0x9000], and the videoram at m_ram[0x8000].
+// we place videoram at 0x0000, colour ram at 0x1000, pcg at 0x2000
 u8 super80r_state::low_r(offs_t offset)
 {
-	return m_ram[offset+0x8000];
+	return m_vram[offset];
 }
 
 void super80r_state::low_w(offs_t offset, u8 data)
 {
-	m_ram[offset+0x8000] = data; // video
+	m_vram[offset] = data; // video
 }
 
 u8 super80r_state::high_r(offs_t offset)
 {
-	return m_ram[offset+0x8800]; // video
+	return m_vram[offset+0x0800]; // video
 }
 
 void super80r_state::high_w(offs_t offset, u8 data)
 {
-	m_ram[offset+0x8800] = data; // video
-	m_ram[offset+0xf800] = data; // pcg
+	m_vram[offset+0x0800] = data; // video
+	m_vram[offset+0x2800] = data; // pcg
 }
 
 u8 super80v_state::low_r(offs_t offset)
 {
 	if (BIT(m_portf0, 2))
-		return m_ram[offset+0x8000]; // video
+		return m_vram[offset]; // video
 	else
-		return m_ram[offset+0x9000]; // colour
+		return m_vram[offset+0x1000]; // colour
 }
 
 void super80v_state::low_w(offs_t offset, u8 data)
 {
 	if (BIT(m_portf0, 2))
-		m_ram[offset+0x8000] = data; // video
+		m_vram[offset] = data; // video
 	else
-		m_ram[offset+0x9000] = data; // colour
+		m_vram[offset+0x1000] = data; // colour
 }
 
 u8 super80v_state::high_r(offs_t offset)
 {
 	if (!BIT(m_portf0, 2))
-		return m_ram[offset+0x9800]; // colour
+		return m_vram[offset+0x1800]; // colour
 	else
 	if (BIT(m_portf0, 4))
-		return m_ram[offset+0x8800]; // video
+		return m_vram[offset+0x0800]; // video
 	else
 		return m_p_chargen[offset]; // char rom
 }
@@ -346,13 +351,13 @@ u8 super80v_state::high_r(offs_t offset)
 void super80v_state::high_w(offs_t offset, u8 data)
 {
 	if (!BIT(m_portf0, 2))
-		m_ram[offset+0x9800] = data; // colour
+		m_vram[offset+0x1800] = data; // colour
 	else
 	{
-		m_ram[offset+0x8800] = data; // video
+		m_vram[offset+0x0800] = data; // video
 
 		if (BIT(m_portf0, 4))
-			m_ram[offset+0xf800] = data; // pcg
+			m_vram[offset+0x2800] = data; // pcg
 	}
 }
 
@@ -374,7 +379,7 @@ MC6845_UPDATE_ROW( super80v_state::crtc_update_row )
 		uint8_t inv = 0;
 		if (x == cursor_x) inv=0xff;
 		const uint16_t mem = (ma + x) & 0xfff;
-		uint8_t chr = m_ram[mem+0x8000];
+		uint8_t chr = m_vram[mem];
 
 		/* get colour or b&w */
 		uint8_t fg = 5;            // green
@@ -384,7 +389,7 @@ MC6845_UPDATE_ROW( super80v_state::crtc_update_row )
 		uint8_t bg = 0;
 		if (~m_s_options & 0x40)
 		{
-			const uint8_t col = m_ram[mem+0x9000];                 // byte of colour to display
+			const uint8_t col = m_vram[mem+0x1000];                 // byte of colour to display
 			fg = m_palette_index + (col & 0x0f);
 			bg = m_palette_index + (col >> 4);
 		}
@@ -398,7 +403,7 @@ MC6845_UPDATE_ROW( super80v_state::crtc_update_row )
 
 		// get pattern of pixels for that character scanline
 		const uint8_t gfx = BIT(chr, 7)
-			? m_ram[0xf000 | ((chr << 4) | ra)] ^ inv
+			? m_vram[0x2000 | ((chr << 4) | ra)] ^ inv
 			: m_p_chargen[((chr << 4) | ra)] ^ inv;
 
 		// Display a scanline of a character
