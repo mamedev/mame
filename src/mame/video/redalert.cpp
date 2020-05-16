@@ -38,7 +38,8 @@ void redalert_state::redalert_bitmap_videoram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void redalert_state::get_pens(pen_t *pens)
+// TODO: clean these functions, add F4 viewer, initialize on boot?
+void redalert_state::get_redalert_pens(pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -102,7 +103,6 @@ void redalert_state::get_pens(pen_t *pens)
 }
 
 /* this uses the same color hook-up between bitmap and chars. */
-/* TODO: clean me up */
 void redalert_state::get_panther_pens(pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
@@ -153,7 +153,71 @@ void redalert_state::get_panther_pens(pen_t *pens)
 	}
 
 	/* background color */
-	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = rgb_t(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
+	// TODO: verify if really black
+	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = rgb_t(0, 0, 0);
+}
+
+void redalert_state::get_demoneye_pens(pen_t *pens)
+{
+	static const int resistances_bitmap[]     = { 100 };
+	static const int resistances_charmap_rg[] = { 390, 220, 180 };
+	static const int resistances_charmap_b[]  = { 220, 100 };
+	static const int resistances_back_r[]     = { 1000 + 100 };
+	static const int resistances_back_gb[]    = { 100 + 470 };
+
+	offs_t offs;
+	double scaler;
+	double bitmap_weight[2];
+	double charmap_rg_weights[3];
+	double charmap_b_weights[2];
+	double back_r_weight[1];
+	double back_gb_weight[1];
+	const uint8_t *prom = memregion("proms")->base();
+
+	scaler = compute_resistor_weights(0, 0xff, -1,
+										1, resistances_bitmap,     bitmap_weight,      470, 0,
+										3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
+										2, resistances_charmap_b,  charmap_b_weights,  470, 0);
+
+				compute_resistor_weights(0, 0xff, scaler,
+										1, resistances_back_r,     back_r_weight,      470, 0,
+										1, resistances_back_gb,    back_gb_weight,     470, 0,
+										0, nullptr, nullptr, 0, 0);
+
+	/* the character layer colors come from the PROM */
+	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
+	{
+		uint8_t data = prom[offs];
+
+		/* very strange mapping */
+		uint8_t r0_bit = (data >> 2) & 0x01;
+		uint8_t r1_bit = (data >> 6) & 0x01;
+		uint8_t r2_bit = (data >> 4) & 0x01;
+		uint8_t g0_bit = (data >> 1) & 0x01;
+		uint8_t g1_bit = (data >> 3) & 0x01;
+		uint8_t g2_bit = (data >> 5) & 0x01;
+		uint8_t b0_bit = (data >> 0) & 0x01;
+		uint8_t b1_bit = (data >> 7) & 0x01;
+
+		uint8_t r = combine_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
+		uint8_t g = combine_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
+		uint8_t b = combine_weights(charmap_b_weights,  b0_bit, b1_bit);
+
+		pens[offs] = rgb_t(r, g, b);
+	}
+
+	/* the bitmap layer colors are directly mapped */
+	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
+	{
+		uint8_t r = bitmap_weight[(offs >> 2) & 0x01];
+		uint8_t g = bitmap_weight[(offs >> 1) & 0x01];
+		uint8_t b = bitmap_weight[(offs >> 0) & 0x01];
+
+		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
+	}
+
+	/* background color */
+	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = rgb_t(0,0,0);//rgb_t(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
 }
 
 /*************************************
@@ -190,7 +254,7 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(pens);
+	get_redalert_pens(pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -262,7 +326,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(pens);
+	get_demoneye_pens(pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

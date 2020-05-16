@@ -109,8 +109,9 @@ private:
 	void demoneye_ay8910_latch_1_w(uint8_t data);
 	uint8_t demoneye_ay8910_latch_2_r();
 	void demoneye_ay8910_data_w(uint8_t data);
-	void get_pens(pen_t *pens);
+	void get_redalert_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
+	void get_demoneye_pens(pen_t *pens);
 
 	virtual void sound_start() override;
 

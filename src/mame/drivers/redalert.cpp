@@ -72,7 +72,7 @@
 		* AY sounds needs an actual ref, they are dubious at best
         * No title screen?
 		* Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
-		* Likewise sports bad wording in input test
+		* Likewise sports corrupted words in input test
 
     ********************************************************************
     IREM 'WW III' 1981
