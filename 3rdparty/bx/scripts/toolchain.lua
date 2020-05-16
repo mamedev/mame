@@ -52,7 +52,8 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm",     "Android - ARM"              },
 			{ "android-arm64",   "Android - ARM64"            },
 			{ "android-x86",     "Android - x86"              },
-			{ "asmjs",           "Emscripten/asm.js"          },
+			{ "wasm2js",         "Emscripten/Wasm2JS"         },
+			{ "wasm",            "Emscripten/Wasm"            },
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
@@ -251,10 +252,10 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
-		elseif "asmjs" == _OPTIONS["gcc"] then
+		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
-				print("Set EMSCRIPTEN environment variable.")
+				print("Set EMSCRIPTEN environment variable to root directory of your Emscripten installation. (e.g. by entering the EMSDK command prompt)")
 			end
 
 			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
@@ -262,7 +263,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
 			premake.gcc.namestyle = "Emscripten"
-			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "freebsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
@@ -932,21 +933,25 @@ function toolchain(_buildDir, _libDir)
 			"-target i686-none-linux-android",
 		}
 
-	configuration { "asmjs" }
-		targetdir (path.join(_buildDir, "asmjs/bin"))
-		objdir (path.join(_buildDir, "asmjs/obj"))
-		libdirs { path.join(_libDir, "lib/asmjs") }
+	configuration { "wasm*" }
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
 		}
 
 		linkoptions {
---			"-s ASSERTIONS=2",
---			"-s EMTERPRETIFY=1",
---			"-s EMTERPRETIFY_ASYNC=1",
-			"-s PRECISE_F32=1",
+			"-s MAX_WEBGL_VERSION=2"
 		}
+
+	configuration { "wasm2js" }
+		targetdir (path.join(_buildDir, "wasm2js/bin"))
+		objdir (path.join(_buildDir, "wasm2js/obj"))
+		libdirs { path.join(_libDir, "lib/wasm2js") }
+
+	configuration { "wasm" }
+		targetdir (path.join(_buildDir, "wasm/bin"))
+		objdir (path.join(_buildDir, "wasm/obj"))
+		libdirs { path.join(_libDir, "lib/wasm") }
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
