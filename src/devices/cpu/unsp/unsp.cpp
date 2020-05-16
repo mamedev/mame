@@ -506,6 +506,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t op1 = (op >> 6) & 7;
 
+	if (!op_is_divq(op))
+		m_core->m_divq_active = 0;
+
 	if (op0 == 0xf)
 		return execute_fxxx_group(op);
 

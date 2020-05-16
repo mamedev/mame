@@ -248,6 +248,32 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 	return;
 }
 
+void unsp_12_device::execute_divq(uint16_t op)
+{
+	const uint16_t sign_a = m_core->m_aq;
+	if (m_core->m_divq_active == 0)
+	{
+		m_core->m_divq_active = 1;
+		m_core->m_divq_dividend = (m_core->m_r[REG_R4] << 16) | m_core->m_r[REG_R3];
+		m_core->m_r[REG_R3] = 0;
+	}
+	m_core->m_aq = BIT(m_core->m_divq_dividend, 31);
+	if (sign_a)
+	{
+		m_core->m_r[REG_R3] += m_core->m_r[REG_R2];
+	}
+	else
+	{
+		m_core->m_r[REG_R3] -= m_core->m_r[REG_R3];
+	}
+	m_core->m_divq_dividend <<= 1;
+	m_core->m_divq_dividend |= m_core->m_aq ? 0 : 1;
+}
+
+bool unsp_12_device::op_is_divq(const uint16_t op)
+{
+	return (op & 0xf163) == 0xf163;
+}
 
 void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 {
@@ -336,8 +362,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16b: case 0xf36b: case 0xf56b: case 0xf76b: case 0xf96b: case 0xfb6b: case 0xfd6b: case 0xff6b:
 	case 0xf173: case 0xf373: case 0xf573: case 0xf773: case 0xf973: case 0xfb73: case 0xfd73: case 0xff73:
 	case 0xf17b: case 0xf37b: case 0xf57b: case 0xf77b: case 0xf97b: case 0xfb7b: case 0xfd7b: case 0xff7b:
-		logerror("divq mr, r2\n");
-		unimplemented_opcode(op);
+		execute_divq(op);
 		return;
 
 	case 0xf164: case 0xf364: case 0xf564: case 0xf764: case 0xf964: case 0xfb64: case 0xfd64: case 0xff64:
@@ -525,18 +550,23 @@ void unsp_device::execute_fxxx_group(uint16_t op)
 	switch ((op & 0x01c0) >> 6)
 	{
 	case 0x0:
+		m_core->m_divq_active = 0;
 		return execute_fxxx_000_group(op);
 
 	case 0x1:
+		m_core->m_divq_active = 0;
 		return execute_fxxx_001_group(op);
 
 	case 0x2:
+		m_core->m_divq_active = 0;
 		return execute_fxxx_010_group(op);
 
 	case 0x3:
+		m_core->m_divq_active = 0;
 		return execute_fxxx_011_group(op);
 
 	case 0x4:
+		m_core->m_divq_active = 0;
 		return execute_fxxx_100_group(op);
 
 	case 0x5:

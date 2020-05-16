@@ -193,6 +193,9 @@ protected:
 		uint32_t m_ine;
 		uint32_t m_pri;
 
+		uint32_t m_divq_active;
+		uint32_t m_divq_dividend;
+
 		uint32_t m_arg0;
 		uint32_t m_arg1;
 		uint32_t m_jmpdest;
@@ -229,7 +232,7 @@ protected:
 	virtual void execute_fxxx_101_group(uint16_t op);
 	void execute_fxxx_110_group(uint16_t op);
 	void execute_fxxx_111_group(uint16_t op);
-	void execute_fxxx_group(uint16_t op);;
+	void execute_fxxx_group(uint16_t op);
 	void execute_fxxx_100_group(uint16_t op);
 	virtual void execute_extended_group(uint16_t op);
 	virtual void execute_exxx_group(uint16_t op);
@@ -237,6 +240,7 @@ protected:
 	void unimplemented_opcode(uint16_t op);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);
+	virtual bool op_is_divq(const uint16_t op) { return false; }
 
 	int m_iso;
 
@@ -369,7 +373,8 @@ protected:
 
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
-
+	void execute_divq(uint16_t op);
+	bool op_is_divq(const uint16_t op) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };

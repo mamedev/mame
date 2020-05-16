@@ -49,14 +49,15 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 	else if (((op & 0xf1c0) == 0xe040))
 	{
 		// Register BITOP  BITOP Rd,offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
 
 		switch (bitop)
 		{
-		case 0x00:
-			fatalerror("UNSP: unknown opcode tstb Rd,offset (%04x) at %04x\n", op, UNSP_LPC);
+		case 0x00: // tstb
 			return;
 
 		case 0x01: // setb
@@ -76,41 +77,123 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 	else if (((op & 0xf1c0) == 0xe180))
 	{
 		// Memory BITOP    BITOP [Rd], offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s [%s],%d\n", bitops[bitop], regs[rd], offset);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		const uint16_t addr =  m_core->m_r[rd];
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c0) == 0xe1c0))
 	{
 		// Memory BITOP    BITOP ds:[Rd], offset
-		uint8_t bitop =  (op & 0x0030) >> 4;
-		uint8_t rd =     (op & 0x0e00) >> 9;
-		uint8_t offset = (op & 0x000f) >> 0;
-		logerror("%s ds:[%s],%d\n", bitops[bitop], regs[rd], offset);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t offset = (op & 0x000f) >> 0;
+		const uint16_t addr =  m_core->m_r[rd] | (get_ds() << 16);
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c8) == 0xe100))
 	{
 		// Memory BITOP    BITOP [Rd], Rs
-		uint8_t bitop = (op & 0x0030) >> 4;
-		uint8_t rd =    (op & 0x0e00) >> 9;
-		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s [%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t rs =     (op & 0x0007) >> 0;
+		const uint8_t offset = (1 << m_core->m_r[rs]);
+		const uint16_t addr =  m_core->m_r[rd];
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf1c8) == 0xe140))
 	{
 		// Memory BITOP    BITOP ds:[Rd], Rs
-		uint8_t bitop = (op & 0x0030) >> 4;
-		uint8_t rd =    (op & 0x0e00) >> 9;
-		uint8_t rs =    (op & 0x0007) >> 0;
-		logerror("%s ds:[%s],%s\n", bitops[bitop], regs[rd], regs[rs]);
-		unimplemented_opcode(op);
+		const uint8_t bitop =  (op & 0x0030) >> 4;
+		const uint8_t rd =     (op & 0x0e00) >> 9;
+		const uint8_t rs =     (op & 0x0007) >> 0;
+		const uint8_t offset = (1 << m_core->m_r[rs]);
+		const uint16_t addr =  m_core->m_r[rd] | (get_ds() << 16);
+		const uint16_t orig =  read16(addr);
+		m_core->m_r[REG_SR] &= ~UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+
+		switch (bitop)
+		{
+		case 0x00: // tstb
+			return;
+
+		case 0x01: // setb
+			write16(addr, orig | (1 << offset));
+			return;
+
+		case 0x02: // clrb
+			write16(addr, orig & ~(1 << offset));
+			return;
+
+		case 0x03:
+			write16(addr, orig ^ (1 << offset));
+			return;
+		}
 		return;
 	}
 	else if (((op & 0xf0f8) == 0xe008))
