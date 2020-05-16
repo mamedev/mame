@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour
 /***************************************************************************
 
-    redalert.c, Irem M27 hardware
+    Irem M27 hardware
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)

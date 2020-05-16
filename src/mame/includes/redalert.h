@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour
 /***************************************************************************
 
-    Irem Red Alert hardware
+    Irem M27 hardware
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
@@ -96,6 +96,7 @@ private:
 	void demoneye_audio_command_w(uint8_t data);
 	DECLARE_VIDEO_START(redalert);
 	DECLARE_VIDEO_START(ww3);
+	DECLARE_VIDEO_START(demoneye);
 	uint32_t screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour
 /***************************************************************************
 
-    Irem Red Alert hardware
+    Irem M27 hardware
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
@@ -235,6 +235,14 @@ VIDEO_START_MEMBER(redalert_state,redalert)
 	m_control_xor = 0x00;
 }
 
+VIDEO_START_MEMBER(redalert_state,demoneye)
+{
+	VIDEO_START_CALL_MEMBER( redalert );
+	
+	save_pointer(NAME(m_demoneye_bitmap_reg), 4);
+	save_item(NAME(m_demoneye_bitmap_yoffs));
+}
+
 VIDEO_START_MEMBER(redalert_state,ww3)
 {
 	VIDEO_START_CALL_MEMBER( redalert );
@@ -321,6 +329,20 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
  *
  *************************************/
 
+/*
+	[0]
+	xxxx xxxx X position
+    [1]
+	-??x ---- tile bank * 0x20 (?)
+	---- xx-- <used, unknown purpose>
+	---- --x- (1) 8x8 tile width 4, (0) 4x4
+	---- ---x enable layer
+	[2]
+	---- x--- boss second form, <unknown purpose>
+	---- --xx tile bank * 0x100 (?)
+	[3]
+	---- --xx <3 on normal/first form boss, 1 on second form>
+*/
 WRITE8_MEMBER(redalert_state::demoneye_bitmap_layer_w)
 {
 	m_demoneye_bitmap_reg[offset] = data;
@@ -394,17 +416,23 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 	u8 x = m_demoneye_bitmap_reg[0];
 	u8 y = m_demoneye_bitmap_yoffs;
 	u8 control = m_demoneye_bitmap_reg[1];
-	// TODO: m_demoneye_bitmap_reg[2] used, base offset? zooming factor?
+
 	
 	if(control&1)
 	{
+		// TODO: pinpoint what the unknown bits are for (more zooming? color offset?)
+		// TODO: layer is offset wrt bullets collision
+		// Note: boss second form has even more offsetted collision (hence bigger?)
 		int width = (control&2)?8:4;
-		int base = (control>>3)*4*8 + 0x1400;
-		for(int yy=0;yy<8;++yy)
+		int base = 0x1400;
+		base += (control & 0x10) ? 0x20 : 0;
+		base += (m_demoneye_bitmap_reg[2] & 3) * 0x100;
+		
+		for(int x_block=0; x_block<8; ++x_block)
 		{
-			for(int xx=0;xx<8;++xx)
+			for(int y_block=0; y_block<8; ++y_block)
 			{
-				if(xx<width && yy<width)
+				if(y_block<width && x_block<width)
 				{
 					for(int iy=0;iy<8;++iy)
 					{
@@ -416,8 +444,13 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 							int ccc = ((l0&0x80)>>5) | ((l1&0x80)>>6) | ((l2&0x80)>>7);
 							if(ccc)
 							{
+								// both are clearly reversed, 
+								// cfr. boss first form (when opens the eye)
+								// or second form (follows player position)
+								int y_dst = 8*width - (y_block*8+iy);
+								int x_dst = 8*width - (x_block*8+7-ix);
 								ccc=pens[NUM_CHARMAP_PENS+ccc];
-								bitmap.pix32(y+xx*8+iy,x+yy*8+7-ix) = ccc;
+								bitmap.pix32(y+y_dst, x+x_dst) = ccc;
 							}
 
 							l0<<=1;
@@ -432,7 +465,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 		}
 	}
 
-	popmessage("%02x: %02x %02x %02x %02x",m_demoneye_bitmap_yoffs, m_demoneye_bitmap_reg[0], m_demoneye_bitmap_reg[1], m_demoneye_bitmap_reg[2], m_demoneye_bitmap_reg[3]);
+	//popmessage("%02x: %02x %02x %02x %02x %04x",m_demoneye_bitmap_yoffs, m_demoneye_bitmap_reg[0], m_demoneye_bitmap_reg[1], m_demoneye_bitmap_reg[2], m_demoneye_bitmap_reg[3], test);
 	return 0;
 }
 
@@ -544,7 +577,7 @@ void redalert_state::ww3_video(machine_config &config)
 
 void redalert_state::demoneye_video(machine_config &config)
 {
-	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state,demoneye)
 
 	redalert_video_common(config);
 
