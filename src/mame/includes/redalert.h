@@ -56,6 +56,7 @@ public:
 	void redalert_audio_voice(machine_config &config);
 	void redalert_audio(machine_config &config);
 	void ww3_audio(machine_config &config);
+	void panther_audio(machine_config &config);
 	void demoneye_audio(machine_config &config);
 	void demoneye(machine_config &config);
 	void ww3(machine_config &config);
@@ -63,6 +64,7 @@ public:
 	void redalert(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
 private:
 	required_shared_ptr<uint8_t> m_bitmap_videoram;
@@ -86,7 +88,6 @@ private:
 	uint8_t redalert_interrupt_clear_r();
 	void redalert_interrupt_clear_w(uint8_t data);
 	uint8_t panther_interrupt_clear_r();
-	uint8_t panther_unk_r();
 	void redalert_bitmap_videoram_w(offs_t offset, uint8_t data);
 	void redalert_audio_command_w(uint8_t data);
 	uint8_t redalert_ay8910_latch_1_r();
@@ -119,6 +120,7 @@ private:
 	void demoneye_main_map(address_map &map);
 
 	void redalert_audio_map(address_map &map);
+	void panther_audio_map(address_map &map);
 	void demoneye_audio_map(address_map &map);
 
 	void redalert_voice_map(address_map &map);
@@ -128,7 +130,7 @@ private:
 
 	uint8_t m_ay8910_latch_1;
 	uint8_t m_ay8910_latch_2;
-	
+	u8 m_sound_hs;
 };
 
 #endif // MAME_INCLUDES_REDALERT_H

@@ -68,7 +68,7 @@
         * Everything needs to be verified on real PCB or schematics
 
     Known issues/to-do's Panther:
-        * Sound comms doesn't work
+		* Analog sounds (same as Red Alert?)
         * No title screen?
 		* Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
 		* Likewise sports bad wording in input test
@@ -157,11 +157,6 @@ uint8_t redalert_state::panther_interrupt_clear_r()
 	return ioport("VOLUM")->read();
 }
 
-uint8_t redalert_state::panther_unk_r()
-{
-	return ((machine().rand() & 0x01) | (ioport("KEY2")->read() & 0xfe));
-}
-
 /*************************************
  *
  *  Memory handlers
@@ -209,7 +204,7 @@ void redalert_state::panther_main_map(address_map &map)
 	map(0x5000, 0xbfff).rom();
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
-	map(0xc020, 0xc020).mirror(0x0f8f).r(FUNC(redalert_state::panther_unk_r)); /* vblank? */
+	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
@@ -250,6 +245,13 @@ INPUT_CHANGED_MEMBER(redalert_state::coin_inserted)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
+CUSTOM_INPUT_MEMBER(redalert_state::sound_status_r)
+{
+	// communication handshake between host and sound CPU
+	// at least Panther uses it, unconfirmed for Red Alert and Demoneye-X
+	return m_sound_hs;
+}
+
 static INPUT_PORTS_START( m27_base )
 	// port names comes from Panther input test
 	PORT_START("COIN")
@@ -270,7 +272,7 @@ static INPUT_PORTS_START( m27_base )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(redalert_state, sound_status_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	// TODO: 2-way/4-way ...?
@@ -315,7 +317,7 @@ static INPUT_PORTS_START( panther )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
@@ -422,7 +424,7 @@ void redalert_state::panther(machine_config &config)
 	panther_video(config);
 
 	/* audio hardware */
-	ww3_audio(config);
+	panther_audio(config);
 }
 
 void redalert_state::demoneye(machine_config &config)
@@ -536,7 +538,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther (bootleg?)",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther (bootleg?)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, empty_init, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, empty_init, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, empty_init, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
