@@ -62,6 +62,8 @@ public:
 	void panther(machine_config &config);
 	void redalert(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
 private:
 	required_shared_ptr<uint8_t> m_bitmap_videoram;
 	required_shared_ptr<uint8_t> m_charmap_videoram;
@@ -126,6 +128,7 @@ private:
 
 	uint8_t m_ay8910_latch_1;
 	uint8_t m_ay8910_latch_2;
+	
 };
 
 #endif // MAME_INCLUDES_REDALERT_H
