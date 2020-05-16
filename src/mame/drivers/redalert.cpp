@@ -70,6 +70,8 @@
     Known issues/to-do's Panther:
         * Sound comms doesn't work
         * No title screen?
+		* Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
+		* Likewise sports bad wording in input test
 
     ********************************************************************
     IREM 'WW III' 1981
@@ -91,6 +93,22 @@
         M-37B  (Sound board)
         M-33 SUB-1
 
+    ********************************************************************
+    Panther notes:
+	- Hold start 1 on boot, press coin chutes or service button to cycle:
+	-> RAM/ROM check 
+	-> Continous Video drawing check (only if above is success)
+	-> (NMI again goes to PROM check and beyond)
+	- Hold start 2 on boot: 
+	-> PROM check?
+	-> Input check
+	-> Freeze
+	- Notes on "ROM ERR 0":
+	  PC=b482 ROM check main routine
+	  PC=b5cc SUM16 individual ROM chunk (ROM 0 -> 8000-87ff, ROM 1 -> 8800-8fff ...)
+	  PC=b5b4 Taking the branch -> failed check
+	  
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -111,6 +129,7 @@
 
 INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 {
+	// TODO: use PORT_CHANGED instead
 	if( ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -140,12 +159,12 @@ uint8_t redalert_state::panther_interrupt_clear_r()
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
-	return ioport("STICK0")->read();
+	return ioport("VOLUM")->read();
 }
 
 uint8_t redalert_state::panther_unk_r()
 {
-	return ((machine().rand() & 0x01) | (ioport("C020")->read() & 0xfe));
+	return ((machine().rand() & 0x01) | (ioport("KEY2")->read() & 0xfe));
 }
 
 /*************************************
@@ -160,9 +179,9 @@ void redalert_state::redalert_main_map(address_map &map)
 	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
-	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
-	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
-	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
+	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
+	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
+	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
@@ -177,9 +196,9 @@ void redalert_state::ww3_main_map(address_map &map)
 	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
-	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
-	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
-	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
+	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
+	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
+	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
@@ -193,8 +212,8 @@ void redalert_state::panther_main_map(address_map &map)
 	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
-	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
-	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
+	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
+	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).r(FUNC(redalert_state::panther_unk_r)); /* vblank? */
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
@@ -209,9 +228,9 @@ void redalert_state::demoneye_main_map(address_map &map)
 	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x5fff).ram().share("charram");
 	map(0x6000, 0xbfff).rom();
-	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
-	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
-	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
+	map(0xc000, 0xc000).mirror(0x0f8f).portr("DSW").nopw();
+	map(0xc010, 0xc010).mirror(0x0f8f).portr("KEY1").nopw();
+	map(0xc020, 0xc020).mirror(0x0f8f).portr("KEY2").nopw();
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::demoneye_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
@@ -231,7 +250,7 @@ void redalert_state::demoneye_main_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( redalert )
-	PORT_START("C000")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -253,7 +272,7 @@ static INPUT_PORTS_START( redalert )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
 
-	PORT_START("C010")
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -263,7 +282,7 @@ static INPUT_PORTS_START( redalert )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Meter */
 
-	PORT_START("C020")
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Meter */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -281,7 +300,7 @@ static INPUT_PORTS_START( redalert )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( panther )
-	PORT_START("C000")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -303,7 +322,7 @@ static INPUT_PORTS_START( panther )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
 
-	PORT_START("C010")
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -313,7 +332,7 @@ static INPUT_PORTS_START( panther )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) /* Meter */
 
-	PORT_START("C020")
+	PORT_START("KEY2")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -329,12 +348,14 @@ static INPUT_PORTS_START( panther )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("STICK0")
-	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(3) PORT_CENTERDELTA(0)
+	PORT_START("VOLUM")
+	// vertical lever according to cabinet pic, no centering
+	// TODO: more akin to AD_STICK_Z? Verify in-game ranges
+	PORT_BIT( 0xff, 0x80, IPT_POSITIONAL_V ) PORT_SENSITIVITY(70) PORT_KEYDELTA(3) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( demoneye )
-	PORT_START("C000")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -358,7 +379,7 @@ static INPUT_PORTS_START( demoneye )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("C010")
+	PORT_START("KEY1")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -368,7 +389,7 @@ static INPUT_PORTS_START( demoneye )
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 
-	PORT_START("C020")
+	PORT_START("KEY2")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Meter */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -459,13 +480,15 @@ void redalert_state::demoneye(machine_config &config)
 
 ROM_START( panther )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "qr-1.bin",      0x8000, 0x0800, CRC(406dc606) SHA1(c12b91145aa579813b7b0e8eb7933bf35e4a5b97) )
-	ROM_LOAD( "qr-2.bin",      0x8800, 0x0800, CRC(e7e64b11) SHA1(0fcfbce552b22edce9051b6fad0974f81ab44973) )
-	ROM_LOAD( "qr-3.bin",      0x9000, 0x0800, CRC(dfec33f2) SHA1(4e631a3a8c7873e8f51a81e8b73704729269ee01) )
+	// TODO: marked as BAD_DUMP since these all fails ROM check
+	// we need a second set to counter-check exact identification
+	ROM_LOAD( "qr-1.bin",      0x8000, 0x0800, BAD_DUMP CRC(406dc606) SHA1(c12b91145aa579813b7b0e8eb7933bf35e4a5b97) )
+	ROM_LOAD( "qr-2.bin",      0x8800, 0x0800, BAD_DUMP CRC(e7e64b11) SHA1(0fcfbce552b22edce9051b6fad0974f81ab44973) )
+	ROM_LOAD( "qr-3.bin",      0x9000, 0x0800, BAD_DUMP CRC(dfec33f2) SHA1(4e631a3a8c7873e8f51a81e8b73704729269ee01) )
 	ROM_LOAD( "qr-4.bin",      0x9800, 0x0800, CRC(60571aa0) SHA1(257474383ad7cb90e9e4f9236b3f865a991d688a) )
 	ROM_LOAD( "qr-5.bin",      0xa000, 0x0800, CRC(2ac19b54) SHA1(613a800179f9705df03967889eb23ef71baed493) )
-	ROM_LOAD( "qr-6.bin",      0xa800, 0x0800, CRC(02fbd9d9) SHA1(65b5875c78886b51c9bdfc75e730b9f67ce72cfc) )
-	ROM_LOAD( "qr-7.bin",      0xb000, 0x0800, CRC(b3e2d6cc) SHA1(7bb18f17d635196e617e8f68bf8d866134c362d1) )
+	ROM_LOAD( "qr-6.bin",      0xa800, 0x0800, BAD_DUMP CRC(02fbd9d9) SHA1(65b5875c78886b51c9bdfc75e730b9f67ce72cfc) )
+	ROM_LOAD( "qr-7.bin",      0xb000, 0x0800, BAD_DUMP CRC(b3e2d6cc) SHA1(7bb18f17d635196e617e8f68bf8d866134c362d1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
@@ -544,7 +567,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, panther,  0,        panther,  panther,  redalert_state, empty_init, ROT270, "Irem",               "Panther (bootleg?)",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, empty_init, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, empty_init, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, empty_init, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
