@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Juergen Buchmueller, Derrick Renaud, Curt Coder
 #ifndef MAME_MACHINE_RESCAP_H
 #define MAME_MACHINE_RESCAP_H
 
