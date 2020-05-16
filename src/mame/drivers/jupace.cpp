@@ -829,7 +829,7 @@ void ace_state::ace(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( jupace )
-	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "rom-a.z1", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c) )
 	ROM_LOAD( "rom-b.z2", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3) )
 
