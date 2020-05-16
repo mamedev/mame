@@ -110,6 +110,13 @@ namespace plib
 			return static_cast<mult_type>(m_time / rhs.m_time);
 		}
 
+		template <typename T>
+		constexpr typename std::enable_if<std::is_integral<T>::value, ptime>::type
+		operator/(const T &rhs) const noexcept
+		{
+			return ptime(m_time / rhs);
+		}
+
 		friend constexpr bool operator<(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return (lhs.m_time < rhs.m_time);

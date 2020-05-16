@@ -142,7 +142,6 @@ NLOBJS := \
 	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_2102A.o \
-	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4006.o \
 	$(NLOBJ)/devices/nld_4013.o \
@@ -180,8 +179,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S115.o \
-	$(NLOBJ)/devices/nld_82S123.o \
-	$(NLOBJ)/devices/nld_82S126.o \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9316.o \
 	$(NLOBJ)/devices/nld_9322.o \
@@ -191,6 +188,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
+	$(NLOBJ)/devices/nld_roms.o \
 	$(NLOBJ)/devices/nld_tristate.o \
 	$(NLOBJ)/devices/nld_schmitt.o \
 	$(NLOBJ)/devices/nld_legacy.o \
@@ -203,6 +201,7 @@ NLOBJS := \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \
 	$(NLOBJ)/macro/nlm_opamp.o \
 	$(NLOBJ)/macro/nlm_other.o \
+	$(NLOBJ)/macro/nlm_roms.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \

@@ -88,6 +88,29 @@ namespace plib
 	};
 #endif
 
+	template<unsigned bits>
+	struct least_size_for_bits
+	{
+		enum { value =
+			bits <= 8       ?   1 :
+			bits <= 16      ?   2 :
+			bits <= 32      ?   4 :
+								8
+		};
+	};
+
+	template<unsigned N> struct least_type_for_size;
+	template<> struct least_type_for_size<1> { using type = uint_least8_t; };
+	template<> struct least_type_for_size<2> { using type = uint_least16_t; };
+	template<> struct least_type_for_size<4> { using type = uint_least32_t; };
+	template<> struct least_type_for_size<8> { using type = uint_least64_t; };
+
+	template<unsigned bits>
+	struct least_type_for_bits
+	{
+		using type = typename least_type_for_size<least_size_for_bits<bits>::value>::type;
+	};
+
 	//============================================================
 	// Avoid unused variable warnings
 	//============================================================

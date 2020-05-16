@@ -263,24 +263,6 @@ public:
 		for (const auto & r : roms)
 			parser().register_source<netlist_data_folder_t>(r);
 
-#if 0
-		using a = plib::psource_str_t<plib::psource_t>;
-#if USE_EVAL
-		const pstring content =
-		"#define RES_R(res) (res)            \n"
-		"#define RES_K(res) ((res) * 1e3)    \n"
-		"#define RES_M(res) ((res) * 1e6)    \n"
-		"#define CAP_U(cap) ((cap) * 1e-6)   \n"
-		"#define CAP_N(cap) ((cap) * 1e-9)   \n"
-		"#define CAP_P(cap) ((cap) * 1e-12)  \n"
-		"#define IND_U(ind) ((ind) * 1e-6)   \n"
-		"#define IND_N(ind) ((ind) * 1e-9)   \n"
-		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
-#else
-		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
-#endif
-#endif
 		for (const auto & i : includes)
 			parser().add_include<netlist_data_folder_t>(i);
 
@@ -745,9 +727,9 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
 				if (n == "Identifier")
 				{
-					ret.id = v;
-					if (!r.readline(l))
+					if (!r.readline(l) || ret.id == id)
 						return (ret.id == id ? ret : doc_ext());
+					ret.id = v;
 				}
 				else
 				{
@@ -821,24 +803,19 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
+	pstring avs;
 	for (const auto &s : v)
 		if (!plib::startsWith(s, "@"))
 			vs += ", p" + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
-	mac_out("#define " + e->name() + "(name" + vs + ")");
+		else
+			avs += ", " + s.substr(1);
 
-	vs = "";
+	mac_out("// usage       : " + e->name() + "(name" + vs + ")", false);
+	if (avs != "")
+		mac_out("// auto connect: " + avs.substr(2), false);
 
-	for (const auto &s : v)
-	{
-		if (!plib::startsWith(s, "@"))
-		{
-			// @ gets automatically connected
-			const pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
-			vs += ", p" + r;
-		}
-	}
-
-	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", name" + vs + ")", false);
+	mac_out("#define " + e->name() + "(...)");
+	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", __VA_ARGS__)", false);
 	mac_out("", false);
 }
 

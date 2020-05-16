@@ -24,6 +24,7 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/ptypes.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -174,7 +175,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
-#define NETLIB_HANDLERI(name) virtual void name() noexcept
+#define NETLIB_HANDLERI(name) void name() noexcept
 #define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
@@ -1879,12 +1880,12 @@ namespace netlist
 	// Support classes for devices
 	// -----------------------------------------------------------------------------
 
-	template<class C, int N>
-	class object_array_t : public plib::uninitialised_array_t<C, N>
+	template<class C, std::size_t N>
+	class object_array_base_t : public plib::uninitialised_array_t<C, N>
 	{
 	public:
 		template<class D, typename... Args>
-		object_array_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		object_array_base_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
 		{
 			passert_always_msg(names.size() == N, "initializer_list size mismatch");
 			std::size_t i = 0;
@@ -1892,20 +1893,170 @@ namespace netlist
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
+#if 0
 		template<class D, typename... Args>
-		object_array_t(D &dev, const pstring &fmt, Args&&... args)
+		object_array_base_t(D &dev, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, plib::pfmt(fmt)(i), std::forward<Args>(args)...);
+				this->emplace(i, dev, formatted(fmt, i), std::forward<Args>(args)...);
 		}
 
 		template<class D, typename... Args>
-		object_array_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, plib::pfmt(fmt)(i+offset), std::forward<Args>(args)...);
+				this->emplace(i, dev, formatted(fmt, i+offset), std::forward<Args>(args)...);
 		}
 
+		template<class D, typename... Args>
+		object_array_base_t(D &dev, std::size_t offset, std::size_t qmask, const pstring &fmt, Args&&... args)
+		{
+			for (std::size_t i = 0; i<N; i++)
+			{
+				pstring name(formatted(fmt, i+offset));
+				if ((qmask >> i) & 1)
+					name += "Q";
+				this->emplace(i, dev, name, std::forward<Args>(args)...);
+			}
+		}
+#else
+		template<class D>
+		object_array_base_t(D &dev, const pstring &fmt)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, formatted(fmt, i));
+		}
+
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, formatted(fmt, i+offset));
+		}
+
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate &&delegate)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, formatted(fmt, i+offset), std::move(delegate));
+		}
+
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, std::size_t qmask, const pstring &fmt)
+		{
+			for (std::size_t i = 0; i<N; i++)
+			{
+				pstring name(formatted(fmt, i+offset));
+				if ((qmask >> i) & 1)
+					name += "Q";
+				this->emplace(i, dev, name);
+			}
+		}
+	protected:
+		object_array_base_t() = default;
+#endif
+
+	protected:
+		static pstring formatted(const pstring &fmt, std::size_t n)
+		{
+			if (N != 1)
+				return plib::pfmt(fmt)(n);
+			else
+				return plib::pfmt(fmt)("");
+		}
+	};
+
+	template<class C, std::size_t N>
+	class object_array_t : public object_array_base_t<C, N>
+	{
+	public:
+		using base_type = object_array_base_t<C, N>;
+		using base_type::base_type;
+	};
+
+	template<std::size_t N>
+	class object_array_t<logic_input_t,N> : public object_array_base_t<logic_input_t, N>
+	{
+	public:
+		using base_type = object_array_base_t<logic_input_t, N>;
+		using base_type::base_type;
+
+		template<class D, std::size_t ND>
+		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
+//			const pstring &fmt, std::initializer_list<nldelegate> &delegates)
+			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
+		{
+			passert_always_msg(delegates.size() >= N, "initializer_list size mismatch");
+			std::size_t i = 0;
+			for (auto &e : delegates)
+			{
+				if (i < N)
+				{
+					pstring name(this->formatted(fmt, i+offset));
+					if ((qmask >> i) & 1)
+						name += "Q";
+					this->emplace(i, dev, name, e);
+				}
+				i++;
+			}
+		}
+
+
+		using value_type = typename plib::least_type_for_bits<N>::type;
+
+		value_type operator ()()
+		{
+			if (N <= 8)
+				return tobits(N, *this);
+			else
+			{
+				value_type r(0);
+				for (std::size_t i = 0; i < N; i++)
+					r = static_cast<value_type>((*this)[i]() << (N-1)) | (r >> 1);
+				return r;
+			}
+		}
+
+	private:
+		template <typename T>
+		static constexpr value_type tobits(std::size_t n, T &a)
+		{
+			return (n == 0 ? 0 : (tobits(n-1, a) | static_cast<value_type>(a[n-1]() << (n-1))));
+		}
+	};
+
+	template<std::size_t N>
+	class object_array_t<logic_output_t,N> : public object_array_base_t<logic_output_t, N>
+	{
+	public:
+		using base_type = object_array_base_t<logic_output_t, N>;
+		using base_type::base_type;
+
+		using value_type = typename plib::least_type_for_bits<N>::type;
+
+		void push(value_type v, netlist_time t)
+		{
+			if (N <= 8)
+				rpush(N, *this, v, t);
+			else
+			{
+				for (std::size_t i = 0; i < N; v = v >> 1, i++)
+					(*this)[i].push(v & 1, t);
+			}
+		}
+
+	private:
+		template <typename A, typename V, typename X>
+		static V rpush(std::size_t n, A &a, V value, X time)
+		{
+			if (n > 0)
+			{
+				value = rpush(n-1, a, value, time);
+				a[n-1].push((value & 1), time);
+				return value >> 1;
+			}
+			return value;
+		}
 	};
 
 	// -----------------------------------------------------------------------------

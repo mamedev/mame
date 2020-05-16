@@ -218,8 +218,12 @@ namespace netlist
 		}
 		else
 		{
-			log().warning(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn, idx->second,
-					val));
+			if (idx->second.find("$(") == pstring::npos)
+			{
+				//* There may be reason ... so make it an INFO
+				log().info(MI_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn,
+					idx->second, val));
+			}
 			m_abstract.m_param_values[fqn] = val;
 		}
 	}

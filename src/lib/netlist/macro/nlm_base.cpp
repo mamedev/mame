@@ -110,6 +110,7 @@ NETLIST_START(base)
 	LOCAL_SOURCE(CD4XXX_lib)
 	LOCAL_SOURCE(OPAMP_lib)
 	LOCAL_SOURCE(otheric_lib)
+	LOCAL_SOURCE(ROMS_lib)
 
 	INCLUDE(diode_models)
 	INCLUDE(bjt_models)
@@ -119,6 +120,7 @@ NETLIST_START(base)
 	INCLUDE(CD4XXX_lib)
 	INCLUDE(OPAMP_lib)
 	INCLUDE(otheric_lib)
+	INCLUDE(ROMS_lib)
 
 NETLIST_END()
 
