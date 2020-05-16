@@ -498,6 +498,8 @@ license:CC0
 
 	<!-- right side -->
 
+		<bezel element="black"><bounds x="85.3" y="14" width="2.7" height="3" /></bezel>
+
 		<bezel element="text_king"><bounds x="84.01" y="22.8" width="5.5" height="3" /></bezel>
 		<bezel element="text_queen"><bounds x="84.01" y="31.6" width="5.5" height="3" /></bezel>
 		<bezel element="text_rook"><bounds x="84.01" y="40.4" width="5.5" height="3" /></bezel>

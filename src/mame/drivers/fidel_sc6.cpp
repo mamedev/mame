@@ -34,6 +34,7 @@ modules. The module overrides the internal ROM, by asserting the EA pin.
 
 TODO:
 - MSC MCU is currently emulated as I8039, due to missing EA pin emulation
+- different button panel for fidel_msc_v2 artwork
 
 ******************************************************************************/
 
