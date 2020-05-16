@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Barry Rodewald
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
     Husky Hunter, Hunter 2

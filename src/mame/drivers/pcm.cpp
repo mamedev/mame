@@ -308,7 +308,7 @@ void pcm_state::pcm(machine_config &config)
 
 /* ROM definition */
 ROM_START( pcm )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v202", "Version 2.02" )
 	ROMX_LOAD( "bios_v202.d14", 0x0000, 0x0800, CRC(27c24892) SHA1(a97bf9ef075de91330dc0c7cfd3bb6c7a88bb585), ROM_BIOS(0))
 	ROMX_LOAD( "bios_v202.d15", 0x0800, 0x0800, CRC(e9cedc70) SHA1(913c526283d9289d0cb2157985bb48193df7aa16), ROM_BIOS(0))

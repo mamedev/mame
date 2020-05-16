@@ -356,7 +356,7 @@ void h8_state::h8(machine_config &config)
 
 /* ROM definition */
 ROM_START( h8 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	// H17 fdc bios - needed by bios2&3
 	ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
