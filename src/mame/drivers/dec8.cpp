@@ -759,7 +759,7 @@ void dec8_state::csilver_mcu_to_main_w(uint8_t data)
 	if (~data & 0x40)
 	{
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // FIRQ to main cpu
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // FIRQ to main cpu
 	}
 
 	if (~data & 0x80)
@@ -1007,6 +1007,7 @@ static INPUT_PORTS_START( gondo )
 
 	PORT_START("I8751") /* hooked up on the i8751 */
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1077,6 +1078,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("I8751") /* hooked up on the (fake) i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1149,6 +1151,7 @@ static INPUT_PORTS_START( ghostb )
 
 	PORT_START("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1200,6 +1203,7 @@ static INPUT_PORTS_START( ghostb2a )
 
 	PORT_MODIFY("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1232,6 +1236,7 @@ static INPUT_PORTS_START( ghostb3 )
 
 	PORT_MODIFY("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1332,8 +1337,11 @@ static INPUT_PORTS_START( csilver )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("I8751") /* hooked up on the i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 INPUT_PORTS_END
 
 /* verified from M6809 code - coinage needs further checking when the MCU is available */
@@ -1472,6 +1480,7 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("I8751") /* hooked up on the i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
