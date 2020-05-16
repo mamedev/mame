@@ -49,7 +49,8 @@ projgen: ## Generate project files for all configurations.
 	$(GENIE)                                --gcc=android-arm     gmake
 	$(GENIE)                                --gcc=android-arm64   gmake
 	$(GENIE)                                --gcc=android-x86     gmake
-	$(GENIE)                                --gcc=asmjs           gmake
+	$(GENIE)                                --gcc=wasm2js         gmake
+	$(GENIE)                                --gcc=wasm            gmake
 	$(GENIE)                                --gcc=ios-arm         gmake
 	$(GENIE)                                --gcc=ios-arm64       gmake
 	$(GENIE)                                --gcc=ios-simulator   gmake
@@ -80,13 +81,21 @@ android-x86-release: .build/projects/gmake-android-x86 ## Build - Android x86 De
 	$(MAKE) -R -C .build/projects/gmake-android-x86 config=release
 android-x86: android-x86-debug android-x86-release ## Build - Android x86 Debug and Release
 
-.build/projects/gmake-asmjs:
-	$(GENIE) --gcc=asmjs gmake
-asmjs-debug: .build/projects/gmake-asmjs ## Build - Emscripten Debug
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=debug
-asmjs-release: .build/projects/gmake-asmjs ## Build - Emscripten Release
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=release
-asmjs: asmjs-debug asmjs-release ## Build - Emscripten Debug and Release
+.build/projects/gmake-wasm2js:
+	$(GENIE) --gcc=wasm2js gmake
+wasm2js-debug: .build/projects/gmake-wasm2js ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=debug
+wasm2js-release: .build/projects/gmake-wasm2js ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=release
+wasm2js: wasm2js-debug wasm2js-release ## Build - Emscripten Debug and Release
+
+.build/projects/gmake-wasm:
+	$(GENIE) --gcc=wasm gmake
+wasm-debug: .build/projects/gmake-wasm ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm config=debug
+wasm-release: .build/projects/gmake-wasm ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm config=release
+wasm: wasm-debug wasm-release ## Build - Emscripten Debug and Release
 
 .build/projects/gmake-linux:
 	$(GENIE) --with-tools --gcc=linux-gcc gmake
