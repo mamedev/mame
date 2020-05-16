@@ -13533,6 +13533,9 @@ fexcelpb                        //
 fexcelv                         //
 granits                         // RCS
 
+@source:fidel_msc.cpp
+miniscco
+
 @source:fidel_phantom.cpp
 fphantom                        //
 

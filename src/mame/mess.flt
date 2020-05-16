@@ -294,6 +294,7 @@ fidel_desdis.cpp
 fidel_eag68k.cpp
 fidel_elite.cpp
 fidel_excel.cpp
+fidel_msc.cpp
 fidel_phantom.cpp
 fidel_sc12.cpp
 fidel_sc6.cpp

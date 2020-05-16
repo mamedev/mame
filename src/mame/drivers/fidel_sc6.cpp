@@ -6,7 +6,7 @@
 Fidelity Sensory Chess Challenger 6 (model SC6)
 Fidelity Mini Sensory Chess Challenger (model MSC, 1982 version)
 
-SC6 Hardware notes:
+SC6 hardware notes:
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
@@ -27,21 +27,13 @@ MSC hardware notes:
 - 2KB internal ROM, module slot
 - buzzer, 18 leds, 8*8 chessboard buttons
 
-I/O is identical to SC6.
+MCU ports I/O is identical to SC6.
 
-MSC released modules, * denotes not dumped yet:
-- CAC: Challenger Advanced Chess
-- *CBO: Challenger Book Openings
-- *CGG: Challenger Greatest Games
-
-The modules take over the internal ROM, by asserting the EA pin.
-
-2 MSC versions exist, they can be distinguished from the button panel design.
-The 2nd version has rectangular buttons. The one in MAME came from the 2nd one.
+It accepts the same modules as the 1st MSC version. See fidel_msc.cpp for known
+modules. The module overrides the internal ROM, by asserting the EA pin.
 
 TODO:
 - MSC MCU is currently emulated as I8039, due to missing EA pin emulation
-- msc internal artwork (game works fine, but not really playable at the moment)
 
 ******************************************************************************/
 
@@ -58,6 +50,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "fidel_msc_v2.lh" // clickable
 #include "fidel_sc6.lh" // clickable
 
 
@@ -130,7 +123,7 @@ void sc6_state::machine_start()
 
 void sc6_state::update_display()
 {
-	// 2 7seg leds
+	// MSC: 18 leds, SC6: 2 7seg leds
 	m_display->matrix(m_led_select, 1 << m_inp_mux);
 }
 
@@ -255,8 +248,7 @@ void sc6_state::msc(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
-	m_display->set_segmask(0x3, 0xff);
-	config.set_default_layout(layout_fidel_sc6);
+	config.set_default_layout(layout_fidel_msc_v2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -282,7 +274,6 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
 	/* video hardware */
-	m_display->set_size(2, 7);
 	m_display->set_segmask(0x3, 0x7f);
 	config.set_default_layout(layout_fidel_sc6);
 
