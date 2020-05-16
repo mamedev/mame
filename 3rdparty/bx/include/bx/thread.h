@@ -9,6 +9,8 @@
 #include "allocator.h"
 #include "mpscqueue.h"
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 namespace bx
 {
 	///
@@ -86,5 +88,7 @@ namespace bx
 	};
 
 } // namespace bx
+
+#endif
 
 #endif // BX_THREAD_H_HEADER_GUARD
