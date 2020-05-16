@@ -1423,6 +1423,8 @@ files {
 	MAME_DIR .. "src/mame/video/gtia.h",
 	MAME_DIR .. "src/mame/drivers/jaguar.cpp",
 	MAME_DIR .. "src/mame/includes/jaguar.h",
+	MAME_DIR .. "src/mame/video/jag_blitter.cpp",
+	MAME_DIR .. "src/mame/video/jag_blitter.h",
 	MAME_DIR .. "src/mame/audio/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jagblit.h",
