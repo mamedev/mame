@@ -158,6 +158,13 @@ uint8_t redalert_state::panther_interrupt_clear_r()
 	return ioport("VOLUM")->read();
 }
 
+void redalert_state::demoneye_bitmap_ypos_w(u8 data)
+{
+	// TODO: sound irq ack most likely don't belong here
+	m_demoneye_bitmap_yoffs = data;
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+}
+
 /*************************************
  *
  *  Memory handlers
@@ -225,10 +232,8 @@ void redalert_state::demoneye_main_map(address_map &map)
 	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::demoneye_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
-	map(0xc060, 0xc060).mirror(0x0f80).noprw();   /* unknown */
-	map(0xc061, 0xc061).mirror(0x0f80).noprw();   /* unknown */
-	map(0xc062, 0xc062).mirror(0x0f80).noprw();   /* unknown */
-	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w)); /* probably not correct */
+	map(0xc060, 0xc063).mirror(0x0f80).w(FUNC(redalert_state::demoneye_bitmap_layer_w));
+	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::demoneye_bitmap_ypos_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
 

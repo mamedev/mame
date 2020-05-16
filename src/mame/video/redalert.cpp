@@ -321,6 +321,11 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
  *
  *************************************/
 
+WRITE8_MEMBER(redalert_state::demoneye_bitmap_layer_w)
+{
+	m_demoneye_bitmap_reg[offset] = data;
+}
+
 uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
@@ -357,7 +362,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 
 		/* this is the mapping of the 3rd char set */
 		//charmap_data_1 = m_charmap_videoram[0x1400 | charmap_data_base];
-		//charmap_data_2 = m_charmap_videoram[0x1c00 | charmap_data_base];
+		//charmap_data_2 = m_charmap_videoram[0x1800 | charmap_data_base];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -385,7 +390,49 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 			charmap_data_2 = charmap_data_2 << 1;
 		}
 	}
+	
+	u8 x = m_demoneye_bitmap_reg[0];
+	u8 y = m_demoneye_bitmap_yoffs;
+	u8 control = m_demoneye_bitmap_reg[1];
+	// TODO: m_demoneye_bitmap_reg[2] used, base offset? zooming factor?
+	
+	if(control&1)
+	{
+		int width = (control&2)?8:4;
+		int base = (control>>3)*4*8 + 0x1400;
+		for(int yy=0;yy<8;++yy)
+		{
+			for(int xx=0;xx<8;++xx)
+			{
+				if(xx<width && yy<width)
+				{
+					for(int iy=0;iy<8;++iy)
+					{
+						int l0 = m_charmap_videoram[base+iy];
+						int l1 = m_charmap_videoram[base+0x400+iy];
+						int l2 = m_charmap_videoram[base+0x800+iy];
+						for(int ix=0;ix<8;++ix)
+						{
+							int ccc = ((l0&0x80)>>5) | ((l1&0x80)>>6) | ((l2&0x80)>>7);
+							if(ccc)
+							{
+								ccc=pens[NUM_CHARMAP_PENS+ccc];
+								bitmap.pix32(y+xx*8+iy,x+yy*8+7-ix) = ccc;
+							}
 
+							l0<<=1;
+							l1<<=1;
+							l2<<=1;
+						}
+					}
+				}
+			
+				base+=8;
+			}
+		}
+	}
+
+	popmessage("%02x: %02x %02x %02x %02x",m_demoneye_bitmap_yoffs, m_demoneye_bitmap_reg[0], m_demoneye_bitmap_reg[1], m_demoneye_bitmap_reg[2], m_demoneye_bitmap_reg[3]);
 	return 0;
 }
 

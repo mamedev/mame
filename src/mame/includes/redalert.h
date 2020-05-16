@@ -112,6 +112,8 @@ private:
 	void get_redalert_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
 	void get_demoneye_pens(pen_t *pens);
+	WRITE8_MEMBER(demoneye_bitmap_layer_w);
+	void demoneye_bitmap_ypos_w(u8 data);
 
 	virtual void sound_start() override;
 
@@ -131,6 +133,8 @@ private:
 
 	uint8_t m_ay8910_latch_1;
 	uint8_t m_ay8910_latch_2;
+	u8 m_demoneye_bitmap_reg[4];
+	u8 m_demoneye_bitmap_yoffs;
 	u8 m_sound_hs;
 };
 
