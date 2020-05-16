@@ -297,7 +297,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
+void segag80r_state::sindbadm_misc_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);

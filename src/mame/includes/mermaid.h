@@ -91,7 +91,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_lo_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_rom_hi_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_sample_playback_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	void adpcm_data_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram2_w);
 	DECLARE_WRITE8_MEMBER(mermaid_videoram_w);
 	DECLARE_WRITE8_MEMBER(mermaid_colorram_w);

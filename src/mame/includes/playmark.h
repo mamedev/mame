@@ -90,11 +90,11 @@ protected:
 	DECLARE_WRITE16_MEMBER(luckboomh_dispenser_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_coin_w);
 	DECLARE_WRITE16_MEMBER(playmark_snd_command_w);
-	DECLARE_READ8_MEMBER(playmark_snd_command_r);
-	DECLARE_READ8_MEMBER(playmark_snd_flag_r);
-	DECLARE_WRITE8_MEMBER(playmark_oki_w);
-	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
-	DECLARE_WRITE8_MEMBER(hrdtimes_snd_control_w);
+	uint8_t playmark_snd_command_r();
+	uint8_t playmark_snd_flag_r();
+	void playmark_oki_w(uint8_t data);
+	void playmark_snd_control_w(uint8_t data);
+	void hrdtimes_snd_control_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(wbeachvl_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_bgvideoram_w);
@@ -105,7 +105,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(wbeachvl_scroll_w);
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
-	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
+	void playmark_oki_banking_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);

@@ -1413,7 +1413,7 @@ MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
 //  INPUT HANDLING
 //**************************************************************************
 
-WRITE8_MEMBER( model3_state::eeprom_w )
+void model3_state::eeprom_w(uint8_t data)
 {
 	m_controls_bank = BIT(data, 0);
 
@@ -1422,7 +1422,7 @@ WRITE8_MEMBER( model3_state::eeprom_w )
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( model3_state::input_r )
+uint8_t model3_state::input_r()
 {
 	if (m_controls_bank == 1)
 		return (ioport("IN1")->read());
@@ -1430,7 +1430,7 @@ READ8_MEMBER( model3_state::input_r )
 		return (ioport("IN0")->read());
 }
 
-WRITE8_MEMBER( model3_state::lostwsga_ser1_w )
+void model3_state::lostwsga_ser1_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -1465,12 +1465,12 @@ WRITE8_MEMBER( model3_state::lostwsga_ser1_w )
 	}
 }
 
-READ8_MEMBER( model3_state::lostwsga_ser2_r )
+uint8_t model3_state::lostwsga_ser2_r()
 {
 	return m_serial_fifo2;
 }
 
-WRITE8_MEMBER( model3_state::lostwsga_ser2_w )
+void model3_state::lostwsga_ser2_w(uint8_t data)
 {
 	m_serial_fifo2 = data;
 }
@@ -5882,7 +5882,7 @@ void model3_state::scsp2_map(address_map &map)
 	map(0x000000, 0x07ffff).ram().share("soundram2");
 }
 
-WRITE8_MEMBER(model3_state::scsp_irq)
+void model3_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_audiocpu->set_input_line(offset, data);
 }

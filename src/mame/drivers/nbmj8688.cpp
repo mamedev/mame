@@ -2548,16 +2548,6 @@ static INPUT_PORTS_START( bikkuri )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-READ8_MEMBER(nbmj8688_state::dipsw1_r)
-{
-	return m_nb1413m3->dipsw1_r(space,offset);
-}
-
-READ8_MEMBER(nbmj8688_state::dipsw2_r)
-{
-	return m_nb1413m3->dipsw2_r(space,offset);
-}
-
 void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2584,8 +2574,8 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &psg(AY8910(config, "psg", 1250000));
-	psg.port_a_read_callback().set(FUNC(nbmj8688_state::dipsw1_r));     // DIPSW-A read
-	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
+	psg.port_a_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));     // DIPSW-A read
+	psg.port_b_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
@@ -2772,8 +2762,8 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &psg(AY8910(config, "psg", 1250000));
-	psg.port_a_read_callback().set(FUNC(nbmj8688_state::dipsw1_r));     // DIPSW-A read
-	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
+	psg.port_a_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));     // DIPSW-A read
+	psg.port_b_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC

@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	// SMPC HLE delegates
 	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);

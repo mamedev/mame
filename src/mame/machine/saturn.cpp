@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
 	printf("m68k RESET opcode triggered\n");
 }
 
-WRITE8_MEMBER(saturn_state::scsp_irq)
+void saturn_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	// don't bother the 68k if it's off
 	if (!m_en_68k)

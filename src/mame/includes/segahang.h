@@ -74,10 +74,10 @@ public:
 
 private:
 	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( video_lamps_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
-	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
-	DECLARE_READ8_MEMBER( adc_status_r );
+	void video_lamps_w(uint8_t data);
+	void tilemap_sound_w(uint8_t data);
+	void sub_control_adc_w(uint8_t data);
+	uint8_t adc_status_r();
 
 	// main CPU read/write handlers
 	uint8_t hangon_inputs_r(offs_t offset);

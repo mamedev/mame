@@ -183,14 +183,14 @@ void carnival_state::carnival_psg_latch()
 	}
 }
 
-WRITE8_MEMBER( carnival_state::carnivala_music_port_1_w )
+void carnival_state::carnivala_music_port_1_w(uint8_t data)
 {
 	// P1: AY8912 d0-d7
 	m_musicData = data;
 	carnival_psg_latch();
 }
 
-WRITE8_MEMBER( carnival_state::carnivala_music_port_2_w )
+void carnival_state::carnivala_music_port_2_w(uint8_t data)
 {
 	// P2 d6: AY8912 BDIR(R/W)
 	// P2 d7: AY8912 BC1
@@ -219,13 +219,13 @@ void carnival_state::carnivala_audio(machine_config &config)
 
 // PIT8253 music
 
-WRITE8_MEMBER( carnival_state::carnivalb_music_port_1_w )
+void carnival_state::carnivalb_music_port_1_w(uint8_t data)
 {
 	// P1: PIT8253 d0-d7
 	m_musicData = data;
 }
 
-WRITE8_MEMBER( carnival_state::carnivalb_music_port_2_w )
+void carnival_state::carnivalb_music_port_2_w(uint8_t data)
 {
 	// P2 d7: PIT8253 write strobe
 	// P2 d5,d6: PIT8253 A0,A1

@@ -62,9 +62,9 @@ private:
 	DECLARE_READ8_MEMBER(z80_io_02_r);
 	DECLARE_WRITE8_MEMBER(z80_io_17_w);
 	DECLARE_WRITE8_MEMBER(z80_io_37_w);
-	DECLARE_WRITE8_MEMBER(i8155_a_w);
-	DECLARE_WRITE8_MEMBER(i8155_b_w);
-	DECLARE_WRITE8_MEMBER(i8155_c_w);
+	void i8155_a_w(uint8_t data);
+	void i8155_b_w(uint8_t data);
+	void i8155_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
 	void paranoia_8085_io_map(address_map &map);
 	void paranoia_8085_map(address_map &map);
@@ -144,17 +144,17 @@ void paranoia_state::paranoia_z80_io_map(address_map &map)
 	map(0x37, 0x37).w(FUNC(paranoia_state::z80_io_37_w));
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_a_w)
+void paranoia_state::i8155_a_w(uint8_t data)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_b_w)
+void paranoia_state::i8155_b_w(uint8_t data)
 {
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_c_w)
+void paranoia_state::i8155_c_w(uint8_t data)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }

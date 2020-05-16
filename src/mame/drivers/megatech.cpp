@@ -119,11 +119,11 @@ private:
 	void megatech(machine_config &config);
 
 	DECLARE_READ8_MEMBER(cart_select_r);
-	DECLARE_WRITE8_MEMBER(cart_select_w);
-	DECLARE_READ8_MEMBER(bios_portc_r);
-	DECLARE_READ8_MEMBER(bios_porte_r);
-	DECLARE_WRITE8_MEMBER(bios_portd_w);
-	DECLARE_WRITE8_MEMBER(bios_porte_w);
+	void cart_select_w(uint8_t data);
+	uint8_t bios_portc_r();
+	uint8_t bios_porte_r();
+	void bios_portd_w(uint8_t data);
+	void bios_porte_w(uint8_t data);
 	DECLARE_READ8_MEMBER(read_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
@@ -464,7 +464,7 @@ void mtech_state::switch_cart(int gameno)
 	}
 }
 
-WRITE8_MEMBER(mtech_state::cart_select_w)
+void mtech_state::cart_select_w(uint8_t data)
 {
 	/* seems to write the slot number..
 	  but it stores something in (banked?) ram
@@ -475,23 +475,23 @@ WRITE8_MEMBER(mtech_state::cart_select_w)
 }
 
 
-READ8_MEMBER(mtech_state::bios_portc_r)
+uint8_t mtech_state::bios_portc_r()
 {
 	return 0;
 }
 
-READ8_MEMBER(mtech_state::bios_porte_r)
+uint8_t mtech_state::bios_porte_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(mtech_state::bios_portd_w)
+void mtech_state::bios_portd_w(uint8_t data)
 {
 	output().set_value("Alarm_sound", BIT(data, 7));
 	m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 }
 
-WRITE8_MEMBER(mtech_state::bios_porte_w)
+void mtech_state::bios_porte_w(uint8_t data)
 {
 	output().set_value("Flash_screen", BIT(data, 1));
 }

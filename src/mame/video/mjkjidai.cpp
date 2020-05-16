@@ -45,7 +45,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
+void mjkjidai_state::mjkjidai_ctrl_w(uint8_t data)
 {
 //  logerror("%s: port c0 = %02x\n",m_maincpu->pc(),data);
 

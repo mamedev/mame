@@ -1182,27 +1182,27 @@ void model2_state::model2_5881_mem(address_map &map)
 // Interface board ID: 837-12079
 // ALTERA FLEX + Sega 315-5338A
 
-READ8_MEMBER( model2_state::lightgun_data_r )
+uint8_t model2_state::lightgun_data_r(offs_t offset)
 {
 	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
 	return BIT(offset, 0) ? (data >> 8) : data;
 }
 
-READ8_MEMBER( model2_state::lightgun_mux_r )
+uint8_t model2_state::lightgun_mux_r()
 {
 	if (m_lightgun_mux < 8)
-		return lightgun_data_r(space, m_lightgun_mux);
+		return lightgun_data_r(m_lightgun_mux);
 	else
-		return lightgun_offscreen_r(space, 0);
+		return lightgun_offscreen_r(0);
 }
 
-WRITE8_MEMBER( model2_state::lightgun_mux_w )
+void model2_state::lightgun_mux_w(uint8_t data)
 {
 	m_lightgun_mux = data;
 }
 
 // handles offscreen gun trigger detection here
-READ8_MEMBER( model2_state::lightgun_offscreen_r )
+uint8_t model2_state::lightgun_offscreen_r(offs_t offset)
 {
 	// 5 percent border size
 	const float BORDER_SIZE = 0.05f;
@@ -1238,7 +1238,7 @@ READ8_MEMBER( model2_state::lightgun_offscreen_r )
 //  OUTPUTS
 //**************************************************************************
 
-WRITE8_MEMBER( model2o_state::daytona_output_w )
+void model2o_state::daytona_output_w(uint8_t data)
 {
 	// 7-------  leader led
 	// -6------  vr4 led
@@ -1253,7 +1253,7 @@ WRITE8_MEMBER( model2o_state::daytona_output_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model2o_state::desert_output_w )
+void model2o_state::desert_output_w(uint8_t data)
 {
 	// 7-------  cannon motor
 	// -6------  machine gun motor
@@ -1268,7 +1268,7 @@ WRITE8_MEMBER( model2o_state::desert_output_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER( model2o_state::vcop_output_w )
+void model2o_state::vcop_output_w(uint8_t data)
 {
 	// 7654----  unknown (not used?)
 	// ----32--  start leds (always set together)
@@ -1569,7 +1569,7 @@ void model2c_state::model2c_5881_mem(address_map &map)
 */
 
 // simulate this so that it passes the initial checks
-READ8_MEMBER( model2_state::rchase2_drive_board_r )
+uint8_t model2_state::rchase2_drive_board_r()
 {
 	uint8_t data = 0xff;
 
@@ -1585,12 +1585,12 @@ READ8_MEMBER( model2_state::rchase2_drive_board_r )
 	return data;
 }
 
-WRITE8_MEMBER( model2_state::rchase2_drive_board_w )
+void model2_state::rchase2_drive_board_w(uint8_t data)
 {
 	m_cmd_data = data;
 }
 
-WRITE8_MEMBER( model2_state::drive_board_w )
+void model2_state::drive_board_w(uint8_t data)
 {
 	m_driveio_comm_data = data;
 	m_drivecpu->set_input_line(0, HOLD_LINE);
@@ -1601,7 +1601,7 @@ WRITE8_MEMBER( model2_state::drive_board_w )
 //  INPUT HANDLING
 //**************************************************************************
 
-WRITE8_MEMBER( model2_state::eeprom_w )
+void model2_state::eeprom_w(uint8_t data)
 {
 	m_ctrlmode = BIT(data, 0);
 
@@ -1610,7 +1610,7 @@ WRITE8_MEMBER( model2_state::eeprom_w )
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( model2_state::in0_r )
+uint8_t model2_state::in0_r()
 {
 	uint8_t data = m_in0->read();
 
@@ -2454,7 +2454,7 @@ void model2_state::scsp_map(address_map &map)
 	map(0x000000, 0x07ffff).ram().share("soundram");
 }
 
-WRITE8_MEMBER(model2_state::scsp_irq)
+void model2_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_audiocpu->set_input_line(offset, data);
 }
@@ -2571,17 +2571,17 @@ void model2o_state::model2o(machine_config &config)
 	M2COMM(config, "m2comm", 0);
 }
 
-READ8_MEMBER(model2_state::driveio_portg_r)
+uint8_t model2_state::driveio_portg_r()
 {
 	return m_driveio_comm_data;
 }
 
-READ8_MEMBER(model2_state::driveio_porth_r)
+uint8_t model2_state::driveio_porth_r()
 {
 	return m_driveio_comm_data;
 }
 
-WRITE8_MEMBER(model2_state::driveio_port_w)
+void model2_state::driveio_port_w(uint8_t data)
 {
 //  TODO: hook up to the main CPU
 //  popmessage("%02x",data);

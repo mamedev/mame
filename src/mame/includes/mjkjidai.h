@@ -48,10 +48,10 @@ private:
 	bool m_display_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(keyboard_select_lo_w);
-	DECLARE_WRITE8_MEMBER(keyboard_select_hi_w);
+	void keyboard_select_lo_w(uint8_t data);
+	void keyboard_select_hi_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
-	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
+	void mjkjidai_ctrl_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	TILE_GET_INFO_MEMBER(get_tile_info);

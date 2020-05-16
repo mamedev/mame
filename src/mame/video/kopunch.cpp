@@ -55,18 +55,18 @@ WRITE8_MEMBER(kopunch_state::vram_bg_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_x_w)
+void kopunch_state::scroll_x_w(uint8_t data)
 {
 	m_scrollx = data;
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_y_w)
+void kopunch_state::scroll_y_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::gfxbank_w)
+void kopunch_state::gfxbank_w(uint8_t data)
 {
 	// d0-d2: bg gfx bank
 	if (m_gfxbank != (data & 0x07))

@@ -119,8 +119,6 @@ private:
 	DECLARE_WRITE8_MEMBER(seiha_romsel_w);
 	DECLARE_WRITE8_MEMBER(HD61830B_both_instr_w);
 	DECLARE_WRITE8_MEMBER(HD61830B_both_data_w);
-	DECLARE_READ8_MEMBER(dipsw1_r);
-	DECLARE_READ8_MEMBER(dipsw2_r);
 	DECLARE_WRITE8_MEMBER(barline_output_w);
 
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);

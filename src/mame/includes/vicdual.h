@@ -284,11 +284,11 @@ protected:
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
 	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivala_music_port_2_w );
+	void carnivala_music_port_1_w(uint8_t data);
+	void carnivala_music_port_2_w(uint8_t data);
 	void carnival_psg_latch();
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnivalb_music_port_2_w );
+	void carnivalb_music_port_1_w(uint8_t data);
+	void carnivalb_music_port_2_w(uint8_t data);
 };
 
 class headonsa_state : public vicdual_state

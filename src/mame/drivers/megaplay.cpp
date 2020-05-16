@@ -71,20 +71,20 @@ private:
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
+	void bios_banksel_w(uint8_t data);
+	void bios_gamesel_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(mp_io_write);
 	DECLARE_READ16_MEMBER(mp_io_read);
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bios_6402_r);
-	DECLARE_WRITE8_MEMBER(bios_6402_w);
-	DECLARE_READ8_MEMBER(bios_6204_r);
-	DECLARE_WRITE8_MEMBER(bios_width_w);
-	DECLARE_READ8_MEMBER(bios_6404_r);
-	DECLARE_WRITE8_MEMBER(bios_6404_w);
-	DECLARE_READ8_MEMBER(bios_6600_r);
-	DECLARE_WRITE8_MEMBER(bios_6600_w);
+	uint8_t bios_6402_r();
+	void bios_6402_w(uint8_t data);
+	uint8_t bios_6204_r();
+	void bios_width_w(uint8_t data);
+	uint8_t bios_6404_r();
+	void bios_6404_w(uint8_t data);
+	uint8_t bios_6600_r();
+	void bios_6600_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
@@ -410,7 +410,7 @@ READ_LINE_MEMBER(mplay_state::start2_r)
 	return BIT(m_bios_bank, 5);
 }
 
-WRITE8_MEMBER(mplay_state::bios_banksel_w)
+void mplay_state::bios_banksel_w(uint8_t data)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -426,7 +426,7 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n", m_bios_bank >> 6, data);
 }
 
-WRITE8_MEMBER(mplay_state::bios_gamesel_w)
+void mplay_state::bios_gamesel_w(uint8_t data)
 {
 	m_bios_6403 = data;
 
@@ -511,38 +511,38 @@ WRITE8_MEMBER(mplay_state::bank_w)
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::bios_6402_r)
+uint8_t mplay_state::bios_6402_r()
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6402_w)
+void mplay_state::bios_6402_w(uint8_t data)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6204_r)
+uint8_t mplay_state::bios_6204_r()
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::bios_width_w)
+void mplay_state::bios_width_w(uint8_t data)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6404_r)
+uint8_t mplay_state::bios_6404_r()
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6404_w)
+void mplay_state::bios_6404_w(uint8_t data)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -551,7 +551,7 @@ WRITE8_MEMBER(mplay_state::bios_6404_w)
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6600_r)
+uint8_t mplay_state::bios_6600_r()
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -562,7 +562,7 @@ READ8_MEMBER(mplay_state::bios_6600_r)
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6600_w)
+void mplay_state::bios_6600_w(uint8_t data)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);

@@ -483,10 +483,10 @@ private:
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
 	void saturn_init_driver(int rgn);
-	DECLARE_READ8_MEMBER(saturn_pdr1_direct_r);
-	DECLARE_READ8_MEMBER(saturn_pdr2_direct_r);
-	DECLARE_WRITE8_MEMBER(saturn_pdr1_direct_w);
-	DECLARE_WRITE8_MEMBER(saturn_pdr2_direct_w);
+	uint8_t saturn_pdr1_direct_r();
+	uint8_t saturn_pdr2_direct_r();
+	void saturn_pdr1_direct_w(uint8_t data);
+	void saturn_pdr2_direct_w(uint8_t data);
 	uint8_t m_direct_mux[2];
 	uint8_t saturn_direct_port_read(bool which);
 	uint8_t smpc_direct_mode(uint16_t in_value, bool which);
@@ -699,22 +699,22 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_vdp2.old_tvmd = -1;
 }
 
-READ8_MEMBER( sat_console_state::saturn_pdr1_direct_r )
+uint8_t sat_console_state::saturn_pdr1_direct_r()
 {
 	return saturn_direct_port_read(false);
 }
 
-READ8_MEMBER( sat_console_state::saturn_pdr2_direct_r )
+uint8_t sat_console_state::saturn_pdr2_direct_r()
 {
 	return saturn_direct_port_read(true);
 }
 
-WRITE8_MEMBER( sat_console_state::saturn_pdr1_direct_w )
+void sat_console_state::saturn_pdr1_direct_w(uint8_t data)
 {
 	m_direct_mux[0] = data;
 }
 
-WRITE8_MEMBER( sat_console_state::saturn_pdr2_direct_w )
+void sat_console_state::saturn_pdr2_direct_w(uint8_t data)
 {
 	m_direct_mux[1] = data;
 }

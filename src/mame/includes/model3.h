@@ -285,11 +285,11 @@ private:
 	DECLARE_READ64_MEMBER(real3d_dma_r);
 	DECLARE_WRITE64_MEMBER(real3d_dma_w);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lostwsga_ser1_w);
-	DECLARE_READ8_MEMBER(lostwsga_ser2_r);
-	DECLARE_WRITE8_MEMBER(lostwsga_ser2_w);
+	void eeprom_w(uint8_t data);
+	uint8_t input_r();
+	void lostwsga_ser1_w(uint8_t data);
+	uint8_t lostwsga_ser2_r();
+	void lostwsga_ser2_w(uint8_t data);
 
 	DECLARE_READ64_MEMBER(model3_sys_r);
 	DECLARE_WRITE64_MEMBER(model3_sys_w);
@@ -319,7 +319,7 @@ private:
 	TIMER_CALLBACK_MEMBER(model3_scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 	void real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
 	uint32_t scsi_fetch(uint32_t dsp);
 	void scsi_irq_callback(int state);

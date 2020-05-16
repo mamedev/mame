@@ -114,16 +114,16 @@ private:
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 
-	DECLARE_WRITE8_MEMBER(soundbank_w);
+	void soundbank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(inputportsel_w);
-	DECLARE_READ8_MEMBER(mscoutm_dipsw_0_r);
-	DECLARE_READ8_MEMBER(mscoutm_dipsw_1_r);
-	DECLARE_READ8_MEMBER(mscoutm_cpu_portb_r);
-	DECLARE_READ8_MEMBER(mscoutm_cpu_portc_r);
-	DECLARE_READ8_MEMBER(others_cpu_porta_r);
-	DECLARE_READ8_MEMBER(others_cpu_portb_r);
-	DECLARE_READ8_MEMBER(others_cpu_portc_r);
-	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
+	uint8_t mscoutm_dipsw_0_r();
+	uint8_t mscoutm_dipsw_1_r();
+	uint8_t mscoutm_cpu_portb_r();
+	uint8_t mscoutm_cpu_portc_r();
+	uint8_t others_cpu_porta_r();
+	uint8_t others_cpu_portb_r();
+	uint8_t others_cpu_portc_r();
+	void soundcpu_porte_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(nb22090_palette_w);
 	DECLARE_WRITE8_MEMBER(blitter_0_w);
@@ -132,11 +132,11 @@ private:
 	DECLARE_READ8_MEMBER(blitter_1_r);
 	DECLARE_WRITE8_MEMBER(clut_0_w);
 	DECLARE_WRITE8_MEMBER(clut_1_w);
-	DECLARE_WRITE8_MEMBER(clutsel_w);
-	DECLARE_WRITE8_MEMBER(gfxflag2_w);
-	DECLARE_WRITE8_MEMBER(outcoin_flag_w);
-	DECLARE_WRITE8_MEMBER(dipswbitsel_w);
-	DECLARE_WRITE8_MEMBER(mscoutm_inputportsel_w);
+	void clutsel_w(uint8_t data);
+	void gfxflag2_w(uint8_t data);
+	void outcoin_flag_w(uint8_t data);
+	void dipswbitsel_w(uint8_t data);
+	void mscoutm_inputportsel_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

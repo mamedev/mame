@@ -145,8 +145,8 @@ private:
 	u32 m_copro_ram_adr[4];
 
 	uint16_t m_r360_state;
-	DECLARE_READ8_MEMBER(r360_r);
-	DECLARE_WRITE8_MEMBER(r360_w);
+	uint8_t r360_r();
+	void r360_w(uint8_t data);
 
 	// Rendering
 	virtual void video_start() override;
@@ -348,14 +348,14 @@ private:
 	output_finder<2> m_digits;
 	output_finder<8> m_outs;
 	DECLARE_READ8_MEMBER(dpram_r);
-	DECLARE_WRITE8_MEMBER(gen_outputs_w);
-	DECLARE_WRITE8_MEMBER(vf_outputs_w);
-	DECLARE_WRITE8_MEMBER(vr_outputs_w);
-	DECLARE_WRITE8_MEMBER(swa_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
-	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
-	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
+	void gen_outputs_w(uint8_t data);
+	void vf_outputs_w(uint8_t data);
+	void vr_outputs_w(uint8_t data);
+	void swa_outputs_w(uint8_t data);
+	void wingwar_outputs_w(uint8_t data);
+	void wingwar360_outputs_w(uint8_t data);
+	void netmerc_outputs_w(uint8_t data);
+	void drive_board_w(uint8_t data);
 };
 
 #endif // MAME_INCLUDES_MODEL1_H

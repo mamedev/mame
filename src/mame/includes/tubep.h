@@ -93,12 +93,12 @@ private:
 	DECLARE_WRITE8_MEMBER(rjammer_background_page_w);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_startstop_w);
 	DECLARE_WRITE8_MEMBER(rjammer_voice_frequency_select_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_1_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_1_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portA_2_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
+	void ay8910_portA_0_w(uint8_t data);
+	void ay8910_portB_0_w(uint8_t data);
+	void ay8910_portA_1_w(uint8_t data);
+	void ay8910_portB_1_w(uint8_t data);
+	void ay8910_portA_2_w(uint8_t data);
+	void ay8910_portB_2_w(uint8_t data);
 	DECLARE_MACHINE_START(tubep);
 	DECLARE_MACHINE_RESET(tubep);
 	virtual void video_start() override;

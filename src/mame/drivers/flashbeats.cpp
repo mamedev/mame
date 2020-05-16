@@ -53,7 +53,7 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 	DECLARE_READ16_MEMBER(p6_r);
 	DECLARE_WRITE16_MEMBER(p6_w);
 
@@ -176,7 +176,7 @@ void flashbeats_state::flashbeats(machine_config &config)
 	m_scsp->add_route(1, "rspeaker", 1.0);
 }
 
-WRITE8_MEMBER(flashbeats_state::scsp_irq)
+void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
 {
 }
 

@@ -205,7 +205,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 	}
 }
 
-READ8_MEMBER(playmark_state::playmark_snd_command_r)
+uint8_t playmark_state::playmark_snd_command_r()
 {
 	int data = 0;
 
@@ -223,7 +223,7 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(playmark_state::playmark_snd_flag_r)
+uint8_t playmark_state::playmark_snd_flag_r()
 {
 	if (m_snd_flag)
 	{
@@ -235,7 +235,7 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 }
 
 
-WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
+void playmark_state::playmark_oki_banking_w(uint8_t data)
 {
 	logerror("%s Writing %02x to PortA  (OKI bank select)\n",machine().describe_context(),data);
 
@@ -244,12 +244,12 @@ WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
-WRITE8_MEMBER(playmark_state::playmark_oki_w)
+void playmark_state::playmark_oki_w(uint8_t data)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
+void playmark_state::playmark_snd_control_w(uint8_t data)
 {
 	/*  This port controls communications to and from the 68K and the OKI device.
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 	}
 }
 
-WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
+void playmark_state::hrdtimes_snd_control_w(uint8_t data)
 {
 	/*  This port controls communications to and from the 68K and the OKI device. See playmark_snd_control_w above. OKI banking is also handled here. */
 
