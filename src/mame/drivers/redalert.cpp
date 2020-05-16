@@ -69,6 +69,7 @@
 
     Known issues/to-do's Panther:
 		* Analog sounds (same as Red Alert?)
+		* AY sounds needs an actual ref, they are dubious at best
         * No title screen?
 		* Fails ROM check in service mode with "ROM ERR 0", bootleg/prototype set?
 		* Likewise sports bad wording in input test
