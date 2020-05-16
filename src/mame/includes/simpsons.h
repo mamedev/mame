@@ -72,7 +72,7 @@ private:
 	void simpsons_objdma();
 	void z80_nmi_w(int state);
 	K052109_CB_MEMBER(tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(u8 data);
 	K053246_CB_MEMBER(sprite_callback);
 
 	void bank0000_map(address_map &map);

@@ -417,7 +417,7 @@ void vendetta_state::machine_reset()
 	m_irq_enabled = 0;
 }
 
-WRITE8_MEMBER( vendetta_state::banking_callback )
+void vendetta_state::banking_callback(uint8_t data)
 {
 	if (data >= 0x1c)
 		logerror("%s Unknown bank selected %02x\n", machine().describe_context(), data);

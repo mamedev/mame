@@ -130,7 +130,7 @@ void namcos21_dsp_device::winrun_flush_poly()
 	}
 } /* winrun_flushpoly */
 
-READ16_MEMBER(namcos21_dsp_device::winrun_poly_reset_r)
+uint16_t namcos21_dsp_device::winrun_poly_reset_r()
 {
 	winrun_flush_poly();
 	return 0;

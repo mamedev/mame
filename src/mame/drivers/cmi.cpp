@@ -257,9 +257,9 @@ public:
 	DECLARE_WRITE8_MEMBER( aic_ad565_msb_w );
 	DECLARE_WRITE8_MEMBER( aic_ad565_lsb_w );
 
-	DECLARE_READ8_MEMBER( q133_1_porta_r );
-	DECLARE_WRITE8_MEMBER( q133_1_porta_w );
-	DECLARE_WRITE8_MEMBER( q133_1_portb_w );
+	uint8_t q133_1_porta_r();
+	void q133_1_porta_w(uint8_t data);
+	void q133_1_portb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( cmi_iix_vblank );
 	IRQ_CALLBACK_MEMBER( cpu1_interrupt_callback );
@@ -268,10 +268,10 @@ public:
 	// Video-related
 	DECLARE_READ8_MEMBER( video_r );
 	DECLARE_READ8_MEMBER( lightpen_r );
-	DECLARE_READ8_MEMBER( pia_q219_b_r );
+	uint8_t pia_q219_b_r();
 	DECLARE_WRITE8_MEMBER( video_w );
-	DECLARE_WRITE8_MEMBER( vscroll_w );
-	DECLARE_WRITE8_MEMBER( video_attr_w );
+	void vscroll_w(uint8_t data);
+	void video_attr_w(uint8_t data);
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( tvt_r );
@@ -311,8 +311,8 @@ public:
 	// Master card
 	DECLARE_READ8_MEMBER( cmi02_r );
 	DECLARE_WRITE8_MEMBER( cmi02_w );
-	DECLARE_WRITE8_MEMBER( cmi02_chsel_w );
-	DECLARE_WRITE8_MEMBER( master_tune_w );
+	void cmi02_chsel_w(uint8_t data);
+	void master_tune_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_irqa_w );
@@ -594,7 +594,7 @@ READ8_MEMBER( cmi_state::lightpen_r )
 		return m_lp_x >> 1;
 }
 
-READ8_MEMBER( cmi_state::pia_q219_b_r )
+uint8_t cmi_state::pia_q219_b_r()
 {
 	return ((m_lp_x << 7) & 0x80) | m_q219_b_touch;
 }
@@ -606,12 +606,12 @@ WRITE8_MEMBER( cmi_state::video_w )
 	video_write(offset);
 }
 
-WRITE8_MEMBER( cmi_state::vscroll_w )
+void cmi_state::vscroll_w(uint8_t data)
 {
 	// TODO: Partial updates. Also, this should be done through a PIA
 }
 
-WRITE8_MEMBER( cmi_state::video_attr_w )
+void cmi_state::video_attr_w(uint8_t data)
 {
 	// TODO
 }
@@ -1277,12 +1277,12 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 28 - 2B = PIA
 */
 
-WRITE8_MEMBER( cmi_state::master_tune_w )
+void cmi_state::master_tune_w(uint8_t data)
 {
 //  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
 }
 
-WRITE8_MEMBER( cmi_state::cmi02_chsel_w )
+void cmi_state::cmi02_chsel_w(uint8_t data)
 {
 	m_cmi02_pia_chsel = data;
 }
@@ -1725,7 +1725,7 @@ WRITE_LINE_MEMBER( cmi_state::pia_q219_irqb )
     IRQA/B = /RTINT?
 */
 
-READ8_MEMBER( cmi_state::q133_1_porta_r )
+uint8_t cmi_state::q133_1_porta_r()
 {
 	if (BIT(m_q133_pia[0]->b_output(), 1))
 	{
@@ -1734,13 +1734,13 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( cmi_state::q133_1_porta_w )
+void cmi_state::q133_1_porta_w(uint8_t data)
 {
 	m_msm5832_addr = data & 0xf;
 	m_msm5832->address_w(data & 0x0f);
 }
 
-WRITE8_MEMBER( cmi_state::q133_1_portb_w )
+void cmi_state::q133_1_portb_w(uint8_t data)
 {
 	m_msm5832->hold_w(BIT(data, 0));
 	m_msm5832->read_w(BIT(data, 1));

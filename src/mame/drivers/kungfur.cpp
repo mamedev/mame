@@ -107,10 +107,10 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	template<int N> DECLARE_WRITE8_MEMBER(digit_data_w) { m_digit_data[N] = data; }
-	template<int N> DECLARE_WRITE8_MEMBER(adpcm_data_w) { m_adpcm_data[N] = data; }
+	void output_w(u8 data);
+	void control_w(u8 data);
+	template<int N> void digit_data_w(u8 data) { m_digit_data[N] = data; }
+	template<int N> void adpcm_data_w(u8 data) { m_adpcm_data[N] = data; }
 	template<int N> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	u8 m_control = 0;
@@ -152,7 +152,7 @@ INTERRUPT_GEN_MEMBER(kungfur_state::interrupt)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(kungfur_state::output_w)
+void kungfur_state::output_w(u8 data)
 {
 	// d0-d2: output led7seg
 	static const u8 lut_digits[24] =
@@ -185,7 +185,7 @@ WRITE8_MEMBER(kungfur_state::output_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 }
 
-WRITE8_MEMBER(kungfur_state::control_w)
+void kungfur_state::control_w(u8 data)
 {
 	// d0-d3: N/C
 	// d4: irq ack

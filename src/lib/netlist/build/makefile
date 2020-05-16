@@ -145,6 +145,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4006.o \
+	$(NLOBJ)/devices/nld_4013.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \

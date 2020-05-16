@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blueprnt_videoram_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_colorram_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(dipsw_w);
+	void dipsw_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

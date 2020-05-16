@@ -759,7 +759,7 @@ WRITE_LINE_MEMBER(galaga_state::nmion_w)
 	m_sub2_nmi_mask = !state;
 }
 
-WRITE8_MEMBER(galaga_state::out)
+void galaga_state::out(uint8_t data)
 {
 	m_leds[1] = BIT(data, 0);
 	m_leds[0] = BIT(data, 1);
@@ -772,7 +772,7 @@ WRITE_LINE_MEMBER(galaga_state::lockout)
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_rom_r)
+uint8_t galaga_state::namco_52xx_rom_r(offs_t offset)
 {
 	uint32_t length = memregion("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
@@ -787,7 +787,7 @@ READ8_MEMBER(galaga_state::namco_52xx_rom_r)
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_si_r)
+uint8_t galaga_state::namco_52xx_si_r()
 {
 	/* pulled to GND */
 	return 0;

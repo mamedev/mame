@@ -965,16 +965,6 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 	return ret;
 }
 
-READ8_MEMBER(fm7_state::fm77av_joy_1_r)
-{
-	return m_joy1->read();
-}
-
-READ8_MEMBER(fm7_state::fm77av_joy_2_r)
-{
-	return m_joy2->read();
-}
-
 READ8_MEMBER(fm7_state::fm7_unknown_r)
 {
 	// Port 0xFDFC is read by Dig Dug.  Controller port, perhaps?
@@ -2145,8 +2135,8 @@ void fm7_state::fm77av(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
 	m_ym->irq_handler().set(FUNC(fm7_state::fm77av_fmirq));
-	m_ym->port_a_read_callback().set(FUNC(fm7_state::fm77av_joy_1_r));
-	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
+	m_ym->port_a_read_callback().set_ioport("joy1");
+	m_ym->port_b_read_callback().set_ioport("joy2");
 	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 

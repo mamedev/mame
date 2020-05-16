@@ -401,7 +401,7 @@ private:
 	void output_w(uint32_t data);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
-	DECLARE_WRITE32_MEMBER(wheel_board_w);
+	void wheel_board_w(offs_t offset, uint32_t data);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
@@ -705,7 +705,7 @@ void seattle_state::analog_port_w(uint32_t data)
 *  Wheelboard output module
 *
 *************************************/
-WRITE32_MEMBER(seattle_state::wheel_board_w)
+void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 {
 	//logerror("wheel_board_w: data = %08X\n", data);
 	uint8_t arg = data & 0xFF;

@@ -2061,7 +2061,7 @@ READ16_MEMBER(namcos22_state::point_hiword_ir)
 }
 
 
-READ16_MEMBER(namcos22_state::pdp_status_r)
+u16 namcos22_state::pdp_status_r()
 {
 	return m_dsp_master_bioz;
 }
@@ -2214,18 +2214,18 @@ void namcos22_state::pdp_handle_commands(u16 offs)
 	}
 }
 
-READ16_MEMBER(namcos22_state::dsp_hold_signal_r)
+u16 namcos22_state::dsp_hold_signal_r()
 {
 	/* STUB */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_hold_ack_w)
+void namcos22_state::dsp_hold_ack_w(u16 data)
 {
 	/* STUB */
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_xf_output_w)
+void namcos22_state::dsp_xf_output_w(u16 data)
 {
 	/* STUB */
 }
@@ -2321,13 +2321,13 @@ READ16_MEMBER(namcos22_state::dsp_upload_status_r)
 	return 0x0000;
 }
 
-WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
+void namcos22_state::slave_serial_io_w(u16 data)
 {
 	m_SerialDataSlaveToMasterNext = data;
 	logerror("slave_serial_io_w(%04x)\n", data);
 }
 
-READ16_MEMBER(namcos22_state::master_serial_io_r)
+u16 namcos22_state::master_serial_io_r()
 {
 	logerror("master_serial_io_r() == %04x\n", m_SerialDataSlaveToMasterCurrent);
 	return m_SerialDataSlaveToMasterCurrent;
@@ -2447,7 +2447,7 @@ void namcos22_state::master_dsp_io(address_map &map)
 }
 
 
-READ16_MEMBER(namcos22_state::dsp_slave_bioz_r)
+u16 namcos22_state::dsp_slave_bioz_r()
 {
 	/* STUB */
 	return 1;
@@ -2563,13 +2563,13 @@ void namcos22_state::slave_dsp_io(address_map &map)
 
 // System22 37702
 
-READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
+u8 namcos22_state::mcu_port4_s22_r()
 {
 	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 	return 0x10;
 }
 
-READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
+u8 namcos22_state::iomcu_port4_s22_r()
 {
 	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 	return 0x00;
@@ -2601,7 +2601,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-WRITE8_MEMBER(namcos22s_state::mb87078_gain_changed)
+void namcos22s_state::mb87078_gain_changed(offs_t offset, u8 data)
 {
 	m_c352->set_output_gain(offset ^ 3, data / 100.0);
 }
@@ -2664,7 +2664,7 @@ WRITE8_MEMBER(namcos22s_state::mb87078_gain_changed)
   other: ?
 */
 
-WRITE8_MEMBER(namcos22s_state::mcu_port4_w)
+void namcos22s_state::mcu_port4_w(u8 data)
 {
 	// d3: input port select for port 5
 	// d4: port 5 direction?
@@ -2686,28 +2686,28 @@ WRITE8_MEMBER(namcos22s_state::mcu_port4_w)
 	m_mcu_iocontrol = data;
 }
 
-READ8_MEMBER(namcos22s_state::mcu_port4_r)
+u8 namcos22s_state::mcu_port4_r()
 {
 	return m_mcu_iocontrol;
 }
 
-WRITE8_MEMBER(namcos22s_state::mcu_port5_w)
+void namcos22s_state::mcu_port5_w(u8 data)
 {
 	m_mcu_outdata = data;
 }
 
-READ8_MEMBER(namcos22s_state::mcu_port5_r)
+u8 namcos22s_state::mcu_port5_r()
 {
 	u16 inputs = m_inputs->read();
 	return (m_mcu_iocontrol & 8) ? inputs & 0xff : inputs >> 8;
 }
 
-WRITE8_MEMBER(namcos22s_state::mcu_port6_w)
+void namcos22s_state::mcu_port6_w(u8 data)
 {
 	// always 2?
 }
 
-READ8_MEMBER(namcos22s_state::mcu_port6_r)
+u8 namcos22s_state::mcu_port6_r()
 {
 	// discarded
 	return 0;
@@ -2829,7 +2829,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::alpine_steplock_callback)
 	m_motor_status = param;
 }
 
-WRITE8_MEMBER(namcos22s_state::alpine_mcu_port4_w)
+void namcos22s_state::alpine_mcu_port4_w(u8 data)
 {
 	if (~m_mcu_iocontrol & data & 0x20)
 	{
@@ -2854,7 +2854,7 @@ WRITE8_MEMBER(namcos22s_state::alpine_mcu_port4_w)
 		}
 	}
 
-	mcu_port4_w(space, offset, data);
+	mcu_port4_w(data);
 }
 
 

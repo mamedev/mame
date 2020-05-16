@@ -153,8 +153,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(out_lamps0);
-	DECLARE_WRITE8_MEMBER(out_lamps1);
+	void out_lamps0(uint8_t data);
+	void out_lamps1(uint8_t data);
 
 	output_finder<2> m_lamps;
 };

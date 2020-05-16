@@ -155,7 +155,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
-	DECLARE_READ8_MEMBER(rescueb_a002_r) { return 0xfc; }
+	uint8_t rescueb_a002_r() { return 0xfc; }
 	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);

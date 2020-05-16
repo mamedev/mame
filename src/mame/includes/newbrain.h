@@ -68,10 +68,10 @@ private:
 	DECLARE_READ8_MEMBER( ust_a_r );
 	DECLARE_READ8_MEMBER( ust_b_r );
 
-	DECLARE_WRITE8_MEMBER( cop_g_w );
-	DECLARE_READ8_MEMBER( cop_g_r );
-	DECLARE_WRITE8_MEMBER( cop_d_w );
-	DECLARE_READ8_MEMBER( cop_in_r );
+	void cop_g_w(uint8_t data);
+	uint8_t cop_g_r();
+	void cop_d_w(uint8_t data);
+	uint8_t cop_in_r();
 	DECLARE_WRITE_LINE_MEMBER( k2_w );
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );

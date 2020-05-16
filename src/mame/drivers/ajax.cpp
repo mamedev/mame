@@ -151,7 +151,7 @@ WRITE8_MEMBER(ajax_state::sound_bank_w)
 	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
-WRITE8_MEMBER(ajax_state::volume_callback0)
+void ajax_state::volume_callback0(uint8_t data)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -163,7 +163,7 @@ WRITE8_MEMBER(ajax_state::k007232_extvol_w)
 	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
-WRITE8_MEMBER(ajax_state::volume_callback1)
+void ajax_state::volume_callback1(uint8_t data)
 {
 	/* channel B volume/pan */
 	m_k007232_2->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);

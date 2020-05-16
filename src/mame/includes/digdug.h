@@ -41,7 +41,7 @@ private:
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(digdug_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_select_w);
+	void bg_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tx_color_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
 

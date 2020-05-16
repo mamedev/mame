@@ -246,36 +246,36 @@ void midway_serial_pic_emu_device::device_start()
 }
 
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_a)
+uint8_t midway_serial_pic_emu_device::read_a()
 {
 //  printf("%s: read_a\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_b)
+uint8_t midway_serial_pic_emu_device::read_b()
 {
 //  printf("%s: read_b\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-READ8_MEMBER(midway_serial_pic_emu_device::read_c)
+uint8_t midway_serial_pic_emu_device::read_c()
 {
 //  used
 //  printf("%s: read_c\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_a)
+void midway_serial_pic_emu_device::write_a(uint8_t data)
 {
 //  printf("%s: write_a %02x\n", machine().describe_context().c_str(), data);
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_b)
+void midway_serial_pic_emu_device::write_b(uint8_t data)
 {
 //  printf("%s: write_b %02x\n", machine().describe_context().c_str(), data);
 }
 
-WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
+void midway_serial_pic_emu_device::write_c(uint8_t data)
 {
 //  used
 //  printf("%s: write_c %02x\n", machine().describe_context().c_str(), data);
@@ -813,7 +813,7 @@ void midway_ioasic_device::update_ioasic_irq()
 }
 
 
-WRITE8_MEMBER(midway_ioasic_device::cage_irq_handler)
+void midway_ioasic_device::cage_irq_handler(uint8_t data)
 {
 	logerror("CAGE irq handler: %d\n", data);
 	m_sound_irq_state = 0;

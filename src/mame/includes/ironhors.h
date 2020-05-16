@@ -47,8 +47,7 @@ private:
 	DECLARE_WRITE8_MEMBER(charbank_w);
 	DECLARE_WRITE8_MEMBER(palettebank_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(filter_w);
-	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
+	void filter_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -77,14 +77,14 @@ private:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(splus_p1_w);
+	void splus_p1_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
 	DECLARE_WRITE8_MEMBER(splus_serial_w);
 	DECLARE_WRITE8_MEMBER(splus_7seg_w);
 	DECLARE_WRITE8_MEMBER(splus_duart_w);
 	DECLARE_READ8_MEMBER(splus_serial_r);
 	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
-	DECLARE_READ8_MEMBER(splus_p3_r);
+	uint8_t splus_p3_r();
 	DECLARE_READ8_MEMBER(splus_duart_r);
 	DECLARE_READ8_MEMBER(splus_watchdog_r);
 	DECLARE_READ8_MEMBER(splus_registers_r);
@@ -166,7 +166,7 @@ static const uint8_t optics[200] = {
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(splus_state::splus_p1_w)
+void splus_state::splus_p1_w(uint8_t data)
 {
 	// P1.0 = Reel 1 Controller
 	// P1.1 = Reel 2 Controller
@@ -520,7 +520,7 @@ READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 	return m_reel_ram[offset];
 }
 
-READ8_MEMBER(splus_state::splus_p3_r)
+uint8_t splus_state::splus_p3_r()
 {
 	return 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
 }

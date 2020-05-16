@@ -110,8 +110,7 @@ private:
 	DECLARE_READ8_MEMBER(slave_com_r);
 	DECLARE_WRITE8_MEMBER(slave_com_w);
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
-	DECLARE_READ8_MEMBER(input_mux_r);
-	DECLARE_READ8_MEMBER(input_system_r);
+	uint8_t input_mux_r();
 
 	void jangou_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(jngolady);
@@ -234,7 +233,7 @@ WRITE8_MEMBER(jangou_state::output_w)
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
-READ8_MEMBER(jangou_state::input_mux_r)
+uint8_t jangou_state::input_mux_r()
 {
 	switch(m_mux_data)
 	{
@@ -247,11 +246,6 @@ READ8_MEMBER(jangou_state::input_mux_r)
 	}
 
 	return ioport("IN_NOMUX")->read();
-}
-
-READ8_MEMBER(jangou_state::input_system_r)
-{
-	return ioport("SYSTEM")->read();
 }
 
 
@@ -987,7 +981,7 @@ void jangou_state::jangou(machine_config &config)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 16));
 	aysnd.port_a_read_callback().set(FUNC(jangou_state::input_mux_r));
-	aysnd.port_b_read_callback().set(FUNC(jangou_state::input_system_r));
+	aysnd.port_b_read_callback().set_ioport("SYSTEM");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	HC55516(config, m_cvsd, MASTER_CLOCK / 1024);

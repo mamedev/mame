@@ -445,9 +445,9 @@ private:
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
 	DECLARE_WRITE8_MEMBER(mpsreset_w);
-	DECLARE_WRITE32_MEMBER(i40_w);
+	void i40_w(uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(wheel_board_w);
+	void wheel_board_w(uint32_t data);
 
 	std::string sioIRQString(uint8_t data);
 
@@ -1045,7 +1045,7 @@ WRITE8_MEMBER(vegas_state::mpsreset_w)
 /*************************************
 * Optical 49 Way Joystick I40 Board
 *************************************/
-WRITE32_MEMBER(vegas_state::i40_w)
+void vegas_state::i40_w(uint32_t data)
 {
 	//printf("i40_w: data = %08x\n", data);
 	//logerror("i40_w: data = %08x\n", data);
@@ -1101,7 +1101,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 /*************************************
 * Keypad
 *************************************/
-WRITE32_MEMBER(vegas_state::wheel_board_w)
+void vegas_state::wheel_board_w(uint32_t data)
 {
 	bool chip_select = BIT(data, 11);
 	bool latch_clk = BIT(data, 10);

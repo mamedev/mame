@@ -770,7 +770,7 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
+void galaxian_state::konami_sound_control_w(uint8_t data)
 {
 	uint8_t old = m_konami_sound_control;
 	m_konami_sound_control = data;
@@ -785,7 +785,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 }
 
 
-READ8_MEMBER(galaxian_state::konami_sound_timer_r)
+uint8_t galaxian_state::konami_sound_timer_r()
 {
 	/*
 	    The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
@@ -845,13 +845,13 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::konami_portc_0_w)
+void galaxian_state::konami_portc_0_w(uint8_t data)
 {
 	logerror("%s:ppi0_portc_w = %02X\n", machine().describe_context(), data);
 }
 
 
-WRITE8_MEMBER(galaxian_state::konami_portc_1_w)
+void galaxian_state::konami_portc_1_w(uint8_t data)
 {
 	logerror("%s:ppi1_portc_w = %02X\n", machine().describe_context(), data);
 }
@@ -881,13 +881,13 @@ WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
+void galaxian_state::theend_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
 
-WRITE8_MEMBER(galaxian_state::theend_protection_w)
+void galaxian_state::theend_protection_w(uint8_t data)
 {
 	/*
 	    Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a nibble.
@@ -926,7 +926,7 @@ WRITE8_MEMBER(galaxian_state::theend_protection_w)
 }
 
 
-READ8_MEMBER(galaxian_state::theend_protection_r)
+uint8_t galaxian_state::theend_protection_r()
 {
 	return m_protection_result;
 }
@@ -954,7 +954,7 @@ WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 }
 
 
-READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
+uint8_t galaxian_state::explorer_sound_latch_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read();
@@ -985,7 +985,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
+void galaxian_state::sfx_sample_control_w(uint8_t data)
 {
 	uint8_t old = m_sfx_sample_control;
 	m_sfx_sample_control = data;
@@ -1030,7 +1030,7 @@ void galaxian_state::monsterz_set_latch()
 }
 
 
-WRITE8_MEMBER(galaxian_state::monsterz_porta_1_w)
+void galaxian_state::monsterz_porta_1_w(uint8_t data)
 {
 	// d7 high: set latch + advance address high bits (and reset low bits?)
 	if (data & 0x80)
@@ -1040,7 +1040,7 @@ WRITE8_MEMBER(galaxian_state::monsterz_porta_1_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::monsterz_portb_1_w)
+void galaxian_state::monsterz_portb_1_w(uint8_t data)
 {
 	// d3 high: set latch + advance address low bits
 	if (data & 0x08)
@@ -1050,7 +1050,7 @@ WRITE8_MEMBER(galaxian_state::monsterz_portb_1_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::monsterz_portc_1_w)
+void galaxian_state::monsterz_portc_1_w(uint8_t data)
 {
 }
 
@@ -1098,10 +1098,10 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 }
 
 
-READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
+uint8_t galaxian_state::frogger_sound_timer_r()
 {
 	/* same as regular Konami sound but with bits 3,5 swapped */
-	uint8_t konami_value = konami_sound_timer_r(space, 0);
+	uint8_t konami_value = konami_sound_timer_r();
 	return bitswap<8>(konami_value, 7,6,3,4,5,2,1,0);
 }
 
@@ -1186,7 +1186,7 @@ WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 }
 
 
-READ8_MEMBER(galaxian_state::scorpion_protection_r)
+uint8_t galaxian_state::scorpion_protection_r()
 {
 	uint16_t paritybits;
 	uint8_t parity = 0;
@@ -1201,7 +1201,7 @@ READ8_MEMBER(galaxian_state::scorpion_protection_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scorpion_protection_w)
+void galaxian_state::scorpion_protection_w(uint8_t data)
 {
 	/* bit 5 low is a reset */
 	if (!(data & 0x20))
@@ -1211,7 +1211,7 @@ WRITE8_MEMBER(galaxian_state::scorpion_protection_w)
 	if (!(data & 0x10))
 	{
 		/* each clock shifts left one bit and ORs in the inverse of the parity */
-		m_protection_state = (m_protection_state << 1) | (~scorpion_protection_r(space, 0) & 1);
+		m_protection_state = (m_protection_state << 1) | (~scorpion_protection_r() & 1);
 	}
 }
 
@@ -1220,7 +1220,7 @@ READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
 	return m_digitalker->digitalker_0_intr_r();
 }
 
-WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
+void galaxian_state::scorpion_digitalker_control_w(uint8_t data)
 {
 	m_digitalker->digitalker_0_cs_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_digitalker->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
@@ -1486,7 +1486,7 @@ READ8_MEMBER(galaxian_state::dingoe_3001_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::moonwar_port_select_w)
+void galaxian_state::moonwar_port_select_w(uint8_t data)
 {
 	m_moonwar_port_select = data & 0x10;
 }

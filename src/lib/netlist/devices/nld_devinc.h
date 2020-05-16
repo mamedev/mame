@@ -906,6 +906,9 @@
 #define CD4070_GATE(name)                                              \
 	NET_REGISTER_DEVEXT(CD4070_GATE, name)
 
+#define CD4069_GATE(name)                                              \
+	NET_REGISTER_DEVEXT(CD4069_GATE, name)
+
 #define CD4001_DIP(name)                                               \
 	NET_REGISTER_DEVEXT(CD4001_DIP, name)
 

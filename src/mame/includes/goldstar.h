@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(goldstar_reel2_ram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_reel3_ram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	void ay8910_outputa_w(uint8_t data);
+	void ay8910_outputb_w(uint8_t data);
 	void init_chryangl();
 	void init_goldstar();
 	void init_jkrmast();
@@ -226,10 +226,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
-	DECLARE_WRITE8_MEMBER(fl7w4_outc802_w);
-	DECLARE_WRITE8_MEMBER(system_outputa_w);
-	DECLARE_WRITE8_MEMBER(system_outputb_w);
-	DECLARE_WRITE8_MEMBER(system_outputc_w);
+	void fl7w4_outc802_w(uint8_t data);
+	void system_outputa_w(uint8_t data);
+	void system_outputb_w(uint8_t data);
+	void system_outputc_w(uint8_t data);
 
 	void init_lucky8a();
 	void init_lucky8f();

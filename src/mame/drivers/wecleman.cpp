@@ -635,7 +635,7 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 ** sample playing ends when a byte with bit 7 set is reached **/
 
-WRITE8_MEMBER(wecleman_state::wecleman_volume_callback)
+void wecleman_state::wecleman_volume_callback(uint8_t data)
 {
 	m_k007232[0]->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232[0]->set_volume(1, 0, (data & 0x0f) * 0x11);

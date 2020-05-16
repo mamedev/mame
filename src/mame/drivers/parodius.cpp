@@ -214,7 +214,7 @@ void parodius_state::machine_reset()
 	m_bank2000->set_bank(0);
 }
 
-WRITE8_MEMBER( parodius_state::banking_callback )
+void parodius_state::banking_callback(uint8_t data)
 {
 	if (data & 0xf0)
 		logerror("%s: setlines %02x\n", machine().describe_context(), data);

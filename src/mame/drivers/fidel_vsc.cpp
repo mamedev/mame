@@ -202,8 +202,8 @@ private:
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
-	DECLARE_READ8_MEMBER(main_io_trampoline_r);
-	DECLARE_WRITE8_MEMBER(main_io_trampoline_w);
+	u8 main_io_trampoline_r(offs_t offset);
+	void main_io_trampoline_w(offs_t offset, u8 data);
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
@@ -211,13 +211,13 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-	DECLARE_READ8_MEMBER(pio_porta_r);
-	DECLARE_READ8_MEMBER(pio_portb_r);
-	DECLARE_WRITE8_MEMBER(pio_portb_w);
+	u8 speech_r(offs_t offset);
+	void ppi_porta_w(u8 data);
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
+	u8 pio_porta_r();
+	u8 pio_portb_r();
+	void pio_portb_w(u8 data);
 
 	u8 m_led_data;
 	u8 m_7seg_data;
@@ -260,7 +260,7 @@ void vsc_state::update_display()
 	m_display->matrix(m_cb_mux, m_led_data << 8 | m_7seg_data);
 }
 
-READ8_MEMBER(vsc_state::speech_r)
+u8 vsc_state::speech_r(offs_t offset)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -268,7 +268,7 @@ READ8_MEMBER(vsc_state::speech_r)
 
 // I8255 PPI
 
-WRITE8_MEMBER(vsc_state::ppi_porta_w)
+void vsc_state::ppi_porta_w(u8 data)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(data & 0x3f);
@@ -278,14 +278,14 @@ WRITE8_MEMBER(vsc_state::ppi_porta_w)
 	update_display();
 }
 
-WRITE8_MEMBER(vsc_state::ppi_portb_w)
+void vsc_state::ppi_portb_w(u8 data)
 {
 	// d0-d7: led row data
 	m_led_data = data;
 	update_display();
 }
 
-WRITE8_MEMBER(vsc_state::ppi_portc_w)
+void vsc_state::ppi_portc_w(u8 data)
 {
 	// d0-d3: select digits
 	// d0-d7: select leds, chessboard input mux
@@ -296,7 +296,7 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 
 // Z80 PIO
 
-READ8_MEMBER(vsc_state::pio_porta_r)
+u8 vsc_state::pio_porta_r()
 {
 	u8 data = 0;
 
@@ -318,7 +318,7 @@ READ8_MEMBER(vsc_state::pio_porta_r)
 	return data;
 }
 
-READ8_MEMBER(vsc_state::pio_portb_r)
+u8 vsc_state::pio_portb_r()
 {
 	u8 data = 0;
 
@@ -328,7 +328,7 @@ READ8_MEMBER(vsc_state::pio_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(vsc_state::pio_portb_w)
+void vsc_state::pio_portb_w(u8 data)
 {
 	// d0,d1: keypad input mux
 	// d5: enable language switch
@@ -361,7 +361,7 @@ void vsc_state::main_map(address_map &map)
 }
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
-READ8_MEMBER(vsc_state::main_io_trampoline_r)
+u8 vsc_state::main_io_trampoline_r(offs_t offset)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
@@ -372,7 +372,7 @@ READ8_MEMBER(vsc_state::main_io_trampoline_r)
 	return data;
 }
 
-WRITE8_MEMBER(vsc_state::main_io_trampoline_w)
+void vsc_state::main_io_trampoline_w(offs_t offset, u8 data)
 {
 	if (~offset & 4)
 		m_ppi8255->write(offset & 3, data);

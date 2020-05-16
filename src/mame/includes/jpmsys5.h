@@ -46,8 +46,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a1_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
 
-	DECLARE_READ8_MEMBER(u29_porta_r);
-	DECLARE_WRITE8_MEMBER(u29_portb_w);
+	uint8_t u29_porta_r();
+	void u29_portb_w(uint8_t data);
 
 protected:
 	virtual void machine_start() override;

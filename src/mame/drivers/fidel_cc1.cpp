@@ -107,9 +107,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	u8 ppi_porta_r();
+	void ppi_portb_w(u8 data);
+	void ppi_portc_w(u8 data);
 
 	u8 m_led_select;
 	u8 m_7seg_data;
@@ -140,7 +140,7 @@ void cc1_state::update_display()
 	m_display->matrix(m_led_select, m_7seg_data);
 }
 
-READ8_MEMBER(cc1_state::ppi_porta_r)
+u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
@@ -153,14 +153,14 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portb_w)
+void cc1_state::ppi_portb_w(u8 data)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(cc1_state::ppi_portc_w)
+void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
 	if (~data & m_led_select & 0x40 && !m_delay->enabled())

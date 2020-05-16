@@ -12,6 +12,7 @@
 #include "machine/eepromser.h"
 #include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
+#include "video/jag_blitter.h"
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
 #include "screen.h"
@@ -33,6 +34,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gpu(*this, "gpu")
+		, m_blitter(*this, "blitter")
 		, m_dsp(*this, "dsp")
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
@@ -111,9 +113,12 @@ protected:
 	virtual void device_postload();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void video_config(machine_config &config, const XTAL clock);
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_cpu_device> m_gpu;
+	required_device<jag_blitter_device> m_blitter;
 	required_device<jaguardsp_cpu_device> m_dsp;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
@@ -301,7 +306,8 @@ private:
 	void get_crosshair_xy(int player, int &x, int &y);
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
-	void update_cpu_irq();
+	inline void trigger_host_cpu_irq(int level);
+	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
 	void scanline_update(int param);

@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(ppi2_b_w);
-	DECLARE_WRITE8_MEMBER(ppi2_c_w);
+	void nmi_and_coins_w(uint8_t data);
+	void ppi2_b_w(uint8_t data);
+	void ppi2_c_w(uint8_t data);
 	void show_out();
 	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -163,7 +163,7 @@ void cabaret_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
+void cabaret_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -184,13 +184,13 @@ WRITE8_MEMBER(cabaret_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(cabaret_state::ppi2_b_w)
+void cabaret_state::ppi2_b_w(uint8_t data)
 {
 	m_out[1] = data;
 	show_out();
 }
 
-WRITE8_MEMBER(cabaret_state::ppi2_c_w)
+void cabaret_state::ppi2_c_w(uint8_t data)
 {
 	m_out[2] = data;
 	show_out();

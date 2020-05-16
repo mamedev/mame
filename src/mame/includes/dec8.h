@@ -134,7 +134,6 @@ private:
 	DECLARE_READ8_MEMBER(gondo_player_1_r);
 	DECLARE_READ8_MEMBER(gondo_player_2_r);
 	DECLARE_WRITE8_MEMBER(dec8_i8751_w);
-	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	void ghostb_bank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
@@ -155,6 +154,7 @@ private:
 	void gondo_mcu_to_main_w(uint8_t data);
 	void shackled_mcu_to_main_w(uint8_t data);
 	void srdarwin_mcu_to_main_w(uint8_t data);
+	void csilver_mcu_to_main_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
 	DECLARE_READ8_MEMBER(dec8_bg_data_r);
 	DECLARE_WRITE8_MEMBER(dec8_videoram_w);

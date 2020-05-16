@@ -52,8 +52,8 @@ public:
 
 protected:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(from_term);
+	uint8_t unk_r();
+	uint8_t from_term();
 	void basic52_io(address_map &map);
 	void basic52_mem(address_map &map);
 	uint8_t m_term_data;
@@ -87,12 +87,12 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(basic52_state::from_term)
+uint8_t basic52_state::from_term()
 {
 	return m_term_data;
 }
 
-READ8_MEMBER( basic52_state::unk_r)
+uint8_t basic52_state::unk_r()
 {
 	return m_term_data; // won't boot without this
 }

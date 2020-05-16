@@ -204,9 +204,9 @@ public:
 
 	void update_display();
 	void update_speaker();
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void touchme(machine_config &config);
 };
 
@@ -222,13 +222,13 @@ void touchme_state::update_speaker()
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 }
 
-READ8_MEMBER(touchme_state::read_a)
+u8 touchme_state::read_a()
 {
 	// A: multiplexed inputs
 	return read_inputs(3, 0xf);
 }
 
-WRITE8_MEMBER(touchme_state::write_b)
+void touchme_state::write_b(u8 data)
 {
 	// B0-B2: input mux
 	m_inp_mux = data & 7;
@@ -242,7 +242,7 @@ WRITE8_MEMBER(touchme_state::write_b)
 	update_speaker();
 }
 
-WRITE8_MEMBER(touchme_state::write_c)
+void touchme_state::write_c(u8 data)
 {
 	// C0-C6: digit segments
 	m_c = data;
@@ -327,8 +327,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void pabball(machine_config &config);
 };
 
@@ -345,14 +345,14 @@ void pabball_state::update_display()
 	m_display->matrix(sel, m_b);
 }
 
-WRITE8_MEMBER(pabball_state::write_b)
+void pabball_state::write_b(u8 data)
 {
 	// B: led data
 	m_b = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(pabball_state::write_c)
+void pabball_state::write_c(u8 data)
 {
 	// C2: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 2 & 1);
@@ -433,27 +433,27 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_READ8_MEMBER(read_c);
-	DECLARE_WRITE8_MEMBER(write_c);
+	void write_b(u8 data);
+	u8 read_c();
+	void write_c(u8 data);
 	void melodym(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(melodym_state::write_b)
+void melodym_state::write_b(u8 data)
 {
 	// B2-B6: input mux
 	m_inp_mux = data >> 2 & 0x1f;
 }
 
-READ8_MEMBER(melodym_state::read_c)
+u8 melodym_state::read_c()
 {
 	// C0-C4: multiplexed inputs
 	return read_inputs(5, 0x1f) | 0xe0;
 }
 
-WRITE8_MEMBER(melodym_state::write_c)
+void melodym_state::write_c(u8 data)
 {
 	// C6: both lamps
 	m_display->matrix(1, ~data >> 6 & 1);
@@ -561,8 +561,8 @@ public:
 
 	void update_display();
 	void update_speaker();
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void maniac(machine_config &config);
 };
 
@@ -580,7 +580,7 @@ void maniac_state::update_speaker()
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 }
 
-WRITE8_MEMBER(maniac_state::write_b)
+void maniac_state::write_b(u8 data)
 {
 	// B0-B6: left 7seg
 	m_b = data;
@@ -590,7 +590,7 @@ WRITE8_MEMBER(maniac_state::write_b)
 	update_speaker();
 }
 
-WRITE8_MEMBER(maniac_state::write_c)
+void maniac_state::write_c(u8 data)
 {
 	// C0-C6: right 7seg
 	m_c = data;
@@ -674,9 +674,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_READ8_MEMBER(read_c);
-	DECLARE_WRITE8_MEMBER(write_c);
+	void write_b(u8 data);
+	u8 read_c();
+	void write_c(u8 data);
 
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
@@ -720,7 +720,7 @@ void flash_state::update_display()
 	m_display->matrix(~m_b >> 4 & 3, (~m_c >> 1 & 0x7f) | (~m_b << 7 & 0x780));
 }
 
-WRITE8_MEMBER(flash_state::write_b)
+void flash_state::write_b(u8 data)
 {
 	// B0-B3: led data
 	// B4,B5: led select
@@ -733,13 +733,13 @@ WRITE8_MEMBER(flash_state::write_b)
 	m_speaker->level_w(data >> 7 & 1);
 }
 
-READ8_MEMBER(flash_state::read_c)
+u8 flash_state::read_c()
 {
 	// C1-C7: buttons
 	return (m_c & 1) ? 0xff : m_inputs[1]->read();
 }
 
-WRITE8_MEMBER(flash_state::write_c)
+void flash_state::write_c(u8 data)
 {
 	// C0: enable buttons
 	// C1-C7: digit segments
@@ -822,9 +822,9 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
-	DECLARE_READ8_MEMBER(read_c);
+	void write_b(u8 data);
+	void write_c(u8 data);
+	u8 read_c();
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
@@ -849,13 +849,13 @@ void matchme_state::set_clock()
 	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 1300000 : 1200000);
 }
 
-WRITE8_MEMBER(matchme_state::write_b)
+void matchme_state::write_b(u8 data)
 {
 	// B0-B7: lamps
 	m_display->matrix(1, data);
 }
 
-READ8_MEMBER(matchme_state::read_c)
+u8 matchme_state::read_c()
 {
 	// C0-C3: multiplexed inputs from C4-C6
 	m_inp_mux = m_c >> 4 & 7;
@@ -868,7 +868,7 @@ READ8_MEMBER(matchme_state::read_c)
 	return lo | hi << 4 | 0x80;
 }
 
-WRITE8_MEMBER(matchme_state::write_c)
+void matchme_state::write_c(u8 data)
 {
 	// C0-C6: input mux
 	m_c = data;
@@ -980,9 +980,9 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
 
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
@@ -1019,19 +1019,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)
 	m_speaker_volume /= 1.015;
 }
 
-READ8_MEMBER(leboom_state::read_a)
+u8 leboom_state::read_a()
 {
 	// A: multiplexed inputs
 	return read_inputs(6, 0xf);
 }
 
-WRITE8_MEMBER(leboom_state::write_b)
+void leboom_state::write_b(u8 data)
 {
 	// B0-B5: input mux
 	m_inp_mux = data & 0x3f;
 }
 
-WRITE8_MEMBER(leboom_state::write_c)
+void leboom_state::write_c(u8 data)
 {
 	// C4: single led
 	m_display->matrix(1, data >> 4 & 1);
@@ -1133,9 +1133,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void tbaskb(machine_config &config);
 };
 
@@ -1146,13 +1146,13 @@ void tbaskb_state::update_display()
 	m_display->matrix(m_b, m_c);
 }
 
-READ8_MEMBER(tbaskb_state::read_a)
+u8 tbaskb_state::read_a()
 {
 	// A2: skill switch, A3: multiplexed inputs
 	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
 }
 
-WRITE8_MEMBER(tbaskb_state::write_b)
+void tbaskb_state::write_b(u8 data)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
@@ -1166,7 +1166,7 @@ WRITE8_MEMBER(tbaskb_state::write_b)
 	update_display();
 }
 
-WRITE8_MEMBER(tbaskb_state::write_c)
+void tbaskb_state::write_c(u8 data)
 {
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1253,10 +1253,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
-	DECLARE_WRITE8_MEMBER(write_d);
+	void write_a(u8 data);
+	void write_b(u8 data);
+	void write_c(u8 data);
+	void write_d(u8 data);
 	void rockpin(machine_config &config);
 };
 
@@ -1271,7 +1271,7 @@ void rockpin_state::update_display()
 	m_display->matrix_partial(3, 6, m_d, m_c);
 }
 
-WRITE8_MEMBER(rockpin_state::write_a)
+void rockpin_state::write_a(u8 data)
 {
 	// A3,A4: speaker out
 	m_speaker->level_w(data >> 3 & 3);
@@ -1281,21 +1281,21 @@ WRITE8_MEMBER(rockpin_state::write_a)
 	update_display();
 }
 
-WRITE8_MEMBER(rockpin_state::write_b)
+void rockpin_state::write_b(u8 data)
 {
 	// B0-B6: digit segments
 	m_b = data & 0x7f;
 	update_display();
 }
 
-WRITE8_MEMBER(rockpin_state::write_c)
+void rockpin_state::write_c(u8 data)
 {
 	// C0-C7: led data
 	m_c = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(rockpin_state::write_d)
+void rockpin_state::write_d(u8 data)
 {
 	// D0-D5: led select
 	m_d = ~data;
@@ -1372,9 +1372,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void hccbaskb(machine_config &config);
 };
 
@@ -1385,13 +1385,13 @@ void hccbaskb_state::update_display()
 	m_display->matrix(m_b, m_c);
 }
 
-READ8_MEMBER(hccbaskb_state::read_a)
+u8 hccbaskb_state::read_a()
 {
 	// A2: skill switch, A3: multiplexed inputs
 	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
 }
 
-WRITE8_MEMBER(hccbaskb_state::write_b)
+void hccbaskb_state::write_b(u8 data)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
@@ -1408,7 +1408,7 @@ WRITE8_MEMBER(hccbaskb_state::write_b)
 	update_display();
 }
 
-WRITE8_MEMBER(hccbaskb_state::write_c)
+void hccbaskb_state::write_c(u8 data)
 {
 	// C0-C6: led data
 	m_c = ~data;
@@ -1496,9 +1496,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
 	void ttfball(machine_config &config);
 };
 
@@ -1515,13 +1515,13 @@ void ttfball_state::update_display()
 	m_display->matrix(m_b | (m_c << 1 & 0x100), led_data);
 }
 
-READ8_MEMBER(ttfball_state::read_a)
+u8 ttfball_state::read_a()
 {
 	// A3: multiplexed inputs, A0-A2: other inputs
 	return m_inputs[5]->read() | read_inputs(5, 8);
 }
 
-WRITE8_MEMBER(ttfball_state::write_b)
+void ttfball_state::write_b(u8 data)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
@@ -1534,7 +1534,7 @@ WRITE8_MEMBER(ttfball_state::write_b)
 	update_display();
 }
 
-WRITE8_MEMBER(ttfball_state::write_c)
+void ttfball_state::write_c(u8 data)
 {
 	// C6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -1657,10 +1657,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
-	DECLARE_WRITE8_MEMBER(write_d);
+	void write_a(u8 data);
+	void write_b(u8 data);
+	void write_c(u8 data);
+	void write_d(u8 data);
 	void uspbball(machine_config &config);
 };
 
@@ -1671,27 +1671,27 @@ void uspbball_state::update_display()
 	m_display->matrix(m_d, m_c << 8 | m_b);
 }
 
-WRITE8_MEMBER(uspbball_state::write_a)
+void uspbball_state::write_a(u8 data)
 {
 	// A0: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(uspbball_state::write_b)
+void uspbball_state::write_b(u8 data)
 {
 	// B: digit segment data
 	m_b = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	update_display();
 }
 
-WRITE8_MEMBER(uspbball_state::write_c)
+void uspbball_state::write_c(u8 data)
 {
 	// C: led data
 	m_c = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(uspbball_state::write_d)
+void uspbball_state::write_d(u8 data)
 {
 	// D0-D2: digit select
 	// D3-D5: led select
@@ -1775,11 +1775,11 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
-	DECLARE_WRITE8_MEMBER(write_d);
+	u8 read_a();
+	void write_a(u8 data);
+	void write_b(u8 data);
+	void write_c(u8 data);
+	void write_d(u8 data);
 	void us2pfball(machine_config &config);
 };
 
@@ -1790,26 +1790,26 @@ void us2pfball_state::update_display()
 	m_display->matrix(m_d | (m_a << 6 & 0x300), m_c);
 }
 
-READ8_MEMBER(us2pfball_state::read_a)
+u8 us2pfball_state::read_a()
 {
 	// A0,A1: multiplexed inputs, A4-A7: other inputs
 	return read_inputs(4, 3) | (m_inputs[4]->read() & 0xf0) | 0x0c;
 }
 
-WRITE8_MEMBER(us2pfball_state::write_a)
+void us2pfball_state::write_a(u8 data)
 {
 	// A2,A3: leds
 	m_a = data;
 	update_display();
 }
 
-WRITE8_MEMBER(us2pfball_state::write_b)
+void us2pfball_state::write_b(u8 data)
 {
 	// B0-B3: input mux
 	m_inp_mux = data & 0xf;
 }
 
-WRITE8_MEMBER(us2pfball_state::write_c)
+void us2pfball_state::write_c(u8 data)
 {
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -1819,7 +1819,7 @@ WRITE8_MEMBER(us2pfball_state::write_c)
 	update_display();
 }
 
-WRITE8_MEMBER(us2pfball_state::write_d)
+void us2pfball_state::write_d(u8 data)
 {
 	// D0-D7: digit select
 	m_d = ~data;

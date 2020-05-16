@@ -367,7 +367,7 @@ READ8_MEMBER( newbrain_state::ust_b_r )
 //  cop_in_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::cop_in_r )
+uint8_t newbrain_state::cop_in_r()
 {
 	/*
 
@@ -395,7 +395,7 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 //  cop_g_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::cop_g_r )
+uint8_t newbrain_state::cop_g_r()
 {
 	/*
 
@@ -438,7 +438,7 @@ void newbrain_state::tm()
 //  m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( newbrain_state::cop_g_w )
+void newbrain_state::cop_g_w(uint8_t data)
 {
 	/*
 
@@ -471,7 +471,7 @@ WRITE8_MEMBER( newbrain_state::cop_g_w )
 //  cop_d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::cop_d_w )
+void newbrain_state::cop_d_w(uint8_t data)
 {
 	/*
 	    bit     description

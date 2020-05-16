@@ -375,7 +375,7 @@ WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
 	// bit 2 is OE for VLM data
 }
 
-READ8_MEMBER(nemesis_state::nemesis_portA_r)
+uint8_t nemesis_state::nemesis_portA_r()
 {
 /*
    bit 0-3:   timer
@@ -1687,7 +1687,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE8_MEMBER(nemesis_state::volume_callback)
+void nemesis_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

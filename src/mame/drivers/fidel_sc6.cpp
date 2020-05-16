@@ -69,11 +69,11 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(select_w);
+	void mux_w(u8 data);
+	void select_w(u8 data);
 
 	u8 read_inputs();
-	DECLARE_READ8_MEMBER(input_r);
+	u8 input_r();
 	DECLARE_READ_LINE_MEMBER(input6_r);
 	DECLARE_READ_LINE_MEMBER(input7_r);
 
@@ -106,7 +106,7 @@ void sc6_state::update_display()
 	m_display->matrix(m_led_select, 1 << m_inp_mux);
 }
 
-WRITE8_MEMBER(sc6_state::mux_w)
+void sc6_state::mux_w(u8 data)
 {
 	// P24-P27: 7442 A-D
 	// 7442 0-8: input mux, 7seg data
@@ -117,7 +117,7 @@ WRITE8_MEMBER(sc6_state::mux_w)
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
-WRITE8_MEMBER(sc6_state::select_w)
+void sc6_state::select_w(u8 data)
 {
 	// P16,P17: digit select
 	m_led_select = ~data >> 6 & 3;
@@ -139,7 +139,7 @@ u8 sc6_state::read_inputs()
 	return ~data;
 }
 
-READ8_MEMBER(sc6_state::input_r)
+u8 sc6_state::input_r()
 {
 	// P10-P15: multiplexed inputs low
 	return (read_inputs() & 0x3f) | 0xc0;

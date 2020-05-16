@@ -96,16 +96,16 @@ private:
 
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 
 	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
@@ -275,12 +275,12 @@ WRITE16_MEMBER(namco_de_pcbstack_device::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namco_de_pcbstack_device::dpram_byte_r)
+uint8_t namco_de_pcbstack_device::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::dpram_byte_w)
+void namco_de_pcbstack_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -388,7 +388,7 @@ WRITE8_MEMBER( namco_de_pcbstack_device::sound_bankselect_w )
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
+void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(namco_de_pcbstack_device::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namco_de_pcbstack_device::system_reset_w)
+void namco_de_pcbstack_device::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 

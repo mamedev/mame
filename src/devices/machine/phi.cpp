@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER(phi_device::ren_w)
 	set_ext_signal(PHI_488_REN , state);
 }
 
-WRITE8_MEMBER(phi_device::bus_dio_w)
+void phi_device::bus_dio_w(uint8_t data)
 {
 	update_pp();
 }

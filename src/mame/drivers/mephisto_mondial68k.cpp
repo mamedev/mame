@@ -51,7 +51,7 @@ protected:
 
 	void mondial68k_mem(address_map &map);
 
-	DECLARE_WRITE32_MEMBER(lcd_s_w);
+	void lcd_s_w(u32 data);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
 	DECLARE_WRITE8_MEMBER(board_mux_w);
 	DECLARE_READ8_MEMBER(inputs_r);
@@ -89,7 +89,7 @@ void mondial68k_state::update_display()
 	m_display->matrix(m_input_mux >> 6, ~m_board_mux);
 }
 
-WRITE32_MEMBER(mondial68k_state::lcd_s_w)
+void mondial68k_state::lcd_s_w(u32 data)
 {
 	// output LCD digits (note: last digit DP segment is unused)
 	for (int i=0; i<4; i++)

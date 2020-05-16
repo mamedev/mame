@@ -330,7 +330,7 @@ private:
 	emu_timer *m_assert_lp_timer;
 
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	template<uint8_t Which> DECLARE_WRITE8_MEMBER(paldata_w);
+	template<uint8_t Which> void paldata_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(crtc_display_w);
 	DECLARE_WRITE8_MEMBER(duart_w);
 	DECLARE_WRITE8_MEMBER(cmos_w);
@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 }
 
 template<uint8_t Which>
-WRITE8_MEMBER(peplus_state::paldata_w)
+void peplus_state::paldata_w(uint8_t data)
 {
 	m_paldata[Which] = data;
 }

@@ -149,8 +149,8 @@ private:
 	READ8_MEMBER (exprom_r);
 	WRITE8_MEMBER(exprom_w);
 
-	WRITE32_MEMBER(user_io_output);
-	READ32_MEMBER(user_io_input);
+	void user_io_output(uint32_t data);
+	uint32_t user_io_input();
 	int m_user_io_state;
 
 	// Board Ctrl Reg Offsets
@@ -387,13 +387,13 @@ WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
 /*************************************
 *  PCI9050 User I/O handlers
 *************************************/
-WRITE32_MEMBER(atlantis_state::user_io_output)
+void atlantis_state::user_io_output(uint32_t data)
 {
 	m_user_io_state = data;
 	logerror("atlantis_state::user_io_output m_user_io_state = %1x\n", m_user_io_state);
 }
 
-READ32_MEMBER(atlantis_state::user_io_input)
+uint32_t atlantis_state::user_io_input()
 {
 	// user io 0: 6016 nCONFIG -- output
 	// user io 1: 6016 nSTATUS -- input

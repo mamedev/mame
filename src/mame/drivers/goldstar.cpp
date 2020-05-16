@@ -1106,7 +1106,7 @@ WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
+void wingco_state::fl7w4_outc802_w(uint8_t data)
 {
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
@@ -8509,19 +8509,19 @@ static GFXDECODE_START( gfx_cm97 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(wingco_state::system_outputa_w)
+void wingco_state::system_outputa_w(uint8_t data)
 {
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputb_w)
+void wingco_state::system_outputb_w(uint8_t data)
 {
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputc_w)
+void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
@@ -8531,12 +8531,12 @@ WRITE8_MEMBER(wingco_state::system_outputc_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
+void goldstar_state::ay8910_outputa_w(uint8_t data)
 {
 	//popmessage("ay8910_outputa_w %02x",data);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
+void goldstar_state::ay8910_outputb_w(uint8_t data)
 {
 	//popmessage("ay8910_outputb_w %02x",data);
 }

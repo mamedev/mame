@@ -765,14 +765,14 @@ READ_LINE_MEMBER(itech8_state::special_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::pia_porta_out)
+void itech8_state::pia_porta_out(uint8_t data)
 {
 	logerror("PIA port A write = %02x\n", data);
 	m_pia_porta_data = data;
 }
 
 
-WRITE8_MEMBER(itech8_state::pia_portb_out)
+void itech8_state::pia_portb_out(uint8_t data)
 {
 	logerror("PIA port B write = %02x\n", data);
 
@@ -786,7 +786,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 }
 
 
-WRITE8_MEMBER(itech8_state::ym2203_portb_out)
+void itech8_state::ym2203_portb_out(uint8_t data)
 {
 	logerror("YM2203 port B write = %02x\n", data);
 

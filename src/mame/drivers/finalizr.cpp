@@ -65,7 +65,7 @@ WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
+void finalizr_state::i8039_irqen_w(uint8_t data)
 {
 	/*  bit 0x80 goes active low, indicating that the
 	    external IRQ being serviced is complete

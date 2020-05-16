@@ -142,13 +142,13 @@ private:
 	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(slave_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mermaid_p0_w);
-	DECLARE_READ8_MEMBER(mermaid_p1_r);
-	DECLARE_WRITE8_MEMBER(mermaid_p1_w);
-	DECLARE_READ8_MEMBER(mermaid_p2_r);
-	DECLARE_WRITE8_MEMBER(mermaid_p2_w);
-	DECLARE_READ8_MEMBER(mermaid_p3_r);
-	DECLARE_WRITE8_MEMBER(mermaid_p3_w);
+	void mermaid_p0_w(uint8_t data);
+	uint8_t mermaid_p1_r();
+	void mermaid_p1_w(uint8_t data);
+	uint8_t mermaid_p2_r();
+	void mermaid_p2_w(uint8_t data);
+	uint8_t mermaid_p3_r();
+	void mermaid_p3_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -318,7 +318,7 @@ WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
+void hvyunit_state::mermaid_p0_w(uint8_t data)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
 		m_slavelatch->write(m_mermaid_p[1]);
@@ -337,17 +337,17 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 	m_mermaid_p[0] = data;
 }
 
-READ8_MEMBER(hvyunit_state::mermaid_p1_r)
+uint8_t hvyunit_state::mermaid_p1_r()
 {
 	return m_mermaid_p[1];
 }
 
-WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
+void hvyunit_state::mermaid_p1_w(uint8_t data)
 {
 	m_mermaid_p[1] = data;
 }
 
-READ8_MEMBER(hvyunit_state::mermaid_p2_r)
+uint8_t hvyunit_state::mermaid_p2_r()
 {
 	switch ((m_mermaid_p[0] >> 2) & 3)
 	{
@@ -358,12 +358,12 @@ READ8_MEMBER(hvyunit_state::mermaid_p2_r)
 	}
 }
 
-WRITE8_MEMBER(hvyunit_state::mermaid_p2_w)
+void hvyunit_state::mermaid_p2_w(uint8_t data)
 {
 	m_mermaid_p[2] = data;
 }
 
-READ8_MEMBER(hvyunit_state::mermaid_p3_r)
+uint8_t hvyunit_state::mermaid_p3_r()
 {
 	uint8_t dsw = 0;
 	uint8_t dsw1 = ioport("DSW1")->read();
@@ -380,7 +380,7 @@ READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 	return (dsw << 4) | (m_slavelatch->pending_r() << 3) | (!m_mermaidlatch->pending_r() << 2);
 }
 
-WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
+void hvyunit_state::mermaid_p3_w(uint8_t data)
 {
 	m_mermaid_p[3] = data;
 	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);

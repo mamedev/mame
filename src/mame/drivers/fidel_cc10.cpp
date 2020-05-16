@@ -89,10 +89,10 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	void ppi_porta_w(u8 data);
+	void ppi_portb_w(u8 data);
+	u8 ppi_portc_r();
+	void ppi_portc_w(u8 data);
 
 	u8 m_inp_mux;
 	u8 m_led_select;
@@ -126,7 +126,7 @@ void ccx_state::update_display()
 	m_display->matrix(m_led_select, m_7seg_data);
 }
 
-WRITE8_MEMBER(ccx_state::ppi_porta_w)
+void ccx_state::ppi_porta_w(u8 data)
 {
 	// d7: enable beeper on falling edge (556 monostable) (unpopulated on ACR)
 	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
@@ -140,7 +140,7 @@ WRITE8_MEMBER(ccx_state::ppi_porta_w)
 	update_display();
 }
 
-WRITE8_MEMBER(ccx_state::ppi_portb_w)
+void ccx_state::ppi_portb_w(u8 data)
 {
 	// d0: lose led, d1: check(win) led
 	// d2-d5: digit select
@@ -148,7 +148,7 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 	update_display();
 }
 
-READ8_MEMBER(ccx_state::ppi_portc_r)
+u8 ccx_state::ppi_portc_r()
 {
 	u8 data = 0;
 
@@ -160,7 +160,7 @@ READ8_MEMBER(ccx_state::ppi_portc_r)
 	return ~data & 0xf;
 }
 
-WRITE8_MEMBER(ccx_state::ppi_portc_w)
+void ccx_state::ppi_portc_w(u8 data)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;

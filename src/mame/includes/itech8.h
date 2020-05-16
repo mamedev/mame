@@ -136,7 +136,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(blitter_bank_w);
 	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_out);
+	void pia_portb_out(uint8_t data);
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -145,8 +145,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(tms34061_w);
 	DECLARE_READ8_MEMBER(tms34061_r);
-	DECLARE_WRITE8_MEMBER(pia_porta_out);
-	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
+	void pia_porta_out(uint8_t data);
+	void ym2203_portb_out(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

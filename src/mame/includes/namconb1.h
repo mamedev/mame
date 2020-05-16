@@ -130,9 +130,9 @@ private:
 	DECLARE_READ32_MEMBER(share_r);
 	DECLARE_WRITE32_MEMBER(share_w);
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
-	DECLARE_READ8_MEMBER(port6_r);
-	DECLARE_WRITE8_MEMBER(port6_w);
-	DECLARE_READ8_MEMBER(port7_r);
+	u8 port6_r();
+	void port6_w(u8 data);
+	u8 port7_r();
 	template <int Bit> u16 dac_bit_r();
 
 	DECLARE_WRITE32_MEMBER(rozbank32_w);

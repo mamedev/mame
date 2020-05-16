@@ -58,7 +58,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 
 	void blockhl(machine_config &config);
 	void audio_map(address_map &map);
@@ -194,7 +194,7 @@ void blockhl_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 }
 
-WRITE8_MEMBER( blockhl_state::banking_callback )
+void blockhl_state::banking_callback(uint8_t data)
 {
 	// bits 0-1 = ROM bank
 	m_rombank->set_entry(data & 0x03);

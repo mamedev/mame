@@ -48,7 +48,7 @@ WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
+void aliens_state::aliens_snd_bankswitch_w(uint8_t data)
 {
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
@@ -172,7 +172,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(aliens_state::volume_callback)
+void aliens_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data & 0x0f) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data >> 4) * 0x11);
@@ -189,7 +189,7 @@ void aliens_state::machine_reset()
 	m_bank0000->set_bank(0);
 }
 
-WRITE8_MEMBER( aliens_state::banking_callback )
+void aliens_state::banking_callback(uint8_t data)
 {
 	m_rombank->set_entry(data & 0x1f);
 }

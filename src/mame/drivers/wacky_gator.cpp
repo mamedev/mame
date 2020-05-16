@@ -56,15 +56,15 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl2_w);
+	void alligators_ctrl1_w(uint8_t data);
+	void alligators_ctrl2_w(uint8_t data);
 
 	void set_lamps(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(status_lamps_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(timing_lamps_w) { set_lamps((N + 1) << 3, data); }
+	void status_lamps_w(uint8_t data);
+	template <unsigned N> void timing_lamps_w(uint8_t data) { set_lamps((N + 1) << 3, data); }
 
 	void set_digits(int p, uint8_t value);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(disp_w) { set_digits(N << 1, data); }
+	template <unsigned N> void disp_w(uint8_t data) { set_digits(N << 1, data); }
 
 	void pmm8713_ck(int i, int state);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
@@ -94,7 +94,7 @@ private:
 };
 
 
-WRITE8_MEMBER(wackygtr_state::status_lamps_w)
+void wackygtr_state::status_lamps_w(uint8_t data)
 {
 	/*
 	    ---x xxxx   status lamps
@@ -123,7 +123,7 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 	m_msm->reset_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
+void wackygtr_state::alligators_ctrl1_w(uint8_t data)
 {
 	m_pit8253[0]->write_gate0(BIT(data, 0));
 	m_pit8253[0]->write_gate1(BIT(data, 1));
@@ -134,7 +134,7 @@ WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl2_w)
+void wackygtr_state::alligators_ctrl2_w(uint8_t data)
 {
 	/*
 	    ---- ---x    PMM8713 0 U/D

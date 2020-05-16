@@ -535,7 +535,7 @@ READ16_MEMBER(namcos21_dsp_c67_device::dsp_portf_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::dsp_xf_w)
+void namcos21_dsp_c67_device::dsp_xf_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror("xf(%d)\n",data);
 }
@@ -654,7 +654,7 @@ WRITE16_MEMBER(namcos21_dsp_c67_device::slave_port3_w)
 { /* 0=busy, 1=ready? */
 }
 
-WRITE16_MEMBER(namcos21_dsp_c67_device::slave_XF_output_w)
+void namcos21_dsp_c67_device::slave_XF_output_w(uint16_t data)
 {
 	if (ENABLE_LOGGING) logerror( "%s :slaveXF(%d)\n", machine().describe_context(), data );
 }

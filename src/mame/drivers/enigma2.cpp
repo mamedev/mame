@@ -105,8 +105,8 @@ private:
 	DECLARE_READ8_MEMBER(dip_switch_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(protection_data_w);
+	uint8_t sound_latch_r();
+	void protection_data_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -411,13 +411,13 @@ WRITE8_MEMBER(enigma2_state::sound_data_w)
 }
 
 
-READ8_MEMBER(enigma2_state::sound_latch_r)
+uint8_t enigma2_state::sound_latch_r()
 {
 	return bitswap<8>(m_sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
-WRITE8_MEMBER(enigma2_state::protection_data_w)
+void enigma2_state::protection_data_w(uint8_t data)
 {
 	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", machine().describe_context(), data);
 	m_protection_data = data;

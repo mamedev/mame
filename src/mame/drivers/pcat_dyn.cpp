@@ -59,7 +59,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	DECLARE_READ8_MEMBER(audio_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 	static void pcat_dyn_sb_conf(device_t *device);
@@ -126,7 +126,7 @@ void pcat_dyn_state::pcat_io(address_map &map)
 }
 
 //TODO: use atmb device
-WRITE8_MEMBER( pcat_dyn_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void pcat_dyn_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 static INPUT_PORTS_START( pcat_dyn )
 	// M,N,Numpad 6 -- Hang

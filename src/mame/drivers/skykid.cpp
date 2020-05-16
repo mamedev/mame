@@ -25,7 +25,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(skykid_state::inputport_select_w)
+void skykid_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -37,7 +37,7 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(skykid_state::inputport_r)
+uint8_t skykid_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -60,7 +60,7 @@ READ8_MEMBER(skykid_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(skykid_state::skykid_led_w)
+void skykid_state::skykid_led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 3);
 	m_leds[1] = BIT(data, 4);

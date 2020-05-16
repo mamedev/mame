@@ -200,8 +200,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin2_w);
 	DECLARE_WRITE8_MEMBER(snd_irq_w);
 	DECLARE_WRITE8_MEMBER(snddata_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
 	DECLARE_READ8_MEMBER(snd_status_r);
 	DECLARE_READ_LINE_MEMBER(irq_r);
 	DECLARE_READ8_MEMBER(snddata_r);
@@ -425,12 +425,12 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_sound_status = offset;
 }
 
-WRITE8_MEMBER(m63_state::p1_w)
+void m63_state::p1_w(uint8_t data)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(m63_state::p2_w)
+void m63_state::p2_w(uint8_t data)
 {
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)
