@@ -753,6 +753,12 @@
 #define TTL_7420_NAND(name, pA, pB, pC, pD)                            \
 	NET_REGISTER_DEVEXT(TTL_7420_NAND, name, pA, pB, pC, pD)
 
+#define TTL_7421_GATE(name)                                            \
+	NET_REGISTER_DEVEXT(TTL_7421_GATE, name)
+
+#define TTL_7421_NAND(name, pA, pB, pC, pD)                            \
+	NET_REGISTER_DEVEXT(TTL_7421_NAND, name, pA, pB, pC, pD)
+
 #define TTL_7425_GATE(name)                                            \
 	NET_REGISTER_DEVEXT(TTL_7425_GATE, name)
 
@@ -854,6 +860,9 @@
 
 #define TTL_7420_DIP(name)                                             \
 	NET_REGISTER_DEVEXT(TTL_7420_DIP, name)
+
+#define TTL_7421_DIP(name)                                             \
+	NET_REGISTER_DEVEXT(TTL_7421_DIP, name)
 
 #define TTL_7425_DIP(name)                                             \
 	NET_REGISTER_DEVEXT(TTL_7425_DIP, name)

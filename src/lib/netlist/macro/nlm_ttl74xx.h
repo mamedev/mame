@@ -144,6 +144,22 @@
 		NET_REGISTER_DEV(TTL_7420_DIP, name)
 
 
+#define TTL_7421_GATE(name)                                                    \
+		NET_REGISTER_DEV(TTL_7421_GATE, name)
+
+#define TTL_7421_AND(name, cI1, cI2, cI3, cI4)                                 \
+		NET_REGISTER_DEV(TTL_7421_AND, name)                                   \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, A, cI1)                                              \
+		NET_CONNECT(name, B, cI2)                                              \
+		NET_CONNECT(name, C, cI3)                                              \
+		NET_CONNECT(name, D, cI4)
+
+#define TTL_7421_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_7421_DIP, name)
+
+
 #define TTL_7425_GATE(name)                                                    \
 		NET_REGISTER_DEV(TTL_7425_GATE, name)
 
