@@ -13542,6 +13542,7 @@ fscc12b                         //
 
 @source:fidel_sc6.cpp
 fscc6                           //
+miniscc
 
 @source:fidel_sc8.cpp
 fscc8                           //
