@@ -897,7 +897,9 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			int de_count = 0;
 			int de_dont_delete = position;
 			int lsn, count;
+			int	save_next_de;
 
+			save_next_de = ent.dngdos_last_or_next;
 			ent.dngdos_last_or_next = last_sector_size;
 
 			// yes, truncate this allocation block if necessary
@@ -929,13 +931,20 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 					lsn = big_endianize_int16( ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].lsn : ent.header_block.block[fat_block].lsn );
 					count = ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count;
 
-					dgndos_fat_deallocate_span(entire_track20, lsn, count);
+					if( count > 0 )
+					{
+						dgndos_fat_deallocate_span(entire_track20, lsn, count);
 
-					(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].lsn : ent.header_block.block[fat_block].lsn) = 0;
-					(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count) = 0;
+						(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].lsn : ent.header_block.block[fat_block].lsn) = 0;
+						(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count) = 0;
+					}
 				}
 				else
 				{
+					uint8_t save_flag = ent.flag_byte;
+
+					ent.flag_byte &= ~DGNDOS_CONTINUED_BIT;
+
 					if( ent.flag_byte & DGNDOS_CONTINUATION_BIT )
 					{
 						if( de_dont_delete != position )
@@ -947,13 +956,14 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 					err = put_dgndos_dirent(entire_track20, position, ent);
 					if (err) return err;
 
-					if( ent.flag_byte & DGNDOS_CONTINUED_BIT )
+					if( save_flag & DGNDOS_CONTINUED_BIT )
 					{
-						position = ent.dngdos_last_or_next;
+						position = save_next_de;
 
 						err = get_dgndos_dirent(entire_track20, position, ent);
 						if (err) return err;
 
+						save_next_de = ent.dngdos_last_or_next;
 						fat_block = -1;
 					}
 					else
@@ -967,25 +977,15 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			while( de_count < MAX_DIRENTS );
 
 			if( de_count == MAX_DIRENTS ) return IMGTOOLERR_CORRUPTDIR;
-
-			err = put_dgndos_dirent(entire_track20, position, ent);
-			if (err) return err;
 		}
 		else // more to write
 		{
 			// check if I can extend the allocation count
-			if( (current_sector_index < 255) && (first_lsn + current_sector_index < bitmap_count) && (dgndos_is_sector_avaiable( entire_track20, first_lsn + current_sector_index )) )
+			if( (current_sector_index < 254) && (first_lsn + current_sector_index < bitmap_count) && (dgndos_is_sector_avaiable( entire_track20, first_lsn + current_sector_index )) )
 			{
 				sectors_avaiable++;
 
-				if( ent.flag_byte & DGNDOS_CONTINUATION_BIT )
-				{
-					ent.continuation_block.block[fat_block].count = sectors_avaiable;
-				}
-				else
-				{
-					ent.header_block.block[fat_block].count = sectors_avaiable;
-				}
+				(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count) = sectors_avaiable;
 
 				dgndos_fat_allocate_sector( entire_track20, first_lsn + current_sector_index );
 			}
@@ -1055,21 +1055,10 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 					int new_lsn;
 
 					err = dgndos_get_avaiable_sector( entire_track20, &new_lsn );
-					if (err)
-					{
-						return err;
-					}
+					if (err) return err;
 
-					if( ent.flag_byte & DGNDOS_CONTINUATION_BIT)
-					{
-						ent.continuation_block.block[fat_block].lsn = big_endianize_int16(new_lsn);
-						ent.continuation_block.block[fat_block].count = 1;
-					}
-					else
-					{
-						ent.header_block.block[fat_block].lsn = big_endianize_int16(new_lsn);
-						ent.header_block.block[fat_block].count = 1;
-					}
+					(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].lsn : ent.header_block.block[fat_block].lsn) = big_endianize_int16(new_lsn);
+					(ent.flag_byte & DGNDOS_CONTINUATION_BIT ? ent.continuation_block.block[fat_block].count : ent.header_block.block[fat_block].count) = 1;
 
 					dgndos_fat_allocate_sector(entire_track20, new_lsn);
 				}
@@ -1081,10 +1070,6 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 		}
 	}
 	while( written < sourcef.size() );
-
-// 	ent.dngdos_last_or_next = last_sector_size;
-// 	err = put_dgndos_dirent(entire_track20, position, ent);
-// 	if (err) return err;
 
 	ferr = dgndos_put_directory_track( image, 20, entire_track20 );
 	if (ferr) return imgtool_floppy_error(ferr);
