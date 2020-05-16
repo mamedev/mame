@@ -131,7 +131,7 @@ void hardbox_device::hardbox_io(address_map &map)
 
 READ8_MEMBER( hardbox_device::ppi0_pa_r )
 {
-	return m_bus->read_dio() ^ 0xff;
+	return m_bus->dio_r() ^ 0xff;
 }
 
 WRITE8_MEMBER( hardbox_device::ppi0_pb_w )

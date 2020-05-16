@@ -1666,7 +1666,8 @@ files {
 	MAME_DIR .. "src/mame/includes/pc1512.h",
 	MAME_DIR .. "src/mame/machine/pc1512kb.cpp",
 	MAME_DIR .. "src/mame/machine/pc1512kb.h",
-	MAME_DIR .. "src/mame/video/pc1512.cpp",
+	MAME_DIR .. "src/mame/video/ams40041.cpp",
+	MAME_DIR .. "src/mame/video/ams40041.h",
 	MAME_DIR .. "src/mame/drivers/pcw.cpp",
 	MAME_DIR .. "src/mame/includes/pcw.h",
 	MAME_DIR .. "src/mame/video/pcw.cpp",
@@ -2673,6 +2674,7 @@ createMESSProjects(_target, _subtarget, "korg")
 files {
 	MAME_DIR .. "src/mame/drivers/korgds8.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdss1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgdvp1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgz3.cpp",

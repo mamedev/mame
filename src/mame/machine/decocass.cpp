@@ -1636,7 +1636,7 @@ void decocass_widel_state::machine_reset()
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::i8041_p1_w)
+void decocass_state::i8041_p1_w(uint8_t data)
 {
 	if (data != m_i8041_p1_write_latch)
 	{
@@ -1670,7 +1670,7 @@ WRITE8_MEMBER(decocass_state::i8041_p1_w)
 	m_i8041_p1 = data;
 }
 
-READ8_MEMBER(decocass_state::i8041_p1_r)
+uint8_t decocass_state::i8041_p1_r()
 {
 	uint8_t data = m_i8041_p1;
 
@@ -1693,7 +1693,7 @@ READ8_MEMBER(decocass_state::i8041_p1_r)
 	return data;
 }
 
-WRITE8_MEMBER(decocass_state::i8041_p2_w)
+void decocass_state::i8041_p2_w(uint8_t data)
 {
 	if (data != m_i8041_p2_write_latch)
 	{
@@ -1714,7 +1714,7 @@ WRITE8_MEMBER(decocass_state::i8041_p2_w)
 	m_i8041_p2 = (m_i8041_p2 & 0xe0) | (data & ~0xe0);
 }
 
-READ8_MEMBER(decocass_state::i8041_p2_r)
+uint8_t decocass_state::i8041_p2_r()
 {
 	uint8_t data;
 

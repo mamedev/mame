@@ -263,13 +263,13 @@ void djboy_state::soundcpu_port_am(address_map &map)
 
 /******************************************************************************/
 
-READ8_MEMBER(djboy_state::beast_p0_r)
+uint8_t djboy_state::beast_p0_r()
 {
 	// ?
 	return 0;
 }
 
-WRITE8_MEMBER(djboy_state::beast_p0_w)
+void djboy_state::beast_p0_w(uint8_t data)
 {
 	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
@@ -282,7 +282,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 	m_beast_p0 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p1_r)
+uint8_t djboy_state::beast_p1_r()
 {
 	if (BIT(m_beast_p0, 0) == 0)
 		return m_beastlatch->read();
@@ -290,12 +290,12 @@ READ8_MEMBER(djboy_state::beast_p1_r)
 		return 0; // ?
 }
 
-WRITE8_MEMBER(djboy_state::beast_p1_w)
+void djboy_state::beast_p1_w(uint8_t data)
 {
 	m_beast_p1 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p2_r)
+uint8_t djboy_state::beast_p2_r()
 {
 	switch ((m_beast_p0 >> 2) & 3)
 	{
@@ -306,12 +306,12 @@ READ8_MEMBER(djboy_state::beast_p2_r)
 	}
 }
 
-WRITE8_MEMBER(djboy_state::beast_p2_w)
+void djboy_state::beast_p2_w(uint8_t data)
 {
 	m_beast_p2 = data;
 }
 
-READ8_MEMBER(djboy_state::beast_p3_r)
+uint8_t djboy_state::beast_p3_r()
 {
 	uint8_t dsw = 0;
 	uint8_t dsw1 = ~m_port_dsw[0]->read();
@@ -327,7 +327,7 @@ READ8_MEMBER(djboy_state::beast_p3_r)
 	return (dsw << 4) | (m_beastlatch->pending_r() ? 0x0 : 0x4) | (m_slavelatch->pending_r() ? 0x8 : 0x0);
 }
 
-WRITE8_MEMBER(djboy_state::beast_p3_w)
+void djboy_state::beast_p3_w(uint8_t data)
 {
 	m_beast_p3 = data;
 	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);

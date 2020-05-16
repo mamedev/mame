@@ -100,11 +100,11 @@ private:
 	DECLARE_WRITE8_MEMBER(block_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(block_h_w);
 	DECLARE_WRITE8_MEMBER(layers_w);
-	DECLARE_WRITE8_MEMBER(input_w);
+	void input_w(uint8_t data);
 	DECLARE_READ8_MEMBER(service_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(dsw_r);
+	uint8_t dsw_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void dunhuang_io_map(address_map &map);
@@ -439,7 +439,7 @@ void dunhuang_state::dunhuang_map(address_map &map)
 
 // Inputs
 
-WRITE8_MEMBER(dunhuang_state::input_w)
+void dunhuang_state::input_w(uint8_t data)
 {
 	m_input = data;
 }
@@ -452,7 +452,7 @@ READ8_MEMBER(dunhuang_state::service_r)
 	;
 }
 
-READ8_MEMBER(dunhuang_state::dsw_r)
+uint8_t dunhuang_state::dsw_r()
 {
 	if (!(m_input & 0x01))  return m_dsw[0]->read();
 	if (!(m_input & 0x02))  return m_dsw[1]->read();

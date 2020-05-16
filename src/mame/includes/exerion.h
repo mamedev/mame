@@ -76,12 +76,12 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(exerion_protection_r);
+	uint8_t exerion_protection_r(offs_t offset);
 	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
 	DECLARE_READ8_MEMBER(exerion_video_timing_r);
-	DECLARE_READ8_MEMBER(exerion_porta_r);
-	DECLARE_WRITE8_MEMBER(exerion_portb_w);
+	uint8_t exerion_porta_r();
+	void exerion_portb_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

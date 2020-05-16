@@ -133,7 +133,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
+	void igs_nmi_and_coins_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(igs_lamps_w);
 	DECLARE_READ8_MEMBER(custom_io_r);
 	DECLARE_WRITE8_MEMBER(custom_io_w);
@@ -281,7 +281,7 @@ void igspoker_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
+void igspoker_state::igs_nmi_and_coins_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c

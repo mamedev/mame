@@ -391,13 +391,15 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="88" top="-1.5" bottom="93.5" />
+		<bounds left="-13" right="88" top="-1.5" bottom="123" />
 
 		<bezel element="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
 		<bezel element="black"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="3" y="2.5" width="81" height="81" /></group>
 
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
+
+		<screen index="0"><bounds x="33" y="90" width="25" height="30.93" /></screen>
 
 		<!-- chessboard coords -->
 		<bezel element="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></bezel>

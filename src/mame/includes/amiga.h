@@ -366,12 +366,12 @@ public:
 			m_chip_ram.write(byteoffs >> 1, data);
 	}
 
-	DECLARE_READ16_MEMBER(chip_ram_r)
+	uint16_t chip_ram_r(offs_t offset, uint16_t mem_mask = ~0)
 	{
 		return read_chip_ram(offset & ~1) & mem_mask;
 	}
 
-	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	void chip_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		uint16_t val = read_chip_ram(offset & ~1) & ~mem_mask;
 		write_chip_ram(offset & ~1, val | data);
@@ -436,10 +436,10 @@ public:
 	DECLARE_READ16_MEMBER( cia_r );
 	DECLARE_WRITE16_MEMBER( cia_w );
 	DECLARE_WRITE16_MEMBER( gayle_cia_w );
-	DECLARE_WRITE8_MEMBER( cia_0_port_a_write );
+	void cia_0_port_a_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
-	DECLARE_READ8_MEMBER( cia_1_port_a_read );
-	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
+	uint8_t cia_1_port_a_read();
+	void cia_1_port_a_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );

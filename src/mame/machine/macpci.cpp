@@ -30,14 +30,14 @@ WRITE_LINE_MEMBER(macpci_state::mac_via_irq)
 {
 }
 
-READ8_MEMBER(macpci_state::mac_via_in_a)
+uint8_t macpci_state::mac_via_in_a()
 {
 //    printf("VIA1 IN_A (PC %x)\n", mac->m_maincpu->pc());
 
 	return 0x80;
 }
 
-READ8_MEMBER(macpci_state::mac_via_in_b)
+uint8_t macpci_state::mac_via_in_b()
 {
 	int val = 0;
 	val |= m_cuda->get_treq()<<3;
@@ -47,12 +47,12 @@ READ8_MEMBER(macpci_state::mac_via_in_b)
 	return val;
 }
 
-WRITE8_MEMBER(macpci_state::mac_via_out_a)
+void macpci_state::mac_via_out_a(uint8_t data)
 {
 //    printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(macpci_state::mac_via_out_b)
+void macpci_state::mac_via_out_b(uint8_t data)
 {
 //    printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 

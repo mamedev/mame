@@ -370,12 +370,6 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 	m_pic8259[0]->ir2_w(state);
 }
 
-READ8_MEMBER(bebox_state::get_slave_ack)
-{
-	return m_pic8259[1]->acknowledge();
-}
-
-
 /*************************************
  *
  *  Floppy/IDE/ATA
@@ -536,7 +530,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 }
 
 
-READ8_MEMBER(bebox_state::bebox_dma_read_byte )
+uint8_t bebox_state::bebox_dma_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
@@ -545,24 +539,13 @@ READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 }
 
 
-WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
+void bebox_state::bebox_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	prog_space.write_byte(page_offset + offset, data);
 }
-
-
-READ8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_r){
-	return m_smc37c78->dma_r();
-}
-
-
-WRITE8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_w){
-	m_smc37c78->dma_w(data);
-}
-
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
 	m_smc37c78->tc_w(state);

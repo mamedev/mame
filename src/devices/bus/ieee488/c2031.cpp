@@ -94,7 +94,7 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 WRITE8_MEMBER( c2031_device::via0_pa_w )

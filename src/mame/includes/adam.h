@@ -79,12 +79,12 @@ public:
 	DECLARE_READ8_MEMBER( mioc_r );
 	DECLARE_WRITE8_MEMBER( mioc_w );
 
-	DECLARE_WRITE8_MEMBER( m6801_p1_w );
-	DECLARE_READ8_MEMBER( m6801_p2_r );
-	DECLARE_WRITE8_MEMBER( m6801_p2_w );
-	DECLARE_READ8_MEMBER( m6801_p3_r );
-	DECLARE_WRITE8_MEMBER( m6801_p3_w );
-	DECLARE_WRITE8_MEMBER( m6801_p4_w );
+	void m6801_p1_w(uint8_t data);
+	uint8_t m6801_p2_r();
+	void m6801_p2_w(uint8_t data);
+	uint8_t m6801_p3_r();
+	void m6801_p3_w(uint8_t data);
+	void m6801_p4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
 

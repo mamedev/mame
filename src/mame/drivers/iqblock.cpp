@@ -96,7 +96,7 @@ WRITE8_MEMBER(iqblock_state::irqack_w)
 }
 
 
-WRITE8_MEMBER(iqblock_state::port_C_w)
+void iqblock_state::port_C_w(uint8_t data)
 {
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 

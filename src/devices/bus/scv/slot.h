@@ -37,7 +37,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) { }
+	virtual void write_bank(uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -103,7 +103,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual void write_bank(uint8_t data);
 
 protected:
 	// device-level overrides

@@ -84,13 +84,13 @@ private:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(clear_timer_w);
 	DECLARE_WRITE_LINE_MEMBER(cb2_u2_w);
-	DECLARE_WRITE8_MEMBER(port_b_u1_w);
+	void port_b_u1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE8_MEMBER(sn1_port_a_u3_w);
-	DECLARE_WRITE8_MEMBER(sn1_port_b_u3_w);
+	void sn1_port_a_u3_w(uint8_t data);
+	void sn1_port_b_u3_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sn1_ca2_u3_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_w);
-	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_w);
+	void sn2_port_a_u2_w(uint8_t data);
+	void sn2_port_b_u2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -163,7 +163,7 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
  *
  *************************************/
 
-WRITE8_MEMBER(toratora_state::port_b_u1_w)
+void toratora_state::port_b_u1_w(uint8_t data)
 {
 	if (m_pia_u1->port_b_z_mask() & 0x20)
 		machine().bookkeeping().coin_counter_w(0, 1);
@@ -225,14 +225,14 @@ WRITE8_MEMBER(toratora_state::clear_timer_w)
  *************************************/
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_a_u3_w)
+void toratora_state::sn1_port_a_u3_w(uint8_t data)
 {
 	m_sn1->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn1->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn1_port_b_u3_w)
+void toratora_state::sn1_port_b_u3_w(uint8_t data)
 {
 	static const double resistances[] =
 	{
@@ -269,14 +269,14 @@ WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u3_w)
 	m_sn1->vco_w(state);
 }
 
-WRITE8_MEMBER(toratora_state::sn2_port_a_u2_w)
+void toratora_state::sn2_port_a_u2_w(uint8_t data)
 {
 	m_sn2->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
 	m_sn2->enable_w((data >> 7) & 0x01);
 }
 
 
-WRITE8_MEMBER(toratora_state::sn2_port_b_u2_w)
+void toratora_state::sn2_port_b_u2_w(uint8_t data)
 {
 	static const double resistances[] =
 	{

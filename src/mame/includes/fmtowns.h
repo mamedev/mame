@@ -167,8 +167,8 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
+	uint16_t towns_scsi_dma_r();
+	void towns_scsi_dma_w(uint16_t data);
 
 private:
 	/* devices */
@@ -414,7 +414,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
@@ -431,11 +431,11 @@ private:
 	inline uint8_t byte_to_bcd(uint8_t val);
 	inline uint8_t bcd_to_byte(uint8_t val);
 	inline uint32_t msf_to_lbafm(uint32_t val);  // because the CDROM core doesn't provide this;
-	DECLARE_READ16_MEMBER(towns_fdc_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_fdc_dma_w);
+	uint16_t towns_fdc_dma_r();
+	void towns_fdc_dma_w(uint16_t data);
 	void towns_cdrom_set_irq(int line,int state);
 	uint8_t towns_cd_get_track();
-	DECLARE_READ16_MEMBER(towns_cdrom_dma_r);
+	uint16_t towns_cdrom_dma_r();
 };
 
 class towns16_state : public towns_state

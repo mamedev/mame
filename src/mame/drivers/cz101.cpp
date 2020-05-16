@@ -57,9 +57,8 @@ private:
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(led_1_w);
 	DECLARE_WRITE8_MEMBER(led_2_w);
@@ -322,7 +321,7 @@ READ8_MEMBER( cz101_state::keys_r )
 // ---4----  music lsi irq input
 // ----3210  key select output
 
-WRITE8_MEMBER( cz101_state::port_b_w )
+void cz101_state::port_b_w(uint8_t data)
 {
 	LOG("port_b_w: %02x\n", data);
 
@@ -338,7 +337,7 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 // ------1-  midi input
 // -------0  midi output
 
-WRITE8_MEMBER( cz101_state::port_c_w )
+void cz101_state::port_c_w(uint8_t data)
 {
 	LOG("port_c_w: %02x\n", data);
 

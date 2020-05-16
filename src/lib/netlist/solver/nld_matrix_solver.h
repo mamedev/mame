@@ -304,7 +304,7 @@ namespace solver
 		std::size_t m_ops;
 
 		// base setup - called from constructor
-		void setup_base(const analog_net_t::list_t &nets) noexcept(false);
+		void setup_base(setup_t &setup, const analog_net_t::list_t &nets) noexcept(false);
 
 		void sort_terms(matrix_sort_type_e sort);
 

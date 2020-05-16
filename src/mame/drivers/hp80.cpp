@@ -178,8 +178,8 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(clk_busy_timer);
 
-	DECLARE_WRITE8_MEMBER(irl_w);
-	DECLARE_WRITE8_MEMBER(halt_w);
+	void irl_w(offs_t offset, uint8_t data);
+	void halt_w(offs_t offset, uint8_t data);
 
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<timer_device> m_clk_busy_timer;
@@ -861,12 +861,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp80_base_state::clk_busy_timer)
 	m_clk_busy = false;
 }
 
-WRITE8_MEMBER(hp80_base_state::irl_w)
+void hp80_base_state::irl_w(offs_t offset, uint8_t data)
 {
 	irq_w(offset + IRQ_IOP0_BIT , data != 0);
 }
 
-WRITE8_MEMBER(hp80_base_state::halt_w)
+void hp80_base_state::halt_w(offs_t offset, uint8_t data)
 {
 	bool prev_halt = m_halt_lines != 0;
 	COPY_BIT(data != 0 , m_halt_lines , offset);

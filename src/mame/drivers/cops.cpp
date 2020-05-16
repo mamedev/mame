@@ -95,11 +95,11 @@ public:
 	void update_dacia_irq();
 	DECLARE_WRITE8_MEMBER(dacia_w);
 	DECLARE_READ8_MEMBER(dacia_r);
-	DECLARE_WRITE8_MEMBER(via1_b_w);
-	DECLARE_WRITE8_MEMBER(via1_cb1_w);
-	DECLARE_WRITE8_MEMBER(cdrom_data_w);
-	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
-	DECLARE_READ8_MEMBER(cdrom_data_r);
+	void via1_b_w(uint8_t data);
+	void via1_cb1_w(uint8_t data);
+	void cdrom_data_w(uint8_t data);
+	void cdrom_ctrl_w(uint8_t data);
+	uint8_t cdrom_data_r();
 	void init_cops();
 	int m_irq;
 
@@ -202,7 +202,7 @@ uint32_t cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-WRITE8_MEMBER(cops_state::cdrom_data_w)
+void cops_state::cdrom_data_w(uint8_t data)
 {
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
 	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
@@ -210,13 +210,13 @@ WRITE8_MEMBER(cops_state::cdrom_data_w)
 	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
 
-WRITE8_MEMBER(cops_state::cdrom_ctrl_w)
+void cops_state::cdrom_ctrl_w(uint8_t data)
 {
 	if (LOG_CDROM) logerror("%s:cdrom_ctrl_w(%02x)\n", machine().describe_context(), data);
 	m_cdrom_ctrl = data;
 }
 
-READ8_MEMBER(cops_state::cdrom_data_r)
+uint8_t cops_state::cdrom_data_r()
 {
 	const char *regs[4] = { "STATUS", "RESULT", "READ", "FIFOST" };
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cops_state::via1_b_w)
+void cops_state::via1_b_w(uint8_t data)
 {
 	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
@@ -769,7 +769,7 @@ WRITE8_MEMBER(cops_state::via1_b_w)
 	}
 }
 
-WRITE8_MEMBER(cops_state::via1_cb1_w)
+void cops_state::via1_cb1_w(uint8_t data)
 {
 	m_sn_cb1 = data;
 }

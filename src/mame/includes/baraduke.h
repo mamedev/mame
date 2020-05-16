@@ -26,11 +26,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(inputport_select_w);
-	DECLARE_READ8_MEMBER(inputport_r);
-	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
-	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
-	DECLARE_READ8_MEMBER(soundkludge_r);
+	void inputport_select_w(uint8_t data);
+	uint8_t inputport_r();
+	void baraduke_lamps_w(uint8_t data);
+	void baraduke_irq_ack_w(uint8_t data);
+	uint8_t soundkludge_r();
 	DECLARE_READ8_MEMBER(baraduke_videoram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
 	DECLARE_READ8_MEMBER(baraduke_textram_r);

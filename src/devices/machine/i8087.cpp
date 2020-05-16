@@ -259,13 +259,13 @@ void i8087_device::execute()
 		m_timer->adjust(attotime::from_hz((m_icount ? m_icount : 1) * clock()));
 }
 
-WRITE32_MEMBER(i8087_device::insn_w)
+void i8087_device::insn_w(uint32_t data)
 {
 	m_ppc = m_pc;
 	m_pc = data;
 }
 
-WRITE32_MEMBER(i8087_device::addr_w)
+void i8087_device::addr_w(uint32_t data)
 {
 	m_ea = data;
 	execute();

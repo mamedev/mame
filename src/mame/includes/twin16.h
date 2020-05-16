@@ -40,7 +40,7 @@ public:
 
 	void init_twin16();
 
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

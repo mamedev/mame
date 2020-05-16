@@ -61,7 +61,7 @@ private:
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -48,7 +48,7 @@ private:
 	DECLARE_WRITE8_MEMBER(gfxrom_select_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	void ccu_int_time_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

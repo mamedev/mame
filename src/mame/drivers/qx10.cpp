@@ -104,12 +104,10 @@ private:
 	DECLARE_WRITE8_MEMBER( prom_sel_w );
 	DECLARE_WRITE8_MEMBER( cmos_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
-	DECLARE_READ8_MEMBER( fdc_dma_r );
-	DECLARE_WRITE8_MEMBER( fdc_dma_w );
 	DECLARE_WRITE8_MEMBER( fdd_motor_w );
 	DECLARE_READ8_MEMBER( qx10_30_r );
-	DECLARE_READ8_MEMBER( gdc_dack_r );
-	DECLARE_WRITE8_MEMBER( gdc_dack_w );
+	uint8_t gdc_dack_r();
+	void gdc_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_READ8_MEMBER( mc146818_r );
 	DECLARE_WRITE8_MEMBER( mc146818_w );
@@ -119,8 +117,8 @@ private:
 	DECLARE_WRITE8_MEMBER( vram_bank_w );
 	DECLARE_READ16_MEMBER( vram_r );
 	DECLARE_WRITE16_MEMBER( vram_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 
@@ -298,17 +296,6 @@ void qx10_state::update_memory_mapping()
 	}
 }
 
-READ8_MEMBER( qx10_state::fdc_dma_r )
-{
-	return m_fdc->dma_r();
-}
-
-WRITE8_MEMBER( qx10_state::fdc_dma_w )
-{
-	m_fdc->dma_w(data);
-}
-
-
 WRITE8_MEMBER( qx10_state::qx10_18_w )
 {
 	m_membank = (data >> 4) & 0x0f;
@@ -423,13 +410,13 @@ WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 	m_dma_1->hack_w(state);
 }
 
-READ8_MEMBER( qx10_state::gdc_dack_r )
+uint8_t qx10_state::gdc_dack_r()
 {
 	logerror("GDC DACK read\n");
 	return 0;
 }
 
-WRITE8_MEMBER( qx10_state::gdc_dack_w )
+void qx10_state::gdc_dack_w(uint8_t data)
 {
 	logerror("GDC DACK write %02x\n", data);
 }
@@ -446,13 +433,13 @@ WRITE_LINE_MEMBER( qx10_state::tc_w )
     Channel 2: GDC
     Channel 3: Option slots
 */
-READ8_MEMBER(qx10_state::memory_read_byte)
+uint8_t qx10_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(qx10_state::memory_write_byte)
+void qx10_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
@@ -796,10 +783,10 @@ void qx10_state::qx10(machine_config &config)
 	m_dma_1->out_eop_callback().set(FUNC(qx10_state::tc_w));
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
 	m_dma_1->out_memw_callback().set(FUNC(qx10_state::memory_write_byte));
-	m_dma_1->in_ior_callback<0>().set(FUNC(qx10_state::fdc_dma_r));
+	m_dma_1->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_dma_1->in_ior_callback<1>().set(FUNC(qx10_state::gdc_dack_r));
 	//m_dma_1->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
-	m_dma_1->out_iow_callback<0>().set(FUNC(qx10_state::fdc_dma_w));
+	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma_1->out_iow_callback<1>().set(FUNC(qx10_state::gdc_dack_w));
 	//m_dma_1->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
 	AM9517A(config, m_dma_2, MAIN_CLK/4);

@@ -168,7 +168,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- boot OK, gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound -->
 	<software name="atarikrt" supported="no">
 		<description>Atari Karts</description>
 		<year>1995</year>
@@ -181,8 +181,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="mutntpng" supported="no">
+	<!-- boot OK, title screen foreground layer not drawn properly, no sound -->
+	<software name="mutntpng" supported="partial">
 		<description>Attack of the Mutant Penguins</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -592,7 +592,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- hangs at the NBA Jam TE logo -->
+	<!-- exception on non-debug, on debug gameplay sports no sprite GFXs -->
+	<!-- minor glitch on team box when selecting one (blitter not filling properly) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
@@ -966,7 +967,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play -->
-	<software name="troyaik" supported="no">
+	<software name="troyaik" supported="partial">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>

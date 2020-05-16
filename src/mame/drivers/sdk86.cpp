@@ -52,9 +52,9 @@ public:
 	void sdk86(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t kbd_r();
 
 	void sdk86_io(address_map &map);
 	void sdk86_mem(address_map &map);
@@ -114,18 +114,18 @@ static INPUT_PORTS_START( sdk86 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( sdk86_state::scanlines_w )
+void sdk86_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( sdk86_state::digit_w )
+void sdk86_state::digit_w(uint8_t data)
 {
 	if (m_digit < 8)
 		m_digits[m_digit] = data;
 }
 
-READ8_MEMBER( sdk86_state::kbd_r )
+uint8_t sdk86_state::kbd_r()
 {
 	uint8_t data = 0xff;
 

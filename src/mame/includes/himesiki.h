@@ -52,8 +52,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(himesiki_rombank_w);
-	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
+	void himesiki_rombank_w(uint8_t data);
+	void himesiki_sound_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(himesiki_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(himesiki_scrollx_w);
 	DECLARE_WRITE8_MEMBER(himesiki_scrolly_w);

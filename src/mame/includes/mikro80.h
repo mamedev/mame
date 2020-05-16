@@ -58,10 +58,10 @@ private:
 	int m_keyboard_mask;
 	int m_key_mask;
 	DECLARE_WRITE8_MEMBER(radio99_sound_w);
-	DECLARE_READ8_MEMBER(mikro80_8255_portb_r);
-	DECLARE_READ8_MEMBER(mikro80_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(mikro80_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(mikro80_8255_portc_w);
+	uint8_t mikro80_8255_portb_r();
+	uint8_t mikro80_8255_portc_r();
+	void mikro80_8255_porta_w(uint8_t data);
+	void mikro80_8255_portc_w(uint8_t data);
 	DECLARE_READ8_MEMBER(mikro80_keyboard_r);
 	DECLARE_WRITE8_MEMBER(mikro80_keyboard_w);
 	DECLARE_WRITE8_MEMBER(mikro80_tape_w);

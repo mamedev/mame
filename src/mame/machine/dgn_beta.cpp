@@ -436,17 +436,17 @@ int dgn_beta_state::GetKeyRow(dgn_beta_state *state, int RowNo)
         CB1 I36/39/6845(Horz Sync)
         CB2 Keyboard (out) Low loads input shift reg
 */
-READ8_MEMBER(dgn_beta_state::d_pia0_pa_r)
+uint8_t dgn_beta_state::d_pia0_pa_r()
 {
 	// The hardware has pullup resistors on port A.
 	return 0xff;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia0_pa_w)
+void dgn_beta_state::d_pia0_pa_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
+uint8_t dgn_beta_state::d_pia0_pb_r()
 {
 	int RetVal;
 	int Idx;
@@ -487,7 +487,7 @@ READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
 	return RetVal;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia0_pb_w)
+void dgn_beta_state::d_pia0_pb_w(uint8_t data)
 {
 	int InClkState;
 	//int   OutClkState;
@@ -557,13 +557,13 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
         Baud rate               PB1..PB5 ????
 */
 
-READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
+uint8_t dgn_beta_state::d_pia1_pa_r()
 {
 	// The hardware has pullup resistors on port A.
 	return 0xff;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
+void dgn_beta_state::d_pia1_pa_w(uint8_t data)
 {
 	int HALT_DMA;
 
@@ -609,12 +609,12 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 	LOG_DISK(("Set density %s\n", BIT(data, 6) ? "low" : "high"));
 }
 
-READ8_MEMBER(dgn_beta_state::d_pia1_pb_r)
+uint8_t dgn_beta_state::d_pia1_pb_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia1_pb_w)
+void dgn_beta_state::d_pia1_pb_w(uint8_t data)
 {
 	int HALT_CPU;
 
@@ -657,13 +657,13 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
         Graphics control PB0..PB7 ???
         VSYNC interrupt CB2
 */
-READ8_MEMBER(dgn_beta_state::d_pia2_pa_r)
+uint8_t dgn_beta_state::d_pia2_pa_r()
 {
 	// The hardware has pullup resistors on port A.
 	return 0xff;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
+void dgn_beta_state::d_pia2_pa_w(uint8_t data)
 {
 	int OldTask;
 	int OldEnableMap;
@@ -728,12 +728,12 @@ WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
 	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", m_TaskReg, m_PIATaskReg));
 }
 
-READ8_MEMBER(dgn_beta_state::d_pia2_pb_r)
+uint8_t dgn_beta_state::d_pia2_pb_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia2_pb_w)
+void dgn_beta_state::d_pia2_pb_w(uint8_t data)
 {
 	/* Update top video address lines */
 	dgnbeta_vid_set_gctrl(data);

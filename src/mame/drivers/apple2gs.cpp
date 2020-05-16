@@ -485,7 +485,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
 	DECLARE_WRITE_LINE_MEMBER(doc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
-	DECLARE_READ8_MEMBER(doc_adc_read);
+	uint8_t doc_adc_read();
 	DECLARE_READ8_MEMBER(apple2gs_read_vector);
 
 #if !RUN_ADB_MICRO
@@ -502,17 +502,17 @@ private:
 	void keyglu_816_write(uint8_t offset, uint8_t data);
 	void keyglu_regen_irqs();
 
-	DECLARE_READ8_MEMBER(adbmicro_p0_in);
-	DECLARE_READ8_MEMBER(adbmicro_p1_in);
-	DECLARE_READ8_MEMBER(adbmicro_p2_in);
-	DECLARE_READ8_MEMBER(adbmicro_p3_in);
-	DECLARE_WRITE8_MEMBER(adbmicro_p0_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p1_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
+	uint8_t adbmicro_p0_in();
+	uint8_t adbmicro_p1_in();
+	uint8_t adbmicro_p2_in();
+	uint8_t adbmicro_p3_in();
+	void adbmicro_p0_out(uint8_t data);
+	void adbmicro_p1_out(uint8_t data);
+	void adbmicro_p2_out(uint8_t data);
+	void adbmicro_p3_out(uint8_t data);
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	DECLARE_WRITE8_MEMBER(wdm_trampoline) { }; //m_a2host->wdm_w(space, offset, data); }
+	void wdm_trampoline(offs_t offset, uint8_t data) { }; //m_a2host->wdm_w(space, offset, data); }
 
 private:
 	bool m_is_rom3;
@@ -1079,6 +1079,7 @@ void apple2gs_state::adb_write_datareg(uint8_t data)
 					break;
 
 				case 0xf2:
+					adb_post_response_1(0x80);
 					break;
 
 				default:
@@ -3770,12 +3771,12 @@ void apple2gs_state::a2gs_es5503_map(address_map &map)
     http://www.llx.com/~nparker/a2/adb.html
 ***************************************************************************/
 
-READ8_MEMBER(apple2gs_state::adbmicro_p0_in)
+uint8_t apple2gs_state::adbmicro_p0_in()
 {
 	return m_glu_bus;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
+uint8_t apple2gs_state::adbmicro_p1_in()
 {
 #if RUN_ADB_MICRO
 	switch (m_glu_kbd_y)
@@ -3805,7 +3806,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
 	return 0xff;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
+uint8_t apple2gs_state::adbmicro_p2_in()
 {
 	uint8_t rv = 0;
 
@@ -3815,7 +3816,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
 	return rv;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p3_in)
+uint8_t apple2gs_state::adbmicro_p3_in()
 {
 	uint8_t rv = 0;
 #if RUN_ADB_MICRO
@@ -3832,16 +3833,16 @@ READ8_MEMBER(apple2gs_state::adbmicro_p3_in)
 	return rv;
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p0_out)
+void apple2gs_state::adbmicro_p0_out(uint8_t data)
 {
 	m_glu_bus = data;
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p1_out)
+void apple2gs_state::adbmicro_p1_out(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p2_out)
+void apple2gs_state::adbmicro_p2_out(uint8_t data)
 {
 	if (!(data & 0x10))
 	{
@@ -3860,7 +3861,7 @@ WRITE8_MEMBER(apple2gs_state::adbmicro_p2_out)
 	}
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p3_out)
+void apple2gs_state::adbmicro_p3_out(uint8_t data)
 {
 	if (((data & 0x08) == 0x08) != m_adb_line)
 	{
@@ -4094,7 +4095,7 @@ WRITE_LINE_MEMBER(apple2gs_state::doc_irq_w)
 	}
 }
 
-READ8_MEMBER(apple2gs_state::doc_adc_read)
+uint8_t apple2gs_state::doc_adc_read()
 {
 	return 0x80;
 }

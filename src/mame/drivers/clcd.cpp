@@ -385,12 +385,12 @@ public:
 		m_lcd_size = data;
 	}
 
-	WRITE8_MEMBER(via0_pa_w)
+	void via0_pa_w(uint8_t data)
 	{
 		m_key_column = data;
 	}
 
-	WRITE8_MEMBER(via0_pb_w)
+	void via0_pb_w(uint8_t data)
 	{
 		write_key_poll((data >> 0) & 1);
 		m_rtc->cs2_w((data >> 1) & 1);
@@ -439,7 +439,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(via1_pa_w)
+	void via1_pa_w(uint8_t data)
 	{
 		m_rtc->d0_w(BIT(data, 0));
 		m_centronics->write_data0(BIT(data, 0));
@@ -465,7 +465,7 @@ public:
 		m_centronics->write_data7(BIT(data, 7));
 	}
 
-	WRITE8_MEMBER(via1_pb_w)
+	void via1_pb_w(uint8_t data)
 	{
 		//int centronics_unknown = !BIT(data,5);
 	}

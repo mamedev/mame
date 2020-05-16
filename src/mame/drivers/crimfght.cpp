@@ -68,9 +68,9 @@ IRQ_CALLBACK_MEMBER( crimfght_state::audiocpu_irq_ack )
 	return 0xff;
 }
 
-WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
+void crimfght_state::ym2151_ct_w(uint8_t data)
 {
-	// ne output from the 007232 is connected to a ls399 which
+	// one output from the 007232 is connected to a ls399 which
 	// has inputs connected to the ct1 and ct2 outputs from
 	// the ym2151 used to select the bank
 
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(crimfght_state::volume_callback)
+void crimfght_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data & 0x0f) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data >> 4) * 0x11);
@@ -272,7 +272,7 @@ void crimfght_state::machine_start()
 	m_rombank->set_entry(0);
 }
 
-WRITE8_MEMBER( crimfght_state::banking_callback )
+void crimfght_state::banking_callback(uint8_t data)
 {
 	m_rombank->set_entry(data & 0x0f);
 

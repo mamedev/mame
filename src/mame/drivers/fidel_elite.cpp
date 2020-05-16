@@ -134,13 +134,13 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	u8 speech_r(offs_t offset);
+	void segment_w(offs_t offset, u8 data);
+	void led_w(offs_t offset, u8 data);
+	u8 input_r();
+	void ppi_porta_w(u8 data);
+	u8 ppi_portb_r();
+	void ppi_portc_w(u8 data);
 
 	bool m_rotate;
 	u8 m_led_data;
@@ -209,12 +209,12 @@ void elite_state::update_display()
 	m_display->matrix(1 << m_inp_mux, m_led_data << 8 | seg_data);
 }
 
-READ8_MEMBER(elite_state::speech_r)
+u8 elite_state::speech_r(offs_t offset)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
-WRITE8_MEMBER(elite_state::segment_w)
+void elite_state::segment_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: digit segment
 	u8 mask = 1 << offset;
@@ -222,14 +222,14 @@ WRITE8_MEMBER(elite_state::segment_w)
 	update_display();
 }
 
-WRITE8_MEMBER(elite_state::led_w)
+void elite_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-READ8_MEMBER(elite_state::input_r)
+u8 elite_state::input_r()
 {
 	u8 data = 0;
 
@@ -254,7 +254,7 @@ READ8_MEMBER(elite_state::input_r)
 
 // 8255 PPI (PC: done with TTL instead)
 
-WRITE8_MEMBER(elite_state::ppi_porta_w)
+void elite_state::ppi_porta_w(u8 data)
 {
 	// d0-d5: TSI C0-C5
 	// d6: TSI START line
@@ -264,7 +264,7 @@ WRITE8_MEMBER(elite_state::ppi_porta_w)
 	// d7: printer? (black wire to LED pcb)
 }
 
-WRITE8_MEMBER(elite_state::ppi_portc_w)
+void elite_state::ppi_portc_w(u8 data)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led select, input mux
@@ -286,7 +286,7 @@ WRITE8_MEMBER(elite_state::ppi_portc_w)
 		m_rombank->set_entry(data >> 6 & 3);
 }
 
-READ8_MEMBER(elite_state::ppi_portb_r)
+u8 elite_state::ppi_portb_r()
 {
 	// d0: printer? white wire from LED pcb
 	u8 data = 1;

@@ -421,9 +421,9 @@ private:
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_WRITE8_MEMBER(analog_w);
 
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(uint8_t data);
 
-	DECLARE_READ8_MEMBER(esq1_adc_read);
+	uint8_t esq1_adc_read();
 
 	DECLARE_READ8_MEMBER(es5503_sample_r);
 
@@ -453,7 +453,7 @@ void esq1_state::sq80_es5503_map(address_map &map)
 	map(0x000000, 0x1ffff).r(FUNC(esq1_state::es5503_sample_r));
 }
 
-READ8_MEMBER(esq1_state::esq1_adc_read)
+uint8_t esq1_state::esq1_adc_read()
 {
 	return m_adc_value[m_adc_target];
 }
@@ -560,7 +560,7 @@ void esq1_state::sq80_map(address_map &map)
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-WRITE8_MEMBER(esq1_state::duart_output)
+void esq1_state::duart_output(uint8_t data)
 {
 	int bank = m_adc_target = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);

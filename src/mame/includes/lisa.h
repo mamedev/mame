@@ -230,9 +230,9 @@ private:
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_a);
+	void COPS_via_out_a(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
+	void COPS_via_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
 
 	void field_interrupts();

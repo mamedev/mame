@@ -25,7 +25,7 @@ license:CC0
 		<bezel element="background">
 			<bounds left="45" top="90" right="553" bottom="300" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit0" element="digit">
 			<bounds left="107" top="105" right="155" bottom="185" />
 		</bezel>
 		<bezel name="digit2" element="digit">

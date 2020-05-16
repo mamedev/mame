@@ -397,7 +397,7 @@ READ8_MEMBER(witch_state::gfx1_cram_r)
 	return m_gfx1_cram[offset];
 }
 
-READ8_MEMBER(witch_state::read_a000)
+uint8_t witch_state::read_a000()
 {
 	switch (m_reg_a002 & 0x3f)
 	{
@@ -413,7 +413,7 @@ READ8_MEMBER(witch_state::read_a000)
 	}
 }
 
-WRITE8_MEMBER(witch_state::write_a002)
+void witch_state::write_a002(uint8_t data)
 {
 	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
@@ -421,7 +421,7 @@ WRITE8_MEMBER(witch_state::write_a002)
 	m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
+void keirinou_state::write_keirinou_a002(uint8_t data)
 {
 	uint8_t new_bg_bank;
 	m_reg_a002 = data;
@@ -437,7 +437,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 //  m_mainbank->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(witch_state::write_a006)
+void witch_state::write_a006(uint8_t data)
 {
 	// don't write when zeroed on reset
 	if (data == 0)
@@ -486,7 +486,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	return memregion("sub")->base()[0x7000+offset];
 }
 
-WRITE8_MEMBER(witch_state::xscroll_w)
+void witch_state::xscroll_w(uint8_t data)
 {
 	m_scrollx = data;
 	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
@@ -495,7 +495,7 @@ WRITE8_MEMBER(witch_state::xscroll_w)
 	m_gfx1_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(witch_state::yscroll_w)
+void witch_state::yscroll_w(uint8_t data)
 {
 	m_scrolly = data;
 }

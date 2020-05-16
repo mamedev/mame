@@ -1314,20 +1314,20 @@ WRITE_LINE_MEMBER(demon_state::demon_sound4_w)
 }
 
 
-READ8_MEMBER(demon_state::sound_porta_r)
+uint8_t demon_state::sound_porta_r()
 {
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return m_sound_fifo[m_sound_fifo_out] | ((m_sound_fifo_in != m_sound_fifo_out) << 4);
 }
 
 
-READ8_MEMBER(demon_state::sound_portb_r)
+uint8_t demon_state::sound_portb_r()
 {
 	return m_last_portb_write;
 }
 
 
-WRITE8_MEMBER(demon_state::sound_portb_w)
+void demon_state::sound_portb_w(uint8_t data)
 {
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (m_last_portb_write & 1) && (data & 1) != 0)
@@ -1345,7 +1345,7 @@ WRITE8_MEMBER(demon_state::sound_portb_w)
 	m_last_portb_write = data;
 }
 
-WRITE8_MEMBER(demon_state::sound_output_w)
+void demon_state::sound_output_w(uint8_t data)
 {
 	logerror("sound_output = %02X\n", data);
 }

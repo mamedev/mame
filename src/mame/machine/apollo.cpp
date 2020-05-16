@@ -386,7 +386,7 @@ READ16_MEMBER(apollo_state::apollo_address_translation_map_r){
 	return data;
 }
 
-READ8_MEMBER(apollo_state::apollo_dma_read_byte){
+uint8_t apollo_state::apollo_dma_read_byte(offs_t offset){
 	uint8_t data;
 	offs_t page_offset;
 
@@ -408,7 +408,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_byte){
 	return data;
 }
 
-WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
+void apollo_state::apollo_dma_write_byte(offs_t offset, uint8_t data){
 	offs_t page_offset;
 	if (apollo_is_dn3000()) {
 		page_offset = dma_page_register[channel2page_register[dn3000_dma_channel1]] << 16;
@@ -427,7 +427,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 //  logerror(" %02x", data);
 }
 
-READ8_MEMBER(apollo_state::apollo_dma_read_word){
+uint8_t apollo_state::apollo_dma_read_word(offs_t offset){
 	uint16_t data;
 	offs_t page_offset;
 
@@ -448,7 +448,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_word){
 	return data;
 }
 
-WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
+void apollo_state::apollo_dma_write_word(offs_t offset, uint8_t data){
 	offs_t page_offset;
 
 	SLOG1(("dma write word at offset %x = %02x", offset, data));
@@ -495,21 +495,21 @@ WRITE_LINE_MEMBER(apollo_state::apollo_dma_2_hrq_changed ) {
 	m_dma8237_2->hack_w(state);
 }
 
-READ8_MEMBER( apollo_state::pc_dma8237_0_dack_r ) { return m_isa->dack_r(0); }
-READ8_MEMBER( apollo_state::pc_dma8237_1_dack_r ) { return m_isa->dack_r(1); }
-READ8_MEMBER( apollo_state::pc_dma8237_2_dack_r ) { return m_isa->dack_r(2); }
-READ8_MEMBER( apollo_state::pc_dma8237_3_dack_r ) { return m_isa->dack_r(3); }
-READ8_MEMBER( apollo_state::pc_dma8237_5_dack_r ) { return m_isa->dack_r(5); }
-READ8_MEMBER( apollo_state::pc_dma8237_6_dack_r ) { return m_isa->dack_r(6); }
-READ8_MEMBER( apollo_state::pc_dma8237_7_dack_r ) { return m_isa->dack_r(7); }
+uint8_t apollo_state::pc_dma8237_0_dack_r() { return m_isa->dack_r(0); }
+uint8_t apollo_state::pc_dma8237_1_dack_r() { return m_isa->dack_r(1); }
+uint8_t apollo_state::pc_dma8237_2_dack_r() { return m_isa->dack_r(2); }
+uint8_t apollo_state::pc_dma8237_3_dack_r() { return m_isa->dack_r(3); }
+uint8_t apollo_state::pc_dma8237_5_dack_r() { return m_isa->dack_r(5); }
+uint8_t apollo_state::pc_dma8237_6_dack_r() { return m_isa->dack_r(6); }
+uint8_t apollo_state::pc_dma8237_7_dack_r() { return m_isa->dack_r(7); }
 
-WRITE8_MEMBER( apollo_state::pc_dma8237_0_dack_w ){ m_isa->dack_w(0, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_1_dack_w ){ m_isa->dack_w(1, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_2_dack_w ){ m_isa->dack_w(2, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_3_dack_w ){ m_isa->dack_w(3, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_5_dack_w ){ m_isa->dack_w(5, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_6_dack_w ){ m_isa->dack_w(6, data); }
-WRITE8_MEMBER( apollo_state::pc_dma8237_7_dack_w ){ m_isa->dack_w(7, data); }
+void apollo_state::pc_dma8237_0_dack_w(uint8_t data){ m_isa->dack_w(0, data); }
+void apollo_state::pc_dma8237_1_dack_w(uint8_t data){ m_isa->dack_w(1, data); }
+void apollo_state::pc_dma8237_2_dack_w(uint8_t data){ m_isa->dack_w(2, data); }
+void apollo_state::pc_dma8237_3_dack_w(uint8_t data){ m_isa->dack_w(3, data); }
+void apollo_state::pc_dma8237_5_dack_w(uint8_t data){ m_isa->dack_w(5, data); }
+void apollo_state::pc_dma8237_6_dack_w(uint8_t data){ m_isa->dack_w(6, data); }
+void apollo_state::pc_dma8237_7_dack_w(uint8_t data){ m_isa->dack_w(7, data); }
 
 WRITE_LINE_MEMBER( apollo_state::pc_dack0_w ) { select_dma_channel(0, state); }
 WRITE_LINE_MEMBER( apollo_state::pc_dack1_w ) { select_dma_channel(1, state); }
@@ -591,7 +591,7 @@ u16 apollo_state::apollo_pic_get_vector()
  * pic8259 configuration
  *************************************************************/
 
-READ8_MEMBER( apollo_state::apollo_pic8259_get_slave_ack )
+uint8_t apollo_state::apollo_pic8259_get_slave_ack(offs_t offset)
 {
 		MLOG1(("apollo_pic8259_get_slave_ack: offset=%x", offset));
 
@@ -799,7 +799,7 @@ WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 	apollo_pic_set_irq_line(APOLLO_IRQ_SIO1, state);
 }
 
-WRITE8_MEMBER(apollo_state::sio_output)
+void apollo_state::sio_output(uint8_t data)
 {
 //  CLOG2(("apollo_sio - sio_output %02x", data));
 

@@ -237,7 +237,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
+uint8_t atetris_mcu_state::mcu_bus_r()
 {
 	switch (m_mcu->p2_r() & 0xf0)
 	{
@@ -252,13 +252,13 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 	}
 }
 
-WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
+void atetris_mcu_state::mcu_p2_w(uint8_t data)
 {
 	if ((data & 0xc0) == 0x80)
 		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
 
-WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
+void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 {
 	// FIXME: a lot of sound writes seem to get lost this way; why doesn't that hurt?
 	m_soundlatch[0]->write(offset | 0x20);

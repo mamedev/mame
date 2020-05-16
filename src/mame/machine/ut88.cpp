@@ -53,7 +53,7 @@ void ut88mini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-READ8_MEMBER( ut88_state::ppi_portb_r )
+uint8_t ut88_state::ppi_portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -77,12 +77,12 @@ READ8_MEMBER( ut88_state::ppi_portb_r )
 	return data;
 }
 
-READ8_MEMBER( ut88_state::ppi_portc_r )
+uint8_t ut88_state::ppi_portc_r()
 {
 	return m_io_line8->read();
 }
 
-WRITE8_MEMBER( ut88_state::ppi_porta_w )
+void ut88_state::ppi_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }

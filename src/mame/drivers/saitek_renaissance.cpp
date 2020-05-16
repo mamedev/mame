@@ -22,8 +22,8 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- LCD (need SVG screen)
 - not sure about comm/module leds
+- finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 
@@ -38,6 +38,7 @@ TODO:
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 // internal artwork
@@ -53,9 +54,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
-		m_display(*this, "display"),
+		m_display(*this, "display%u", 0),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
 	// machine configs
@@ -68,11 +70,15 @@ private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device_array<pwm_display_device, 2> m_display;
 	optional_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+1> m_inputs;
+	output_finder<16, 34> m_out_lcd;
 
 	void main_map(address_map &map);
+
+	void lcd_pwm_w(offs_t offset, u8 data);
+	void lcd_output_w(offs_t offset, u64 data);
 
 	void update_display();
 	void mux_w(u8 data);
@@ -93,6 +99,8 @@ private:
 
 void ren_state::machine_start()
 {
+	m_out_lcd.resolve();
+
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
 }
@@ -103,12 +111,25 @@ void ren_state::machine_start()
     I/O
 ******************************************************************************/
 
+// LCD
+
+void ren_state::lcd_pwm_w(offs_t offset, u8 data)
+{
+	m_out_lcd[offset & 0x3f][offset >> 6] = data;
+}
+
+void ren_state::lcd_output_w(offs_t offset, u64 data)
+{
+	m_display[1]->write_row(offset, data);
+}
+
+
 // misc
 
 void ren_state::update_display()
 {
-	m_display->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0], false);
-	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1], true);
+	m_display[0]->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0], false);
+	m_display[0]->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1], true);
 }
 
 void ren_state::mux_w(u8 data)
@@ -292,8 +313,17 @@ void ren_state::ren(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
-	SED1502(config, "lcd", 32768);
-	PWM_DISPLAY(config, m_display).set_size(9+1, 9);
+	PWM_DISPLAY(config, m_display[0]).set_size(9+1, 9);
+
+	SED1502(config, "lcd", 32768).write_segs().set(FUNC(ren_state::lcd_output_w));
+	PWM_DISPLAY(config, m_display[1]).set_size(16, 34);
+	m_display[1]->output_x().set(FUNC(ren_state::lcd_pwm_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(873/2, 1080/2);
+	screen.set_visarea_full();
+
 	config.set_default_layout(layout_saitek_renaissance);
 
 	/* sound hardware */
@@ -311,11 +341,17 @@ void ren_state::ren(machine_config &config)
 ROM_START( renaissa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sw7_518d_u3.u3", 0x8000, 0x8000, CRC(21d2405f) SHA1(6ddcf9bdd30aa446fcaeab919a8f950dc3428365) ) // HN27C256AG-10
+
+	ROM_REGION( 795951, "screen", 0 )
+	ROM_LOAD("renaissa.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
 ROM_END
 
 ROM_START( renaissaa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sx7_518b.u3", 0x8000, 0x8000, CRC(a0c3ffe8) SHA1(fa170a6d4d54d41de77e0bb72f969219e6f376af) ) // MBM27C256H-10
+
+	ROM_REGION( 795951, "screen", 0 )
+	ROM_LOAD("renaissa.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
 ROM_END
 
 } // anonymous namespace

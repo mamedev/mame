@@ -96,8 +96,8 @@ private:
 	DECLARE_WRITE8_MEMBER(self_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
-	DECLARE_READ8_MEMBER(riot_porta_r);
-	DECLARE_WRITE8_MEMBER(riot_porta_w);
+	uint8_t riot_porta_r();
+	void riot_porta_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(bgtile_get_info);
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
@@ -345,7 +345,7 @@ WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(firefox_state::riot_porta_r)
+uint8_t firefox_state::riot_porta_r()
 {
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
@@ -359,7 +359,7 @@ READ8_MEMBER(firefox_state::riot_porta_r)
 	return (m_soundlatch->pending_r() ? 0x80 : 0x00) | (m_soundlatch2->pending_r() ? 0x40 : 0x00) | 0x10 | (m_tms->readyq_r() << 2);
 }
 
-WRITE8_MEMBER(firefox_state::riot_porta_w)
+void firefox_state::riot_porta_w(uint8_t data)
 {
 	/* handle 5220 read */
 	m_tms->rsq_w((data>>1) & 1);

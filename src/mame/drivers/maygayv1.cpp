@@ -235,15 +235,15 @@ private:
 	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(b_read);
-	DECLARE_WRITE8_MEMBER(b_writ);
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	uint8_t b_read();
+	void b_writ(uint8_t data);
+	void strobe_w(uint8_t data);
+	void lamp_data_w(uint8_t data);
+	uint8_t kbd_r();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
+	void data_from_i8031(uint8_t data);
+	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	void main_map(address_map &map);
@@ -527,12 +527,12 @@ READ16_MEMBER(maygayv1_state::read_odd)
  *
  *************************************/
 
-WRITE8_MEMBER( maygayv1_state::strobe_w )
+void maygayv1_state::strobe_w(uint8_t data)
 {
 	m_lamp_strobe = data;
 }
 
-WRITE8_MEMBER( maygayv1_state::lamp_data_w )
+void maygayv1_state::lamp_data_w(uint8_t data)
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
@@ -551,7 +551,7 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 
 }
 
-READ8_MEMBER( maygayv1_state::kbd_r )
+uint8_t maygayv1_state::kbd_r()
 {
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 
@@ -842,23 +842,23 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 }
 
-READ8_MEMBER(maygayv1_state::data_to_i8031)
+uint8_t maygayv1_state::data_to_i8031()
 {
 	return m_d68681_val;
 }
 
-WRITE8_MEMBER(maygayv1_state::data_from_i8031)
+void maygayv1_state::data_from_i8031(uint8_t data)
 {
 	m_duart68681->rx_a_w(data);
 }
 
-READ8_MEMBER(maygayv1_state::b_read)
+uint8_t maygayv1_state::b_read()
 {
 	// Meters - upper nibble?
 	return 0xff;
 }
 
-WRITE8_MEMBER(maygayv1_state::b_writ)
+void maygayv1_state::b_writ(uint8_t data)
 {
 	logerror("B WRITE %x\n",data);
 }

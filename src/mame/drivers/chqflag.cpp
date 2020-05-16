@@ -255,7 +255,7 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(chqflag_state::volume_callback0)
+void chqflag_state::volume_callback0(uint8_t data)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
@@ -269,7 +269,7 @@ WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 	m_k007232[0]->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-WRITE8_MEMBER(chqflag_state::volume_callback1)
+void chqflag_state::volume_callback1(uint8_t data)
 {
 	m_k007232[1]->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232[1]->set_volume(1, 0, (data & 0x0f) * 0x11);

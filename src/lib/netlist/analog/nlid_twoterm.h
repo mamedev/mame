@@ -488,6 +488,7 @@ namespace analog
 	public:
 		NETLIB_CONSTRUCTOR_EX(D, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
+		, m_modacc(m_model)
 		, m_D(*this, "m_D")
 		{
 			register_subalias("A", P());
@@ -504,6 +505,7 @@ namespace analog
 
 	private:
 		param_model_t m_model;
+		diode_model_t m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 	};
 
@@ -516,6 +518,7 @@ namespace analog
 	public:
 		NETLIB_CONSTRUCTOR_EX(Z, const pstring &model = "D")
 		, m_model(*this, "MODEL", model)
+		, m_modacc(m_model)
 		, m_D(*this, "m_D")
 		, m_R(*this, "m_R")
 		{
@@ -533,6 +536,7 @@ namespace analog
 
 	private:
 		param_model_t m_model;
+		zdiode_model_t m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 		// REVERSE diode
 		generic_diode<diode_e::BIPOLAR> m_R;

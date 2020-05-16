@@ -45,7 +45,7 @@ static const int scramble_timer[10] =
 	0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 };
 
-READ8_MEMBER( scramble_state::scramble_portB_r )
+uint8_t scramble_state::scramble_portB_r()
 {
 	return scramble_timer[(m_audiocpu->total_cycles()/512) % 10];
 }
@@ -74,12 +74,12 @@ static const int frogger_timer[10] =
 	0x00, 0x10, 0x08, 0x18, 0x40, 0x90, 0x88, 0x98, 0x88, 0xd0
 };
 
-READ8_MEMBER( scramble_state::hustler_portB_r )
+uint8_t scramble_state::hustler_portB_r()
 {
 	return frogger_timer[(m_audiocpu->total_cycles()/512) % 10];
 }
 
-WRITE8_MEMBER( scramble_state::scramble_sh_irqtrigger_w )
+void scramble_state::scramble_sh_irqtrigger_w(uint8_t data)
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	m_konami_7474->clock_w((~data & 0x08) >> 3);
@@ -88,7 +88,7 @@ WRITE8_MEMBER( scramble_state::scramble_sh_irqtrigger_w )
 	machine().sound().system_mute((data & 0x10) >> 4);
 }
 
-WRITE8_MEMBER( scramble_state::mrkougar_sh_irqtrigger_w )
+void scramble_state::mrkougar_sh_irqtrigger_w(uint8_t data)
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	m_konami_7474->clock_w((~data & 0x08) >> 3);
@@ -114,12 +114,12 @@ WRITE_LINE_MEMBER(scramble_state::scramble_sh_7474_q_callback)
 		m_audiocpu->set_input_line(0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
+void scramble_state::hotshock_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER( scramble_state::hotshock_soundlatch_r )
+uint8_t scramble_state::hotshock_soundlatch_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read();
@@ -139,7 +139,7 @@ READ8_MEMBER(scramble_state::harem_digitalker_intr_r)
 	return m_digitalker->digitalker_0_intr_r();
 }
 
-WRITE8_MEMBER(scramble_state::harem_digitalker_control_w)
+void scramble_state::harem_digitalker_control_w(uint8_t data)
 {
 	m_digitalker->digitalker_0_cs_w (data & 1 ? ASSERT_LINE : CLEAR_LINE);
 	m_digitalker->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);

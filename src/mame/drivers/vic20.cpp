@@ -100,13 +100,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_user_light_pen );
 	DECLARE_WRITE_LINE_MEMBER( write_user_cassette_switch );
 
-	DECLARE_READ8_MEMBER( via1_pa_r );
-	DECLARE_WRITE8_MEMBER( via1_pa_w );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pa_r();
+	void via1_pa_w(uint8_t data);
+	void via1_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( via2_pa_r );
-	DECLARE_READ8_MEMBER( via2_pb_r );
-	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	uint8_t via2_pa_r();
+	uint8_t via2_pb_r();
+	void via2_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
 
@@ -537,7 +537,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-READ8_MEMBER( vic20_state::via1_pa_r )
+uint8_t vic20_state::via1_pa_r()
 {
 	/*
 
@@ -576,7 +576,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via1_pa_w )
+void vic20_state::via1_pa_w(uint8_t data)
 {
 	/*
 
@@ -602,7 +602,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 	m_iec->host_atn_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER( vic20_state::via1_pb_w )
+void vic20_state::via1_pb_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -614,7 +614,7 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
 	m_user->write_l((data>>7)&1);
 }
 
-READ8_MEMBER( vic20_state::via2_pa_r )
+uint8_t vic20_state::via2_pa_r()
 {
 	/*
 
@@ -641,7 +641,7 @@ READ8_MEMBER( vic20_state::via2_pa_r )
 	return data;
 }
 
-READ8_MEMBER( vic20_state::via2_pb_r )
+uint8_t vic20_state::via2_pb_r()
 {
 	/*
 
@@ -668,7 +668,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via2_pb_w )
+void vic20_state::via2_pb_w(uint8_t data)
 {
 	/*
 

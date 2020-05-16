@@ -339,23 +339,23 @@ WRITE8_MEMBER(metro_state::soundstatus_w)
 }
 
 template<int Mask>
-WRITE8_MEMBER(metro_state::upd7810_rombank_w)
+void metro_state::upd7810_rombank_w(uint8_t data)
 {
 	m_audiobank->set_entry((data >> 4) & Mask);
 }
 
 
-READ8_MEMBER(metro_state::upd7810_porta_r)
+uint8_t metro_state::upd7810_porta_r()
 {
 	return m_porta;
 }
 
-WRITE8_MEMBER(metro_state::upd7810_porta_w)
+void metro_state::upd7810_porta_w(uint8_t data)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER(metro_state::upd7810_portb_w)
+void metro_state::upd7810_portb_w(uint8_t data)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -404,7 +404,7 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 }
 
 
-WRITE8_MEMBER(metro_state::daitorid_portb_w)
+void metro_state::daitorid_portb_w(uint8_t data)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -1270,7 +1270,7 @@ void metro_state::puzzlet_map(address_map &map)
 }
 
 
-WRITE16_MEMBER(metro_state::puzzlet_portb_w)
+void metro_state::puzzlet_portb_w(uint16_t data)
 {
 //  popmessage("PORTB %02x", data);
 }

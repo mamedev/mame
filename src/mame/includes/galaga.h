@@ -47,10 +47,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE8_MEMBER(galaga_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(gatsbee_bank_w);
-	DECLARE_WRITE8_MEMBER(out);
+	void out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(lockout);
-	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
-	DECLARE_READ8_MEMBER(namco_52xx_si_r);
+	uint8_t namco_52xx_rom_r(offs_t offset);
+	uint8_t namco_52xx_si_r();
 	void init_galaga();
 	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

@@ -263,7 +263,7 @@ void sapphire_ioga_device::device_reset()
 /*
  * Interrupts
  */
-WRITE32_MEMBER(interpro_ioga_device::bus_error)
+void interpro_ioga_device::bus_error(offs_t offset, u32 data)
 {
 	LOG("bus_error address 0x%08x businfo 0x%08x\n", data, offset);
 
@@ -1257,7 +1257,7 @@ READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 	return result;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::mouse_status_w)
+void interpro_ioga_device::mouse_status_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_MOUSE, "mouse_status_w status 0x%08x mask 0x%08x\n",
 		data, mem_mask);

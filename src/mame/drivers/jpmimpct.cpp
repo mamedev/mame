@@ -882,7 +882,7 @@ void jpmimpct_state::jpmimpct(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(jpmimpct_state::hopper_b_r)
+uint8_t jpmimpct_state::hopper_b_r()
 {
 	int retval;
 	// B0 = 100p Hopper Out Verif
@@ -908,7 +908,7 @@ READ8_MEMBER(jpmimpct_state::hopper_b_r)
 	return retval;
 }
 
-READ8_MEMBER(jpmimpct_state::hopper_c_r)
+uint8_t jpmimpct_state::hopper_c_r()
 {
 	int retval;
 	// C0-C2 = Alpha
@@ -945,7 +945,7 @@ READ8_MEMBER(jpmimpct_state::hopper_c_r)
 	return retval;
 }
 
-WRITE8_MEMBER(jpmimpct_state::payen_a_w)
+void jpmimpct_state::payen_a_w(uint8_t data)
 {
 	m_motor[0] = (data & 0x01);
 	m_payen = (data & 0x10);
@@ -954,7 +954,7 @@ WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 	m_hopinhibit = (data & 0x80);
 }
 
-WRITE8_MEMBER(jpmimpct_state::display_c_w)
+void jpmimpct_state::display_c_w(uint8_t data)
 {
 	//Reset 0x04, data 0x02, clock 0x01
 	m_vfd->por(data & 0x04);

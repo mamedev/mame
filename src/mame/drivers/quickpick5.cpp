@@ -57,7 +57,7 @@ private:
 
 	K05324X_CB_MEMBER(sprite_callback);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	DECLARE_WRITE8_MEMBER(ccu_int_time_w);
+	void ccu_int_time_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	READ8_MEMBER(control_r) { return m_control; }
@@ -107,7 +107,7 @@ private:
 	int         m_ccu_int_time, m_ccu_int_time_count;
 };
 
-WRITE8_MEMBER(quickpick5_state::ccu_int_time_w)
+void quickpick5_state::ccu_int_time_w(uint8_t data)
 {
 	logerror("ccu_int_time rewritten with value of %02x\n", data);
 	m_ccu_int_time = data;

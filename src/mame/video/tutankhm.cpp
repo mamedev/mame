@@ -431,7 +431,7 @@ void tutankhm_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectan
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
 
-WRITE8_MEMBER(tutankhm_state::galaxian_stars_enable_w)
+void tutankhm_state::galaxian_stars_enable_w(uint8_t data)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
 	{

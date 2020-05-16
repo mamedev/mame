@@ -21,7 +21,7 @@ WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( kaypro_state::pio_system_r )
+uint8_t kaypro_state::pio_system_r()
 {
 	uint8_t data = 0;
 
@@ -34,7 +34,7 @@ READ8_MEMBER( kaypro_state::pio_system_r )
 	return data;
 }
 
-WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
+void kaypro_state::kayproii_pio_system_w(uint8_t data)
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -72,9 +72,9 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kayproiv_pio_system_w )
+void kaypro_state::kayproiv_pio_system_w(uint8_t data)
 {
-	kayproii_pio_system_w(space, offset, data);
+	kayproii_pio_system_w(data);
 
 	/* side select */
 	m_floppy->ss_w(BIT(data, 2));

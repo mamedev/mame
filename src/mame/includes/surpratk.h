@@ -55,7 +55,7 @@ private:
 
 	K05324X_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(uint8_t data);
 	void bank0000_map(address_map &map);
 	void surpratk_map(address_map &map);
 };

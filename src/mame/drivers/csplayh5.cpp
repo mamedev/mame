@@ -63,7 +63,7 @@ public:
 
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	void tmp68301_parallel_port_w(uint16_t data);
 
 	#if USE_H8
 	DECLARE_READ16_MEMBER(test_r);
@@ -342,7 +342,7 @@ WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
 }
 #endif
 
-WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
+void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 {
 	/*
 	    -x-- ---- used during ROM check, h8 reset assert?

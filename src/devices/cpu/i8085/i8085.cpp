@@ -878,7 +878,6 @@ void i8085a_cpu_device::execute_run()
 			check_for_interrupts();
 
 		m_in_acknowledge = false;
-		logerror("PC=%04X\n", m_PC.d);
 		debugger_instruction_hook(m_PC.d);
 
 		/* here we go... */

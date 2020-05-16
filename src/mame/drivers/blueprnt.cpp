@@ -65,7 +65,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(blueprnt_state::dipsw_w)
+void blueprnt_state::dipsw_w(uint8_t data)
 {
 	m_dipsw = data;
 }

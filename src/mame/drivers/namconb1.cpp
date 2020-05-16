@@ -755,17 +755,17 @@ void namconb1_state::namcoc75_am(address_map &map)
 }
 
 
-READ8_MEMBER(namconb1_state::port6_r)
+uint8_t namconb1_state::port6_r()
 {
 	return m_port6;
 }
 
-WRITE8_MEMBER(namconb1_state::port6_w)
+void namconb1_state::port6_w(uint8_t data)
 {
 	m_port6 = data;
 }
 
-READ8_MEMBER(namconb1_state::port7_r)
+uint8_t namconb1_state::port7_r()
 {
 	switch (m_port6 & 0xf0)
 	{

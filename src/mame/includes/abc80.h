@@ -142,9 +142,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pa_r();
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	void kbd_w(u8 data);

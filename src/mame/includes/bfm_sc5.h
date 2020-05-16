@@ -35,8 +35,8 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc5_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc5_duart_output_w);
+	uint8_t bfm_sc5_duart_input_r();
+	void bfm_sc5_duart_output_w(uint8_t data);
 };
 
 INPUT_PORTS_EXTERN( bfm_sc5 );

@@ -7,28 +7,28 @@
 #undef FLAG_SET_M
 #undef FLAG_SET_X
 #undef m37710i_set_flag_mx
-#undef m37710i_set_reg_p
+#undef m37710i_set_reg_ps
 
 #if EXECUTION_MODE == EXECUTION_MODE_M0X0
 #define FLAG_SET_M 0
 #define FLAG_SET_X 0
 #define m37710i_set_flag_mx m37710i_set_flag_m0x0
-#define m37710i_set_reg_p m37710i_set_reg_p_m0x0
+#define m37710i_set_reg_ps m37710i_set_reg_ps_m0x0
 #elif EXECUTION_MODE == EXECUTION_MODE_M0X1
 #define FLAG_SET_M 0
 #define FLAG_SET_X 1
 #define m37710i_set_flag_mx m37710i_set_flag_m0x1
-#define m37710i_set_reg_p m37710i_set_reg_p_m0x1
+#define m37710i_set_reg_ps m37710i_set_reg_ps_m0x1
 #elif EXECUTION_MODE == EXECUTION_MODE_M1X0
 #define FLAG_SET_M 1
 #define FLAG_SET_X 0
 #define m37710i_set_flag_mx m37710i_set_flag_m1x0
-#define m37710i_set_reg_p m37710i_set_reg_p_m1x0
+#define m37710i_set_reg_ps m37710i_set_reg_ps_m1x0
 #elif EXECUTION_MODE == EXECUTION_MODE_M1X1
 #define FLAG_SET_M 1
 #define FLAG_SET_X 1
 #define m37710i_set_flag_mx m37710i_set_flag_m1x1
-#define m37710i_set_reg_p m37710i_set_reg_p_m1x1
+#define m37710i_set_reg_ps m37710i_set_reg_ps_m1x1
 #endif
 
 /* ======================================================================== */
@@ -82,7 +82,7 @@ void m37710_cpu_device::m37710i_set_flag_mx(uint32_t value)
 }
 
 
-void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
+void m37710_cpu_device::m37710i_set_reg_ps(uint32_t value)
 {
 	FLAG_N = value;
 	FLAG_V = value << 1;
@@ -115,13 +115,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 	if (SRC&0x8)    \
 		{ m37710i_push_8(REG_Y);  CLK(2); }  \
 	if (SRC&0x10)   \
-		{ m37710i_push_16(REG_D); CLK(2); }  \
+		{ m37710i_push_16(REG_DPR); CLK(2); }  \
 	if (SRC&0x20)   \
-		{ m37710i_push_8(REG_DB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_DT>>16); CLK(1); }  \
 	if (SRC&0x40)   \
-		{ m37710i_push_8(REG_PB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_PG>>16); CLK(1); }  \
 	if (SRC&0x80)   \
-		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_p()); CLK(2); }
+		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_ps()); CLK(2); }
 #else   // FLAG_SET_X
 #define OP_PSH(MODE)    \
 	SRC = OPER_8_##MODE();  \
@@ -135,13 +135,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 	if (SRC&0x8)    \
 		{ m37710i_push_16(REG_Y); CLK(2); }  \
 	if (SRC&0x10)   \
-		{ m37710i_push_16(REG_D); CLK(2); }  \
+		{ m37710i_push_16(REG_DPR); CLK(2); }  \
 	if (SRC&0x20)   \
-		{ m37710i_push_8(REG_DB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_DT>>16); CLK(1); }  \
 	if (SRC&0x40)   \
-		{ m37710i_push_8(REG_PB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_PG>>16); CLK(1); }  \
 	if (SRC&0x80)   \
-		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_p()); CLK(2); }
+		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_ps()); CLK(2); }
 #endif  // FLAG_SET_X
 #else   // FLAG_SET_M
 #if FLAG_SET_X
@@ -157,13 +157,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 	if (SRC&0x8)    \
 		{ m37710i_push_8(REG_Y); CLK(2); }   \
 	if (SRC&0x10)   \
-		{ m37710i_push_16(REG_D); CLK(2); }  \
+		{ m37710i_push_16(REG_DPR); CLK(2); }  \
 	if (SRC&0x20)   \
-		{ m37710i_push_8(REG_DB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_DT>>16); CLK(1); }  \
 	if (SRC&0x40)   \
-		{ m37710i_push_8(REG_PB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_PG>>16); CLK(1); }  \
 	if (SRC&0x80)   \
-		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_p()); CLK(2); }
+		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_ps()); CLK(2); }
 #else   // FLAG_SET_X
 #define OP_PSH(MODE)    \
 	SRC = OPER_8_##MODE();  \
@@ -177,13 +177,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 	if (SRC&0x8)    \
 		{ m37710i_push_16(REG_Y); CLK(2); }  \
 	if (SRC&0x10)   \
-		{ m37710i_push_16(REG_D); CLK(2); }  \
+		{ m37710i_push_16(REG_DPR); CLK(2); }  \
 	if (SRC&0x20)   \
-		{ m37710i_push_8(REG_DB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_DT>>16); CLK(1); }  \
 	if (SRC&0x40)   \
-		{ m37710i_push_8(REG_PB>>16); CLK(1); }  \
+		{ m37710i_push_8(REG_PG>>16); CLK(1); }  \
 	if (SRC&0x80)   \
-		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_p()); CLK(2); }
+		{ m37710i_push_8(m_ipl); m37710i_push_8(m37710i_get_reg_ps()); CLK(2); }
 #endif  // FLAG_SET_X
 #endif  // FLAG_SET_M
 
@@ -194,12 +194,12 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 	SRC = OPER_8_##MODE();  \
 	CLK(14); \
 	if (SRC&0x80)   \
-		{ m37710i_set_reg_p(m37710i_pull_8()); m37710i_set_reg_ipl(m37710i_pull_8()); CLK(3); } \
+		{ m37710i_set_reg_ps(m37710i_pull_8()); m37710i_set_reg_ipl(m37710i_pull_8()); CLK(3); } \
 	if (SRC&0x20)   \
-		{ REG_DB = m37710i_pull_8() << 16; CLK(3); }   \
+		{ REG_DT  = m37710i_pull_8() << 16; CLK(3); }   \
 	if (SRC&0x10)   \
-		{ REG_D  = m37710i_pull_16(); CLK(4); }   \
-	if (m37710i_get_reg_p() & XFLAG_SET) \
+		{ REG_DPR = m37710i_pull_16(); CLK(4); }   \
+	if (m37710i_get_reg_ps() & XFLAG_SET) \
 	{ \
 		if (SRC&0x8)    \
 			{ REG_Y = m37710i_pull_8(); CLK(3); }  \
@@ -213,7 +213,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 		if (SRC&0x4)    \
 			{ REG_X = m37710i_pull_16(); CLK(3); } \
 	} \
-	if (m37710i_get_reg_p() & MFLAG_SET) \
+	if (m37710i_get_reg_ps() & MFLAG_SET) \
 	{ \
 		if (SRC&0x2)    \
 			{ REG_BA = m37710i_pull_8(); CLK(3); } \
@@ -462,7 +462,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_BRK
 #define OP_BRK()                                                            \
 			REG_PC++; CLK(CLK_OP + CLK_R8 + CLK_IMM);                       \
-			logerror("error M37710: BRK at PC=%06x\n", REG_PB|REG_PC);      \
+			logerror("error M37710: BRK at PC=%06x\n", REG_PG|REG_PC);      \
 			m37710i_interrupt_software(0xfffa)
 
 /* M37710  Branch Always */
@@ -704,7 +704,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_JMPAXI
 #define OP_JMPAXI()                                                         \
 			CLK(CLK_OP + CLK_AXI);                                          \
-			m37710i_jump_16(read_16_AXI(REG_PB | (MAKE_UINT_16(OPER_16_IMM() + REG_X))))
+			m37710i_jump_16(read_16_AXI(REG_PG | (MAKE_UINT_16(OPER_16_IMM() + REG_X))))
 
 /* M37710  Jump absolute long */
 #undef OP_JMPAL
@@ -717,7 +717,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_JSL(MODE)                                                        \
 			CLK(CLK_OP + CLK_W24 + CLK_##MODE + 1);                         \
 			DST = EA_##MODE();                                              \
-			m37710i_push_8(REG_PB>>16);                                       \
+			m37710i_push_8(REG_PG>>16);                                       \
 			m37710i_push_16(REG_PC);                                      \
 			m37710i_jump_24(DST)
 
@@ -733,7 +733,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_JSRAXI
 #define OP_JSRAXI()                                                         \
 			CLK(CLK_OP + CLK_W16 + CLK_AXI);                                \
-			DST = read_16_AXI(REG_PB | (MAKE_UINT_16(OPER_16_IMM() + REG_X))); \
+			DST = read_16_AXI(REG_PG | (MAKE_UINT_16(OPER_16_IMM() + REG_X))); \
 			m37710i_push_16(REG_PC);                                      \
 			m37710i_jump_16(DST)
 
@@ -769,14 +769,14 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_LDM(MODE)                                                        \
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);  \
 			REG_IM2 = EA_##MODE();      \
-			REG_IM = read_8_IMM(REG_PB | REG_PC);        \
+			REG_IM = read_8_IMM(REG_PG | REG_PC);        \
 			REG_PC++;               \
 			write_8_##MODE(REG_IM2, REG_IM)
 #else
 #define OP_LDM(MODE)                                                        \
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE); \
 			REG_IM2 = EA_##MODE();      \
-			REG_IM = read_16_IMM(REG_PB | REG_PC);       \
+			REG_IM = read_16_IMM(REG_PG | REG_PC);       \
 			REG_PC+=2;              \
 			write_16_##MODE(REG_IM2, REG_IM)
 #endif
@@ -787,7 +787,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_BBS(MODE)                                                        \
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);  \
 			REG_IM2 = read_8_NORM(EA_##MODE());     \
-			REG_IM = read_8_IMM(REG_PB | REG_PC);      \
+			REG_IM = read_8_IMM(REG_PG | REG_PC);      \
 			REG_PC++;               \
 			DST = OPER_8_IMM();         \
 			if ((REG_IM2 & REG_IM) == REG_IM)   \
@@ -800,7 +800,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_BBS(MODE)                                                        \
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE); \
 			REG_IM2 = read_16_NORM(EA_##MODE());    \
-			REG_IM = read_16_IMM(REG_PB | REG_PC);     \
+			REG_IM = read_16_IMM(REG_PG | REG_PC);     \
 			REG_PC++;               \
 			REG_PC++;               \
 			DST = OPER_8_IMM();         \
@@ -818,7 +818,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_BBC(MODE)                                                        \
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);  \
 			REG_IM2 = read_8_NORM(EA_##MODE());     \
-			REG_IM = read_8_IMM(REG_PB | REG_PC);      \
+			REG_IM = read_8_IMM(REG_PG | REG_PC);      \
 			REG_PC++;               \
 			DST = OPER_8_IMM();         \
 			if ((REG_IM2 & REG_IM) == 0)        \
@@ -831,7 +831,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_BBC(MODE)                                                        \
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE); \
 			REG_IM2 = read_16_NORM(EA_##MODE());    \
-			REG_IM = read_16_IMM(REG_PB | REG_PC);     \
+			REG_IM = read_16_IMM(REG_PG | REG_PC);     \
 			REG_PC++;               \
 			REG_PC++;               \
 			DST = OPER_8_IMM();         \
@@ -933,7 +933,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_MVN()                                                            \
 			DST = OPER_8_IMM()<<16;                                         \
 			SRC = OPER_8_IMM()<<16;                                         \
-			REG_DB = DST;   \
+			REG_DT = DST;   \
 			REG_A |= REG_B;                                                 \
 			CLK(7);                                             \
 			if (REG_A > 0)                              \
@@ -963,7 +963,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_MVN()                                                            \
 			DST = OPER_8_IMM()<<16;                                         \
 			SRC = OPER_8_IMM()<<16;                                         \
-			REG_DB = DST;   \
+			REG_DT = DST;   \
 			REG_A |= REG_B;                                                 \
 			CLK(7);                                             \
 			if (REG_A > 0)                              \
@@ -997,7 +997,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_MVP()                                                            \
 			DST = OPER_8_IMM()<<16;                                         \
 			SRC = OPER_8_IMM()<<16;                                         \
-			REG_DB = DST;   \
+			REG_DT = DST;   \
 			REG_A |= REG_B;                                                 \
 			CLK(7);                                             \
 			if (REG_A > 0)                                  \
@@ -1027,7 +1027,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_MVP()                                                            \
 			DST = OPER_8_IMM()<<16;                                         \
 			SRC = OPER_8_IMM()<<16;                                         \
-			REG_DB = DST;   \
+			REG_DT = DST;   \
 			REG_A |= REG_B;                                                 \
 			CLK(7);                                             \
 			if (REG_A > 0)                                  \
@@ -1145,26 +1145,26 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_PHT
 #define OP_PHT()                                                            \
 			CLK(CLK_OP + CLK_W8 + 1);                                       \
-			m37710i_push_8(REG_DB>>16)
+			m37710i_push_8(REG_DT>>16)
 
-/* M37710  Push direct register */
+/* M37710  Push direct page register */
 #undef OP_PHD
 #define OP_PHD()                                                            \
 			CLK(CLK_OP + CLK_W16 + 1);                                      \
-			m37710i_push_16(REG_D)
+			m37710i_push_16(REG_DPR)
 
 /* M37710  Push program bank register */
 #undef OP_PHK
 #define OP_PHK()                                                            \
 			CLK(CLK_OP + CLK_W8 + 1);                                       \
-			m37710i_push_8(REG_PB>>16)
+			m37710i_push_8(REG_PG>>16)
 
 /* M37710   Push the Processor Status Register to the stack */
 #undef OP_PHP
 #define OP_PHP()                                                            \
 			CLK(CLK_OP + CLK_W8 + 1);                                       \
 			m37710i_push_8(m_ipl);                                    \
-			m37710i_push_8(m37710i_get_reg_p())
+			m37710i_push_8(m37710i_get_reg_ps())
 
 /* M37710   Pull accumulator from the stack */
 #undef OP_PLA
@@ -1210,19 +1210,19 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #define OP_PLT()                                                            \
 			CLK(CLK_OP + CLK_R8 + 2);                                       \
 			FLAG_N = FLAG_Z = m37710i_pull_8();                             \
-			REG_DB = FLAG_Z << 16
+			REG_DT = FLAG_Z << 16
 
-/* M37710  Pull direct register */
+/* M37710  Pull direct page register */
 #undef OP_PLD
 #define OP_PLD()                                                            \
 			CLK(CLK_OP + CLK_R16 + 2);                                      \
-			REG_D = m37710i_pull_16()
+			REG_DPR = m37710i_pull_16()
 
 /* M37710   Pull the Processor Status Register from the stack */
 #undef OP_PLP
 #define OP_PLP()                                                            \
 			CLK(CLK_OP + CLK_R8 + 2);                                       \
-			m37710i_set_reg_p(m37710i_pull_8());          \
+			m37710i_set_reg_ps(m37710i_pull_8());         \
 			m37710i_set_reg_ipl(m37710i_pull_8());        \
 			m37710i_update_irqs()
 
@@ -1230,14 +1230,14 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_REP
 #define OP_REP()                                                            \
 			CLK(CLK_OP + CLK_R8 + 1);                                       \
-			m37710i_set_reg_p(m37710i_get_reg_p() & ~OPER_8_IMM());   \
+			m37710i_set_reg_ps(m37710i_get_reg_ps() & ~OPER_8_IMM());   \
 			m37710i_update_irqs()
 
 /* M37710  Clear "M" status bit */
 #undef OP_CLM
 #define OP_CLM()                                                            \
 			CLK(CLK_OP + CLK_R8 + 1);                                       \
-			m37710i_set_reg_p(m37710i_get_reg_p() & ~FLAGPOS_M)
+			m37710i_set_reg_ps(m37710i_get_reg_ps() & ~FLAGPOS_M)
 
 /* M37710   Rotate Left the accumulator */
 #undef OP_ROL
@@ -1360,10 +1360,10 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_RTI
 #define OP_RTI()                                                            \
 			CLK(8);                                                         \
-			m37710i_set_reg_p(m37710i_pull_8());                  \
+			m37710i_set_reg_ps(m37710i_pull_8());                  \
 			m37710i_set_reg_ipl(m37710i_pull_8());                    \
 			m37710i_jump_16(m37710i_pull_16());                   \
-			REG_PB = m37710i_pull_8() << 16;                    \
+			REG_PG = m37710i_pull_8() << 16;                    \
 			m37710i_update_irqs()
 
 /* M37710  Return from Subroutine Long */
@@ -1513,13 +1513,13 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_SEP
 #define OP_SEP()                                                            \
 			CLK(CLK_OP + CLK_R8 + 1);                                       \
-			m37710i_set_reg_p(m37710i_get_reg_p() | OPER_8_IMM())
+			m37710i_set_reg_ps(m37710i_get_reg_ps() | OPER_8_IMM())
 
 /* M37710  Set "M" status bit */
 #undef OP_SEM
 #define OP_SEM()                                                            \
 			CLK(CLK_OP + CLK_R8 + 1);                                       \
-			m37710i_set_reg_p(m37710i_get_reg_p() | FLAGPOS_M)
+			m37710i_set_reg_ps(m37710i_get_reg_ps() | FLAGPOS_M)
 
 /* M37710   Store accumulator to memory */
 #undef OP_STA
@@ -1648,59 +1648,59 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
-/* M37710  Transfer accumulator to direct register */
+/* M37710  Transfer accumulator to direct page register */
 #undef OP_TAD
 #if FLAG_SET_M
 #define OP_TAD()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			REG_D = REG_A | REG_B
+			REG_DPR = REG_A | REG_B
 #else
 #define OP_TAD()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			REG_D = REG_A
+			REG_DPR = REG_A
 #endif
 
-/* M37710  Transfer accumulator B to direct register */
+/* M37710  Transfer accumulator B to direct page register */
 #undef OP_TBD
 #if FLAG_SET_M
 #define OP_TBD()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			REG_D = REG_BA | REG_BB
+			REG_DPR = REG_BA | REG_BB
 #else
 #define OP_TBD()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			REG_D = REG_BA
+			REG_DPR = REG_BA
 #endif
 
-/* M37710  Transfer direct register to accumulator */
+/* M37710  Transfer direct page register to accumulator */
 #undef OP_TDA
 #if FLAG_SET_M
 #define OP_TDA()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_Z = REG_D;                                                 \
+			FLAG_Z = REG_DPR;                                               \
 			FLAG_N = NFLAG_16(FLAG_Z);                                      \
-			REG_A = MAKE_UINT_8(REG_D);                                     \
-			REG_B = REG_D & 0xff00
+			REG_A = MAKE_UINT_8(REG_DPR);                                   \
+			REG_B = REG_DPR & 0xff00
 #else
 #define OP_TDA()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_Z = REG_A = REG_D;                                         \
+			FLAG_Z = REG_A = REG_DPR;                                         \
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
-/* M37710  Transfer direct register to accumulator B */
+/* M37710  Transfer direct page register to accumulator B */
 #undef OP_TDB
 #if FLAG_SET_M
 #define OP_TDB()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_Z = REG_D;                                                 \
+			FLAG_Z = REG_DPR;                                               \
 			FLAG_N = NFLAG_16(FLAG_Z);                                      \
-			REG_BA = MAKE_UINT_8(REG_D);                                    \
-			REG_BB = REG_D & 0xff00
+			REG_BA = MAKE_UINT_8(REG_DPR);                                  \
+			REG_BB = REG_DPR & 0xff00
 #else
 #define OP_TDB()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			FLAG_Z = REG_BA = REG_D;                                        \
+			FLAG_Z = REG_BA = REG_DPR;                                        \
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
@@ -1821,7 +1821,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);                          \
 			DST    = EA_##MODE();                                           \
 			REG_IM = read_8_##MODE(DST);                                    \
-			REG_IM2 = read_8_IMM(REG_PB | REG_PC); \
+			REG_IM2 = read_8_IMM(REG_PG | REG_PC); \
 			REG_PC++;           \
 			write_8_##MODE(DST, REG_IM & ~REG_IM2);
 #else
@@ -1829,7 +1829,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);                         \
 			DST    = EA_##MODE();                                           \
 			REG_IM = read_16_##MODE(DST);                                   \
-			REG_IM2 = read_16_IMM(REG_PB | REG_PC);    \
+			REG_IM2 = read_16_IMM(REG_PG | REG_PC);    \
 			REG_PC+=2;          \
 			write_16_##MODE(DST, REG_IM & ~REG_IM2);
 #endif
@@ -1841,7 +1841,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			CLK(CLK_OP + CLK_RMW8 + CLK_W_##MODE);                          \
 			DST    = EA_##MODE();                                           \
 			REG_IM = read_8_##MODE(DST);                                    \
-			REG_IM2 = read_8_IMM(REG_PB | REG_PC); \
+			REG_IM2 = read_8_IMM(REG_PG | REG_PC); \
 			REG_PC++;           \
 			write_8_##MODE(DST, REG_IM | REG_IM2);
 #else
@@ -1849,7 +1849,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 			CLK(CLK_OP + CLK_RMW16 + CLK_W_##MODE);                         \
 			DST    = EA_##MODE();                                           \
 			REG_IM = read_16_##MODE(DST);                                   \
-			REG_IM2 = read_16_IMM(REG_PB | REG_PC);    \
+			REG_IM2 = read_16_IMM(REG_PG | REG_PC);    \
 			REG_PC+=2;          \
 			write_16_##MODE(DST, REG_IM | REG_IM2);
 #endif
@@ -1864,7 +1864,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_LDT
 #define OP_LDT(MODE)    \
 	CLK(CLK_OP + CLK_R8 + CLK_##MODE);  \
-	REG_DB = OPER_8_##MODE()<<16;
+	REG_DT = OPER_8_##MODE()<<16;
 
 
 /* M37710  prefix for B accumulator (0x42) */
@@ -1872,7 +1872,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 #undef OP_PFB
 #define OP_PFB()                                                            \
 			CLK(2);     \
-			REG_IR = read_8_IMM(REG_PB | REG_PC);   \
+			REG_IR = read_8_IMM(REG_PG | REG_PC);   \
 			REG_PC++;   \
 			(this->*m_opcodes42[REG_IR])();
 
@@ -1880,7 +1880,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 /* M37710  prefix for multiply / divide instructions (0x89) */
 #undef OP_PFXM
 #define OP_PFXM()                                                           \
-			REG_IR = read_8_IMM(REG_PB | REG_PC);   \
+			REG_IR = read_8_IMM(REG_PG | REG_PC);   \
 			REG_PC++;   \
 			(this->*m_opcodes89[REG_IR])();
 
@@ -1888,7 +1888,7 @@ void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 /* M37710 unimplemented opcode */
 #undef OP_UNIMP
 #define OP_UNIMP()                                                          \
-	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PB, REG_PPC);
+	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PG, REG_PPC);
 
 /* ======================================================================== */
 /* ======================== OPCODE & FUNCTION TABLES ====================== */
@@ -2497,10 +2497,10 @@ TABLE_FUNCTION(uint32_t, get_reg, (int regnum))
 		case M37710_Y: return REG_Y;
 		case M37710_S: return REG_S;
 		case M37710_PC: return REG_PC;
-		case M37710_PB: return REG_PB >> 16;
-		case M37710_DB: return REG_DB >> 16;
-		case M37710_D: return REG_D;
-		case M37710_P: return m37710i_get_reg_p();
+		case M37710_PG: return REG_PG >> 16;
+		case M37710_DT: return REG_DT >> 16;
+		case M37710_DPR: return REG_DPR;
+		case M37710_PS: return m37710i_get_reg_ps();
 		case M37710_IRQ_STATE: return LINE_IRQ;
 		case STATE_GENPCBASE: return REG_PPC;
 	}
@@ -2513,7 +2513,7 @@ TABLE_FUNCTION(void, set_reg, (int regnum, uint32_t val))
 	{
 		case M37710_PC: REG_PC = MAKE_UINT_16(val); break;
 		case M37710_S: REG_S = MAKE_UINT_16(val); break;
-		case M37710_P: m37710i_set_reg_p(val); break;
+		case M37710_PS: m37710i_set_reg_ps(val); break;
 #if FLAG_SET_M
 		case M37710_A: REG_A = MAKE_UINT_8(val); REG_B = val&0xff00; break;
 		case M37710_B: REG_BA = MAKE_UINT_8(val); REG_BB = val&0xff00; break;
@@ -2540,9 +2540,9 @@ TABLE_FUNCTION(int, execute, (int clocks))
 		do
 		{
 			REG_PPC = REG_PC;
-			M37710_CALL_DEBUGGER(REG_PB | REG_PC);
+			M37710_CALL_DEBUGGER(REG_PG | REG_PC);
 			REG_PC++;
-			REG_IR = read_8_IMM(REG_PB | REG_PPC);
+			REG_IR = read_8_IMM(REG_PG | REG_PPC);
 			(this->*m_opcodes[REG_IR])();
 		} while(CLOCKS > 0);
 		return clocks - CLOCKS;

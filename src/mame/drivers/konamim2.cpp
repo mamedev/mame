@@ -290,10 +290,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
 	DECLARE_WRITE_LINE_MEMBER(ppc2_int);
 
-	DECLARE_WRITE32_MEMBER(cde_sdbg_out);
+	void cde_sdbg_out(uint32_t data);
 
-	DECLARE_WRITE16_MEMBER(ldac_out);
-	DECLARE_WRITE16_MEMBER(rdac_out);
+	void ldac_out(uint16_t data);
+	void rdac_out(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ata_int);
 
@@ -326,12 +326,12 @@ public:
 
 	DECLARE_READ16_MEMBER(konami_ide_r)
 	{
-		return swapendian_int16(m_ata->read_cs0(offset, mem_mask));
+		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
 	}
 
 	DECLARE_WRITE16_MEMBER(konami_ide_w)
 	{
-		m_ata->write_cs0(offset, swapendian_int16(data), mem_mask);
+		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
 	}
 
 private:
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER(konamim2_state::ppc2_int)
 	m_ppc2->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE32_MEMBER(konamim2_state::cde_sdbg_out)
+void konamim2_state::cde_sdbg_out(uint32_t data)
 {
 	if (data == 0xd)
 		putc('\n', stdout);
@@ -406,12 +406,12 @@ WRITE32_MEMBER(konamim2_state::cde_sdbg_out)
 #endif
 }
 
-WRITE16_MEMBER( konamim2_state::ldac_out )
+void konamim2_state::ldac_out(uint16_t data)
 {
 	m_ldac->write(data);
 }
 
-WRITE16_MEMBER( konamim2_state::rdac_out )
+void konamim2_state::rdac_out(uint16_t data)
 {
 	m_rdac->write(data);
 }

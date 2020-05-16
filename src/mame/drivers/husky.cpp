@@ -62,11 +62,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	uint8_t porta_r();
+	void porta_w(uint8_t data);
+	uint8_t portb_r();
+	uint8_t portc_r();
+	void portc_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(serial_tx_w);
 	DECLARE_WRITE8_MEMBER(cursor_w);
 	DECLARE_WRITE8_MEMBER(curinh_w);
@@ -199,7 +199,7 @@ static INPUT_PORTS_START(husky)
 INPUT_PORTS_END
 
 
-READ8_MEMBER(husky_state::porta_r)
+uint8_t husky_state::porta_r()
 {
 	uint8_t data = 0xff;
 
@@ -211,12 +211,12 @@ READ8_MEMBER(husky_state::porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(husky_state::porta_w)
+void husky_state::porta_w(uint8_t data)
 {
 	m_keydata = data;
 }
 
-READ8_MEMBER(husky_state::portb_r)
+uint8_t husky_state::portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -232,7 +232,7 @@ READ8_MEMBER(husky_state::portb_r)
 Bit 2 = Power low warning (1 = Power OK, 0 = Power low)
 Input bits 7,6,4,3,2
 */
-READ8_MEMBER(husky_state::portc_r)
+uint8_t husky_state::portc_r()
 {
 	uint8_t data = 0x23;
 
@@ -245,7 +245,7 @@ READ8_MEMBER(husky_state::portc_r)
 /*
 Output bits 5,1,0
 */
-WRITE8_MEMBER(husky_state::portc_w)
+void husky_state::portc_w(uint8_t data)
 {
 	m_beeper->set_state(!BIT(data, 0));
 	m_rs232->write_rts(BIT(data, 1));

@@ -154,10 +154,10 @@ private:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	DECLARE_READ8_MEMBER(mac_via_in_a);
-	DECLARE_READ8_MEMBER(mac_via_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b);
+	uint8_t mac_via_in_a();
+	uint8_t mac_via_in_b();
+	void mac_via_out_a(uint8_t data);
+	void mac_via_out_b(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);

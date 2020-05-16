@@ -84,10 +84,10 @@ public:
 	DECLARE_WRITE8_MEMBER(DMAgic_w);
 	DECLARE_READ8_MEMBER(CIASelect_r);
 	DECLARE_WRITE8_MEMBER(CIASelect_w);
-	DECLARE_READ8_MEMBER(cia0_porta_r);
-	DECLARE_WRITE8_MEMBER(cia0_porta_w);
-	DECLARE_READ8_MEMBER(cia0_portb_r);
-	DECLARE_WRITE8_MEMBER(cia0_portb_w);
+	uint8_t cia0_porta_r();
+	void cia0_porta_w(uint8_t data);
+	uint8_t cia0_portb_r();
+	void cia0_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
 
 	DECLARE_READ8_MEMBER(dummy_r);
@@ -439,12 +439,12 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 
 }
 
-READ8_MEMBER(c65_state::cia0_porta_r)
+uint8_t c65_state::cia0_porta_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(c65_state::cia0_portb_r)
+uint8_t c65_state::cia0_portb_r()
 {
 	static const char *const c64ports[] = { "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7" };
 	static const char *const c65ports[] = { "C8", "C9" };
@@ -470,13 +470,13 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::cia0_porta_w)
+void c65_state::cia0_porta_w(uint8_t data)
 {
 	m_keyb_c0_c7 = ~data;
 //  printf("%02x\n",m_keyb_c0_c7);
 }
 
-WRITE8_MEMBER(c65_state::cia0_portb_w)
+void c65_state::cia0_portb_w(uint8_t data)
 {
 }
 

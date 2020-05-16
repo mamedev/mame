@@ -102,7 +102,7 @@ READ8_MEMBER(timeplt_state::psurge_protection_r)
 }
 
 // chkun has access to an extra soundchip via ay2 port a
-WRITE8_MEMBER(timeplt_state::chkun_sound_w)
+void timeplt_state::chkun_sound_w(uint8_t data)
 {
 	// d0-d3: P0-P3
 	// d5: /R (unused?)

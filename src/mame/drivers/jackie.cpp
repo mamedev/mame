@@ -84,8 +84,8 @@ private:
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	template<uint8_t Which> DECLARE_WRITE8_MEMBER(reel_ram_w);
 
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void nmi_and_coins_w(uint8_t data);
+	void lamps_w(uint8_t data);
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
 	DECLARE_READ8_MEMBER(expram_r);
@@ -274,7 +274,7 @@ WRITE8_MEMBER(jackie_state::unk_reg_hi_w)
 	show_out();
 }
 
-WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
+void jackie_state::nmi_and_coins_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
@@ -290,7 +290,7 @@ WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(jackie_state::lamps_w)
+void jackie_state::lamps_w(uint8_t data)
 {
 /*
     - Lbits -

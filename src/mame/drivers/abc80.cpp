@@ -219,7 +219,7 @@ void abc80_state::abc80_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::pio_pa_r )
+uint8_t abc80_state::pio_pa_r()
 {
 	/*
 
@@ -247,7 +247,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 	return data;
 }
 
-READ8_MEMBER( abc80_state::pio_pb_r )
+uint8_t abc80_state::pio_pb_r()
 {
 	/*
 
@@ -283,7 +283,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc80_state::pio_pb_w )
+void abc80_state::pio_pb_w(uint8_t data)
 {
 	/*
 

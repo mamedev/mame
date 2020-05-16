@@ -71,12 +71,12 @@ void gscpm_state::gscpm_io(address_map &map)
 
 READ8_MEMBER( gscpm_state::cflash_r )
 {
-	return m_ide->read_cs0(offset, 0xff);
+	return m_ide->cs0_r(offset, 0xff);
 }
 
 WRITE8_MEMBER( gscpm_state::cflash_w )
 {
-	m_ide->write_cs0(offset, data, 0xff);
+	m_ide->cs0_w(offset, data, 0xff);
 }
 
 READ8_MEMBER( gscpm_state::sio_r )

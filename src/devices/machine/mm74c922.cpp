@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16-Key Encoder")
+DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C922 16-Key Encoder")
 DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encoder")
 
 
@@ -72,7 +72,7 @@ void mm74c922_device::device_start()
 
 	// allocate timers
 	m_scan_timer = timer_alloc();
-	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(500)); // approximate rate from a 100n capacitor
 
 	// register for state saving
 	save_item(NAME(m_inhibit));

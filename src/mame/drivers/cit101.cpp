@@ -94,10 +94,8 @@ private:
 	DECLARE_WRITE8_MEMBER(screen_control_w);
 	DECLARE_WRITE8_MEMBER(brightness_w);
 
-	DECLARE_WRITE8_MEMBER(nvr_address_w);
-	DECLARE_READ8_MEMBER(nvr_data_r);
-	DECLARE_WRITE8_MEMBER(nvr_data_w);
-	DECLARE_WRITE8_MEMBER(nvr_control_w);
+	void nvr_address_w(u8 data);
+	void nvr_control_w(u8 data);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -276,23 +274,13 @@ WRITE8_MEMBER(cit101_state::brightness_w)
 	m_brightness = pal5bit(~data & 0x1f);
 }
 
-WRITE8_MEMBER(cit101_state::nvr_address_w)
+void cit101_state::nvr_address_w(u8 data)
 {
 	m_nvr->set_address(data & 0x3f);
 	m_nvr->set_clk(BIT(data, 6));
 }
 
-READ8_MEMBER(cit101_state::nvr_data_r)
-{
-	return m_nvr->data();
-}
-
-WRITE8_MEMBER(cit101_state::nvr_data_w)
-{
-	m_nvr->set_data(data);
-}
-
-WRITE8_MEMBER(cit101_state::nvr_control_w)
+void cit101_state::nvr_control_w(u8 data)
 {
 	m_nvr->set_control(BIT(data, 5), !BIT(data, 4), BIT(data, 7), BIT(data, 6));
 }
@@ -391,8 +379,8 @@ void cit101_state::cit101(machine_config &config)
 
 	i8255_device &ppi(I8255A(config, "ppi", 0));
 	ppi.out_pa_callback().set(FUNC(cit101_state::nvr_address_w));
-	ppi.in_pb_callback().set(FUNC(cit101_state::nvr_data_r));
-	ppi.out_pb_callback().set(FUNC(cit101_state::nvr_data_w));
+	ppi.in_pb_callback().set(m_nvr, FUNC(er2055_device::data));
+	ppi.out_pb_callback().set(m_nvr, FUNC(er2055_device::set_data));
 	ppi.in_pc_callback().set("comm", FUNC(rs232_port_device::cts_r)).lshift(0);
 	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::dcd_r)).lshift(1); // tied to DSR for loopback test
 	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::ri_r)).lshift(2); // tied to CTS for loopback test

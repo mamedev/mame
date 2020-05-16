@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(bw12_state::motor1_w)
 	floppy_motor_on_off();
 }
 
-READ8_MEMBER( bw12_state::ls259_r )
+uint8_t bw12_state::ls259_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_latch->write_bit(offset >> 1, BIT(offset, 0));
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( bw12_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( bw12_state::pia_pa_r )
+uint8_t bw12_state::pia_pa_r()
 {
 	/*
 

@@ -136,10 +136,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(pia_keyboard_r);
-	DECLARE_WRITE8_MEMBER(pia_display_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t pia_keyboard_r();
+	void pia_display_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	TIMER_CALLBACK_MEMBER(ready_start_cb);
@@ -414,7 +414,7 @@ void apple1_state::machine_reset()
 	m_lastports[0] = m_lastports[1] = m_lastports[2] = m_lastports[3] = 0;
 }
 
-READ8_MEMBER(apple1_state::ram_r)
+uint8_t apple1_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -424,7 +424,7 @@ READ8_MEMBER(apple1_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(apple1_state::ram_w)
+void apple1_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram_size)
 	{
@@ -440,12 +440,12 @@ void apple1_state::apple1_map(address_map &map)
 	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);
 }
 
-READ8_MEMBER(apple1_state::pia_keyboard_r)
+uint8_t apple1_state::pia_keyboard_r()
 {
 	return m_transchar | 0x80;  // bit 7 is wired high, similar-ish to the Apple II
 }
 
-WRITE8_MEMBER(apple1_state::pia_display_w)
+void apple1_state::pia_display_w(uint8_t data)
 {
 	data &= 0x7f;   // D7 is ignored by the video h/w
 

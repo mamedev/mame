@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_attr_w);
 	DECLARE_READ8_MEMBER(beep_r);
 	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(piaA_w);
+	void piaA_w(uint8_t data);
 	DECLARE_READ8_MEMBER(keyb_nmi_r);
 	DECLARE_WRITE8_MEMBER(firq_mask_w);
 	DECLARE_READ8_MEMBER(firq_status_r);
@@ -776,7 +776,7 @@ void bml3_state::machine_reset()
 	m_firq_mask = -1; // disable firq
 }
 
-WRITE8_MEMBER(bml3_state::piaA_w)
+void bml3_state::piaA_w(uint8_t data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:

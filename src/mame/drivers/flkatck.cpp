@@ -188,7 +188,7 @@ static GFXDECODE_START( gfx_flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(flkatck_state::volume_callback)
+void flkatck_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

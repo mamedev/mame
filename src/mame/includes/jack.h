@@ -76,7 +76,7 @@ private:
 	DECLARE_WRITE8_MEMBER(jack_colorram_w);
 	DECLARE_READ8_MEMBER(jack_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
-	DECLARE_READ8_MEMBER(timer_r);
+	uint8_t timer_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);

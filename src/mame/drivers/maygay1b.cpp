@@ -158,14 +158,14 @@ void maygay1b_state::cpu0_nmi()
 ***************************************************************************/
 
 // some games might differ..
-WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
+void maygay1b_state::m1_pia_porta_w(uint8_t data)
 {
 	m_vfd->por(data & 0x40);
 	m_vfd->data(data & 0x10);
 	m_vfd->sclk(data & 0x20);
 }
 
-WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
+void maygay1b_state::m1_pia_portb_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -324,15 +324,14 @@ WRITE8_MEMBER(maygay1b_state::reel56_w)
 	awp_draw_reel(machine(),"reel6", *m_reels[5]);
 }
 
-READ8_MEMBER(maygay1b_state::m1_duart_r)
+uint8_t maygay1b_state::m1_duart_r()
 {
 	return ~(m_optic_pattern);
 }
 
-WRITE8_MEMBER(maygay1b_state::m1_meter_w)
+void maygay1b_state::m1_meter_w(uint8_t data)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 	{
 		if ( data & (1 << i) )
 		{
@@ -413,10 +412,9 @@ READ8_MEMBER(maygay1b_state::m1_meter_r)
 	//TODO: Can we just return the AY port A data?
 	return m_meter;
 }
-WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
+void maygay1b_state::m1_lockout_w(uint8_t data)
 {
-	int i;
-	for (i=0; i<6; i++)
+	for (int i=0; i<6; i++)
 	{
 		machine().bookkeeping().coin_lockout_w(i, data & (1 << i) );
 	}
@@ -561,12 +559,12 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
  *
  *************************************/
 
-WRITE8_MEMBER( maygay1b_state::scanlines_w )
+void maygay1b_state::scanlines_w(uint8_t data)
 {
 	m_lamp_strobe = data;
 }
 
-WRITE8_MEMBER( maygay1b_state::lamp_data_w )
+void maygay1b_state::lamp_data_w(uint8_t data)
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
@@ -583,17 +581,17 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 }
 
-READ8_MEMBER( maygay1b_state::kbd_r )
+uint8_t maygay1b_state::kbd_r()
 {
 	return (m_kbd_ports[(m_lamp_strobe&0x07)^4])->read();
 }
 
-WRITE8_MEMBER( maygay1b_state::scanlines_2_w )
+void maygay1b_state::scanlines_2_w(uint8_t data)
 {
 	m_lamp_strobe2 = data;
 }
 
-WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
+void maygay1b_state::lamp_data_2_w(uint8_t data)
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
@@ -636,7 +634,7 @@ WRITE8_MEMBER(maygay1b_state::main_to_mcu_1_w)
 }
 
 
-WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
+void maygay1b_state::mcu_port0_w(uint8_t data)
 {
 #ifdef USE_MCU
 // only during startup
@@ -644,7 +642,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
 #endif
 }
 
-WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
+void maygay1b_state::mcu_port1_w(uint8_t data)
 {
 #ifdef USE_MCU
 	int bit_offset;
@@ -663,7 +661,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 #endif
 }
 
-WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
+void maygay1b_state::mcu_port2_w(uint8_t data)
 {
 #ifdef USE_MCU
 // only during startup
@@ -671,7 +669,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
 #endif
 }
 
-WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
+void maygay1b_state::mcu_port3_w(uint8_t data)
 {
 #ifdef USE_MCU
 // only during startup
@@ -679,7 +677,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
 #endif
 }
 
-READ8_MEMBER(maygay1b_state::mcu_port0_r)
+uint8_t maygay1b_state::mcu_port0_r()
 {
 	uint8_t ret = m_lamp_strobe;
 #ifdef USE_MCU
@@ -693,7 +691,7 @@ READ8_MEMBER(maygay1b_state::mcu_port0_r)
 }
 
 
-READ8_MEMBER(maygay1b_state::mcu_port2_r)
+uint8_t maygay1b_state::mcu_port2_r()
 {
 	// this is read in BOTH the external interrupts
 	// it seems that both the writes from the main cpu go here

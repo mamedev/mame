@@ -126,7 +126,7 @@ void atarigt_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(atarigt_state::cage_irq_callback)
+void atarigt_state::cage_irq_callback(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }

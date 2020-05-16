@@ -18,7 +18,7 @@ READ_LINE_MEMBER(homerun_state::sprite0_r)
 	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;
 }
 
-WRITE8_MEMBER(homerun_state::scrollhi_w)
+void homerun_state::scrollhi_w(u8 data)
 {
 	// d0: scroll y high bit
 	// d1: scroll x high bit
@@ -27,12 +27,12 @@ WRITE8_MEMBER(homerun_state::scrollhi_w)
 	m_scrollx = (m_scrollx & 0xff) | (data << 7 & 0x100);
 }
 
-WRITE8_MEMBER(homerun_state::scrolly_w)
+void homerun_state::scrolly_w(u8 data)
 {
 	m_scrolly = (m_scrolly & 0xff00) | data;
 }
 
-WRITE8_MEMBER(homerun_state::scrollx_w)
+void homerun_state::scrollx_w(u8 data)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
@@ -62,7 +62,7 @@ void homerun_state::banking_w(u8 data)
 	}
 }
 
-WRITE8_MEMBER(homerun_state::videoram_w)
+void homerun_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0xfff);

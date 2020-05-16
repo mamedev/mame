@@ -57,13 +57,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	DECLARE_READ8_MEMBER(mcu_porta_r);
-	DECLARE_WRITE8_MEMBER(mcu_porta_w);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
-	DECLARE_WRITE8_MEMBER(mcu_portc_w);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	WRITE8_MEMBER(pia_pb_w) { mmu(data); }
+	uint8_t mcu_porta_r();
+	void mcu_porta_w(uint8_t data);
+	void mcu_portb_w(uint8_t data);
+	void mcu_portc_w(uint8_t data);
+	uint8_t pia_pa_r();
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data) { mmu(data); }
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 
@@ -123,7 +123,7 @@ void maxaflex_state::mmu(uint8_t new_mmu)
     7   (out) AUDIO
 */
 
-READ8_MEMBER(maxaflex_state::mcu_porta_r)
+uint8_t maxaflex_state::mcu_porta_r()
 {
 	return
 			((m_dsw->read()     << 0) & 0x0f) |
@@ -132,7 +132,7 @@ READ8_MEMBER(maxaflex_state::mcu_porta_r)
 			0xc0;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_porta_w)
+void maxaflex_state::mcu_porta_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -148,7 +148,7 @@ WRITE8_MEMBER(maxaflex_state::mcu_porta_w)
     7   (out)   TOFF - enables/disables user controls
 */
 
-WRITE8_MEMBER(maxaflex_state::mcu_portb_w)
+void maxaflex_state::mcu_portb_w(uint8_t data)
 {
 	const uint8_t diff = data ^ m_portb_out;
 	m_portb_out = data;
@@ -180,7 +180,7 @@ WRITE8_MEMBER(maxaflex_state::mcu_portb_w)
     2   (out)   lamp START
     3   (out)   lamp OVER */
 
-WRITE8_MEMBER(maxaflex_state::mcu_portc_w)
+void maxaflex_state::mcu_portc_w(uint8_t data)
 {
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	constexpr static uint8_t ls48_map[16] =
@@ -283,12 +283,12 @@ static INPUT_PORTS_START( a600xl )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(maxaflex_state::pia_pa_r)
+uint8_t maxaflex_state::pia_pa_r()
 {
 	return atari_input_disabled() ? 0xff : m_joy01.read_safe(0);
 }
 
-READ8_MEMBER(maxaflex_state::pia_pb_r)
+uint8_t maxaflex_state::pia_pb_r()
 {
 	return atari_input_disabled() ? 0xff : m_joy23.read_safe(0);
 }

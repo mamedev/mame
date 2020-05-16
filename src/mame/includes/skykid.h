@@ -31,9 +31,9 @@ public:
 	void init_skykid();
 
 private:
-	DECLARE_WRITE8_MEMBER(inputport_select_w);
-	DECLARE_READ8_MEMBER(inputport_r);
-	DECLARE_WRITE8_MEMBER(skykid_led_w);
+	void inputport_select_w(uint8_t data);
+	uint8_t inputport_r();
+	void skykid_led_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(skykid_subreset_w);
 	DECLARE_WRITE8_MEMBER(skykid_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(skykid_irq_1_ctrl_w);

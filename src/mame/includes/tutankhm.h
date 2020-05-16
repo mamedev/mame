@@ -81,7 +81,7 @@ protected:
 	optional_ioport m_stars_config;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
-	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
+	void galaxian_stars_enable_w(uint8_t data);
 	void stars_init();
 	void stars_init_scramble();
 	void stars_init_bootleg();

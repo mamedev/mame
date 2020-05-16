@@ -697,7 +697,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		m_gpib->write_dio(data);
+		m_gpib->host_dio_w(data);
 	}
 }
 
@@ -780,7 +780,7 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		m_gpib->write_dio(0xff);
+		m_gpib->host_dio_w(0xff);
 		m_gpib->host_nrfd_w(1);
 		m_gpib->host_ndac_w(1);
 	}

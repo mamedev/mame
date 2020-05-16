@@ -147,7 +147,7 @@ void hp48_state::rs232_send_byte()
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-WRITE32_MEMBER( hp48_state::reg_out )
+void hp48_state::reg_out(uint32_t data)
 {
 	LOG(("%s %f hp48_state::reg_out: %03x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -182,7 +182,7 @@ int hp48_state::get_in()
 }
 
 /* CPU reads IN register (keyboard) */
-READ32_MEMBER( hp48_state::reg_in )
+uint32_t hp48_state::reg_in()
 {
 	int in = get_in();
 	LOG(("%s %f hp48_state::reg_in: %04x\n", machine().describe_context(), machine().time().as_double(), in));
@@ -784,7 +784,7 @@ WRITE_LINE_MEMBER( hp48_state::mem_reset )
 
 
 /* CONFIG opcode */
-WRITE32_MEMBER( hp48_state::mem_config )
+void hp48_state::mem_config(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -813,7 +813,7 @@ WRITE32_MEMBER( hp48_state::mem_config )
 
 
 /* UNCFG opcode */
-WRITE32_MEMBER( hp48_state::mem_unconfig )
+void hp48_state::mem_unconfig(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -833,7 +833,7 @@ WRITE32_MEMBER( hp48_state::mem_unconfig )
 
 
 /* C=ID opcode */
-READ32_MEMBER( hp48_state::mem_id )
+uint32_t hp48_state::mem_id()
 {
 	int data = 0; /* 0 = everything is configured */
 
@@ -865,7 +865,7 @@ READ32_MEMBER( hp48_state::mem_id )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-WRITE32_MEMBER( hp48_state::mem_crc )
+void hp48_state::mem_crc(offs_t offset, uint32_t data)
 {
 	/* no CRC for I/O RAM */
 	if (offset >= m_io_addr && offset < m_io_addr + 0x40) return;

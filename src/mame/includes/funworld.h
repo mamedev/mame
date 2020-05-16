@@ -47,8 +47,8 @@ public:
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
 	DECLARE_WRITE8_MEMBER(funworld_colorram_w);
-	DECLARE_WRITE8_MEMBER(funworld_lamp_a_w);
-	DECLARE_WRITE8_MEMBER(funworld_lamp_b_w);
+	void funworld_lamp_a_w(uint8_t data);
+	void funworld_lamp_b_w(uint8_t data);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
@@ -66,8 +66,8 @@ private:
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(question_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
-	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
-	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
+	uint8_t funquiz_ay8910_a_r();
+	uint8_t funquiz_ay8910_b_r();
 
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
