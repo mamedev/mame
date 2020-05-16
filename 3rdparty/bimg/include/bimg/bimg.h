@@ -174,6 +174,7 @@ namespace bimg
 		uint8_t numMips;            //!< Number of MIP maps.
 		uint8_t bitsPerPixel;       //!< Format bits per pixel.
 		bool    cubeMap;            //!< Texture is cubemap.
+		bool	hasAlpha;			//!< Texture utilizes alpha channel.
 	};
 
 	struct ImageContainer
@@ -273,6 +274,7 @@ namespace bimg
 		, bool _hasMips
 		, uint16_t _numLayers
 		, TextureFormat::Enum _format
+		, bool _hasAlpha = false
 		);
 
 	///

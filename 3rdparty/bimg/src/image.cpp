@@ -294,7 +294,7 @@ namespace bimg
 		return numMips;
 	}
 
-	uint32_t imageGetSize(TextureInfo* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _hasMips, uint16_t _numLayers, TextureFormat::Enum _format)
+	uint32_t imageGetSize(TextureInfo* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _hasMips, uint16_t _numLayers, TextureFormat::Enum _format, bool _hasAlpha)
 	{
 		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
 		const uint8_t  bpp         = blockInfo.bitsPerPixel;
@@ -341,6 +341,7 @@ namespace bimg
 			_info->cubeMap   = _cubeMap;
 			_info->storageSize  = size;
 			_info->bitsPerPixel = bpp;
+			_info->hasAlpha = _hasAlpha;
 		}
 
 		return size;
