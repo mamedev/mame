@@ -24,6 +24,7 @@
 #include "audio/nl_spacewar.h"
 #include "audio/nl_speedfrk.h"
 #include "audio/nl_starcas.h"
+#include "audio/nl_starhawk.h"
 #include "audio/nl_sundance.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
@@ -414,6 +415,23 @@ void starhawk_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
+#if STARHAWK_USE_NETLIST
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(starhawk))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_0", "I_OUT_0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_1", "I_OUT_1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_2", "I_OUT_2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_3", "I_OUT_3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_4", "I_OUT_4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:out_7", "I_OUT_7.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(3000.0, 0.0);
+
+#else
+
 	static const char *const sample_names[] =
 	{
 		"*starhawk",
@@ -430,10 +448,14 @@ void starhawk_audio_device::device_add_mconfig(machine_config &config)
 	m_samples->set_channels(5);
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+#endif
 }
 
 void starhawk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 {
+#if !STARHAWK_USE_NETLIST
+
 	// explosion - falling edge
 	if (falling_edge(curvals, oldvals, 0))
 		m_samples->start(0, 0);
@@ -463,6 +485,8 @@ void starhawk_audio_device::inputs_changed(u8 curvals, u8 oldvals)
 		m_samples->start(3, 5, true);
 	if (falling_edge(curvals, oldvals, 7))
 		m_samples->stop(3);
+
+#endif
 }
 
 

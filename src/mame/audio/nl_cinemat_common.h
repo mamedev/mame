@@ -45,6 +45,7 @@
 // alias LS devices to real devices
 #define TTL_74LS04_DIP TTL_7404_DIP     // Hex Inverting Gates
 #define TTL_74LS08_DIP TTL_7408_DIP     // Quad 2-Input AND Gates
+#define TTL_74LS21_DIP TTL_7421_DIP     // Dual 4-Input AND Gates
 #define TTL_74LS75_DIP TTL_7475_DIP     // 4-Bit Bistable Latches with Complementary Outputs
 #define TTL_74LS86_DIP TTL_7486_DIP     // Quad 2-Input Exclusive-OR Gates
 #define TTL_74LS107_DIP TTL_74107_DIP
@@ -107,7 +108,7 @@ static NETLIST_START(_NE556_DIP)
 		 A.DISCH, /* 1DISCH |1     ++    14| VCC    */ A.VCC,
 		A.THRESH, /* 1THRES |2           13| 2DISCH */ B.DISCH,
 		  A.CONT, /*  1CONT |3           12| 2THRES */ B.THRESH,
-		 A.RESET, /* 1RESET |4   TL182   11| 2CONT  */ B.CONT,
+		 A.RESET, /* 1RESET |4   NE556   11| 2CONT  */ B.CONT,
 	       A.OUT, /*   1OUT |5           10| 2RESET */ B.RESET,
 		  A.TRIG, /*  1TRIG |6            9| 2OUT   */ B.OUT,
 		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
