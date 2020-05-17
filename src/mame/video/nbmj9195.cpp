@@ -116,7 +116,7 @@ void nbmj9195_state::blitter_w(int offset, int data, int vram)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::clutsel_w)
+void nbmj9195_state::clutsel_w(uint8_t data)
 {
 	m_clutsel = data;
 }
@@ -126,7 +126,7 @@ void nbmj9195_state::clut_w(int offset, int data, int vram)
 	m_clut[vram][((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
+void nbmj9195_state::gfxflag2_w(uint8_t data)
 {
 	m_gfxflag2 = data;
 }

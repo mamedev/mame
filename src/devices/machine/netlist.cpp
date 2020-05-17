@@ -639,9 +639,9 @@ netlist::setup_t &netlist_mame_device::setup()
 	return m_netlist->setup();
 }
 
-void netlist_mame_device::register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name)
+void netlist_mame_device::register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name)
 {
-	setup.register_source<netlist_source_memregion_t>(dev, pstring(name));
+	parser.register_source<netlist_source_memregion_t>(dev, pstring(name));
 }
 
 void netlist_mame_analog_input_device::write(const double val)
@@ -781,16 +781,14 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 {
 	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
-	pstring dfqn = nlstate.parser().build_fqn(dname);
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
-	//static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
+	auto dev = nlstate.make_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
-	nlstate.register_device(dfqn, std::move(dev));
+	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);
 }
 
@@ -816,15 +814,14 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 {
 	pstring pin(m_in);
 	pstring dname = "OUT_" + pin;
-	pstring dfqn = nlstate.parser().build_fqn(dname);
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
+	auto dev = nlstate.make_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
-	nlstate.register_device(dfqn, std::move(dev));
+	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);
 }
 
@@ -1086,14 +1083,14 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 		bool err=false;
 		bool v = plib::pstonum_ne<bool>(p, err);
 		if (err)
-			lsetup.parser().log().warning("NL_STATS: invalid value {1}", p);
+			lsetup.log().warning("NL_STATS: invalid value {1}", p);
 		else
 			lnetlist->exec().enable_stats(v);
 	}
 
 	// register additional devices
 
-	nl_register_devices(lsetup);
+	nl_register_devices(lsetup.parser());
 
 	/* let sub-devices add sources and do stuff prior to parsing */
 	for (device_t &d : subdevices())
@@ -1102,7 +1099,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Preparse subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->pre_parse_action(*lnetlist);
+			sdev->pre_parse_action(lsetup.parser());
 		}
 	}
 
@@ -1112,7 +1109,6 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 
 	m_setup_func(lsetup.parser());
 
-#if 1
 	/* let sub-devices tweak the netlist */
 	for (device_t &d : subdevices())
 	{
@@ -1123,8 +1119,6 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 			sdev->custom_netlist_additions(*lnetlist);
 		}
 	}
-	lsetup.prepare_to_run();
-#endif
 }
 
 plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
@@ -1135,6 +1129,7 @@ plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_ch
 		// enable validation mode
 		lnetlist->set_extended_validation(true);
 		common_dev_start(lnetlist.get());
+		lnetlist->setup().prepare_to_run();
 
 		for (device_t &d : subdevices())
 		{
@@ -1184,6 +1179,7 @@ void netlist_mame_device::device_start()
 	}
 
 	common_dev_start(m_netlist.get());
+	m_netlist->setup().prepare_to_run();
 
 	m_netlist->save(*this, m_rem, pstring(this->name()), "m_rem");
 	m_netlist->save(*this, m_div, pstring(this->name()), "m_div");
@@ -1334,9 +1330,9 @@ void netlist_mame_cpu_device::device_start()
 }
 
 
-void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) const
+void netlist_mame_cpu_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	lsetup.parser().factory().add<nld_analog_callback>( "NETDEV_CALLBACK", "-", __FILE__);
+	parser.factory().add<nld_analog_callback>( "NETDEV_CALLBACK", "-", std::move(PSOURCELOC()));
 }
 
 uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
@@ -1487,10 +1483,10 @@ void netlist_mame_sound_device::device_start()
 
 }
 
-void netlist_mame_sound_device::nl_register_devices(netlist::setup_t &lsetup) const
+void netlist_mame_sound_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	lsetup.parser().factory().add<nld_sound_out>("NETDEV_SOUND_OUT", "+CHAN", __FILE__);
-	lsetup.parser().factory().add<nld_sound_in>("NETDEV_SOUND_IN", "-", __FILE__);
+	parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT", "+CHAN", std::move(PSOURCELOC()));
+	parser.factory().add<nld_sound_in>("NETDEV_SOUND_IN", "-", std::move(PSOURCELOC()));
 }
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

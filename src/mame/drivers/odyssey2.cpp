@@ -61,7 +61,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER(t1_read);
 	void odyssey2_palette(palette_device &palette) const;
 
-	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+	void scanline_postprocess(uint16_t data);
 
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
@@ -84,12 +84,12 @@ protected:
 
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(bus_read);
-	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(p1_read);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_READ8_MEMBER(p2_read);
-	DECLARE_WRITE8_MEMBER(p2_write);
+	uint8_t bus_read();
+	void bus_write(uint8_t data);
+	uint8_t p1_read();
+	void p1_write(uint8_t data);
+	uint8_t p2_read();
+	void p2_write(uint8_t data);
 };
 
 class g7400_state : public odyssey2_state
@@ -111,14 +111,14 @@ private:
 	void g7400_palette(palette_device &palette) const;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(p2_write);
+	void p2_write(uint8_t data);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
 	void i8243_p4_w(uint8_t data);
 	void i8243_p5_w(uint8_t data);
 	void i8243_p6_w(uint8_t data);
 	void i8243_p7_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+	void scanline_postprocess(uint16_t data);
 
 	void g7400_io(address_map &map);
 
@@ -416,7 +416,7 @@ WRITE8_MEMBER(g7400_state::io_write)
 }
 
 
-WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
+void odyssey2_state::scanline_postprocess(uint16_t data)
 {
 	int vpos = data;
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
@@ -434,7 +434,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 }
 
 
-WRITE16_MEMBER(g7400_state::scanline_postprocess)
+void g7400_state::scanline_postprocess(uint16_t data)
 {
 	int vpos = data;
 	int y = vpos - i8244_device::START_Y - 5;
@@ -489,7 +489,7 @@ READ_LINE_MEMBER(odyssey2_state::t1_read)
 }
 
 
-READ8_MEMBER(odyssey2_state::p1_read)
+uint8_t odyssey2_state::p1_read()
 {
 	uint8_t data = m_p1;
 
@@ -497,7 +497,7 @@ READ8_MEMBER(odyssey2_state::p1_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::p1_write)
+void odyssey2_state::p1_write(uint8_t data)
 {
 	m_p1 = data;
 	m_lum = ( data & 0x80 ) >> 4;
@@ -505,7 +505,7 @@ WRITE8_MEMBER(odyssey2_state::p1_write)
 }
 
 
-READ8_MEMBER(odyssey2_state::p2_read)
+uint8_t odyssey2_state::p2_read()
 {
 	uint8_t h = 0xFF;
 	int i, j;
@@ -542,20 +542,20 @@ READ8_MEMBER(odyssey2_state::p2_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::p2_write)
+void odyssey2_state::p2_write(uint8_t data)
 {
 	m_p2 = data;
 }
 
 
-WRITE8_MEMBER(g7400_state::p2_write)
+void g7400_state::p2_write(uint8_t data)
 {
 	m_p2 = data;
 	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 
-READ8_MEMBER(odyssey2_state::bus_read)
+uint8_t odyssey2_state::bus_read()
 {
 	uint8_t data = 0xff;
 
@@ -573,7 +573,7 @@ READ8_MEMBER(odyssey2_state::bus_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::bus_write)
+void odyssey2_state::bus_write(uint8_t data)
 {
 	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }

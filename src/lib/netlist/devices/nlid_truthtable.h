@@ -11,6 +11,7 @@
 #include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "plib/ptypes.h"
 #include "plib/putil.h"
 
 #define USE_TT_ALTERNATIVE (0)
@@ -20,29 +21,12 @@ namespace netlist
 namespace devices
 {
 
-	template<unsigned bits>
-	struct need_bytes_for_bits
-	{
-		enum { value =
-			bits <= 8       ?   1 :
-			bits <= 16      ?   2 :
-			bits <= 32      ?   4 :
-								8
-		};
-	};
-
-	template<unsigned bits> struct uint_for_size;
-	template<> struct uint_for_size<1> { using type = uint_least8_t; };
-	template<> struct uint_for_size<2> { using type = uint_least16_t; };
-	template<> struct uint_for_size<4> { using type = uint_least32_t; };
-	template<> struct uint_for_size<8> { using type = uint_least64_t; };
-
 	template<std::size_t m_NI, std::size_t m_NO>
 	class NETLIB_NAME(truthtable_t) : public device_t
 	{
 	public:
 
-		using type_t = typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type;
+		using type_t = typename plib::least_type_for_bits<m_NO + m_NI>::type;
 
 		static constexpr const std::size_t m_num_bits = m_NI;
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
@@ -217,13 +201,14 @@ namespace factory
 	{
 	public:
 		truthtable_base_element_t(const pstring &name,
-			const pstring &def_param, const pstring &sourcefile);
+			const pstring &def_param, plib::source_location &&sourceloc);
 
 		std::vector<pstring> m_desc;
 		pstring m_family_name;
 	};
 
-	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, const pstring &sourcefile);
+	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc,
+		plib::source_location &&sourceloc);
 
 } // namespace factory
 } // namespace netlist

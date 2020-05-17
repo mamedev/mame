@@ -290,7 +290,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
-	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
+	uint8_t pia_ic5_porta_track_r();
 	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
 	DECLARE_READ16_MEMBER( mpu4_vid_vidram_r );
@@ -531,7 +531,7 @@ READ8_MEMBER(mpu4vid_state::bt471_r )
  *
  *************************************/
 
-READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
+uint8_t mpu4vid_state::pia_ic5_porta_track_r()
 {
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
 	mainboard. As per usual, they've taken the cheap route here, reading and processing the

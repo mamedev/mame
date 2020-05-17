@@ -240,7 +240,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( ic10_w );
+	void ic10_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( unkout_w );
 
 	void nightmare_map(address_map &map);
@@ -316,7 +316,7 @@ READ_LINE_MEMBER( nightmare_state::ef2_r )
 }
 
 
-WRITE8_MEMBER( nightmare_state::ic10_w )
+void nightmare_state::ic10_w(uint8_t data)
 {
   /*
     7 - EEPROM Di

@@ -26,7 +26,7 @@ Hardware notes:
 - expansion slot at top-tight (dummy empty cartridge by default)
 
 Expansion modules: (* denotes not dumped)
-- *Strong Play Module
+- Strong Play Module
 - Classical Style Super Strong
 - *Hyper Modern Super Strong
 

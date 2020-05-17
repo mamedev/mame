@@ -20,7 +20,7 @@ Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
 - *Gruenfeld Edition - Master Chess Openings
 - *Morphy Edition - Master Chess
-- *Capablanca Edition - Master Chess Endgame
+- Capablanca Edition - Master Chess Endgame
 - Sandy Edition - Master Chess (German language version of Morphy)
 - Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel
@@ -113,22 +113,17 @@ private:
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
 
-	u8 m_inp_mux;
-	u16 m_digit_data;
-	u8 m_shift_data;
-	u8 m_shift_clock;
-	u32 m_cart_mask;
-	u8 m_overlay;
+	u8 m_inp_mux = 0;
+	u16 m_digit_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
+
+	u32 m_cart_mask = 0;
+	u8 m_overlay = 0;
 };
 
 void ggm_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_digit_data = 0;
-	m_shift_data = 0;
-	m_shift_clock = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));
@@ -176,9 +171,8 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	// keypad overlay
-	std::string overlay(image.get_feature("overlay"));
-	m_overlay = std::stoul(overlay, nullptr, 0) & 0xf;
+	// keypad overlay (will return 0 if it's not defined)
+	m_overlay = strtoul(image.get_feature("overlay"), nullptr, 0) & 0xf;
 
 	// extra ram (optional)
 	if (image.get_feature("ram"))

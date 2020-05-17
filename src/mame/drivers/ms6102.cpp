@@ -97,8 +97,8 @@ private:
 	DECLARE_WRITE8_MEMBER(pic_w);
 	IRQ_CALLBACK_MEMBER(ms6102_int_ack);
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(vdack_w);
+	u8 memory_read_byte(offs_t offset);
+	void vdack_w(u8 data);
 
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
@@ -106,7 +106,7 @@ private:
 	DECLARE_READ8_MEMBER(misc_status_r);
 	u16 m_dmaaddr;
 
-	DECLARE_WRITE8_MEMBER(kbd_uart_clock_w);
+	void kbd_uart_clock_w(u8 data);
 
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER(ms6102_state::irq_w)
 	m_maincpu->set_input_line(I8085_INTR_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(ms6102_state::memory_read_byte)
+u8 ms6102_state::memory_read_byte(offs_t offset)
 {
 	m_dmaaddr = offset;
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -219,7 +219,7 @@ READ8_MEMBER(ms6102_state::misc_status_r)
 	return status;
 }
 
-WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
+void ms6102_state::kbd_uart_clock_w(u8 data)
 {
 	m_kbd_uart->write_tcp(BIT(data, 1));
 	m_kbd_uart->write_rcp(BIT(data, 1));
@@ -236,7 +236,7 @@ WRITE8_MEMBER(ms6102_state::pic_w)
 	m_pic->b_sgs_w(~data);
 }
 
-WRITE8_MEMBER(ms6102_state::vdack_w)
+void ms6102_state::vdack_w(u8 data)
 {
 	if(m_dmaaddr & 1)
 		m_crtc1->dack_w(data);

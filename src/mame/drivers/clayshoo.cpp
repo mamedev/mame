@@ -35,10 +35,10 @@ public:
 	void clayshoo(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(analog_reset_w);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_WRITE8_MEMBER(input_port_select_w);
-	DECLARE_READ8_MEMBER(input_port_r);
+	void analog_reset_w(uint8_t data);
+	uint8_t analog_r();
+	void input_port_select_w(uint8_t data);
+	uint8_t input_port_r();
 	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
 	uint8_t difficulty_input_port_r(int bit);
@@ -68,7 +68,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(clayshoo_state::input_port_select_w)
+void clayshoo_state::input_port_select_w(uint8_t data)
 {
 	m_input_port_select = data;
 }
@@ -92,7 +92,7 @@ uint8_t clayshoo_state::difficulty_input_port_r( int bit )
 }
 
 
-READ8_MEMBER(clayshoo_state::input_port_r)
+uint8_t clayshoo_state::input_port_r()
 {
 	uint8_t ret = 0;
 
@@ -132,7 +132,7 @@ static attotime compute_duration( device_t *device, int analog_pos )
 }
 
 
-WRITE8_MEMBER(clayshoo_state::analog_reset_w)
+void clayshoo_state::analog_reset_w(uint8_t data)
 {
 	/* reset the analog value, and start the two times that will fire
 	   off in a short period proportional to the position of the
@@ -145,7 +145,7 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 }
 
 
-READ8_MEMBER(clayshoo_state::analog_r)
+uint8_t clayshoo_state::analog_r()
 {
 	return m_analog_port_val;
 }

@@ -123,8 +123,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_brgb);
 	DECLARE_WRITE_LINE_MEMBER(write_brgc);
 
-	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	void ksm_ppi_porta_w(uint8_t data);
+	void ksm_ppi_portc_w(uint8_t data);
 
 	void ksm_io(address_map &map);
 	void ksm_mem(address_map &map);
@@ -247,13 +247,13 @@ void ksm_state::video_start()
 	m_brg = timer_alloc(TIMER_ID_BRG);
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
+void ksm_state::ksm_ppi_porta_w(uint8_t data)
 {
 	LOG("PPI port A line %d\n", data);
 	m_video.line = data;
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
+void ksm_state::ksm_ppi_portc_w(uint8_t data)
 {
 	brgc = (data >> 5) & 3;
 

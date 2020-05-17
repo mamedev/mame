@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,Barry Rodewald
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
     Husky Hunter, Hunter 2
@@ -68,10 +68,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(portc_r);
+	uint8_t keyboard_r();
+	uint8_t portb_r();
+	void keyboard_w(uint8_t data);
+	uint8_t portc_r();
 	DECLARE_WRITE8_MEMBER(display_ctrl_w);
 	DECLARE_WRITE8_MEMBER(serial_tx_w);
 	DECLARE_WRITE8_MEMBER(serial_dtr_w);
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_CONFSETTING(0x04, "Low")
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::keyboard_r )
+uint8_t hunter2_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 	for (int i = 0; i < 7; i++)
@@ -225,7 +225,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::portb_r )
+uint8_t hunter2_state::portb_r()
 {
 	uint8_t res = 0x00;
 
@@ -235,7 +235,7 @@ READ8_MEMBER( hunter2_state::portb_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::keyboard_w )
+void hunter2_state::keyboard_w(uint8_t data)
 {
 	m_keydata = data;
 }
@@ -247,7 +247,7 @@ Bit 1 = DCD (inverted from RS-232 line)
 Bit 2 = Power low warning (0 = Power OK, 1 = Power low)
 Bit 3 = TXCLK (inverted from RS-232 line)
 */
-READ8_MEMBER( hunter2_state::portc_r )
+uint8_t hunter2_state::portc_r()
 {
 	uint8_t res = 0x28;
 

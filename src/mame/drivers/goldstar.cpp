@@ -1106,7 +1106,7 @@ WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
+void wingco_state::fl7w4_outc802_w(uint8_t data)
 {
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
@@ -8509,19 +8509,19 @@ static GFXDECODE_START( gfx_cm97 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(wingco_state::system_outputa_w)
+void wingco_state::system_outputa_w(uint8_t data)
 {
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputb_w)
+void wingco_state::system_outputb_w(uint8_t data)
 {
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputc_w)
+void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
@@ -8531,12 +8531,12 @@ WRITE8_MEMBER(wingco_state::system_outputc_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
+void goldstar_state::ay8910_outputa_w(uint8_t data)
 {
 	//popmessage("ay8910_outputa_w %02x",data);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
+void goldstar_state::ay8910_outputb_w(uint8_t data)
 {
 	//popmessage("ay8910_outputb_w %02x",data);
 }
@@ -16773,31 +16773,6 @@ ROM_END
 ROM_START( cmtetrsa )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cm89-tetri-9.u81",  0x10000,  0x10000, CRC(75e0c101) SHA1(6dc4f7c43f0f4e21d621f3c42cb1709d6b730c53) )
-/*
-  Need checks and fixes
-
-  3800+ --> 5800+
-  9800+ --> 3800+
-
-*/
-//  ROM_COPY( "maincpu", 0x1c000, 0x0000, 0x1000 )      /* src-dest-size ok */
-//  ROM_COPY( "maincpu", 0x16000, 0x1000, 0x1000 )      /* src-dest-size ok */
-//  ROM_COPY( "maincpu", 0x14000, 0x2000, 0x1000 )      /* src-dest-size ok */
-//  ROM_COPY( "maincpu", 0x1a000, 0x3000, 0x1000 )      /* src-dest-size ok (some calls to high 5xxx appear here, maybe split in 0x800?) */
-//  ROM_COPY( "maincpu", 0x15000, 0x4000, 0x1000 )      /* src-dest-size ok */
-//  ROM_COPY( "maincpu", 0x11000, 0x6000, 0x1000 )      /* src-dest-size ok */
-//  ROM_COPY( "maincpu", 0x13000, 0x8000, 0x1000 )      /* src-dest-size ok */
-
-//  ROM_COPY( "maincpu", 0x17000, 0x5000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x10000, 0x7000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x18000, 0x9000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x19000, 0xa000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x12000, 0xb000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x1b000, 0xc000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x1d000, 0xd000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x1e000, 0xe000, 0x1000 )      /* src-dest-size */
-//  ROM_COPY( "maincpu", 0x1f000, 0xf000, 0x1000 )      /* src-dest-size */
-
 	ROM_COPY( "maincpu", 0x1c000, 0x0000, 0x0800 )      /* src-dest-size */ // #01
 	ROM_COPY( "maincpu", 0x19800, 0x0800, 0x0800 )      /* src-dest-size */ // #02
 	ROM_COPY( "maincpu", 0x16000, 0x1000, 0x0800 )      /* src-dest-size */ // #03
@@ -16807,14 +16782,14 @@ ROM_START( cmtetrsa )
 	ROM_COPY( "maincpu", 0x1a000, 0x3000, 0x0800 )      /* src-dest-size */ // #07
 	ROM_COPY( "maincpu", 0x18800, 0x3800, 0x0800 )      /* src-dest-size */ // #08
 	ROM_COPY( "maincpu", 0x10000, 0x4000, 0x0800 )      /* src-dest-size */ // #09
-	ROM_COPY( "maincpu", 0x15000, 0x4800, 0x0800 )      /* src-dest-size */ // #10
-	ROM_COPY( "maincpu", 0x14800, 0x5000, 0x0800 )      /* src-dest-size */ // #11
+	ROM_COPY( "maincpu", 0x15800, 0x4800, 0x0800 )      /* src-dest-size */ // #10
+	ROM_COPY( "maincpu", 0x13000, 0x5000, 0x0800 )      /* src-dest-size */ // #11
 	ROM_COPY( "maincpu", 0x1a800, 0x5800, 0x0800 )      /* src-dest-size */ // #12
 	ROM_COPY( "maincpu", 0x11000, 0x6000, 0x0800 )      /* src-dest-size */ // #13
 	ROM_COPY( "maincpu", 0x11800, 0x6800, 0x0800 )      /* src-dest-size */ // #14
 	ROM_COPY( "maincpu", 0x1b000, 0x7000, 0x0800 )      /* src-dest-size */ // #15
-	ROM_COPY( "maincpu", 0x1f000, 0x7800, 0x0800 )      /* src-dest-size */ // #16
-	ROM_COPY( "maincpu", 0x1f800, 0x8000, 0x0800 )      /* src-dest-size */ // #17
+	ROM_COPY( "maincpu", 0x16800, 0x7800, 0x0800 )      /* src-dest-size */ // #16
+	ROM_COPY( "maincpu", 0x17000, 0x8000, 0x0800 )      /* src-dest-size */ // #17
 	ROM_COPY( "maincpu", 0x13800, 0x8800, 0x0800 )      /* src-dest-size */ // #18
 	ROM_COPY( "maincpu", 0x19000, 0x9000, 0x0800 )      /* src-dest-size */ // #19
 	ROM_COPY( "maincpu", 0x1b800, 0x9800, 0x0800 )      /* src-dest-size */ // #20
@@ -16822,7 +16797,8 @@ ROM_START( cmtetrsa )
 	ROM_COPY( "maincpu", 0x10800, 0xa800, 0x0800 )      /* src-dest-size */ // #22
 	ROM_COPY( "maincpu", 0x18000, 0xb000, 0x0800 )      /* src-dest-size */ // #23
 	ROM_COPY( "maincpu", 0x12800, 0xb800, 0x0800 )      /* src-dest-size */ // #24
-	ROM_COPY( "maincpu", 0x13000, 0xc000, 0x0800 )      /* src-dest-size */ // #25
+	ROM_COPY( "maincpu", 0x15000, 0xc000, 0x0800 )      /* src-dest-size */ // #25
+	ROM_COPY( "maincpu", 0x14800, 0xc800, 0x0800 )      /* src-dest-size */ // #26
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "cm89-tetri-7.u16", 0x00000,  0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
@@ -16838,7 +16814,6 @@ ROM_START( cmtetrsa )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "cm89-tetri-8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	/* proms taken from cmv4, probably wrong  */
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -16846,7 +16821,6 @@ ROM_START( cmtetrsa )
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
-
 
 /*
   Tetris + Cherry Master (+K, Canada Version, encrypted)
@@ -19327,7 +19301,7 @@ GAME( 200?, ss2001,    0,        ss2001,   cmaster,   cmaster_state,  empty_init
 GAMEL( 198?, cmpacman,  0,        cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 1)", 0,                        layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmpacmana, cmpacman, cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 2)", 0,                        layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmtetris,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
+GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              0,                        layout_cmpacman )
 GAMEL( 198?, cmtetrsb,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
 GAMEL( 1997, crazybon,  0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona, crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon )

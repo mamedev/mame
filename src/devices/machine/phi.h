@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
 
-	DECLARE_WRITE8_MEMBER(bus_dio_w);
+	void bus_dio_w(uint8_t data);
 
 	void set_ext_signal(phi_488_signal_t signal , int state);
 

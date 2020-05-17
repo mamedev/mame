@@ -99,7 +99,7 @@ private:
 	DECLARE_READ8_MEMBER(earom_read);
 	DECLARE_WRITE8_MEMBER(earom_write);
 	void earom_control_w(uint8_t data);
-	DECLARE_READ8_MEMBER(caterplr_unknown_r);
+	uint8_t caterplr_unknown_r();
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
 	DECLARE_READ8_MEMBER(multiped_eeprom_r);

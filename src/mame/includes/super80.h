@@ -38,6 +38,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
@@ -74,7 +75,6 @@ protected:
 	u8 m_key_pressed;
 	u8 m_last_data;
 	bool m_boot_in_progress;
-	std::unique_ptr<u8[]> m_ram;
 	void super80m_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -84,6 +84,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
@@ -137,13 +139,16 @@ public:
 protected:
 	void super80v_map(address_map &map);
 	void super80v_io(address_map &map);
+	void machine_reset() override;
+	void machine_start() override;
 	void port3f_w(u8 data);
 	u8 port3e_r();
+	std::unique_ptr<u8[]> m_vram;
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<mc6845_device> m_crtc;
@@ -155,12 +160,10 @@ protected:
 	required_device<floppy_connector> m_floppy3;
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
-	void low_w(u16 offset, u8 data);
-	void high_w(u16 offset, u8 data);
-	u8 low_r(u16 offset);
-	u8 high_r(u16 offset);
+	void low_w(offs_t offset, u8 data);
+	void high_w(offs_t offset, u8 data);
+	u8 low_r(offs_t offset);
+	u8 high_r(offs_t offset);
 };
 
 class super80r_state : public super80v_state
@@ -171,14 +174,11 @@ public:
 	void super80r(machine_config &config);
 
 private:
-
-	void machine_reset() override;
-	void machine_start() override;
-	void low_w(u16 offset, u8 data);
-	void high_w(u16 offset, u8 data);
 	void super80r_map(address_map &map);
-	u8 low_r(u16 offset);
-	u8 high_r(u16 offset);
+	void low_w(offs_t offset, u8 data);
+	void high_w(offs_t offset, u8 data);
+	u8 low_r(offs_t offset);
+	u8 high_r(offs_t offset);
 };
 
 

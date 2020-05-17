@@ -195,8 +195,8 @@ private:
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(iolines_r);
-	DECLARE_WRITE8_MEMBER(iolines_w);
+	uint8_t iolines_r();
+	void iolines_w(uint8_t data);
 	bool m_flash_bank_select;
 };
 
@@ -227,7 +227,7 @@ private:
 
 //TODO: eeprom  24c01 & 24c02
 // TODO: untangle, kill hacks
-READ8_MEMBER(ssfindo_state::iolines_r)
+uint8_t ssfindo_state::iolines_r()
 {
 	if(m_flashType == 1)
 		return 0;
@@ -235,7 +235,7 @@ READ8_MEMBER(ssfindo_state::iolines_r)
 		return machine().rand();
 }
 
-WRITE8_MEMBER(ssfindo_state::iolines_w)
+void ssfindo_state::iolines_w(uint8_t data)
 {
 	if(data&0xc0)
 		m_adrLatch=0;

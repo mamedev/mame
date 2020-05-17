@@ -41,7 +41,7 @@ public:
 	void survival_palette(palette_device &palette) const;
 	void pleiads_palette(palette_device &palette) const;
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(survival_protection_r);
+	uint8_t survival_protection_r();
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 
 	void condor(machine_config &config);

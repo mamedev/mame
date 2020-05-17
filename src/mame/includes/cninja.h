@@ -58,8 +58,8 @@ public:
 	uint16_t m_priority;
 
 	template<int Chip> DECLARE_WRITE16_MEMBER(cninja_pf_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
+	void sound_bankswitch_w(uint8_t data);
+	void cninjabl2_oki_bank_w(uint8_t data);
 	void init_mutantf();
 	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);

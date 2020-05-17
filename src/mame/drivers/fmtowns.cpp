@@ -656,12 +656,12 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 	}
 }
 
-READ16_MEMBER(towns_state::towns_fdc_dma_r)
+uint16_t towns_state::towns_fdc_dma_r()
 {   uint16_t data = m_fdc->data_r();
 	return data;
 }
 
-WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
+void towns_state::towns_fdc_dma_w(uint16_t data)
 {
 	m_fdc->data_w(data);
 }
@@ -1734,7 +1734,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 	}
 }
 
-READ16_MEMBER(towns_state::towns_cdrom_dma_r)
+uint16_t towns_state::towns_cdrom_dma_r()
 {
 	if(m_towns_cd.buffer_ptr >= 2048)
 		return 0x00;
@@ -2012,12 +2012,12 @@ WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
-READ16_MEMBER(towns_state::towns_scsi_dma_r)
+uint16_t towns_state::towns_scsi_dma_r()
 {
 	return m_scsi->fmscsi_data_r();
 }
 
-WRITE16_MEMBER(towns_state::towns_scsi_dma_w)
+void towns_state::towns_scsi_dma_w(uint16_t data)
 {
 	m_scsi->fmscsi_data_w(data & 0xff);
 }
@@ -2783,7 +2783,7 @@ void towns_state::machine_reset()
 	m_towns_fm_irq_flag = 0;
 }
 
-READ8_MEMBER(towns_state::get_slave_ack)
+uint8_t towns_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic_slave->acknowledge();

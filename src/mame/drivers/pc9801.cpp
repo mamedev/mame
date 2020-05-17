@@ -499,22 +499,22 @@ WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
 
 READ16_MEMBER(pc9801_state::ide_cs0_r)
 {
-	return m_ide[m_ide_sel]->read_cs0(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs0_r(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs0_w)
 {
-	m_ide[m_ide_sel]->write_cs0(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs0_w(offset, data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::ide_cs1_r)
 {
-	return m_ide[m_ide_sel]->read_cs1(offset, mem_mask);
+	return m_ide[m_ide_sel]->cs1_r(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 {
-	m_ide[m_ide_sel]->write_cs1(offset, data, mem_mask);
+	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
 
 READ8_MEMBER( pc9801_state::sasi_data_r )

@@ -6,8 +6,6 @@ license:CC0
 
 <softwarelist name="fidel_sc6" description="Fidelity SC6 Modules">
 
-<!-- Sensory Chess Challenger 6 -->
-
 	<software name="sc6">
 		<description>SC6: original program</description>
 		<year>1982</year>

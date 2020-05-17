@@ -158,17 +158,17 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 	return 0;
 }
 
-WRITE8_MEMBER(lordgun_state::fake_w)
+void lordgun_state::fake_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::fake2_w)
+void lordgun_state::fake2_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
+void lordgun_state::lordgun_eeprom_w(uint8_t data)
 {
 	int i;
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 	m_old = data;
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
+void lordgun_state::aliencha_eeprom_w(uint8_t data)
 {
 	if (~data & ~0xf8)
 	{
@@ -224,7 +224,7 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 }
 
 
-READ8_MEMBER(lordgun_state::aliencha_dip_r)
+uint8_t lordgun_state::aliencha_dip_r()
 {
 	switch (m_aliencha_dip_sel & 0x70)
 	{
@@ -238,7 +238,7 @@ READ8_MEMBER(lordgun_state::aliencha_dip_r)
 	}
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_dip_w)
+void lordgun_state::aliencha_dip_w(uint8_t data)
 {
 	m_aliencha_dip_sel = data;
 }
@@ -347,7 +347,7 @@ void lordgun_state::soundmem_map(address_map &map)
 	map(0xf000, 0xffff).ram();
 }
 
-WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
+void lordgun_state::lordgun_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 1) & 1);
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);

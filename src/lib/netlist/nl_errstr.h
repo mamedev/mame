@@ -87,7 +87,7 @@ namespace netlist
 	PERRMSGV(MF_MODEL_NUMBER_CONVERSION_ERROR,      4, "Can't convert {1}={2} to {3} for model {4}")
 	PERRMSGV(MF_NOT_FOUND_IN_SOURCE_COLLECTION,     1, "unable to find {1} in sources collection")
 
-	PERRMSGV(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3,    3, "Overwriting {1} old <{2}> new <{3}>")
+	PERRMSGV(MI_OVERWRITING_PARAM_1_OLD_2_NEW_3,    3, "Overwriting {1} old <{2}> new <{3}>")
 	PERRMSGV(MW_CONNECTING_1_TO_ITSELF,             1, "Connecting net {1} to itself.")
 	PERRMSGV(MW_CONNECTING_1_TO_2_SAME_NET,         3, "Connecting terminals {1} and {2} which are already both on net {3}")
 	PERRMSGV(ME_NC_PIN_1_WITH_CONNECTIONS,          1, "Found NC (not connected) terminal {1} with connections")
@@ -98,6 +98,15 @@ namespace netlist
 
 	PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,             1, "Found terminal {1} without a net")
 	PERRMSGV(MF_TERMINALS_WITHOUT_NET,              0, "Found terminals without a net")
+	PERRMSGV(ME_TRISTATE_NO_PROXY_FOUND_2,			2,
+		"Tristate output {1} on device {2} is not connected to a proxy. You "
+		"need to set parameter FORCE_TRISTATE_LOGIC for device {2} if "
+		"tristate enable inputs are all connected to fixed inputs. If this "
+		"is not the case: Review your netlist. Something is wrong.")
+	PERRMSGV(ME_TRISTATE_PROXY_FOUND_2,				2,
+		"The tristate output {1} on device {2} is connected to an analog net "
+		"but has been forced to act as a logic output. Parameter "
+		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
 
 	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Will be removed")
 

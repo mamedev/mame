@@ -317,7 +317,7 @@ READ_LINE_MEMBER(polepos_state::auto_start_r)
 	return m_auto_start_mask;
 }
 
-WRITE8_MEMBER(polepos_state::out)
+void polepos_state::out(uint8_t data)
 {
 // no start lamps in pole position
 //  output().set_led_value(1,data & 1);
@@ -331,26 +331,26 @@ WRITE_LINE_MEMBER(polepos_state::lockout)
 	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_rom_r)
+uint8_t polepos_state::namco_52xx_rom_r(offs_t offset)
 {
 	uint32_t length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_si_r)
+uint8_t polepos_state::namco_52xx_si_r()
 {
 	/* pulled to +5V */
 	return 1;
 }
 
-READ8_MEMBER(polepos_state::namco_53xx_k_r)
+uint8_t polepos_state::namco_53xx_k_r()
 {
 	/* hardwired to 0 */
 	return 0;
 }
 
-READ8_MEMBER(polepos_state::steering_changed_r)
+uint8_t polepos_state::steering_changed_r()
 {
 	/* read the current steering value and update our delta */
 	uint8_t steer_new = ioport("STEER")->read();
@@ -372,7 +372,7 @@ READ8_MEMBER(polepos_state::steering_changed_r)
 	return m_steer_accum & 1;
 }
 
-READ8_MEMBER(polepos_state::steering_delta_r)
+uint8_t polepos_state::steering_delta_r()
 {
 	return m_steer_delta;
 }

@@ -121,6 +121,8 @@ namespace plib
 		: m_file(std::move(file)), m_func(std::move(func)), m_line(line), m_col(0)
 		{ }
 
+		PCOPYASSIGNMOVE(source_location, default)
+
 		unsigned line() const noexcept { return m_line; }
 		unsigned column() const noexcept { return m_col; }
 		pstring file_name() const noexcept { return m_file; }

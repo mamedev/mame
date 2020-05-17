@@ -100,7 +100,7 @@ void softbox_device::softbox_io(address_map &map)
 
 READ8_MEMBER( softbox_device::ppi0_pa_r )
 {
-	return m_bus->read_dio() ^ 0xff;
+	return m_bus->dio_r() ^ 0xff;
 }
 
 WRITE8_MEMBER( softbox_device::ppi0_pb_w )

@@ -57,8 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(subreset_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);

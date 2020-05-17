@@ -8,7 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#define NL_AUTO_DEVICES 1
+#define NL_AUTO_DEVICES 0
 
 #include "plib/ppreprocessor.h"
 #include "plib/pstream.h"
@@ -84,13 +84,11 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 // FIXME: Need to pass in parameter definition
 #define LOCAL_LIB_ENTRY_1(name)                                                \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, "", __FILE__);
+		setup.register_lib_entry(# name, "", PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY_2(name, param_spec)                                    \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, param_spec, __FILE__);
-
-//#define LOCAL_LIB_ENTRY(...) PMSVC_VARARG_BUG(PCONCAT, (LOCAL_LIB_ENTRY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
 
@@ -128,7 +126,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truthtable_create(desc, __FILE__);       \
+		setup.truthtable_create(desc, PSOURCELOC());       \
 	}
 
 namespace netlist
@@ -222,11 +220,12 @@ namespace netlist
 	class models_t
 	{
 	public:
-		using model_map_t = std::unordered_map<pstring, pstring>;
+		using raw_map_t = std::unordered_map<pstring, pstring>;
+		using map_t = std::unordered_map<pstring, pstring>;
 		class model_t
 		{
 		public:
-			model_t(const pstring &model, const model_map_t &map)
+			model_t(const pstring &model, const map_t &map)
 			: m_model(model), m_map(map) { }
 
 			pstring value_str(const pstring &entity) const;
@@ -236,22 +235,24 @@ namespace netlist
 			pstring type() const { return value_str("COREMODEL"); }
 
 		private:
-			static pstring model_string(const model_map_t &map);
+			static pstring model_string(const map_t &map);
 
 			const pstring m_model; // only for error messages
-			const model_map_t &m_map;
+			const map_t &m_map;
 		};
 
-		void register_model(const pstring &model_in);
+		models_t(const raw_map_t &models)
+		: m_models(models)
+		{}
 
 		model_t get_model(const pstring &model);
 
 	private:
 
-		void model_parse(const pstring &model, model_map_t &map);
+		void model_parse(const pstring &model, map_t &map);
 
-		std::unordered_map<pstring, pstring> m_models;
-		std::unordered_map<pstring, model_map_t> m_cache;
+		const raw_map_t &m_models;
+		std::unordered_map<pstring, map_t> m_cache;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -268,6 +269,7 @@ namespace netlist
 			std::unordered_map<pstring, pstring>        m_alias;
 			std::vector<link_t>                         m_links;
 			std::unordered_map<pstring, pstring>        m_param_values;
+			models_t::raw_map_t 						m_models;
 
 			// need to preserve order of device creation ...
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
@@ -275,9 +277,9 @@ namespace netlist
 			std::vector<std::pair<pstring, pstring>>    m_defparams;
 		};
 
-		nlparse_t(log_type &log);
+		nlparse_t(log_type &log, abstract_t &abstract);
 
-		void register_model(const pstring &model_in) { m_models.register_model(model_in); }
+		void register_model(const pstring &model_in);
 		void register_alias(const pstring &alias, const pstring &out);
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
 		void register_dip_alias_arr(const pstring &terms);
@@ -307,7 +309,7 @@ namespace netlist
 			register_param(param, static_cast<nl_fptype>(value));
 		}
 
-		void register_lib_entry(const pstring &name, const pstring &paramdef, const pstring &sourcefile);
+		void register_lib_entry(const pstring &name, const pstring &paramdef, plib::source_location &&sourceloc);
 
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
@@ -321,7 +323,7 @@ namespace netlist
 			m_sources.add_source(std::move(src));
 		}
 
-		void truthtable_create(tt_desc &desc, const pstring &sourcefile);
+		void truthtable_create(tt_desc &desc, plib::source_location &&sourceloc);
 
 		// handle namespace
 
@@ -368,13 +370,7 @@ namespace netlist
 		log_type &log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		models_t &models() noexcept { return m_models; }
-		const models_t &models() const noexcept { return m_models; }
-
 		plib::psource_t::stream_ptr get_data_stream(const pstring &name);
-
-		abstract_t &result() { return m_abstract; }
-		const abstract_t &result() const { return m_abstract; }
 
 	private:
 		// FIXME: stale? - remove later
@@ -382,12 +378,11 @@ namespace netlist
 
 		plib::ppreprocessor::defines_map_type       m_defines;
 		plib::psource_collection_t<>                m_includes;
-		models_t                                    m_models;
 		std::stack<pstring>                         m_namespace_stack;
 		plib::psource_collection_t<>                m_sources;
 		// FIXME: convert to hash and deal with sorting in nltool
 		factory::list_t                             m_factory;
-		abstract_t                                  m_abstract;
+		abstract_t                                 &m_abstract;
 
 		log_type &m_log;
 		unsigned m_frontier_cnt;
@@ -439,6 +434,9 @@ namespace netlist
 
 		void prepare_to_run();
 
+		models_t &models() noexcept { return m_models; }
+		const models_t &models() const noexcept { return m_models; }
+
 		netlist_state_t &nlstate() { return m_nlstate; }
 		const netlist_state_t &nlstate() const { return m_nlstate; }
 
@@ -448,11 +446,13 @@ namespace netlist
 		log_type &log() noexcept;
 		const log_type &log() const noexcept;
 
+		// FIXME: needed from matrix_solver_t
+		void add_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
+
 	private:
 
 		void resolve_inputs();
 		pstring resolve_alias(const pstring &name) const;
-		void delete_empty_nets();
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
@@ -469,8 +469,17 @@ namespace netlist
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
+		// net manipulations
+
+		void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
+		void move_connections(detail::net_t &net, detail::net_t &dest_net);
+		void delete_empty_nets();
+
+		nlparse_t::abstract_t                       m_abstract;
 		nlparse_t                                   m_parser;
 		netlist_state_t                             &m_nlstate;
+
+		models_t                                    m_models;
 
 		// FIXME: currently only used during setup
 		devices::nld_netlistparams                  *m_netlist_params;

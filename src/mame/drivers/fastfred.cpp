@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER(fastfred_state::imago_dma_irq_w)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
+void fastfred_state::imago_sprites_bank_w(uint8_t data)
 {
 	m_imago_sprites_bank = (data & 2) >> 1;
 }
@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
+void fastfred_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }

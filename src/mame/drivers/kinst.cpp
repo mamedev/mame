@@ -374,25 +374,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 
 READ32_MEMBER(kinst_state::ide_r)
 {
-	return m_ata->read_cs0(offset / 2, mem_mask);
+	return m_ata->cs0_r(offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_w)
 {
-	m_ata->write_cs0(offset / 2, data, mem_mask);
+	m_ata->cs0_w(offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::ide_extra_r)
 {
-	return m_ata->read_cs1(6, 0xff);
+	return m_ata->cs1_r(6, 0xff);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_extra_w)
 {
-	m_ata->write_cs1(6, data, 0xff);
+	m_ata->cs1_w(6, data, 0xff);
 }
 
 

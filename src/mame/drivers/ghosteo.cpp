@@ -122,20 +122,20 @@ private:
 	DECLARE_READ32_MEMBER(bballoon_speedup_r);
 	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
 
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void qs1000_p1_w(uint8_t data);
+	void qs1000_p2_w(uint8_t data);
+	void qs1000_p3_w(uint8_t data);
 
 	int m_rom_pagesize;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
-	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_command_w );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_address_w );
-	DECLARE_READ8_MEMBER(s3c2410_nand_data_r );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_data_w );
+	uint32_t s3c2410_gpio_port_r(offs_t offset);
+	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
+	uint32_t s3c2410_core_pin_r(offs_t offset);
+	void s3c2410_nand_command_w(uint8_t data);
+	void s3c2410_nand_address_w(uint8_t data);
+	uint8_t s3c2410_nand_data_r();
+	void s3c2410_nand_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
@@ -168,15 +168,15 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
+void ghosteo_state::qs1000_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p2_w )
+void ghosteo_state::qs1000_p2_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
+void ghosteo_state::qs1000_p3_w(uint8_t data)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
@@ -193,7 +193,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 
 static const uint8_t security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
 
-READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
+uint32_t ghosteo_state::s3c2410_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_bballoon_port[offset];
 	switch (offset)
@@ -213,7 +213,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(ghosteo_state::s3c2410_gpio_port_w)
+void ghosteo_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 {
 	uint32_t old_value = m_bballoon_port[offset];
 	m_bballoon_port[offset] = data;
@@ -258,7 +258,7 @@ NCON : NAND flash memory address step selection
 
 */
 
-READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
+uint32_t ghosteo_state::s3c2410_core_pin_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)
@@ -272,7 +272,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 
 // NAND
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
+void ghosteo_state::s3c2410_nand_command_w(uint8_t data)
 {
 	struct nand_t &nand = m_nand;
 	#if NAND_LOG
@@ -296,7 +296,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 	}
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
+void ghosteo_state::s3c2410_nand_address_w(uint8_t data)
 {
 	struct nand_t &nand = m_nand;
 	#if NAND_LOG
@@ -330,7 +330,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 	}
 }
 
-READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
+uint8_t ghosteo_state::s3c2410_nand_data_r()
 {
 	struct nand_t &nand = m_nand;
 	uint8_t data = 0;
@@ -376,7 +376,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 	return data;
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
+void ghosteo_state::s3c2410_nand_data_w(uint8_t data)
 {
 	#if NAND_LOG
 	logerror( "s3c2410_nand_data_w %02X\n", data);

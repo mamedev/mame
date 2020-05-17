@@ -37,8 +37,9 @@ public:
 	{ }
 
 	void astrocde(machine_config &config);
+
 private:
-	DECLARE_READ8_MEMBER(inputs_r);
+	uint8_t inputs_r(offs_t offset);
 	DECLARE_MACHINE_START(astrocde);
 
 	void astrocade_io(address_map &map);
@@ -105,7 +106,7 @@ void astrocde_home_state::astrocade_io(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_home_state::inputs_r)
+uint8_t astrocde_home_state::inputs_r(offs_t offset)
 {
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();

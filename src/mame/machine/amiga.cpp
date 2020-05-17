@@ -1073,7 +1073,7 @@ CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
 	return m_fdc->ciaapra_r();
 }
 
-WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
+void amiga_state::cia_0_port_a_write(uint8_t data)
 {
 	// bit 0, kickstart overlay
 	m_overlay->set_bank(BIT(data, 0));
@@ -1091,7 +1091,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 	update_int2();
 }
 
-READ8_MEMBER( amiga_state::cia_1_port_a_read )
+uint8_t amiga_state::cia_1_port_a_read()
 {
 	uint8_t data = 0;
 
@@ -1109,7 +1109,7 @@ READ8_MEMBER( amiga_state::cia_1_port_a_read )
 	return data;
 }
 
-WRITE8_MEMBER( amiga_state::cia_1_port_a_write )
+void amiga_state::cia_1_port_a_write(uint8_t data)
 {
 	if (m_rs232)
 	{

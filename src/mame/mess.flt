@@ -294,6 +294,7 @@ fidel_desdis.cpp
 fidel_eag68k.cpp
 fidel_elite.cpp
 fidel_excel.cpp
+fidel_msc.cpp
 fidel_phantom.cpp
 fidel_sc12.cpp
 fidel_sc6.cpp
@@ -462,6 +463,7 @@ kim1.cpp
 konin.cpp
 korgds8.cpp
 korgdss1.cpp
+korgdvp1.cpp
 korgdw8k.cpp
 korgm1.cpp
 korgz3.cpp
@@ -631,7 +633,7 @@ notetaker.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
-novag_presto.cpp
+novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
 novag_supremo.cpp

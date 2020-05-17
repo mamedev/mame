@@ -230,14 +230,14 @@ READ8_MEMBER(pacland_state::input_r)
 	return r;
 }
 
-WRITE8_MEMBER(pacland_state::coin_w)
+void pacland_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	machine().bookkeeping().coin_counter_w(0, ~data & 2);
 	machine().bookkeeping().coin_counter_w(1, ~data & 4);
 }
 
-WRITE8_MEMBER(pacland_state::led_w)
+void pacland_state::led_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 3);
 	m_leds[1] = BIT(data, 4);

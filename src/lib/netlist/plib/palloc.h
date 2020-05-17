@@ -30,45 +30,59 @@ namespace plib {
 	// Standard arena_deleter
 	//============================================================
 
-	template <typename P, typename T>
+	template <typename P, typename T, typename A = void>
 	struct arena_deleter
 	{
-		//using arena_storage_type = P *;
-		using arena_storage_type = typename std::conditional<P::is_stateless, P, P *>::type;
 
-		template <typename X, typename Y = void>
-		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) const noexcept
-		{ return *x;}
+	};
 
-		template <typename X, typename Y = void *>
-		typename std::enable_if<std::remove_pointer<X>::type::is_stateless, X&>::type
-		getref(X &x, Y y = nullptr) const noexcept
-		{
-			unused_var(y);
-			return x;
-		}
+
+	template <typename P, typename T>
+	struct arena_deleter<P, T, typename std::enable_if<!P::is_stateless>::type>
+	{
+		using arena_storage_type = P *;
 
 		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
 		: m_a(a) { }
 
-#if 1
 		template<typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
 		arena_deleter(const arena_deleter<P, U> &rhs) noexcept
 		: m_a(rhs.m_a) { }
-#else
-		template<typename PU, typename U, typename = typename
-			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		arena_deleter(const arena_deleter<PU, U> &rhs) : m_a(rhs.m_a) { }
-#endif
+
 		void operator()(T *p) noexcept
 		{
 			// call destructor
 			p->~T();
-			getref(m_a).deallocate(p, sizeof(T));
+			m_a->deallocate(p, sizeof(T));
 		}
 	//private:
 		arena_storage_type m_a;
+	};
+
+	template <typename P, typename T>
+	struct arena_deleter<P, T, typename std::enable_if<P::is_stateless>::type>
+	{
+		using arena_storage_type = P;
+
+		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		{
+			plib::unused_var(a);
+		}
+
+		template<typename U, typename = typename
+			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		arena_deleter(const arena_deleter<P, U> &rhs) noexcept
+		{
+			plib::unused_var(rhs);
+		}
+
+		void operator()(T *p) noexcept
+		{
+			// call destructor
+			p->~T();
+			P::deallocate(p, sizeof(T));
+		}
 	};
 
 	//============================================================

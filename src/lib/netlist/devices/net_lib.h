@@ -35,6 +35,7 @@
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
 #include "netlist/macro/nlm_ttl74xx.h"
+#include "netlist/macro/nlm_roms.h"
 
 #include "nld_7448.h"
 
@@ -46,13 +47,14 @@
 #include "nld_system.h"
 
 #include "nld_2102A.h"
-#include "nld_2716.h"
 #include "nld_4006.h"
+#include "nld_4013.h"
 #include "nld_4020.h"
 #include "nld_4066.h"
 #include "nld_4316.h"
 #include "nld_74107.h"
 #include "nld_74123.h"
+#include "nld_74125.h"
 #include "nld_74153.h"
 #include "nld_74161.h"
 #include "nld_74164.h"
@@ -78,8 +80,6 @@
 #include "nld_7497.h"
 #include "nld_74ls629.h"
 #include "nld_82S115.h"
-#include "nld_82S123.h"
-#include "nld_82S126.h"
 #include "nld_82S16.h"
 #include "nld_9310.h"
 #include "nld_9316.h"
@@ -95,6 +95,8 @@
 
 #include "nld_r2r_dac.h"
 
+#include "nld_roms.h"
+
 #include "nld_schmitt.h"
 
 #include "nld_tristate.h"
@@ -105,6 +107,7 @@
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
 #include "netlist/macro/nlm_ttl74xx.h"
+#include "netlist/macro/nlm_roms.h"
 
 #include "netlist/analog/nld_bjt.h"
 #include "netlist/analog/nld_fourterm.h"

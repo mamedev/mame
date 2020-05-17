@@ -281,6 +281,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
 	MAME_DIR .. "src/mame/drivers/bailey.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
+	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/electra.cpp",
 	MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",

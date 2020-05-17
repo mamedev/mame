@@ -44,7 +44,7 @@ private:
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(port_C_w);
+	void port_C_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 

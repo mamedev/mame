@@ -76,9 +76,9 @@ private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
+	uint8_t ppi_portb_r();
+	uint8_t ppi_portc_r();
+	void ppi_porta_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

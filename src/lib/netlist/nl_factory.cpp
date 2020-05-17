@@ -27,15 +27,16 @@ namespace factory {
 		NETLIB_UPDATEI() { }
 	};
 
-	element_t::element_t(const pstring &name, const pstring &def_param, const pstring &sourcefile)
+	element_t::element_t(const pstring &name, const pstring &def_param,
+		plib::source_location &&sourceloc)
 		: m_name(name), m_def_param(def_param),
-		  m_sourcefile(sourcefile)
+		  m_sourceloc(sourceloc)
 	{
 	}
 
 	element_t::element_t(const pstring &name, const pstring &def_param)
 		: m_name(name), m_def_param(def_param),
-		  m_sourcefile("<unknown>")
+		  m_sourceloc("<unknown>", 1)
 	{
 	}
 

@@ -114,7 +114,7 @@ void namcos2_state::reset_all_subcpus(int state)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::sound_reset_w)
+void namcos2_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(namcos2_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos2_state::system_reset_w)
+void namcos2_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 

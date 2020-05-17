@@ -373,16 +373,6 @@ protected:
 	virtual void device_reset() override;
 };
 
-class ams40041_device : public mc6845_device
-{
-public:
-	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
 class ams40489_device : public mc6845_device
 {
 public:
@@ -481,7 +471,6 @@ DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
 DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
-DECLARE_DEVICE_TYPE(AMS40041, ams40041_device)
 DECLARE_DEVICE_TYPE(AMS40489, ams40489_device)
 DECLARE_DEVICE_TYPE(MOS8563,  mos8563_device)
 DECLARE_DEVICE_TYPE(MOS8568,  mos8568_device)

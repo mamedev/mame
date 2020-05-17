@@ -143,7 +143,7 @@ Dumped by Chackn
 
 */
 
-WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
+void angelkds_state::angelkds_cpu_bank_write(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);   // shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }

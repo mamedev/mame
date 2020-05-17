@@ -870,7 +870,7 @@ void turbo_state::turbo(machine_config &config)
 	m_i8255_3->in_pb_callback().set_ioport("DSW2");
 	m_i8255_3->out_pc_callback().set(FUNC(turbo_state::turbo_ppi3c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // clock = H1
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
@@ -914,7 +914,7 @@ void turbo_state::subroc3d(machine_config &config)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::subroc3d_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::subroc3d_sound_c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
@@ -961,7 +961,7 @@ void turbo_state::buckrog(machine_config &config)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::buckrog_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi1c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
 	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines

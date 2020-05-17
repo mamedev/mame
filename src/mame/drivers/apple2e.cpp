@@ -369,7 +369,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 	DECLARE_READ8_MEMBER(memexp_r);
 	DECLARE_WRITE8_MEMBER(memexp_w);
-	DECLARE_READ8_MEMBER(nsc_backing_r);
+	uint8_t nsc_backing_r(offs_t offset);
 
 	void apple2cp(machine_config &config);
 	void laser128ex2(machine_config &config);
@@ -2380,7 +2380,7 @@ uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
 	return m_ds1315->read(slotbias + offset);
 }
 
-READ8_MEMBER(apple2e_state::nsc_backing_r) { return m_rom_ptr[offset]; }
+uint8_t apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
 
 READ8_MEMBER(apple2e_state::c100_r)  { return read_slot_rom(1, offset); }
 READ8_MEMBER(apple2e_state::c100_int_r)  { return read_int_rom(0x100, offset); }

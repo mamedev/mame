@@ -31,9 +31,7 @@ namespace netlist
 		, m_ABCD(*this, {"A", "B", "C", "D"}, NETLIB_DELEGATE(9316_base, abcd))
 		, m_Q(*this, { "QA", "QB", "QC", "QD" })
 		, m_cnt(*this, "m_cnt", 0)
-		, m_abcd(*this, "m_abcd", 0)
-		, m_loadq(*this, "m_loadq", 0)
-		, m_ent(*this, "m_ent", 0)
+		//, m_abcd(*this, "m_abcd", 0)
 		, m_power_pins(*this)
 		{
 		}
@@ -43,16 +41,14 @@ namespace netlist
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
 			m_cnt = 0;
-			m_abcd = 0;
+			//m_abcd = 0;
 		}
 
 		NETLIB_UPDATEI()
 		{
 			const auto CLRQ(m_CLRQ());
-			m_ent = m_ENT();
-			m_loadq = m_LOADQ();
 
-			if (((m_loadq ^ 1) || (m_ent && m_ENP())) && (!ASYNC || CLRQ))
+			if (((m_LOADQ() ^ 1) || (m_ENT() && m_ENP())) && (!ASYNC || CLRQ))
 			{
 				m_CLK.activate_lh();
 			}
@@ -61,11 +57,11 @@ namespace netlist
 				m_CLK.inactivate();
 				if (ASYNC && !CLRQ && (m_cnt>0))
 				{
-					update_outputs_all(0, NLTIME_FROM_NS(36));
 					m_cnt = 0;
+					m_Q.push(m_cnt, NLTIME_FROM_NS(36));
 				}
 			}
-			m_RC.push(m_ent && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			m_RC.push(m_ENT() && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 
 
@@ -73,21 +69,22 @@ namespace netlist
 		{
 			if (!ASYNC && !m_CLRQ())
 			{
-					update_outputs_all(0, NLTIME_FROM_NS(36));
-					m_cnt = 0;
+				m_cnt = 0;
+				m_Q.push(m_cnt, NLTIME_FROM_NS(36));
 			}
 			else
 			{
-				auto cnt = (m_loadq ? (m_cnt + 1) & MAXCNT: m_abcd);
-				m_RC.push(m_ent && (cnt == MAXCNT), NLTIME_FROM_NS(27));
-				update_outputs_all(cnt, NLTIME_FROM_NS(20));
-				m_cnt = cnt;
+				//const auto cnt = (m_LOADQ() ? (m_cnt + 1) & MAXCNT: m_abcd);
+				const auto cnt = (m_LOADQ() ? (m_cnt + 1) & MAXCNT: m_ABCD());
+				m_RC.push(m_ENT() && (cnt == MAXCNT), NLTIME_FROM_NS(27));
+				m_Q.push(cnt, NLTIME_FROM_NS(20));
+				m_cnt = static_cast<unsigned>(cnt);
 			}
 		}
 
 		NETLIB_HANDLERI(abcd)
 		{
-			m_abcd = static_cast<unsigned>((m_ABCD[0]() << 0) | (m_ABCD[1]() << 1) | (m_ABCD[2]() << 2) | (m_ABCD[3]() << 3));
+			//m_abcd = static_cast<unsigned>(m_ABCD());
 		}
 
 		logic_input_t m_CLK;
@@ -106,18 +103,9 @@ namespace netlist
 		/* counter state */
 		state_var<unsigned> m_cnt;
 		/* cached pins */
-		state_var<unsigned> m_abcd;
-		state_var_sig m_loadq;
-		state_var_sig m_ent;
+		//state_var<unsigned> m_abcd;
 		nld_power_pins m_power_pins;
 
-		void update_outputs_all(unsigned cnt, netlist_time out_delay) noexcept
-		{
-			m_Q[0].push((cnt >> 0) & 1, out_delay);
-			m_Q[1].push((cnt >> 1) & 1, out_delay);
-			m_Q[2].push((cnt >> 2) & 1, out_delay);
-			m_Q[3].push((cnt >> 3) & 1, out_delay);
-		}
 	};
 
 	template <bool ASYNC>

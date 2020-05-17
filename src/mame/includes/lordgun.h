@@ -84,13 +84,13 @@ private:
 	DECLARE_READ16_MEMBER(lordgun_gun_1_y_r);
 	DECLARE_WRITE16_MEMBER(soundlatch_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(fake_w);
-	DECLARE_WRITE8_MEMBER(fake2_w);
-	DECLARE_WRITE8_MEMBER(lordgun_eeprom_w);
-	DECLARE_WRITE8_MEMBER(aliencha_eeprom_w);
-	DECLARE_READ8_MEMBER(aliencha_dip_r);
-	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
-	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
+	void fake_w(uint8_t data);
+	void fake2_w(uint8_t data);
+	void lordgun_eeprom_w(uint8_t data);
+	void aliencha_eeprom_w(uint8_t data);
+	uint8_t aliencha_dip_r();
+	void aliencha_dip_w(uint8_t data);
+	void lordgun_okibank_w(uint8_t data);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 

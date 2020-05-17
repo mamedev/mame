@@ -102,8 +102,8 @@ private:
 	DECLARE_READ8_MEMBER(royalqn_comm_r);
 	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
+	uint8_t input_1p_r();
+	uint8_t input_2p_r();
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(sexygal_soundram_r);
 	DECLARE_READ8_MEMBER(sexygal_unknown_sound_r);
@@ -309,7 +309,7 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 	//printf("%02x\n", m_mux_data);
 }
 
-READ8_MEMBER(nightgal_state::input_1p_r)
+uint8_t nightgal_state::input_1p_r()
 {
 	uint8_t cr_clear = m_io_cr_clear->read();
 
@@ -328,7 +328,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
 }
 
-READ8_MEMBER(nightgal_state::input_2p_r)
+uint8_t nightgal_state::input_2p_r()
 {
 	uint8_t coin_port = m_io_coins->read();
 

@@ -422,7 +422,7 @@ void powerbls_state::powerbls_map(address_map &map)
     Sound MCU mapping
 */
 
-READ8_MEMBER(sslam_state::playmark_snd_command_r)
+uint8_t sslam_state::playmark_snd_command_r()
 {
 	uint8_t data = 0;
 
@@ -434,12 +434,12 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 	return data;
 }
 
-WRITE8_MEMBER(sslam_state::playmark_oki_w)
+void sslam_state::playmark_oki_w(uint8_t data)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
+void sslam_state::playmark_snd_control_w(uint8_t data)
 {
 	m_oki_control = data;
 

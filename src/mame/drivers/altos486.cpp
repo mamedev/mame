@@ -28,7 +28,7 @@ public:
 	void altos486(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(read_rmx_ack);
+	uint8_t read_rmx_ack(offs_t offset);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
 	DECLARE_READ16_MEMBER(mmu_io_r);
@@ -49,7 +49,7 @@ private:
 	uint8_t m_prot[256];
 };
 
-READ8_MEMBER(altos486_state::read_rmx_ack)
+uint8_t altos486_state::read_rmx_ack(offs_t offset)
 {
 	if(offset == 4)
 		return m_maincpu->int_callback(*this, 0);

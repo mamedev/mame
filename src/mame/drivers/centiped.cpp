@@ -616,7 +616,7 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
  *
  *************************************/
 
-READ8_MEMBER(centiped_state::caterplr_unknown_r)
+uint8_t centiped_state::caterplr_unknown_r()
 {
 	return machine().rand() % 0xff;
 }

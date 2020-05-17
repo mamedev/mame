@@ -68,7 +68,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1,(data >> 1) & 0x01);
 }
 
-READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
+uint8_t ddribble_state::ddribble_vlm5030_busy_r()
 {
 	return machine().rand(); /* patch */
 	/* FIXME: remove ? */
@@ -78,7 +78,7 @@ READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 #endif
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
+void ddribble_state::ddribble_vlm5030_ctrl_w(uint8_t data)
 {
 	/* b7 : vlm data bus OE   */
 

@@ -73,13 +73,7 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 	m_msm->vclk_w(0);
 }
 
-
-WRITE8_MEMBER(f1dream_state::out1_w)
-{
-	m_soundlatch->write(data);
-}
-
-WRITE8_MEMBER(f1dream_state::out3_w)
+void f1dream_state::out3_w(uint8_t data)
 {
 	if ((m_old_p3 & 0x20) != (data & 0x20))
 	{
@@ -681,7 +675,7 @@ void f1dream_state::f1dream(machine_config &config)
 
 	I8751(config, m_mcu, XTAL(10'000'000)); /* ??? */
 	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
-	m_mcu->port_out_cb<1>().set(FUNC(f1dream_state::out1_w));
+	m_mcu->port_out_cb<1>().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
 }
 

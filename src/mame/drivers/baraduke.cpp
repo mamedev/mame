@@ -116,7 +116,7 @@ DIP locations verified for:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(baraduke_state::inputport_select_w)
+void baraduke_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -128,7 +128,7 @@ WRITE8_MEMBER(baraduke_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(baraduke_state::inputport_r)
+uint8_t baraduke_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -151,13 +151,13 @@ READ8_MEMBER(baraduke_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
+void baraduke_state::baraduke_lamps_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 3);
 	m_lamps[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
+void baraduke_state::baraduke_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -177,7 +177,7 @@ void baraduke_state::baraduke_map(address_map &map)
 	map(0x6000, 0xffff).rom();                             /* ROM */
 }
 
-READ8_MEMBER(baraduke_state::soundkludge_r)
+uint8_t baraduke_state::soundkludge_r()
 {
 	return ((m_counter++) >> 4) & 0xff;
 }

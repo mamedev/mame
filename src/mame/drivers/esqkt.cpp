@@ -134,13 +134,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(u8 data);
 
 	u8 m_duart_io;
 	bool  m_bCalibSecondByte;
 
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 	void kt_map(address_map &map);
 	void ts_map(address_map &map);
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 	#endif
 }
 
-READ16_MEMBER(esqkt_state::esq5506_read_adc)
+u16 esqkt_state::esq5506_read_adc()
 {
 	switch ((m_duart_io & 7) ^ 7)
 	{
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-WRITE8_MEMBER(esqkt_state::duart_output)
+void esqkt_state::duart_output(u8 data)
 {
 	m_duart_io = data;
 

@@ -77,9 +77,9 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_g2_ctrl_w );
 	DECLARE_READ64_MEMBER( dc_modem_r );
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
-	DECLARE_WRITE8_MEMBER( g1_irq );
-	DECLARE_WRITE8_MEMBER( pvr_irq );
-	DECLARE_WRITE8_MEMBER( maple_irq );
+	void g1_irq(uint8_t data);
+	void pvr_irq(uint8_t data);
+	void maple_irq(uint8_t data);
 	DECLARE_READ16_MEMBER( soundram_r );
 	DECLARE_WRITE16_MEMBER( soundram_w );
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);

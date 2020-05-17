@@ -2879,7 +2879,7 @@ end
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
---@src/devices/machine/sunplus_gpl16250soc.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpl16250soc.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then

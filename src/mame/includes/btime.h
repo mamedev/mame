@@ -101,7 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
-	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
+	void ay_audio_nmi_enable_w(uint8_t data);
 
 	void init_btime();
 	void init_tisland();

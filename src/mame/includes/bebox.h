@@ -73,10 +73,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);
-	DECLARE_READ8_MEMBER(bebox_dma8237_fdc_dack_r);
-	DECLARE_WRITE8_MEMBER(bebox_dma8237_fdc_dack_w);
 	DECLARE_WRITE_LINE_MEMBER(bebox_dma8237_out_eop);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
@@ -101,8 +98,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bebox_flash_w);
 	DECLARE_READ8_MEMBER(at_dma8237_1_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_1_w);
-	DECLARE_READ8_MEMBER(bebox_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(bebox_dma_write_byte);
+	uint8_t bebox_dma_read_byte(offs_t offset);
+	void bebox_dma_write_byte(offs_t offset, uint8_t data);
 	DECLARE_READ64_MEMBER(scsi53c810_r);
 	DECLARE_WRITE64_MEMBER(scsi53c810_w);
 	DECLARE_READ64_MEMBER(bb_slave_64be_r);

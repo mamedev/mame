@@ -13,10 +13,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8155.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 #include "cp1.lh"
 
@@ -29,9 +32,9 @@ public:
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
+		m_display(*this, "display"),
 		m_io_lines(*this, "LINE%u", 0U),
-		m_io_config(*this, "CONFIG"),
-		m_digits(*this, "digit%u", 0U)
+		m_io_config(*this, "CONFIG")
 	{ }
 
 	void cp1(machine_config &config);
@@ -58,9 +61,9 @@ private:
 	required_device<i8155_device> m_i8155;
 	required_device<i8155_device> m_i8155_cp3;
 	required_device<cassette_image_device> m_cassette;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_io_lines;
 	required_ioport m_io_config;
-	output_finder<6> m_digits;
 
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
@@ -153,19 +156,8 @@ WRITE8_MEMBER(cp1_state::i8155_write)
 
 WRITE8_MEMBER(cp1_state::i8155_porta_w)
 {
-	data &= 0x7f;   // PA7 is not connected
-
-	if (m_7seg)
-	{
-		if (!(m_matrix & 0x01))     m_digits[5] = data;
-		if (!(m_matrix & 0x02))     m_digits[4] = data;
-		if (!(m_matrix & 0x04))     m_digits[3] = data;
-		if (!(m_matrix & 0x08))     m_digits[2] = data | 0x80;     // this digit has always the dot active
-		if (!(m_matrix & 0x10))     m_digits[1] = data;
-		if (!(m_matrix & 0x20))     m_digits[0] = data;
-	}
-
-	m_7seg ^= 0x01;
+	m_7seg = data & 0x7f; // PA7 is not connected
+	m_display->matrix(~m_matrix, m_7seg);
 }
 
 READ8_MEMBER(cp1_state::i8155_portb_r)
@@ -181,9 +173,9 @@ WRITE8_MEMBER(cp1_state::i8155_portb_w)
 
 WRITE8_MEMBER(cp1_state::i8155_portc_w)
 {
-	// --xx xxxx   keyboard matrix
-
+	// --xx xxxx   keyboard matrix, 7seg select
 	m_matrix = data & 0x3f;
+	m_display->matrix(~m_matrix, m_7seg);
 }
 
 
@@ -232,7 +224,6 @@ INPUT_PORTS_END
 
 void cp1_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 void cp1_state::machine_reset()
@@ -286,6 +277,8 @@ void cp1_state::cp1(machine_config &config)
 
 	I8155(config, "i8155_cp3", 0);
 
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0x3f, 0x7f);
 	config.set_default_layout(layout_cp1);
 
 	SPEAKER(config, "mono").front_center();

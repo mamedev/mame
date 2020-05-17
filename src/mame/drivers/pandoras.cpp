@@ -86,7 +86,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
+void pandoras_state::i8039_irqen_and_status_w(uint8_t data)
 {
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
@@ -295,12 +295,12 @@ void pandoras_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portA_r)
+uint8_t pandoras_state::pandoras_portA_r()
 {
 	return m_i8039_status;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portB_r)
+uint8_t pandoras_state::pandoras_portB_r()
 {
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }

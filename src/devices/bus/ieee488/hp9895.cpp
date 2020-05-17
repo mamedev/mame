@@ -473,7 +473,7 @@ WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
 
 READ8_MEMBER(hp9895_device::phi_dio_r)
 {
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 WRITE8_MEMBER(hp9895_device::phi_dio_w)

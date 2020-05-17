@@ -172,17 +172,17 @@ private:
 // TODO: wrong, likely PIC protected too
 READ8_MEMBER( psattack_state::cfcard_regs_r )
 {
-	return m_ata->read_cs0(offset & 7, 0x000000ff);
+	return m_ata->cs0_r(offset & 7, 0x000000ff);
 }
 
 WRITE8_MEMBER( psattack_state::cfcard_regs_w )
 {
-	m_ata->write_cs0(offset & 7, 0x000000ff);
+	m_ata->cs0_w(offset & 7, 0x000000ff);
 }
 
 READ16_MEMBER( psattack_state::cfcard_data_r )
 {
-	return m_ata->read_cs0(0, 0x0000ffff);
+	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
 WRITE32_MEMBER( psattack_state::output_w )

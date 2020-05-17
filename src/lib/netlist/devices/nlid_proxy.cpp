@@ -120,7 +120,7 @@ namespace netlist
 	, m_I(*this, "I")
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
-	, m_last_state(*this, "m_last_var", -1)
+	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
 	{
 		register_subalias("Q", m_RN.P());
 
@@ -144,7 +144,7 @@ namespace netlist
 	void nld_d_to_a_proxy::reset()
 	{
 		//m_Q.initial(0.0);
-		m_last_state = -1;
+		m_last_state = terminal_t::OUT_TRISTATE();
 		m_RN.reset();
 		m_RP.reset();
 		m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
@@ -156,27 +156,38 @@ namespace netlist
 
 	NETLIB_UPDATE(d_to_a_proxy)
 	{
-		const auto state = static_cast<int>(m_I());
+		const auto state = m_I();
 		if (state != m_last_state)
 		{
 			// RN, RP are connected ...
 			m_RN.change_state([this, &state]()
 			{
-				if (state)
+				switch (state)
 				{
-					m_RN.set_G_V_I(G_OFF,
-						nlconst::zero(),
-						nlconst::zero());
-					m_RP.set_G_V_I(plib::reciprocal(logic_family()->R_high()),
-							logic_family()->high_offset_V(), nlconst::zero());
-				}
-				else
-				{
-					m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
-							logic_family()->low_offset_V(), nlconst::zero());
-					m_RP.set_G_V_I(G_OFF,
-						nlconst::zero(),
-						nlconst::zero());
+					case 0:
+						m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
+								logic_family()->low_offset_V(), nlconst::zero());
+						m_RP.set_G_V_I(G_OFF,
+							nlconst::zero(),
+							nlconst::zero());
+						break;
+					case 1:
+						m_RN.set_G_V_I(G_OFF,
+							nlconst::zero(),
+							nlconst::zero());
+						m_RP.set_G_V_I(plib::reciprocal(logic_family()->R_high()),
+								logic_family()->high_offset_V(), nlconst::zero());
+						break;
+					case terminal_t::OUT_TRISTATE():
+						m_RN.set_G_V_I(G_OFF,
+							nlconst::zero(),
+							nlconst::zero());
+						m_RP.set_G_V_I(G_OFF,
+							nlconst::zero(),
+							nlconst::zero());
+						break;
+					default:
+						throw nl_exception("unknown state for proxy: this should never happen! %d\n", static_cast<int>(state));
 				}
 			});
 			m_last_state = state;

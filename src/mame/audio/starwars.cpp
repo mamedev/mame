@@ -19,7 +19,7 @@
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::r6532_porta_r)
+uint8_t starwars_state::r6532_porta_r()
 {
 	/* Configured as follows:           */
 	/* d7 (in)  Main Ready Flag         */
@@ -38,7 +38,7 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 }
 
 
-WRITE8_MEMBER(starwars_state::r6532_porta_w)
+void starwars_state::r6532_porta_w(uint8_t data)
 {
 	/* handle 5220 read */
 	m_tms->rsq_w((data & 2)>>1);

@@ -87,17 +87,17 @@ void pk8000_base_state::pk8000_palette(palette_device &palette) const
 	palette.set_pen_colors(0, pk8000_pens);
 }
 
-READ8_MEMBER(pk8000_base_state::_84_porta_r)
+uint8_t pk8000_base_state::_84_porta_r()
 {
 	return m_video_mode;
 }
 
-WRITE8_MEMBER(pk8000_base_state::_84_porta_w)
+void pk8000_base_state::_84_porta_w(uint8_t data)
 {
 	m_video_mode = data;
 }
 
-WRITE8_MEMBER(pk8000_base_state::_84_portc_w)
+void pk8000_base_state::_84_portc_w(uint8_t data)
 {
 	m_video_enable = BIT(data, 4);
 }

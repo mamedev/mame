@@ -11137,6 +11137,7 @@ vsav                            // 19/05/1997 (c) 1997 (Euro)
 vsav2                           // 13/09/1997 (c) 1997 (Japan)
 vsav2d                          //
 vsava                           // 19/05/1997 (c) 1997 (Asia)
+vsavb                           // 19/05/1997 (c) 1997 (Brazil)
 vsavd                           //
 vsavh                           // 19/05/1997 (c) 1997 (Hispanic)
 vsavj                           // 19/05/1997 (c) 1997 (Japan)
@@ -11229,6 +11230,9 @@ cpzodiacj                       //
 
 @source:craft.cpp
 craft                           // Craft, by [lft]
+
+@source:crazybal.cpp
+crazybal                        // EGS
 
 @source:crbaloon.cpp
 crbaloon                        // CL  (c) 1980 Taito Corporation
@@ -13532,6 +13536,9 @@ fexcelpb                        //
 fexcelv                         //
 granits                         // RCS
 
+@source:fidel_msc.cpp
+miniscco
+
 @source:fidel_phantom.cpp
 fphantom                        //
 
@@ -13541,6 +13548,8 @@ fscc12b                         //
 
 @source:fidel_sc6.cpp
 fscc6                           //
+gambit
+miniscc
 
 @source:fidel_sc8.cpp
 fscc8                           //
@@ -16223,7 +16232,9 @@ terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
 terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
 
 @source:hotblock.cpp
-hotblock                        // (c) 1993 Nics? / Nix?
+hotblock                        // (c) 1993 Nics? / NIX?
+hotblocka                       // (c) 1993 Nics? / NIX?
+hotblockb                       // (c) 1993 Nics? / NIX?
 
 @source:hotstuff.cpp
 hotstuff                        //
@@ -16642,7 +16653,8 @@ grndtour                        // (c) 1993
 iqblock                         // (c) 1993
 
 @source:iqunlim.cpp
-iqunlim                         // 199? IQ Unlimited (680x0)
+iqunlim                         // (c) 1995 Vtech / Integrated Systems Inc.
+iqunlimgr                       // (c) 1995 VTech / Integrated Systems Inc.
 
 @source:iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
@@ -18847,6 +18859,9 @@ korg707                         //
 @source:korgdss1.cpp
 dss1                            //
 dssmsrk                         //
+
+@source:korgdvp1.cpp
+dvp1                            //
 
 @source:korgdw8k.cpp
 dw8000                          //
@@ -22158,6 +22173,7 @@ mephisto2a
 mephisto2e
 mephisto3
 mephisto3b
+mephistoj
 
 @source:mephisto_glasgow.cpp
 amsterd                         // Amsterdam
@@ -31949,9 +31965,8 @@ supercon
 diablo68                        //
 scorpio68                       //
 
-@source:novag_presto.cpp
-nocto                           //
-npresto                         //
+@source:novag_micro2.cpp
+nmicro2
 
 @source:novag_savant.cpp
 savant                          //
@@ -35185,20 +35200,20 @@ safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 sag
 
 @source:sage2.cpp
-sage2                           //
+sage2
 
 @source:saitek_chesstrv.cpp
-chesstrv                        //
+chesstrv
 
 @source:saitek_corona.cpp
 corona
 coronaa
 
 @source:saitek_cp2000.cpp
-cp2000                          //
+cp2000
 
 @source:saitek_delta1.cpp
-ccdelta1                        //
+ccdelta1
 
 @source:saitek_exchess.cpp
 exchess
@@ -35223,15 +35238,16 @@ renaissa
 renaissaa
 
 @source:saitek_risc2500.cpp
-montreux                        //
-risc2500                        //
-risc2500a                       //
+montreux
+risc2500
+risc2500a
 
 @source:saitek_schess.cpp
 schess
 
 @source:saitek_ssystem3.cpp
-ssystem3                        // Chess Champion Super System III / MK III
+ssystem3
+ssystem4
 
 @source:saitek_stratos.cpp
 stratos
@@ -35242,6 +35258,7 @@ tkingb
 
 @source:saitek_superstar.cpp
 sstar28k
+sstar36k
 tstar432
 
 @source:sam.cpp
@@ -37418,7 +37435,8 @@ guitarssa
 tmntbftc
 gssytts
 jjstrip
-vtechtvs
+vtechtvssp                      // (c) 2006 VTech
+vtechtvsgr                      // (c) 2006 VTech
 tmntmutm
 pballpup
 swclone

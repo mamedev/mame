@@ -72,10 +72,10 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_r);
-	DECLARE_WRITE8_MEMBER(memory_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t memory_r(offs_t offset);
+	void memory_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(page0_r);
 	DECLARE_READ8_MEMBER(page1_r);
 	DECLARE_READ8_MEMBER(mapper_r);
@@ -105,7 +105,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(pio_porta_w);
+	void pio_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232b_rx_w);
 	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
@@ -344,7 +344,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( kdt6_state::beeper_off )
 //  EXTERNAL I/O
 //**************************************************************************
 
-WRITE8_MEMBER( kdt6_state::pio_porta_w )
+void kdt6_state::pio_porta_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 	m_centronics->write_init(BIT(data, 1));
@@ -390,22 +390,22 @@ WRITE_LINE_MEMBER( kdt6_state::busreq_w )
 	m_dma->bai_w(state);
 }
 
-READ8_MEMBER( kdt6_state::memory_r )
+uint8_t kdt6_state::memory_r(offs_t offset)
 {
 	return m_ram[m_dma_map << 16 | offset];
 }
 
-WRITE8_MEMBER( kdt6_state::memory_w )
+void kdt6_state::memory_w(offs_t offset, uint8_t data)
 {
 	m_ram[m_dma_map << 16 | offset] = data;
 }
 
-READ8_MEMBER( kdt6_state::io_r )
+uint8_t kdt6_state::io_r(offs_t offset)
 {
 	return m_cpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( kdt6_state::io_w )
+void kdt6_state::io_w(offs_t offset, uint8_t data)
 {
 	m_cpu->space(AS_IO).write_byte(offset, data);
 }

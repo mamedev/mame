@@ -1001,6 +1001,7 @@ ROM_START( exctsccr ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
+// CPU BOARD NO. 58AS50-1, DISPLAY BOARD NO. 58AS51-1, MUSIC & VOICE BOARD NO. 59MC02
 ROM_START( exctsccra ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_g10.bin",    0x0000, 0x2000, CRC(aa68df66) SHA1(f10cac5a4c5aad1e1eb8835174dc8d517bb2921a) )

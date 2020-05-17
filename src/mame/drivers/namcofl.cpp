@@ -264,17 +264,17 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 }
 
 
-READ8_MEMBER(namcofl_state::port6_r)
+uint8_t namcofl_state::port6_r()
 {
 	return m_mcu_port6;
 }
 
-WRITE8_MEMBER(namcofl_state::port6_w)
+void namcofl_state::port6_w(uint8_t data)
 {
 	m_mcu_port6 = data;
 }
 
-READ8_MEMBER(namcofl_state::port7_r)
+uint8_t namcofl_state::port7_r()
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -297,26 +297,26 @@ READ8_MEMBER(namcofl_state::port7_r)
 	return 0xff;
 }
 
-READ8_MEMBER(namcofl_state::dac7_r)
+uint8_t namcofl_state::dac7_r()
 {
 	return m_accel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac6_r)
+uint8_t namcofl_state::dac6_r()
 {
 	return m_brake.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac5_r)
+uint8_t namcofl_state::dac5_r()
 {
 	return m_wheel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac3_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
+uint8_t namcofl_state::dac4_r(){ return 0xff; }
+uint8_t namcofl_state::dac3_r(){ return 0xff; }
+uint8_t namcofl_state::dac2_r(){ return 0xff; }
+uint8_t namcofl_state::dac1_r(){ return 0xff; }
+uint8_t namcofl_state::dac0_r(){ return 0xff; }
 
 void namcofl_state::namcoc75_am(address_map &map)
 {

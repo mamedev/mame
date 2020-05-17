@@ -59,8 +59,8 @@ private:
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(portB_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
+	uint8_t portB_r();
+	void portB_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

@@ -347,13 +347,11 @@ public:
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
 
-	DECLARE_READ8_MEMBER( dmac_scsi_data_read );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_data_write );
-	DECLARE_READ8_MEMBER( dmac_io_read );
-	DECLARE_WRITE8_MEMBER( dmac_io_write );
+	uint8_t dmac_scsi_data_read(offs_t offset);
+	void dmac_scsi_data_write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
 
-	DECLARE_WRITE8_MEMBER( tpi_port_b_write );
+	void tpi_port_b_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
 
 	void cdtv(machine_config &config);
@@ -545,7 +543,7 @@ public:
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(uint8_t data);
 
 	void handle_joystick_cia(u8 pra, u8 dra);
 	u16 handle_joystick_potgor(u16 potgor);
@@ -613,7 +611,7 @@ WRITE16_MEMBER( a500p_state::clock_w )
 //  CD-ROM CONTROLLER
 //**************************************************************************
 
-READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
+uint8_t cdtv_state::dmac_scsi_data_read(offs_t offset)
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
 		return m_tpi->read(offset);
@@ -621,20 +619,10 @@ READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
+void cdtv_state::dmac_scsi_data_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
 		m_tpi->write(offset, data);
-}
-
-READ8_MEMBER( cdtv_state::dmac_io_read )
-{
-	return m_cdrom->read();
-}
-
-WRITE8_MEMBER( cdtv_state::dmac_io_write )
-{
-	m_cdrom->write(data);
 }
 
 WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
@@ -643,7 +631,7 @@ WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
 	update_int2();
 }
 
-WRITE8_MEMBER( cdtv_state::tpi_port_b_write )
+void cdtv_state::tpi_port_b_write(uint8_t data)
 {
 	m_cdrom->cmd_w(BIT(data, 0));
 	m_cdrom->enable_w(BIT(data, 1));
@@ -987,9 +975,9 @@ READ16_MEMBER( a4000_state::ide_r )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		data = m_ata->read_cs1((offset >> 1) & 0x07, mem_mask);
+		data = m_ata->cs1_r((offset >> 1) & 0x07, mem_mask);
 	else
-		data = m_ata->read_cs0((offset >> 1) & 0x07, mem_mask);
+		data = m_ata->cs0_r((offset >> 1) & 0x07, mem_mask);
 
 	// swap
 	data = (data << 8) | (data >> 8);
@@ -1009,9 +997,9 @@ WRITE16_MEMBER( a4000_state::ide_w )
 
 	// this very likely doesn't respond to all the addresses, figure out which ones
 	if (BIT(offset, 12))
-		m_ata->write_cs1((offset >> 1) & 0x07, data, mem_mask);
+		m_ata->cs1_w((offset >> 1) & 0x07, data, mem_mask);
 	else
-		m_ata->write_cs0((offset >> 1) & 0x07, data, mem_mask);
+		m_ata->cs0_w((offset >> 1) & 0x07, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
@@ -1152,7 +1140,7 @@ READ_LINE_MEMBER( cd32_state::cd32_sel_mirror_input )
 	return (bits & 0x20)>>5;
 }
 
-WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
+void cd32_state::akiko_cia_0_port_a_write(uint8_t data)
 {
 	// bit 0, cd audio mute
 	m_cdda->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);
@@ -1823,8 +1811,8 @@ void cdtv_state::cdtv(machine_config &config)
 	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
 	m_dmac->scsi_read_handler().set(FUNC(cdtv_state::dmac_scsi_data_read));
 	m_dmac->scsi_write_handler().set(FUNC(cdtv_state::dmac_scsi_data_write));
-	m_dmac->io_read_handler().set(FUNC(cdtv_state::dmac_io_read));
-	m_dmac->io_write_handler().set(FUNC(cdtv_state::dmac_io_write));
+	m_dmac->io_read_handler().set(m_cdrom, FUNC(cr511b_device::read));
+	m_dmac->io_write_handler().set(m_cdrom, FUNC(cr511b_device::write));
 	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
 
 	TPI6525(config, m_tpi, 0);

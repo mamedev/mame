@@ -593,27 +593,27 @@ void tubep_state::rjammer_sound_portmap(address_map &map)
 }
 
 
-WRITE8_MEMBER(tubep_state::ay8910_portA_0_w)
+void tubep_state::ay8910_portA_0_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_0_w)
+void tubep_state::ay8910_portB_0_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_1_w)
+void tubep_state::ay8910_portA_1_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_1_w)
+void tubep_state::ay8910_portB_1_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_2_w)
+void tubep_state::ay8910_portA_2_w(uint8_t data)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_2_w)
+void tubep_state::ay8910_portB_2_w(uint8_t data)
 {
 		//analog sound control
 }

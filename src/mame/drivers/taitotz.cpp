@@ -2187,7 +2187,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	uint16_t d = m_ata->read_cs0(offset, mem_mask);
+	uint16_t d = m_ata->cs0_r(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2196,7 +2196,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	uint16_t d = m_ata->read_cs1(offset, mem_mask);
+	uint16_t d = m_ata->cs1_r(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).

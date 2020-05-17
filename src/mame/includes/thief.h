@@ -38,8 +38,8 @@ private:
 	uint8_t m_write_mask;
 	uint8_t m_video_control;
 	coprocessor_t m_coprocessor;
-	DECLARE_WRITE8_MEMBER(thief_input_select_w);
-	DECLARE_READ8_MEMBER(thief_io_r);
+	void thief_input_select_w(uint8_t data);
+	uint8_t thief_io_r();
 	DECLARE_READ8_MEMBER(thief_context_ram_r);
 	DECLARE_WRITE8_MEMBER(thief_context_ram_w);
 	DECLARE_WRITE8_MEMBER(thief_context_bank_w);
@@ -51,7 +51,7 @@ private:
 	DECLARE_WRITE8_MEMBER(thief_blit_w);
 	DECLARE_READ8_MEMBER(thief_coprocessor_r);
 	DECLARE_WRITE8_MEMBER(thief_coprocessor_w);
-	DECLARE_WRITE8_MEMBER(tape_control_w);
+	void tape_control_w(uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

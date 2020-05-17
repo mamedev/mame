@@ -89,7 +89,7 @@ WRITE8_MEMBER(dynax_state::dynax_extra_scrolly_w)
 
 
 /* Destination Layers */
-WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
+void dynax_state::dynax_blit_dest_w(uint8_t data)
 {
 	m_blit_dest = data;
 	if (m_layer_layout == LAYOUT_HNORIDUR)
@@ -106,7 +106,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 {
-	dynax_blit_dest_w(space, 0, bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3));
+	dynax_blit_dest_w(bitswap<8>(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
 
 /*
@@ -115,7 +115,7 @@ mjembase:   b d e -> - 2 4 8
 */
 WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
 {
-	dynax_blit_dest_w(space, 0, bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0));
+	dynax_blit_dest_w(bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0));
 }
 
 
@@ -291,7 +291,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
 }
 
 
-WRITE8_MEMBER(dynax_state::hanamai_blit_pixel_w)
+void dynax_state::hanamai_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -308,7 +308,7 @@ WRITE8_MEMBER(dynax_state::hanamai_blit_pixel_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::cdracula_blit_pixel_w)
+void dynax_state::cdracula_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -322,7 +322,7 @@ WRITE8_MEMBER(dynax_state::cdracula_blit_pixel_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::hnoridur_blit_pixel_w)
+void dynax_state::hnoridur_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -340,7 +340,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_blit_pixel_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::drgpunch_blit_pixel_w)
+void dynax_state::drgpunch_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -355,7 +355,7 @@ WRITE8_MEMBER(dynax_state::drgpunch_blit_pixel_w)
 }
 
 // two blitters/screens
-WRITE8_MEMBER(dynax_state::jantouki_blit_pixel_w)
+void dynax_state::jantouki_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -369,7 +369,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blit_pixel_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_blit2_pixel_w)
+void dynax_state::jantouki_blit2_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -383,7 +383,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blit2_pixel_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::mjdialq2_blit_pixel_w)
+void dynax_state::mjdialq2_blit_pixel_w(offs_t offset, uint8_t data)
 {
 	if (m_flipscreen)
 		offset ^= 0xffff;
@@ -395,33 +395,33 @@ WRITE8_MEMBER(dynax_state::mjdialq2_blit_pixel_w)
 
 
 
-WRITE8_MEMBER(dynax_state::dynax_blit_scrollx_w)
+void dynax_state::dynax_blit_scrollx_w(uint8_t data)
 {
 	m_blit_scroll_x = data;
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit_scrolly_w)
+void dynax_state::dynax_blit_scrolly_w(uint8_t data)
 {
 	m_blit_scroll_y = data;
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_scrollx_w)
+void dynax_state::dynax_blit2_scrollx_w(uint8_t data)
 {
 	m_blit2_scroll_x = data;
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_scrolly_w)
+void dynax_state::dynax_blit2_scrolly_w(uint8_t data)
 {
 	m_blit2_scroll_y = data;
 }
 
 // inverted scroll values
-WRITE8_MEMBER(dynax_state::tenkai_blit_scrollx_w)
+void dynax_state::tenkai_blit_scrollx_w(uint8_t data)
 {
 	m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_scrolly_w)
+void dynax_state::tenkai_blit_scrolly_w(uint8_t data)
 {
 	m_blit_scroll_y = data ^ 0xff;
 }

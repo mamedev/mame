@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(jpmsys5_state::u29_porta_r)
+uint8_t jpmsys5_state::u29_porta_r()
 {
 	int meter_bit =0;
 
@@ -485,7 +485,7 @@ READ8_MEMBER(jpmsys5_state::u29_porta_r)
 	return m_direct_port->read() | meter_bit;
 }
 
-WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
+void jpmsys5_state::u29_portb_w(uint8_t data)
 {
 	if (m_meters)
 	{

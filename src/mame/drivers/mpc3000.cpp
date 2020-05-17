@@ -107,8 +107,8 @@ private:
 
 	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
-	DECLARE_READ16_MEMBER(dma_memr_cb);
-	DECLARE_WRITE16_MEMBER(dma_memw_cb);
+	uint16_t dma_memr_cb(offs_t offset);
+	void dma_memw_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
 };
 
@@ -161,13 +161,13 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-READ16_MEMBER(mpc3000_state::dma_memr_cb)
+uint16_t mpc3000_state::dma_memr_cb(offs_t offset)
 {
 	//logerror("dma_memr_cb: offset %x\n", offset);
 	return m_maincpu->space(AS_PROGRAM).read_word(offset);
 }
 
-WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
+void mpc3000_state::dma_memw_cb(offs_t offset, uint16_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }

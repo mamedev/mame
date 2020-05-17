@@ -78,7 +78,7 @@ private:
 	DECLARE_READ8_MEMBER(psurge_protection_r);
 
 	/* chkun */
-	DECLARE_WRITE8_MEMBER(chkun_sound_w);
+	void chkun_sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_chkun_tile_info);

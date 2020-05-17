@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE32_MEMBER(colorram_protection_w);
 	DECLARE_WRITE32_MEMBER(tmek_pf_w);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_callback);
+	void cage_irq_callback(uint8_t data);
 
 	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
 	uint16_t atarigt_colorram_r(offs_t address);

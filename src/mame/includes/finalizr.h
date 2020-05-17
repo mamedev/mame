@@ -65,7 +65,7 @@ private:
 	DECLARE_WRITE8_MEMBER(finalizr_coin_w);
 	DECLARE_WRITE8_MEMBER(finalizr_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(finalizr_i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_w);
+	void i8039_irqen_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(i8039_t1_r);
 	DECLARE_WRITE8_MEMBER(i8039_t0_w);
 	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);

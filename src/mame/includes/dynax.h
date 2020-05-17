@@ -79,9 +79,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(layer_half2_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_WRITE8_MEMBER(hnoridur_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_scrollx_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_scrolly_w);
+	void hnoridur_blit_pixel_w(offs_t offset, uint8_t data);
+	void dynax_blit_scrollx_w(uint8_t data);
+	void dynax_blit_scrolly_w(uint8_t data);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -103,7 +103,7 @@ protected:
 	DECLARE_VIDEO_START(hnoridur);
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
+	void dynax_blit_dest_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
@@ -161,21 +161,21 @@ private:
 	DECLARE_READ8_MEMBER(tenkai_ip_r);
 	DECLARE_READ8_MEMBER(tenkai_palette_r);
 	DECLARE_WRITE8_MEMBER(tenkai_palette_w);
-	DECLARE_READ8_MEMBER(tenkai_p3_r);
-	DECLARE_WRITE8_MEMBER(tenkai_p3_w);
-	DECLARE_WRITE8_MEMBER(tenkai_p4_w);
-	DECLARE_READ8_MEMBER(tenkai_p5_r);
-	DECLARE_WRITE8_MEMBER(tenkai_p6_w);
-	DECLARE_WRITE8_MEMBER(tenkai_p7_w);
-	DECLARE_WRITE8_MEMBER(tenkai_p8_w);
-	DECLARE_READ8_MEMBER(tenkai_p8_r);
+	uint8_t tenkai_p3_r();
+	void tenkai_p3_w(uint8_t data);
+	void tenkai_p4_w(uint8_t data);
+	uint8_t tenkai_p5_r();
+	void tenkai_p6_w(uint8_t data);
+	void tenkai_p7_w(uint8_t data);
+	void tenkai_p8_w(uint8_t data);
+	uint8_t tenkai_p8_r();
 	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_romregion_w);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_0_r);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(gekisha_hopper_w);
-	DECLARE_WRITE8_MEMBER(gekisha_p4_w);
+	void gekisha_p4_w(uint8_t data);
 	//DECLARE_WRITE8_MEMBER(dynax_blit_pen_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
@@ -197,16 +197,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer0_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer1_enable_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_romregion_w);
-	DECLARE_WRITE8_MEMBER(hanamai_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(cdracula_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(drgpunch_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blit2_pixel_w);
-	DECLARE_WRITE8_MEMBER(mjdialq2_blit_pixel_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit2_scrollx_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit2_scrolly_w);
-	DECLARE_WRITE8_MEMBER(tenkai_blit_scrollx_w);
-	DECLARE_WRITE8_MEMBER(tenkai_blit_scrolly_w);
+	void hanamai_blit_pixel_w(offs_t offset, uint8_t data);
+	void cdracula_blit_pixel_w(offs_t offset, uint8_t data);
+	void drgpunch_blit_pixel_w(offs_t offset, uint8_t data);
+	void jantouki_blit_pixel_w(offs_t offset, uint8_t data);
+	void jantouki_blit2_pixel_w(offs_t offset, uint8_t data);
+	void mjdialq2_blit_pixel_w(offs_t offset, uint8_t data);
+	void dynax_blit2_scrollx_w(uint8_t data);
+	void dynax_blit2_scrolly_w(uint8_t data);
+	void tenkai_blit_scrollx_w(uint8_t data);
+	void tenkai_blit_scrolly_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
@@ -230,8 +230,8 @@ private:
 	DECLARE_MACHINE_RESET(adpcm);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
-	DECLARE_WRITE8_MEMBER(tenkai_dswsel_w);
-	DECLARE_READ8_MEMBER(tenkai_dsw_r);
+	void tenkai_dswsel_w(uint8_t data);
+	uint8_t tenkai_dsw_r();
 	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(tenkai_blitter_ack_w);
 	DECLARE_MACHINE_START(hanamai);

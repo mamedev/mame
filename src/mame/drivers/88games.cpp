@@ -252,7 +252,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER( _88games_state::banking_callback )
+void _88games_state::banking_callback(uint8_t data)
 {
 	logerror("%s: bank select %02x\n", machine().describe_context(), data);
 

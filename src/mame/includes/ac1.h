@@ -31,10 +31,10 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(ac1_port_b_r);
-	DECLARE_READ8_MEMBER(ac1_port_a_r);
-	DECLARE_WRITE8_MEMBER(ac1_port_a_w);
-	DECLARE_WRITE8_MEMBER(ac1_port_b_w);
+	uint8_t ac1_port_b_r();
+	uint8_t ac1_port_a_r();
+	void ac1_port_a_w(uint8_t data);
+	void ac1_port_b_w(uint8_t data);
 
 	void ac1_32(machine_config &config);
 	void ac1(machine_config &config);

@@ -292,15 +292,15 @@ protected:
 	DECLARE_READ8_MEMBER(msx_sec_slot_r);
 	DECLARE_READ8_MEMBER(msx_kanji_r);
 	DECLARE_WRITE8_MEMBER(msx_kanji_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
-	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
+	void msx_ppi_port_a_w(uint8_t data);
+	void msx_ppi_port_c_w(uint8_t data);
+	uint8_t msx_ppi_port_b_r();
 	DECLARE_READ8_MEMBER(msx_mem_read);
 	DECLARE_WRITE8_MEMBER(msx_mem_write);
-	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
-	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	uint8_t msx_psg_port_a_r();
+	uint8_t msx_psg_port_b_r();
+	void msx_psg_port_a_w(uint8_t data);
+	void msx_psg_port_b_w(uint8_t data);
 
 private:
 	void msx_memory_map_all();

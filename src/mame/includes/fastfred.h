@@ -67,11 +67,11 @@ private:
 	DECLARE_READ8_MEMBER(jumpcoas_custom_io_r);
 	DECLARE_READ8_MEMBER(boggy84_custom_io_r);
 	DECLARE_WRITE_LINE_MEMBER(imago_dma_irq_w);
-	DECLARE_WRITE8_MEMBER(imago_sprites_bank_w);
+	void imago_sprites_bank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(imago_sprites_dma_w);
 	DECLARE_READ8_MEMBER(imago_sprites_offset_r);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	void sound_nmi_mask_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(fastfred_videoram_w);
 	DECLARE_WRITE8_MEMBER(fastfred_attributes_w);
 	DECLARE_WRITE_LINE_MEMBER(charbank1_w);

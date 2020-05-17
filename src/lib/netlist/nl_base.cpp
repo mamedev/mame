@@ -77,14 +77,6 @@ namespace netlist
 		}
 	}
 
-#if 0
-	// ----------------------------------------------------------------------------------------
-	// netlist_ref_t
-	// ----------------------------------------------------------------------------------------
-
-	detail::netlist_ref::netlist_ref(netlist_t &nl)
-	: m_netlist(nl) { }
-#endif
 	// ----------------------------------------------------------------------------------------
 	// device_object_t
 	// ----------------------------------------------------------------------------------------
@@ -194,7 +186,10 @@ namespace netlist
 
 	void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
 	{
-	#define ENTRY(x) if (pstring(#x) != PSTRINGIFY(x)) defs.emplace_back(std::pair<pstring, pstring>(#x, PSTRINGIFY(x)));
+	#define ENTRY(x) if (pstring(#x) != PSTRINGIFY(x)) \
+			defs.emplace_back(std::pair<pstring, pstring>(#x, PSTRINGIFY(x))); \
+		else defs.emplace_back(std::pair<pstring, pstring>(#x, "<NOT DEFINED>"));
+	#define ENTRY_EX(x) defs.emplace_back(std::pair<pstring, pstring>(#x, plib::pfmt("{}")(x)));
 		ENTRY(NL_VERSION_MAJOR)
 		ENTRY(NL_VERSION_MINOR)
 		ENTRY(NL_VERSION_PATCHLEVEL)
@@ -242,6 +237,15 @@ namespace netlist
 		ENTRY(__unix__)
 		ENTRY(__linux__)
 
+		ENTRY_EX(sizeof(base_device_t))
+		ENTRY_EX(sizeof(device_t))
+		ENTRY_EX(sizeof(logic_input_t))
+		ENTRY_EX(sizeof(logic_output_t))
+		ENTRY_EX(sizeof(param_model_t))
+		ENTRY_EX(sizeof(param_logic_t))
+		ENTRY_EX(sizeof(state_var<int>))
+		ENTRY_EX(sizeof(pstring))
+
 	#undef ENTRY
 	}
 
@@ -275,6 +279,8 @@ namespace netlist
 
 	void netlist_state_t::reset()
 	{
+		m_setup = nullptr;
+
 		// Reset all nets once !
 		log().verbose("Call reset on all nets:");
 		for (auto & n : nets())
@@ -649,41 +655,6 @@ namespace netlist
 		}
 	}
 
-	void detail::net_t::add_terminal(detail::core_terminal_t &terminal) noexcept(false)
-	{
-		for (auto &t : core_terms())
-			if (t == &terminal)
-			{
-				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
-				throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
-			}
-
-		terminal.set_net(this);
-
-		core_terms().push_back(&terminal);
-	}
-
-	void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) noexcept(false)
-	{
-		if (plib::container::contains(core_terms(), &terminal))
-		{
-			terminal.set_net(nullptr);
-			plib::container::remove(core_terms(), &terminal);
-		}
-		else
-		{
-			state().log().fatal(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
-			throw nl_exception(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
-		}
-	}
-
-	void detail::net_t::move_connections(detail::net_t &dest_net)
-	{
-		for (auto &ct : core_terms())
-			dest_net.add_terminal(*ct);
-		core_terms().clear();
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// logic_net_t
 	// ----------------------------------------------------------------------------------------
@@ -868,13 +839,13 @@ namespace netlist
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
 	: param_t(&device, name)
 	{
-		m_param = device.state().setup().get_initial_param_val(this->name(),val);
+		m_param = plib::make_unique<pstring>(device.state().setup().get_initial_param_val(this->name(),val));
 	}
 
 	param_str_t::param_str_t(netlist_state_t &state, const pstring &name, const pstring &val)
 	: param_t(nullptr, name)
 	{
-		m_param = state.setup().get_initial_param_val(this->name(),val);
+		m_param = plib::make_unique<pstring>(state.setup().get_initial_param_val(this->name(),val));
 	}
 
 	void param_str_t::changed() noexcept
@@ -893,18 +864,18 @@ namespace netlist
 
 	pstring param_model_t::type()
 	{
-		auto mod = state().parser().models().get_model(str());
+		auto mod = state().setup().models().get_model(str());
 		return mod.type();
 	}
 
 	pstring param_model_t::value_str(const pstring &entity)
 	{
-		return state().parser().models().get_model(str()).value_str(entity);
+		return state().setup().models().get_model(str()).value_str(entity);
 	}
 
 	nl_fptype param_model_t::value(const pstring &entity)
 	{
-		return state().parser().models().get_model(str()).value(entity);
+		return state().setup().models().get_model(str()).value(entity);
 	}
 
 
@@ -926,6 +897,11 @@ namespace netlist
 	bool detail::core_terminal_t::is_logic_output() const noexcept
 	{
 		return dynamic_cast<const logic_output_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_tristate_output() const noexcept
+	{
+		return dynamic_cast<const tristate_output_t *>(this) != nullptr;
 	}
 
 	bool detail::core_terminal_t::is_analog() const noexcept

@@ -1160,10 +1160,10 @@ void amstrad_state::amstrad_setLowerRom()
 
 /*      if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
         {
-            space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
-            space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
-            space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
-            space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
+            space.install_read_handler(0x4000, 0x5fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+            space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+            space.install_write_handler(0x4000, 0x5fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+            space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
         }
         else
         {
@@ -1383,7 +1383,7 @@ void amstrad_state::AmstradCPC_GA_SetRamConfiguration()
 
  */
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
+void amstrad_state::amstrad_plus_asic_4000_w(offs_t offset, uint8_t data)
 {
 //  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1396,7 +1396,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
+void amstrad_state::amstrad_plus_asic_6000_w(offs_t offset, uint8_t data)
 {
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
@@ -1499,7 +1499,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
+uint8_t amstrad_state::amstrad_plus_asic_4000_r(offs_t offset)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1512,7 +1512,7 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
+uint8_t amstrad_state::amstrad_plus_asic_6000_r(offs_t offset)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x6000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1711,7 +1711,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
 }
 
 
-WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
+void amstrad_state::aleste_msx_mapper(offs_t offset, uint8_t data)
 {
 	int page = (offset & 0x0300) >> 8;
 	int ramptr = (data & 0x3f) * 0x4000;
@@ -1837,7 +1837,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 */
 
-READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
+uint8_t amstrad_state::amstrad_cpc_io_r(offs_t offset)
 {
 	uint8_t data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -1987,7 +1987,7 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
-WRITE8_MEMBER(amstrad_state::rom_select)
+void amstrad_state::rom_select(uint8_t data)
 {
 	m_gate_array.upper_bank = data;
 	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
@@ -2015,7 +2015,7 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 }
 
 /* Offset handler for write */
-WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
+void amstrad_state::amstrad_cpc_io_w(offs_t offset, uint8_t data)
 {
 	cpc_multiface2_device* mface2;
 
@@ -2023,7 +2023,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	{
 		if(m_aleste_mode & 0x04) // Aleste mode
 		{
-			aleste_msx_mapper(space, offset, data);
+			aleste_msx_mapper(offset, data);
 		}
 		else
 		{
@@ -2080,7 +2080,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	/* b13 = 0 : ROM select Write Selected*/
 	if ((offset & (1<<13)) == 0)
 	{
-		rom_select(space,0,data);
+		rom_select(data);
 	}
 
 	/* b12 = 0 : Printer port Write Selected*/
@@ -2534,14 +2534,14 @@ void amstrad_state::update_psg()
 
 
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
-READ8_MEMBER(amstrad_state::amstrad_ppi_porta_r)
+uint8_t amstrad_state::amstrad_ppi_porta_r()
 {
 	update_psg();
 	return m_ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_porta_w)
+void amstrad_state::amstrad_ppi_porta_w(uint8_t data)
 {
 	m_ppi_port_outputs[amstrad_ppi_PortA] = data;
 	update_psg();
@@ -2578,7 +2578,7 @@ WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
+uint8_t amstrad_state::amstrad_ppi_portb_r()
 {
 	int data = 0;
 /* Set b7 with cassette tape input */
@@ -2630,7 +2630,7 @@ Bit Description  Usage
 
 /* previous_ppi_portc_w value */
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_portc_w)
+void amstrad_state::amstrad_ppi_portc_w(uint8_t data)
 {
 	int changed_data;
 
@@ -2679,7 +2679,7 @@ When port B is defined as input (bit 7 of register 7 is set to "0"), a read of t
 */
 
 /* read PSG port A */
-READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
+uint8_t amstrad_state::amstrad_psg_porta_read()
 {
 	/* Read CPC Keyboard
 	If keyboard matrix line 11-15 are selected, the byte is always &ff.
@@ -3144,10 +3144,10 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
+	space.install_read_handler(0x4000, 0x5fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	//  multiface_init();
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
@@ -3187,10 +3187,10 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
+	space.install_read_handler(0x4000, 0x5fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }

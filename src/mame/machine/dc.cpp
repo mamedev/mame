@@ -101,7 +101,7 @@ TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE8_MEMBER(dc_state::g1_irq)
+void dc_state::g1_irq(uint8_t data)
 {
 	switch(data) {
 	case naomi_g1_device::DMA_GDROM_IRQ:
@@ -111,7 +111,7 @@ WRITE8_MEMBER(dc_state::g1_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE8_MEMBER(dc_state::pvr_irq)
+void dc_state::pvr_irq(uint8_t data)
 {
 	switch(data) {
 	case powervr2_device::EOXFER_YUV_IRQ:
@@ -177,7 +177,7 @@ WRITE8_MEMBER(dc_state::pvr_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE8_MEMBER(dc_state::maple_irq)
+void dc_state::maple_irq(uint8_t data)
 {
 	switch(data) {
 	case maple_dc_device::DMA_MAPLE_IRQ:

@@ -30,12 +30,12 @@
 
 /******************************************************************************/
 
-WRITE8_MEMBER(actfancr_state::triothep_control_select_w)
+void actfancr_state::triothep_control_select_w(uint8_t data)
 {
 	m_trio_control_select = data;
 }
 
-READ8_MEMBER(actfancr_state::triothep_control_r)
+uint8_t actfancr_state::triothep_control_r()
 {
 	switch (m_trio_control_select)
 	{

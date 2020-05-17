@@ -155,7 +155,7 @@ void surpratk_state::machine_reset()
 	m_sprite_colorbase = 0;
 }
 
-WRITE8_MEMBER( surpratk_state::banking_callback )
+void surpratk_state::banking_callback(uint8_t data)
 {
 //  logerror("%s: setlines %02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry(data & 0x1f);

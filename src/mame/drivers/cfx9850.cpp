@@ -44,27 +44,28 @@ public:
 		, m_opt(0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(kol_w);
-	DECLARE_WRITE8_MEMBER(koh_w);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(opt_w);
-	DECLARE_READ8_MEMBER(ki_r);
-	DECLARE_READ8_MEMBER(in0_r);
+	void cfx9850(machine_config &config);
+
+private:
 	required_shared_ptr<u8> m_video_ram;
 	required_shared_ptr<u8> m_display_ram;
-	void cfx9850_palette(palette_device &palette) const;
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void cfx9850(machine_config &config);
-	void cfx9850_mem(address_map &map);
-protected:
 	required_ioport_array<12> m_ko_port;
 	required_device<hcd62121_cpu_device> m_maincpu;
 
-private:
 	u16 m_ko;   // KO lines KO1 - KO14
 	u8 m_port;  // PORT lines PORT0 - PORT7 (serial I/O)
 	u8 m_opt;   // OPT lines OPT0 - OPT7 (contrast)
+
+	void kol_w(u8 data);
+	void koh_w(u8 data);
+	void port_w(u8 data);
+	void opt_w(u8 data);
+	u8 ki_r();
+	u8 in0_r();
+	void cfx9850_palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void cfx9850_mem(address_map &map);
 };
 
 
@@ -81,14 +82,14 @@ void cfx9850_state::cfx9850_mem(address_map &map)
 }
 
 
-WRITE8_MEMBER(cfx9850_state::kol_w)
+void cfx9850_state::kol_w(u8 data)
 {
 	m_ko = (m_ko & 0xff00) | data;
 	logerror("KO is now %04x\n", m_ko);
 }
 
 
-WRITE8_MEMBER(cfx9850_state::koh_w)
+void cfx9850_state::koh_w(u8 data)
 {
 	m_ko = (m_ko & 0x00ff) | (data << 8);
 	logerror("KO is now %04x\n", m_ko);
@@ -103,7 +104,7 @@ WRITE8_MEMBER(cfx9850_state::koh_w)
 // -----2-- PORT2 - NC / CP29
 // ------1- PORT1 - NC / CP30
 // -------0 PORT0 - display (enable?) related? + CP31
-WRITE8_MEMBER(cfx9850_state::port_w)
+void cfx9850_state::port_w(u8 data)
 {
 	m_port = data;
 	logerror("PORT is now %02x\n", m_port);
@@ -118,14 +119,14 @@ WRITE8_MEMBER(cfx9850_state::port_w)
 // -----2-- OPT2 - contrast (TC74HC4066AFS pin 6)
 // ------1- OPT1 - contrast (TC74HC4066AFS pin 5)
 // -------0 OPT0 - contrast (TC74HC4066AFS pin 13)
-WRITE8_MEMBER(cfx9850_state::opt_w)
+void cfx9850_state::opt_w(u8 data)
 {
 	m_opt = data;
 	logerror("OPT is now %02x\n", m_opt);
 }
 
 
-READ8_MEMBER(cfx9850_state::ki_r)
+u8 cfx9850_state::ki_r()
 {
 	u8 data = 0;
 
@@ -141,7 +142,7 @@ READ8_MEMBER(cfx9850_state::ki_r)
 }
 
 
-READ8_MEMBER(cfx9850_state::in0_r)
+u8 cfx9850_state::in0_r()
 {
 	// battery level?
 	// bit4 -> if reset CPU keeps restarting (several unknown instructions before jumping to 0)

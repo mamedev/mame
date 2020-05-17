@@ -397,7 +397,7 @@ void mermaid_state::machine_reset()
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-WRITE8_MEMBER(mermaid_state::adpcm_data_w)
+void mermaid_state::adpcm_data_w(uint8_t data)
 {
 	m_adpcm_data = data;
 	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);

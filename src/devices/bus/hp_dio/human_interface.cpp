@@ -217,7 +217,7 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 		if (m_ppoll_sc & PPOLL_IE) {
 			LOG("%s: start parallel poll\n", __func__);
-			ieee488_dio_w(space, 0, m_ieee488->dio_r(space, 0));
+			ieee488_dio_w(space, 0, m_ieee488->dio_r());
 		}
 		break;
 	case 4:

@@ -1279,7 +1279,7 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 #define PA2 0x04
 #define PA1 0x02
 
-READ8_MEMBER(mac_state::mac_via_in_a)
+uint8_t mac_state::mac_via_in_a()
 {
 //  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
 
@@ -1335,7 +1335,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 	}
 }
 
-READ8_MEMBER(mac_state::mac_via_in_a_pmu)
+uint8_t mac_state::mac_via_in_a_pmu()
 {
 //  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
 
@@ -1345,7 +1345,7 @@ READ8_MEMBER(mac_state::mac_via_in_a_pmu)
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b)
+uint8_t mac_state::mac_via_in_b()
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
@@ -1388,7 +1388,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_ii)
+uint8_t mac_state::mac_via_in_b_ii()
 {
 	int val = 0;
 
@@ -1417,7 +1417,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_ii)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
+uint8_t mac_state::mac_via_in_b_via2pmu()
 {
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
@@ -1432,7 +1432,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_pmu)
+uint8_t mac_state::mac_via_in_b_pmu()
 {
 	int val = 0;
 //  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
@@ -1443,7 +1443,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 	return val;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a)
+void mac_state::mac_via_out_a(uint8_t data)
 {
 //  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1475,7 +1475,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
+void mac_state::mac_via_out_a_pmu(uint8_t data)
 {
 //  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1485,7 +1485,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 	m_pm_data_send = data;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b)
+void mac_state::mac_via_out_b(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1520,7 +1520,7 @@ void mac_state::update_volume(void)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
+void mac_state::mac_via_out_b_bbadb(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1556,7 +1556,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 	m_rtc->clk_w((data >> 1) & 0x01);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
+void mac_state::mac_via_out_b_egadb(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1567,7 +1567,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
+void mac_state::mac_via_out_b_cdadb(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1578,12 +1578,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_via2pmu)
+void mac_state::mac_via_out_b_via2pmu(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
+void mac_state::mac_via_out_b_pmu(uint8_t data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
@@ -1723,7 +1723,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 }
 
 
-READ8_MEMBER(mac_state::mac_via2_in_a)
+uint8_t mac_state::mac_via2_in_a()
 {
 	uint8_t result;
 
@@ -1739,12 +1739,12 @@ READ8_MEMBER(mac_state::mac_via2_in_a)
 	return result;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_a_pmu)
+uint8_t mac_state::mac_via2_in_a_pmu()
 {
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b)
+uint8_t mac_state::mac_via2_in_b()
 {
 //  logerror("%s VIA2 IN B\n", machine().describe_context());
 
@@ -1761,7 +1761,7 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 	return 0xcf;        // indicate no NuBus transaction error
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
+uint8_t mac_state::mac_via2_in_b_pmu()
 {
 //  logerror("%s VIA2 IN B\n", machine().describe_context());
 
@@ -1775,18 +1775,18 @@ READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a)
+void mac_state::mac_via2_out_a(uint8_t data)
 {
 //  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a_pmu)
+void mac_state::mac_via2_out_a_pmu(uint8_t data)
 {
 //  logerror("%s VIA2 OUT A: %02x\n", machine().describe_context(), data);
 	m_pm_data_send = data;
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b)
+void mac_state::mac_via2_out_b(uint8_t data)
 {
 //  logerror("%s VIA2 OUT B: %02x\n", machine().describe_context(), data);
 
@@ -1800,7 +1800,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
+void mac_state::mac_via2_out_b_pmu(uint8_t data)
 {
 //  logerror("%s VIA2 OUT B PMU: %02x\n", machine().describe_context(), data);
 

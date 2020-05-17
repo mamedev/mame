@@ -332,6 +332,9 @@ void sparc_base_device::device_start()
 	save_item(NAME(m_fp_disabled));
 	save_item(NAME(m_cp_disabled));
 	save_item(NAME(m_fp_exception));
+	save_item(NAME(m_fp_exception_pending));
+	save_item(NAME(m_fpr_pending));
+	save_item(NAME(m_pending_fpr));
 	save_item(NAME(m_cp_exception));
 	save_item(NAME(m_instruction_access_exception));
 	save_item(NAME(m_data_access_exception));
@@ -397,6 +400,9 @@ void sparc_base_device::device_reset()
 	m_mem_address_not_aligned = 0;
 	m_fp_disabled = 0;
 	m_fp_exception = 0;
+	m_fp_exception_pending = 0;
+	m_fpr_pending = 0;
+	m_pending_fpr = ARRAY_LENGTH(m_fpr);
 	m_fpu_sequence_err = 0;
 	m_cp_disabled = 0;
 	m_cp_exception = 0;
@@ -2026,8 +2032,8 @@ void sparc_base_device::execute_store(uint32_t op)
 	}
 	else if ((STD || STDA || STDF || STDFQ || STDC || STDCQ) && ((address & 7) != 0))
 	{
-		m_trap = 1;
 		m_mem_address_not_aligned = 1;
+		m_trap = 1;
 		m_stashed_icount = m_icount;
 		m_icount = 0;
 		return;
@@ -2036,11 +2042,6 @@ void sparc_base_device::execute_store(uint32_t op)
 	if (STDFQ)
 	{
 		// assume no floating-point queue for now
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = m_fpu_sequence_err;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	if (STDCQ)
@@ -2053,22 +2054,17 @@ void sparc_base_device::execute_store(uint32_t op)
 		// { possibly additional implementation-dependent actions }
 		return;
 	}
-	if (STDF && ((RD & 1) != 0))
-	{
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = 0xff;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
 
 	uint32_t data0 = 0;
+	uint32_t data1 = 0;
 	//uint8_t byte_mask;
 	if (STF)
 	{
 		//byte_mask = 15;
-		data0 = FREG(RD);
+		if (get_fpr32(data0, RD))
+		{
+			return;
+		}
 	}
 	else if (STC)
 	{
@@ -2078,7 +2074,14 @@ void sparc_base_device::execute_store(uint32_t op)
 	else if (STDF)
 	{
 		//byte_mask = 15;
-		data0 = FREG(RD & 0x1e);
+		if (get_fpr32(data0, RD & 0x1e))
+		{
+			return;
+		}
+		if (get_fpr32(data1, RD | 1))
+		{
+			return;
+		}
 	}
 	else if (STDC)
 	{
@@ -2089,16 +2092,19 @@ void sparc_base_device::execute_store(uint32_t op)
 	{
 		//byte_mask = 15;
 		data0 = REG(RD & 0x1e);
+		data1 = REG(RD | 1);
 	}
 	else if (STDFQ)
 	{
 		//byte_mask = 15;
 		data0 = 0;
+		data1 = 0;
 	}
 	else if (STDCQ)
 	{
 		//byte_mask = 15;
 		data0 = 0;
+		data1 = 0;
 	}
 	else if (STFSR)
 	{
@@ -2171,28 +2177,6 @@ void sparc_base_device::execute_store(uint32_t op)
 
 	if (STD || STDA || STDF || STDC || STDFQ || STDCQ)
 	{
-		uint32_t data1 = 0;
-		if (STD || STDA)
-		{
-			data1 = REG(RD | 1);
-		}
-		else if (STDF)
-		{
-			data1 = FREG(RD | 1);
-		}
-		else if (STDC)
-		{
-			data1 = 0;
-		}
-		else if (STDFQ)
-		{
-			data1 = 0;
-		}
-		else if (STDCQ)
-		{
-			data1 = 0;
-		}
-
 		m_mmu->write_asi(addr_space, (address + 4) >> 2, data1, 0xffffffff);
 		if (MAE)
 		{
@@ -2528,26 +2512,6 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 		return;
 	}
 
-	if (RD & 1)
-	{
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = 0xff;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
-
-	if (m_fpu_sequence_err)
-	{
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = m_fpu_sequence_err;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
-
 	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
 
 	if (m_mae)
@@ -2559,7 +2523,10 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 		return;
 	}
 
-	FREG(RD & 0x1e) = data;
+	if (m_pending_fpr == (RD & 0x1e))
+	{
+		return;
+	}
 
 	const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
 	if (MAE)
@@ -2571,6 +2538,12 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 		return;
 	}
 
+	if (m_pending_fpr == (RD | 1))
+	{
+		return;
+	}
+
+	FREG(RD & 0x1e) = data;
 	FREG(RD | 1) = word1;
 
 	PC = nPC;
@@ -2599,16 +2572,6 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 		return;
 	}
 
-	if (m_fpu_sequence_err)
-	{
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = m_fpu_sequence_err;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
-
 	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
 
 	if (m_mae)
@@ -2617,6 +2580,11 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 		m_data_access_exception = 1;
 		m_stashed_icount = m_icount;
 		m_icount = 0;
+		return;
+	}
+
+	if (m_pending_fpr == RD)
+	{
 		return;
 	}
 
@@ -2643,16 +2611,6 @@ inline void sparc_base_device::execute_ldfsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
-	}
-
-	if (m_fpu_sequence_err)
-	{
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_ftt = m_fpu_sequence_err;
 		m_stashed_icount = m_icount;
 		m_icount = 0;
 		return;
@@ -3412,7 +3370,7 @@ inline void sparc_base_device::execute_group3(uint32_t op)
 			break;
 	}
 
-	if (MAE /*|| HOLD_BUS*/)
+	if (MAE)
 		m_icount--;
 	else
 		m_icount -= ldst_cycles[OP3];
@@ -3715,11 +3673,11 @@ void sparc_base_device::select_trap()
 	m_illegal_instruction = 0;
 	m_privileged_instruction = 0;
 	m_fp_disabled = 0;
+	m_fp_exception = 0;
 	m_cp_disabled = 0;
 	m_window_overflow = 0;
 	m_window_underflow = 0;
 	m_mem_address_not_aligned = 0;
-	m_fp_exception = 0;
 	m_cp_exception = 0;
 	m_data_access_exception = 0;
 	m_tag_overflow = 0;
@@ -4096,10 +4054,7 @@ void sparc_base_device::check_fdiv_zero_exception()
 	if (m_fsr & FSR_TEM_DZM)
 	{
 		m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
-		m_trap = 1;
-		m_fp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
+		m_fp_exception_pending = true;
 		return;
 	}
 	m_fsr |= FSR_AEXC_DZA;
@@ -4125,19 +4080,42 @@ bool sparc_base_device::check_fp_exceptions()
 	if (tem & cexc)
 	{
 		m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
-		m_trap = 1;
 		m_fp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return true;
 	}
 	return false;
 }
 
+bool sparc_base_device::get_fpr32(uint32_t &data, const uint32_t rd)
+{
+	if (m_pending_fpr == rd)
+	{
+		return true;
+	}
+	data = FREG(rd);
+	return false;
+}
+
+bool sparc_base_device::get_fpr64(uint64_t &data, const uint32_t rd)
+{
+	if (m_pending_fpr == rd || m_pending_fpr == (rd | 1))
+	{
+		return true;
+	}
+	data = (uint64_t)FREG(rd) << 32;
+	data |= FREG(rd | 1);
+	return false;
+}
+
 bool sparc_base_device::set_fpr32(const uint32_t rd, const uint32_t data)
 {
+	m_pending_fpr = rd;
 	if (softfloat_exceptionFlags && check_fp_exceptions())
+	{
+		m_fp_exception_pending = true;
+		m_fpr[rd] = 0;
 		return true;
+	}
 
 	m_fpr[rd] = data;
 	return false;
@@ -4145,8 +4123,14 @@ bool sparc_base_device::set_fpr32(const uint32_t rd, const uint32_t data)
 
 bool sparc_base_device::set_fpr64(const uint32_t rd, const uint64_t data)
 {
+	m_pending_fpr = rd;
 	if (softfloat_exceptionFlags && check_fp_exceptions())
+	{
+		m_fp_exception_pending = true;
+		m_fpr[rd] = 0;
+		m_fpr[rd + 1] = 0;
 		return true;
+	}
 
 	m_fpr[rd]     = (uint32_t)(data >> 32);
 	m_fpr[rd + 1] = (uint32_t)data;
@@ -4162,185 +4146,213 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 {
 	softfloat_exceptionFlags = 0;
 
+	uint32_t rs1 = 0;
+	uint32_t rs2 = 0;
+	uint64_t rd1 = 0;
+	uint64_t rd2 = 0;
+
 	const uint32_t fpop = (op >> 5) & 0x1ff;
 	switch (fpop)
 	{
 	case FPOP_FMOVS:
-		FDREG = FREG(RS2);
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 4;
+		set_fpr32(RD, rs2);
 		break;
 	case FPOP_FNEGS:
 	{
-		const float32_t fs2 = float32_t{ FREG(RS2) };
-		if (set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 4;
+		const float32_t fs2 = float32_t{ rs2 };
+		set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v);
 		break;
 	}
 	case FPOP_FABSS:
 	{
-		const uint32_t rs2 = FREG(RS2);
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 4;
 		const float32_t fs2 = float32_t{ rs2 };
 		if (f32_lt(fs2, float32_t{0}))
 		{
-			if (set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v))
-			{
-				return;
-			}
+			set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v);
 		}
-		else if (set_fpr32(RD, rs2))
+		else
 		{
-			return;
+			set_fpr32(RD, rs2);
 		}
 		break;
 	}
 	case FPOP_FSQRTS:
 	{
-		const float32_t fs2 = float32_t{ FREG(RS2) };
-		if (set_fpr32(RD, f32_sqrt(fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 62;
+		const float32_t fs2 = float32_t{ rs2 };
+		set_fpr32(RD, f32_sqrt(fs2).v);
 		break;
 	}
 	case FPOP_FSQRTD:
 	{
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr64(RD_D, f64_sqrt(fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 120;
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr64(RD_D, f64_sqrt(fs2).v);
 		break;
 	}
 	case FPOP_FADDS:
 	{
-		const float32_t fs1 = float32_t{ FREG(RS1) };
-		const float32_t fs2 = float32_t{ FREG(RS2) };
-		if (set_fpr32(RD, f32_add(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 8;
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		set_fpr32(RD, f32_add(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FADDD:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr64(RD_D, f64_add(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 8;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr64(RD_D, f64_add(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FSUBS:
 	{
-		const float32_t fs1 = float32_t{ FREG(RS1) };
-		const float32_t fs2 = float32_t{ FREG(RS2) };
-		if (set_fpr32(RD, f32_sub(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 8;
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		set_fpr32(RD, f32_sub(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FSUBD:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr64(RD_D, f64_sub(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 8;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr64(RD_D, f64_sub(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FMULS:
 	{
-		const float32_t fs1 = float32_t{ FREG(RS1) };
-		const float32_t fs2 = float32_t{ FREG(RS2) };
-		if (set_fpr32(RD, f32_mul(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 8;
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		set_fpr32(RD, f32_mul(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FMULD:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr64(RD_D, f64_mul(fs1, fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 14;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr64(RD_D, f64_mul(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FDIVS:
 	{
-		const uint32_t rs1 = FREG(RS1);
-		const uint32_t rs2 = FREG(RS2);
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 40;
 		if (rs2 == 0)
 		{
 			check_fdiv_zero_exception();
-			return;
+			m_pending_fpr = RD;
+			break;
 		}
 		const float32_t fs1 = float32_t{ rs1 };
 		const float32_t fs2 = float32_t{ rs2 };
-		if (set_fpr32(RD, f32_div(fs1, fs2).v))
-			return;
+		set_fpr32(RD, f32_div(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FDIVD:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		if (rs2 == 0)
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 68;
+		if (rd2 == 0)
 		{
 			check_fdiv_zero_exception();
-			return;
+			m_pending_fpr = RD;
+			break;
 		}
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr64(RD_D, f64_div(fs1, fs2).v))
-			return;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr64(RD_D, f64_div(fs1, fs2).v);
 		break;
 	}
 	case FPOP_FITOS:
 	{
-		const uint32_t rs2 = FREG(RS2);
-		if (set_fpr32(RD, i32_to_f32(int32_t(rs2)).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 16;
+		set_fpr32(RD, i32_to_f32(int32_t(rs2)).v);
 		break;
 	}
 	case FPOP_FDTOS:
 	{
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr32(RD, f64_to_f32(fs2).v))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 8;
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr32(RD, f64_to_f32(fs2).v);
 		break;
 	}
 	case FPOP_FITOD:
 	{
-		const uint32_t rs2 = FREG(RS2);
-		if (set_fpr64(RD_D, i32_to_f64(int32_t(rs2)).v))
-			return;
+		if (RD_D == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 8;
+		set_fpr64(RD_D, i32_to_f64(int32_t(rs2)).v);
 		break;
 	}
 	case FPOP_FSTOD:
 	{
-		const uint32_t rs2 = FREG(RS2);
+		if (RD_D == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 8;
 		const float32_t fs = float32_t{ rs2 };
-		if (set_fpr64(RD_D, f32_to_f64(fs).v))
-			return;
+		set_fpr64(RD_D, f32_to_f64(fs).v);
 		break;
 	}
 	case FPOP_FSTOI:
 	{
-		const uint32_t rs2 = FREG(RS2);
+		if (RD == m_pending_fpr) return;
+		if (get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 16; // Guessed based on FITOS
 		const float32_t fs2 = float32_t{ rs2 };
-		if (set_fpr32(RD, f32_to_i32(fs2, softfloat_roundingMode, true)))
-			return;
+		set_fpr32(RD, f32_to_i32(fs2, softfloat_roundingMode, true));
 		break;
 	}
 	case FPOP_FDTOI:
 	{
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs2 = float64_t{ rs2 };
-		if (set_fpr32(RD, f64_to_i32(fs2, softfloat_roundingMode, true)))
-			return;
+		if (RD == m_pending_fpr) return;
+		if (get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 8; // Guessed based on FITOD
+		const float64_t fs2 = float64_t{ rd2 };
+		set_fpr32(RD, f64_to_i32(fs2, softfloat_roundingMode, true));
 		break;
 	}
 	case FPOP_FCMPS:
 	{
-		const float32_t fs1 = float32_t{ FREG(RS1) };
-		const float32_t fs2 = float32_t{ FREG(RS2) };
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 4;
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
 		bool equal = f32_eq(fs1, fs2);
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_UO;
@@ -4354,10 +4366,10 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 	}
 	case FPOP_FCMPD:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 4;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
 		bool equal = f64_eq(fs1, fs2);
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_UO;
@@ -4371,8 +4383,10 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 	}
 	case FPOP_FCMPES:
 	{
-		const float32_t fs1 = float32_t{ FREG(RS1) };
-		const float32_t fs2 = float32_t{ FREG(RS2) };
+		if (get_fpr32(rs1, RS1) || get_fpr32(rs2, RS2)) return;
+		m_fpr_pending = 4;
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
 		bool equal = f32_eq(fs1, fs2);
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 		{
@@ -4381,11 +4395,8 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 			if (m_fsr & FSR_TEM_NVM)
 			{
 				m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
-				m_trap = 1;
 				m_fp_exception = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
-				return;
+				break;
 			}
 			m_fsr |= FSR_AEXC_NVA;
 		}
@@ -4399,10 +4410,10 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 	}
 	case FPOP_FCMPED:
 	{
-		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
-		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
-		const float64_t fs1 = float64_t{ rs1 };
-		const float64_t fs2 = float64_t{ rs2 };
+		if (get_fpr64(rd1, RS1_D) || get_fpr64(rd2, RS2_D)) return;
+		m_fpr_pending = 4;
+		const float64_t fs1 = float64_t{ rd1 };
+		const float64_t fs2 = float64_t{ rd2 };
 		bool equal = f64_eq(fs1, fs2);
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 		{
@@ -4411,11 +4422,8 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 			if (m_fsr & FSR_TEM_NVM)
 			{
 				m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
-				m_trap = 1;
 				m_fp_exception = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
-				return;
+				break;
 			}
 			m_fsr |= FSR_AEXC_NVA;
 		}
@@ -4442,11 +4450,8 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 	case FPOP_FCMPEX:
 	default:
 		m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_UNIMP;
-		m_trap = 1;
 		m_fp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-		return;
+		break;
 	}
 
 	PC = nPC;
@@ -4822,6 +4827,24 @@ inline void sparc_base_device::execute_step()
 			return;
 		}
 		dispatch_instruction(op);
+
+		if (m_fpr_pending)
+		{
+			m_fpr_pending--;
+			if (!m_fpr_pending)
+			{
+				m_pending_fpr = ARRAY_LENGTH(m_fpr);
+				if (m_fp_exception_pending)
+				{
+					m_fp_exception_pending = false;
+					m_fp_exception = 1;
+					m_trap = 1;
+					m_stashed_icount = m_icount;
+					m_icount = 0;
+					return;
+				}
+			}
+		}
 	}
 	else
 	{

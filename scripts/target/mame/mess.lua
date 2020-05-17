@@ -1310,7 +1310,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"telenova",
 		"telercas",
 		"televideo",
-		"tem",
 		"tesla",
 		"thomson",
 		"ti",
@@ -1423,6 +1422,8 @@ files {
 	MAME_DIR .. "src/mame/video/gtia.h",
 	MAME_DIR .. "src/mame/drivers/jaguar.cpp",
 	MAME_DIR .. "src/mame/includes/jaguar.h",
+	MAME_DIR .. "src/mame/video/jag_blitter.cpp",
+	MAME_DIR .. "src/mame/video/jag_blitter.h",
 	MAME_DIR .. "src/mame/audio/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jaguar.cpp",
 	MAME_DIR .. "src/mame/video/jagblit.h",
@@ -1666,7 +1667,8 @@ files {
 	MAME_DIR .. "src/mame/includes/pc1512.h",
 	MAME_DIR .. "src/mame/machine/pc1512kb.cpp",
 	MAME_DIR .. "src/mame/machine/pc1512kb.h",
-	MAME_DIR .. "src/mame/video/pc1512.cpp",
+	MAME_DIR .. "src/mame/video/ams40041.cpp",
+	MAME_DIR .. "src/mame/video/ams40041.h",
 	MAME_DIR .. "src/mame/drivers/pcw.cpp",
 	MAME_DIR .. "src/mame/includes/pcw.h",
 	MAME_DIR .. "src/mame/video/pcw.cpp",
@@ -2341,6 +2343,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_eag68k.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_excel.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_msc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_phantom.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc12.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_sc6.cpp",
@@ -2673,6 +2676,7 @@ createMESSProjects(_target, _subtarget, "korg")
 files {
 	MAME_DIR .. "src/mame/drivers/korgds8.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdss1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgdvp1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
 	MAME_DIR .. "src/mame/drivers/korgz3.cpp",
@@ -3062,7 +3066,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_const.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
-	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_micro2.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_supremo.cpp",
@@ -3743,11 +3747,6 @@ files {
 	MAME_DIR .. "src/mame/machine/tv955kb.h",
 }
 
-createMESSProjects(_target, _subtarget, "tem")
-files {
-	MAME_DIR .. "src/mame/drivers/tec1.cpp",
-}
-
 createMESSProjects(_target, _subtarget, "tesla")
 files {
 	MAME_DIR .. "src/mame/drivers/ondra.cpp",
@@ -3856,6 +3855,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pro80.cpp",
 	MAME_DIR .. "src/mame/drivers/savia84.cpp",
 	MAME_DIR .. "src/mame/drivers/selz80.cpp",
+	MAME_DIR .. "src/mame/drivers/tec1.cpp",
 	MAME_DIR .. "src/mame/drivers/tk80.cpp",
 	MAME_DIR .. "src/mame/drivers/zapcomputer.cpp",
 }

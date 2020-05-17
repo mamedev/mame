@@ -42,12 +42,12 @@ private:
 	DECLARE_READ16_MEMBER(histryma_700000_r);
 	DECLARE_READ16_MEMBER(bbprot_700000_r);
 	DECLARE_WRITE16_MEMBER(fitfight_700000_w);
-	DECLARE_READ8_MEMBER(snd_porta_r);
-	DECLARE_READ8_MEMBER(snd_portb_r);
-	DECLARE_READ8_MEMBER(snd_portc_r);
-	DECLARE_WRITE8_MEMBER(snd_porta_w);
-	DECLARE_WRITE8_MEMBER(snd_portb_w);
-	DECLARE_WRITE8_MEMBER(snd_portc_w);
+	uint8_t snd_porta_r();
+	uint8_t snd_portb_r();
+	uint8_t snd_portc_r();
+	void snd_porta_w(uint8_t data);
+	void snd_portb_w(uint8_t data);
+	void snd_portc_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(fof_bak_tileram_w);
 	DECLARE_WRITE16_MEMBER(fof_mid_tileram_w);
 	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);

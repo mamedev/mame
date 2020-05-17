@@ -498,7 +498,7 @@ READ8_MEMBER( nb1413m3_device::inputport3_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw1_r )
+uint8_t nb1413m3_device::dipsw1_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)
@@ -542,7 +542,7 @@ READ8_MEMBER( nb1413m3_device::dipsw1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw2_r )
+uint8_t nb1413m3_device::dipsw2_r()
 {
 	device_t &root = machine().root_device();
 	switch (m_nb1413m3_type)

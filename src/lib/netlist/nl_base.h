@@ -24,6 +24,7 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/ptypes.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -174,7 +175,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
-#define NETLIB_HANDLERI(name) virtual void name() noexcept
+#define NETLIB_HANDLERI(name) void name() noexcept
 #define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
@@ -564,6 +565,10 @@ namespace netlist
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
 
+			// to ease template design
+			template<typename T, typename... Args>
+			unique_pool_ptr<T> make_object(Args&&... args);
+
 		private:
 			netlist_t & m_netlist;
 
@@ -627,11 +632,16 @@ namespace netlist
 			/// Going forward setting this to 8 will allow 8-bit signal
 			/// busses to be used in netlist, e.g. for more complex memory
 			/// arrangements.
-			static constexpr const unsigned int INP_BITS = 1;
+			/// Mimimum value is 2 here to support tristate output on proxies.
+			static constexpr const unsigned int INP_BITS = 2;
 
 			static constexpr const unsigned int INP_MASK = (1 << INP_BITS) - 1;
 			static constexpr const unsigned int INP_HL_SHIFT = 0;
 			static constexpr const unsigned int INP_LH_SHIFT = INP_BITS;
+
+			static constexpr netlist_sig_t OUT_TRISTATE() { return INP_MASK; }
+
+			static_assert(INP_BITS * 2 <= sizeof(netlist_sig_t) * 8, "netlist_sig_t size not sufficient");
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,
@@ -666,6 +676,7 @@ namespace netlist
 			bool is_logic() const noexcept;
 			bool is_logic_input() const noexcept;
 			bool is_logic_output() const noexcept;
+			bool is_tristate_output() const noexcept;
 			bool is_analog() const noexcept;
 			bool is_analog_input() const noexcept;
 			bool is_analog_output() const noexcept;
@@ -747,14 +758,10 @@ namespace netlist
 
 			// setup stuff
 
-			void add_terminal(core_terminal_t &terminal) noexcept(false);
-			void remove_terminal(core_terminal_t &terminal) noexcept(false);
-
 			bool is_logic() const noexcept;
 			bool is_analog() const noexcept;
 
 			void rebuild_list();     // rebuild m_list after a load
-			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
 
@@ -1019,6 +1026,67 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
+	// tristate_output_t
+	// -----------------------------------------------------------------------------
+
+	/// \brief Tristate output
+	///
+	/// In a lot of applications tristate enable inputs are just connected to
+	/// VCC/GND to permanently enable the outputs. In this case a pure
+	/// implementation using analog outputs would not perform well.
+	///
+	/// For this object during creation it can be decided if a logic output or
+	/// a tristate output is used. Generally the owning device uses parameter
+	/// FORCE_TRISTATE_LOGIC to determine this.
+	///
+	/// This is the preferred way to implement tristate outputs.
+	///
+
+	class tristate_output_t : public logic_output_t
+	{
+	public:
+
+		tristate_output_t(device_t &dev, const pstring &aname, bool force_logic)
+		: logic_output_t(dev, aname)
+		, m_last_logic(dev, name() + "." + "m_last_logic", 1) // force change
+		, m_tristate(dev, name() + "." + "m_tristate", 2) // force change
+		, m_force_logic(force_logic)
+		{}
+
+		void push(netlist_sig_t newQ, netlist_time delay) noexcept
+		{
+			if (!m_tristate)
+				logic_output_t::push(newQ, delay);
+			m_last_logic = newQ;
+		}
+
+		void set_tristate(bool v,
+			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
+		{
+			//printf("%s %d\n", this->name().c_str(), (int) m_force_logic);
+			if (!m_force_logic)
+				if (v != m_tristate)
+				{
+					logic_output_t::push(v ? OUT_TRISTATE() : m_last_logic, v ? ts_off_on : ts_on_off);
+					m_tristate = v;
+				}
+		}
+
+		bool is_force_logic() const noexcept
+		{
+			return m_force_logic;
+		}
+
+	private:
+		using logic_output_t::initial;
+		using logic_output_t::set_Q_time;
+		state_var<netlist_sig_t> m_last_logic;
+		state_var<netlist_sig_t> m_tristate;
+		bool m_force_logic;
+	};
+
+
+	// -----------------------------------------------------------------------------
 	// analog_output_t
 	// -----------------------------------------------------------------------------
 
@@ -1161,22 +1229,22 @@ namespace netlist
 		const pstring &operator()() const noexcept { return str(); }
 		void set(const pstring &param)
 		{
-			if (m_param != param)
+			if (*m_param != param)
 			{
-				m_param = param;
+				*m_param = param;
 				changed();
 				update_param();
 			}
 		}
 		pstring valstr() const override
 		{
-			return m_param;
+			return *m_param;
 		}
 	protected:
 		virtual void changed() noexcept;
-		const pstring &str() const noexcept { return m_param; }
+		const pstring &str() const noexcept { return *m_param; }
 	private:
-		pstring m_param;
+		plib::unique_ptr<pstring> m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1837,12 +1905,12 @@ namespace netlist
 	// Support classes for devices
 	// -----------------------------------------------------------------------------
 
-	template<class C, int N>
-	class object_array_t : public plib::uninitialised_array_t<C, N>
+	template<class C, std::size_t N>
+	class object_array_base_t : public plib::uninitialised_array_t<C, N>
 	{
 	public:
 		template<class D, typename... Args>
-		object_array_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		object_array_base_t(D &dev, const std::initializer_list<const char *> &names, Args&&... args)
 		{
 			passert_always_msg(names.size() == N, "initializer_list size mismatch");
 			std::size_t i = 0;
@@ -1850,20 +1918,140 @@ namespace netlist
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
-		template<class D, typename... Args>
-		object_array_t(D &dev, const pstring &fmt, Args&&... args)
+		template<class D>
+		object_array_base_t(D &dev, const pstring &fmt)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, plib::pfmt(fmt)(i), std::forward<Args>(args)...);
+				this->emplace(i, dev, formatted(fmt, i));
 		}
 
-		template<class D, typename... Args>
-		object_array_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, plib::pfmt(fmt)(i+offset), std::forward<Args>(args)...);
+				this->emplace(i, dev, formatted(fmt, i+offset));
 		}
 
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate &&delegate)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, formatted(fmt, i+offset), std::move(delegate));
+		}
+
+		template<class D>
+		object_array_base_t(D &dev, std::size_t offset, std::size_t qmask, const pstring &fmt)
+		{
+			for (std::size_t i = 0; i<N; i++)
+			{
+				pstring name(formatted(fmt, i+offset));
+				if ((qmask >> i) & 1)
+					name += "Q";
+				this->emplace(i, dev, name);
+			}
+		}
+	protected:
+		object_array_base_t() = default;
+
+	protected:
+		static pstring formatted(const pstring &fmt, std::size_t n)
+		{
+			if (N != 1)
+				return plib::pfmt(fmt)(n);
+			else
+				return plib::pfmt(fmt)("");
+		}
+	};
+
+	template<class C, std::size_t N>
+	class object_array_t : public object_array_base_t<C, N>
+	{
+	public:
+		using base_type = object_array_base_t<C, N>;
+		using base_type::base_type;
+	};
+
+	template<std::size_t N>
+	class object_array_t<logic_input_t,N> : public object_array_base_t<logic_input_t, N>
+	{
+	public:
+		using base_type = object_array_base_t<logic_input_t, N>;
+		using base_type::base_type;
+
+		template<class D, std::size_t ND>
+		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
+//			const pstring &fmt, std::initializer_list<nldelegate> &delegates)
+			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
+		{
+			passert_always_msg(delegates.size() >= N, "initializer_list size mismatch");
+			std::size_t i = 0;
+			for (auto &e : delegates)
+			{
+				if (i < N)
+				{
+					pstring name(this->formatted(fmt, i+offset));
+					if ((qmask >> i) & 1)
+						name += "Q";
+					this->emplace(i, dev, name, e);
+				}
+				i++;
+			}
+		}
+
+
+		//using value_type = typename plib::least_type_for_bits<N>::type;
+		using value_type = std::uint_fast32_t;
+
+		value_type operator ()()
+		{
+			if (N == 1) return e<0>();
+			if (N == 2) return e<0>() | (e<1>() << 1);
+			if (N == 3) return e<0>() | (e<1>() << 1) | (e<2>() << 2);
+			if (N == 4) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3);
+			if (N == 5) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4);
+			if (N == 6) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5);
+			if (N == 7) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5) | (e<6>() << 6);
+			if (N == 8) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5) | (e<6>() << 6) | (e<7>() << 7);
+
+			value_type r(0);
+			for (std::size_t i = 0; i < N; i++)
+				r = static_cast<value_type>((*this)[i]() << (N-1)) | (r >> 1);
+			return r;
+		}
+
+	private:
+		template <std::size_t P>
+		inline constexpr value_type e() const { return (*this)[P](); }
+	};
+
+	template<std::size_t N>
+	class object_array_t<logic_output_t,N> : public object_array_base_t<logic_output_t, N>
+	{
+	public:
+		using base_type = object_array_base_t<logic_output_t, N>;
+		using base_type::base_type;
+
+		using value_type = std::uint_fast32_t;
+		//using value_type = typename plib::least_type_for_bits<N>::type;
+
+		void push(value_type v, netlist_time t)
+		{
+			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
+			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
+			if (N >= 3) (*this)[2].push((v >> 2) & 1, t);
+			if (N >= 4) (*this)[3].push((v >> 3) & 1, t);
+			if (N >= 5) (*this)[4].push((v >> 4) & 1, t);
+			if (N >= 6) (*this)[5].push((v >> 5) & 1, t);
+			if (N >= 7) (*this)[6].push((v >> 6) & 1, t);
+			if (N >= 8) (*this)[7].push((v >> 7) & 1, t);
+
+			for (std::size_t i = 8; i < N; i++)
+				(*this)[i].push((v >> i) & 1, t);
+		}
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1913,6 +2101,13 @@ namespace netlist
 	{
 		return m_netlist.nlstate();
 	}
+
+	template<typename T, typename... Args>
+	inline unique_pool_ptr<T> detail::netlist_object_t::make_object(Args&&... args)
+	{
+		return state().make_object<T>(std::forward<Args>(args)...);
+	}
+
 
 	inline void param_t::update_param() noexcept
 	{
@@ -2021,6 +2216,8 @@ namespace netlist
 
 	inline void detail::net_t::push_to_queue(netlist_time delay) noexcept
 	{
+		// FIXME: checking for has_connection doesn't have any noticable effect
+		//        on performance.
 		if (has_connections())
 		{
 			m_next_scheduled_time = exec().time() + delay;

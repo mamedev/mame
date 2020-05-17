@@ -390,7 +390,7 @@ public:
 	DECLARE_WRITE32_MEMBER(dma_w);
 	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void lamps_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
@@ -414,7 +414,7 @@ public:
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void dma_transfer( address_space &space, uint16_t dma_index );
 
@@ -2828,7 +2828,7 @@ WRITE16_MEMBER( coolridr_state::soundram_w)
 }
 
 
-WRITE8_MEMBER( coolridr_state::lamps_w )
+void coolridr_state::lamps_w(uint8_t data)
 {
 	/*
 	x--- ---- P2 Music select Lamp
@@ -3204,7 +3204,7 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE8_MEMBER(coolridr_state::scsp_irq)
+void coolridr_state::scsp_irq(offs_t offset, uint8_t data)
 {
 	m_soundcpu->set_input_line(offset, data);
 }

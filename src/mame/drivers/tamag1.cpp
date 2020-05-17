@@ -33,7 +33,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(uint8_t data);
 	void tama_palette(palette_device &palette) const;
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
@@ -96,7 +96,7 @@ void tamag1_state::tama_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tamag1_state::speaker_w)
+void tamag1_state::speaker_w(uint8_t data)
 {
 	// R43: speaker out
 	m_speaker->level_w(data >> 3 & 1);

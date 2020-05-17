@@ -76,19 +76,19 @@ private:
 	DECLARE_WRITE8_MEMBER( lcd_cs_w );
 	DECLARE_WRITE8_MEMBER( lcd_data_w );
 
-	DECLARE_READ8_MEMBER( main_p1_r );
-	DECLARE_WRITE8_MEMBER( main_p1_w );
-	DECLARE_READ8_MEMBER( main_p2_r );
-	DECLARE_WRITE8_MEMBER( main_p2_w );
+	uint8_t main_p1_r();
+	void main_p1_w(uint8_t data);
+	uint8_t main_p2_r();
+	void main_p2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( slave_p1_r );
-	DECLARE_WRITE8_MEMBER( slave_p1_w );
-	DECLARE_READ8_MEMBER( slave_p2_r );
-	DECLARE_WRITE8_MEMBER( slave_p2_w );
-	DECLARE_READ8_MEMBER( slave_p3_r );
-	DECLARE_WRITE8_MEMBER( slave_p3_w );
-	DECLARE_READ8_MEMBER( slave_p4_r );
-	DECLARE_WRITE8_MEMBER( slave_p4_w );
+	uint8_t slave_p1_r();
+	void slave_p1_w(uint8_t data);
+	uint8_t slave_p2_r();
+	void slave_p2_w(uint8_t data);
+	uint8_t slave_p3_r();
+	void slave_p3_w(uint8_t data);
+	uint8_t slave_p4_r();
+	void slave_p4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 

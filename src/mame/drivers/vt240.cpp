@@ -74,7 +74,7 @@ private:
 	DECLARE_WRITE8_MEMBER(t11_comm_w);
 	DECLARE_READ8_MEMBER(duart_r);
 	DECLARE_WRITE8_MEMBER(duart_w);
-	DECLARE_WRITE8_MEMBER(duartout_w);
+	void duartout_w(uint8_t data);
 	DECLARE_READ8_MEMBER(mem_map_cs_r);
 	DECLARE_WRITE8_MEMBER(mem_map_cs_w);
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -280,7 +280,7 @@ WRITE8_MEMBER(vt240_state::duart_w)
 		m_duart->write(offset >> 1, data);
 }
 
-WRITE8_MEMBER(vt240_state::duartout_w)
+void vt240_state::duartout_w(uint8_t data)
 {
 	m_host->write_rts(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 	m_host->write_dtr(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);

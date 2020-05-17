@@ -184,9 +184,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
 
-	DECLARE_READ8_MEMBER(io_portc_r);
-	DECLARE_WRITE8_MEMBER(io_portd_w);
-	DECLARE_WRITE8_MEMBER(io_porth_w);
+	uint8_t io_portc_r();
+	void io_portd_w(uint8_t data);
+	void io_porth_w(uint8_t data);
 
 	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
 	DECLARE_READ16_MEMBER( palette_r );
@@ -444,7 +444,7 @@ void segac2_state::recompute_palette_tables()
     Sega 315-5296 I/O chip
 ******************************************************************************/
 
-READ8_MEMBER(segac2_state::io_portc_r)
+uint8_t segac2_state::io_portc_r()
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
@@ -452,7 +452,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 	return 0xbf | busy;
 }
 
-WRITE8_MEMBER(segac2_state::io_portd_w)
+void segac2_state::io_portd_w(uint8_t data)
 {
 	/*
 	 D7 : To pin 3 of JP15. (Watchdog clock control)
@@ -470,7 +470,7 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
-WRITE8_MEMBER(segac2_state::io_porth_w)
+void segac2_state::io_porth_w(uint8_t data)
 {
 	/*
 	 D7 : To pin A19 of CN4

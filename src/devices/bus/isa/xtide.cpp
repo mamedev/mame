@@ -63,13 +63,13 @@ READ8_MEMBER( xtide_device::read )
 
 	if (offset == 0)
 	{
-		uint16_t data16 = m_ata->read_cs0(offset & 7);
+		uint16_t data16 = m_ata->cs0_r(offset & 7);
 		result = data16 & 0xff;
 		m_d8_d15_latch = data16 >> 8;
 	}
 	else if (offset < 8)
 	{
-		result = m_ata->read_cs0(offset & 7, 0xff);
+		result = m_ata->cs0_r(offset & 7, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -77,7 +77,7 @@ READ8_MEMBER( xtide_device::read )
 	}
 	else
 	{
-		result = m_ata->read_cs1(offset & 7, 0xff);
+		result = m_ata->cs1_r(offset & 7, 0xff);
 	}
 
 //  logerror("%s xtide_device::read: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
@@ -93,11 +93,11 @@ WRITE8_MEMBER( xtide_device::write )
 	{
 		// Data register transfer low byte and latched high
 		uint16_t data16 = (m_d8_d15_latch << 8) | data;
-		m_ata->write_cs0(offset & 7, data16);
+		m_ata->cs0_w(offset & 7, data16);
 	}
 	else if (offset < 8)
 	{
-		m_ata->write_cs0(offset & 7, data, 0xff);
+		m_ata->cs0_w(offset & 7, data, 0xff);
 	}
 	else if (offset == 8)
 	{
@@ -105,7 +105,7 @@ WRITE8_MEMBER( xtide_device::write )
 	}
 	else
 	{
-		m_ata->write_cs1(offset & 7, data, 0xff);
+		m_ata->cs1_w(offset & 7, data, 0xff);
 	}
 }
 

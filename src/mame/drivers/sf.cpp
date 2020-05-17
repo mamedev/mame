@@ -1045,7 +1045,7 @@ ROM_START( sfjbl ) // main PCB is marked '17-51-1' on component side
 	ROM_LOAD( "a-6.6.8f", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
 	ROM_REGION( 0x1000, "protcpu", 0 )
-	ROM_LOAD( "c8751h-88.5o", 0x0000, 0x1000, BAD_DUMP CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) ) // C8751H-88, not dumped yet for this PCB
+	ROM_LOAD( "c8751h-88.5o", 0x0000, 0x1000, CRC(6588891f) SHA1(699a96c682dd527dc77aa5cb2c2655136d2bfc90) ) // decapped, matches other dump from unprotected 8751
 
 	ROM_REGION( 0x40000, "audio2", 0 )  // samples CPU, identical to the original, but with half size ROMs
 	ROM_LOAD( "a-2.2.6b", 0x00000, 0x10000, CRC(a3212da3) SHA1(4f95eb1dedbcca05016d92f62968ffce8173defe) )

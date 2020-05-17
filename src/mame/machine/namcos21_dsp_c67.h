@@ -123,13 +123,13 @@ private:
 	DECLARE_WRITE16_MEMBER(dsp_portb_w);
 	DECLARE_WRITE16_MEMBER(dsp_portc_w);
 	DECLARE_READ16_MEMBER(dsp_portf_r);
-	DECLARE_WRITE16_MEMBER(dsp_xf_w);
+	void dsp_xf_w(uint16_t data);
 	DECLARE_READ16_MEMBER(slave_port0_r);
 	DECLARE_WRITE16_MEMBER(slave_port0_w);
 	DECLARE_READ16_MEMBER(slave_port2_r);
 	DECLARE_READ16_MEMBER(slave_port3_r);
 	DECLARE_WRITE16_MEMBER(slave_port3_w);
-	DECLARE_WRITE16_MEMBER(slave_XF_output_w);
+	void slave_XF_output_w(uint16_t data);
 	DECLARE_READ16_MEMBER(slave_portf_r);
 
 	void master_dsp_data(address_map &map);

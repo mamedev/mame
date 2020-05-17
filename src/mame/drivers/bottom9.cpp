@@ -262,13 +262,13 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(bottom9_state::volume_callback0)
+void bottom9_state::volume_callback0(uint8_t data)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE8_MEMBER(bottom9_state::volume_callback1)
+void bottom9_state::volume_callback1(uint8_t data)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);

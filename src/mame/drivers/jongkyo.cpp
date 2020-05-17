@@ -73,8 +73,8 @@ private:
 	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
+	uint8_t input_1p_r();
+	uint8_t input_2p_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -178,7 +178,7 @@ WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 	m_flip_screen = (data & 4) >> 2;
 }
 
-READ8_MEMBER(jongkyo_state::input_1p_r)
+uint8_t jongkyo_state::input_1p_r()
 {
 	uint8_t cr_clear = ioport("CR_CLEAR")->read();
 
@@ -197,7 +197,7 @@ READ8_MEMBER(jongkyo_state::input_1p_r)
 			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
-READ8_MEMBER(jongkyo_state::input_2p_r)
+uint8_t jongkyo_state::input_2p_r()
 {
 	uint8_t coin_port = ioport("COINS")->read();
 

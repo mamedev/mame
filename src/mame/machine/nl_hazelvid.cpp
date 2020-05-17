@@ -222,7 +222,7 @@ NETLIST_START(hazelvid)
 	EPROM_2716(u78, low, low, lc20, lc21, lc22, lc23, u66.Q1, u66.Q2, u66.Q3, u66.Q4, u66.Q5, u66.Q6, u56.Q1)
 	PARAM(u78.ROM, "u83_chr.bin")
 
-	TTL_74166(u77, video_clk, low, ndot, low, u78.D0, u78.D1, u78.D2, u78.D3, u78.D4, u78.D5, u78.D6, low, clr_vid_sr)
+	TTL_74166(u77, video_clk, low, ndot, low, u78.O0, u78.O1, u78.O2, u78.O3, u78.O4, u78.O5, u78.O6, low, clr_vid_sr)
 	ALIAS(raw_dot, u77.QH)
 
 	TTL_7400_NAND(u79_4, fgbit_q, fgbit_q)

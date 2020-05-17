@@ -124,6 +124,8 @@ protected:
 
 	void check_fdiv_zero_exception();
 	bool check_fp_exceptions();
+	bool get_fpr32(uint32_t &data, const uint32_t rd);
+	bool get_fpr64(uint64_t &data, const uint32_t rd);
 	bool set_fpr32(const uint32_t rd, const uint32_t data);
 	bool set_fpr64(const uint32_t rd, const uint64_t data);
 
@@ -202,6 +204,9 @@ protected:
 	bool m_fp_disabled;
 	bool m_cp_disabled;
 	bool m_fp_exception;
+	bool m_fp_exception_pending;
+	uint32_t m_fpr_pending;
+	uint32_t m_pending_fpr;
 	bool m_cp_exception;
 	bool m_instruction_access_exception;
 	bool m_data_access_exception;

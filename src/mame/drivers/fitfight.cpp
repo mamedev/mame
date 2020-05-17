@@ -225,35 +225,35 @@ void fitfight_state::snd_mem(address_map &map)
 	map(0x8000, 0x87ff).ram();
 }
 
-READ8_MEMBER(fitfight_state::snd_porta_r)
+uint8_t fitfight_state::snd_porta_r()
 {
 	//logerror("PA R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(fitfight_state::snd_portb_r)
+uint8_t fitfight_state::snd_portb_r()
 {
 	//logerror("PB R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(fitfight_state::snd_portc_r)
+uint8_t fitfight_state::snd_portc_r()
 {
 	//logerror("PC R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(fitfight_state::snd_porta_w)
+void fitfight_state::snd_porta_w(uint8_t data)
 {
 	//logerror("PA W %x %s\n",data,machine().describe_context());
 }
 
-WRITE8_MEMBER(fitfight_state::snd_portb_w)
+void fitfight_state::snd_portb_w(uint8_t data)
 {
 	//logerror("PB W %x %s\n",data,machine().describe_context());
 }
 
-WRITE8_MEMBER(fitfight_state::snd_portc_w)
+void fitfight_state::snd_portc_w(uint8_t data)
 {
 	//logerror("PC W %x %s\n",data,machine().describe_context());
 }

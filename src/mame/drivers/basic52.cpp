@@ -23,12 +23,13 @@ However, the way the cpu is written, it actually passes bytes around, so
 the auto-speed detection doesn't work as intended. Also the cpu interface
 is horribly outdated and needs to be brought up to date.
 
-So, as it stands, start the driver, then press d and g in turn until
-something starts happening. Basic-52 usually starts at a very slow rate,
-about 1 character per second, while Basic-31 is much faster.
+The optional eprom presents the ability to bypass the auto-speed problems.
 
 Once the system starts, all input must be in uppercase. Read the manual
 to discover the special features of this Basic.
+
+Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
+       Example: PWM 800,200,900
 
 ****************************************************************************/
 
@@ -36,6 +37,8 @@ to discover the special features of this Basic.
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
 #include "machine/terminal.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 
 class basic52_state : public driver_device
@@ -45,6 +48,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	void basic52(machine_config &config);
@@ -52,13 +56,15 @@ public:
 
 protected:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(from_term);
+	void port1_w(u8 data);
+	uint8_t unk_r();
+	uint8_t from_term();
 	void basic52_io(address_map &map);
 	void basic52_mem(address_map &map);
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -66,20 +72,17 @@ void basic52_state::basic52_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x7fff).ram();
-	//map(0x8000, 0x9fff).rom(); // EPROM
-	//map(0xc000, 0xdfff) // Expansion block
-	//map(0xe000, 0xffff) // Expansion block
 }
 
 void basic52_state::basic52_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0x9fff).rom(); // EPROM
+	// 8000-9FFF is reserved for a plug-in EPROM containing BASIC programs.
+	// We have used this to preset the baud rate and skip the unreliable auto-detect.
+	map(0x8000, 0x8000).lr8(NAME([] () { return 0x31; }));  // we will be manually setting the baud rate
+	map(0x8001, 0x8002).lr8(NAME([] () { return 0xFE; }));  // to the fastest possible
 	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
-	//map(0xc000, 0xdfff) // Expansion block
-	//map(0xe000, 0xffff) // Expansion block
 }
 
 /* Input ports */
@@ -87,14 +90,19 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(basic52_state::from_term)
+uint8_t basic52_state::from_term()
 {
 	return m_term_data;
 }
 
-READ8_MEMBER( basic52_state::unk_r)
+uint8_t basic52_state::unk_r()
 {
 	return m_term_data; // won't boot without this
+}
+
+void basic52_state::port1_w(u8 data)
+{
+	m_speaker->level_w(BIT(data, 2));
 }
 
 
@@ -111,6 +119,7 @@ void basic52_state::basic31(machine_config &config)
 	I8031(config, m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::basic52_mem);
 	m_maincpu->set_addrmap(AS_IO, &basic52_state::basic52_io);
+	m_maincpu->port_out_cb<1>().set(FUNC(basic52_state::port1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
 	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
 	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
@@ -120,6 +129,10 @@ void basic52_state::basic31(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
 
 	I8255(config, "ppi8255", 0);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void basic52_state::basic52(machine_config &config)
@@ -156,4 +169,4 @@ ROM_END
 /* Driver */
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME        FLAGS */
 COMP( 1985, basic52, 0,       0,      basic52, basic52, basic52_state, empty_init, "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
-COMP( 1985, basic31, basic52, 0,      basic31, basic52, basic52_state, empty_init, "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)
+COMP( 1985, basic31, basic52, 0,      basic31, basic52, basic52_state, empty_init, "Intel", "MCS BASIC 31", 0 )

@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour
 /***************************************************************************
 
-    Irem Red Alert hardware
+    Irem M27 hardware
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
@@ -86,6 +86,7 @@ void redalert_state::redalert_audio_command_w(uint8_t data)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(data);
+	m_sound_hs = 1;
 
 	/* D7 is also connected to the NMI input of the CPU -
 	   the NMI is actually toggled by a 74121 (R1=27K, C10=330p) */
@@ -105,6 +106,7 @@ void redalert_state::redalert_AY8910_w(uint8_t data)
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
+			m_sound_hs = 0;
 			m_ay8910_latch_1 = m_ay8910->data_r();
 			break;
 
@@ -140,6 +142,15 @@ void redalert_state::redalert_audio_map(address_map &map)
 	map(0x7000, 0x77ff).mirror(0x0800).rom();
 }
 
+void redalert_state::panther_audio_map(address_map &map)
+{
+	redalert_audio_map(map);
+	// Panther maps these two to $2000 while Red Alert to $1000, different PAL addressing?
+	map(0x1000, 0x1fff).unmaprw();
+	map(0x2000, 0x2000).mirror(0x0ffe).nopr().w(FUNC(redalert_state::redalert_AY8910_w));
+	map(0x2001, 0x2001).mirror(0x0ffe).rw(FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+}
+
 /*************************************
  *
  * Red Alert audio board
@@ -153,6 +164,7 @@ void redalert_state::sound_start()
 
 	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
 
+	save_item(NAME(m_sound_hs));
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
 }
@@ -257,6 +269,14 @@ void redalert_state::ww3_audio(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
+}
+
+void redalert_state::panther_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	
+	redalert_audio_m37b(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &redalert_state::panther_audio_map);
 }
 
 /*************************************

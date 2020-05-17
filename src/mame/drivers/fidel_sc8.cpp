@@ -11,6 +11,9 @@ The box names it Sensory Chess Challenger, Sensory Chess Challenger "8" title
 is on the 1st page of the manual. Like other Fidelity chesscomputers from
 around this time, the number indicates maximum difficulty level.
 
+It was also rereleased in 1983 as "Poppy", marketed for children, the housing
+was in bright red color.
+
 Hardware notes:
 - Z80A CPU @ 3.9MHz
 - 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)

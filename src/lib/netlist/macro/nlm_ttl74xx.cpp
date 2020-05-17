@@ -732,6 +732,101 @@ NETLIST_END()
  *
  */
 
+//- Identifier:  TTL_74125_DIP
+//- Title: SN74125 QUADRUPLE BUS BUFFERS WITH 3-STATE OUTPUTS
+//- Description: These bus buffers feature three-state outputs
+//-    that, when enabled, have the low impedance characteristics of a
+//-    TTL output with additional drive capability at high logic levels
+//-    to permit driving heavily loaded bus lines without external
+//-    pullup resistors. When disabled, both output transistors are turned
+//-    off, presenting a high-impedance state to the bus so the output will
+//-    act neither as a significant load nor as a driver. The ’125 and
+//-    ’LS125A devices’ outputs are disabled when G is high.
+//-    The ’126 and ’LS126A devices’ outputs are disabled when G is low
+//-
+//- Pinalias: 1GQ,1A,1Y,2GQ,2A,2Y,GND,3Y,3A,3GQ,4Y,4A,4GQ,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas instruments datasheet
+//- Limitations:
+//-    No limitations
+//-
+//- Example: 74125.cpp,74125_example
+//-
+//- FunctionTable:
+//-
+//-    | GQ  | A  | Y  |
+//-    |:---:|:--:|:--:|
+//-    |  L  |  L |  L |
+//-    |  L  |  H |  H |
+//-    |  H  |  X |  Z |
+//-
+
+static NETLIST_START(TTL_74125_DIP)
+
+	TTL_74125_GATE(A1)
+	TTL_74125_GATE(A2)
+	TTL_74125_GATE(A3)
+	TTL_74125_GATE(A4)
+
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+
+	ALIAS(1, A1.GQ)
+	ALIAS(2, A1.A)
+	ALIAS(3, A1.Y)
+	ALIAS(4, A2.GQ)
+	ALIAS(5, A2.A)
+	ALIAS(6, A2.Y)
+	ALIAS(7, A1.GND)
+
+	ALIAS(8, A3.Y)
+	ALIAS(9, A3.A)
+	ALIAS(10, A3.GQ)
+	ALIAS(11, A4.Y)
+	ALIAS(12, A4.A)
+	ALIAS(13, A4.GQ)
+	ALIAS(14, A1.VCC)
+
+	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
+	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+NETLIST_END()
+
+static NETLIST_START(TTL_74126_DIP)
+
+	TTL_74126_GATE(A1)
+	TTL_74126_GATE(A2)
+	TTL_74126_GATE(A3)
+	TTL_74126_GATE(A4)
+
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A4.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+
+	ALIAS(1, A1.G)
+	ALIAS(2, A1.A)
+	ALIAS(3, A1.Y)
+	ALIAS(4, A2.G)
+	ALIAS(5, A2.A)
+	ALIAS(6, A2.Y)
+	ALIAS(7, A1.GND)
+
+	ALIAS(8, A3.Y)
+	ALIAS(9, A3.A)
+	ALIAS(10, A3.G)
+	ALIAS(11, A4.Y)
+	ALIAS(12, A4.A)
+	ALIAS(13, A4.G)
+	ALIAS(14, A1.VCC)
+
+	NET_C(A1.VCC, A2.VCC, A3.VCC, A4.VCC)
+	NET_C(A1.GND, A2.GND, A3.GND, A4.GND)
+NETLIST_END()
+
 static NETLIST_START(TTL_74155_DIP)
 	NET_REGISTER_DEV(TTL_74155A_GATE, A)
 	NET_REGISTER_DEV(TTL_74155B_GATE, B)
@@ -1573,6 +1668,8 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
+	LOCAL_LIB_ENTRY(TTL_74125_DIP)
+	LOCAL_LIB_ENTRY(TTL_74126_DIP)
 #if (NL_USE_TRUTHTABLE_74107)
 	LOCAL_LIB_ENTRY(TTL_74107_DIP)
 #endif

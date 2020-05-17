@@ -13,7 +13,7 @@
         published by BYTE/McGRAW-HILL
 
     Basic usage instructions:
-    SHIFT + 0: view and edit memory values
+    SHIFT + 0: view and edit memory values (Enter to escape)
     SHIFT + 1: view and edit register values
     SHIFT + 2: execution mode
 
@@ -24,6 +24,10 @@
     Currently missing features in this driver:
       * hookup RS232 support
       * maybe also support video terminal described in chapter 9
+
+    Here is a test to paste in:
+    -0400^11^22^33^44^55^66^77^88^99^X-0400
+    You can confirm the entries by pressing UP
 */
 
 
@@ -61,7 +65,7 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 	//into the status of the segments of the 7 segment displays
 	//controlled by a 82S23 PROM
 
-	uint8_t patterns[16] = {
+	static uint8_t patterns[16] = {
 		0x77, 0x41, 0x6e, 0x6b,
 		0x59, 0x3b, 0x3f, 0x61,
 		0x7f, 0x79, 0x7d, 0x1f,
@@ -107,7 +111,7 @@ READ8_MEMBER( zapcomp_state::keyboard_r )
 
 void zapcomp_state::zapcomp_mem(address_map &map)
 {
-	map(0x0000, 0x03ff).rom().region("roms", 0); /* system monitor */
+	map(0x0000, 0x03ff).rom(); /* system monitor */
 	map(0x0400, 0x07ff).ram(); /* mandatory 1 kilobyte bank #0 */
 	map(0x0800, 0x0bff).ram(); /* extra 1 kilobyte bank #1 (optional) */
 	map(0x0c00, 0x0fff).ram(); /* extra 1 kilobyte bank #2 (optional) */
@@ -127,9 +131,9 @@ void zapcomp_state::zapcomp_io(address_map &map)
 
 static INPUT_PORTS_START( zapcomp )
 	PORT_START("X0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('-')
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('R')
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('Z')
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
@@ -137,17 +141,17 @@ static INPUT_PORTS_START( zapcomp )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a')
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b')
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c')
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d')
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e')
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f')
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('X')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
 void zapcomp_state::machine_start()
@@ -167,7 +171,7 @@ void zapcomp_state::zapcomp(machine_config &config)
 }
 
 ROM_START( zapcomp )
-	ROM_REGION( 0x10000, "roms", 0 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD("zap.rom", 0x0000, 0x0400, CRC(3f4416e9) SHA1(d6493707bfba1a1e1e551f8144194afa5bda3316) )
 ROM_END
 

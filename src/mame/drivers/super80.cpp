@@ -234,40 +234,30 @@ ToDo:
 
 void super80_state::super80_map(address_map &map)
 {
-	map(0x0000, 0xbfff).lrw8(NAME([this](u16 offset)          { return m_ram[offset]; }),
-                             NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
-	map(0x0000, 0x0fff).lr8 (NAME([this](u16 offset)          { if(m_boot_in_progress) offset |= 0xc000; return m_ram[offset]; }));
-	map(0xc000, 0xefff).lr8 (NAME([this](u16 offset)          { m_boot_in_progress = false; return m_ram[offset+0xc000]; }));
-	map(0xf000, 0xffff).lr8 (NAME([this](u16 offset)          { return m_ram[offset+0xf000]; }));
-	map(0xc000, 0xffff).nopw();
+	map(0x0000, 0xbfff).ram().share("mainram");
+	map(0xc000, 0xefff).rom().region("maincpu", 0).nopw();
+	map(0xf000, 0xffff).lr8(NAME([] () { return 0xff; })).nopw();
 }
 
 void super80_state::super80m_map(address_map &map)
 {
-	super80_map(map);
-	map(0xf000, 0xffff).lrw8(NAME([this](u16 offset)          { return m_ram[offset+0xf000]; }),
-                             NAME([this](u16 offset, u8 data) { m_ram[offset+0xf000] = data; }));
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0xc000, 0xefff).rom().region("maincpu", 0).nopw();
 }
 
 void super80v_state::super80v_map(address_map &map)
 {
-	map(0x0000, 0x0fff).lrw8(NAME([this](u16 offset)          { if(m_boot_in_progress) return m_rom[offset]; else return m_ram[offset]; }),
-                             NAME([this](u16 offset, u8 data) { m_ram[offset] = data; }));
-	map(0x1000, 0xbfff).ram();
-	map(0xc000, 0xefff).lr8 (NAME([this](u16 offset)          { m_boot_in_progress = false; return m_rom[offset]; }));
-	map(0xf000, 0xf7ff).lrw8(NAME([this](u16 offset)          { return super80v_state::low_r(offset); }),
-                             NAME([this](u16 offset, u8 data) { super80v_state::low_w(offset, data); }));
-	map(0xf800, 0xffff).lrw8(NAME([this](u16 offset)          { return super80v_state::high_r(offset); }),
-                             NAME([this](u16 offset, u8 data) { super80v_state::high_w(offset, data); }));
+	map(0x0000, 0xbfff).ram().share("mainram");
+	map(0xc000, 0xefff).rom().region("maincpu", 0).nopw();
+	map(0xf000, 0xf7ff).rw(FUNC(super80v_state::low_r),  FUNC(super80v_state::low_w));
+	map(0xf800, 0xffff).rw(FUNC(super80v_state::high_r), FUNC(super80v_state::high_w));
 }
 
 void super80r_state::super80r_map(address_map &map)
 {
 	super80v_map(map);
-	map(0xf000, 0xf7ff).lrw8(NAME([this](u16 offset)          { return super80r_state::low_r(offset); }),
-                             NAME([this](u16 offset, u8 data) { super80r_state::low_w(offset, data); }));
-	map(0xf800, 0xffff).lrw8(NAME([this](u16 offset)          { return super80r_state::high_r(offset); }),
-                             NAME([this](u16 offset, u8 data) { super80r_state::high_w(offset, data); }));
+	map(0xf000, 0xf7ff).rw(FUNC(super80r_state::low_r),  FUNC(super80r_state::low_w));
+	map(0xf800, 0xffff).rw(FUNC(super80r_state::high_r), FUNC(super80r_state::high_w));
 }
 
 void super80_state::super80_io(address_map &map)
@@ -275,10 +265,10 @@ void super80_state::super80_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xdc, 0xdc).lw8(NAME([this](u8 data) { super80_state::portdc_w(data); }));
-	map(0xe0, 0xe0).mirror(0x14).lw8(NAME([this](u8 data) { super80_state::portf0_w(data); }));
-	map(0xe1, 0xe1).mirror(0x14).lw8(NAME([this](u8 data) { super80_state::portf1_w(data); }));
-	map(0xe2, 0xe2).mirror(0x14).lr8(NAME([this]() { return super80_state::portf2_r(); }));
+	map(0xdc, 0xdc).w(FUNC(super80_state::portdc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::portf0_w));
+	map(0xe1, 0xe1).mirror(0x14).w(FUNC(super80_state::portf1_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::portf2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -287,10 +277,10 @@ void super80_state::super80e_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xbc, 0xbc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xbc, 0xbc).lw8(NAME([this](u8 data) { super80_state::portdc_w(data); }));
-	map(0xe0, 0xe0).mirror(0x14).lw8(NAME([this](u8 data) { super80_state::portf0_w(data); }));
-	map(0xe1, 0xe1).mirror(0x14).lw8(NAME([this](u8 data) { super80_state::portf1_w(data); }));
-	map(0xe2, 0xe2).mirror(0x14).lr8(NAME([this]() { return super80_state::portf2_r(); }));
+	map(0xbc, 0xbc).w(FUNC(super80_state::portdc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80_state::portf0_w));
+	map(0xe1, 0xe1).mirror(0x14).w(FUNC(super80_state::portf1_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80_state::portf2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -306,9 +296,9 @@ void super80v_state::super80v_io(address_map &map)
 	map(0x3e, 0x3e).r(FUNC(super80v_state::port3e_r));
 	map(0x3f, 0x3f).w(FUNC(super80v_state::port3f_w));
 	map(0xdc, 0xdc).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xdc, 0xdc).lw8(NAME([this](u8 data) { super80v_state::portdc_w(data); }));
-	map(0xe0, 0xe0).mirror(0x14).lw8(NAME([this](u8 data) { super80v_state::portf0_w(data); }));
-	map(0xe2, 0xe2).mirror(0x14).lr8(NAME([this]() { return super80v_state::portf2_r(); }));
+	map(0xdc, 0xdc).w(FUNC(super80v_state::portdc_w));
+	map(0xe0, 0xe0).mirror(0x14).w(FUNC(super80v_state::portf0_w));
+	map(0xe2, 0xe2).mirror(0x14).r(FUNC(super80v_state::portf2_r));
 	map(0xf8, 0xfb).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
@@ -641,29 +631,29 @@ WRITE_LINE_MEMBER( super80v_state::busreq_w )
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(super80v_state::memory_read_byte)
+uint8_t super80v_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80v_state::memory_write_byte)
+void super80v_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super80v_state::io_read_byte)
+uint8_t super80v_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80v_state::io_write_byte)
+void super80v_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

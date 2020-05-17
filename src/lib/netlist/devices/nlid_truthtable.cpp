@@ -241,8 +241,8 @@ namespace devices
 	{
 	public:
 		netlist_factory_truthtable_t(const pstring &name,
-			const pstring &def_param, const pstring  &sourcefile)
-		: truthtable_base_element_t(name, def_param, sourcefile)
+			const pstring &def_param, plib::source_location &&sourceloc)
+		: truthtable_base_element_t(name, def_param, std::move(sourceloc))
 		{ }
 
 		unique_pool_ptr<core_device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
@@ -472,39 +472,40 @@ namespace factory
 {
 
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name,
-			const pstring &def_param, const pstring &sourcefile)
-	: factory::element_t(name, def_param, sourcefile)
+			const pstring &def_param, plib::source_location &&sourceloc)
+	: factory::element_t(name, def_param, std::move(sourceloc))
 	, m_family_name(NETLIST_DEFAULT_LOGIC_FAMILY)
 	{
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
-			ret = plib::make_unique<xtype>(desc.name, desc.def_param, s); } \
+			auto cs=s; \
+			ret = plib::make_unique<xtype>(desc.name, desc.def_param, std::move(cs)); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
 						ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
-	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, const pstring &sourcefile)
+	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, plib::source_location &&sourceloc)
 	{
 		plib::unique_ptr<truthtable_base_element_t> ret;
 
 		switch (desc.ni * 100 + desc.no)
 		{
-			ENTRY(1, sourcefile);
-			ENTRY(2, sourcefile);
-			ENTRY(3, sourcefile);
-			ENTRY(4, sourcefile);
-			ENTRY(5, sourcefile);
-			ENTRY(6, sourcefile);
-			ENTRY(7, sourcefile);
-			ENTRY(8, sourcefile);
-			ENTRY(9, sourcefile);
-			ENTRY(10, sourcefile);
-			ENTRY(11, sourcefile);
-			ENTRY(12, sourcefile);
+			ENTRY(1, sourceloc);
+			ENTRY(2, sourceloc);
+			ENTRY(3, sourceloc);
+			ENTRY(4, sourceloc);
+			ENTRY(5, sourceloc);
+			ENTRY(6, sourceloc);
+			ENTRY(7, sourceloc);
+			ENTRY(8, sourceloc);
+			ENTRY(9, sourceloc);
+			ENTRY(10, sourceloc);
+			ENTRY(11, sourceloc);
+			ENTRY(12, sourceloc);
 			default:
 				pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
 				nl_assert_always(false, msg.c_str());

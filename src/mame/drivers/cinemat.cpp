@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(cinemat_state::mux_select_w)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::joystick_read)
+uint8_t cinemat_state::joystick_read()
 {
 	if (machine().phase() != machine_phase::RUNNING)
 		return 0;

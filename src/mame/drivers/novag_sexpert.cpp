@@ -419,16 +419,6 @@ void sexpert_state::sexpert(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(21500)); // active for 21.5us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
-	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
-	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
-	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
@@ -457,6 +447,17 @@ void sexpert_state::sexpert(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	/* uart (configure after video) */
+	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
+	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	m_rs232->dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
 }
 
 void sforte_state::sforte(machine_config &config)

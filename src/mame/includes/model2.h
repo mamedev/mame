@@ -169,18 +169,18 @@ protected:
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(colorxlat_r);
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(in0_r);
+	void eeprom_w(uint8_t data);
+	uint8_t in0_r();
 	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
-	DECLARE_READ8_MEMBER(rchase2_drive_board_r);
-	DECLARE_WRITE8_MEMBER(rchase2_drive_board_w);
-	DECLARE_WRITE8_MEMBER(drive_board_w);
-	DECLARE_READ8_MEMBER(lightgun_data_r);
-	DECLARE_READ8_MEMBER(lightgun_mux_r);
-	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
-	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
+	uint8_t rchase2_drive_board_r();
+	void rchase2_drive_board_w(uint8_t data);
+	void drive_board_w(uint8_t data);
+	uint8_t lightgun_data_r(offs_t offset);
+	uint8_t lightgun_mux_r();
+	void lightgun_mux_w(uint8_t data);
+	uint8_t lightgun_offscreen_r(offs_t offset);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -188,8 +188,8 @@ protected:
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
-	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	void horizontal_sync_w(uint16_t data);
+	void vertical_sync_w(uint16_t data);
 	DECLARE_READ32_MEMBER(doa_prot_r);
 	DECLARE_READ32_MEMBER(doa_unk_r);
 	void sega_0229_map(address_map &map);
@@ -210,9 +210,9 @@ protected:
 	DECLARE_READ8_MEMBER(tgpid_r);
 	DECLARE_READ32_MEMBER(polygon_count_r);
 
-	DECLARE_READ8_MEMBER(driveio_portg_r);
-	DECLARE_READ8_MEMBER(driveio_porth_r);
-	DECLARE_WRITE8_MEMBER(driveio_port_w);
+	uint8_t driveio_portg_r();
+	uint8_t driveio_porth_r();
+	void driveio_port_w(uint8_t data);
 	void push_geo_data(uint32_t data);
 	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
@@ -220,7 +220,7 @@ protected:
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(offs_t offset, uint8_t data);
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
@@ -399,9 +399,9 @@ public:
 
 protected:
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
-	DECLARE_WRITE8_MEMBER(daytona_output_w);
-	DECLARE_WRITE8_MEMBER(desert_output_w);
-	DECLARE_WRITE8_MEMBER(vcop_output_w);
+	void daytona_output_w(uint8_t data);
+	void desert_output_w(uint8_t data);
+	void vcop_output_w(uint8_t data);
 
 	void model2o_mem(address_map &map);
 };

@@ -166,8 +166,8 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	m_dma8237[0]->out_eop_callback().set(FUNC(bebox_state::bebox_dma8237_out_eop));
 	m_dma8237[0]->in_memr_callback().set(FUNC(bebox_state::bebox_dma_read_byte));
 	m_dma8237[0]->out_memw_callback().set(FUNC(bebox_state::bebox_dma_write_byte));
-	m_dma8237[0]->in_ior_callback<2>().set(FUNC(bebox_state::bebox_dma8237_fdc_dack_r));
-	m_dma8237[0]->out_iow_callback<2>().set(FUNC(bebox_state::bebox_dma8237_fdc_dack_w));
+	m_dma8237[0]->in_ior_callback<2>().set(m_smc37c78, FUNC(smc37c78_device::dma_r));
+	m_dma8237[0]->out_iow_callback<2>().set(m_smc37c78, FUNC(smc37c78_device::dma_w));
 	m_dma8237[0]->out_dack_callback<0>().set(FUNC(bebox_state::pc_dack0_w));
 	m_dma8237[0]->out_dack_callback<1>().set(FUNC(bebox_state::pc_dack1_w));
 	m_dma8237[0]->out_dack_callback<2>().set(FUNC(bebox_state::pc_dack2_w));
@@ -178,7 +178,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	PIC8259(config, m_pic8259[0], 0);
 	m_pic8259[0]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_master_set_int_line));
 	m_pic8259[0]->in_sp_callback().set_constant(1);
-	m_pic8259[0]->read_slave_ack_callback().set(FUNC(bebox_state::get_slave_ack));
+	m_pic8259[0]->read_slave_ack_callback().set(m_pic8259[1], FUNC(pic8259_device::acknowledge));
 
 	PIC8259(config, m_pic8259[1], 0);
 	m_pic8259[1]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_slave_set_int_line));

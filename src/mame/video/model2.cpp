@@ -856,14 +856,14 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
     (8,90)                          (504,90)
 */
 
-WRITE16_MEMBER(model2_state::horizontal_sync_w)
+void model2_state::horizontal_sync_w(uint16_t data)
 {
 	m_crtc_xoffset = 84 + (int16_t)data;
 //  printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);
 	m_poly->set_xoffset(m_crtc_xoffset);
 }
 
-WRITE16_MEMBER(model2_state::vertical_sync_w)
+void model2_state::vertical_sync_w(uint16_t data)
 {
 	m_crtc_yoffset = 130 + (int16_t)data;
 //  printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);

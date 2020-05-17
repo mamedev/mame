@@ -220,7 +220,7 @@ WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::input_mux_r)
+uint8_t astrocde_state::input_mux_r(offs_t offset)
 {
 	return m_handle[offset & 3].read_safe(0xff);
 }
@@ -395,7 +395,7 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::votrax_speech_w)
+void astrocde_state::votrax_speech_w(uint8_t data)
 {
 	m_votrax->inflection_w(data >> 6);
 	m_votrax->write(data & 0x3f);

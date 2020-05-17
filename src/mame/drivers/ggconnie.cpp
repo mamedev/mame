@@ -46,7 +46,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void lamp_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	void sgx_io(address_map &map);
@@ -64,7 +64,7 @@ void ggconnie_state::machine_start()
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
 }
 
-WRITE8_MEMBER(ggconnie_state::lamp_w)
+void ggconnie_state::lamp_w(uint8_t data)
 {
 	output().set_value("lamp", !BIT(data,0));
 }

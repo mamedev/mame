@@ -27,21 +27,21 @@ class dac_bit_interface
 {
 public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write) = 0;
-	virtual DECLARE_WRITE8_MEMBER(data_w) = 0;
+	virtual void data_w(uint8_t data) = 0;
 };
 
 class dac_byte_interface
 {
 public:
 	virtual void write(unsigned char data) = 0;
-	virtual DECLARE_WRITE8_MEMBER(data_w) = 0;
+	virtual void data_w(uint8_t data) = 0;
 };
 
 class dac_word_interface
 {
 public:
 	virtual void write(unsigned short data) = 0;
-	virtual DECLARE_WRITE16_MEMBER(data_w) = 0;
+	virtual void data_w(uint16_t data) = 0;
 };
 
 template <unsigned bits>
@@ -213,7 +213,7 @@ public:
 	}
 
 	virtual WRITE_LINE_MEMBER(write) override { this->setCode(state); }
-	virtual WRITE8_MEMBER(data_w) override { this->setCode(data); }
+	virtual void data_w(uint8_t data) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -228,7 +228,7 @@ public:
 	}
 
 	virtual void write(unsigned char data) override { this->setCode(data); }
-	virtual DECLARE_WRITE8_MEMBER(data_w) override { this->setCode(data); }
+	virtual void data_w(uint8_t data) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -243,7 +243,7 @@ public:
 	}
 
 	virtual void write(unsigned short data) override { this->setCode(data); }
-	virtual DECLARE_WRITE16_MEMBER(data_w) override { this->setCode(data); }
+	virtual void data_w(uint16_t data) override { this->setCode(data); }
 };
 
 constexpr double dac_gain_r2r = 1.0;
