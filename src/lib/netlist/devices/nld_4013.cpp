@@ -8,22 +8,20 @@
 
 #include "nld_4013.h"
 #include "netlist/nl_base.h"
-#include "nlid_system.h"
-
-#include <array>
+#include "netlist/nl_setup.h"
 
 namespace netlist
 {
 	namespace devices
 	{
 
-	NETLIB_OBJECT(4013)
+	NETLIB_OBJECT(CD4013)
 	{
-		NETLIB_CONSTRUCTOR(4013)
+		NETLIB_CONSTRUCTOR_MODEL(CD4013, "CD4XXX")
 		, m_D(*this, "DATA")
 		, m_RESET(*this, "RESET")
 		, m_SET(*this, "SET")
-		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(4013, clk))
+		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(CD4013, clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
@@ -49,7 +47,7 @@ namespace netlist
 
 		void newstate_clk(const netlist_sig_t stateQ)
 		{
-			static constexpr delay = NLTIME_FROM_NS(150);
+			static constexpr auto delay = NLTIME_FROM_NS(150);
 			m_Q.push(stateQ, delay);
 			m_QQ.push(!stateQ, delay);
 		}
@@ -63,10 +61,9 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(4013_dip)
+	NETLIB_OBJECT(CD4013_dip)
 	{
-		NETLIB_CONSTRUCTOR(4013_dip)
-		NETLIB_FAMILY("CD4XXX")
+		NETLIB_CONSTRUCTOR(CD4013_dip)
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		{
@@ -93,17 +90,17 @@ namespace netlist
 		NETLIB_RESETI();
 
 	private:
-		NETLIB_SUB(4013) m_A;
-		NETLIB_SUB(4013) m_B;
+		NETLIB_SUB(CD4013) m_A;
+		NETLIB_SUB(CD4013) m_B;
 	};
 
-	NETLIB_HANDLER(4013, clk)
+	NETLIB_HANDLER(CD4013, clk)
 	{
 		newstate_clk(m_nextD);
 		m_CLK.inactivate();
 	}
 
-	NETLIB_UPDATE(4013)
+	NETLIB_UPDATE(CD4013)
 	{
 		const auto set(m_SET());
 		const auto reset(m_RESET());
@@ -121,23 +118,23 @@ namespace netlist
 		}
 	}
 
-	NETLIB_RESET(4013)
+	NETLIB_RESET(CD4013)
 	{
 		m_CLK.set_state(logic_t::STATE_INP_LH);
 		m_D.set_state(logic_t::STATE_INP_ACTIVE);
 		m_nextD = 0;
 	}
 
-	NETLIB_RESET(4013_dip)
+	NETLIB_RESET(CD4013_dip)
 	{
 	}
 
-	NETLIB_UPDATE(4013_dip)
+	NETLIB_UPDATE(CD4013_dip)
 	{
 	}
 
 	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLOCK,+DATA,+RESET,+SET,@VDD,@VSS")
-	NETLIB_DEVICE_IMPL(CD4013_DIP, "CD4013_DIP", "")
+	NETLIB_DEVICE_IMPL(CD4013_dip, "CD4013_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -44,14 +44,9 @@
 
 #include "netlist/nl_setup.h"
 
-#define CD4013(name, cCLOCK, cDATA, cRESET, cSET)                              \
-		NET_REGISTER_DEV(CD4013, name)                                         \
-		NET_CONNECT(name, VSS, VSS)                                            \
-		NET_CONNECT(name, VDD, VDD)                                            \
-		NET_CONNECT(name, CLK, cCLK)                                           \
-		NET_CONNECT(name, DATA,  cDATA)                                        \
-		NET_CONNECT(name, SET,  cSET)                                          \
-		NET_CONNECT(name, RESET,  cRESET)
+// usage: CD4013(name, cCLOCK, cDATA, cRESET, cSET)
+#define CD4013(...)                                                            \
+		NET_REGISTER_DEVEXT(CD4013, __VA_ARGS__)
 
 #define CD4013_DIP(name)                                                       \
 		NET_REGISTER_DEV(CD4013_DIP, name)
