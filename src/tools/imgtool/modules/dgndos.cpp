@@ -552,7 +552,7 @@ static imgtoolerr_t dgndos_diskimage_freespace(imgtool::partition &partition, ui
 {
 	floperr_t ferr;
 	imgtool::image &image(partition.image());
-	int bitmap_count;
+	int bitmap_count(0);
 
 	uint8_t entire_track20[18*256];
 
