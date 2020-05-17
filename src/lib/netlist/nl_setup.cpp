@@ -170,7 +170,6 @@ namespace netlist
 		throw nl_exception(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
 	}
 
-
 	void nlparse_t::namespace_push(const pstring &aname)
 	{
 		if (m_namespace_stack.empty())
@@ -234,10 +233,9 @@ namespace netlist
 		m_abstract.m_defparams.emplace_back(namespace_prefix() + name, def);
 	}
 
-	void nlparse_t::register_lib_entry(const pstring &name, const
-		pstring &paramdef, plib::source_location &&sourceloc)
+	void nlparse_t::register_lib_entry(const pstring &name, factory::properties &&props)
 	{
-		m_factory.add(plib::make_unique<factory::library_element_t>(name, paramdef, std::move(sourceloc)));
+		m_factory.add(plib::make_unique<factory::library_element_t>(name, std::move(props)));
 	}
 
 	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN,
@@ -273,9 +271,9 @@ namespace netlist
 		register_link(attach, frontier_name + ".Q");
 	}
 
-	void nlparse_t::truthtable_create(tt_desc &desc, plib::source_location &&sourceloc)
+	void nlparse_t::truthtable_create(tt_desc &desc, factory::properties &&props)
 	{
-		auto fac = factory::truthtable_create(desc, std::move(sourceloc));
+		auto fac = factory::truthtable_create(desc, std::move(props));
 		m_factory.add(std::move(fac));
 	}
 

@@ -133,7 +133,7 @@ void parser_t::parse_netlist(const pstring &nlname)
 		{
 			require_token(m_tok_paren_left);
 			// FIXME: Need to pass in parameter definition FIXME: get line number right
-			m_setup.register_lib_entry(get_identifier(), "", plib::source_location("parser: " + nlname, 1));
+			m_setup.register_lib_entry(get_identifier(), factory::properties("", plib::source_location("parser: " + nlname, 1)));
 			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NETLIST_END))
@@ -166,7 +166,6 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 	desc.name = name;
 	desc.ni = static_cast<unsigned long>(ni);
 	desc.no = static_cast<unsigned long>(no);
-	desc.def_param = "+" + def_param;
 	desc.family = "";
 
 	while (true)
@@ -200,7 +199,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, plib::source_location(nlname, 1));
+			m_setup.truthtable_create(desc, factory::properties("+" + def_param, plib::source_location(nlname, 1)));
 			return;
 		}
 	}

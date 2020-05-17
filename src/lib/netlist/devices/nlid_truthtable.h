@@ -200,15 +200,14 @@ namespace factory
 	class truthtable_base_element_t : public factory::element_t
 	{
 	public:
-		truthtable_base_element_t(const pstring &name,
-			const pstring &def_param, plib::source_location &&sourceloc);
+		truthtable_base_element_t(const pstring &name,properties &&props);
 
 		std::vector<pstring> m_desc;
 		pstring m_family_name;
 	};
 
 	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc,
-		plib::source_location &&sourceloc);
+		properties &&props);
 
 } // namespace factory
 } // namespace netlist
