@@ -881,11 +881,11 @@ void tool_app_t::create_header()
 
 		if (found)
 		{
-			if (last_source != e->sourcefile())
+			if (last_source != e->source().file_name())
 			{
-				last_source = e->sourcefile();
+				last_source = e->source().file_name();
 				pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
-				pout("{1}{2}\n", "// Source: ", plib::replace_all(e->sourcefile(), "../", ""));
+				pout("{1}{2}\n", "// Source: ", plib::replace_all(e->source().file_name(), "../", ""));
 				pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 			}
 			header_entry(e.get());
@@ -947,7 +947,7 @@ void tool_app_t::create_docheader()
 
 	for (auto &e : nt.parser().factory())
 	{
-		auto d(read_docsrc(e->sourcefile(), e->name()));
+		auto d(read_docsrc(e->source().file_name(), e->name()));
 
 		if (d.id != "")
 		{

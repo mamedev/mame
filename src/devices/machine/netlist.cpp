@@ -1332,7 +1332,7 @@ void netlist_mame_cpu_device::device_start()
 
 void netlist_mame_cpu_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	parser.factory().add<nld_analog_callback>( "NETDEV_CALLBACK", "-", __FILE__);
+	parser.factory().add<nld_analog_callback>( "NETDEV_CALLBACK", "-", std::move(PSOURCELOC()));
 }
 
 uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
@@ -1485,8 +1485,8 @@ void netlist_mame_sound_device::device_start()
 
 void netlist_mame_sound_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
-	parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT", "+CHAN", __FILE__);
-	parser.factory().add<nld_sound_in>("NETDEV_SOUND_IN", "-", __FILE__);
+	parser.factory().add<nld_sound_out>("NETDEV_SOUND_OUT", "+CHAN", std::move(PSOURCELOC()));
+	parser.factory().add<nld_sound_in>("NETDEV_SOUND_IN", "-", std::move(PSOURCELOC()));
 }
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

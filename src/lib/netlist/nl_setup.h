@@ -84,13 +84,11 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 // FIXME: Need to pass in parameter definition
 #define LOCAL_LIB_ENTRY_1(name)                                                \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, "", __FILE__);
+		setup.register_lib_entry(# name, "", PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY_2(name, param_spec)                                    \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, param_spec, __FILE__);
-
-//#define LOCAL_LIB_ENTRY(...) PMSVC_VARARG_BUG(PCONCAT, (LOCAL_LIB_ENTRY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
 
 #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
 
@@ -128,7 +126,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truthtable_create(desc, __FILE__);       \
+		setup.truthtable_create(desc, PSOURCELOC());       \
 	}
 
 namespace netlist
@@ -311,7 +309,7 @@ namespace netlist
 			register_param(param, static_cast<nl_fptype>(value));
 		}
 
-		void register_lib_entry(const pstring &name, const pstring &paramdef, const pstring &sourcefile);
+		void register_lib_entry(const pstring &name, const pstring &paramdef, plib::source_location &&sourceloc);
 
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
@@ -325,7 +323,7 @@ namespace netlist
 			m_sources.add_source(std::move(src));
 		}
 
-		void truthtable_create(tt_desc &desc, const pstring &sourcefile);
+		void truthtable_create(tt_desc &desc, plib::source_location &&sourceloc);
 
 		// handle namespace
 
