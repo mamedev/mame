@@ -121,4 +121,4 @@ ROM_START( crazybal )
 ROM_END
 
 
-GAME( 1978, crazybal, 0, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems", "Crazy Balls", MACHINE_IS_SKELETON )
+GAME( 1978, crazybal, 0, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems", "Crazy Balls [TTL]", MACHINE_IS_SKELETON )
