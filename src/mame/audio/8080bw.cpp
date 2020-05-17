@@ -1470,7 +1470,7 @@ cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *
 
 void cane_audio_device::device_add_mconfig(machine_config &config)
 {
-	TIMER(config, m_vco_timer).configure_periodic(FUNC(cane_audio_device::vco_voltage_timer), attotime::from_hz(1000));
+	TIMER(config, m_vco_timer).configure_generic(FUNC(cane_audio_device::vco_voltage_timer));
 
 	SPEAKER(config, "mono").front_center();
 
