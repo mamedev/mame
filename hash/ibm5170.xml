@@ -11150,7 +11150,7 @@ license:CC0
 	</software>
 
 	<software name="indyfatede" cloneof="indyfate">
-		<description>Indiana Jones and the Fate of Atlantis (3.5", German)</description>
+		<description>Indiana Jones and the Fate of Atlantis (3.5", Germany)</description>
 		<year>1992</year>
 		<publisher>LucasArts</publisher>
 		<info name="developer" value="LucasArts" />
@@ -11416,6 +11416,57 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (VGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 3] (Startup Disk).img" size="1474560" crc="c8caf78b" sha1="88eb7c5442fba643acc15daccebda62a6b5d6aa5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 2 of 3] (Disk 1).img" size="1474560" crc="42a6fbd1" sha1="60d8f9703a79b918555c3fcd2b22146ad53dceb6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 3 of 3] (Disk 2).img" size="1474560" crc="09610d5f" sha1="e40d9e8c40e7b6b2f2a0936840d6b09daff1e140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lslega" cloneof="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (EGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 1 of 4] (Startup Disk).img" size="737280" crc="58f85d3d" sha1="e893f0463faa25daaf6c3d6904ff8165254137c2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 2 of 4] (Disk 1).img" size="737280" crc="73ed045a" sha1="997ad190e171b60d0be8fff6fd2ae7343a843cca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 3 of 4] (Disk 2).img" size="737280" crc="2af71f4a" sha1="0636341bbfd8891ff9c5b5554a11f1cdaa0b03fd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 4 of 4] (Disk 3).img" size="737280" crc="5a6ef8f5" sha1="975ca78d507d0f47bfff1a5395882f9764a1e21b"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="lemmings">
 		<!-- Dumped via Kryoflux -->
 		<description>Lemmings</description>
@@ -12496,6 +12547,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="laurabw2">
+		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra"</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="a62b1110" sha1="610eb437df91cc2e60b02c23530ed6255fffa9d6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="4f79b610" sha1="2c56eca8cdedb8493ca94a7189d170c62f3ea036"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="c324aeab" sha1="9082db6c91e394e87cb8d92edfa202e903c16b3e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="ccd2ff76" sha1="e67324610889ef7fa856a580b004bd42f75fa424"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 5 of 5] (Message - Audio).img" size="1474560" crc="4492d76b" sha1="f3c6aa180d1e6bc1c34faa3c96be58e83fadc3f9"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="samnmax">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
 		<description>Sam &amp; Max Hit the Road</description>
