@@ -505,6 +505,9 @@ fun4a                           // (c) 1976 Bailey
 @source:chicago.cpp
 dmodrbcc                        // (c) 1976 Chicago Coin
 
+@source:crazybal.cpp
+crazybal                        // (c) 1978 EGS
+
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
 
