@@ -205,8 +205,8 @@ READ8_MEMBER( selz80_state::kbd_r )
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 4)
-		data = m_keyboard[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		data = m_keyboard[m_digit & 3]->read();
 
 	return data;
 }
