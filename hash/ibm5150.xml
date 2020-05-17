@@ -803,6 +803,38 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="eyehorus">
+		<description>Eye of Horus</description>
+		<year>1989</year>
+		<publisher>Fanfare</publisher>
+		<info name="developer" value="Denton Designs" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 1 of 5].img" size="368640" crc="43110255" sha1="bb23967a4a4186a54376a46087c108a76ae3ac8a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 2 of 5].img" size="368640" crc="8e2e7ca3" sha1="65949b63fb314a7181586d3aea0a6be292765168"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 3 of 5].img" size="368640" crc="16f0aa40" sha1="e8d387ad8c4dbdbde19801cf1d72ad8a16318133"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 4 of 5].img" size="368640" crc="fac37d18" sha1="9d942766c74f57e194e7377b2ad1d31678b48af7"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Eye Of Horus [FanFare] [1989] [5.25DD] [Disk 5 of 5].img" size="368640" crc="59fb1548" sha1="7dcc454402c154f70a18d1dd53a0920cd0215fac"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="f15se">
 		<description>F-15 Strike Eagle (CGA/Tandy/EGA/Amstrad, 3.5")</description>
 		<year>1985</year>
@@ -9965,7 +9997,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="loomfr" cloneof="loom">
 		<!-- Dumped from copied disks -->
-		<description>Loom (3.5", French)</description>
+		<description>Loom (3.5", France)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9987,7 +10019,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="loomde" cloneof="loom">
-		<description>Loom (3.5", German)</description>
+		<description>Loom (3.5", Germany)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
 		<part name="flop1" interface="floppy_3_5">
