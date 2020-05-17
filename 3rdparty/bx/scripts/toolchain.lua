@@ -947,6 +947,9 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
 		objdir (path.join(_buildDir, "wasm2js/obj"))
 		libdirs { path.join(_libDir, "lib/wasm2js") }
+		linkoptions {
+			"-s WASM=0"
+		}
 
 	configuration { "wasm" }
 		targetdir (path.join(_buildDir, "wasm/bin"))
