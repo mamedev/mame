@@ -264,6 +264,7 @@ cps1bl_pic.cpp
 cps2.cpp
 cps3.cpp
 cpzodiac.cpp
+crazybal.cpp
 crbaloon.cpp
 crgolf.cpp
 crimfght.cpp
