@@ -14,7 +14,7 @@ TODO:
 - granits has a module slot, is it usable?
 - granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Voice Excellence (model 6092)
 ----------------
@@ -115,7 +115,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Designer 2000 (model 6102)
 ----------------
@@ -126,7 +126,7 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware)
+(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see fidel_sc6.cpp)
 
 ******************************************************************************/
 
