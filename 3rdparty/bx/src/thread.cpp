@@ -128,18 +128,22 @@ namespace bx
 		}
 	}
 
-	void Thread::init(ThreadFn _fn, void* _userData, uint32_t _stackSize, const char* _name)
+	bool Thread::init(ThreadFn _fn, void* _userData, uint32_t _stackSize, const char* _name)
 	{
 		BX_CHECK(!m_running, "Already running!");
 
 		m_fn = _fn;
 		m_userData = _userData;
 		m_stackSize = _stackSize;
-		m_running = true;
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
 		ti->m_handle = crt0::threadCreate(&ti->threadFunc, _userData, m_stackSize, _name);
+
+		if (NULL == ti->m_handle)
+		{
+			return false;
+		}
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE
 		ti->m_handle = ::CreateThread(NULL
@@ -149,8 +153,18 @@ namespace bx
 				, 0
 				, NULL
 				);
+		if (NULL == ti->m_handle)
+		{
+			return false;
+		}
 #elif BX_PLATFORM_WINRT
 		ti->m_handle = CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
+
+		if (NULL == ti->m_handle)
+		{
+			return false;
+		}
+
 		auto workItemHandler = ref new WorkItemHandler([=](IAsyncAction^)
 			{
 				m_exitCode = ti->threadFunc(this);
@@ -166,26 +180,42 @@ namespace bx
 
 		pthread_attr_t attr;
 		result = pthread_attr_init(&attr);
-		BX_CHECK(0 == result, "pthread_attr_init failed! %d", result);
+		BX_WARN(0 == result, "pthread_attr_init failed! %d", result);
+		if (0 != result)
+		{
+			return false;
+		}
 
 		if (0 != m_stackSize)
 		{
 			result = pthread_attr_setstacksize(&attr, m_stackSize);
-			BX_CHECK(0 == result, "pthread_attr_setstacksize failed! %d", result);
+			BX_WARN(0 == result, "pthread_attr_setstacksize failed! %d", result);
+
+			if (0 != result)
+			{
+				return false;
+			}
 		}
 
 		result = pthread_create(&ti->m_handle, &attr, &ti->threadFunc, this);
-		BX_CHECK(0 == result, "pthread_attr_setschedparam failed! %d", result);
+		BX_WARN(0 == result, "pthread_attr_setschedparam failed! %d", result);
+		if (0 != result)
+		{
+			return false;
+		}
 #else
 #	error "Not implemented!"
 #endif // BX_PLATFORM_
 
+		m_running = true;
 		m_sem.wait();
 
 		if (NULL != _name)
 		{
 			setThreadName(_name);
 		}
+
+		return true;
 	}
 
 	void Thread::shutdown()
