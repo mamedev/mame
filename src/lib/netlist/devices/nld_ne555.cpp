@@ -115,7 +115,7 @@ namespace netlist
 			return ret;
 		}
 	};
-#if 1
+
 	NETLIB_OBJECT(NE555_dip)
 	{
 		NETLIB_CONSTRUCTOR(NE555_dip)
@@ -138,32 +138,9 @@ namespace netlist
 	private:
 		NETLIB_SUB(NE555) A;
 	};
-#else
-	NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
-	{
-		NETLIB_CONSTRUCTOR_DERIVED(NE555_dip)
-		{
-			register_subalias("1", "GND");      // Pin 1
-			register_subalias("2", "TRIG");     // Pin 2
-			register_subalias("3", "OUT");      // Pin 3
-			register_subalias("4", "RESET");    // Pin 4
-			register_subalias("5", "CONT");     // Pin 5
-			register_subalias("6", "THRESH");   // Pin 6
-			register_subalias("7", "DISCH");    // Pin 7
-			register_subalias("8", "VCC");      // Pin 8
-		}
-	};
-#endif
 
 	NETLIB_RESET(NE555)
 	{
-#if 0
-		m_R1.reset();
-		m_R2.reset();
-		m_R3.reset();
-		m_ROUT.reset();
-		m_RDIS.reset();
-#endif
 		/* FIXME make resistances a parameter, properly model other variants */
 		m_R1.set_R(nlconst::magic(5000));
 		m_R2.set_R(nlconst::magic(5000));

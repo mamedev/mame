@@ -565,6 +565,10 @@ namespace netlist
 			netlist_t & exec() noexcept { return m_netlist; }
 			const netlist_t & exec() const noexcept { return m_netlist; }
 
+			// to ease template design
+			template<typename T, typename... Args>
+			unique_pool_ptr<T> make_object(Args&&... args);
+
 		private:
 			netlist_t & m_netlist;
 
@@ -672,6 +676,7 @@ namespace netlist
 			bool is_logic() const noexcept;
 			bool is_logic_input() const noexcept;
 			bool is_logic_output() const noexcept;
+			bool is_tristate_output() const noexcept;
 			bool is_analog() const noexcept;
 			bool is_analog_input() const noexcept;
 			bool is_analog_output() const noexcept;
@@ -1024,17 +1029,28 @@ namespace netlist
 	// tristate_output_t
 	// -----------------------------------------------------------------------------
 
+	/// \brief Tristate output
+	///
+	/// In a lot of applications tristate enable inputs are just connected to
+	/// VCC/GND to permanently enable the outputs. In this case a pure
+	/// implementation using analog outputs would not perform well.
+	///
+	/// For this object during creation it can be decided if a logic output or
+	/// a tristate output is used. Generally the owning device uses parameter
+	/// FORCE_TRISTATE_LOGIC to determine this.
+	///
+	/// This is the preferred way to implement tristate outputs.
+	///
+
 	class tristate_output_t : public logic_output_t
 	{
 	public:
 
-		tristate_output_t(device_t &dev, const pstring &aname,
-			netlist_time ts_off_on, netlist_time ts_on_off)
+		tristate_output_t(device_t &dev, const pstring &aname, bool force_logic)
 		: logic_output_t(dev, aname)
-		, m_last_logic(dev, name() + "." + "m_last_logic", 2) // force change
+		, m_last_logic(dev, name() + "." + "m_last_logic", 1) // force change
 		, m_tristate(dev, name() + "." + "m_tristate", 2) // force change
-		, m_ts_off_on(ts_off_on)
-		, m_ts_on_off(ts_on_off)
+		, m_force_logic(force_logic)
 		{}
 
 		void push(netlist_sig_t newQ, netlist_time delay) noexcept
@@ -1044,13 +1060,21 @@ namespace netlist
 			m_last_logic = newQ;
 		}
 
-		void set_tristate(bool v) noexcept
+		void set_tristate(bool v,
+			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
 		{
-			if (v != m_tristate)
-			{
-				logic_output_t::push(v ? OUT_TRISTATE() : m_last_logic, v ? m_ts_off_on : m_ts_on_off);
-				m_tristate = v;
-			}
+			//printf("%s %d\n", this->name().c_str(), (int) m_force_logic);
+			if (!m_force_logic)
+				if (v != m_tristate)
+				{
+					logic_output_t::push(v ? OUT_TRISTATE() : m_last_logic, v ? ts_off_on : ts_on_off);
+					m_tristate = v;
+				}
+		}
+
+		bool is_force_logic() const noexcept
+		{
+			return m_force_logic;
 		}
 
 	private:
@@ -1058,9 +1082,10 @@ namespace netlist
 		using logic_output_t::set_Q_time;
 		state_var<netlist_sig_t> m_last_logic;
 		state_var<netlist_sig_t> m_tristate;
-		const netlist_time m_ts_off_on;
-		const netlist_time m_ts_on_off;
+		bool m_force_logic;
 	};
+
+
 	// -----------------------------------------------------------------------------
 	// analog_output_t
 	// -----------------------------------------------------------------------------
@@ -1893,33 +1918,6 @@ namespace netlist
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
-#if 0
-		template<class D, typename... Args>
-		object_array_base_t(D &dev, const pstring &fmt, Args&&... args)
-		{
-			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i), std::forward<Args>(args)...);
-		}
-
-		template<class D, typename... Args>
-		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, Args&&... args)
-		{
-			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset), std::forward<Args>(args)...);
-		}
-
-		template<class D, typename... Args>
-		object_array_base_t(D &dev, std::size_t offset, std::size_t qmask, const pstring &fmt, Args&&... args)
-		{
-			for (std::size_t i = 0; i<N; i++)
-			{
-				pstring name(formatted(fmt, i+offset));
-				if ((qmask >> i) & 1)
-					name += "Q";
-				this->emplace(i, dev, name, std::forward<Args>(args)...);
-			}
-		}
-#else
 		template<class D>
 		object_array_base_t(D &dev, const pstring &fmt)
 		{
@@ -1954,7 +1952,6 @@ namespace netlist
 		}
 	protected:
 		object_array_base_t() = default;
-#endif
 
 	protected:
 		static pstring formatted(const pstring &fmt, std::size_t n)
@@ -2002,27 +1999,33 @@ namespace netlist
 		}
 
 
-		using value_type = typename plib::least_type_for_bits<N>::type;
+		//using value_type = typename plib::least_type_for_bits<N>::type;
+		using value_type = std::uint_fast32_t;
 
 		value_type operator ()()
 		{
-			if (N <= 8)
-				return tobits(N, *this);
-			else
-			{
-				value_type r(0);
-				for (std::size_t i = 0; i < N; i++)
-					r = static_cast<value_type>((*this)[i]() << (N-1)) | (r >> 1);
-				return r;
-			}
+			if (N == 1) return e<0>();
+			if (N == 2) return e<0>() | (e<1>() << 1);
+			if (N == 3) return e<0>() | (e<1>() << 1) | (e<2>() << 2);
+			if (N == 4) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3);
+			if (N == 5) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4);
+			if (N == 6) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5);
+			if (N == 7) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5) | (e<6>() << 6);
+			if (N == 8) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3)
+				| (e<4>() << 4) | (e<5>() << 5) | (e<6>() << 6) | (e<7>() << 7);
+
+			value_type r(0);
+			for (std::size_t i = 0; i < N; i++)
+				r = static_cast<value_type>((*this)[i]() << (N-1)) | (r >> 1);
+			return r;
 		}
 
 	private:
-		template <typename T>
-		static constexpr value_type tobits(std::size_t n, T &a)
-		{
-			return (n == 0 ? 0 : (tobits(n-1, a) | static_cast<value_type>(a[n-1]() << (n-1))));
-		}
+		template <std::size_t P>
+		inline constexpr value_type e() const { return (*this)[P](); }
 	};
 
 	template<std::size_t N>
@@ -2032,30 +2035,22 @@ namespace netlist
 		using base_type = object_array_base_t<logic_output_t, N>;
 		using base_type::base_type;
 
-		using value_type = typename plib::least_type_for_bits<N>::type;
+		using value_type = std::uint_fast32_t;
+		//using value_type = typename plib::least_type_for_bits<N>::type;
 
 		void push(value_type v, netlist_time t)
 		{
-			if (N <= 8)
-				rpush(N, *this, v, t);
-			else
-			{
-				for (std::size_t i = 0; i < N; v = v >> 1, i++)
-					(*this)[i].push(v & 1, t);
-			}
-		}
+			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
+			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
+			if (N >= 3) (*this)[2].push((v >> 2) & 1, t);
+			if (N >= 4) (*this)[3].push((v >> 3) & 1, t);
+			if (N >= 5) (*this)[4].push((v >> 4) & 1, t);
+			if (N >= 6) (*this)[5].push((v >> 5) & 1, t);
+			if (N >= 7) (*this)[6].push((v >> 6) & 1, t);
+			if (N >= 8) (*this)[7].push((v >> 7) & 1, t);
 
-	private:
-		template <typename A, typename V, typename X>
-		static V rpush(std::size_t n, A &a, V value, X time)
-		{
-			if (n > 0)
-			{
-				value = rpush(n-1, a, value, time);
-				a[n-1].push((value & 1), time);
-				return value >> 1;
-			}
-			return value;
+			for (std::size_t i = 8; i < N; i++)
+				(*this)[i].push((v >> i) & 1, t);
 		}
 	};
 
@@ -2106,6 +2101,13 @@ namespace netlist
 	{
 		return m_netlist.nlstate();
 	}
+
+	template<typename T, typename... Args>
+	inline unique_pool_ptr<T> detail::netlist_object_t::make_object(Args&&... args)
+	{
+		return state().make_object<T>(std::forward<Args>(args)...);
+	}
+
 
 	inline void param_t::update_param() noexcept
 	{

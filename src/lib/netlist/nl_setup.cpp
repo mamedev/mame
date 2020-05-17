@@ -1084,6 +1084,28 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(term->name()));
 		}
 	}
+	log().verbose("checking tristate consistency  ...");
+	for (auto & i : m_terminals)
+	{
+		detail::core_terminal_t *term = i.second;
+		if (term->is_tristate_output())
+		{
+			const auto *tri(static_cast<tristate_output_t *>(term));
+			// check if we are connected to a proxy
+			const auto iter_proxy(m_proxies.find(tri));
+
+			if (iter_proxy == m_proxies.end() && !tri->is_force_logic())
+			{
+				log().error(ME_TRISTATE_NO_PROXY_FOUND_2(term->name(), term->device().name()));
+				err = true;
+			}
+			else if (iter_proxy != m_proxies.end() && tri->is_force_logic())
+			{
+				log().error(ME_TRISTATE_PROXY_FOUND_2(term->name(), term->device().name()));
+				err = true;
+			}
+		}
+	}
 	if (err)
 	{
 		log().fatal(MF_TERMINALS_WITHOUT_NET());

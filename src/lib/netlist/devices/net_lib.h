@@ -54,6 +54,7 @@
 #include "nld_4316.h"
 #include "nld_74107.h"
 #include "nld_74123.h"
+#include "nld_74125.h"
 #include "nld_74153.h"
 #include "nld_74161.h"
 #include "nld_74164.h"

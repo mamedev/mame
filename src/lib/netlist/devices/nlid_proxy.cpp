@@ -187,7 +187,7 @@ namespace netlist
 							nlconst::zero());
 						break;
 					default:
-						printf("this should never happen!");
+						throw nl_exception("unknown state for proxy: this should never happen! %d\n", static_cast<int>(state));
 				}
 			});
 			m_last_state = state;

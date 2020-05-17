@@ -77,14 +77,6 @@ namespace netlist
 		}
 	}
 
-#if 0
-	// ----------------------------------------------------------------------------------------
-	// netlist_ref_t
-	// ----------------------------------------------------------------------------------------
-
-	detail::netlist_ref::netlist_ref(netlist_t &nl)
-	: m_netlist(nl) { }
-#endif
 	// ----------------------------------------------------------------------------------------
 	// device_object_t
 	// ----------------------------------------------------------------------------------------
@@ -905,6 +897,11 @@ namespace netlist
 	bool detail::core_terminal_t::is_logic_output() const noexcept
 	{
 		return dynamic_cast<const logic_output_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_tristate_output() const noexcept
+	{
+		return dynamic_cast<const tristate_output_t *>(this) != nullptr;
 	}
 
 	bool detail::core_terminal_t::is_analog() const noexcept

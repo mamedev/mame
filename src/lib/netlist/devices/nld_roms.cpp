@@ -25,42 +25,6 @@ namespace netlist
 	namespace devices
 	{
 
-		template<netlist_time::internal_type value0>
-		struct times_ns1
-		{
-			static constexpr netlist_time value(std::size_t N = 0)
-			{
-				plib::unused_var(N);
-				return NLTIME_FROM_NS(value0);
-			}
-		};
-
-		template <netlist_time::internal_type value0>
-		using time_ns = times_ns1<value0>;
-
-		template<netlist_time::internal_type value0,
-			netlist_time::internal_type  value1>
-		struct times_ns2
-		{
-			static constexpr netlist_time value(std::size_t N)
-			{
-				return NLTIME_FROM_NS(N == 0 ? value0 : value1);
-			}
-		};
-
-		template<netlist_time::internal_type value0,
-			netlist_time::internal_type value1,
-			netlist_time::internal_type value2>
-		struct times_ns3
-		{
-			static constexpr netlist_time value(std::size_t N)
-			{
-				return NLTIME_FROM_NS(N == 0 ? value0 :
-						N == 1 ? value1 :
-							     value2);
-			}
-		};
-
 		template <typename D>
 		NETLIB_OBJECT(generic_prom)
 		{
