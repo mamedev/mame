@@ -43,10 +43,12 @@ DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 #define LOG_CACHE_FILLS		(1U << 22)
 #define LOG_PAGE_ENTRIES	(1U << 23)
 
+#if SUN4CMMU_LOG_MEM_ACCESSES
+static FILE* s_mem_log = nullptr;
+#endif
+
 #define VERBOSE (0)
 #include "logmacro.h"
-
-static FILE* s_mem_log = nullptr;
 
 sun4_mmu_base_device::sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -82,13 +84,17 @@ sun4c_mmu_device::sun4c_mmu_device(const machine_config &mconfig, const char *ta
 
 void sun4_mmu_base_device::device_stop()
 {
+#if SUN4CMMU_LOG_MEM_ACCESSES
 	fclose(s_mem_log);
+#endif
 }
 
 void sun4_mmu_base_device::device_start()
 {
+#if SUN4CMMU_LOG_MEM_ACCESSES
 	s_mem_log = fopen("sun4c_mem.bin", "wb");
 	m_fpos = 0;
+#endif
 
 	m_type1_r.resolve_safe(0xffffffff);
 	m_type1_w.resolve_safe();
@@ -841,17 +847,21 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 				{
 					if (cache_fetch<PERM_MODE>(entry, offset, masked_addr, cached_data, entry_index))
 					{
-						//uint32_t value = masked_addr | 0x80000000;
-						//fwrite(&value, 1, 4, s_mem_log);
-						//fwrite(&cached_data, 1, 4, s_mem_log);
-						//m_fpos += 8;
+#if SUN4CMMU_LOG_MEM_ACCESSES
+						uint32_t value = masked_addr | 0x80000000;
+						fwrite(&value, 1, 4, s_mem_log);
+						fwrite(&cached_data, 1, 4, s_mem_log);
+						m_fpos += 8;
+#endif
 						return cached_data;
 					}
 				}
-				//uint32_t value = masked_addr | 0x80000000;
-				//fwrite(&value, 1, 4, s_mem_log);
-				//fwrite(&m_ram_ptr[masked_addr], 1, 4, s_mem_log);
-				//m_fpos += 8;
+#if SUN4CMMU_LOG_MEM_ACCESSES
+				uint32_t value = masked_addr | 0x80000000;
+				fwrite(&value, 1, 4, s_mem_log);
+				fwrite(&m_ram_ptr[masked_addr], 1, 4, s_mem_log);
+				m_fpos += 8;
+#endif
 				return m_ram_ptr[masked_addr];
 			}
 			else if (paddr >= 0x4000000 >> 2 && paddr < 0x10000000 >> 2)
@@ -1003,9 +1013,11 @@ void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t dat
 					}
 				}
 				COMBINE_DATA((m_ram_ptr + masked_addr));
-				//fwrite(&masked_addr, 1, 4, s_mem_log);
-				//fwrite(&m_ram_ptr[masked_addr], 1, 4, s_mem_log);
-				//m_fpos += 8;
+#if SUN4CMMU_LOG_MEM_ACCESSES
+				fwrite(&masked_addr, 1, 4, s_mem_log);
+				fwrite(&m_ram_ptr[masked_addr], 1, 4, s_mem_log);
+				m_fpos += 8;
+#endif
 			}
 			else if (paddr >= 0x4000000 >> 2 && paddr < 0x10000000 >> 2)
 			{

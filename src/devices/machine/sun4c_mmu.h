@@ -15,6 +15,8 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
+#define SUN4CMMU_LOG_MEM_ACCESSES	(0)
+
 class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {
 public:
@@ -198,7 +200,9 @@ protected:
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
+#if SUN4CMMU_LOG_MEM_ACCESSES
 	uint64_t m_fpos;
+#endif
 	emu_timer *m_reset_timer;
 	bool m_log_mem;
 };
