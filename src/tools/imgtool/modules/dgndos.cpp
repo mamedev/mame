@@ -19,24 +19,27 @@
 
 #ifdef _MSC_VER
 #pragma pack(push,1)
+#define A_PACKED
+#else
+#define A_PACKED __attribute__((packed))
 #endif
 
-typedef struct __attribute__((packed)) dngdos_sector_allocation_format {
+typedef struct A_PACKED dngdos_sector_allocation_format {
 	uint16_t lsn;
 	uint8_t count;
 } dngdos_sector_allocation_format;
 
-typedef struct __attribute__((packed)) dngdos_file_header_block {
+typedef struct A_PACKED dngdos_file_header_block {
 	char filename[11];
 	dngdos_sector_allocation_format block[4];
 } dngdos_file_header_block;
 
-typedef struct __attribute__((packed)) dngdos_file_continuation_block {
+typedef struct A_PACKED dngdos_file_continuation_block {
 	dngdos_sector_allocation_format block[7];
 	uint16_t unused;
 } dngdos_file_continuation_block;
 
-struct __attribute__((packed)) dgndos_dirent
+struct A_PACKED dgndos_dirent
 {
 	unsigned char flag_byte;
 	union block {
