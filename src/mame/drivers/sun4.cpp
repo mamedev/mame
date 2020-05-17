@@ -673,12 +673,12 @@ private:
 
 READ32_MEMBER( sun4_base_state::debugger_r )
 {
-	return m_mmu->insn_data_r<sun4_mmu_base_device::SUPER_INSN>(offset, mem_mask);
+	return m_mmu->insn_data_r<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(offset, mem_mask);
 }
 
 WRITE32_MEMBER( sun4_base_state::debugger_w )
 {
-	m_mmu->insn_data_w<sun4_mmu_base_device::SUPER_INSN>(offset, data, mem_mask);
+	m_mmu->insn_data_w<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(offset, data, mem_mask);
 }
 
 void sun4_base_state::fcodes_command(int ref, const std::vector<std::string> &params)
@@ -1078,7 +1078,7 @@ void sun4_base_state::dma_transfer_write()
 		pack_cnt++;
 		if (pack_cnt == 4)
 		{
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
 			pack_cnt = 0;
 			m_dma_pack_register = 0;
 			m_dma[DMA_ADDR] += 4;
@@ -1099,7 +1099,7 @@ void sun4_base_state::dma_transfer_read()
 	{
 		if (!word_cached)
 		{
-			current_word = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, ~0);
+			current_word = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, ~0);
 			word_cached = true;
 			//logerror("Current word: %08x\n", current_word);
 		}
@@ -1176,7 +1176,7 @@ WRITE32_MEMBER( sun4_base_state::dma_w )
 					const uint32_t bit_index = (3 - i) * 8;
 					//const uint32_t value = m_dma_pack_register & (0xff << bit_index);
 					//logerror("dma_w: draining %02x to RAM address %08x & %08x\n", value >> bit_index, m_dma[DMA_ADDR], 0xff << (24 - bit_index));
-					m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
+					m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
 					m_dma[DMA_ADDR]++;
 				}
 				m_dma_pack_register = 0;
@@ -1301,16 +1301,16 @@ void sun4_base_state::sun4_base(machine_config &config)
 	AM79C90(config, m_lance);
 	m_lance->dma_in().set([this](offs_t offset)
 	{
-		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
+		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, 0xffffffffU);
 
 		return (offset & 2) ? u16(data) : u16(data >> 16);
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
 	{
 		if (offset & 2)
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, data, mem_mask);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, data, mem_mask);
 		else
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
 	});
 
 	// Keyboard/mouse
@@ -1390,6 +1390,7 @@ void sun4c_state::sun4c(machine_config &config)
 	m_mmu->set_ram(m_ram);
 	m_mmu->set_rom("user1");
 	m_mmu->set_scc(m_scc2);
+	m_mmu->set_cache_line_size(16);
 	m_maincpu->set_mmu(m_mmu);
 
 	// SBus
@@ -1441,6 +1442,7 @@ void sun4c_state::sun4_50(machine_config &config)
 
 	m_mmu->set_ctx_mask(0xf);
 	m_mmu->set_pmeg_mask(0xff);
+	m_mmu->set_cache_line_size(32);
 
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
@@ -1478,6 +1480,7 @@ void sun4c_state::sun4_75(machine_config &config)
 
 	m_mmu->set_ctx_mask(0xf);
 	m_mmu->set_pmeg_mask(0xff);
+	m_mmu->set_cache_line_size(32);
 
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);

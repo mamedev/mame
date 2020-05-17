@@ -36,6 +36,7 @@ public:
 	template <typename T> void set_ram(T &&ram_tag) { m_ram.set_tag(std::forward<T>(ram_tag)); }
 	template <typename T> void set_rom(T &&rom_tag) { m_rom.set_tag(std::forward<T>(rom_tag)); }
 	template <typename T> void set_scc(T &&scc_tag) { m_scc.set_tag(std::forward<T>(scc_tag)); }
+	void set_cache_line_size(uint32_t line_size) { m_cache_line_size = line_size; }
 
 	auto type1_r() { return m_type1_r.bind(); }
 	auto type1_w() { return m_type1_w.bind(); }
@@ -56,8 +57,14 @@ public:
 		SUPER_DATA
 	};
 
-	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
-	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
+	enum perm_mode
+	{
+		USER_MODE,
+		SUPER_MODE
+	};
+
+	template <insn_data_mode MODE, perm_mode PERM_MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
+	template <insn_data_mode MODE, perm_mode PERM_MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 
 	uint32_t type1_timeout_r(uint32_t offset);
 	void type1_timeout_w(uint32_t offset, uint32_t data);
@@ -75,6 +82,8 @@ protected:
 
 	struct page_entry
 	{
+		uint32_t index;
+		uint32_t raw;
 		uint32_t valid;
 		uint32_t writable;
 		uint32_t supervisor;
@@ -90,12 +99,15 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t page_entry_to_uint(uint32_t index);
 	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);
 
-	bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data);
+	template <perm_mode MODE> bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+	void cache_fill(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t entry_index);
+
 	void segment_flush_w(const uint32_t vaddr);
 	void context_flush_w(const uint32_t vaddr);
 	void page_flush_w(const uint32_t vaddr);
@@ -107,7 +119,9 @@ protected:
 	void page_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 	void type0_timeout_r(const uint32_t offset);
 	void type0_timeout_w(const uint32_t offset);
+	bool translate(uint32_t &addr);
 	void l2p_command(int ref, const std::vector<std::string> &params);
+	uint32_t vaddr_to_cache_line(uint32_t vaddr);
 
 	enum
 	{
@@ -175,9 +189,16 @@ protected:
 	uint32_t m_page_entry_mask;
 	uint32_t m_cache_mask;
 	uint32_t m_cache_tag_mask;
+	uint32_t m_cache_line_size;
+	uint32_t m_cache_word_size;
+	uint32_t m_cache_tag_shift;
+	uint32_t m_cache_tag_id_mask;
+	uint32_t m_cache_tag_id_shift;
+	uint32_t m_cache_vaddr_shift;
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
+	uint64_t m_fpos;
 	emu_timer *m_reset_timer;
 	bool m_log_mem;
 };
