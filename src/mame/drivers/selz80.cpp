@@ -35,6 +35,7 @@ ToDo:
 #include "machine/i8279.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
+#include "video/pwm.h"
 #include "selz80.lh"
 
 
@@ -45,36 +46,47 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
-		, m_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_clock(*this, "uart_clock")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
 	{ }
 
 	void selz80(machine_config &config);
-	void dagz80(machine_config &config);
 
-private:
+protected:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_MACHINE_RESET(dagz80);
-	DECLARE_MACHINE_RESET(selz80);
 
-	void dagz80_mem(address_map &map);
 	void selz80_io(address_map &map);
-	void selz80_mem(address_map &map);
 
-	uint8_t m_digit;
+	u8 m_digit;
+	u8 m_seg;
 	void setup_baud();
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<4> m_keyboard;
+	optional_shared_ptr<u8> m_p_ram;
+	required_ioport_array<4> m_io_keyboard;
 	required_device<clock_device> m_clock;
-	output_finder<8> m_digits;
-	virtual void machine_start() override;
+	required_device<pwm_display_device> m_display;
+
+private:
+	void selz80_mem(address_map &map);
+	void machine_reset() override;
+
 };
 
-void selz80_state::dagz80_mem(address_map &map)
+class dagz80_state : public selz80_state
+{
+public:
+	using selz80_state::selz80_state;
+	void dagz80(machine_config &config);
+
+private:
+	void dagz80_mem(address_map &map);
+	void machine_reset() override;
+};
+
+void dagz80_state::dagz80_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("ram");
@@ -176,12 +188,12 @@ void selz80_state::setup_baud()
 	}
 }
 
-MACHINE_RESET_MEMBER(selz80_state, selz80)
+void selz80_state::machine_reset()
 {
 	setup_baud();
 }
 
-MACHINE_RESET_MEMBER(selz80_state, dagz80)
+void dagz80_state::machine_reset()
 {
 	setup_baud();
 	uint8_t* rom = memregion("user1")->base();
@@ -193,12 +205,13 @@ MACHINE_RESET_MEMBER(selz80_state, dagz80)
 WRITE8_MEMBER( selz80_state::scanlines_w )
 {
 	m_digit = data;
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 WRITE8_MEMBER( selz80_state::digit_w )
 {
-	if (m_digit < 8)
-		m_digits[m_digit] = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	m_seg = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
+	m_display->matrix(1 << m_digit, m_seg);
 }
 
 READ8_MEMBER( selz80_state::kbd_r )
@@ -206,29 +219,25 @@ READ8_MEMBER( selz80_state::kbd_r )
 	uint8_t data = 0xff;
 
 	if ((m_digit & 7) < 4)
-		data = m_keyboard[m_digit & 3]->read();
+		data = m_io_keyboard[m_digit & 3]->read();
 
 	return data;
-}
-
-void selz80_state::machine_start()
-{
-	m_digits.resolve();
 }
 
 void selz80_state::selz80(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	Z80(config, m_maincpu, 4.9152_MHz_XTAL / 2); // NEC uPD780C-1 cpu
 	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::selz80_mem);
 	m_maincpu->set_addrmap(AS_IO, &selz80_state::selz80_io);
-	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
 	config.set_default_layout(layout_selz80);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	/* Devices */
-	CLOCK(config, m_clock, 153600);
+	CLOCK(config, m_clock, 153'600);
 	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
@@ -242,7 +251,7 @@ void selz80_state::selz80(machine_config &config)
 	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
-	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", 4.9152_MHz_XTAL / 2)); // based on divider
 	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(selz80_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
@@ -250,11 +259,10 @@ void selz80_state::selz80(machine_config &config)
 	kbdc.in_ctrl_callback().set_constant(1);
 }
 
-void selz80_state::dagz80(machine_config &config)
+void dagz80_state::dagz80(machine_config &config)
 {
 	selz80(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::dagz80_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &dagz80_state::dagz80_mem);
 }
 
 
@@ -279,4 +287,4 @@ ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
 COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, dagz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
