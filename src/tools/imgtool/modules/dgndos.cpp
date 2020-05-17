@@ -56,7 +56,6 @@ struct dgndos_direnum
 #define MAX_DIRENTS 160
 #define HEADER_EXTENTS_COUNT 4
 #define CONT_EXTENTS_COUNT 7
-#define MAX_BITMAP_SIZE 512
 
 #define DGNDOS_DELETED_BIT	0x80       // deleted entry
 #define DGNDOS_CONTINUED_BIT 0x20      // byte at offset 0x18 give next entry number
@@ -239,7 +238,7 @@ static int dgndos_fat_deallocate_sector(uint8_t *entire_track, int lsn)
 
 static int dgndos_fat_deallocate_span(uint8_t *entire_track, int lsn, int count)
 {
-	int value;
+	int value = 0;
 
 	for( int i=lsn; i<lsn+count; i++)
 	{
@@ -343,29 +342,27 @@ static imgtoolerr_t dgndos_get_avaiable_sector( uint8_t *entire_track, int *lsn 
 	return IMGTOOLERR_NOSPACE;
 }
 
-static int dgndos_count_dirents(uint8_t *entire_track, dgndos_dirent dgnent)
+static imgtoolerr_t dgndos_count_dirents(uint8_t *entire_track, dgndos_dirent dgnent, int *result)
 {
-	imgtoolerr_t err;
-	int result = 1;
+	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
+	*result = 1;
 
-	while( (dgnent.flag_byte & DGNDOS_CONTINUED_BIT) && result < 256 )
+	while( (dgnent.flag_byte & DGNDOS_CONTINUED_BIT) && *result < MAX_DIRENTS )
 	{
-		result++;
+		(*result)++;
 		err = get_dgndos_dirent(entire_track, dgnent.dngdos_last_or_next, dgnent);
 	}
 
-	return result;
+	return err;
 }
 
 static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent dgnent, size_t &filesize)
 {
 	imgtoolerr_t err;
 	int directory_entry_count = 0;
-	int position;
 	int extent = 0;
 	int block_size;
 	int done;
-	int lsn;
 	int count;
 	int i;
 
@@ -375,7 +372,6 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent dg
 	{
 		if(directory_entry_count>MAX_DIRENTS) return IMGTOOLERR_CORRUPTDIR;
 
-		lsn = big_endianize_int16( dgnent.flag_byte & DGNDOS_CONTINUATION_BIT ? dgnent.continuation_block.block[extent].lsn : dgnent.header_block.block[extent].lsn );
 		count = dgnent.flag_byte & DGNDOS_CONTINUATION_BIT ? dgnent.continuation_block.block[extent].count : dgnent.header_block.block[extent].count;
 
 		if( count == 0 ) break;
@@ -427,7 +423,6 @@ static imgtoolerr_t dgndos_get_file_size(uint8_t *entire_track, dgndos_dirent dg
 		{
 			if( dgnent.flag_byte & DGNDOS_CONTINUED_BIT)
 			{
-				position = dgnent.dngdos_last_or_next;
 				err = get_dgndos_dirent(entire_track, dgnent.dngdos_last_or_next, *(&dgnent) );
 				if(err) return err;
 
@@ -474,6 +469,7 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 	size_t filesize;
 	dgndos_direnum *dgnenum;
 	dgndos_dirent dgnent;
+	int dir_ent_count;
 
 	imgtool::image &image(enumeration.image());
 
@@ -529,10 +525,13 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 
 		std::string fname = get_dirent_fname(dgnent);
 
+		err = dgndos_count_dirents(entire_track20, dgnent, &dir_ent_count);
+		if (err) return err;
+
 		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
 		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c (%03d)",
 			(char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'),
-			dgndos_count_dirents(entire_track20, dgnent));
+			dir_ent_count);
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -790,7 +789,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 	dgndos_dirent ent;
 	int position;
 	uint64_t written = 0;
-	int fat_block, block_index, first_lsn, sectors_avaiable, current_sector_index;
+	int fat_block, first_lsn, sectors_avaiable, current_sector_index;
 	int last_sector_size = 0;
 	int bitmap_count;
 
@@ -854,7 +853,6 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 	}
 
 	fat_block = 0;
-	block_index = 0;
 
 	/* get next available fat entry */
 	first_lsn = big_endianize_int16(ent.header_block.block[fat_block].lsn);
