@@ -8,6 +8,9 @@
 //
 // Known problems/issues:
 //
+//    * Reports a confusing warning:
+//        WARNING: Connecting net net.IC12.VO.OP to itself
+//
 //    * Not tested at all, just compiles. Crashes upon execution,
 //       both in MAME and in nltool.
 //
