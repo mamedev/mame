@@ -15,6 +15,7 @@
 #define SPEEDFRK_USE_NETLIST		(1)
 #define STARHAWK_USE_NETLIST		(1)
 #define SUNDANCE_USE_NETLIST		(1)
+#define TAILG_USE_NETLIST			(1)
 #define STARCAS_USE_NETLIST			(1)
 #define WOTW_USE_NETLIST			(1)
 

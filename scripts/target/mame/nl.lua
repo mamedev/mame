@@ -218,6 +218,8 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_starhawk.h",
 	MAME_DIR .. "src/mame/audio/nl_sundance.cpp",
 	MAME_DIR .. "src/mame/audio/nl_sundance.h",
+	MAME_DIR .. "src/mame/audio/nl_tailg.cpp",
+	MAME_DIR .. "src/mame/audio/nl_tailg.h",
 
 	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
 	MAME_DIR .. "src/mame/includes/galaxian.h",

@@ -49,8 +49,10 @@
 #define TTL_74LS75_DIP TTL_7475_DIP     // 4-Bit Bistable Latches with Complementary Outputs
 #define TTL_74LS86_DIP TTL_7486_DIP     // Quad 2-Input Exclusive-OR Gates
 #define TTL_74LS107_DIP TTL_74107_DIP
+#define TTL_74LS123_DIP TTL_74123_DIP
 #define TTL_74LS163_DIP TTL_74163_DIP
 #define TTL_74LS164_DIP TTL_74164_DIP
+#define TTL_74LS259_DIP TTL_9334_DIP	// Seems to be pin-compatible
 #define TTL_74LS377_DIP TTL_74377_DIP
 #define TTL_74LS393_DIP TTL_74393_DIP
 
