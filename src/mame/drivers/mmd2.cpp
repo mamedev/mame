@@ -127,20 +127,19 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port05_w);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port13_r);
+	void port00_w(uint8_t data);
+	void port01_w(uint8_t data);
+	void port02_w(uint8_t data);
+	void port05_w(uint8_t data);
+	uint8_t port01_r();
+	uint8_t port13_r();
 	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(status_callback);
+	uint8_t keyboard_r();
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	void status_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(inte_callback);
-	DECLARE_READ_LINE_MEMBER(si);
-	DECLARE_WRITE_LINE_MEMBER(so);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void reset_banks();
@@ -159,7 +158,7 @@ private:
 };
 
 
-WRITE8_MEMBER( mmd2_state::port00_w )
+void mmd2_state::port00_w(uint8_t data)
 {
 	m_p[0][7] = BIT(data,7) ? 0 : 1;
 	m_p[0][6] = BIT(data,6) ? 0 : 1;
@@ -171,7 +170,7 @@ WRITE8_MEMBER( mmd2_state::port00_w )
 	m_p[0][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd2_state::port01_w )
+void mmd2_state::port01_w(uint8_t data)
 {
 	m_p[1][7] = BIT(data,7) ? 0 : 1;
 	m_p[1][6] = BIT(data,6) ? 0 : 1;
@@ -183,7 +182,7 @@ WRITE8_MEMBER( mmd2_state::port01_w )
 	m_p[1][0] = BIT(data,0) ? 0 : 1;
 }
 
-WRITE8_MEMBER( mmd2_state::port02_w )
+void mmd2_state::port02_w(uint8_t data)
 {
 	m_p[2][7] = BIT(data,7) ? 0 : 1;
 	m_p[2][6] = BIT(data,6) ? 0 : 1;
@@ -296,7 +295,7 @@ READ8_MEMBER( mmd2_state::bank_r )
 	return space.unmap();
 }
 
-READ8_MEMBER( mmd2_state::port01_r )
+uint8_t mmd2_state::port01_r()
 {
 	// need to add ttyin bit 0
 	uint8_t data = 0x84;
@@ -305,34 +304,34 @@ READ8_MEMBER( mmd2_state::port01_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::port05_w )
+void mmd2_state::port05_w(uint8_t data)
 {
 	// need to add ttyout bit 0
 	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( mmd2_state::scanlines_w )
+void mmd2_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( mmd2_state::digit_w )
+void mmd2_state::digit_w(uint8_t data)
 {
 	if (m_digit < 9)
 		m_digits[m_digit] = data;
 }
 
-READ8_MEMBER( mmd2_state::keyboard_r )
+uint8_t mmd2_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 4)
-		data = m_io_keyboard[m_digit]->read();
+	if ((m_digit & 7) < 4)
+		data = m_io_keyboard[m_digit & 7]->read();
 
 	return data;
 }
 
-WRITE8_MEMBER( mmd2_state::status_callback )
+void mmd2_state::status_callback(uint8_t data)
 {
 	// operate the HALT LED
 	m_led_halt = ~data & i8080_cpu_device::STATUS_HLTA;
