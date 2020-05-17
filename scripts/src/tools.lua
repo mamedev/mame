@@ -686,6 +686,7 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/amiga.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/macbin.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/rsdos.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/dgndos.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/os9.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/mac.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/ti99.cpp",
