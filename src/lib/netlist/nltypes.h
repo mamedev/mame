@@ -162,54 +162,57 @@ namespace netlist
 	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
 	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
 
-	/// \brief: used to hold one static netlist_time value
-	///
-	template<netlist_time::internal_type value0>
-	struct times_ns1
+	struct desc_base
 	{
-		static constexpr netlist_time value(std::size_t N = 0)
+		/// \brief: used to hold one static netlist_time value
+		///
+		template<netlist_time::internal_type value0>
+		struct times_ns1
 		{
-			plib::unused_var(N);
-			return NLTIME_FROM_NS(value0);
-		}
-	};
+			static constexpr netlist_time value(std::size_t N = 0)
+			{
+				plib::unused_var(N);
+				return NLTIME_FROM_NS(value0);
+			}
+		};
 
-	template <netlist_time::internal_type value0>
-	using time_ns = times_ns1<value0>;
+		template <netlist_time::internal_type value0>
+		using time_ns = times_ns1<value0>;
 
-	/// \brief: used to hold two static netlist_time values
-	///
-	template<netlist_time::internal_type value0,
-		netlist_time::internal_type  value1>
-	struct times_ns2
-	{
-		static constexpr netlist_time value(std::size_t N)
+		/// \brief: used to hold two static netlist_time values
+		///
+		template<netlist_time::internal_type value0,
+			netlist_time::internal_type  value1>
+		struct times_ns2
 		{
-			return NLTIME_FROM_NS(N == 0 ? value0 : value1);
-		}
-	};
+			static constexpr netlist_time value(std::size_t N)
+			{
+				return NLTIME_FROM_NS(N == 0 ? value0 : value1);
+			}
+		};
 
-	/// \brief: used to hold two static netlist_time values
-	///
-	template<netlist_time::internal_type value0,
-		netlist_time::internal_type value1,
-		netlist_time::internal_type value2>
-	struct times_ns3
-	{
-		static constexpr netlist_time value(std::size_t N)
+		/// \brief: used to hold two static netlist_time values
+		///
+		template<netlist_time::internal_type value0,
+			netlist_time::internal_type value1,
+			netlist_time::internal_type value2>
+		struct times_ns3
 		{
-			return NLTIME_FROM_NS(N == 0 ? value0 :
-					N == 1 ? value1 :
-						     value2);
-		}
-	};
+			static constexpr netlist_time value(std::size_t N)
+			{
+				return NLTIME_FROM_NS(N == 0 ? value0 :
+						N == 1 ? value1 :
+							     value2);
+			}
+		};
 
-	/// \brief: used define a constant in device description struct
-	///
-	/// See the 74125 implementation
-	///
-	template <std::size_t V>
-	using desc_const = 	std::integral_constant<std::size_t, V>;
+		/// \brief: used define a constant in device description struct
+		///
+		/// See the 74125 implementation
+		///
+		template <std::size_t V>
+		using desc_const = 	std::integral_constant<std::size_t, V>;
+	};
 
 
 } // namespace netlist
