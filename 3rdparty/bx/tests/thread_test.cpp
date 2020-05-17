@@ -42,7 +42,9 @@ TEST_CASE("Thread", "")
 
 	REQUIRE(!th.isRunning() );
 
-	th.init(threadExit0);
+	bool init = th.init(threadExit0, NULL, 0, NULL);
+	REQUIRE(init);
+
 	REQUIRE(th.isRunning() );
 	th.push(NULL);
 	th.shutdown();

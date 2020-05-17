@@ -31,8 +31,16 @@ namespace bx
 		///
 		virtual ~Thread();
 
+		/// Create and initialize thread.
 		///
-		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0, const char* _name = NULL);
+		/// @param[in] _fn Thread function.
+		/// @param[in] _userData User data passed to thread function.
+		/// @param[in] _stackSize Stack size, if zero is passed it will use OS default thread stack
+		///   size.
+		/// @param[in] _name Thread name used by debugger.
+		/// @returns True if thread is created, otherwise returns false.
+		///
+		bool init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0, const char* _name = NULL);
 
 		///
 		void shutdown();
