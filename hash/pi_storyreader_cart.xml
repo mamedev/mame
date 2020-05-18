@@ -379,7 +379,7 @@ license:CC0
 	</software>
 
 	<software name="arielle" supported="no">
-		<description>Arielle  - Die Meerjungfrau (Germany)</description>
+		<description>Arielle - Die Meerjungfrau (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
@@ -412,7 +412,7 @@ license:CC0
 	</software>
 
 	<software name="schone" supported="no">
-		<description>Die Schöne und das Biest (GER) (Germany)</description>
+		<description>Die Schöne und das Biest (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
