@@ -59,11 +59,11 @@ private:
 	u8 m_data;
 	u8 m_control;
 
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_READ8_MEMBER(input_r);
+	void data_w(u8 data);
+	u8 data_r();
+	void control_w(u8 data);
+	u8 control_r();
+	u8 input_r();
 };
 
 void milton_state::machine_start()
@@ -136,13 +136,13 @@ void milton_filter_device::sound_stream_update(sound_stream &stream, stream_samp
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(milton_state::data_w)
+void milton_state::data_w(u8 data)
 {
 	// TMC0430 + SP0250 data
 	m_data = data;
 }
 
-READ8_MEMBER(milton_state::data_r)
+u8 milton_state::data_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -154,7 +154,7 @@ READ8_MEMBER(milton_state::data_r)
 	return data;
 }
 
-WRITE8_MEMBER(milton_state::control_w)
+void milton_state::control_w(u8 data)
 {
 	// d0-d4: input mux
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(milton_state::control_w)
 	m_control = data;
 }
 
-READ8_MEMBER(milton_state::control_r)
+u8 milton_state::control_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -192,7 +192,7 @@ READ8_MEMBER(milton_state::control_r)
 	return m_speech->drq_r() ? 0x40 : 0;
 }
 
-READ8_MEMBER(milton_state::input_r)
+u8 milton_state::input_r()
 {
 	u8 data = 0;
 

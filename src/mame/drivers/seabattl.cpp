@@ -83,7 +83,7 @@ private:
 	DECLARE_WRITE8_MEMBER(time_display_w);
 	DECLARE_WRITE8_MEMBER(score_display_w);
 	DECLARE_WRITE8_MEMBER(score2_display_w);
-	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
+	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 

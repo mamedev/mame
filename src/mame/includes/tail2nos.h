@@ -69,7 +69,7 @@ private:
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE8_MEMBER(tail2nos_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(uint8_t data);
 	DECLARE_READ8_MEMBER(sound_semaphore_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

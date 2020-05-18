@@ -135,7 +135,7 @@ void flstory_state::rumba_map(address_map &map)
 
 
 
-WRITE8_MEMBER(flstory_state::sound_control_0_w)
+void flstory_state::sound_control_0_w(uint8_t data)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(flstory_state::sound_control_0_w)
 	//m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
-WRITE8_MEMBER(flstory_state::sound_control_1_w)
+void flstory_state::sound_control_1_w(uint8_t data)
 {
 	m_snd_ctrl1 = data & 0xff;
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -162,7 +162,7 @@ WRITE8_MEMBER(flstory_state::sound_control_1_w)
 //  m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
-WRITE8_MEMBER(flstory_state::sound_control_2_w)
+void flstory_state::sound_control_2_w(uint8_t data)
 {
 	m_snd_ctrl2 = data & 0xff;
 	//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -171,7 +171,7 @@ WRITE8_MEMBER(flstory_state::sound_control_2_w)
 }
 
 // ta7630 bass / treble for AY?
-WRITE8_MEMBER(flstory_state::sound_control_3_w)
+void flstory_state::sound_control_3_w(uint8_t data)
 {
 	m_snd_ctrl3 = data & 0xff;
 	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);

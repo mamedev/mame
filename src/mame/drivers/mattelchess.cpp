@@ -55,11 +55,11 @@ private:
 	void update_reset(ioport_value state);
 
 	// I/O handlers
-	template<int Sel> DECLARE_WRITE32_MEMBER(lcd_output_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(lcd_r);
+	template<int Sel> void lcd_output_w(offs_t offset, u32 data);
+	void input_w(u8 data);
+	u8 input_r();
+	void lcd_w(u8 data);
+	u8 lcd_r();
 };
 
 void mchess_state::machine_start()
@@ -95,7 +95,7 @@ void mchess_state::update_reset(ioport_value state)
 ******************************************************************************/
 
 template<int Sel>
-WRITE32_MEMBER(mchess_state::lcd_output_w)
+void mchess_state::lcd_output_w(offs_t offset, u32 data)
 {
 	int enabled = ~m_inputs[3]->read() & m_lcd_control & 1;
 
@@ -105,13 +105,13 @@ WRITE32_MEMBER(mchess_state::lcd_output_w)
 		m_out_x[Sel][offset][i] = BIT(data, i) & enabled;
 }
 
-WRITE8_MEMBER(mchess_state::input_w)
+void mchess_state::input_w(u8 data)
 {
 	// d0,d5,d6: input mux
 	m_inp_mux = (~data >> 4 & 6) | (~data & 1);
 }
 
-READ8_MEMBER(mchess_state::input_r)
+u8 mchess_state::input_r()
 {
 	u8 data = 0;
 
@@ -123,7 +123,7 @@ READ8_MEMBER(mchess_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(mchess_state::lcd_w)
+void mchess_state::lcd_w(u8 data)
 {
 	// d0: both LCDC VDRIVE
 	// d1: N/C
@@ -144,7 +144,7 @@ WRITE8_MEMBER(mchess_state::lcd_w)
 	m_lcd_control = data;
 }
 
-READ8_MEMBER(mchess_state::lcd_r)
+u8 mchess_state::lcd_r()
 {
 	// d2: 1st LCDC DATA OUT
 	// d7: 2nd LCDC DATA OUT

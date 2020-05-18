@@ -68,12 +68,12 @@ WRITE8_MEMBER(drgnmst_pic_state::snd_flag_w)
 }
 
 
-READ8_MEMBER(drgnmst_pic_state::pic16c5x_port0_r)
+uint8_t drgnmst_pic_state::pic16c5x_port0_r()
 {
 	return m_pic16c5x_port0;
 }
 
-READ8_MEMBER(drgnmst_pic_state::snd_command_r)
+uint8_t drgnmst_pic_state::snd_command_r()
 {
 	uint8_t data = 0;
 
@@ -89,7 +89,7 @@ READ8_MEMBER(drgnmst_pic_state::snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(drgnmst_pic_state::snd_flag_r)
+uint8_t drgnmst_pic_state::snd_flag_r()
 {
 	if (m_snd_flag)
 	{
@@ -100,7 +100,7 @@ READ8_MEMBER(drgnmst_pic_state::snd_flag_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(drgnmst_pic_state::pcm_banksel_w)
+void drgnmst_pic_state::pcm_banksel_w(uint8_t data)
 {
 	/*  This is a 4 bit port.
 	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
@@ -110,12 +110,12 @@ WRITE8_MEMBER(drgnmst_pic_state::pcm_banksel_w)
 	m_pic16c5x_port0 = data;
 }
 
-WRITE8_MEMBER(drgnmst_pic_state::oki_w)
+void drgnmst_pic_state::oki_w(uint8_t data)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(drgnmst_pic_state::snd_control_w)
+void drgnmst_pic_state::snd_control_w(uint8_t data)
 {
 	/*  This port controls communications to and from the 68K, both OKI
 	    devices, and part of the OKI PCM ROM bank selection.

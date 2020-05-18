@@ -66,12 +66,12 @@ READ8_MEMBER(pitnrun_state::mcu_status_r)
 }
 
 
-READ8_MEMBER(pitnrun_state::m68705_porta_r)
+uint8_t pitnrun_state::m68705_porta_r()
 {
 	return m_porta_in;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_porta_w)
+void pitnrun_state::m68705_porta_w(uint8_t data)
 {
 	m_porta_out = data;
 }
@@ -96,7 +96,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_porta_w)
  *               the main Z80 memory location to access)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portb_r)
+uint8_t pitnrun_state::m68705_portb_r()
 {
 	return 0xff;
 }
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_status_real_w)
 	m_zaccept = 0;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_portb_w)
+void pitnrun_state::m68705_portb_w(uint8_t data)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	if (~data & 0x02)
@@ -156,7 +156,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_portb_w)
  *                  passes through)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portc_r)
+uint8_t pitnrun_state::m68705_portc_r()
 {
 	return (m_zready << 0) | (m_zaccept << 1);
 }

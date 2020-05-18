@@ -261,7 +261,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 }
 
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
+void mexico86_state::mexico86_68705_port_a_w(u8 data)
 {
 	//logerror("%s: 68705 port A write %02x\n", machine().describe_context(), data);
 	m_port_a_out = data;
@@ -285,7 +285,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
  *  7   W  not used?
  */
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
+void mexico86_state::mexico86_68705_port_b_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	//logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
 

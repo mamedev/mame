@@ -112,11 +112,11 @@ public:
 	TIMER_CALLBACK_MEMBER(ai_timer_callback);
 	TIMER_CALLBACK_MEMBER(pi_dma_callback);
 	TIMER_CALLBACK_MEMBER(si_dma_callback);
-	DECLARE_READ32_MEMBER( dp_reg_r );
-	DECLARE_WRITE32_MEMBER( dp_reg_w );
-	DECLARE_READ32_MEMBER( sp_reg_r );
-	DECLARE_WRITE32_MEMBER( sp_reg_w );
-	DECLARE_WRITE32_MEMBER(sp_set_status);
+	uint32_t dp_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sp_reg_r(offs_t offset);
+	void sp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void sp_set_status(uint32_t data);
 	void signal_rcp_interrupt(int interrupt);
 	void check_interrupts();
 

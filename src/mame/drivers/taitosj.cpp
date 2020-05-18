@@ -173,7 +173,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
+void taitosj_state::taitosj_sndnmi_msk_w(uint8_t data)
 {
 	/* B0 is the sound nmi enable, active low */
 	m_soundnmi->in_w<0>((~data)&1);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(taitosj_state::soundlatch_w)
 }
 
 
-WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
+void taitosj_state::input_port_4_f0_w(uint8_t data)
 {
 	m_input_port_4_f0 = data >> 4;
 }
@@ -1770,7 +1770,7 @@ DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_OUTPUT(NODE_02, 9637)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
+void taitosj_state::taitosj_dacvol_w(uint8_t data)
 {
 	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
@@ -2894,13 +2894,13 @@ GAME( 1982, alpinea,   alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea
 GAME( 1982, timetunl,  0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Time Tunnel", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern,  0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern1, wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlin,  0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (AA1, 4 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlina, frontlin, mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (FL, 5 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator,  0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (BA3, 4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevatora, elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (EA, 5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlin,  0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (AA1, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlina, frontlin, mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Front Line (FL, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator,  0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (BA3, 4 PCB version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevatora, elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Elevator Action (EA, 5 PCB version, 1.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, elevatorb, elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg",                   "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 pcb version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 pcb version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar,   0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (A10, 4 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstara,  tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "The Tin Star (TS, 5 PCB version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, waterski,  0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Water Ski", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, bioatack,  0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sfposeid,  0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )

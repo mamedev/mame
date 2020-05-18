@@ -149,12 +149,12 @@ private:
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(adc_w);
 	DECLARE_WRITE_LINE_MEMBER(plr2_w);
-	DECLARE_READ8_MEMBER(cop_unk_r);
+	uint8_t cop_unk_r();
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
+	void cop_l_w(uint8_t data);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
-	DECLARE_WRITE8_MEMBER(looping_sound_sw);
+	void looping_sound_sw(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -430,7 +430,7 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::looping_sound_sw)
+void looping_state::looping_sound_sw(uint8_t data)
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -500,7 +500,7 @@ WRITE_LINE_MEMBER(looping_state::plr2_w)
  *
  *************************************/
 
-READ8_MEMBER(looping_state::cop_unk_r)
+uint8_t looping_state::cop_unk_r()
 {
 	return 1;
 }
@@ -510,7 +510,7 @@ READ_LINE_MEMBER(looping_state::cop_serial_r)
 	return 1;
 }
 
-WRITE8_MEMBER(looping_state::cop_l_w)
+void looping_state::cop_l_w(uint8_t data)
 {
 	m_cop_port_l = data;
 	logerror("%02x  ",data);

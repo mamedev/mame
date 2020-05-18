@@ -65,13 +65,13 @@ private:
 	DECLARE_WRITE16_MEMBER(bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(txvideoram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
 	void weststry_soundlatch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
-	DECLARE_WRITE8_MEMBER(weststry_opl_w);
-	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);
+	void weststry_opl_w(offs_t offset, uint8_t data);
+	void weststry_soundnmi_ack_w(uint8_t data);
 	void weststry_soundnmi_update();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

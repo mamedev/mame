@@ -59,8 +59,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(amerdart_dsp_bio_line_r);
 	DECLARE_READ16_MEMBER(amerdart_trackball_r);
 	DECLARE_WRITE16_MEMBER(coolpool_misc_w);
-	DECLARE_READ16_MEMBER(dsp_bio_line_r);
-	DECLARE_READ16_MEMBER(dsp_hold_line_r);
+	uint16_t dsp_bio_line_r();
+	uint16_t dsp_hold_line_r();
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_romaddr_w);
 	DECLARE_READ16_MEMBER(coolpool_input_r);

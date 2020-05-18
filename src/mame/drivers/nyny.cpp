@@ -150,10 +150,10 @@ private:
 	DECLARE_WRITE8_MEMBER(nyny_pia_1_2_w);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
-	DECLARE_WRITE8_MEMBER(pia_2_port_a_w);
-	DECLARE_WRITE8_MEMBER(pia_2_port_b_w);
+	void pia_2_port_a_w(uint8_t data);
+	void pia_2_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
+	void nyny_ay8910_37_port_a_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
@@ -218,13 +218,13 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::pia_2_port_a_w)
+void nyny_state::pia_2_port_a_w(uint8_t data)
 {
 	m_star_delay_counter = (m_star_delay_counter & 0x0f00) | data;
 }
 
 
-WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
+void nyny_state::pia_2_port_b_w(uint8_t data)
 {
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
 	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
@@ -383,7 +383,7 @@ WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 }
 
 
-WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
+void nyny_state::nyny_ay8910_37_port_a_w(uint8_t data)
 {
 	/* not sure what this does */
 

@@ -74,14 +74,14 @@ public:
 
 protected:
 	// PPI read/write handlers
-	DECLARE_READ8_MEMBER( unknown_porta_r );
-	DECLARE_READ8_MEMBER( unknown_portb_r );
-	DECLARE_READ8_MEMBER( unknown_portc_r );
-	DECLARE_WRITE8_MEMBER( unknown_porta_w );
-	DECLARE_WRITE8_MEMBER( unknown_portb_w );
-	DECLARE_WRITE8_MEMBER( video_control_w );
-	DECLARE_READ8_MEMBER( bankmotor_limit_r );
-	DECLARE_WRITE8_MEMBER( bankmotor_control_w );
+	uint8_t unknown_porta_r();
+	uint8_t unknown_portb_r();
+	uint8_t unknown_portc_r();
+	void unknown_porta_w(uint8_t data);
+	void unknown_portb_w(uint8_t data);
+	void video_control_w(uint8_t data);
+	uint8_t bankmotor_limit_r();
+	void bankmotor_control_w(uint8_t data);
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);

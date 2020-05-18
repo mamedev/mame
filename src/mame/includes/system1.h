@@ -142,9 +142,9 @@ private:
 	int m_nobb_inport23_step;
 
 	// video handlers
-	DECLARE_WRITE8_MEMBER(common_videomode_w);
-	DECLARE_WRITE8_MEMBER(videomode_w);
-	DECLARE_WRITE8_MEMBER(videoram_bank_w);
+	void common_videomode_w(u8 data);
+	void videomode_w(u8 data);
+	void videoram_bank_w(u8 data);
 	DECLARE_READ8_MEMBER(mixer_collision_r);
 	DECLARE_WRITE8_MEMBER(mixer_collision_w);
 	DECLARE_WRITE8_MEMBER(mixer_collision_reset_w);
@@ -156,18 +156,18 @@ private:
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 
 	// sound handlers
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(soundport_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	u8 sound_data_r();
+	void soundport_w(u8 data);
+	void sound_control_w(u8 data);
 
 	// misc handlers
-	DECLARE_WRITE8_MEMBER(mcu_control_w);
+	void mcu_control_w(u8 data);
 	DECLARE_READ8_MEMBER(mcu_io_r);
 	DECLARE_WRITE8_MEMBER(mcu_io_w);
-	DECLARE_READ8_MEMBER(nob_mcu_latch_r);
-	DECLARE_WRITE8_MEMBER(nob_mcu_latch_w);
-	DECLARE_WRITE8_MEMBER(nob_mcu_status_w);
-	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
+	u8 nob_mcu_latch_r();
+	void nob_mcu_latch_w(u8 data);
+	void nob_mcu_status_w(u8 data);
+	void nob_mcu_control_p2_w(u8 data);
 	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
 	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
 	DECLARE_READ8_MEMBER(nob_mcu_status_r);

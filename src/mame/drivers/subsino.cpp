@@ -315,8 +315,8 @@ private:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
-	DECLARE_WRITE8_MEMBER(out_a_w);
-	DECLARE_WRITE8_MEMBER(out_b_w);
+	void out_a_w(uint8_t data);
+	void out_b_w(uint8_t data);
 	DECLARE_READ8_MEMBER(flash_r);
 	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ8_MEMBER(hwcheck_r);
@@ -599,7 +599,7 @@ void subsino_state::_3proms_palette(palette_device &palette) const
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino_state::out_a_w)
+void subsino_state::out_a_w(uint8_t data)
 {
 /***** COIN PULSE: *****
 
@@ -643,7 +643,7 @@ WRITE8_MEMBER(subsino_state::out_a_w)
 //  popmessage("Out A %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::out_b_w)
+void subsino_state::out_b_w(uint8_t data)
 {
 /***** LAMPS: *****
 

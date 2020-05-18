@@ -433,7 +433,7 @@ void system1_state::bank0c_custom_w(u8 data, u8 prevdata)
 }
 
 
-WRITE8_MEMBER(system1_state::videomode_w)
+void system1_state::videomode_w(u8 data)
 {
 	/* bit 6 is connected to the 8751 IRQ */
 	if (m_mcu != nullptr)
@@ -448,7 +448,7 @@ WRITE8_MEMBER(system1_state::videomode_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 
 	/* remaining signals are video-related */
-	common_videomode_w(space, 0, data);
+	common_videomode_w(data);
 }
 
 
@@ -503,7 +503,7 @@ READ8_MEMBER(system1_state::shtngmst_gunx_r)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::sound_control_w)
+void system1_state::sound_control_w(u8 data)
 {
 	/* bit 0 = MUTE (inverted sense on System 2) */
 	machine().sound().system_mute((data ^ m_mute_xor) & 1);
@@ -514,11 +514,11 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
-	videoram_bank_w(space, offset, data);
+	videoram_bank_w(data);
 }
 
 
-READ8_MEMBER(system1_state::sound_data_r)
+u8 system1_state::sound_data_r()
 {
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (m_ppi8255 != nullptr)
@@ -541,7 +541,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 }
 
 
-WRITE8_MEMBER(system1_state::soundport_w)
+void system1_state::soundport_w(u8 data)
 {
 	/* boost interleave when communicating with the sound CPU */
 	m_soundlatch->write(data);
@@ -562,7 +562,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::mcu_control_w)
+void system1_state::mcu_control_w(u8 data)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
@@ -645,22 +645,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::nob_mcu_latch_r)
+u8 system1_state::nob_mcu_latch_r()
 {
 	return m_nob_mcu_latch;
 }
 
-WRITE8_MEMBER(system1_state::nob_mcu_latch_w)
+void system1_state::nob_mcu_latch_w(u8 data)
 {
 	m_nob_mcu_latch = data;
 }
 
-WRITE8_MEMBER(system1_state::nob_mcu_status_w)
+void system1_state::nob_mcu_status_w(u8 data)
 {
 	m_nob_mcu_status = data;
 }
 
-WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
+void system1_state::nob_mcu_control_p2_w(u8 data)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))

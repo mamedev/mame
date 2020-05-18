@@ -70,10 +70,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
+	void ppi_pa_w(u8 data);
+	void ppi_pb_w(u8 data);
+	void ppi_pc_w(u8 data);
+	u8 ppi_pc_r();
 	u8 read_rom(offs_t offset);
 
 	void io_map(address_map &map);
@@ -122,7 +122,7 @@ d5     /DDEN
 d6     /DSK_WAITEN (don't know what this is, not emulated)
 d7     XMEMEX line (for external memory, not emulated)
 */
-WRITE8_MEMBER( pulsar_state::ppi_pa_w )
+void pulsar_state::ppi_pa_w(u8 data)
 {
 	m_floppy = nullptr;
 	if (BIT(data, 0))
@@ -143,7 +143,7 @@ d5     RTC write line
 d6     RTC hold line
 d7     Allow 64k of ram
 */
-WRITE8_MEMBER( pulsar_state::ppi_pb_w )
+void pulsar_state::ppi_pb_w(u8 data)
 {
 	m_rtc->address_w(data & 0x0f);
 	m_rtc->read_w(BIT(data, 4));
@@ -153,13 +153,13 @@ WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 }
 
 // d0..d3 Data lines to rtc
-WRITE8_MEMBER( pulsar_state::ppi_pc_w )
+void pulsar_state::ppi_pc_w(u8 data)
 {
 	m_rtc->data_w(data & 15);
 }
 
 // d7     /2 SIDES
-READ8_MEMBER( pulsar_state::ppi_pc_r )
+u8 pulsar_state::ppi_pc_r()
 {
 	uint8_t data = 0;
 	if (m_floppy)

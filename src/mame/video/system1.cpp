@@ -244,7 +244,7 @@ VIDEO_START_MEMBER(system1_state,system2)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::common_videomode_w)
+void system1_state::common_videomode_w(u8 data)
 {
 	if (data & 0x6e) logerror("videomode = %02x\n",data);
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER(system1_state::videoram_w)
 	}
 }
 
-WRITE8_MEMBER(system1_state::videoram_bank_w)
+void system1_state::videoram_bank_w(u8 data)
 {
 	m_videoram_bank = data;
 }

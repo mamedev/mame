@@ -45,7 +45,7 @@ private:
 	DECLARE_READ8_MEMBER(key_matrix_status_r);
 	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
 	DECLARE_WRITE8_MEMBER(m6845_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

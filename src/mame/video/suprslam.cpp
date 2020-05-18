@@ -64,7 +64,7 @@ void suprslam_state::video_start()
 	m_screen_tilemap->set_transparent_pen(15);
 }
 
-WRITE8_MEMBER(suprslam_state::spr_ctrl_w)
+void suprslam_state::spr_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl = data;
 }

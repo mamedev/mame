@@ -71,10 +71,10 @@ private:
 	DECLARE_WRITE8_MEMBER(fortyl_bg_colorram_w);
 	DECLARE_READ8_MEMBER(fortyl_bg_colorram_r);
 	DECLARE_WRITE8_MEMBER(pix1_mcu_w);
-	DECLARE_WRITE8_MEMBER(sound_control_0_w);
-	DECLARE_WRITE8_MEMBER(sound_control_1_w);
-	DECLARE_WRITE8_MEMBER(sound_control_2_w);
-	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	void sound_control_0_w(uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void sound_control_2_w(uint8_t data);
+	void sound_control_3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	/* devices */

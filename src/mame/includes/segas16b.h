@@ -150,14 +150,14 @@ protected:
 	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
 
 	// sound CPU read/write handlers
-	DECLARE_WRITE8_MEMBER( upd7759_control_w );
-	DECLARE_READ8_MEMBER( upd7759_status_r );
+	void upd7759_control_w(uint8_t data);
+	uint8_t upd7759_status_r();
 	DECLARE_WRITE16_MEMBER( sound_w16 );
 
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
-	DECLARE_WRITE8_MEMBER(spin_68k_w);
+	void spin_68k_w(uint8_t data);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -302,8 +302,8 @@ public:
 	void dfjail(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER( sound_control_w );
-	DECLARE_WRITE8_MEMBER( dac_data_w );
+	void sound_control_w(uint8_t data);
+	void dac_data_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER( soundirq_cb );
 	bool m_nmi_enable;
 	uint16_t m_dac_data;

@@ -51,13 +51,13 @@ WRITE8_MEMBER(tankbust_state::soundlatch_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(tankbust_state::soundlatch_r)
+uint8_t tankbust_state::soundlatch_r()
 {
 	return m_latch;
 }
 
 //port B of ay8910#0
-READ8_MEMBER(tankbust_state::soundtimer_r)
+uint8_t tankbust_state::soundtimer_r()
 {
 	int ret;
 

@@ -82,9 +82,8 @@ public:
 protected:
 	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
 
-	DECLARE_READ8_MEMBER(mcu_port1_r);
-	DECLARE_READ8_MEMBER(mcu_port2_r);
-	DECLARE_WRITE8_MEMBER(mcu_port2_w );
+	uint8_t mcu_port1_r();
+	void mcu_port2_w(uint8_t data);
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
 
@@ -196,8 +195,8 @@ private:
 
 	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
 
-	DECLARE_READ8_MEMBER(csport_r);
-	DECLARE_WRITE8_MEMBER(csport_w);
+	uint8_t csport_r();
+	void csport_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(kageki);
 
@@ -294,7 +293,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	void sound_bank_w(uint8_t data);
 
 	void kabukiz_cpu2_map(address_map &map);
 	void kabukiz_sub_map(address_map &map);

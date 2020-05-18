@@ -107,7 +107,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_READ8_MEMBER(pio_pa_r);
+	uint8_t pio_pa_r();
 
 	static rgb_t IIBBGGRR(uint32_t raw);
 	void radar_palette(palette_device &palette) const;

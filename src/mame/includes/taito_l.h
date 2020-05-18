@@ -32,7 +32,7 @@ public:
 	DECLARE_MACHINE_RESET(taito_l);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER(coin_control_w);
+	void coin_control_w(u8 data);
 
 protected:
 	/* misc */
@@ -110,7 +110,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(slave_rombank_w);
 	DECLARE_READ8_MEMBER(slave_rombank_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
+	void portA_w(u8 data);
 
 	void fhawk(machine_config &config);
 
@@ -148,7 +148,7 @@ public:
 	DECLARE_WRITE8_MEMBER(msm5205_hi_w);
 	DECLARE_WRITE8_MEMBER(msm5205_start_w);
 	DECLARE_WRITE8_MEMBER(msm5205_stop_w);
-	DECLARE_WRITE8_MEMBER(msm5205_volume_w);
+	void msm5205_volume_w(u8 data);
 
 	void champwr(machine_config &config);
 

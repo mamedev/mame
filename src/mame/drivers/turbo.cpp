@@ -211,49 +211,49 @@ MACHINE_RESET_MEMBER(turbo_state,buckrog)
         3 = IC6 - CPU Board, Sheet 5, D7
 */
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0a_w)
+void turbo_state::turbo_ppi0a_w(uint8_t data)
 {
 	/* bit0-7 = 0PA0-7 */
 	m_turbo_opa = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0b_w)
+void turbo_state::turbo_ppi0b_w(uint8_t data)
 {
 	/* bit0-7 = 0PB0-7 */
 	m_turbo_opb = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi0c_w)
+void turbo_state::turbo_ppi0c_w(uint8_t data)
 {
 	/* bit0-7 = 0PC0-7 */
 	m_turbo_opc = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1a_w)
+void turbo_state::turbo_ppi1a_w(uint8_t data)
 {
 	/* bit0-7 = 1PA0-7 */
 	m_turbo_ipa = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1b_w)
+void turbo_state::turbo_ppi1b_w(uint8_t data)
 {
 	/* bit0-7 = 1PB0-7 */
 	m_turbo_ipb = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi1c_w)
+void turbo_state::turbo_ppi1c_w(uint8_t data)
 {
 	/* bit0-7 = 1PC0-7 */
 	m_turbo_ipc = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_ppi3c_w)
+void turbo_state::turbo_ppi3c_w(uint8_t data)
 {
 	/* bit 0-3 = PLA0-3 */
 	/* bit 4-6 = COL0-2 */
@@ -275,7 +275,7 @@ WRITE8_MEMBER(turbo_state::turbo_ppi3c_w)
         1 = IC119 - CPU Board, Sheet 3, A5
 */
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0a_w)
+void turbo_state::subroc3d_ppi0a_w(uint8_t data)
 {
 	/* bit 0-3 = PLY0-3 */
 	/* bit 4-7 = n/c */
@@ -283,14 +283,14 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0a_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0c_w)
+void turbo_state::subroc3d_ppi0c_w(uint8_t data)
 {
 	/* bit 0-3 = COL0-3 */
 	m_subroc3d_col = data & 0x0f;
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
+void turbo_state::subroc3d_ppi0b_w(uint8_t data)
 {
 	/* bit 0 = COM1 (COIN METER 1) */
 	/* bit 1 = COM2 (COIN METER 2) */
@@ -309,14 +309,14 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0a_w)
+void turbo_state::buckrog_ppi0a_w(uint8_t data)
 {
 	/* bit 0-7 = data to be read on the /IOREQ */
 	m_buckrog_command = data;
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0b_w)
+void turbo_state::buckrog_ppi0b_w(uint8_t data)
 {
 	/* bit 0-5 = MOV0-5 */
 	/* bit 6-7 = n/c */
@@ -324,7 +324,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0b_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
+void turbo_state::buckrog_ppi0c_w(uint8_t data)
 {
 	/* bit 0-2 = FCHG0 */
 	/* bit 3-5 = n/c */
@@ -335,7 +335,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
+void turbo_state::buckrog_ppi1c_w(uint8_t data)
 {
 	/* bit 0-2 = OBCH0-2 */
 	/* bit   3 = n/c */
@@ -356,12 +356,12 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
  *
  *************************************/
 
-WRITE8_MEMBER( turbo_state::scanlines_w )
+void turbo_state::scanlines_w(uint8_t data)
 {
 	m_i8279_scanlines = data;
 }
 
-WRITE8_MEMBER( turbo_state::digit_w )
+void turbo_state::digit_w(uint8_t data)
 {
 	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -376,27 +376,27 @@ WRITE8_MEMBER( turbo_state::digit_w )
  *
  *************************************/
 
-READ8_MEMBER(turbo_state::turbo_collision_r)
+uint8_t turbo_state::turbo_collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
 	return ioport("DSW3")->read() | (m_turbo_collision & 15);
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_collision_clear_w)
+void turbo_state::turbo_collision_clear_w(uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_turbo_collision = 0;
 }
 
 
-READ8_MEMBER(turbo_state::turbo_analog_r)
+uint8_t turbo_state::turbo_analog_r()
 {
 	return ioport("DIAL")->read() - m_turbo_last_analog;
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_analog_reset_w)
+void turbo_state::turbo_analog_reset_w(uint8_t data)
 {
 	m_turbo_last_analog = ioport("DIAL")->read();
 }
@@ -427,7 +427,7 @@ WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
  *
  *************************************/
 
-READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
+uint8_t turbo_state::buckrog_cpu2_command_r()
 {
 	/* assert ACK */
 	m_i8255_0->pc6_w(CLEAR_LINE);
@@ -435,7 +435,7 @@ READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 }
 
 
-READ8_MEMBER(turbo_state::buckrog_port_2_r)
+uint8_t turbo_state::buckrog_port_2_r()
 {
 	int inp1 = ioport("DSW1")->read();
 	int inp2 = ioport("DSW2")->read();
@@ -451,7 +451,7 @@ READ8_MEMBER(turbo_state::buckrog_port_2_r)
 }
 
 
-READ8_MEMBER(turbo_state::buckrog_port_3_r)
+uint8_t turbo_state::buckrog_port_3_r()
 {
 	int inp1 = ioport("DSW1")->read();
 	int inp2 = ioport("DSW2")->read();

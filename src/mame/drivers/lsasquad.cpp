@@ -539,7 +539,7 @@ static GFXDECODE_START( gfx_lsasquad )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(lsasquad_state::unk)
+void lsasquad_state::unk(uint8_t data)
 {
 }
 

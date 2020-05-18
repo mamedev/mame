@@ -98,7 +98,7 @@ protected:
 	void foreground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void midground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE16_MEMBER(m_videoram_private_w);
+	void m_videoram_private_w(offs_t offset, uint16_t data);
 
 	void bank_reset(int bgbank, int fgbank, int midbank, int txbank);
 

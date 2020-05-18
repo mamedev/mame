@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
 	void dmovlay_remap_memory();
-	WRITE32_MEMBER(dmovlay_callback);
+	void dmovlay_callback(uint32_t data);
 	void denver_postload(void);
 	void install_speedup(void);
 
@@ -91,7 +91,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
 	TIMER_DEVICE_CALLBACK_MEMBER( sport0_irq );
 	void recompute_sample_rate();
-	WRITE32_MEMBER(sound_tx_callback);
+	void sound_tx_callback(offs_t offset, uint32_t data);
 	DECLARE_READ16_MEMBER( dcs_polling_r );
 	DECLARE_WRITE16_MEMBER( dcs_polling_w );
 	DECLARE_READ32_MEMBER(dcs_polling32_r);

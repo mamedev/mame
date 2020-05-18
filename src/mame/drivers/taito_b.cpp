@@ -267,7 +267,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 *************************************************************************/
 
 
-WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
+void taitob_state::player_12_coin_ctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -1701,7 +1701,7 @@ INPUT_PORTS_END
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
+void taitob_state::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

@@ -610,7 +610,7 @@ void n64_periphs::sp_dma(int direction)
 	}
 }
 
-WRITE32_MEMBER(n64_periphs::sp_set_status)
+void n64_periphs::sp_set_status(uint32_t data)
 {
 	if (data & 0x1)
 	{
@@ -629,7 +629,7 @@ WRITE32_MEMBER(n64_periphs::sp_set_status)
 	}
 }
 
-READ32_MEMBER(n64_periphs::sp_reg_r)
+uint32_t n64_periphs::sp_reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -701,7 +701,7 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 }
 
 
-WRITE32_MEMBER(n64_periphs::sp_reg_w )
+void n64_periphs::sp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset & 0x10000) == 0)
 	{
@@ -893,7 +893,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::dp_delay_callback)
 	signal_rcp_interrupt(DP_INTERRUPT);
 }
 
-READ32_MEMBER( n64_periphs::dp_reg_r )
+uint32_t n64_periphs::dp_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -925,7 +925,7 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 	return 0;
 }
 
-WRITE32_MEMBER( n64_periphs::dp_reg_w )
+void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t status = m_n64->rdp()->get_status();
 

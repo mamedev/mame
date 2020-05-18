@@ -45,11 +45,11 @@ public:
 	void tk80bs(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ppi_custom_r);
-	DECLARE_WRITE8_MEMBER(ppi_custom_w);
+	uint8_t ppi_custom_r(offs_t offse);
+	void ppi_custom_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	void tk80bs_mem(address_map &map);
@@ -83,7 +83,7 @@ uint32_t tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 
 }
 
 /* A0 and A1 are swapped at the 8255 chip */
-READ8_MEMBER( tk80bs_state::ppi_custom_r )
+uint8_t tk80bs_state::ppi_custom_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -96,7 +96,7 @@ READ8_MEMBER( tk80bs_state::ppi_custom_r )
 	}
 }
 
-WRITE8_MEMBER( tk80bs_state::ppi_custom_w )
+void tk80bs_state::ppi_custom_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -129,7 +129,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 static INPUT_PORTS_START( tk80bs )
 INPUT_PORTS_END
 
-READ8_MEMBER( tk80bs_state::port_a_r )
+uint8_t tk80bs_state::port_a_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -137,7 +137,7 @@ READ8_MEMBER( tk80bs_state::port_a_r )
 }
 
 
-READ8_MEMBER( tk80bs_state::port_b_r )
+uint8_t tk80bs_state::port_b_r()
 {
 	if (m_term_data)
 	{

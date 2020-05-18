@@ -404,7 +404,7 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(lockon_state::ym2203_out_b)
+void lockon_state::ym2203_out_b(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);

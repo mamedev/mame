@@ -105,8 +105,8 @@ private:
 	DECLARE_WRITE8_MEMBER(debug7c00_w);
 	DECLARE_WRITE8_MEMBER(coinin_w);
 	DECLARE_WRITE8_MEMBER(payout_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	void ay8910_outputa_w(uint8_t data);
+	void ay8910_outputb_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -436,12 +436,12 @@ GFXDECODE_END
                          Sound Interface
 **********************************************************************/
 
-WRITE8_MEMBER(supdrapo_state::ay8910_outputa_w)
+void supdrapo_state::ay8910_outputa_w(uint8_t data)
 {
 //  popmessage("ay8910_outputa_w %02x",data);
 }
 
-WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
+void supdrapo_state::ay8910_outputb_w(uint8_t data)
 {
 //  popmessage("ay8910_outputb_w %02x",data);
 }

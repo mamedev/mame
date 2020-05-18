@@ -217,7 +217,7 @@ WRITE16_MEMBER(cyclwarr_state::output_w)
 		logerror("output_w = %04x & %04x\n",data,mem_mask);
 }
 
-WRITE8_MEMBER(roundup5_state::output_w)
+void roundup5_state::output_w(uint8_t data)
 {
 	/*
 	    ---- x--- depending on Output Mode dipswitch:

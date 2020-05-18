@@ -77,9 +77,9 @@ private:
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
+	void ppi8255_a_w(uint8_t data);
+	void ppi8255_b_w(uint8_t data);
+	void ppi8255_c_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -274,9 +274,9 @@ GFXDECODE_END
 
 /* PPI8255 Interface */
 
-WRITE8_MEMBER(vroulet_state::ppi8255_a_w){}// watchdog ?
-WRITE8_MEMBER(vroulet_state::ppi8255_b_w){}// lamps ?
-WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
+void vroulet_state::ppi8255_a_w(uint8_t data) {}// watchdog ?
+void vroulet_state::ppi8255_b_w(uint8_t data) {}// lamps ?
+void vroulet_state::ppi8255_c_w(uint8_t data) {}
 
 /* Machine Driver */
 

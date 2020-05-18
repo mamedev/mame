@@ -119,7 +119,7 @@ WRITE8_MEMBER(suprloco_state::scrollram_w)
 	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_MEMBER(suprloco_state::control_w)
+void suprloco_state::control_w(uint8_t data)
 {
 	/* There is probably a palette select in here */
 

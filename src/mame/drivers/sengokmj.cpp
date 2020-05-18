@@ -117,8 +117,8 @@ private:
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
@@ -568,12 +568,12 @@ WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_en_w )
+void sengokmj_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
+void sengokmj_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

@@ -969,10 +969,10 @@
 #define TTL_7421_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7421_GATE, __VA_ARGS__)
 
-// usage       : TTL_7421_NAND(name, pA, pB, pC, pD)
+// usage       : TTL_7421_AND(name, pA, pB, pC, pD)
 // auto connect: VCC, GND
-#define TTL_7421_NAND(...)                                             \
-	NET_REGISTER_DEVEXT(TTL_7421_NAND, __VA_ARGS__)
+#define TTL_7421_AND(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_7421_AND, __VA_ARGS__)
 
 // usage       : TTL_7425_GATE(name)
 #define TTL_7425_GATE(...)                                             \

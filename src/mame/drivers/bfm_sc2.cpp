@@ -231,7 +231,6 @@ protected:
 	DECLARE_READ8_MEMBER(timerirqclr_r);
 	DECLARE_READ8_MEMBER(irqstatus_r);
 	DECLARE_WRITE8_MEMBER(coininhib_w);
-	DECLARE_READ8_MEMBER(coin_input_r);
 	DECLARE_WRITE8_MEMBER(payout_latch_w);
 	DECLARE_WRITE8_MEMBER(payout_triac_w);
 	DECLARE_WRITE8_MEMBER(payout_select_w);
@@ -958,12 +957,6 @@ WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc2_state::coin_input_r)
-{
-	return ioport("COINS")->read();
-}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1570,7 +1563,7 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 	//map(0x2F00, 0x2F00).w(FUNC(bfm_sc2_state::vfd2_data_w));                /* vfd2 data (not usually connected!)*/
 
 	map(0x3FFE, 0x3FFE).r(FUNC(bfm_sc2_state::direct_input_r));
-	map(0x3FFF, 0x3FFF).r(FUNC(bfm_sc2_state::coin_input_r));
+	map(0x3FFF, 0x3FFF).portr("COINS");
 	map(0x4000, 0x5FFF).rom();
 	map(0x4000, 0xFFFF).w(FUNC(bfm_sc2_state::unknown_w));            // contains unknown I/O registers
 	map(0x6000, 0x7FFF).bankr("bank1");

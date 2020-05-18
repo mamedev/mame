@@ -24,7 +24,8 @@ TODO:
 - glfgreat: imperfect protection emulation:
   1. putting to MAX power on green causes the game to return an incorrect
      value a.k.a. it detects a bunker/rough/water hazard;
-  2. top/back spins doesn't seem to have any effect in-game;
+  2. top/back spins doesn't have any effect in-game;
+- glfgreat: serious sound cut off -> "it's in the" ... "water"
 - prmrsocr: when the field rotates before the penalty kicks, parts of the
   053936 tilemap that shouldn't be seen are visible. Maybe the tilemap ROM is
   banked, or there are controls to clip the visible region (registers 0x06 and
@@ -4346,9 +4347,9 @@ GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init, 
 GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )

@@ -86,14 +86,14 @@ private:
 	DECLARE_READ16_MEMBER(sound_status_r);
 	template<int screen> DECLARE_WRITE16_MEMBER(sound_w);
 	template<int screen> DECLARE_READ8_MEMBER(sndcpu_sound_r);
-	DECLARE_WRITE8_MEMBER(ym1_port_a_w);
-	DECLARE_WRITE8_MEMBER(ym1_port_b_w);
-	DECLARE_WRITE8_MEMBER(ym2_port_a_w);
-	DECLARE_WRITE8_MEMBER(ym2_port_b_w);
-	DECLARE_WRITE8_MEMBER(ym3_port_a_w);
-	DECLARE_WRITE8_MEMBER(ym3_port_b_w);
-	DECLARE_WRITE8_MEMBER(ym4_port_a_w);
-	DECLARE_WRITE8_MEMBER(ym4_port_b_w);
+	void ym1_port_a_w(uint8_t data);
+	void ym1_port_b_w(uint8_t data);
+	void ym2_port_a_w(uint8_t data);
+	void ym2_port_b_w(uint8_t data);
+	void ym3_port_a_w(uint8_t data);
+	void ym3_port_b_w(uint8_t data);
+	void ym4_port_a_w(uint8_t data);
+	void ym4_port_b_w(uint8_t data);
 
 	template<int screen> DECLARE_WRITE16_MEMBER(text_w);
 	template<int screen> TILE_GET_INFO_MEMBER(get_fg_tile_info);

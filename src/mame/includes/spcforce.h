@@ -34,9 +34,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sn76496_latch_w);
-	DECLARE_READ8_MEMBER(sn76496_select_r);
-	DECLARE_WRITE8_MEMBER(sn76496_select_w);
+	void sn76496_latch_w(uint8_t data);
+	uint8_t sn76496_select_r();
+	void sn76496_select_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);

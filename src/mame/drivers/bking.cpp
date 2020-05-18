@@ -318,7 +318,7 @@ static GFXDECODE_START( gfx_bking )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(bking_state::port_b_w)
+void bking_state::port_b_w(uint8_t data)
 {
 	/* don't know what this is... could be a filter */
 	if (data != 0x00)

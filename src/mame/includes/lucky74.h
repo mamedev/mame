@@ -43,9 +43,9 @@ private:
 	DECLARE_WRITE8_MEMBER(lucky74_fg_colorram_w);
 	DECLARE_WRITE8_MEMBER(lucky74_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(lucky74_bg_colorram_w);
-	DECLARE_WRITE8_MEMBER(ym2149_portb_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
+	void ym2149_portb_w(uint8_t data);
+	void lamps_a_w(uint8_t data);
+	void lamps_b_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void lucky74_palette(palette_device &palette) const;

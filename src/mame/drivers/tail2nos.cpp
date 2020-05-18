@@ -30,7 +30,7 @@ READ8_MEMBER(tail2nos_state::sound_semaphore_r)
 	return m_soundlatch->pending_r();
 }
 
-WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
+void tail2nos_state::sound_bankswitch_w(uint8_t data)
 {
 	membank("bank3")->set_entry(data & 0x01);
 }

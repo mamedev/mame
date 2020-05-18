@@ -67,8 +67,8 @@ private:
 	void smc_init();
 	uint8_t smc_read();
 	void smc_write(uint8_t data);
-	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
+	uint32_t s3c44b0_gpio_port_r(offs_t offset);
+	void s3c44b0_gpio_port_w(offs_t offset, uint32_t data);
 	//DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 	void juicebox_map(address_map &map);
 };
@@ -145,7 +145,7 @@ void juicebox_state::smc_write( uint8_t data)
 	}
 }
 
-READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
+uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 {
 	uint32_t data = port[offset];
 	switch (offset)
@@ -211,7 +211,7 @@ READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
+void juicebox_state::s3c44b0_gpio_port_w(offs_t offset, uint32_t data)
 {
 	port[offset] = data;
 	switch (offset)

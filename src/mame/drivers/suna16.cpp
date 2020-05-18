@@ -998,7 +998,7 @@ void suna16_state::sunaq(machine_config &config)
                             Best Of Best
 ***************************************************************************/
 
-WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
+void suna16_state::bestbest_ay8910_port_a_w(uint8_t data)
 {
 	// ?
 }

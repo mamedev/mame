@@ -114,8 +114,8 @@ private:
 	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(raidenb_control_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
+	void raidenb_layer_enable_w(uint16_t data);
+	void raidenb_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void raidenb_main_map(address_map &map);
 };

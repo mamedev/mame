@@ -35,7 +35,7 @@ WRITE8_MEMBER(tnzs_mcu_state::mcu_w)
 	m_mcu->upi41_master_w(offset & 1, data);
 }
 
-READ8_MEMBER(tnzs_mcu_state::mcu_port1_r)
+uint8_t tnzs_mcu_state::mcu_port1_r()
 {
 	int data = 0;
 
@@ -52,12 +52,7 @@ READ8_MEMBER(tnzs_mcu_state::mcu_port1_r)
 	return data;
 }
 
-READ8_MEMBER(tnzs_mcu_state::mcu_port2_r)
-{
-	return m_in2->read();
-}
-
-WRITE8_MEMBER(tnzs_mcu_state::mcu_port2_w)
+void tnzs_mcu_state::mcu_port2_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, (data & 0x40) != 0 ? m_lockout_level : !m_lockout_level);
 	machine().bookkeeping().coin_lockout_w(1, (data & 0x80) != 0 ? m_lockout_level : !m_lockout_level);
@@ -495,7 +490,7 @@ WRITE_LINE_MEMBER(tnzsb_state::ym2203_irqhandler)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(kabukiz_state::sound_bank_w)
+void kabukiz_state::sound_bank_w(uint8_t data)
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)

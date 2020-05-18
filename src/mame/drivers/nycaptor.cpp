@@ -266,7 +266,7 @@ WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
 	m_soundnmi->in_w<1>(1);
 }
 
-WRITE8_MEMBER(nycaptor_state::unk_w)
+void nycaptor_state::unk_w(uint8_t data)
 {
 }
 

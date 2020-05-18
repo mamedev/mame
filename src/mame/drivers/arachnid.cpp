@@ -96,18 +96,18 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_u4_pa_r );
-	DECLARE_READ8_MEMBER( pia_u4_pb_r );
+	uint8_t pia_u4_pa_r();
+	uint8_t pia_u4_pb_r();
 	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
 	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
-	DECLARE_WRITE8_MEMBER( pia_u4_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_u4_pb_w );
+	void pia_u4_pa_w(uint8_t data);
+	void pia_u4_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
 
-	DECLARE_READ8_MEMBER( pia_u17_pa_r );
+	uint8_t pia_u17_pa_r();
 	DECLARE_READ_LINE_MEMBER( pia_u17_pca_r );
-	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
+	void pia_u17_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
@@ -287,7 +287,7 @@ uint8_t arachnid_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pa_r )
+uint8_t arachnid_state::pia_u4_pa_r()
 {
 	// Pulses from Switch Matrix Part I
 	// PA0 - G
@@ -305,7 +305,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pb_r )
+uint8_t arachnid_state::pia_u4_pb_r()
 {
 	// Pulses from Switch Matrix Part II
 	// PB0 - J
@@ -343,7 +343,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u17_pa_r )
+uint8_t arachnid_state::pia_u17_pa_r()
 {
 	// PA0 - Select
 	// PA1 - Player Change
@@ -366,12 +366,12 @@ READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 	return data;
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pa_w )
+void arachnid_state::pia_u4_pa_w(uint8_t data)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part I
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pb_w )
+void arachnid_state::pia_u4_pb_w(uint8_t data)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
@@ -386,7 +386,7 @@ WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
 	// CB2 - Throw Darts Lamp
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u17_pb_w )
+void arachnid_state::pia_u17_pb_w(uint8_t data)
 {
 	// PB0 - Select Lamp
 	// PB1 - Player Change Lamp

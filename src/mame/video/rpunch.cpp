@@ -169,7 +169,7 @@ WRITE8_MEMBER(rpunch_state::gga_w)
 }
 
 
-WRITE8_MEMBER(rpunch_state::gga_data_w)
+void rpunch_state::gga_data_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

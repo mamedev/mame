@@ -46,12 +46,12 @@ public:
 	required_device<m68000_device> m_maincpu;
 
 	// custom I/O
-	DECLARE_READ8_MEMBER(aburner2_motor_r);
-	DECLARE_WRITE8_MEMBER(aburner2_motor_w);
-	DECLARE_READ8_MEMBER(smgp_motor_r);
-	DECLARE_WRITE8_MEMBER(smgp_motor_w);
-	DECLARE_READ8_MEMBER(lastsurv_port_r);
-	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
+	uint8_t aburner2_motor_r();
+	void aburner2_motor_w(uint8_t data);
+	uint8_t smgp_motor_r();
+	void smgp_motor_w(uint8_t data);
+	uint8_t lastsurv_port_r();
+	void lastsurv_muxer_w(uint8_t data);
 
 	// game-specific main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
@@ -103,8 +103,8 @@ protected:
 	// compare/timer chip callbacks
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 
-	DECLARE_WRITE8_MEMBER(pc_0_w);
-	DECLARE_WRITE8_MEMBER(pd_0_w);
+	void pc_0_w(uint8_t data);
+	void pd_0_w(uint8_t data);
 
 	// devices
 	required_device<m68000_device> m_subcpu;

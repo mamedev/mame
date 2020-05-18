@@ -168,8 +168,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	void port_a_w(uint8_t data);
+	void port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 

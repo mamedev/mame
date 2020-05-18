@@ -281,7 +281,7 @@ private:
 	DECLARE_READ8_MEMBER(coin_lockout_r);
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
-	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
+	void sndnmi_msk_w(uint8_t data);
 	void halleys_palette(palette_device &palette);
 	uint32_t screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1594,7 +1594,7 @@ WRITE8_MEMBER(halleys_state::firq_ack_w)
 }
 
 
-WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
+void halleys_state::sndnmi_msk_w(uint8_t data)
 {
 	m_sndnmi_mask = data & 1;
 }

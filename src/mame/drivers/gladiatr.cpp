@@ -210,7 +210,7 @@ MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 }
 
 /* YM2203 port B handler (output) */
-WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
+void gladiatr_state::gladiator_int_control_w(u8 data)
 {
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
@@ -283,22 +283,22 @@ WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
 	m_tclk_val = state != 0;
 }
 
-READ8_MEMBER(gladiatr_state::cctl_p1_r)
+u8 gladiatr_state::cctl_p1_r()
 {
 	return m_cctl_p1 & m_in2->read();
 }
 
-READ8_MEMBER(gladiatr_state::cctl_p2_r)
+u8 gladiatr_state::cctl_p2_r()
 {
 	return m_cctl_p2;
 }
 
-READ8_MEMBER(gladiatr_state::ucpu_p2_r)
+u8 gladiatr_state::ucpu_p2_r()
 {
 	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
+void gladiatr_state::ccpu_p2_w(u8 data)
 {
 	// almost certainly active low (bootleg MCU never uses these outputs, which makes them always high)
 	// coin counters and lockout pass through 4049 inverting buffer at 12L
@@ -318,7 +318,7 @@ READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
 	return BIT(m_csnd_p1, 1);
 }
 
-READ8_MEMBER(gladiatr_state::ucpu_p1_r)
+u8 gladiatr_state::ucpu_p1_r()
 {
 	 // p10 connected to corresponding line on other MCU
 	 // p11 connected to t1 on other MCU
@@ -326,7 +326,7 @@ READ8_MEMBER(gladiatr_state::ucpu_p1_r)
 	return m_csnd_p1 |= 0xfe;
 }
 
-WRITE8_MEMBER(gladiatr_state::ucpu_p1_w)
+void gladiatr_state::ucpu_p1_w(u8 data)
 {
 	m_ucpu_p1 = data;
 }
@@ -337,7 +337,7 @@ READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
 	return BIT(m_ucpu_p1, 1);
 }
 
-READ8_MEMBER(gladiatr_state::csnd_p1_r)
+u8 gladiatr_state::csnd_p1_r()
 {
 	 // p10 connected to corresponding line on other MCU
 	 // p11 connected to t1 on other MCU
@@ -345,12 +345,12 @@ READ8_MEMBER(gladiatr_state::csnd_p1_r)
 	return m_ucpu_p1 |= 0xfe;
 }
 
-WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
+void gladiatr_state::csnd_p1_w(u8 data)
 {
 	m_csnd_p1 = data;
 }
 
-READ8_MEMBER(gladiatr_state::csnd_p2_r)
+u8 gladiatr_state::csnd_p2_r()
 {
 	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
@@ -384,7 +384,7 @@ INPUT_CHANGED_MEMBER(gladiatr_state::p2_s2)
 
 
 
-READ8_MEMBER(ppking_state::ppking_f1_r)
+u8 ppking_state::ppking_f1_r()
 {
 	return 0xff;
 }
@@ -403,7 +403,7 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
 inline bool ppking_state::mcu_parity_check()
 {
 	int i;
-	uint8_t res = 0;
+	u8 res = 0;
 
 	for(i=0;i<8;i++)
 	{
@@ -1366,7 +1366,7 @@ ROM_START( gcastle )
 ROM_END
 
 
-void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
+void gladiatr_state::swap_block(u8 *src1,u8 *src2,int len)
 {
 	int i,t;
 
@@ -1380,7 +1380,7 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 
 void gladiatr_state::init_gladiatr()
 {
-	uint8_t *rom = memregion("gfx2")->base();
+	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (int j = 3; j >= 0; j--)
 	{
@@ -1432,7 +1432,7 @@ void gladiatr_state::init_gladiatr()
 
 void ppking_state::init_ppking()
 {
-	uint8_t *rom = memregion("gfx2")->base();
+	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (int i = 0; i < 0x2000; i++)
 	{

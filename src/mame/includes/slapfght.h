@@ -109,7 +109,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
-	DECLARE_WRITE8_MEMBER(scroll_from_mcu_w);
+	void scroll_from_mcu_w(offs_t offset, uint8_t data);
 
 	DECLARE_READ8_MEMBER(getstar_mcusim_r);
 	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);

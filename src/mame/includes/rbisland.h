@@ -54,8 +54,8 @@ private:
 	DECLARE_READ16_MEMBER(rbisland_cchip_ram_r);
 	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void bankswitch_w(uint8_t data);
+	void counters_w(uint8_t data);
 	DECLARE_VIDEO_START(jumping);
 	void rbisland_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

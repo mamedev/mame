@@ -389,12 +389,12 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(ppi_pa_r);
-	DECLARE_READ8_MEMBER(ppi_pb_r);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
+	uint8_t ppi_pa_r();
+	uint8_t ppi_pb_r();
+	uint8_t ppi_pc_r();
+	void ppi_pa_w(uint8_t data);
+	void ppi_pb_w(uint8_t data);
+	void ppi_pc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
@@ -486,20 +486,20 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 	return 0x38;
 }
 
-READ8_MEMBER( votrpss_state::ppi_pa_r )
+uint8_t votrpss_state::ppi_pa_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( votrpss_state::ppi_pb_r )
+uint8_t votrpss_state::ppi_pb_r()
 {
 	return m_portb;
 }
 
 // Bit 0 controls what happens at interrupt time. See code around 518.
-READ8_MEMBER( votrpss_state::ppi_pc_r )
+uint8_t votrpss_state::ppi_pc_r()
 {
 	uint8_t data = 0;
 
@@ -512,18 +512,18 @@ READ8_MEMBER( votrpss_state::ppi_pc_r )
 	return (m_portc & 0xdb) | data;
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pa_w )
+void votrpss_state::ppi_pa_w(uint8_t data)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pb_w )
+void votrpss_state::ppi_pb_w(uint8_t data)
 {
 	m_portb = data;
 	m_terminal->write(data&0x7f);
 }
 
-WRITE8_MEMBER( votrpss_state::ppi_pc_w )
+void votrpss_state::ppi_pc_w(uint8_t data)
 {
 	m_portc = data;
 }

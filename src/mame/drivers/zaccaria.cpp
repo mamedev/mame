@@ -61,7 +61,7 @@ void zaccaria_state::machine_reset()
 	m_dsw_sel = 0;
 }
 
-WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
+void zaccaria_state::dsw_sel_w(uint8_t data)
 {
 	switch (data & 0xf0)
 	{

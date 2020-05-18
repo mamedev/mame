@@ -67,10 +67,10 @@ private:
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_WRITE8_MEMBER(soundlatch_clear7_w);
 	DECLARE_READ8_MEMBER(soundlatch_flags_r);
-	DECLARE_WRITE8_MEMBER(portA_0_w);
-	DECLARE_WRITE8_MEMBER(portB_0_w);
-	DECLARE_WRITE8_MEMBER(portA_2_w);
-	DECLARE_WRITE8_MEMBER(portB_2_w);
+	void portA_0_w(uint8_t data);
+	void portB_0_w(uint8_t data);
+	void portA_2_w(uint8_t data);
+	void portB_2_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_left_tile_info);

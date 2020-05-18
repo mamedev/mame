@@ -379,7 +379,7 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
-	DECLARE_READ32_MEMBER(zsg2_ext_r);
+	uint32_t zsg2_ext_r(offs_t offset);
 
 	void flashbank_map(address_map &map);
 	void main_map(address_map &map);
@@ -534,7 +534,7 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 	return ioport("P4")->read();
 }
 
-READ32_MEMBER(taitogn_state::zsg2_ext_r)
+uint32_t taitogn_state::zsg2_ext_r(offs_t offset)
 {
 	offset <<= 1;
 

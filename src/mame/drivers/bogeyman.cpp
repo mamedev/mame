@@ -220,7 +220,7 @@ void bogeyman_state::machine_reset()
 	m_colbank = 0;
 }
 
-WRITE8_MEMBER(bogeyman_state::colbank_w)
+void bogeyman_state::colbank_w(uint8_t data)
 {
 	if((data & 1) != (m_colbank & 1))
 	{

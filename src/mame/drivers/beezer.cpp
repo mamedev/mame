@@ -79,19 +79,19 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(noise_w);
 	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_READ8_MEMBER(via_audio_pa_r);
-	DECLARE_WRITE8_MEMBER(via_audio_pa_w);
-	DECLARE_WRITE8_MEMBER(via_audio_pb_w);
+	uint8_t via_audio_pa_r();
+	void via_audio_pa_w(uint8_t data);
+	void via_audio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o2_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_o3_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_clr_w);
 	DECLARE_WRITE_LINE_MEMBER(dmod_data_w);
 
-	DECLARE_READ8_MEMBER(via_system_pa_r);
-	DECLARE_READ8_MEMBER(via_system_pb_r);
-	DECLARE_WRITE8_MEMBER(via_system_pa_w);
-	DECLARE_WRITE8_MEMBER(via_system_pb_w);
+	uint8_t via_system_pa_r();
+	uint8_t via_system_pb_r();
+	void via_system_pa_w(uint8_t data);
+	void via_system_pb_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
 
 	void beezer(machine_config &config);
@@ -336,17 +336,17 @@ WRITE8_MEMBER( beezer_state::dac_w )
 	m_dac_data[offset] = data;
 }
 
-READ8_MEMBER( beezer_state::via_audio_pa_r )
+uint8_t beezer_state::via_audio_pa_r()
 {
 	return m_pbus;
 }
 
-WRITE8_MEMBER( beezer_state::via_audio_pa_w )
+void beezer_state::via_audio_pa_w(uint8_t data)
 {
 	m_pbus = data;
 }
 
-WRITE8_MEMBER( beezer_state::via_audio_pb_w )
+void beezer_state::via_audio_pb_w(uint8_t data)
 {
 	// bit 0 - dmod disable
 	// bit 1 - fm or am
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER( beezer_state::dmod_data_w )
 //  MACHINE EMULATION
 //**************************************************************************
 
-READ8_MEMBER( beezer_state::via_system_pa_r )
+uint8_t beezer_state::via_system_pa_r()
 {
 	uint8_t data = 0;
 
@@ -408,7 +408,7 @@ READ8_MEMBER( beezer_state::via_system_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER(beezer_state::via_system_pa_w)
+void beezer_state::via_system_pa_w(uint8_t data)
 {
 	// bit 3, audio cpu reset line
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
@@ -435,12 +435,12 @@ WRITE8_MEMBER(beezer_state::via_system_pa_w)
 	}
 }
 
-READ8_MEMBER( beezer_state::via_system_pb_r )
+uint8_t beezer_state::via_system_pb_r()
 {
 	return m_pbus;
 }
 
-WRITE8_MEMBER( beezer_state::via_system_pb_w )
+void beezer_state::via_system_pb_w(uint8_t data)
 {
 	m_pbus = data;
 }

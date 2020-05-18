@@ -392,7 +392,7 @@ INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 }
 
 
-WRITE8_MEMBER(bub68705_state::port_a_w)
+void bub68705_state::port_a_w(uint8_t data)
 {
 	//logerror("%04x: 68705 port A write %02x\n", m_mcu->pc(), data);
 	m_port_a_out = data;
@@ -419,7 +419,7 @@ WRITE8_MEMBER(bub68705_state::port_a_w)
  *  7   W  not used?
  */
 
-WRITE8_MEMBER(bub68705_state::port_b_w)
+void bub68705_state::port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 

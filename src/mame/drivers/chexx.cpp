@@ -46,11 +46,11 @@ public:
 	}
 
 	// handlers
-	DECLARE_READ8_MEMBER(via_a_in);
-	DECLARE_READ8_MEMBER(via_b_in);
+	uint8_t via_a_in();
+	uint8_t via_b_in();
 
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
+	void via_a_out(uint8_t data);
+	void via_b_out(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_out);
@@ -126,28 +126,28 @@ protected:
 
 // VIA
 
-READ8_MEMBER(chexx_state::via_a_in)
+uint8_t chexx_state::via_a_in()
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read A: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(chexx_state::via_b_in)
+uint8_t chexx_state::via_b_in()
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read B: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(chexx_state::via_a_out)
+void chexx_state::via_a_out(uint8_t data)
 {
 	m_port_a = data;    // multiplexer
 	m_digitalker->digitalker_data_w(data);
 //  logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chexx_state::via_b_out)
+void chexx_state::via_b_out(uint8_t data)
 {
 	m_port_b = data;
 

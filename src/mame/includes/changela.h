@@ -56,8 +56,8 @@ public:
 	/* devices */
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_WRITE8_MEMBER(changela_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(changela_68705_port_c_w);
+	void changela_68705_port_a_w(uint8_t data);
+	void changela_68705_port_c_w(uint8_t data);
 	DECLARE_READ8_MEMBER(changela_24_r);
 	DECLARE_READ8_MEMBER(changela_25_r);
 	DECLARE_READ8_MEMBER(changela_30_r);

@@ -44,7 +44,7 @@ private:
 	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
 	DECLARE_READ8_MEMBER(bestbest_prot_r);
 	DECLARE_WRITE8_MEMBER(bestbest_prot_w);
-	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
+	void bestbest_ay8910_port_a_w(uint8_t data);
 
 	// bssoccer specific
 	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);

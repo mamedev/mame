@@ -52,8 +52,8 @@ private:
 
 	u8 sdgndmps_sound_comms_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_WRITE16_MEMBER(background_w);
 	DECLARE_WRITE16_MEMBER(foreground_w);

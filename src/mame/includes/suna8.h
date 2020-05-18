@@ -137,9 +137,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 
 	// samples
-	DECLARE_WRITE8_MEMBER(suna8_play_samples_w);
-	DECLARE_WRITE8_MEMBER(rranger_play_samples_w);
-	DECLARE_WRITE8_MEMBER(suna8_samples_number_w);
+	void suna8_play_samples_w(uint8_t data);
+	void rranger_play_samples_w(uint8_t data);
+	void suna8_samples_number_w(uint8_t data);
 	void play_sample(int index);
 	SAMPLES_START_CB_MEMBER(sh_start);
 

@@ -313,7 +313,7 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)
 	m_interrupt_output(state);
 }
 
-READ8_MEMBER(mcpx_isalpc_device::get_slave_ack)
+uint8_t mcpx_isalpc_device::get_slave_ack(offs_t offset)
 {
 	if (offset == 2) // IRQ = 2
 		return pic8259_2->acknowledge();
