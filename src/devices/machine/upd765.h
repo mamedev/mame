@@ -238,6 +238,8 @@ protected:
 
 	bool external_ready;
 
+	int recalibrate_steps;
+
 	mode_t mode;
 	int main_phase;
 
@@ -307,6 +309,7 @@ protected:
 	virtual void start_command(int cmd);
 	virtual void execute_command(int cmd);
 	virtual void command_end(floppy_info &fi, bool data_completion);
+	virtual uint8_t get_st3(floppy_info &fi);
 
 	void recalibrate_start(floppy_info &fi);
 	void seek_start(floppy_info &fi);
@@ -513,6 +516,7 @@ public:
 	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }
 
 	virtual void map(address_map &map) override;
+	virtual uint8_t get_st3(floppy_info &fi) override;
 
 private:
 	uint32_t m_clock2;

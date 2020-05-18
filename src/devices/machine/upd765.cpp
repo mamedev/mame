@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(UPD72065,       upd72065_device,       "upd72065",       "NEC
 DEFINE_DEVICE_TYPE(UPD72067,       upd72067_device,       "upd72067",       "NEC uPD72067 FDC")
 DEFINE_DEVICE_TYPE(UPD72069,       upd72069_device,       "upd72069",       "NEC uPD72069 FDC")
 DEFINE_DEVICE_TYPE(I82072,         i82072_device,         "i82072",         "Intel 82072 FDC")
-DEFINE_DEVICE_TYPE(SMC37C78,       smc37c78_device,       "smc37c78",       "SMC FDC73C78 FDC")
+DEFINE_DEVICE_TYPE(SMC37C78,       smc37c78_device,       "smc37c78",       "SMC FDC37C78 FDC")
 DEFINE_DEVICE_TYPE(N82077AA,       n82077aa_device,       "n82077aa",       "Intel N82077AA FDC")
 DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "Winbond PC FDC Super I/O")
 DEFINE_DEVICE_TYPE(DP8473,         dp8473_device,         "dp8473",         "National Semiconductor DP8473 FDC")
@@ -109,22 +109,17 @@ void n82077aa_device::map(address_map &map)
 
 void pc_fdc_superio_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(pc_fdc_superio_device::sra_r));
-	map(0x1, 0x1).r(FUNC(pc_fdc_superio_device::srb_r));
-	map(0x2, 0x2).rw(FUNC(pc_fdc_superio_device::dor_r), FUNC(pc_fdc_superio_device::dor_w));
-	map(0x3, 0x3).rw(FUNC(pc_fdc_superio_device::tdr_r), FUNC(pc_fdc_superio_device::tdr_w));
-	map(0x4, 0x4).rw(FUNC(pc_fdc_superio_device::msr_r), FUNC(pc_fdc_superio_device::dsr_w));
+	map(0x2, 0x2).w(FUNC(pc_fdc_superio_device::dor_w));
+	map(0x3, 0x3).w(FUNC(pc_fdc_superio_device::tdr_w));
+	map(0x4, 0x4).r(FUNC(pc_fdc_superio_device::msr_r));
 	map(0x5, 0x5).rw(FUNC(pc_fdc_superio_device::fifo_r), FUNC(pc_fdc_superio_device::fifo_w));
 	map(0x7, 0x7).rw(FUNC(pc_fdc_superio_device::dir_r), FUNC(pc_fdc_superio_device::ccr_w));
 }
 
 void dp8473_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(dp8473_device::sra_r));
-	map(0x1, 0x1).r(FUNC(dp8473_device::srb_r));
-	map(0x2, 0x2).rw(FUNC(dp8473_device::dor_r), FUNC(dp8473_device::dor_w));
-	map(0x3, 0x3).rw(FUNC(dp8473_device::tdr_r), FUNC(dp8473_device::tdr_w));
-	map(0x4, 0x4).rw(FUNC(dp8473_device::msr_r), FUNC(dp8473_device::dsr_w));
+	map(0x2, 0x2).w(FUNC(dp8473_device::dor_w));
+	map(0x4, 0x4).r(FUNC(dp8473_device::msr_r));
 	map(0x5, 0x5).rw(FUNC(dp8473_device::fifo_r), FUNC(dp8473_device::fifo_w));
 	map(0x7, 0x7).rw(FUNC(dp8473_device::dir_r), FUNC(dp8473_device::ccr_w));
 }
@@ -176,6 +171,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	select_connected(true),
 	select_multiplexed(true),
 	external_ready(false),
+	recalibrate_steps(77),
 	mode(mode_t::AT),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -1407,14 +1403,7 @@ void upd765_family_device::execute_command(int cmd)
 	case C_SENSE_DRIVE_STATUS: {
 		floppy_info &fi = flopi[command[1] & 3];
 		main_phase = PHASE_RESULT;
-		result[0] = command[1] & 7;
-		if(fi.ready)
-			result[0] |= ST3_RY;
-		if(fi.dev)
-			result[0] |=
-				(fi.dev->wpt_r() ? ST3_WP : 0x00) |
-				(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
-				(fi.dev->twosid_r() ? 0x00 : ST3_TS);
+		result[0] = get_st3(fi);
 		LOGCOMMAND("command sense drive status %d (%02x)\n", fi.id, result[0]);
 		result_pos = 1;
 		break;
@@ -1493,13 +1482,26 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	check_irq();
 }
 
+uint8_t upd765_family_device::get_st3(floppy_info &fi)
+{
+	uint8_t st3 = command[1] & 7;
+	if(fi.ready)
+		result[0] |= ST3_RY;
+	if(fi.dev)
+		result[0] |=
+			(fi.dev->wpt_r() ? ST3_WP : 0x00) |
+			(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
+			(fi.dev->twosid_r() ? 0x00 : ST3_TS);
+	return st3;
+}
+
 void upd765_family_device::recalibrate_start(floppy_info &fi)
 {
 	LOGCOMMAND("command recalibrate %d\n", command[1] & 3);
 	fi.main_state = RECALIBRATE;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = 1;
-	fi.counter = 77;
+	fi.counter = recalibrate_steps;
 	fi.ready = get_ready(command[1] & 3);
 	fi.st0 = (fi.ready ? 0 : ST0_NR);
 	seek_continue(fi);
@@ -2658,6 +2660,7 @@ upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag,
 upd72065_device::upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, type, tag, owner, clock)
 {
 	dor_reset = 0x0c;
+	recalibrate_steps = 255;
 }
 
 upd72067_device::upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72067, tag, owner, clock)
@@ -2679,6 +2682,7 @@ upd72069_device::upd72069_device(const machine_config &mconfig, const char *tag,
 i82072_device::i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I82072, tag, owner, clock)
 {
 	dor_reset = 0x0c;
+	recalibrate_steps = 255;
 }
 
 void i82072_device::device_start()
@@ -2945,6 +2949,7 @@ smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag,
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
+	recalibrate_steps = 80;
 }
 
 n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, N82077AA, tag, owner, clock)
@@ -2988,6 +2993,17 @@ wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag,
 	select_multiplexed = false;
 
 	(void)m_clock2; // TODO
+}
+
+uint8_t wd37c65c_device::get_st3(floppy_info &fi)
+{
+	uint8_t st3 = command[1] & 7;
+	result[0] |= 0x20;
+	if(fi.dev)
+		result[0] |=
+			(fi.dev->wpt_r() ? 0x48 : 0x00) |
+			(fi.dev->trk00_r() ? 0x00 : 0x10);
+	return st3;
 }
 
 mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
