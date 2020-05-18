@@ -87,14 +87,14 @@ public:
 	void ronjan(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(output_regs_w);
+	void output_regs_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(mux_p2_r);
 	DECLARE_READ8_MEMBER(mux_p1_r);
 	DECLARE_READ8_MEMBER(ronjan_prot_r);
 	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
-	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
+	uint8_t ronjan_prot_status_r();
 	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 	virtual void video_start() override;
 	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -399,7 +399,7 @@ void pinkiri8_state::pinkiri8_map(address_map &map)
 	map(0x10000, 0x1ffff).rom();
 }
 
-WRITE8_MEMBER(pinkiri8_state::output_regs_w)
+void pinkiri8_state::output_regs_w(uint8_t data)
 {
 	if(data & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -1248,7 +1248,7 @@ WRITE8_MEMBER(pinkiri8_state::ronjan_prot_w)
 	}
 }
 
-READ8_MEMBER(pinkiri8_state::ronjan_prot_status_r)
+uint8_t pinkiri8_state::ronjan_prot_status_r()
 {
 	return 0; //bit 0 seems a protection status bit
 }

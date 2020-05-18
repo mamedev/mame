@@ -151,10 +151,10 @@ private:
 	required_device<sega_billboard_device> m_billboard;
 	uint16_t crypt_read_callback(uint32_t addr);
 
-	DECLARE_READ8_MEMBER(pdr1_input_r);
-	DECLARE_READ8_MEMBER(pdr2_input_r);
-	DECLARE_WRITE8_MEMBER(pdr1_output_w);
-	DECLARE_WRITE8_MEMBER(pdr2_output_w);
+	uint8_t pdr1_input_r();
+	uint8_t pdr2_input_r();
+	void pdr1_output_w(uint8_t data);
+	void pdr2_output_w(uint8_t data);
 	void stv_select_game(int gameno);
 	uint8_t     m_prev_gamebank_select;
 

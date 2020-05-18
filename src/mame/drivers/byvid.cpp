@@ -78,24 +78,24 @@ public:
 
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_READ8_MEMBER(m6803_port2_r);
-	DECLARE_WRITE8_MEMBER(m6803_port2_w);
+	uint8_t m6803_port2_r();
+	void m6803_port2_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_READ8_MEMBER(u7_a_r);
-	DECLARE_WRITE8_MEMBER(u7_a_w);
-	DECLARE_READ8_MEMBER(u7_b_r);
-	DECLARE_WRITE8_MEMBER(u7_b_w);
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_READ8_MEMBER(u11_b_r);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
+	uint8_t u7_a_r();
+	void u7_a_w(uint8_t data);
+	uint8_t u7_b_r();
+	void u7_b_w(uint8_t data);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	uint8_t u11_b_r();
+	void u11_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
@@ -547,13 +547,13 @@ WRITE8_MEMBER( by133_state::sound_data_w )
 	m_vid_to_mpu = data;
 }
 
-READ8_MEMBER( by133_state::m6803_port2_r )
+uint8_t by133_state::m6803_port2_r()
 {
 	//machine().scheduler().synchronize();
 	return (m_u7_b << 1) | 0;
 }
 
-WRITE8_MEMBER( by133_state::m6803_port2_w )
+void by133_state::m6803_port2_w(uint8_t data)
 {
 	//m_u7_b = data >> 1;
 	m_beep->set_clock(600);
@@ -593,17 +593,17 @@ WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
 	// solenoid-sound selector
 }
 
-READ8_MEMBER( by133_state::u7_a_r )
+uint8_t by133_state::u7_a_r()
 {
 	return m_u7_a;
 }
 
-WRITE8_MEMBER( by133_state::u7_a_w )
+void by133_state::u7_a_w(uint8_t data)
 {
 	m_u7_a = data;
 }
 
-READ8_MEMBER( by133_state::u7_b_r )
+uint8_t by133_state::u7_b_r()
 {
 	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
 		m_u7_b |= m_io_joy->read();
@@ -614,25 +614,25 @@ READ8_MEMBER( by133_state::u7_b_r )
 	return m_u7_b;
 }
 
-WRITE8_MEMBER( by133_state::u7_b_w )
+void by133_state::u7_b_w(uint8_t data)
 {
 	//machine().scheduler().synchronize();
 	m_u7_b = data;
 }
 
-READ8_MEMBER( by133_state::u10_a_r )
+uint8_t by133_state::u10_a_r()
 {
 	return m_u10_a;
 }
 
-WRITE8_MEMBER( by133_state::u10_a_w )
+void by133_state::u10_a_w(uint8_t data)
 {
 	m_u10_a = data;
 	if (BIT(m_u11_a, 2) == 0)
 		m_mpu_to_vid = data ^ 0x0f;
 }
 
-READ8_MEMBER( by133_state::u10_b_r )
+uint8_t by133_state::u10_b_r()
 {
 	if (BIT(m_u11_a, 3) == 0)
 		return ~m_u7_a & 0x03;
@@ -672,29 +672,29 @@ READ8_MEMBER( by133_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by133_state::u10_b_w )
+void by133_state::u10_b_w(uint8_t data)
 {
 	m_u10_b = data;
 }
 
-READ8_MEMBER( by133_state::u11_a_r )
+uint8_t by133_state::u11_a_r()
 {
 	return m_u11_a;
 }
 
-WRITE8_MEMBER( by133_state::u11_a_w )
+void by133_state::u11_a_w(uint8_t data)
 {
 	m_u11_a = data;
 	m_pia_u7->ca1_w(BIT(data, 1));
 	m_pia_u7->ca2_w(BIT(data, 2));
 }
 
-READ8_MEMBER( by133_state::u11_b_r )
+uint8_t by133_state::u11_b_r()
 {
 	return m_u11_b;
 }
 
-WRITE8_MEMBER( by133_state::u11_b_w )
+void by133_state::u11_b_w(uint8_t data)
 {
 	m_u11_b = data;
 }

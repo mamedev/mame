@@ -79,10 +79,10 @@ public:
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);
 	DECLARE_WRITE8_MEMBER(buggychl_ctrl_w);
 	DECLARE_WRITE8_MEMBER(buggychl_bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay1_w);
-	DECLARE_WRITE8_MEMBER(port_b_0_w);
-	DECLARE_WRITE8_MEMBER(ta7630_volbal_ay2_w);
-	DECLARE_WRITE8_MEMBER(port_b_1_w);
+	void ta7630_volbal_ay1_w(uint8_t data);
+	void port_b_0_w(uint8_t data);
+	void ta7630_volbal_ay2_w(uint8_t data);
+	void port_b_1_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(ta7630_volbal_msm_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

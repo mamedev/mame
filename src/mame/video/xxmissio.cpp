@@ -14,11 +14,11 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::scroll_x_w)
+void xxmissio_state::scroll_x_w(uint8_t data)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::scroll_y_w)
+void xxmissio_state::scroll_y_w(uint8_t data)
 {
 	m_yscroll = data;
 }

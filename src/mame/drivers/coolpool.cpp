@@ -408,13 +408,13 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
  *************************************/
 
 
-READ16_MEMBER(coolpool_state::dsp_bio_line_r)
+uint16_t coolpool_state::dsp_bio_line_r()
 {
 	return m_main2dsp->pending_r() ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
-READ16_MEMBER(coolpool_state::dsp_hold_line_r)
+uint16_t coolpool_state::dsp_hold_line_r()
 {
 	return CLEAR_LINE;  /* ??? */
 }

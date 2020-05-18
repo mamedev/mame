@@ -55,8 +55,8 @@ protected:
 private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(hsync_r);
+	void video_w(uint8_t data);
+	uint8_t hsync_r();
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
 	DECLARE_READ8_MEMBER(asic_r);
@@ -194,13 +194,13 @@ WRITE8_MEMBER(cardline_state::attr_w)
 	m_colorram[offset]=data;
 }
 
-WRITE8_MEMBER(cardline_state::video_w)
+void cardline_state::video_w(uint8_t data)
 {
 	m_video=data;
 	//printf("m_video %x\n", m_video);
 }
 
-READ8_MEMBER(cardline_state::hsync_r)
+uint8_t cardline_state::hsync_r()
 {
 	return m_hsync_q;
 }

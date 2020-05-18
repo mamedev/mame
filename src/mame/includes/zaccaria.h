@@ -42,7 +42,7 @@ private:
 	DECLARE_WRITE8_MEMBER(attributes_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(dsw_sel_w);
+	void dsw_sel_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void zaccaria_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

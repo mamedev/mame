@@ -82,18 +82,18 @@ private:
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
+	void rom_5874_bank_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER( rom_5987_bank_w );
 	DECLARE_WRITE16_MEMBER( rom_837_7525_bank_w );
-	DECLARE_WRITE8_MEMBER( misc_outputs_w );
+	void misc_outputs_w(uint8_t data);
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
-	DECLARE_WRITE8_MEMBER( soundbank_w );
+	void soundbank_w(uint8_t data);
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
 	DECLARE_READ16_MEMBER( lghost_custom_io_r );
-	DECLARE_WRITE8_MEMBER( lghost_gun_recoil_w );
+	void lghost_gun_recoil_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER( lghost_custom_io_w );
 	DECLARE_READ16_MEMBER( wwally_custom_io_r );
 	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );

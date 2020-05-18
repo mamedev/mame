@@ -220,12 +220,12 @@ WRITE8_MEMBER(stfight_state::stfight_mcu_w)
 	m_cpu_to_mcu_empty = false;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
+void stfight_state::stfight_68705_port_a_w(uint8_t data)
 {
 	m_port_a_out = data;
 }
 
-READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
+uint8_t stfight_state::stfight_68705_port_b_r()
 {
 	return
 			(m_coin_mech->read() << 6) |
@@ -233,14 +233,14 @@ READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
 			(m_cpu_to_mcu_data & 0x0f);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
+void stfight_state::stfight_68705_port_b_w(uint8_t data)
 {
 	// Acknowledge Z80 command
 	if (!BIT(data, 5))
 		m_cpu_to_mcu_empty = true;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
+void stfight_state::stfight_68705_port_c_w(uint8_t data)
 {
 	// Signal a valid coin on the falling edge
 	if (BIT(m_port_c_out, 0) && !BIT(data, 0))

@@ -41,12 +41,12 @@ WRITE8_MEMBER(changela_state::mcu_w)
         MCU
 *********************************/
 
-WRITE8_MEMBER(changela_state::changela_68705_port_a_w)
+void changela_state::changela_68705_port_a_w(uint8_t data)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
+void changela_state::changela_68705_port_c_w(uint8_t data)
 {
 	/* PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge */
 	if (BIT(data, 3) && ~BIT(m_port_c_out, 3))

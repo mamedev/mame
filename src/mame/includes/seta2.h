@@ -68,7 +68,7 @@ protected:
 	DECLARE_READ8_MEMBER(pzlbowl_coins_r);
 	DECLARE_WRITE8_MEMBER(pzlbowl_coin_counter_w);
 
-	DECLARE_WRITE16_MEMBER(reelquak_leds_w);
+	void reelquak_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE8_MEMBER(reelquak_coin_w);
 
 	DECLARE_WRITE8_MEMBER(samshoot_coin_w);
@@ -77,8 +77,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(telpacfl_lamp2_w);
 	DECLARE_WRITE8_MEMBER(telpacfl_lockout_w);
 
-	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
-	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
+	uint16_t gundamex_eeprom_r();
+	void gundamex_eeprom_w(uint16_t data);
 
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_READ16_MEMBER(spriteram_r);

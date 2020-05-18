@@ -118,7 +118,7 @@ protected:
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);

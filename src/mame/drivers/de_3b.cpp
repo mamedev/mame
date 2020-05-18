@@ -32,20 +32,20 @@ private:
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void lamp0_w(uint8_t data) { };
+	void lamp1_w(uint8_t data) { };
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t dmd_status_r();
+	void pia2c_pa_w(uint8_t data);
+	uint8_t pia2c_pb_r();
+	void pia2c_pb_w(uint8_t data);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	void lamps_w(offs_t offset, uint8_t data);
 
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -127,14 +127,14 @@ static INPUT_PORTS_START( de_3b )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-READ8_MEMBER( de_3b_state::switch_r )
+uint8_t de_3b_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3b_state::switch_w )
+void de_3b_state::switch_w(uint8_t data)
 {
 	int x;
 
@@ -146,84 +146,84 @@ WRITE8_MEMBER( de_3b_state::switch_w )
 	m_kbdrow = data & (1<<x);
 }
 
-WRITE8_MEMBER( de_3b_state::sound_w )
+void de_3b_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
 		m_decobsmt->bsmt_comms_w(m_sound_data);
 }
 
-READ8_MEMBER( de_3b_state::dmd_status_r )
+uint8_t de_3b_state::dmd_status_r()
 {
 	return m_dmdtype3->status_r();
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pa_w )
+void de_3b_state::pia2c_pa_w(uint8_t data)
 {
 	/* DMD data */
 	m_dmdtype3->data_w(data);
 	logerror("DMD: Data write %02x\n", data);
 }
 
-READ8_MEMBER( de_3b_state::pia2c_pb_r )
+uint8_t de_3b_state::pia2c_pb_r()
 {
 	return m_dmdtype3->busy_r();
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pb_w )
+void de_3b_state::pia2c_pb_w(uint8_t data)
 {
 	/* DMD ctrl */
 	m_dmdtype3->ctrl_w(data);
 	logerror("DMD: Control write %02x\n", data);
 }
-READ8_MEMBER(de_3b_state::display_r)
+uint8_t de_3b_state::display_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
 	case 0:
-//      ret = pia28_w7_r(space,0);
+//      ret = pia28_w7_r();
 		break;
 	case 3:
-		ret = pia2c_pb_r(space,0);
+		ret = pia2c_pb_r();
 		break;
 	}
 
 	return ret;
 }
 
-WRITE8_MEMBER(de_3b_state::display_w)
+void de_3b_state::display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-//      dig0_w(space,0,data);
+//      dig0_w(data);
 		break;
 	case 1:
-//      dig1_w(space,0,data);
+//      dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-//      pia34_pa_w(space,0,data);
+//      pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_3b_state::lamps_w)
+void de_3b_state::lamps_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		lamp0_w(space,0,data);
+		lamp0_w(data);
 		break;
 	case 1:
-		lamp1_w(space,0,data);
+		lamp1_w(data);
 		break;
 	}
 }

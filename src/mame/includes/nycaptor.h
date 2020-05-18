@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE8_MEMBER(nycaptor_gfxctrl_w);
 	DECLARE_READ8_MEMBER(nycaptor_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(nycaptor_scrlram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	void unk_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot();

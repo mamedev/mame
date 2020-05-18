@@ -121,23 +121,23 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
 	/* Parallel port */
-	DECLARE_READ8_MEMBER(ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	uint8_t ppi_portb_r();
+	void ppi_portc_w(uint8_t data);
 
 	/* DMA controller */
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	DECLARE_WRITE8_MEMBER(dma_segment_w);
-	DECLARE_READ8_MEMBER(dma_memory_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_memory_write_byte);
-	DECLARE_READ8_MEMBER( io_dack0_r )  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack1_r )  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack2_r )  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_READ8_MEMBER( io_dack3_r )  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
-	DECLARE_WRITE8_MEMBER( io_dack0_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
-	DECLARE_WRITE8_MEMBER( io_dack1_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
-	DECLARE_WRITE8_MEMBER( io_dack2_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
-	DECLARE_WRITE8_MEMBER( io_dack3_w ) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
+	uint8_t dma_memory_read_byte(offs_t offset);
+	void dma_memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_dack0_r()  { uint8_t tmp = m_isabus->dack_r(0); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack1_r()  { uint8_t tmp = m_isabus->dack_r(1); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack2_r()  { uint8_t tmp = m_isabus->dack_r(2); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	uint8_t io_dack3_r()  { uint8_t tmp = m_isabus->dack_r(3); LOGDMA("%s: %02x\n", FUNCNAME, tmp); return tmp; }
+	void io_dack0_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(0,data); }
+	void io_dack1_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(1,data); }
+	void io_dack2_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(2,data); }
+	void io_dack3_w(uint8_t data) { LOGDMA("%s: %02x\n", FUNCNAME, data); m_isabus->dack_w(3,data); }
 	DECLARE_WRITE_LINE_MEMBER( dack0_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack1_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack2_w ){ LOGDMA("%s: %d\n", FUNCNAME, state); select_dma_channel(2, state); }
@@ -815,7 +815,7 @@ WRITE_LINE_MEMBER(myb3k_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(myb3k_state::dma_memory_read_byte)
+uint8_t myb3k_state::dma_memory_read_byte(offs_t offset)
 {
 	assert(m_dma_channel != -1);
 
@@ -826,7 +826,7 @@ READ8_MEMBER(myb3k_state::dma_memory_read_byte)
 	return tmp;
 }
 
-WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
+void myb3k_state::dma_memory_write_byte(offs_t offset, uint8_t data)
 {
 	assert(m_dma_channel != -1);
 
@@ -836,14 +836,14 @@ WRITE8_MEMBER(myb3k_state::dma_memory_write_byte)
 	return prog_space.write_byte(offset |  m_dma_page[m_dma_channel & 3] << 16, data);
 }
 
-READ8_MEMBER( myb3k_state::ppi_portb_r )
+uint8_t myb3k_state::ppi_portb_r()
 {
 	LOGPPI("%s\n", FUNCNAME);
 
 	return m_io_dsw1->read();
 }
 
-WRITE8_MEMBER( myb3k_state::ppi_portc_w )
+void myb3k_state::ppi_portc_w(uint8_t data)
 {
 	LOGPPI("%s: %02x\n", FUNCNAME, data);
 	LOGPPI(" - STROBE : %d\n", (data & PC0_STROBE)  ? 1 : 0);

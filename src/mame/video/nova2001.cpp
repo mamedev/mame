@@ -220,12 +220,12 @@ READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
 	return m_bg_videoram[offset];
 }
 
-WRITE8_MEMBER(nova2001_state::scroll_x_w)
+void nova2001_state::scroll_x_w(u8 data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(nova2001_state::scroll_y_w)
+void nova2001_state::scroll_y_w(u8 data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }

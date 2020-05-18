@@ -90,11 +90,11 @@ private:
 	DECLARE_WRITE8_MEMBER(flipscreen_y_w);
 	DECLARE_WRITE8_MEMBER(gridiron_led0_w);
 	DECLARE_WRITE8_MEMBER(gridiron_led1_w);
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_READ8_MEMBER(portB_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
-	DECLARE_WRITE8_MEMBER(portB_w);
-	DECLARE_WRITE8_MEMBER(msm_reset_w);
+	uint8_t portA_r();
+	uint8_t portB_r();
+	void portA_w(uint8_t data);
+	void portB_w(uint8_t data);
+	void msm_reset_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

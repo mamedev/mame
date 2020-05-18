@@ -128,14 +128,14 @@ private:
 
 	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
 	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_attr_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
 	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_READ8_MEMBER(test_r);
+	uint8_t test_r();
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
@@ -339,7 +339,7 @@ void luckgrln_state::_7smash_map(address_map &map)
 	map(0xf0000, 0xfffff).unmaprw();
 }
 
-WRITE8_MEMBER(luckgrln_state::output_w)
+void luckgrln_state::output_w(uint8_t data)
 {
 	data &= 0xc7;
 
@@ -502,7 +502,7 @@ void luckgrln_state::luckgrln_io(address_map &map)
 }
 
 /* reads a bit 1 status there after every round played */
-READ8_MEMBER(luckgrln_state::test_r)
+uint8_t luckgrln_state::test_r()
 {
 	return 0xff;
 }

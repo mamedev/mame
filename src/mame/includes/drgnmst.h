@@ -113,12 +113,12 @@ private:
 
 	DECLARE_WRITE8_MEMBER(snd_command_w);
 	DECLARE_WRITE8_MEMBER(snd_flag_w);
-	DECLARE_READ8_MEMBER(pic16c5x_port0_r);
-	DECLARE_READ8_MEMBER(snd_command_r);
-	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(pcm_banksel_w);
-	DECLARE_WRITE8_MEMBER(oki_w);
-	DECLARE_WRITE8_MEMBER(snd_control_w);
+	uint8_t pic16c5x_port0_r();
+	uint8_t snd_command_r();
+	uint8_t snd_flag_r();
+	void pcm_banksel_w(uint8_t data);
+	void oki_w(uint8_t data);
+	void snd_control_w(uint8_t data);
 
 	void drgnmst_main_map_with_pic(address_map& map);
 

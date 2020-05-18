@@ -494,7 +494,7 @@ uint8_t segaxbd_state::analog_r()
 //  I/O chip
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::pc_0_w)
+void segaxbd_state::pc_0_w(uint8_t data)
 {
 	m_pc_0 = data;
 
@@ -521,7 +521,7 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 //  I/O chip
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::pd_0_w)
+void segaxbd_state::pd_0_w(uint8_t data)
 {
 	// Output port:
 	//  D7: Amplifier mute control (1= sounding, 0= muted)
@@ -671,7 +671,7 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 //  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::aburner2_motor_r)
+uint8_t segaxbd_state::aburner2_motor_r()
 {
 	uint8_t data = m_io0_porta->read() & 0xc0;
 
@@ -685,7 +685,7 @@ READ8_MEMBER(segaxbd_state::aburner2_motor_r)
 //  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
+void segaxbd_state::aburner2_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -696,7 +696,7 @@ WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
 //  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::smgp_motor_r)
+uint8_t segaxbd_state::smgp_motor_r()
 {
 	uint8_t data = m_io0_porta->read() & 0xc0;
 
@@ -710,7 +710,7 @@ READ8_MEMBER(segaxbd_state::smgp_motor_r)
 //  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
+void segaxbd_state::smgp_motor_w(uint8_t data)
 {
 	// TODO
 }
@@ -754,7 +754,7 @@ WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
 //  I/O chip 1 for Last Survivor
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_state::lastsurv_port_r)
+uint8_t segaxbd_state::lastsurv_port_r()
 {
 	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
@@ -765,7 +765,7 @@ READ8_MEMBER(segaxbd_state::lastsurv_port_r)
 //  of I/O chip 0 for Last Survivor
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_state::lastsurv_muxer_w)
+void segaxbd_state::lastsurv_muxer_w(uint8_t data)
 {
 	machine().sound().system_enable(data & 0x80);
 

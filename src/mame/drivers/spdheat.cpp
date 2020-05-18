@@ -414,42 +414,42 @@ WRITE8_MEMBER(spdheat_state::sub_nmi_w)
     PGA[3:0], PGB[3:0] = FMB VR1
  */
 
-WRITE8_MEMBER(spdheat_state::ym1_port_a_w)
+void spdheat_state::ym1_port_a_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym1_port_b_w)
+void spdheat_state::ym1_port_b_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym2_port_a_w)
+void spdheat_state::ym2_port_a_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym2_port_b_w)
+void spdheat_state::ym2_port_b_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym3_port_a_w)
+void spdheat_state::ym3_port_a_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym3_port_b_w)
+void spdheat_state::ym3_port_b_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym4_port_a_w)
+void spdheat_state::ym4_port_a_w(uint8_t data)
 {
 
 }
 
-WRITE8_MEMBER(spdheat_state::ym4_port_b_w)
+void spdheat_state::ym4_port_b_w(uint8_t data)
 {
 
 }

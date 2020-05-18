@@ -106,7 +106,7 @@ private:
 	DECLARE_WRITE16_MEMBER(apache3_v30_v20_w);
 	DECLARE_READ16_MEMBER(apache3_z80_r);
 	DECLARE_WRITE16_MEMBER(apache3_z80_w);
-	DECLARE_READ8_MEMBER(apache3_vr1_r);
+	uint8_t apache3_vr1_r();
 	DECLARE_WRITE16_MEMBER(apache3_rotate_w);
 	DECLARE_WRITE16_MEMBER(apache3_road_z_w);
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
@@ -165,7 +165,7 @@ private:
 	DECLARE_WRITE16_MEMBER(road_vregs_w);
 	DECLARE_READ8_MEMBER(gfxdata_r);
 	DECLARE_WRITE8_MEMBER(gfxdata_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(uint8_t data);
 
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -219,7 +219,7 @@ private:
 	DECLARE_WRITE16_MEMBER(video_config_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(mixing_control_w);
-	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
+	void cyclwarr_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(cyclwarr_sound_w);
 	DECLARE_WRITE16_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(oki_status_xor_r);

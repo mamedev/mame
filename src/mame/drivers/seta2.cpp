@@ -185,12 +185,12 @@ void seta2_state::grdians_map(address_map &map)
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-READ16_MEMBER(seta2_state::gundamex_eeprom_r)
+uint16_t seta2_state::gundamex_eeprom_r()
 {
 	return ((m_eeprom->do_read() & 1)) << 3;
 }
 
-WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
+void seta2_state::gundamex_eeprom_w(uint16_t data)
 {
 	m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(data & 0x1);
@@ -408,7 +408,7 @@ void seta2_state::ablastb_map(address_map &map)
                               Reel'N Quake
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::reelquak_leds_w)
+void seta2_state::reelquak_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

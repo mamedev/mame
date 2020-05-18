@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_rotram);
 	DECLARE_READ16_MEMBER(read_sndram);
 	DECLARE_WRITE16_MEMBER(write_sndram);
-	DECLARE_WRITE16_MEMBER(sound_dac_w);
+	void sound_dac_w(uint16_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -509,7 +509,7 @@ void cubeqst_state::machine_reset()
  */
 
 /* Called by the sound CPU emulation */
-WRITE16_MEMBER( cubeqst_state::sound_dac_w )
+void cubeqst_state::sound_dac_w(uint16_t data)
 {
 	/// d0 selects between 4051.1d (right, d0=1) and 4051.3d (left, d0=0)
 	/// d1-d3 select the channel

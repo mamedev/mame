@@ -458,7 +458,7 @@ static const int dendego_pressure_table[0x100] =
 #define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
 
 
-WRITE8_MEMBER(taitojc_state::coin_control_w)
+void taitojc_state::coin_control_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -696,28 +696,28 @@ void taitojc_state::dendego_map(address_map &map)
 
 ***************************************************************************/
 
-READ8_MEMBER(taitojc_state::hc11_comm_r)
+uint8_t taitojc_state::hc11_comm_r()
 {
 	return m_mcu_comm_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_comm_w)
+void taitojc_state::hc11_comm_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(taitojc_state::hc11_data_r)
+uint8_t taitojc_state::hc11_data_r()
 {
 	m_mcu_comm_hc11 |= 0x04;
 	m_mcu_comm_main |= 0x20;
 	return m_mcu_data_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_data_w)
+void taitojc_state::hc11_data_w(uint8_t data)
 {
 	m_mcu_data_main = data;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_output_w)
+void taitojc_state::hc11_output_w(uint8_t data)
 {
 /*
     cabinet lamps, active high

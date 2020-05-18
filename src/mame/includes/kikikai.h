@@ -124,8 +124,8 @@ private:
 	virtual DECLARE_WRITE8_MEMBER(main_f008_w) override;
 
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
-	DECLARE_WRITE8_MEMBER(mexico86_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(mexico86_68705_port_b_w);
+	void mexico86_68705_port_a_w(u8 data);
+	void mexico86_68705_port_b_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 
 	optional_device<m68705p_device>     m_68705mcu;
 

@@ -401,7 +401,7 @@ void rbisland_state::jumping_map(address_map &map)
               Jumping uses two YM2203's
 ***********************************************************/
 
-WRITE8_MEMBER(rbisland_state::bankswitch_w)
+void rbisland_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 3);
 }
@@ -621,7 +621,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rbisland_state::cchip_irq_clear_cb)
 	m_cchip->ext_interrupt(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(rbisland_state::counters_w)
+void rbisland_state::counters_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);

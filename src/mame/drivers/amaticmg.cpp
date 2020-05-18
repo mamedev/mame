@@ -478,8 +478,8 @@ private:
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	DECLARE_WRITE8_MEMBER(out_a_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
+	void out_a_w(uint8_t data);
+	void out_c_w(uint8_t data);
 	void amaticmg_palette(palette_device &palette) const;
 	void amaticmg2_palette(palette_device &palette) const;
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -623,7 +623,7 @@ WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
 	m_nmi_mask = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER(amaticmg_state::out_a_w)
+void amaticmg_state::out_a_w(uint8_t data)
 {
 /*  LAMPS A:
 
@@ -643,7 +643,7 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
 	logerror("port A: %2X\n", data);
 }
 
-WRITE8_MEMBER(amaticmg_state::out_c_w)
+void amaticmg_state::out_c_w(uint8_t data)
 {
 /*  LAMPS B:
 

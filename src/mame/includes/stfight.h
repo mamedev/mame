@@ -70,10 +70,10 @@ private:
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 
 	// MCU specifics
-	DECLARE_READ8_MEMBER(stfight_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
+	uint8_t stfight_68705_port_b_r();
+	void stfight_68705_port_a_w(uint8_t data);
+	void stfight_68705_port_b_w(uint8_t data);
+	void stfight_68705_port_c_w(uint8_t data);
 
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);

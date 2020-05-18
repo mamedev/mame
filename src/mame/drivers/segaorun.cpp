@@ -300,19 +300,19 @@ const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 //  unknown ports
 //-------------------------------------------------
 
-READ8_MEMBER( segaorun_state::unknown_porta_r )
+uint8_t segaorun_state::unknown_porta_r()
 {
 	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
 	return m_adc->intr_r() << 6;
 }
 
-READ8_MEMBER( segaorun_state::unknown_portb_r )
+uint8_t segaorun_state::unknown_portb_r()
 {
 	//logerror("%06X:read from 8255 port B\n", m_maincpu->pc());
 	return 0;
 }
 
-READ8_MEMBER( segaorun_state::unknown_portc_r )
+uint8_t segaorun_state::unknown_portc_r()
 {
 	//logerror("%06X:read from 8255 port C\n", m_maincpu->pc());
 	return 0;
@@ -324,12 +324,12 @@ READ8_MEMBER( segaorun_state::unknown_portc_r )
 //  unknown ports
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::unknown_porta_w )
+void segaorun_state::unknown_porta_w(uint8_t data)
 {
 	//logerror("%06X:write %02X to 8255 port A\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER( segaorun_state::unknown_portb_w )
+void segaorun_state::unknown_portb_w(uint8_t data)
 {
 	//logerror("%06X:write %02X to 8255 port B\n", m_maincpu->pc(), data);
 }
@@ -340,7 +340,7 @@ WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 //  sound interrupt control
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::video_control_w )
+void segaorun_state::video_control_w(uint8_t data)
 {
 	// PPI Output port C:
 	//  D7: SG1 -- connects to sprite chip
@@ -361,7 +361,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 //  for deluxe cabs
 //-------------------------------------------------
 
-READ8_MEMBER( segaorun_state::bankmotor_limit_r )
+uint8_t segaorun_state::bankmotor_limit_r()
 {
 	uint8_t ret = 0xff;
 
@@ -398,7 +398,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 //  for deluxe cabs
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
+void segaorun_state::bankmotor_control_w(uint8_t data)
 {
 	// PPI Output port B
 	data &= 0x0f;

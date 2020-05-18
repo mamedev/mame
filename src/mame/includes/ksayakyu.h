@@ -55,9 +55,9 @@ private:
 	DECLARE_READ8_MEMBER(int_ack_r);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
-	DECLARE_WRITE8_MEMBER(dummy1_w);
-	DECLARE_WRITE8_MEMBER(dummy2_w);
-	DECLARE_WRITE8_MEMBER(dummy3_w);
+	void dummy1_w(uint8_t data);
+	void dummy2_w(uint8_t data);
+	void dummy3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_ksayakyu_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	void ksayakyu_palette(palette_device &palette) const;

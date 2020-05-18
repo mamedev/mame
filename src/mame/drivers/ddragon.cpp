@@ -313,7 +313,7 @@ WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
+void ddragon_state::ddragonba_port_w(uint8_t data)
 {
 	if ((data & 0x8) == 0)
 		m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
@@ -342,7 +342,7 @@ READ_LINE_MEMBER(ddragon_state::subcpu_bus_free_r)
 }
 
 
-WRITE8_MEMBER(darktowr_state::mcu_port_a_w)
+void darktowr_state::mcu_port_a_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: McuWrite %08x %08x\n", machine().describe_context(), offset, data);
 	m_mcu_port_a_out = data;

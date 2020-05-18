@@ -277,7 +277,7 @@ void fromance_state::crtc_refresh()
 	m_screen->configure(512, 256, visarea, refresh);
 }
 
-WRITE8_MEMBER(fromance_state::fromance_gga_data_w)
+void fromance_state::fromance_gga_data_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

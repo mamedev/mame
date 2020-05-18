@@ -820,7 +820,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *************************************/
 
 
-WRITE8_MEMBER(segas32_state::misc_output_0_w)
+void segas32_state::misc_output_0_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(0, data);
@@ -832,7 +832,7 @@ WRITE8_MEMBER(segas32_state::misc_output_0_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::misc_output_1_w)
+void segas32_state::misc_output_1_w(uint8_t data)
 {
 	if (m_sw1_output)
 		(this->*m_sw1_output)(1, data);
@@ -844,21 +844,21 @@ WRITE8_MEMBER(segas32_state::misc_output_1_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_0_w)
+void segas32_state::sw2_output_0_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(0, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::sw2_output_1_w)
+void segas32_state::sw2_output_1_w(uint8_t data)
 {
 	if (m_sw2_output)
 		(this->*m_sw2_output)(1, data);
 }
 
 
-WRITE8_MEMBER(segas32_state::tilebank_external_w)
+void segas32_state::tilebank_external_w(uint8_t data)
 {
 	m_system32_tilebank_external = data;
 }
@@ -2486,13 +2486,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 
 
 
-WRITE8_MEMBER(segas32_cd_state::lamps1_w)
+void segas32_cd_state::lamps1_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(segas32_cd_state::lamps2_w)
+void segas32_cd_state::lamps2_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[8 + i] = BIT(data, i);

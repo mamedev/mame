@@ -92,9 +92,9 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pb_r();
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cb2_w);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -275,7 +275,7 @@ static GFXDECODE_START( gfx_jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xc000, tilesram_layout, 0, 1 )   // user defined
 GFXDECODE_END
 
-READ8_MEMBER(jr100_state::pb_r)
+uint8_t jr100_state::pb_r()
 {
 	uint8_t data = 0x1f;
 	if (m_keyboard_line < 9)
@@ -284,12 +284,12 @@ READ8_MEMBER(jr100_state::pb_r)
 	return data;
 }
 
-WRITE8_MEMBER(jr100_state::pa_w)
+void jr100_state::pa_w(uint8_t data)
 {
 	m_keyboard_line = data & 0x0f;
 }
 
-WRITE8_MEMBER(jr100_state::pb_w)
+void jr100_state::pb_w(uint8_t data)
 {
 	m_use_pcg = BIT(data, 5);
 	m_pb7 = BIT(data, 7);

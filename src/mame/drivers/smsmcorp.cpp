@@ -246,9 +246,9 @@ private:
 	DECLARE_READ8_MEMBER(p03_r);
 	DECLARE_WRITE8_MEMBER(p03_w);
 	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(ppi0_c_r);
-	DECLARE_WRITE8_MEMBER(ppi0_a_w);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	uint8_t ppi0_c_r();
+	void ppi0_a_w(uint8_t data);
+	void ppi0_b_w(uint8_t data);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sms_map(address_map &map);
@@ -396,7 +396,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::ppi0_c_r)
+uint8_t smsmfg_state::ppi0_c_r()
 {
 /*
   PC7 - unused
@@ -414,7 +414,7 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
+void smsmfg_state::ppi0_a_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
 	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
@@ -427,7 +427,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
+void smsmfg_state::ppi0_b_w(uint8_t data)
 {
 	m_lamps[8] = BIT(~data, 7); /* Stand Light */
 	m_lamps[9] = BIT(~data, 6); /* Cancel Light */

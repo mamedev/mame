@@ -84,8 +84,8 @@ public:
 
 private:
 	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( misc_control_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+	void misc_control_w(uint8_t data);
+	void tilemap_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( standard_io_r );
@@ -94,20 +94,20 @@ private:
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_WRITE8_MEMBER( n7751_command_w );
-	DECLARE_WRITE8_MEMBER( n7751_control_w );
+	uint8_t sound_data_r();
+	void n7751_command_w(uint8_t data);
+	void n7751_control_w(uint8_t data);
 	template<int Shift> void n7751_rom_offset_w(uint8_t data);
 
 	// N7751 sound generator CPU read/write handlers
-	DECLARE_READ8_MEMBER( n7751_rom_r );
-	DECLARE_READ8_MEMBER( n7751_p2_r );
-	DECLARE_WRITE8_MEMBER( n7751_p2_w );
+	uint8_t n7751_rom_r();
+	uint8_t n7751_p2_r();
+	void n7751_p2_w(uint8_t data);
 
 	// I8751 MCU read/write handlers
-	DECLARE_WRITE8_MEMBER( mcu_control_w );
-	DECLARE_WRITE8_MEMBER( mcu_io_w );
-	DECLARE_READ8_MEMBER( mcu_io_r );
+	void mcu_control_w(uint8_t data);
+	void mcu_io_w(offs_t offset, uint8_t data);
+	uint8_t mcu_io_r(address_space &space, offs_t offset);
 
 	// I8751-related VBLANK interrupt handlers
 	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);

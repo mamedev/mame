@@ -46,7 +46,7 @@ private:
 	DECLARE_WRITE16_MEMBER(video_ctrl_w);
 	DECLARE_READ16_MEMBER(video_ctrl_r);
 	DECLARE_WRITE16_MEMBER(video_mask_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void counters_w(uint8_t data);
 	void volfied_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);

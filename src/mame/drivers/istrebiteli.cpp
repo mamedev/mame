@@ -161,14 +161,14 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi0_w);
 	DECLARE_READ8_MEMBER(ppi1_r);
 	DECLARE_WRITE8_MEMBER(ppi1_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
+	void sound_w(uint8_t data);
+	void spr0_ctrl_w(uint8_t data);
+	void spr1_ctrl_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(spr_xy_w);
 	DECLARE_WRITE8_MEMBER(moto_spr_xy_w);
 	DECLARE_WRITE8_MEMBER(tileram_w);
 	DECLARE_WRITE8_MEMBER(moto_tileram_w);
-	DECLARE_WRITE8_MEMBER(road_ctrl_w);
+	void road_ctrl_w(uint8_t data);
 	DECLARE_VIDEO_START(moto);
 
 	required_device<cpu_device> m_maincpu;
@@ -362,7 +362,7 @@ WRITE8_MEMBER(istrebiteli_state::moto_tileram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(istrebiteli_state::road_ctrl_w)
+void istrebiteli_state::road_ctrl_w(uint8_t data)
 {
 	m_road_scroll = data;
 }
@@ -384,7 +384,7 @@ WRITE8_MEMBER(istrebiteli_state::ppi1_w)
 	m_ppi1->write(offset ^ 3, data ^ 0xff);
 }
 
-WRITE8_MEMBER(istrebiteli_state::sound_w)
+void istrebiteli_state::sound_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	if (data & 1)
@@ -392,14 +392,14 @@ WRITE8_MEMBER(istrebiteli_state::sound_w)
 	m_sound_dev->sound_w(data);
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
+void istrebiteli_state::spr0_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl[0] = data;
 	if (data & 0x80)
 		m_spr_collision[0] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr1_ctrl_w)
+void istrebiteli_state::spr1_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl[1] = data;
 	if (data & 0x80)

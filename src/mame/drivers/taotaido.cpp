@@ -90,7 +90,7 @@ READ16_MEMBER(taotaido_state::pending_command_r)
 	return m_soundlatch->pending_r();
 }
 
-WRITE8_MEMBER(taotaido_state::unknown_output_w)
+void taotaido_state::unknown_output_w(uint8_t data)
 {
 	m_watchdog->write_line_ck(BIT(data, 7));
 

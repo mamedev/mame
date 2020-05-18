@@ -53,11 +53,11 @@ private:
 	DECLARE_WRITE16_MEMBER(bg2ram_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
 
-	DECLARE_WRITE8_MEMBER(soundio_port_a_w);
-	DECLARE_READ8_MEMBER(soundio_port_b_r);
-	DECLARE_WRITE8_MEMBER(soundio_port_b_w);
-	DECLARE_READ8_MEMBER(soundio_port_c_r);
-	DECLARE_WRITE8_MEMBER(soundio_port_c_w);
+	void soundio_port_a_w(uint8_t data);
+	uint8_t soundio_port_b_r();
+	void soundio_port_b_w(uint8_t data);
+	uint8_t soundio_port_c_r();
+	void soundio_port_c_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(to_pic_w);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);

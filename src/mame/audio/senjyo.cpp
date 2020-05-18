@@ -14,7 +14,7 @@ const z80_daisy_config senjyo_daisy_chain[] =
 
 /* z80 pio */
 
-READ8_MEMBER(senjyo_state::pio_pa_r)
+uint8_t senjyo_state::pio_pa_r()
 {
 	return m_sound_cmd;
 }

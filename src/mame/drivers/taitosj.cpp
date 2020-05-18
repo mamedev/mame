@@ -173,7 +173,7 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
+void taitosj_state::taitosj_sndnmi_msk_w(uint8_t data)
 {
 	/* B0 is the sound nmi enable, active low */
 	m_soundnmi->in_w<0>((~data)&1);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(taitosj_state::soundlatch_w)
 }
 
 
-WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
+void taitosj_state::input_port_4_f0_w(uint8_t data)
 {
 	m_input_port_4_f0 = data >> 4;
 }
@@ -1770,7 +1770,7 @@ DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_OUTPUT(NODE_02, 9637)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
+void taitosj_state::taitosj_dacvol_w(uint8_t data)
 {
 	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }

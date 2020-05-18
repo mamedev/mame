@@ -342,7 +342,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
  *
  *************************************/
 
-WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
+void spiders_state::gfx_rom_intf_w(uint8_t data)
 {
 	m_gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
 	m_gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
@@ -350,7 +350,7 @@ WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
 }
 
 
-READ8_MEMBER(spiders_state::gfx_rom_r)
+uint8_t spiders_state::gfx_rom_r()
 {
 	uint8_t ret;
 

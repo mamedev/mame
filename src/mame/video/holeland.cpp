@@ -84,7 +84,7 @@ WRITE8_MEMBER(holeland_state::colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::pal_offs_w)
+void holeland_state::pal_offs_w(uint8_t data)
 {
 	if ((m_palette_offset >> 4) != (data & 3))
 	{

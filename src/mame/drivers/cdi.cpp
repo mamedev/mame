@@ -448,7 +448,7 @@ void quizard_state::mcu_rx(uint8_t data)
 	}
 }
 
-READ8_MEMBER(quizard_state::mcu_p1_r)
+uint8_t quizard_state::mcu_p1_r()
 {
 	LOG("%s: MCU Port 1 Read\n", machine().describe_context());
 	return 0;

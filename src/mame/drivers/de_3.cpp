@@ -42,35 +42,35 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void pia34_pa_w(uint8_t data);
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
+	void pia2c_pa_w(uint8_t data);
+	uint8_t pia2c_pb_r();
+	void pia2c_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } // comma1&2
-	DECLARE_READ8_MEMBER(pia28_w7_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { }
+	uint8_t pia28_w7_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { }
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
 	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(dac_w) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
+	uint8_t dmd_status_r();
 
 //  DECLARE_READ8_MEMBER(sound_latch_r);
 //  DECLARE_WRITE8_MEMBER(sample_bank_w);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
+	void lamps_w(offs_t offset, uint8_t data);
 
 	void de_3(machine_config &config);
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER( de_3_state::sol3_w )
 {
 }
 
-WRITE8_MEMBER( de_3_state::sound_w )
+void de_3_state::sound_w(uint8_t data)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
@@ -184,13 +184,13 @@ WRITE_LINE_MEMBER( de_3_state::pia21_ca2_w )
 }
 
 // 6821 PIA at 0x2400
-WRITE8_MEMBER( de_3_state::lamp0_w )
+void de_3_state::lamp0_w(uint8_t data)
 {
 }
 
 
 // 6821 PIA at 0x2800
-WRITE8_MEMBER( de_3_state::dig0_w )
+void de_3_state::dig0_w(uint8_t data)
 {
 //  static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 //  data &= 0x7f;
@@ -201,7 +201,7 @@ WRITE8_MEMBER( de_3_state::dig0_w )
 //  m_segment2 = 0;
 }
 
-WRITE8_MEMBER( de_3_state::dig1_w )
+void de_3_state::dig1_w(uint8_t data)
 {
 //  m_segment2 |= data;
 //  m_segment2 |= 0x30000;
@@ -215,7 +215,7 @@ WRITE8_MEMBER( de_3_state::dig1_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia28_w7_r )
+uint8_t de_3_state::pia28_w7_r()
 {
 	uint8_t ret = 0x80;
 
@@ -226,7 +226,7 @@ READ8_MEMBER( de_3_state::pia28_w7_r )
 }
 
 // 6821 PIA at 0x2c00
-WRITE8_MEMBER( de_3_state::pia2c_pa_w )
+void de_3_state::pia2c_pa_w(uint8_t data)
 {
 	/* DMD data */
 	if(m_dmdtype2)
@@ -248,7 +248,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia2c_pb_r )
+uint8_t de_3_state::pia2c_pb_r()
 {
 	if(m_dmdtype1)
 		return m_dmdtype1->busy_r();
@@ -257,7 +257,7 @@ READ8_MEMBER( de_3_state::pia2c_pb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( de_3_state::pia2c_pb_w )
+void de_3_state::pia2c_pb_w(uint8_t data)
 {
 	/* DMD ctrl */
 	if(m_dmdtype2)
@@ -282,14 +282,14 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 
 
 // 6821 PIA at 0x3000
-READ8_MEMBER( de_3_state::switch_r )
+uint8_t de_3_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3_state::switch_w )
+void de_3_state::switch_w(uint8_t data)
 {
 	int x;
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER( de_3_state::switch_w )
 }
 
 // 6821 PIA at 0x3400
-WRITE8_MEMBER( de_3_state::pia34_pa_w )
+void de_3_state::pia34_pa_w(uint8_t data)
 {
 	// Not connected?
 //  m_segment2 |= (data<<8);
@@ -314,7 +314,7 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::dmd_status_r )
+uint8_t de_3_state::dmd_status_r()
 {
 	if(m_dmdtype1)
 	{
@@ -327,54 +327,54 @@ READ8_MEMBER( de_3_state::dmd_status_r )
 	return 0;
 }
 
-READ8_MEMBER(de_3_state::display_r)
+uint8_t de_3_state::display_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
 	switch(offset)
 	{
 	case 0:
-		ret = pia28_w7_r(space,0);
+		ret = pia28_w7_r();
 		break;
 	case 3:
-		ret = pia2c_pb_r(space,0);
+		ret = pia2c_pb_r();
 		break;
 	}
 
 	return ret;
 }
 
-WRITE8_MEMBER(de_3_state::display_w)
+void de_3_state::display_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		dig0_w(space,0,data);
+		dig0_w(data);
 		break;
 	case 1:
-		dig1_w(space,0,data);
+		dig1_w(data);
 		break;
 	case 2:
-		pia2c_pa_w(space,0,data);
+		pia2c_pa_w(data);
 		break;
 	case 3:
-		pia2c_pb_w(space,0,data);
+		pia2c_pb_w(data);
 		break;
 	case 4:
-		pia34_pa_w(space,0,data);
+		pia34_pa_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER(de_3_state::lamps_w)
+void de_3_state::lamps_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case 0:
-		lamp0_w(space,0,data);
+		lamp0_w(data);
 		break;
 	case 1:
-		lamp1_w(space,0,data);
+		lamp1_w(data);
 		break;
 	}
 }

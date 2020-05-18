@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
 	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
-	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
+	uint8_t superwng_sound_byte_r();
 	DECLARE_WRITE8_MEMBER(superwng_unk_a187_w);
 	DECLARE_WRITE8_MEMBER(superwng_unk_a185_w);
 
@@ -254,7 +254,7 @@ WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(superwng_state::superwng_sound_byte_r)
+uint8_t superwng_state::superwng_sound_byte_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;

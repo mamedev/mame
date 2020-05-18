@@ -60,9 +60,9 @@ public:
 
 private:
 	// main CPU read/write handlers
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(misc_output_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
+	void output1_w(uint8_t data);
+	void misc_output_w(uint8_t data);
+	void output2_w(uint8_t data);
 
 	// linked cabinet specific handlers
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
@@ -70,7 +70,7 @@ private:
 	DECLARE_READ16_MEMBER(link_r);
 	DECLARE_READ16_MEMBER(link2_r);
 	DECLARE_WRITE16_MEMBER(link2_w);
-//  DECLARE_READ8_MEMBER(link_portc0_r);
+//  uint8_t link_portc0_r();
 
 	// input helpers
 	ioport_value analog_mux();

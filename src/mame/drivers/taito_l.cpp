@@ -241,7 +241,7 @@ READ8_MEMBER(fhawk_state::slave_rombank_r)
 	return m_slave_rombank;
 }
 
-WRITE8_MEMBER(taitol_state::coin_control_w)
+void taitol_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -303,7 +303,7 @@ WRITE8_MEMBER(champwr_state::msm5205_stop_w)
 	m_adpcm_pos &= 0x1ff00;
 }
 
-WRITE8_MEMBER(champwr_state::msm5205_volume_w)
+void champwr_state::msm5205_volume_w(u8 data)
 {
 	m_msm->set_output_gain(0, data / 255.0);
 }
@@ -1310,7 +1310,7 @@ static INPUT_PORTS_START( evilston )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(fhawk_state::portA_w)
+void fhawk_state::portA_w(u8 data)
 {
 	m_audio_bnk->set_entry(data & 0x03);
 	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );

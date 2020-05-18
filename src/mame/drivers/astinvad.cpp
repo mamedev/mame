@@ -84,11 +84,11 @@ private:
 	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound1_w);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
+	void kamikaze_sound1_w(uint8_t data);
+	void kamikaze_sound2_w(uint8_t data);
+	void spcking2_sound1_w(uint8_t data);
+	void spcking2_sound2_w(uint8_t data);
+	void spcking2_sound3_w(uint8_t data);
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -365,7 +365,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
  *************************************/
 
 // Kamikaze
-WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
+void astinvad_state::kamikaze_sound1_w(uint8_t data)
 {
 	// d0: ufo sound generator
 	// d1: fire sound generator
@@ -388,7 +388,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	machine().sound().system_enable(data & 0x20);
 }
 
-WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
+void astinvad_state::kamikaze_sound2_w(uint8_t data)
 {
 	// d0: red screen -> to video board
 	// d1: invaders advancing sound generator
@@ -407,7 +407,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
 }
 
 // Space King 2
-WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
+void astinvad_state::spcking2_sound1_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -422,7 +422,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
 	m_screen_red = data & 0x04; // ?
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
+void astinvad_state::spcking2_sound2_w(uint8_t data)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -437,7 +437,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
 	m_player = BIT(data, 5);
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound3_w)
+void astinvad_state::spcking2_sound3_w(uint8_t data)
 {
 	// ?
 }

@@ -463,24 +463,24 @@ WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
 	m_ta7630->set_device_volume(m_msm, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay1_w)
+void buggychl_state::ta7630_volbal_ay1_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay1, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_0_w)
+void buggychl_state::port_b_0_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_ay2_w)
+void buggychl_state::ta7630_volbal_ay2_w(uint8_t data)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 	m_ta7630->set_device_volume(m_ay2, data >> 4);
 }
 
-WRITE8_MEMBER(buggychl_state::port_b_1_w)
+void buggychl_state::port_b_1_w(uint8_t data)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }

@@ -62,8 +62,8 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	uint32_t eeprom_r();
+	void eeprom_w(uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
@@ -92,12 +92,12 @@ inline void ATTR_PRINTF(3,4) _39in1_state::verboselog(int n_level, const char *s
 	}
 }
 
-READ32_MEMBER(_39in1_state::eeprom_r)
+uint32_t _39in1_state::eeprom_r()
 {
 	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_w)
+void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 {
 	if (BIT(mem_mask, 2))
 		m_eeprom->cs_write(ASSERT_LINE);

@@ -1147,7 +1147,7 @@ WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 //  uPD7759 control register
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16b_state::upd7759_control_w )
+void segas16b_state::upd7759_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 //  bit in the top bit
 //-------------------------------------------------
 
-READ8_MEMBER( segas16b_state::upd7759_status_r )
+uint8_t segas16b_state::upd7759_status_r()
 {
 	return m_upd7759->busy_r() << 7;
 }
@@ -1910,7 +1910,7 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(dfjail_state::sound_control_w)
+void dfjail_state::sound_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 
@@ -1930,7 +1930,7 @@ WRITE8_MEMBER(dfjail_state::sound_control_w)
 	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 }
 
-WRITE8_MEMBER(dfjail_state::dac_data_w)
+void dfjail_state::dac_data_w(uint8_t data)
 {
 	// TODO: understand how this is hooked up
 	#if 0
@@ -1984,7 +1984,7 @@ void segas16b_state::lockonph_sound_iomap(address_map &map)
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-WRITE8_MEMBER(segas16b_state::spin_68k_w)
+void segas16b_state::spin_68k_w(uint8_t data)
 {
 	// this is probably a hack but otherwise the 68k and i8751 end up fighting
 	// on 'goldnaxe' causing hangs in various places.  maybe the interrupts

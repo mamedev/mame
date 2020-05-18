@@ -971,19 +971,19 @@ void stv_state::stv_select_game(int gameno)
 	}
 }
 
-READ8_MEMBER( stv_state::pdr1_input_r )
+uint8_t stv_state::pdr1_input_r()
 {
 	return (ioport("PDR1")->read() & 0x40) | 0x3f;
 }
 
 
-READ8_MEMBER( stv_state::pdr2_input_r )
+uint8_t stv_state::pdr2_input_r()
 {
 	return (ioport("PDR2")->read() & ~0x19) | 0x18 | (m_eeprom->do_read()<<0);
 }
 
 
-WRITE8_MEMBER( stv_state::pdr1_output_w )
+void stv_state::pdr1_output_w(uint8_t data)
 {
 	m_eeprom->clk_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write((data >> 4) & 1);
@@ -992,7 +992,7 @@ WRITE8_MEMBER( stv_state::pdr1_output_w )
 	stv_select_game(data & 3);
 }
 
-WRITE8_MEMBER( stv_state::pdr2_output_w )
+void stv_state::pdr2_output_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = ((data & 0x10) >> 4) ^ 1;

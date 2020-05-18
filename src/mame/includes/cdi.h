@@ -99,7 +99,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(mcu_p1_r);
+	uint8_t mcu_p1_r();
 
 	void mcu_tx(uint8_t data);
 	void mcu_calculate_state();

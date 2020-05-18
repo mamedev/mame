@@ -58,9 +58,9 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(output_a_w);
-	DECLARE_WRITE8_MEMBER(output_b_w);
-	DECLARE_WRITE8_MEMBER(output_c_w);
+	void output_a_w(u8 data);
+	void output_b_w(u8 data);
+	void output_c_w(u8 data);
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
@@ -111,7 +111,7 @@ void clpoker_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-WRITE8_MEMBER(clpoker_state::output_a_w)
+void clpoker_state::output_a_w(u8 data)
 {
 	if (data != 0xff)
 	{
@@ -120,11 +120,11 @@ WRITE8_MEMBER(clpoker_state::output_a_w)
 	}
 }
 
-WRITE8_MEMBER(clpoker_state::output_b_w)
+void clpoker_state::output_b_w(u8 data)
 {
 }
 
-WRITE8_MEMBER(clpoker_state::output_c_w)
+void clpoker_state::output_c_w(u8 data)
 {
 	m_nmi_enable = BIT(data, 1);
 	if (!m_nmi_enable)

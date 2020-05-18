@@ -199,7 +199,7 @@ void volfied_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(volfied_state::counters_w)
+void volfied_state::counters_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);

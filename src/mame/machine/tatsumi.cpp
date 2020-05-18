@@ -101,7 +101,7 @@ WRITE16_MEMBER(apache3_state::apache3_z80_w)
 	m_apache3_z80_ram[offset] = data & 0xff;
 }
 
-READ8_MEMBER(apache3_state::apache3_vr1_r)
+uint8_t apache3_state::apache3_vr1_r()
 {
 	return (uint8_t)((255./100) * (100 - m_vr1->read()));
 }
@@ -225,7 +225,7 @@ WRITE16_MEMBER(roundup5_state::road_vregs_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
+void cyclwarr_state::cyclwarr_control_w(uint8_t data)
 {
 	m_control_word = data;
 

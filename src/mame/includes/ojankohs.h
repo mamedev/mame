@@ -105,8 +105,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ojankohs_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(ojankoc_videoram_w);
 	DECLARE_WRITE8_MEMBER(ojankohs_adpcm_reset_w);
-	DECLARE_READ8_MEMBER(ojankohs_dipsw1_r);
-	DECLARE_READ8_MEMBER(ojankohs_dipsw2_r);
+	uint8_t ojankohs_dipsw1_r();
+	uint8_t ojankohs_dipsw2_r();
 	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
 	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
 	DECLARE_MACHINE_START(ojankohs);

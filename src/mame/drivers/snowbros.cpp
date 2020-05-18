@@ -226,7 +226,7 @@ void snowbros_state::sound_io_map(address_map &map)
 /* Semicom AT89C52 MCU */
 
 // probably not endian safe
-WRITE8_MEMBER(snowbros_state::prot_p0_w)
+void snowbros_state::prot_p0_w(uint8_t data)
 {
 	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
 	word = (word & 0xff00) | (data << 0);
@@ -234,14 +234,14 @@ WRITE8_MEMBER(snowbros_state::prot_p0_w)
 }
 
 // probably not endian safe
-WRITE8_MEMBER(snowbros_state::prot_p1_w)
+void snowbros_state::prot_p1_w(uint8_t data)
 {
 	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
 	word = (word & 0x00ff) | (data << 8);
 	m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
 }
 
-WRITE8_MEMBER(snowbros_state::prot_p2_w)
+void snowbros_state::prot_p2_w(uint8_t data)
 {
 	// offset
 	m_semicom_prot_offset = data;

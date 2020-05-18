@@ -186,27 +186,27 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 /* Emulate MSM sound samples with counters */
 
 
-READ8_MEMBER(tehkanwc_state::portA_r)
+uint8_t tehkanwc_state::portA_r()
 {
 	return m_msm_data_offs & 0xff;
 }
 
-READ8_MEMBER(tehkanwc_state::portB_r)
+uint8_t tehkanwc_state::portB_r()
 {
 	return (m_msm_data_offs >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portA_w)
+void tehkanwc_state::portA_w(uint8_t data)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portB_w)
+void tehkanwc_state::portB_w(uint8_t data)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
+void tehkanwc_state::msm_reset_w(uint8_t data)
 {
 	m_msm->reset_w(data ? 0 : 1);
 }

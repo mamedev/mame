@@ -97,10 +97,10 @@ private:
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
-	DECLARE_WRITE8_MEMBER(sound_control_0_w);
-	DECLARE_WRITE8_MEMBER(sound_control_1_w);
-	DECLARE_WRITE8_MEMBER(sound_control_2_w);
-	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	void sound_control_0_w(uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void sound_control_2_w(uint8_t data);
+	void sound_control_3_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);

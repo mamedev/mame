@@ -54,13 +54,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
-	DECLARE_WRITE8_MEMBER(ic10_a_w);
-	DECLARE_WRITE8_MEMBER(ic10_b_w);
-	DECLARE_WRITE8_MEMBER(ic11_a_w);
-	DECLARE_WRITE8_MEMBER(ic2_b_w);
-	DECLARE_WRITE8_MEMBER(ic2_a_w);
-	DECLARE_READ8_MEMBER(ic11_b_r);
-	DECLARE_READ8_MEMBER(ic2_a_r);
+	void ic10_a_w(uint8_t data);
+	void ic10_b_w(uint8_t data);
+	void ic11_a_w(uint8_t data);
+	void ic2_b_w(uint8_t data);
+	void ic2_a_w(uint8_t data);
+	uint8_t ic11_b_r();
+	uint8_t ic2_a_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 
@@ -253,7 +253,7 @@ INPUT_CHANGED_MEMBER( hankin_state::self_test )
 	m_ic11->ca1_w(newval);
 }
 
-WRITE8_MEMBER( hankin_state::ic10_a_w )
+void hankin_state::ic10_a_w(uint8_t data)
 {
 	m_ic10a = data;
 
@@ -283,7 +283,7 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 	}
 }
 
-WRITE8_MEMBER( hankin_state::ic10_b_w )
+void hankin_state::ic10_b_w(uint8_t data)
 {
 	m_ic10b = data;
 
@@ -324,7 +324,7 @@ WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
 	m_ic10_cb2 = state;
 }
 
-WRITE8_MEMBER( hankin_state::ic11_a_w )
+void hankin_state::ic11_a_w(uint8_t data)
 {
 	m_ic11a = data;
 
@@ -349,7 +349,7 @@ WRITE8_MEMBER( hankin_state::ic11_a_w )
 	}
 }
 
-READ8_MEMBER( hankin_state::ic11_b_r )
+uint8_t hankin_state::ic11_b_r()
 {
 	uint8_t data = 0;
 
@@ -429,13 +429,13 @@ void hankin_state::machine_reset()
 }
 
 // PA0-3 = sound data from main cpu
-READ8_MEMBER( hankin_state::ic2_a_r )
+uint8_t hankin_state::ic2_a_r()
 {
 	return m_ic10b;
 }
 
 // PA4-7 = sound data to prom
-WRITE8_MEMBER( hankin_state::ic2_a_w )
+void hankin_state::ic2_a_w(uint8_t data)
 {
 	m_ic2a = data >> 4;
 	offs_t offs = (m_timer_s[2] & 31) | (m_ic2a << 5);
@@ -444,7 +444,7 @@ WRITE8_MEMBER( hankin_state::ic2_a_w )
 
 // PB0-3 = preset on 74LS161
 // PB4-7 = volume
-WRITE8_MEMBER( hankin_state::ic2_b_w )
+void hankin_state::ic2_b_w(uint8_t data)
 {
 	m_ic2b = data;
 

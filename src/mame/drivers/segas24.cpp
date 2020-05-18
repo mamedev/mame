@@ -542,36 +542,36 @@ WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
 
 // I/O Mappers
 
-READ8_MEMBER(segas24_state::dcclub_p1_r)
+uint8_t segas24_state::dcclub_p1_r()
 {
 	static const uint8_t pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
 	return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
 }
 
-READ8_MEMBER(segas24_state::dcclub_p3_r)
+uint8_t segas24_state::dcclub_p3_r()
 {
 	static const uint8_t pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
 	return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
 }
 
 
-READ8_MEMBER(segas24_state::mahmajn_input_line_r)
+uint8_t segas24_state::mahmajn_input_line_r()
 {
 	return ~(1 << m_cur_input_line);
 }
 
-READ8_MEMBER(segas24_state::mahmajn_inputs_r)
+uint8_t segas24_state::mahmajn_inputs_r()
 {
 	return m_mj_inputs[m_cur_input_line].read_safe(0xff);
 }
 
-WRITE8_MEMBER(segas24_state::mahmajn_mux_w)
+void segas24_state::mahmajn_mux_w(uint8_t data)
 {
 	if(data & 4)
 		m_cur_input_line = (m_cur_input_line + 1) & 7;
 }
 
-WRITE8_MEMBER(segas24_state::hotrod_lamps_w)
+void segas24_state::hotrod_lamps_w(uint8_t data)
 {
 	// Lamps
 }

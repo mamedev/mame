@@ -60,12 +60,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
 
-	DECLARE_WRITE8_MEMBER(misc_output_0_w);
-	DECLARE_WRITE8_MEMBER(misc_output_1_w);
-	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
-	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
+	void misc_output_0_w(uint8_t data);
+	void misc_output_1_w(uint8_t data);
+	void sw2_output_0_w(uint8_t data);
+	void sw2_output_1_w(uint8_t data);
 	template<int Which> DECLARE_WRITE_LINE_MEMBER(display_enable_w);
-	DECLARE_WRITE8_MEMBER(tilebank_external_w);
+	void tilebank_external_w(uint8_t data);
 
 protected:
 	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32);
@@ -329,8 +329,8 @@ class segas32_cd_state : public segas32_state
 public:
 	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 

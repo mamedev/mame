@@ -215,7 +215,7 @@ void taitoh_state::sound_bankswitch_w(u8 data)
 	m_z80bank->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(taitoh_state::coin_control_w)
+void taitoh_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);

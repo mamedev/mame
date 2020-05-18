@@ -286,10 +286,10 @@ private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sub_irq_ack_w);
-	DECLARE_READ8_MEMBER(saiyugoub1_mcu_command_r);
+	uint8_t saiyugoub1_mcu_command_r();
 	DECLARE_WRITE8_MEMBER(saiyugoub1_mcu_command_w);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_rom_addr_w);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_control_w);
+	void saiyugoub1_adpcm_rom_addr_w(uint8_t data);
+	void saiyugoub1_adpcm_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(saiyugoub1_m5205_clk_w);
 	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
@@ -410,7 +410,7 @@ WRITE8_MEMBER(chinagat_state::sub_irq_ack_w)
 	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
+uint8_t chinagat_state::saiyugoub1_mcu_command_r()
 {
 #if 0
 	if (m_mcu_command == 0x78)
@@ -432,13 +432,13 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
 #endif
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
+void chinagat_state::saiyugoub1_adpcm_rom_addr_w(uint8_t data)
 {
 	/* i8748 Port 1 write */
 	m_i8748_P1 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
+void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 {
 	/* i8748 Port 2 write */
 	uint8_t *saiyugoub1_adpcm_rom = memregion("adpcm")->base();

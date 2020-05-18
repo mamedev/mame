@@ -882,7 +882,7 @@ or to advance into the tests.
 		m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
+void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 {
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;

@@ -1435,7 +1435,7 @@ void dcs_audio_device::dmovlay_remap_memory()
 	}
 }
 
-WRITE32_MEMBER(dcs_audio_device::dmovlay_callback)
+void dcs_audio_device::dmovlay_callback(uint32_t data)
 {
 	// Do some checking first
 	if (data < 0 || data > 1) {
@@ -2073,7 +2073,7 @@ void dcs_audio_device::recompute_sample_rate()
 	}
 }
 
-WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
+void dcs_audio_device::sound_tx_callback(offs_t offset, uint32_t data)
 {
 	/* check if it's for SPORT1 */
 	if (offset != 1) {

@@ -129,13 +129,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_WRITE8_MEMBER(output_a_w);
-	DECLARE_WRITE8_MEMBER(output_b_w);
-	DECLARE_WRITE8_MEMBER(output_c_w);
+	void output_a_w(uint8_t data);
+	void output_b_w(uint8_t data);
+	void output_c_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(lpt_status_r);
-	DECLARE_WRITE8_MEMBER(lpt_data_w);
-	DECLARE_WRITE8_MEMBER(rtc_control_w);
+	uint8_t lpt_status_r();
+	void lpt_data_w(uint8_t data);
+	void rtc_control_w(uint8_t data);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
@@ -241,7 +241,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::output_a_w)
+void amusco_state::output_a_w(uint8_t data)
 {
 /* Lamps from port A
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER(amusco_state::output_a_w)
 //  logerror("Writing %02Xh to PPI output A\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_b_w)
+void amusco_state::output_b_w(uint8_t data)
 {
 /* Lamps and counters from port B
 
@@ -283,7 +283,7 @@ WRITE8_MEMBER(amusco_state::output_b_w)
 //  logerror("Writing %02Xh to PPI output B\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_c_w)
+void amusco_state::output_c_w(uint8_t data)
 {
 /* Lamps and counters from port C
 
@@ -311,7 +311,7 @@ WRITE8_MEMBER(amusco_state::vram_w)
 //  printf("%04x %04x\n",m_video_update_address,data);
 }
 
-READ8_MEMBER(amusco_state::lpt_status_r)
+uint8_t amusco_state::lpt_status_r()
 {
 	// Bit 0 = busy
 	// Bit 1 = paper jam (active low)
@@ -320,7 +320,7 @@ READ8_MEMBER(amusco_state::lpt_status_r)
 	return 2;
 }
 
-WRITE8_MEMBER(amusco_state::lpt_data_w)
+void amusco_state::lpt_data_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -357,7 +357,7 @@ WRITE8_MEMBER(amusco_state::lpt_data_w)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::rtc_control_w)
+void amusco_state::rtc_control_w(uint8_t data)
 {
 	m_rtc->address_w(data & 0x0f);
 	m_rtc->cs_w(BIT(data, 6));

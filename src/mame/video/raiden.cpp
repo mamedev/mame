@@ -64,7 +64,7 @@ WRITE8_MEMBER(raidenb_state::raidenb_control_w)
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-WRITE16_MEMBER(raidenb_state::raidenb_layer_enable_w)
+void raidenb_state::raidenb_layer_enable_w(uint16_t data)
 {
 	// d0: back layer disable
 	// d1: fore layer disable

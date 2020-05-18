@@ -44,7 +44,7 @@ private:
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
-	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
+	void tiamc1_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_sprite_x_w);

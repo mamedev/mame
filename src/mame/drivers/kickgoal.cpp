@@ -351,7 +351,7 @@ void kickgoal_state::oki_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
+void kickgoal_state::soundio_port_a_w(uint8_t data)
 {
 	// only time this ever gets a different value is the high score name entry, these banks are correct based on sample positions
 	switch (data)
@@ -362,23 +362,23 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 	}
 }
 
-READ8_MEMBER(kickgoal_state::soundio_port_b_r)
+uint8_t kickgoal_state::soundio_port_b_r()
 {
 	return m_pic_portb;
 }
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_b_w)
+void kickgoal_state::soundio_port_b_w(uint8_t data)
 {
 	m_pic_portb = data;
 }
 
-READ8_MEMBER(kickgoal_state::soundio_port_c_r)
+uint8_t kickgoal_state::soundio_port_c_r()
 {
 	// 0x20 = sound command ready?
 	return (m_pic_portc & ~0x20) | m_sound_command_sent;
 }
 
-WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
+void kickgoal_state::soundio_port_c_w(uint8_t data)
 {
 	if ((data & 0x10) != (m_pic_portc & 0x10))
 	{

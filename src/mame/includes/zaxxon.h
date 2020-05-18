@@ -119,11 +119,11 @@ private:
 	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_int);
-	DECLARE_WRITE8_MEMBER(zaxxon_sound_a_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_sound_b_w);
-	DECLARE_WRITE8_MEMBER(zaxxon_sound_c_w);
-	DECLARE_WRITE8_MEMBER(congo_sound_b_w);
-	DECLARE_WRITE8_MEMBER(congo_sound_c_w);
+	void zaxxon_sound_a_w(uint8_t data);
+	void zaxxon_sound_b_w(uint8_t data);
+	void zaxxon_sound_c_w(uint8_t data);
+	void congo_sound_b_w(uint8_t data);
+	void congo_sound_c_w(uint8_t data);
 	void video_start_common(tilemap_get_info_delegate &&fg_tile_info);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int skew);
 	inline int find_minimum_y(uint8_t value, int flip);

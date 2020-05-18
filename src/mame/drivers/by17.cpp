@@ -104,13 +104,13 @@ private:
 	output_finder<5, 8> m_digits;
 	output_finder<20> m_solenoids;
 
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
 	DECLARE_READ8_MEMBER(nibble_nvram_r);
 	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
@@ -599,12 +599,12 @@ WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( by17_state::u10_a_r )
+uint8_t by17_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( by17_state::u10_a_w )
+void by17_state::u10_a_w(uint8_t data)
 {
 //  logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
@@ -642,7 +642,7 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 	m_u10a = data;
 }
 
-READ8_MEMBER( by17_state::u10_b_r )
+uint8_t by17_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -676,17 +676,17 @@ READ8_MEMBER( by17_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by17_state::u10_b_w )
+void by17_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( by17_state::u11_a_r )
+uint8_t by17_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( by17_state::u11_a_w )
+void by17_state::u11_a_w(uint8_t data)
 {
 	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
@@ -725,7 +725,7 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 	m_u11a = data;
 }
 
-WRITE8_MEMBER( by17_state::u11_b_w )
+void by17_state::u11_b_w(uint8_t data)
 {
 	if (!m_u11_cb2)
 	{

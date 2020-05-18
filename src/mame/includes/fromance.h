@@ -45,7 +45,7 @@ public:
 
 	void init_common();
 
-	DECLARE_WRITE8_MEMBER(fromance_gga_data_w);
+	void fromance_gga_data_w(offs_t offset, uint8_t data);
 
 protected:
 	required_device<cpu_device> m_maincpu;
