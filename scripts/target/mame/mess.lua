@@ -3360,6 +3360,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_renaissance.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_schess.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_simultano.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_stratos.cpp",

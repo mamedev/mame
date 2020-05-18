@@ -35246,6 +35246,9 @@ risc2500a
 @source:saitek_schess.cpp
 schess
 
+@source:saitek_simultano.cpp
+simultano
+
 @source:saitek_ssystem3.cpp
 ssystem3
 ssystem4

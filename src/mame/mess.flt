@@ -814,6 +814,7 @@ saitek_prschess.cpp
 saitek_renaissance.cpp
 saitek_risc2500.cpp
 saitek_schess.cpp
+saitek_simultano.cpp
 saitek_ssystem3.cpp
 saitek_stratos.cpp
 saitek_superstar.cpp
