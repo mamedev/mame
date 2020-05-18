@@ -99,6 +99,7 @@ namespace netlist
 		{
 			using chip_enable_time = times_ns2<15, 15>;
 			using access_time = time_ns<35>;
+			static constexpr const size_t data_name_offset = 0; // O0, O1, ..
 		};
 
 		struct desc_82S123
