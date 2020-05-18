@@ -37,10 +37,10 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
+	void porta_w(u8 data);
+	void portb_w(u8 data);
+	u8 porta_r();
+	u8 portb_r();
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	void maincpu_map(address_map &map);
@@ -79,26 +79,26 @@ TIMER_DEVICE_CALLBACK_MEMBER( spirit76_state::irq )
 }
 
 // continual write in irq routine
-WRITE8_MEMBER( spirit76_state::porta_w )
+void spirit76_state::porta_w(u8 data)
 {
 	printf("PORT A=%X\n",data);
 }
 
 // continual write in irq routine
-WRITE8_MEMBER( spirit76_state::portb_w )
+void spirit76_state::portb_w(u8 data)
 {
 	printf("PORT B=%X\n",data);
 }
 
 // continual read in irq routine
-READ8_MEMBER( spirit76_state::porta_r )
+u8 spirit76_state::porta_r()
 {
 	printf("Read PORT A\n");
 	return 0xff;
 }
 
 // might not be used?
-READ8_MEMBER( spirit76_state::portb_r )
+u8 spirit76_state::portb_r()
 {
 	printf("Read PORT B\n");
 	return 0xff;

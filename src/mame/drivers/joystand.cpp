@@ -189,8 +189,8 @@ private:
 	bool bg15_tiles_dirty;
 
 	// eeprom
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	uint16_t eeprom_r();
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// cart
 	DECLARE_READ16_MEMBER(cart_r);
@@ -374,13 +374,13 @@ WRITE16_MEMBER(joystand_state::oki_bank_w)
 		m_oki->set_rom_bank((data >> 6) & 3);
 }
 
-READ16_MEMBER(joystand_state::eeprom_r)
+uint16_t joystand_state::eeprom_r()
 {
 	// mask 0x0020 ? (active low)
 	// mask 0x0040 ? ""
 	return (m_eeprom->do_read() & 1) << 3;
 }
-WRITE16_MEMBER(joystand_state::eeprom_w)
+void joystand_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

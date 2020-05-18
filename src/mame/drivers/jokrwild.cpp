@@ -111,8 +111,8 @@ private:
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
 	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(testa_w);
-	DECLARE_WRITE8_MEMBER(testb_w);
+	void testa_w(uint8_t data);
+	void testb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void jokrwild_palette(palette_device &palette) const;
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -399,12 +399,12 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-WRITE8_MEMBER(jokrwild_state::testa_w)
+void jokrwild_state::testa_w(uint8_t data)
 {
 //  printf("%02x A\n",data);
 }
 
-WRITE8_MEMBER(jokrwild_state::testb_w)
+void jokrwild_state::testb_w(uint8_t data)
 {
 //  printf("%02x B\n",data);
 }

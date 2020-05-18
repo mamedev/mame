@@ -1353,10 +1353,10 @@ public:
 	void init_bchancep();
 	void init_bonuspkr();
 
-	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	uint8_t pottnpkr_mux_port_r();
+	void lamps_a_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void mux_w(uint8_t data);
 
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1380,19 +1380,19 @@ protected:
 	optional_device<discrete_device> m_discrete;
 
 private:
-	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
+	uint8_t goldnpkr_mux_port_r();
+	void mux_port_w(uint8_t data);
 	uint8_t ay8910_data_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
+	void pia0_a_w(uint8_t data);
+	void pia0_b_w(uint8_t data);
+	void pia1_a_w(uint8_t data);
+	void pia1_b_w(uint8_t data);
+	uint8_t pia0_a_r();
+	uint8_t pia0_b_r();
+	uint8_t pia1_a_r();
+	uint8_t pia1_b_r();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
@@ -1448,8 +1448,8 @@ public:
 private:
 	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
-	DECLARE_WRITE8_MEMBER(mcu_portc_w);
+	void mcu_portb_w(uint8_t data);
+	void mcu_portc_w(uint8_t data);
 	void megadpkr_banked_map(address_map &map);
 	void megadpkr_map(address_map &map);
 
@@ -1740,7 +1740,7 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
+uint8_t goldnpkr_state::goldnpkr_mux_port_r()
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -1760,7 +1760,7 @@ READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
+uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 {
 	uint8_t pa_0_4 = 0xff, pa_7;  /* Temporary place holder for bits 0 to 4 & 7 */
 
@@ -1777,13 +1777,13 @@ READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_w)
+void goldnpkr_state::mux_w(uint8_t data)
 {
 	//logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_port_w)
+void goldnpkr_state::mux_port_w(uint8_t data)
 {
 	m_pia0_PA_data = data;
 }
@@ -1859,7 +1859,7 @@ void goldnpkr_state::ay8910_control_w(uint8_t data)
   ---- x---  Take Lamp.
 
 */
-WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
+void goldnpkr_state::lamps_a_w(uint8_t data)
 {
 /***** General Lamps and Counters wiring *****
 
@@ -1887,7 +1887,7 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 */
 }
 
-WRITE8_MEMBER(goldnpkr_state::sound_w)
+void goldnpkr_state::sound_w(uint8_t data)
 {
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
@@ -1897,43 +1897,43 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	m_discrete->write(NODE_10, data & 0x07);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
+void goldnpkr_state::pia0_a_w(uint8_t data)
 {
 	logerror("pia0_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_b_w)
+void goldnpkr_state::pia0_b_w(uint8_t data)
 {
 	logerror("pia0_b_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_a_w)
+void goldnpkr_state::pia1_a_w(uint8_t data)
 {
 	logerror("pia1_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_b_w)
+void goldnpkr_state::pia1_b_w(uint8_t data)
 {
 	logerror("pia1_b_w: %2x\n", data);
 }
 
 
-READ8_MEMBER(goldnpkr_state::pia0_a_r)
+uint8_t goldnpkr_state::pia0_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia0_b_r)
+uint8_t goldnpkr_state::pia0_b_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_a_r)
+uint8_t goldnpkr_state::pia1_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_b_r)
+uint8_t goldnpkr_state::pia1_b_r()
 {
 	return 0xff;
 }
@@ -4909,12 +4909,12 @@ WRITE8_MEMBER(blitz_state::mcu_command_w)
 	}
 }
 
-WRITE8_MEMBER(blitz_state::mcu_portb_w)
+void blitz_state::mcu_portb_w(uint8_t data)
 {
 	m_cpubank_xor = data;
 }
 
-WRITE8_MEMBER(blitz_state::mcu_portc_w)
+void blitz_state::mcu_portc_w(uint8_t data)
 {
 	if (!BIT(data, 0))
 	{

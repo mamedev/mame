@@ -710,17 +710,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER(freekick_state::snd_rom_addr_l_w)
+void freekick_state::snd_rom_addr_l_w(uint8_t data)
 {
 	m_romaddr = (m_romaddr & 0xff00) | data;
 }
 
-WRITE8_MEMBER(freekick_state::snd_rom_addr_h_w)
+void freekick_state::snd_rom_addr_h_w(uint8_t data)
 {
 	m_romaddr = (m_romaddr & 0x00ff) | (data << 8);
 }
 
-READ8_MEMBER(freekick_state::snd_rom_r)
+uint8_t freekick_state::snd_rom_r()
 {
 	return memregion("user1")->base()[m_romaddr & 0x7fff];
 }

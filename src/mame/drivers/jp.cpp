@@ -48,8 +48,8 @@ public:
 	void jps(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
+	uint8_t porta_r();
+	uint8_t portb_r();
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(out2_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_data_w);
@@ -283,7 +283,7 @@ void jp_state::update_display()
 	}
 }
 
-READ8_MEMBER(jp_state::porta_r)
+uint8_t jp_state::porta_r()
 {
 	uint8_t result = 0xff;
 	if (m_latch[3]->q1_r() == 0)
@@ -295,7 +295,7 @@ READ8_MEMBER(jp_state::porta_r)
 	return result;
 }
 
-READ8_MEMBER(jp_state::portb_r)
+uint8_t jp_state::portb_r()
 {
 	uint8_t result = 0xff;
 	if (m_latch[3]->q1_r() == 0)

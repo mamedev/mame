@@ -106,9 +106,9 @@ private:
 	DECLARE_WRITE8_MEMBER(frame_w);
 	DECLARE_READ8_MEMBER(fdt_r);
 	DECLARE_WRITE8_MEMBER(fdt_w);
-	DECLARE_READ16_MEMBER( fdt_rip_r );
-	DECLARE_WRITE16_MEMBER( fdt_rip_w );
-	DECLARE_READ8_MEMBER(rip_status_in);
+	uint16_t fdt_rip_r(offs_t offset);
+	void fdt_rip_w(offs_t offset, uint16_t data);
+	uint8_t rip_status_in();
 	DECLARE_WRITE8_MEMBER(g_iobus_w);
 	DECLARE_READ8_MEMBER(g_iobus_r);
 	DECLARE_WRITE8_MEMBER(g_ioadd_w);

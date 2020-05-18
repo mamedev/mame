@@ -139,8 +139,8 @@ private:
 	DECLARE_WRITE8_MEMBER(csoki_w);
 	DECLARE_READ8_MEMBER(csoki_r);
 
-	DECLARE_READ8_MEMBER(ay8910_a_r);
-	DECLARE_READ8_MEMBER(ay8910_b_r);
+	uint8_t ay8910_a_r();
+	uint8_t ay8910_b_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
@@ -390,7 +390,7 @@ WRITE8_MEMBER(mgavegas_state::cso2_w)
 }
 
 
-READ8_MEMBER(mgavegas_state::ay8910_a_r)
+uint8_t mgavegas_state::ay8910_a_r()
 {
 	uint8_t ret=0xff;
 
@@ -402,7 +402,7 @@ READ8_MEMBER(mgavegas_state::ay8910_a_r)
 	return ret;
 }
 
-READ8_MEMBER(mgavegas_state::ay8910_b_r)
+uint8_t mgavegas_state::ay8910_b_r()
 {
 	uint8_t ret=0xff;
 

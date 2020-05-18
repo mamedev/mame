@@ -58,7 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(playfield_w);
-	DECLARE_READ8_MEMBER(videoram_r);
+	uint8_t videoram_r(offs_t offset);
 
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

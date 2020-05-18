@@ -26,7 +26,7 @@ void malzak_state::palette_init(palette_device &palette) const
 	}
 }
 
-READ8_MEMBER(malzak_state::videoram_r)
+uint8_t malzak_state::videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }

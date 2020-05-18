@@ -191,7 +191,7 @@ WRITE8_MEMBER(esripsys_state::fdt_w)
  *
  *************************************/
 
-READ16_MEMBER( esripsys_state::fdt_rip_r )
+uint16_t esripsys_state::fdt_rip_r(offs_t offset)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -201,7 +201,7 @@ READ16_MEMBER( esripsys_state::fdt_rip_r )
 		return (m_fdt_b[offset] << 8) | m_fdt_b[offset + 1];
 }
 
-WRITE16_MEMBER( esripsys_state::fdt_rip_w )
+void esripsys_state::fdt_rip_w(offs_t offset, uint16_t data)
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -228,7 +228,7 @@ WRITE16_MEMBER( esripsys_state::fdt_rip_w )
    D7 = /FDONE
 */
 
-READ8_MEMBER(esripsys_state::rip_status_in)
+uint8_t esripsys_state::rip_status_in()
 {
 	int vpos =  m_screen->vpos();
 	uint8_t _vblank = !(vpos >= ESRIPSYS_VBLANK_START);

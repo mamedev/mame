@@ -66,10 +66,10 @@ private:
 	DECLARE_READ8_MEMBER(io_04_r);
 	DECLARE_WRITE8_MEMBER(io_06_w);
 	DECLARE_READ8_MEMBER(io_06_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p3_r);
-	DECLARE_WRITE8_MEMBER(p3_w);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 	void fireball_io_map(address_map &map);
@@ -203,17 +203,17 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p1_r)
-	{
+uint8_t fireball_state::p1_r()
+{
 	uint8_t tmp=0;
 	tmp=(m_p1_data&0xfe)|(m_eeprom->do_read());
 	if (LOG_P1)
 		logerror("readP1 port data %02X\n",tmp&0x01);
 	return tmp;
-	}
+}
 
-	WRITE8_MEMBER(fireball_state::p1_w)
-	{
+void fireball_state::p1_w(uint8_t data)
+{
 	//eeprom x24c44/ay8912/system stuff...
 	//bit0 goes to eeprom pin 3 and 4  (0x01) Data_in and Data_out
 	//bit1 goes to eeprom pin 1 (0x02)      CE Hi active
@@ -228,7 +228,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 		if(( data&0x30) !=  (m_p1_data&0x30)){
 			logerror("write ay8910 control bc1= %02X bdir= %02X\n",data&0x10, data&0x20);
 		}
-	}
+}
 
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -271,16 +271,16 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p3_r)
-	{
+uint8_t fireball_state::p3_r()
+{
 	uint8_t ret = 0xfb | ((int_data&1)<<2);
 	if (LOG_P3)
 		logerror("read P3 port data = %02X\n",ret);
 	return ret;
-	}
+}
 
-WRITE8_MEMBER(fireball_state::p3_w)
-	{
+void fireball_state::p3_w(uint8_t data)
+{
 	if (LOG_P3)
 		logerror("write to P3 port data=%02X\n",data);
 

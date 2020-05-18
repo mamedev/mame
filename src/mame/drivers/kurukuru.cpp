@@ -427,8 +427,8 @@ private:
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
-	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
+	void ym2149_aout_w(uint8_t data);
+	void ym2149_bout_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -646,12 +646,12 @@ void kurukuru_state::ppj_audio_io(address_map &map)
 */
 
 /* YM2149 ports */
-WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
+void kurukuru_state::ym2149_aout_w(uint8_t data)
 {
 	logerror("YM2149: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
+void kurukuru_state::ym2149_bout_w(uint8_t data)
 {
 	logerror("YM2149: Port B out: %02X\n", data);
 }

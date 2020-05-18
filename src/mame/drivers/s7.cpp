@@ -95,19 +95,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 
 private:
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol0_w) { };
-	DECLARE_WRITE8_MEMBER(sol1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w);
-	DECLARE_WRITE8_MEMBER(sol3_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(dips_r);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r();
+	void dig0_w(uint8_t data);
+	void dig1_w(uint8_t data);
+	void lamp0_w(uint8_t data);
+	void lamp1_w(uint8_t data) { };
+	void sol0_w(uint8_t data) { };
+	void sol1_w(uint8_t data) { };
+	void sol2_w(uint8_t data);
+	void sol3_w(uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t dips_r();
+	uint8_t switch_r();
+	void switch_w(uint8_t data);
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
@@ -282,18 +282,18 @@ INPUT_CHANGED_MEMBER( s7_state::diag_coin )
 	m_memprotect = newval;
 }
 
-WRITE8_MEMBER( s7_state::sol2_w )
+void s7_state::sol2_w(uint8_t data)
 {
 	m_pia21->ca1_w(BIT(data, 5));
 }
 
-WRITE8_MEMBER( s7_state::sol3_w )
+void s7_state::sol3_w(uint8_t data)
 {
 	if (BIT(data, 1))
 		m_samples->start(0, 6); // knocker
 }
 
-WRITE8_MEMBER( s7_state::sound_w )
+void s7_state::sound_w(uint8_t data)
 {
 	uint8_t sound_data = (ioport("SND")->read() & 0xe0) | (data & 0x1f);
 
@@ -305,11 +305,11 @@ WRITE8_MEMBER( s7_state::sound_w )
 	m_pias->cb1_w(cb1);
 }
 
-WRITE8_MEMBER( s7_state::lamp0_w )
+void s7_state::lamp0_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( s7_state::dig0_w )
+void s7_state::dig0_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	m_strobe = data & 15;
@@ -318,7 +318,7 @@ WRITE8_MEMBER( s7_state::dig0_w )
 	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
-WRITE8_MEMBER( s7_state::dig1_w )
+void s7_state::dig1_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -329,7 +329,7 @@ WRITE8_MEMBER( s7_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s7_state::dips_r )
+uint8_t s7_state::dips_r()
 {
 	if (BIT(ioport("DIAGS")->read(), 4) )
 	{
@@ -348,14 +348,14 @@ READ8_MEMBER( s7_state::dips_r )
 	return 0xff;
 }
 
-READ8_MEMBER( s7_state::switch_r )
+uint8_t s7_state::switch_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff; // comes in through inverter buffers
 }
 
-WRITE8_MEMBER( s7_state::switch_w )
+void s7_state::switch_w(uint8_t data)
 {
 	m_kbdrow = data;
 }
@@ -373,7 +373,7 @@ WRITE8_MEMBER( s7_state::nvram_w )
 		m_nvram[offset] = data;
 }
 
-READ8_MEMBER( s7_state::sound_r )
+uint8_t s7_state::sound_r()
 {
 	return m_sound_data;
 }

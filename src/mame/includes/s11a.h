@@ -23,7 +23,7 @@ public:
 	void init_s11a();
 
 	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
+	void dig0_w(uint8_t data);
 
 private:
 	DECLARE_MACHINE_RESET(s11a);
