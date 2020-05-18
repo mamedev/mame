@@ -220,6 +220,7 @@ public:
 		m_upd7759(*this, "upd"),
 		m_duart68681(*this, "duart68681"),
 		m_palette(*this, "palette"),
+		m_kbd_ports(*this, "STROBE%u", 1U),
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
@@ -261,6 +262,7 @@ private:
 	required_device<upd7759_device> m_upd7759;
 	required_device<mc68681_device> m_duart68681;
 	required_device<palette_device> m_palette;
+	required_ioport_array<8> m_kbd_ports;
 
 	int m_lamp_strobe;
 	int m_old_lamp_strobe;
@@ -553,9 +555,7 @@ void maygayv1_state::lamp_data_w(uint8_t data)
 
 uint8_t maygayv1_state::kbd_r()
 {
-	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
-
-	return ioport(portnames[m_lamp_strobe&0x07])->read();
+	return m_kbd_ports[m_lamp_strobe & 0x07]->read();
 }
 
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
@@ -572,9 +572,8 @@ void maygayv1_state::main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x083fff).ram().share("nvram");
 	map(0x100000, 0x17ffff).rom().region("maincpu", 0x80000);
-	map(0x820001, 0x820001).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
-	map(0x820003, 0x820003).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
+	map(0x820000, 0x820003).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
 	map(0x860000, 0x86000d).rw(FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
 	map(0x86000e, 0x86000f).w(FUNC(maygayv1_state::vsync_int_ctrl));
 	map(0x880000, 0x89ffff).rw(FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
