@@ -959,6 +959,15 @@
 #define TTL_7420_NAND(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7420_NAND, __VA_ARGS__)
 
+// usage       : TTL_7421_GATE(name)
+#define TTL_7421_GATE(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_7421_GATE, __VA_ARGS__)
+
+// usage       : TTL_7421_AND(name, pA, pB, pC, pD)
+// auto connect: VCC, GND
+#define TTL_7421_AND(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_7421_AND, __VA_ARGS__)
+
 // usage       : TTL_7425_GATE(name)
 #define TTL_7425_GATE(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_7425_GATE, __VA_ARGS__)
@@ -1101,6 +1110,10 @@
 // usage       : TTL_7420_DIP(name)
 #define TTL_7420_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_7420_DIP, __VA_ARGS__)
+
+// usage       : TTL_7421_DIP(name)
+#define TTL_7421_DIP(...)                                              \
+	NET_REGISTER_DEVEXT(TTL_7421_DIP, __VA_ARGS__)
 
 // usage       : TTL_7425_DIP(name)
 #define TTL_7425_DIP(...)                                              \

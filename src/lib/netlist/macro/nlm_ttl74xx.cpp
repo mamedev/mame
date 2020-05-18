@@ -398,6 +398,44 @@ static NETLIST_START(TTL_7420_DIP)
 NETLIST_END()
 
 /*
+ *  DM7421: Dual 4-Input AND Gates
+ *
+ *                  ___
+ *              Y = ABCD
+ *          +---+---+---+---++---+
+ *          | A | B | C | D || Y |
+ *          +===+===+===+===++===+
+ *          | X | X | X | 0 || 0 |
+ *          | X | X | 0 | X || 0 |
+ *          | X | 0 | X | X || 0 |
+ *          | 0 | X | X | X || 0 |
+ *          | 1 | 1 | 1 | 1 || 1 |
+ *          +---+---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet *
+ */
+
+static NETLIST_START(TTL_7421_DIP)
+	TTL_7421_GATE(A)
+	TTL_7421_GATE(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+	NC_PIN(NC)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.B,  /*    B1 |2           13| D2   */ B.D,
+		NC.I, /*    NC |3           12| C2   */ B.C,
+		A.C,  /*    C1 |4    7420   11| NC   */ NC.I,
+		A.D,  /*    D1 |5           10| B2   */ B.B,
+		A.Q,  /*    Y1 |6            9| A2   */ B.A,
+		A.GND,/*   GND |7            8| Y2   */ B.Q
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
  *  DM7425: Dual 4-Input NOR Gates
  *
  *                  ______
@@ -1243,6 +1281,26 @@ NETLIST_START(TTL74XX_lib)
 		TT_LINE("X,X,0,X|1|22")
 		TT_LINE("X,X,X,0|1|22")
 		TT_LINE("1,1,1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7421_GATE, 4, 1, "")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|0|22")
+		TT_LINE("X,0,X,X|0|22")
+		TT_LINE("X,X,0,X|0|22")
+		TT_LINE("X,X,X,0|0|22")
+		TT_LINE("1,1,1,1|1|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7421_AND, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
+		TT_HEAD("A,B,C,D|Q ")
+		TT_LINE("0,X,X,X|0|22")
+		TT_LINE("X,0,X,X|0|22")
+		TT_LINE("X,X,0,X|0|22")
+		TT_LINE("X,X,X,0|0|22")
+		TT_LINE("1,1,1,1|1|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
