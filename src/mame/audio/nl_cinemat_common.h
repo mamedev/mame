@@ -39,9 +39,6 @@
 #define LM555_DIP NE555_DIP
 #define LM566_DIP NE566_DIP
 
-// 72S287 PROM matches 82S126 pinout
-#define PROM_74S287_DIP PROM_82S126_DIP
-
 // alias LS devices to real devices
 #define TTL_74LS04_DIP TTL_7404_DIP     // Hex Inverting Gates
 #define TTL_74LS08_DIP TTL_7408_DIP     // Quad 2-Input AND Gates
@@ -50,14 +47,12 @@
 #define TTL_74LS86_DIP TTL_7486_DIP     // Quad 2-Input Exclusive-OR Gates
 #define TTL_74LS107_DIP TTL_74107_DIP
 #define TTL_74LS123_DIP TTL_74123_DIP
+#define TTL_74LS125_DIP TTL_74125_DIP
 #define TTL_74LS163_DIP TTL_74163_DIP
 #define TTL_74LS164_DIP TTL_74164_DIP
 #define TTL_74LS259_DIP TTL_9334_DIP	// Seems to be pin-compatible
 #define TTL_74LS377_DIP TTL_74377_DIP
 #define TTL_74LS393_DIP TTL_74393_DIP
-
-// this device needs proper implementation; cheese it up with an AND gate
-#define TTL_74LS125_DIP TTL_7408_DIP
 
 
 
