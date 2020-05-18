@@ -32,6 +32,7 @@ public:
 		set_seg_entry_mask(seg_entry_mask);
 		set_page_entry_mask(page_entry_mask);
 		set_cache_mask(cache_mask);
+		set_cache_line_size(16);
 	}
 
 	template <typename T> void set_cpu(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
