@@ -10482,6 +10482,54 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="f1gp">
+		<description>Formula One Grand Prix (Euro)</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="b6b492b4" sha1="72f8342d0f5c8088be1d26026834d2d08d3c430d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="730ac7ca" sha1="3f2e0bc149ec259fd7f8d5481005743975891b99"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="746eb33e" sha1="74cad4aed7f95cf4fb987844495f85b646801cde"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="wcgps" cloneof="f1gp">
+		<description>World Circuit - The Grand Prix Race Simulation (USA)</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861A" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk A].img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861B" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk B].img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="Disc Code" value="4861C" />
+			<dataarea name="flop" size="1474560">
+				<rom name="World Circuit [MicroProse] [1992] [3.5HD] [Disk C].img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -13855,31 +13903,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Word Rescue (USA) (v2.0).img" size="1474560" crc="0d3b9f45" sha1="162640737e6b9617245e04f1eefb6c36238b7a85"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcgps">
-		<description>World Circuit - Grand Prix Simulation</description>
-		<year>1992</year>
-		<publisher>MicroProse</publisher>
-		<info name="version" value="1.2" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861A" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861B" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="Disc Code" value="4861C" />
-			<dataarea name="flop" size="1474560">
-				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e"/>
 			</dataarea>
 		</part>
 	</software>
