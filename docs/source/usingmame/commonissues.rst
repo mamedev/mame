@@ -26,6 +26,7 @@ Common Issues and Questions (FAQ)
 20. :ref:`ControllerIssues`
 21. :ref:`ExternalOPL`
 22. :ref:`Autofire`
+23. :ref:`gsync-freesync`
 
 
 .. _rapid-coins:
@@ -276,3 +277,14 @@ Note that if you set the autofire button to an input button that's also defined 
  If you set button 3 on your controller to autofire and set button 3 to be powerup as well, you will trigger the powerup action every time you grab a powerup because the powerup button is also being held down along with the autofire button.
 
  It is suggested you choose a button for autofire that is not in use for anything else in the current system.
+
+
+.. _gsync-freesync:
+
+Does MAME support G-Sync or FreeSync? How do I configure MAME to use them?
+--------------------------------------------------------------------------
+
+MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux and requires no special configuration. macOS does not support G-Sync or FreeSync.
+
+Be sure to leave triple buffering turned off, as that is unnecessary with variable refresh rate support. Variable Refresh Rate also requires fullscreen mode.
+
