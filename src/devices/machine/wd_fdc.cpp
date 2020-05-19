@@ -23,7 +23,7 @@
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
 
-#define VERBOSE (LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_MATCH)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -147,6 +147,8 @@ void wd_fdc_device_base::device_start()
 	save_item(NAME(mr));
 	save_item(NAME(intrq));
 	save_item(NAME(drq));
+	if (head_control)
+		save_item(NAME(hld));
 }
 
 void wd_fdc_device_base::device_reset()
@@ -185,15 +187,15 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 
 		intrq = false;
 		if (!intrq_cb.isnull())
-		{
 			intrq_cb(intrq);
-		}
 		drq = false;
 		if (!drq_cb.isnull())
-		{
 			drq_cb(drq);
+		if(head_control) {
+			hld = false;
+			if(!hld_cb.isnull())
+				hld_cb(hld);
 		}
-		hld = false;
 
 		mon_cb(1); // Clear the MON* line
 
@@ -299,8 +301,13 @@ void wd_fdc_device_base::seek_start(int state)
 	main_state = state;
 	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
+		if(BIT(command, 3))
+			set_hld();
+		else
+			drop_hld();
+
 		// TODO get value from HLT callback
-		if(command & 8)
+		if(hld)
 			status |= S_HLD;
 		else
 			status &= ~S_HLD;
@@ -388,6 +395,7 @@ void wd_fdc_device_base::seek_continue()
 					track = 0;
 
 				if(command & 0x04) {
+					set_hld();
 					sub_state = SEEK_WAIT_STABILIZATION_TIME;
 					delay_cycles(t_gen, 30000);
 					return;
@@ -406,15 +414,13 @@ void wd_fdc_device_base::seek_continue()
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
 			LOGSTATE("SEEK_WAIT_STABILIZATION_TIME_DONE\n");
+			if(hld)
+				status |= S_HLD;
 			sub_state = SEEK_DONE;
 			break;
 
 		case SEEK_DONE:
 			LOGSTATE("SEEK_DONE\n");
-			status |= S_HLD;
-			hld = true;
-			if (!hld_cb.isnull())
-				hld_cb(hld);
 			if(command & 0x04) {
 				if(!is_ready()) {
 					status |= S_RNF;
@@ -488,8 +494,8 @@ void wd_fdc_device_base::read_sector_start()
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control)
-		update_sso();
+	update_sso();
+	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
@@ -589,8 +595,8 @@ void wd_fdc_device_base::read_track_start()
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
 	drop_drq();
-	if(side_control)
-		update_sso();
+	update_sso();
+	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
@@ -668,8 +674,8 @@ void wd_fdc_device_base::read_id_start()
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control)
-		update_sso();
+	update_sso();
+	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
@@ -745,8 +751,8 @@ void wd_fdc_device_base::write_track_start()
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control)
-		update_sso();
+	update_sso();
+	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 
@@ -856,8 +862,8 @@ void wd_fdc_device_base::write_sector_start()
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control)
-		update_sso();
+	update_sso();
+	set_hld();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
@@ -1353,14 +1359,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 					floppy->mon_w(1);
 			}
 
-			if (head_control && motor_timeout >= hld_timeout)
-			{
-				hld = false;
-
-				// signal drive to unload head
-				if (!hld_cb.isnull())
-					hld_cb(hld);
-
+			if(head_control && motor_timeout >= hld_timeout) {
+				drop_hld();
 				status &= ~S_HLD; // todo: should get this value from the drive
 			}
 		}
@@ -2214,6 +2214,24 @@ void wd_fdc_device_base::drop_drq()
 			if(!intrq_cb.isnull())
 				intrq_cb(intrq);
 		}
+	}
+}
+
+void wd_fdc_device_base::set_hld()
+{
+	if(head_control && !hld) {
+		hld = true;
+		if(!hld_cb.isnull())
+			hld_cb(hld);
+	}
+}
+
+void wd_fdc_device_base::drop_hld()
+{
+	if(head_control && hld) {
+		hld = false;
+		if(!hld_cb.isnull())
+			hld_cb(hld);
 	}
 }
 
