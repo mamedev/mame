@@ -3050,6 +3050,7 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
+	recalibrate_steps = 77; // TODO: 3917 in extended track range mode
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
@@ -3058,6 +3059,7 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
+	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
 wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -3113,6 +3115,7 @@ tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag,
 	ready_connected = true;
 	select_connected = true;
 	select_multiplexed = false;
+	recalibrate_steps = 255;
 }
 
 void tc8566af_device::device_start()
