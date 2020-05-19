@@ -580,6 +580,20 @@ protected:
 	void ncr53c90a(device_t *device);
 
 	void debugger_map(address_map &map);
+	void system_asi_map(address_map &map);
+	void segment_asi_map(address_map &map);
+	void page_asi_map(address_map &map);
+	void hw_segment_flush_asi_map(address_map &map);
+	void hw_page_flush_asi_map(address_map &map);
+	void hw_context_flush_asi_map(address_map &map);
+	void user_insn_asi_map(address_map &map);
+	void super_insn_asi_map(address_map &map);
+	void user_data_asi_map(address_map &map);
+	void super_data_asi_map(address_map &map);
+	void sw_segment_flush_asi_map(address_map &map);
+	void sw_page_flush_asi_map(address_map &map);
+	void sw_context_flush_asi_map(address_map &map);
+	void hw_flush_all_asi_map(address_map &map);
 
 	void type1space_base_map(address_map &map);
 
@@ -673,12 +687,12 @@ private:
 
 READ32_MEMBER( sun4_base_state::debugger_r )
 {
-	return m_mmu->insn_data_r<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(offset, mem_mask);
+	return m_mmu->insn_data_r<sun4_mmu_base_device::SUPER_INSN>(offset, mem_mask);
 }
 
 WRITE32_MEMBER( sun4_base_state::debugger_w )
 {
-	m_mmu->insn_data_w<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(offset, data, mem_mask);
+	m_mmu->insn_data_w<sun4_mmu_base_device::SUPER_INSN>(offset, data, mem_mask);
 }
 
 void sun4_base_state::fcodes_command(int ref, const std::vector<std::string> &params)
@@ -736,6 +750,81 @@ void sun4c_state::type1space_map(address_map &map)
 void sun4_state::type1space_map(address_map &map)
 {
 	type1space_base_map(map);
+}
+
+void sun4_base_state::system_asi_map(address_map &map)
+{
+	map(0x30000000, 0x3fffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::context_reg_r), FUNC(sun4_mmu_base_device::context_reg_w));
+	map(0x40000000, 0x4fffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::system_enable_r), FUNC(sun4_mmu_base_device::system_enable_w));
+	map(0x60000000, 0x6fffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::bus_error_r), FUNC(sun4_mmu_base_device::bus_error_w));
+	map(0x80000000, 0x8fffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::cache_tag_r), FUNC(sun4_mmu_base_device::cache_tag_w));
+	map(0x90000000, 0x9fffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::cache_data_r), FUNC(sun4_mmu_base_device::cache_data_w));
+	map(0xf0000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::uart_r), FUNC(sun4_mmu_base_device::uart_w));
+}
+
+void sun4_base_state::segment_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::segment_map_r), FUNC(sun4_mmu_base_device::segment_map_w));
+}
+
+void sun4_base_state::page_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::page_map_r), FUNC(sun4_mmu_base_device::page_map_w));
+}
+
+void sun4_base_state::hw_segment_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::hw_segment_flush_w));
+}
+
+void sun4_base_state::hw_page_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::hw_page_flush_w));
+}
+
+void sun4_base_state::hw_context_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::hw_context_flush_w));
+}
+
+void sun4_base_state::user_insn_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN>), FUNC(sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN>));
+}
+
+void sun4_base_state::super_insn_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN>), FUNC(sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN>));
+}
+
+void sun4_base_state::user_data_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA>), FUNC(sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA>));
+}
+
+void sun4_base_state::super_data_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA>), FUNC(sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA>));
+}
+
+void sun4_base_state::sw_segment_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::segment_flush_w));
+}
+
+void sun4_base_state::sw_page_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::page_flush_w));
+}
+
+void sun4_base_state::sw_context_flush_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::context_flush_w));
+}
+
+void sun4_base_state::hw_flush_all_asi_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).w(m_mmu, FUNC(sun4_mmu_base_device::hw_flush_all_w));
 }
 
 /* Input ports */
@@ -1078,7 +1167,7 @@ void sun4_base_state::dma_transfer_write()
 		pack_cnt++;
 		if (pack_cnt == 4)
 		{
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
 			pack_cnt = 0;
 			m_dma_pack_register = 0;
 			m_dma[DMA_ADDR] += 4;
@@ -1099,7 +1188,7 @@ void sun4_base_state::dma_transfer_read()
 	{
 		if (!word_cached)
 		{
-			current_word = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, ~0);
+			current_word = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, ~0);
 			word_cached = true;
 			//logerror("Current word: %08x\n", current_word);
 		}
@@ -1176,7 +1265,7 @@ WRITE32_MEMBER( sun4_base_state::dma_w )
 					const uint32_t bit_index = (3 - i) * 8;
 					//const uint32_t value = m_dma_pack_register & (0xff << bit_index);
 					//logerror("dma_w: draining %02x to RAM address %08x & %08x\n", value >> bit_index, m_dma[DMA_ADDR], 0xff << (24 - bit_index));
-					m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
+					m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(m_dma[DMA_ADDR] >> 2, m_dma_pack_register, 0xff << bit_index);
 					m_dma[DMA_ADDR]++;
 				}
 				m_dma_pack_register = 0;
@@ -1301,16 +1390,16 @@ void sun4_base_state::sun4_base(machine_config &config)
 	AM79C90(config, m_lance);
 	m_lance->dma_in().set([this](offs_t offset)
 	{
-		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, 0xffffffffU);
+		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
 
 		return (offset & 2) ? u16(data) : u16(data >> 16);
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
 	{
 		if (offset & 2)
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, data, mem_mask);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, data, mem_mask);
 		else
-			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
 	});
 
 	// Keyboard/mouse
@@ -1376,7 +1465,21 @@ void sun4c_state::sun4c(machine_config &config)
 	/* basic machine hardware */
 	SPARCV7(config, m_maincpu, 20'000'000);
 	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
-	m_maincpu->set_addrmap(0, &sun4c_state::debugger_map);
+	m_maincpu->set_addrmap(0x00, &sun4c_state::debugger_map);
+	m_maincpu->set_addrmap(0x12, &sun4c_state::system_asi_map);
+	m_maincpu->set_addrmap(0x13, &sun4c_state::segment_asi_map);
+	m_maincpu->set_addrmap(0x14, &sun4c_state::page_asi_map);
+	m_maincpu->set_addrmap(0x15, &sun4c_state::hw_segment_flush_asi_map);
+	m_maincpu->set_addrmap(0x16, &sun4c_state::hw_page_flush_asi_map);
+	m_maincpu->set_addrmap(0x17, &sun4c_state::hw_context_flush_asi_map);
+	m_maincpu->set_addrmap(0x18, &sun4c_state::user_insn_asi_map);
+	m_maincpu->set_addrmap(0x19, &sun4c_state::super_insn_asi_map);
+	m_maincpu->set_addrmap(0x1a, &sun4c_state::user_data_asi_map);
+	m_maincpu->set_addrmap(0x1b, &sun4c_state::super_data_asi_map);
+	m_maincpu->set_addrmap(0x1c, &sun4c_state::sw_segment_flush_asi_map);
+	m_maincpu->set_addrmap(0x1d, &sun4c_state::sw_page_flush_asi_map);
+	m_maincpu->set_addrmap(0x1e, &sun4c_state::sw_context_flush_asi_map);
+	m_maincpu->set_addrmap(0x1f, &sun4c_state::hw_flush_all_asi_map);
 
 	sun4_base(config);
 

@@ -155,11 +155,13 @@ protected:
 	required_device<sparc_mmu_interface> m_mmu;
 
 	// address spaces
-	address_space_config m_default_config;
+	address_space_config m_debugger_config;
+	address_space_config m_asi_config[0x10];
+	address_space *m_asi[0x20];
 
 	// memory access
-	uint32_t read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask);
-	void write_sized_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask);
+	inline uint32_t read_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask = 0xffffffff);
+	inline void write_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask = 0xffffffff);
 
 	// helpers for the disassembler
 	virtual uint64_t get_reg_r(unsigned index) const override;

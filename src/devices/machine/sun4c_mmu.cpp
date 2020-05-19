@@ -230,107 +230,45 @@ void sun4_mmu_base_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, const uint32_t offset)
+uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, uint32_t offset)
 {
 	if (supervisor)
-		return insn_data_r<SUPER_INSN, SUPER_MODE>(offset, 0xffffffff);
+		return insn_data_r<SUPER_INSN>(offset, 0xffffffff);
 	else
-		return insn_data_r<USER_INSN, USER_MODE>(offset, 0xffffffff);
+		return insn_data_r<USER_INSN>(offset, 0xffffffff);
 }
 
-uint32_t sun4_mmu_base_device::read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_segment_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_ALL_ASI, "read_asi %d: %08x & %08x\n", asi, offset << 2, mem_mask);
-	switch (asi)
+	for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
 	{
-		case 2:
-			return system_r(offset, mem_mask);
-		case 3:
-			return segment_map_r(offset, mem_mask);
-		case 4:
-			return page_map_r(offset, mem_mask);
-		case 8:
-			return insn_data_r<USER_INSN, USER_MODE>(offset, mem_mask);
-		case 9:
-			return insn_data_r<SUPER_INSN, SUPER_MODE>(offset, mem_mask);
-		case 10:
-			return insn_data_r<USER_DATA, USER_MODE>(offset, mem_mask);
-		case 11:
-			return insn_data_r<SUPER_DATA, SUPER_MODE>(offset, mem_mask);
-		case 12:
-		case 13:
-		case 14:
-			return 0;
-		default:
-			LOGMASKED(LOG_UNKNOWN_ASI, "Unknown ASI read: %d, %08x & %08x\n", asi, offset << 2, mem_mask);
-			return ~0;
+		segment_flush_w(offset | (i << m_cache_tag_shift), data, mem_mask);
 	}
 }
 
-void sun4_mmu_base_device::write_asi(uint8_t asi, uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_page_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_ALL_ASI, "write_asi %d: %08x = %08x & %08x\n", asi, offset << 2, data, mem_mask);
-	switch (asi)
+	for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
 	{
-		case 2:
-			system_w(offset, data, mem_mask);
-			return;
-		case 3:
-			segment_map_w(offset, data, mem_mask);
-			return;
-		case 4:
-			page_map_w(offset, data, mem_mask);
-			return;
-		case 5:
-			for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
-			{
-				segment_flush_w(offset | (i << m_cache_tag_shift));
-			}
-			break;
-		case 6:
-			for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
-			{
-				page_flush_w(offset | (i << m_cache_tag_shift));
-			}
-			break;
-		case 7:
-			for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
-			{
-				context_flush_w(offset | (i << m_cache_tag_shift));
-			}
-			break;
-		case 8:
-			insn_data_w<USER_INSN, USER_MODE>(offset, data, mem_mask);
-			return;
-		case 9:
-			insn_data_w<SUPER_INSN, SUPER_MODE>(offset, data, mem_mask);
-			return;
-		case 10:
-			insn_data_w<USER_DATA, USER_MODE>(offset, data, mem_mask);
-			return;
-		case 11:
-			insn_data_w<SUPER_DATA, SUPER_MODE>(offset, data, mem_mask);
-			return;
-		case 12:
-			segment_flush_w(offset);
-			break;
-		case 13:
-			page_flush_w(offset);
-			break;
-		case 14:
-			context_flush_w(offset);
-			return;
-		case 15:
-			for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
-			{
-				const uint32_t vaddr = offset | (i << m_cache_tag_shift);
-				const uint32_t tag_addr = vaddr_to_cache_line(vaddr);
-				m_cachetags[tag_addr] &= ~(1 << 19);
-			}
-			break;
-		default:
-			LOGMASKED(LOG_UNKNOWN_ASI, "Unknown ASI write: %d, %08x = %08x & %08x\n", asi, offset << 2, data, mem_mask);
-			return;
+		page_flush_w(offset | (i << m_cache_tag_shift), data, mem_mask);
+	}
+}
+
+void sun4_mmu_base_device::hw_context_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
+	{
+		context_flush_w(offset | (i << m_cache_tag_shift), data, mem_mask);
+	}
+}
+
+void sun4_mmu_base_device::hw_flush_all_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	for (uint32_t i = 0x0000; i < (0x1000 >> (m_cache_tag_shift + 2)); i++)
+	{
+		const uint32_t vaddr = offset | (i << m_cache_tag_shift);
+		const uint32_t tag_addr = vaddr_to_cache_line(vaddr);
+		m_cachetags[tag_addr] &= ~(1 << 19);
 	}
 }
 
@@ -365,7 +303,7 @@ void sun4_mmu_base_device::parity_w(uint32_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-void sun4_mmu_base_device::segment_flush_w(const uint32_t vaddr)
+void sun4_mmu_base_device::segment_flush_w(uint32_t vaddr, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_SEGMENT_FLUSH, "%s: segment_flush_w %08x\n", machine().describe_context(), vaddr);
 	const uint32_t tag_addr = vaddr_to_cache_line(vaddr);
@@ -393,7 +331,7 @@ void sun4_mmu_base_device::segment_flush_w(const uint32_t vaddr)
 	}
 }
 
-void sun4_mmu_base_device::context_flush_w(const uint32_t vaddr)
+void sun4_mmu_base_device::context_flush_w(uint32_t vaddr, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_CONTEXT_FLUSH, "%s: context_flush_w %08x\n", machine().describe_context(), vaddr << 2);
 	const uint32_t tag_addr = vaddr_to_cache_line(vaddr);
@@ -413,7 +351,7 @@ void sun4_mmu_base_device::context_flush_w(const uint32_t vaddr)
 	}
 }
 
-void sun4_mmu_base_device::page_flush_w(const uint32_t vaddr)
+void sun4_mmu_base_device::page_flush_w(uint32_t vaddr, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_PAGE_FLUSH, "%s: page_flush_w %08x\n", machine().describe_context(), vaddr << 2);
 	const uint32_t tag_addr = vaddr_to_cache_line(vaddr);
@@ -443,133 +381,115 @@ void sun4_mmu_base_device::page_flush_w(const uint32_t vaddr)
 	}
 }
 
-uint32_t sun4_mmu_base_device::system_r(const uint32_t offset, const uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::context_reg_r(uint32_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_SYSTEM, "%s: system_r: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
-	switch (offset >> 26)
+	if (mem_mask == 0x00ff0000)
 	{
-		case 3: // context reg
-		{
-			if (mem_mask == 0x00ff0000)
-			{
-				LOGMASKED(LOG_CONTEXT, "sun4c_mmu: read context %08x & %08x = %08x\n", offset << 2, mem_mask, m_context<<16);
-				return m_context<<16;
-			}
-			LOGMASKED(LOG_CONTEXT, "sun4c_mmu: read context %08x & %08x = %08x\n", offset << 2, mem_mask, m_context<<24);
-			return m_context<<24;
-		}
+		LOGMASKED(LOG_CONTEXT, "sun4c_mmu: read context %08x & %08x = %08x\n", offset << 2, mem_mask, m_context<<16);
+		return m_context<<16;
+	}
+	LOGMASKED(LOG_CONTEXT, "sun4c_mmu: read context %08x & %08x = %08x\n", offset << 2, mem_mask, m_context<<24);
+	return m_context<<24;
+}
 
-		case 4: // system enable reg
-			LOGMASKED(LOG_SYSTEM_ENABLE, "sun4c_mmu: read system enable %08x & %08x = %08x\n", offset << 2, mem_mask, m_system_enable<<24);
-			return m_system_enable<<24;
+uint32_t sun4_mmu_base_device::system_enable_r(uint32_t offset, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_SYSTEM_ENABLE, "sun4c_mmu: read system enable %08x & %08x = %08x\n", offset << 2, mem_mask, m_system_enable<<24);
+	return m_system_enable<<24;
+}
 
-		case 6: // bus error register
-		{
-			const uint32_t ret = m_buserr[offset & 0xf];
-			LOGMASKED(LOG_BUSERROR, "sun4c_mmu: read buserror %08x & %08x = %08x, PC=%x\n", 0x60000000 | (offset << 2), mem_mask, ret, m_cpu->pc());
-			m_buserr[offset & 0xf] = 0; // clear on reading
-			return ret;
-		}
+uint32_t sun4_mmu_base_device::bus_error_r(uint32_t offset, uint32_t mem_mask)
+{
+	const uint32_t ret = m_buserr[offset & 0xf];
+	LOGMASKED(LOG_BUSERROR, "sun4c_mmu: read buserror %08x & %08x = %08x, PC=%x\n", 0x60000000 | (offset << 2), mem_mask, ret, m_cpu->pc());
+	m_buserr[offset & 0xf] = 0; // clear on reading
+	return ret;
+}
 
-		case 8: // (d-)cache tags
-			LOGMASKED(LOG_CACHE_TAGS, "%s: sun4c_mmu: read dcache tags @ %x, %08x\n", machine().describe_context(), offset << 2, m_cachetags[vaddr_to_cache_line(offset)]);
-			return m_cachetags[vaddr_to_cache_line(offset)];
+uint32_t sun4_mmu_base_device::cache_tag_r(uint32_t offset, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CACHE_TAGS, "%s: sun4c_mmu: read dcache tags @ %x, %08x\n", machine().describe_context(), offset << 2, m_cachetags[vaddr_to_cache_line(offset)]);
+	return m_cachetags[vaddr_to_cache_line(offset)];
+}
 
-		case 9: // (d-)cache data
-			LOGMASKED(LOG_CACHE_DATA, "%s: sun4c_mmu: read dcache data @ %x, PC = %x\n", machine().describe_context(), offset << 2, m_cpu->pc());
-			return m_cachedata[offset & 0x3fff];
+uint32_t sun4_mmu_base_device::cache_data_r(uint32_t offset, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CACHE_DATA, "%s: sun4c_mmu: read dcache data @ %x, PC = %x\n", machine().describe_context(), offset << 2, m_cpu->pc());
+	return m_cachedata[offset & 0x3fff];
+}
 
-		case 0xf:   // UART bypass
-			switch (offset & 3)
-			{
-				case 0: if (mem_mask == 0xff000000) return m_scc->cb_r(0)<<24; else return m_scc->db_r(0)<<8; break;
-				case 1: if (mem_mask == 0xff000000) return m_scc->ca_r(0)<<24; else return m_scc->da_r(0)<<8; break;
-			}
-			return 0xffffffff;
+uint32_t sun4_mmu_base_device::uart_r(uint32_t offset, uint32_t mem_mask)
+{
+	switch (offset & 3)
+	{
+		case 0: if (mem_mask == 0xff000000) return m_scc->cb_r(0)<<24; else return m_scc->db_r(0)<<8; break;
+		case 1: if (mem_mask == 0xff000000) return m_scc->ca_r(0)<<24; else return m_scc->da_r(0)<<8; break;
+	}
+	return 0xffffffff;
+}
 
-		case 0: // IDPROM - SPARCstation-1 does not have an ID prom and a timeout should occur.
-		default:
-			LOGMASKED(LOG_UNKNOWN_SYSTEM, "read unhandled ASI 2 space %08x & %08x\n", offset << 2, mem_mask);
-			return 0;
+void sun4_mmu_base_device::context_reg_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CONTEXT, "write context = %08x & %08x\n", data, mem_mask);
+	m_context = data >> 24;
+	m_context_masked = m_context & m_ctx_mask;
+	m_cache_context = m_context & m_ctx_mask;
+	m_curr_segmap = &m_segmap[m_context_masked][0];
+	m_curr_segmap_masked = &m_segmap_masked[m_context_masked][0];
+}
+
+void sun4_mmu_base_device::system_enable_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_SYSTEM_ENABLE, "write system enable = %08x & %08x\n", data, mem_mask);
+	m_system_enable = data >> 24;
+	m_fetch_bootrom = !(m_system_enable & ENA_NOTBOOT);
+
+	if (m_system_enable & ENA_RESET)
+	{
+		m_reset_timer->adjust(attotime::from_usec(1));
+		m_cpu->set_input_line(SPARC_RESET, ASSERT_LINE);
+	}
+	if (m_system_enable & ENA_RESET)
+	{
+		m_system_enable = 0;
+		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
-void sun4_mmu_base_device::system_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask)
+void sun4_mmu_base_device::bus_error_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_SYSTEM, "system_w: %08x = %08x & %08x\n", offset << 2, data, mem_mask);
-	switch (offset >> 26)
+	const uint32_t masked_offset = offset & 0xf;
+	LOGMASKED(LOG_BUSERROR, "write bus error %08x = %08x & %08x\n", offset << 2, data, mem_mask);
+	if (masked_offset == 0)
+		m_buserr[0] = (data & 0x000000ff) | 0x00008000;
+	else
+		m_buserr[masked_offset] = data;
+}
+
+void sun4_mmu_base_device::cache_tag_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CACHE_TAGS, "%s: write dcache tags %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+	m_cachetags[vaddr_to_cache_line(offset)] = data & 0x03f8fffc;
+}
+
+void sun4_mmu_base_device::cache_data_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CACHE_DATA, "write cache data %08x = %08x & %08x\n", offset << 2, data, mem_mask);
+	COMBINE_DATA(&m_cachedata[offset & 0x3fff]);
+	m_cachetags[vaddr_to_cache_line(offset)] &= ~(1 << 19);
+}
+
+void sun4_mmu_base_device::uart_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset & 3)
 	{
-		case 3: // context reg
-			LOGMASKED(LOG_CONTEXT, "write context = %08x & %08x\n", data, mem_mask);
-			m_context = data >> 24;
-			m_context_masked = m_context & m_ctx_mask;
-			m_cache_context = m_context & m_ctx_mask;
-			m_curr_segmap = &m_segmap[m_context_masked][0];
-			m_curr_segmap_masked = &m_segmap_masked[m_context_masked][0];
-			return;
-
-		case 4: // system enable reg
-		{
-			LOGMASKED(LOG_SYSTEM_ENABLE, "write system enable = %08x & %08x\n", data, mem_mask);
-			m_system_enable = data >> 24;
-			m_fetch_bootrom = !(m_system_enable & ENA_NOTBOOT);
-
-			if (m_system_enable & ENA_RESET)
-			{
-				m_reset_timer->adjust(attotime::from_usec(1));
-				m_cpu->set_input_line(SPARC_RESET, ASSERT_LINE);
-			}
-			if (m_system_enable & ENA_RESET)
-			{
-				m_system_enable = 0;
-				m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-				m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			}
-			return;
-		}
-
-		case 6: // bus error
-		{
-			const uint32_t masked_offset = offset & 0xf;
-			LOGMASKED(LOG_BUSERROR, "write bus error %08x = %08x & %08x\n", offset << 2, data, mem_mask);
-			if (masked_offset == 0)
-				m_buserr[0] = (data & 0x000000ff) | 0x00008000;
-			else
-				m_buserr[masked_offset] = data;
-			return;
-		}
-
-		case 8: // cache tags
-			LOGMASKED(LOG_CACHE_TAGS, "%s: write dcache tags %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
-			m_cachetags[vaddr_to_cache_line(offset)] = data & 0x03f8fffc;
-			/*if (m_cpu->pc() == 0xFFE8B4F8)
-			{
-			    m_log_mem = true;
-			}*/
-			return;
-
-		case 9: // cache data
-			LOGMASKED(LOG_CACHE_DATA, "write cache data %08x = %08x & %08x\n", offset << 2, data, mem_mask);
-			COMBINE_DATA(&m_cachedata[offset & 0x3fff]);
-			m_cachetags[vaddr_to_cache_line(offset)] &= ~(1 << 19);
-			return;
-
-		case 0xf:   // UART bypass
-			switch (offset & 3)
-			{
-				case 0: if (mem_mask == 0xff000000) m_scc->cb_w(0, data>>24); else m_scc->db_w(0, data>>8); break;
-				case 1: if (mem_mask == 0xff000000) m_scc->ca_w(0, data>>24); else { m_scc->da_w(0, data>>8); logerror("%c\n", data>>8); printf("%c", data>>8); } break;
-			}
-			return;
-
-		case 0: // IDPROM
-		default:
-			LOGMASKED(LOG_UNKNOWN_SYSTEM, "write unhandled ASI 2 space %08x = %08x & %08x, PC=%08x\n", offset << 2, data, mem_mask, m_cpu->pc());
-			return;
+		case 0: if (mem_mask == 0xff000000) m_scc->cb_w(0, data>>24); else m_scc->db_w(0, data>>8); break;
+		case 1: if (mem_mask == 0xff000000) m_scc->ca_w(0, data>>24); else { m_scc->da_w(0, data>>8); logerror("%c\n", data>>8); printf("%c", data>>8); } break;
 	}
 }
 
-uint32_t sun4_mmu_base_device::segment_map_r(const uint32_t offset, const uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::segment_map_r(uint32_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	if (mem_mask == 0xffff0000)
@@ -584,7 +504,7 @@ uint32_t sun4_mmu_base_device::segment_map_r(const uint32_t offset, const uint32
 	return ret;
 }
 
-void sun4_mmu_base_device::segment_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask)
+void sun4_mmu_base_device::segment_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_SEGMENT_MAP, "write segment map %08x = %08x & %08x\n", offset << 2, data, mem_mask);
 
@@ -599,7 +519,7 @@ void sun4_mmu_base_device::segment_map_w(const uint32_t offset, const uint32_t d
 	m_curr_segmap_masked[seg] = (segdata & m_pmeg_mask) << 6;
 }
 
-uint32_t sun4_mmu_base_device::page_map_r(const uint32_t offset, const uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::page_map_r(uint32_t offset, uint32_t mem_mask)
 {
 	const uint32_t page = m_curr_segmap_masked[(offset >> 16) & 0xfff] | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
 	const uint32_t ret = page_entry_to_uint(page);
@@ -607,7 +527,7 @@ uint32_t sun4_mmu_base_device::page_map_r(const uint32_t offset, const uint32_t 
 	return ret;
 }
 
-void sun4_mmu_base_device::page_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask)
+void sun4_mmu_base_device::page_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t page = m_curr_segmap_masked[(offset >> 16) & 0xfff] | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
 	LOGMASKED(LOG_PAGE_MAP, "write page map %08x (%x) = %08x & %08x\n", offset << 2, page, data, mem_mask);
@@ -615,7 +535,7 @@ void sun4_mmu_base_device::page_map_w(const uint32_t offset, const uint32_t data
 	m_page_valid[page] = m_pagemap[page].valid;
 }
 
-void sun4_mmu_base_device::type0_timeout_r(const uint32_t offset)
+void sun4_mmu_base_device::type0_timeout_r(uint32_t offset)
 {
 	LOGMASKED(LOG_TYPE0_TIMEOUT, "type 0 read timeout %08x, PC=%08x\n", offset << 2, m_cpu->pc());
 	m_buserr[0] = 0x20; // read timeout
@@ -623,7 +543,7 @@ void sun4_mmu_base_device::type0_timeout_r(const uint32_t offset)
 	m_host->set_mae();
 }
 
-void sun4_mmu_base_device::type0_timeout_w(const uint32_t offset)
+void sun4_mmu_base_device::type0_timeout_w(uint32_t offset)
 {
 	LOGMASKED(LOG_TYPE0_TIMEOUT, "type 0 write timeout %08x, PC=%08x\n", offset << 2, m_cpu->pc());
 	m_buserr[0] = 0x8020; // write timeout
@@ -703,10 +623,12 @@ void sun4_mmu_base_device::cache_fill(page_entry &entry, uint32_t vaddr, uint32_
 	}
 }
 
-template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::USER_MODE>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
-template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::SUPER_MODE>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::USER_INSN>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::USER_DATA>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::SUPER_INSN>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
+template bool sun4_mmu_base_device::cache_fetch<sun4_mmu_base_device::SUPER_DATA>(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index);
 
-template <sun4_mmu_base_device::perm_mode PERM_MODE>
+template <sun4_mmu_base_device::insn_data_mode MODE>
 bool sun4_mmu_base_device::cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data, uint32_t entry_index)
 {
 	const uint32_t cache_line = vaddr_to_cache_line(vaddr);
@@ -725,7 +647,7 @@ bool sun4_mmu_base_device::cache_fetch(page_entry &entry, uint32_t vaddr, uint32
 	else if ((tag & m_cache_tag_id_mask) == ((vaddr >> m_cache_tag_id_shift) & m_cache_tag_id_mask))
 	{
 		// If the current tag is valid and the tag IDs match, fetch from the cache
-		if (PERM_MODE == USER_MODE)
+		if ((MODE >> 1) == USER_MODE)
 		{
 			// If we're in user mode and the context does not match, this is a miss
 			if (((tag >> 22) & m_ctx_mask) != m_context_masked && (tag & (1 << 20)))
@@ -750,17 +672,13 @@ bool sun4_mmu_base_device::cache_fetch(page_entry &entry, uint32_t vaddr, uint32
 	}
 }
 
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN>(const uint32_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN>(const uint32_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA>(const uint32_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA>(const uint32_t, const uint32_t);
 
-template <sun4_mmu_base_device::insn_data_mode MODE, sun4_mmu_base_device::perm_mode PERM_MODE>
-uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t mem_mask)
+template <sun4_mmu_base_device::insn_data_mode MODE>
+uint32_t sun4_mmu_base_device::insn_data_r(uint32_t offset, uint32_t mem_mask)
 {
 	// supervisor program fetches in boot state are special
 	if (MODE == SUPER_INSN && m_fetch_bootrom)
@@ -785,7 +703,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 		{
 			uint32_t tag_entry = vaddr_to_cache_line(offset);
 			uint32_t tag = m_cachetags[tag_entry];
-			bool user_mode = (PERM_MODE == USER_MODE);
+			bool user_mode = ((MODE >> 1) == USER_MODE);
 			bool cache_hit = (tag & m_cache_tag_id_mask) == ((offset >> m_cache_tag_id_shift) & m_cache_tag_id_mask);
 			bool cacheable = entry.type == 0 && !entry.uncached;
 			bool check_cache = cacheable && cache_hit && (m_system_enable & ENA_CACHE);
@@ -845,7 +763,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 				const uint32_t masked_addr = m_ram_set_base[set] + (paddr & addr_mask);
 				if (!entry.uncached && (m_system_enable & ENA_CACHE))
 				{
-					if (cache_fetch<PERM_MODE>(entry, offset, masked_addr, cached_data, entry_index))
+					if (cache_fetch<MODE>(entry, offset, masked_addr, cached_data, entry_index))
 					{
 #if SUN4CMMU_LOG_MEM_ACCESSES
 						uint32_t value = masked_addr | 0x80000000;
@@ -886,7 +804,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	{
 		if (!machine().side_effects_disabled())
 		{
-			if ((m_system_enable & ENA_CACHE) && cache_fetch<PERM_MODE>(entry, offset, 0, cached_data, entry_index))
+			if ((m_system_enable & ENA_CACHE) && cache_fetch<MODE>(entry, offset, 0, cached_data, entry_index))
 			{
 				return cached_data;
 			}
@@ -915,17 +833,13 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	}
 }
 
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA, sun4_mmu_base_device::USER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA, sun4_mmu_base_device::SUPER_MODE>(const uint32_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN>(const uint32_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN>(const uint32_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA>(const uint32_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA>(const uint32_t, const uint32_t, const uint32_t);
 
-template <sun4_mmu_base_device::insn_data_mode MODE, sun4_mmu_base_device::perm_mode PERM_MODE>
-void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask)
+template <sun4_mmu_base_device::insn_data_mode MODE>
+void sun4_mmu_base_device::insn_data_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// it's translation time
 	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];// & m_pmeg_mask;
@@ -939,7 +853,7 @@ void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t dat
 		{
 			uint32_t tag_entry = vaddr_to_cache_line(offset);
 			uint32_t tag = m_cachetags[tag_entry];
-			bool user_mode = PERM_MODE == USER_MODE;
+			bool user_mode = (MODE >> 1) == USER_MODE;
 			bool cacheable = entry.type == 0 && !entry.uncached;
 			bool check_cache = cacheable && (m_system_enable & ENA_CACHE);
 			bool cache_valid = BIT(tag, 19);
