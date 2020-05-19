@@ -9,6 +9,13 @@
 #include "emumem_hep.h"
 #include "emumem_hedr.h"
 
+template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+{
+	dispatch = m_dispatch;
+	mask = BITMASK;
+	shift = LowBits;
+}
+
 template<int HighBits, int Width, int AddrShift, int Endian> handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::handler_entry_read_dispatch(address_space *space, const handler_entry::range &init, handler_entry_read<Width, AddrShift, Endian> *handler) : handler_entry_read<Width, AddrShift, Endian>(space, handler_entry::F_DISPATCH)
 {
 	if (!handler)
@@ -49,7 +56,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 
 template<int HighBits, int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
-	return m_dispatch[(offset >> LowBits) & BITMASK]->read(offset, mem_mask);
+	return dispatch_read<Width, AddrShift, Endian>(BITMASK, LowBits, offset, mem_mask, m_dispatch);
 }
 
 template<int HighBits, int Width, int AddrShift, int Endian> void *handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_ptr(offs_t offset) const

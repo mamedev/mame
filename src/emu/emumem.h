@@ -597,8 +597,10 @@ public:
 
 	// Remove a set of passthrough handlers, leaving the lower handler in their place
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
-};
 
+	// Return the internal structures of the root dispatch
+	virtual void get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const;
+};
 
 // =====================-> The parent class of all write handlers
 
@@ -667,6 +669,9 @@ public:
 
 	// Remove a set of passthrough handlers, leaving the lower handler in their place
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
+
+	// Return the internal structures of the root dispatch
+	virtual void get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const;
 };
 
 // =====================-> Passthrough handler management structure
@@ -956,6 +961,20 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 		}
 	}
 }
+
+// ======================> Direct dispatching
+
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX dispatch_read(offs_t mask, u8 shift, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, handler_entry_read<Width, AddrShift, Endian> *const *dispatch)
+{
+	return dispatch[(offset >> shift) & mask]->read(offset, mem_mask);
+}
+
+
+template<int Width, int AddrShift, int Endian> void dispatch_write(offs_t mask, u8 shift, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, handler_entry_write<Width, AddrShift, Endian> *const *dispatch)
+{
+	return dispatch[(offset >> shift) & mask]->write(offset, data, mem_mask);
+}
+
 
 
 // ======================> memory_access_cache

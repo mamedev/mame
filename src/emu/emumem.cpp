@@ -80,6 +80,11 @@ void handler_entry::enumerate_references(handler_entry::reflist &refs) const
 {
 }
 
+template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+{
+	fatalerror("get_dispatch called on non-dispatching class\n");
+}
+
 template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
@@ -125,6 +130,11 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, Ad
 	fatalerror("detach called on non-dispatching class\n");
 }
 
+
+template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+{
+	fatalerror("get_dispatch called on non-dispatching class\n");
+}
 
 template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler)
 {
@@ -289,6 +299,13 @@ class address_space_specific : public address_space
 	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 public:
+	handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
+	handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
+	offs_t m_mask_read;
+	offs_t m_mask_write;
+	u8 m_shift_read;
+	u8 m_shift_write;
+
 	std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const override;
 	void dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const override;
 
@@ -503,6 +520,9 @@ public:
 			case 32: m_root_read = new handler_entry_read_dispatch<32, Width, AddrShift, Endian>(this, r, nullptr); m_root_write = new handler_entry_write_dispatch<32, Width, AddrShift, Endian>(this, r, nullptr); break;
 			default: fatalerror("Unhandled address bus width %d\n", address_width);
 		}
+
+		m_root_read->get_dispatch(m_dispatch_read, m_mask_read, m_shift_read);
+		m_root_write->get_dispatch(m_dispatch_write, m_mask_write, m_shift_write);
 	}
 
 	void *create_cache() override {
@@ -575,7 +595,7 @@ public:
 	{
 		g_profiler.start(PROFILER_MEMREAD);
 
-		uX result = m_root_read->read(offset, mask);
+		uX result = dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, mask, m_dispatch_read);;
 
 		g_profiler.stop();
 		return result;
@@ -586,7 +606,7 @@ public:
 	{
 		g_profiler.start(PROFILER_MEMREAD);
 
-		uX result = m_root_read->read(offset, uX(0xffffffffffffffffU));
+		uX result = dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, uX(0xffffffffffffffffU), m_dispatch_read);;
 
 		g_profiler.stop();
 		return result;
@@ -597,7 +617,7 @@ public:
 	{
 		g_profiler.start(PROFILER_MEMWRITE);
 
-		m_root_write->write(offset, data, mask);
+		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, mask, m_dispatch_write);;
 
 		g_profiler.stop();
 	}
@@ -607,7 +627,7 @@ public:
 	{
 		g_profiler.start(PROFILER_MEMWRITE);
 
-		m_root_write->write(offset, data, uX(0xffffffffffffffffU));
+		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
 
 		g_profiler.stop();
 	}
