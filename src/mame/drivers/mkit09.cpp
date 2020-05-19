@@ -41,6 +41,7 @@ Test Paste:
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "mkit09.lh"
 
@@ -53,8 +54,8 @@ public:
 		, m_pia(*this, "pia")
 		, m_cass(*this, "cassette")
 		, m_maincpu(*this, "maincpu")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void mkit09(machine_config &config);
@@ -63,33 +64,33 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
-	uint8_t pa_r();
-	uint8_t pb_r();
-	void pa_w(uint8_t data);
-	void pb_w(uint8_t data);
-	void mkit09_mem(address_map &map);
-
-	uint8_t m_keydata;
+	u8 pa_r();
+	u8 pb_r();
+	u8 m_digit;
+	u8 m_seg;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
-	output_finder<10> m_digits;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_io_keyboard;
+
+private:
+	void pa_w(u8 data);
+	void pb_w(u8 data);
+	void mkit09_mem(address_map &map);
 };
 
 class mkit09a_state : public mkit09_state
 {
 public:
-	mkit09a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mkit09_state(mconfig, type, tag)
-	{ }
+	using mkit09_state::mkit09_state;
 
 	void mkit09a(machine_config &config);
 
 private:
-	void pa_w(uint8_t data);
+	void pa_w(u8 data);
+	void pb_w(u8 data);
 	void mkit09a_mem(address_map &map);
 };
 
@@ -134,7 +135,7 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -167,7 +168,7 @@ static INPUT_PORTS_START( mkit09a )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Inc") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Dec") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
@@ -218,56 +219,58 @@ INPUT_CHANGED_MEMBER( mkit09_state::trigger_nmi )
 
 void mkit09_state::machine_reset()
 {
-	m_keydata = 0;
+	m_digit = 0;
 }
 
 // read keyboard
-uint8_t mkit09_state::pa_r()
+u8 mkit09_state::pa_r()
 {
-	if (m_keydata < 4)
-		return m_io_keyboard[m_keydata]->read();
+	if (m_digit < 4)
+		return m_io_keyboard[m_digit]->read();
 
 	return 0xff;
 }
 
 // read cassette
-uint8_t mkit09_state::pb_r()
+u8 mkit09_state::pb_r()
 {
-	return m_keydata | ((m_cass->input() > +0.03) ? 0x80 : 0);
+	return m_digit | ((m_cass->input() > +0.03) ? 0x80 : 0);
 }
 
 // write display segments
-void mkit09_state::pa_w(uint8_t data)
+void mkit09_state::pa_w(u8 data)
 {
-	data ^= 0xff;
-	if (m_keydata > 3)
-	{
-		if (m_keydata < 10)
-			m_digits[m_keydata] = bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3);
-		m_keydata = 0;
-	}
+	m_seg = bitswap<8>(~data, 7, 0, 5, 6, 4, 2, 1, 3);
 
-	return;
+	if ((m_digit > 3) && (m_digit < 10))
+		m_display->matrix(1 << m_digit, m_seg);
 }
 
-void mkit09a_state::pa_w(uint8_t data)
+void mkit09a_state::pa_w(u8 data)
 {
-	if (m_keydata > 3)
-	{
-		if (m_keydata < 10)
-			m_digits[13-m_keydata] = data;
-		m_keydata = 0;
-	}
+	m_seg = data;
 
-	return;
+	if ((m_digit > 3) && (m_digit < 10))
+		m_display->matrix(1 << (13-m_digit), m_seg);
 }
 
 // write cassette, select keyboard row, select a digit
-void mkit09_state::pb_w(uint8_t data)
+void mkit09_state::pb_w(u8 data)
 {
 	m_cass->output(BIT(data, 6) ? -1.0 : +1.0);
-	m_keydata = data & 15;
-	return;
+	m_digit = data & 15;
+
+	if ((m_digit > 3) && (m_digit < 10))
+		m_display->matrix(1 << m_digit, m_seg);
+}
+
+void mkit09a_state::pb_w(u8 data)
+{
+	m_cass->output(BIT(data, 6) ? -1.0 : +1.0);
+	m_digit = data & 15;
+
+	if ((m_digit > 3) && (m_digit < 10))
+		m_display->matrix(1 << (13-m_digit), m_seg);
 }
 
 
@@ -279,6 +282,8 @@ void mkit09_state::mkit09(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_mkit09);
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3f0, 0xff);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -305,6 +310,8 @@ void mkit09a_state::mkit09a(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_mkit09);
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3f0, 0xff);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -320,6 +327,7 @@ void mkit09a_state::mkit09a(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
