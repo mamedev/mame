@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Dirk Best
+// copyright-holders:Dirk Best
 /****************************************************************************
 
     Qume QVT-102/QVT-102A video terminal

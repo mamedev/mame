@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,AJR
+// copyright-holders:AJR
 /************************************************************************************************************
 
 Control Data Corporation CDC 721 Terminal (Viking)

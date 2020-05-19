@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Robbbert
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     2013-09-10 Skeleton driver for Televideo TV950
