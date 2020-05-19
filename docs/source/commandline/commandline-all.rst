@@ -27,9 +27,7 @@ short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either
 Depending on the command you're using the pattern with, pattern matching may
 match systems or systems and devices.  It is advised to put quotes around your
 patterns to avoid having your shell try to expand them against filenames (e.g.
-**mame -validate "pac\*"**). This is true on all shells on Linux or Mac. On
-Windows you'll find that while cmd.exe doesn't need the quotes, PowerShell
-needs the quotes around patterns.
+**mame -validate "pac\*"**).
 
 
 .. _mame-commandline-paths:
@@ -235,12 +233,12 @@ overwritten.
                     ...
             	<machine name="z80" sourcefile="src/devices/cpu/z80/z80.cpp" isdevice="yes" runnable="no">
 		            <description>Zilog Z80</description>
-	            </machine>
+	        </machine>
             </mame>
 
 .. Tip:: Output from this command is typically more useful if redirected to
          an output file. For instance, doing 
-         **mame64 -listxml galaxian > galax.txt** will make ``galax.txt`` or
+         **mame64 -listxml galaxian > galax.xml** will make ``galax.xml`` or
          overwrite any existing data in the file with the results of 
          **-listxml**; this will allow you to view it in a text editor or parse
          it with external tools.
@@ -553,9 +551,8 @@ overwritten.
 
 **-listsoftware** / **-lsoft** [<*pattern*>]
 
-    Posts to screen all software lists which can be used by the entered
-    *pattern* or system. Note that this is simply a copy/paste of the .XML file
-    which reside in the HASH folder which are allowed to be used.
+    Displays the contents of all softlists that can be used by the system or
+    systems represented by *pattern*.
 
     Example:
         .. code-block:: bash
@@ -610,8 +607,8 @@ overwritten.
 
 **-getsoftlist** / **-glist** [<*pattern*>]
 
-    Posts to screen a specific software list which matches with the system name
-    provided.
+    Displays the contents of a specific softlist with the filename represented 
+    by *pattern*.
 
     Example:
         .. code-block:: bash
@@ -2053,11 +2050,13 @@ Core Video Options
 
 **-numscreens** *<count>*
 
-    Tells MAME how many output windows to create.  For most systems, a single
-    output window is all you need, but some systems originally used multiple
-    screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Each screen
-    (up to 4) has its own independent settings for physical monitor, aspect
-    ratio, resolution, and view, which can be set using the options below.
+    Tells MAME how many output windows or screens to create.  For most systems, 
+    a single output window is all you need, but some systems originally used 
+    multiple screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Some 
+    systems with front panel controls and/or status lights also may let you put
+    these in different windows/screens. Each screen (up to 4) has its own
+    independent settings for physical monitor, aspect ratio, resolution, and
+    view, which can be set using the options below.
 
     The default is ``1``.
 
@@ -2211,7 +2210,7 @@ Core Video Options
     The default is ``1``.
 
     This is supported with all video output types ( ``bgfx``, ``d3d``, etc) on
-    Windows and is **ONLY** supported with OpenGL on other platforms.
+    Windows and is supported with BGFX and OpenGL on other platforms.
 
     Example:
         .. code-block:: bash
@@ -2726,7 +2725,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -gl_glsl -glsl_shader_mame0 NTSC\NTSC_chain -glsl_shader_mame1 CRT-geom\CRT-geom
+            mame64 suprmrio -gl_glsl -glsl_shader_mame0 NTSC/NTSC_chain -glsl_shader_mame1 CRT-geom/CRT-geom
 
 .. _mame-commandline-glslshaderscreen:
 
