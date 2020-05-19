@@ -3,6 +3,10 @@
 <!--
 license:CC0
 
+TODO compatibility notes:
+- identify/translate all "loading Abort" causes;
+- verify doujinshi bugs that are really bugs and not bad coding or even bad dumps;
+
 Image formats:
 
 Collections of X68000 disks are available in multiple formats: DIM, FDI, XDF, D88
@@ -796,7 +800,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, has video glitches on first stage, Ajax title logo on background -->
+	<!-- boot OK, sometimes a line of garbage appear on background during gameplay (happened after continue on stage 3, hard to repro?) --> 
+	<!-- old note: has video glitches on first stage, Ajax title logo on background (cannot repro) -->
 	<software name="ajax" supported="partial">
 		<description>Ajax</description>
 		<year>1989</year>
@@ -3010,13 +3015,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Crazy Climber", Set drive 1 to boot "Crazy Climber 2". -->
 	<software name="cclimber" supported="no">
 		<description>Video Game Anthology Vol. 5 - Crazy Climber / Crazy Climber 2</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="19930827" />
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.5 - クレイジークライマー / クレイジークライマー2" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Crazy Climber, on DF1 to boot Crazy Climber 2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="crazy climber i &amp; ii (1993)(dempa).dim" size="1261824" crc="3b64d206" sha1="fc7001ac394277ccdb417a47528ed26c9a05a487" offset="000000" />
@@ -3742,13 +3747,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Dig Dug", Set drive 1 to boot "Dig Dug II". -->
 	<software name="digdug">
 		<description>Video Game Anthology vol. 12 - Dig Dug / Dig Dug II</description>
 		<year>1995</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.12 - ディグダグ / ディグダグII" />
 		<info name="release" value="19950224" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Dig Dug, on DF1 to boot Dig Dug II" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="dig dug i &amp; ii (1995)(dempa).dim" size="1261824" crc="9a6ea5d4" sha1="724bcc24d739b693f70708ade3f4cc89fadb2856" offset="000000" />
@@ -4916,7 +4921,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<description>Video Game Anthology Vol. 8 - Exciting Hour / Syusse Oozumou</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="usage" value="This format is multi boot disk. Set drive 0 to boot Exciting Hour, Set drive 1 to boot Syusse Oozumou" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Exciting Hour, on DF1 to boot Syusse Oozumou" />
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.8 - エキサイティングアワー / 出世大相撲" />
 		<info name="release" value="19940225" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8939,7 +8944,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!-- boot OK, "NEW SYSTEM HOUSE OH" speech has some garbage, title screen/gameplay sports a minor horizontal black line GFX glitches -->
+	<!-- boot OK, "NEW SYSTEM HOUSE OH" ADPCM has some garbage, title screen/gameplay sports a minor horizontal black line GFX glitches -->
 	<software name="kumiko" supported="partial">
 		<description>Makenshi Kumiko</description>
 		<year>1989</year>
@@ -9651,7 +9656,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.10 - ミスター・ドゥ / ミスター・ドゥ対ユニコーン" />
 		<info name="release" value="19940702" />
-		<info name="usage" value="This format is multi boot disk. Set drive 0 to boot Mr. Do!, Set drive 1 to boot Mr. Do! vs Unicorns" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Mr. Do!, on DF1 to boot Mr. Do! vs Unicorns" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="mr. do &amp; mr. do vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
@@ -13849,13 +13854,14 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Terra Cresta", Set drive 1 to boot "Moon Cresta". -->
 	<software name="terracre">
 		<description>Video Game Anthology Vol. 1 - Terra Cresta / Moon Cresta</description>
 		<year>1992</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.1 - テラクレスタ / ムーンクレスタ" />
 		<info name="release" value="19921120" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Terra Cresta, on DF1 to boot Moon Cresta" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="terra cresta &amp; moon cresta (1992)(dempa).dim" size="1261824" crc="1e7c5847" sha1="aea8ae183e2bac3d5e0e6dfddcc2ca1655f07c24" offset="000000" />
@@ -14608,7 +14614,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!-- hangs during in-game loading, asking Disk C in drive 0 (huh?) -->
+	<!-- hangs during in-game loading, asking Disk C in DF0 (huh?) -->
 	<software name="versnag" supported="no">
 		<description>War Torn Versnag</description>
 		<year>1993</year>
@@ -21970,13 +21976,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Fortress Attack", Set drive 1 to boot "GJ". -->
 	<software name="fortatgj">
 		<description>The World of X68000 - Fortress Attack &amp; GJ</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 - フォートレスアタック &amp; GJ" />
 		<info name="release" value="19930820" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Fortress Attack, on DF1 to boot GJ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="the world of x68000 (disk 1 of 3) - fortress attack &amp; gj.dim" size="1261824" crc="373b5d62" sha1="b0e9d5304c33546bee2ffc3e6380b8fe2f3d3e95" offset="000000" />
@@ -21984,13 +21990,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Logic Rush", Set drive 1 to boot "Ah! Ohimesama!". -->
 	<software name="lcmyprin" supported="no">
 		<description>The World of X68000 - Logic Rush &amp; Ah! Ohimesama!</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 - ロジックラッシュ &amp; ああっ! お姫さまっ!" />
 		<info name="release" value="19930820" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Logic Rush, on DF1 to boot Ah! Ohimesama!" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="the world of x68000 (disk 2 of 3) - logic rush &amp; ah ohimesama.dim" size="1261824" crc="235f83ca" sha1="a40470d9fab4c7d13184b5300eb16aa52db2d39e" offset="000000" />
@@ -22024,13 +22030,13 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Rush!", Set drive 1 to boot "Useful". -->
 	<software name="rushusfl">
 		<description>The World of X68000 II - Rush! &amp; Useful</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ザ・ワールド・オブ・X68000 II - ラッシュ! &amp; ユースフル" />
 		<info name="release" value="19940720" />
+		<info name="usage" value="This format is multi boot disk. Mount on DF0 to boot Rush!, on DF1 to boot Useful" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="the world of x68000 ii (disk 3 of 4) - rush &amp; useful.dim" size="1261824" crc="f60f3b1b" sha1="a4ff175494a9438ed4444e533816bac8303a6e4c" offset="000000" />
@@ -22064,9 +22070,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- This boot disk is copied file from "The World of X68000" -->
 	<!-- boot OK -->
 	<software name="aahime" supported="yes">
+		<!-- This boot disk is copied file from "The World of X68000" -->
 		<description>Aa! O-Hime-sama! (Ripped from The World of X68000)</description>
 		<year>1993</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -22159,7 +22165,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<!-- boot OK --> 
-	<!-- some projectiles don't move (can't reproduce) -->
+	<!-- some projectiles don't move (cannot repro) -->
 	<software name="actshoot">
 		<description>Active Shoot</description>
 		<year>1999</year>
@@ -27157,8 +27163,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Abort Retry Fail at boot trying to read drive 2 ("copyall a:message c:" in autoexec.bat!?) -->
-	<!-- doesn't boot even if another image is present in drive 2 -->
+	<!-- Abort Retry Fail at boot trying to read DF2 ("copyall a:message c:" in autoexec.bat!?) -->
+	<!-- doesn't boot even if another image is present in DF2 -->
 	<software name="lunafant" supported="no">
 		<description>Lunatic Fantasy v2.0</description>
 		<year>199?</year>
