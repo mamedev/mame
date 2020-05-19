@@ -753,10 +753,11 @@ namespace netlist
 	// logic_output_t
 	// ----------------------------------------------------------------------------------------
 
-	logic_output_t::logic_output_t(device_t &dev, const pstring &aname)
+	logic_output_t::logic_output_t(device_t &dev, const pstring &aname, bool dummy)
 		: logic_t(dev, aname, STATE_OUT)
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
+		plib::unused_var(dummy);
 		this->set_net(&m_my_net);
 		state().register_net(owned_pool_ptr<logic_net_t>(&m_my_net, false));
 		state().setup().register_term(*this);
@@ -803,12 +804,16 @@ namespace netlist
 	// Parameters ...
 	// ----------------------------------------------------------------------------------------
 
-	param_t::param_t(core_device_t *device, const pstring &name)
-		: device_object_t(device, (device ? device->name() + "." : "")  + name)
+	// deviceless, it's the responsibility of the owner to register!
+	param_t::param_t(const pstring &name)
+		: device_object_t(nullptr, name)
 	{
-		// if deviceless, it's the responsibility of the owner to register!
-		if (device != nullptr)
-			device->state().setup().register_param_t(*this);
+	}
+
+	param_t::param_t(core_device_t &device, const pstring &name)
+		: device_object_t(&device, device.name() + "." + name)
+	{
+		device.state().setup().register_param_t(*this);
 	}
 
 	param_t::param_type_t param_t::param_type() const noexcept(false)
@@ -829,23 +834,26 @@ namespace netlist
 	}
 
 
-	pstring param_t::get_initial(const core_device_t &dev, bool *found) const
+	pstring param_t::get_initial(const core_device_t *dev, bool *found) const
 	{
-		pstring res = dev.state().setup().get_initial_param_val(this->name(), "");
+		pstring res = dev->state().setup().get_initial_param_val(this->name(), "");
 		*found = (res != "");
 		return res;
 	}
 
 	param_str_t::param_str_t(core_device_t &device, const pstring &name, const pstring &val)
-	: param_t(&device, name)
+	: param_t(device, name)
 	{
-		m_param = plib::make_unique<pstring>(device.state().setup().get_initial_param_val(this->name(),val));
+		m_param = plib::make_unique<pstring>(val);
+		*m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
 	param_str_t::param_str_t(netlist_state_t &state, const pstring &name, const pstring &val)
-	: param_t(nullptr, name)
+	: param_t(name)
 	{
-		m_param = plib::make_unique<pstring>(state.setup().get_initial_param_val(this->name(),val));
+		// deviceless parameter, no registration, owner is responsible
+		m_param = plib::make_unique<pstring>(val);
+		*m_param = state.setup().get_initial_param_val(this->name(),val);
 	}
 
 	void param_str_t::changed() noexcept
@@ -853,7 +861,7 @@ namespace netlist
 	}
 
 	param_ptr_t::param_ptr_t(core_device_t &device, const pstring &name, uint8_t * val)
-	: param_t(&device, name)
+	: param_t(device, name)
 	{
 		m_param = val;
 	}

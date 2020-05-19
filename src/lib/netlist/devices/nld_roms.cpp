@@ -30,13 +30,14 @@ namespace netlist
 		{
 			NETLIB_CONSTRUCTOR(generic_prom)
 			, m_enabled(*this, "m_enabled", true)
+			, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
 			, m_A(*this, 0, "A{}", NETLIB_DELEGATE(generic_prom, addr))
 			, m_CEQ(*this, 1,
 				D::chip_enable_mask::value ^ static_cast<size_t>(0xffff), pstring("CE{}"),
 				std::array<nldelegate, 3>{ NETLIB_DELEGATE(generic_prom, ce<0>),
 				  NETLIB_DELEGATE(generic_prom, ce<1>),
 				  NETLIB_DELEGATE(generic_prom, ce<2>)})
-			, m_O(*this, D::data_name_offset::value, "O{}")
+			, m_O(*this, D::data_name_offset::value, "O{}", m_TE())
 			, m_ROM(*this, "ROM")
 			, m_power_pins(*this)
 			{
@@ -51,11 +52,29 @@ namespace netlist
 			{
 				using cet = typename D::chip_enable_time;
 				m_enabled = (m_CEQ() == D::chip_enable_mask::value);
-				const auto delay = m_enabled ? D::access_time::value() : cet::value(N);
-				const data_type o = m_enabled ? m_ROM[m_A()] :
-					(1 << D::data_width::value) - 1; // FIXME tristate !
+				switch (D::output_id::value)
+				{
+					case 0: // logic
+						{
+							m_O.push(m_ROM[m_A()], D::access_time::value());
+						}
+						break;
+					case 1: // tristate
+						{
+							m_O.set_tristate(!m_enabled, cet::value(N), cet::value(N));
+							m_O.push(m_ROM[m_A()], D::access_time::value());
+						}
+						break;
+					default: // 2, open collector
+						{
+							const auto delay = m_enabled ? D::access_time::value() : cet::value(N);
+							const data_type o = m_enabled ? m_ROM[m_A()] :
+								(1 << D::data_width::value) - 1;
+							m_O.push(o, delay);
+						}
+						break;
+				}
 
-				m_O.push(o, delay);
 			}
 
 			inline
@@ -63,7 +82,6 @@ namespace netlist
 			{
 				if (m_enabled)
 				{
-					// FIXME: Outputs are tristate. This needs to be properly implemented
 					m_O.push(m_ROM[m_A()], D::access_time::value());
 				}
 			}
@@ -74,6 +92,7 @@ namespace netlist
 			}
 
 			state_var<bool> m_enabled;
+			param_logic_t m_TE;
 			object_array_t<logic_input_t, D::address_width::value> m_A;
 			object_array_t<logic_input_t, D::chip_enable_inputs::value> m_CEQ;
 			object_array_t<typename D::output_type, D::data_width::value> m_O;
@@ -94,14 +113,15 @@ namespace netlist
 			using chip_enable_time =   times_ns2<25, 25>;
 			using access_time =        time_ns<40>;
 
-			using output_type =        logic_output_t;
+			using output_type =        tristate_output_t;
+			using output_id   =        desc_const<1>; // 0: logic, 1: tristate, 2: open collector
 		};
 
 		struct desc_74S287 : public desc_82S126
 		{
-			using chip_enable_time = times_ns2<15, 15>;
-			using access_time = time_ns<35>;
-			static constexpr const size_t data_name_offset = 0; // O0, O1, ..
+			using data_name_offset =   desc_const<0>; // O0, O1, ... according to National Semiconductor datasheet
+			using chip_enable_time =   times_ns2<15, 15>;
+			using access_time =        time_ns<35>;
 		};
 
 		struct desc_82S123 : public desc_base
@@ -117,7 +137,8 @@ namespace netlist
 			using chip_enable_time =   times_ns1<35>;
 			using access_time =        time_ns<45>;
 
-			using output_type =        logic_output_t;
+			using output_type =        tristate_output_t;
+			using output_id   =        desc_const<1>; // 0: logic, 1: tristate, 2: open collector
 		};
 
 		struct desc_2716 : public desc_base
@@ -134,7 +155,8 @@ namespace netlist
 			using chip_enable_time = times_ns2<450, 100>; //CE, OE
 			using access_time =        time_ns<450>;
 
-			using output_type =        logic_output_t;
+			using output_type =        tristate_output_t;
+			using output_id   =        desc_const<1>; // 0: logic, 1: tristate, 2: open collector
 		};
 
 

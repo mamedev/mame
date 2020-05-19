@@ -501,7 +501,6 @@ namespace solver
 				m_last_V[k] = v;
 				const nl_fptype hn = cur_ts;
 
-				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
 				nl_fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
 				nl_fptype new_net_timestep(0);
 

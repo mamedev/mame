@@ -694,6 +694,7 @@ struct doc_ext
 	pstring description;
 	std::vector<pstring> pinalias;
 	pstring package;
+	std::vector<std::pair<pstring, pstring>> params;
 	pstring namingconventions;
 	pstring limitations;
 	pstring functiontable;
@@ -702,7 +703,6 @@ struct doc_ext
 
 static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 {
-	//printf("file %s\n", fname.c_str());
 	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
 		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
@@ -725,10 +725,12 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					throw netlist::nl_exception(l+" size mismatch");
 				pstring n(plib::trim(a[0]));
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
+				pstring v2(v);
 				if (n == "Identifier")
 				{
 					if (!r.readline(l) || ret.id == id)
 						return (ret.id == id ? ret : doc_ext());
+					ret = doc_ext();
 					ret.id = v;
 				}
 				else
@@ -755,6 +757,8 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 						ret.limitations = v;
 					else if (n == "FunctionTable")
 						ret.functiontable = v;
+					else if (n == "Param")
+						ret.params.push_back(std::pair<pstring, pstring>(v2, plib::trim(v.substr(v2.length()))));
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
@@ -929,25 +933,33 @@ void tool_app_t::create_docheader()
 
 	pout("\n");
 
+	std::vector<doc_ext> de_cache;
+
 	for (auto &e : nt.parser().factory())
 	{
-		pout("//! [{1} csynopsis]\n", e->name());
-		header_entry(e.get());
-		pout("//! [{1} csynopsis]\n", e->name());
-		pout("//! [{1} synopsis]\n", e->name());
-		mac(e.get());
-		pout("//! [{1} synopsis]\n", e->name());
+		auto d(read_docsrc(e->source().file_name(), e->name()));
+
+		if (d.id != "")
+		{
+			pout("//! [{1} csynopsis]\n", e->name());
+			header_entry(e.get());
+			pout("//! [{1} csynopsis]\n", e->name());
+			pout("//! [{1} synopsis]\n", e->name());
+			mac(e.get());
+			pout("//! [{1} synopsis]\n", e->name());
+		}
+		de_cache.push_back(std::move(d));
 	}
 
 	poutprefix("", "");
 	poutprefix("///", "");
 	//poutprefix("///", " @file ");
-	poutprefix("///", " @page '' "); // FIXME: snippets and pages need to be separate files
+	poutprefix("///", " @page ''"); // FIXME: snippets and pages need to be separate files
 	poutprefix("", "");
 
-	for (auto &e : nt.parser().factory())
+	for (auto &d : de_cache)
 	{
-		auto d(read_docsrc(e->source().file_name(), e->name()));
+		//auto d(read_docsrc(e->source().file_name(), e->name()));
 
 		if (d.id != "")
 		{
@@ -967,7 +979,17 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  @snippet devsyn.dox.h {} csynopsis", d.id);
 			poutprefix("///", "");
-			poutprefix("///", "  @section {}_2 Connection Diagram", d.id);
+#if 1
+			poutprefix("///", "  @section {}_2 Parameters", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  <table>");
+			poutprefix("///", "  <tr><th>Name</th><th>Description</th></tr>");
+			for (auto &e : d.params)
+				poutprefix("///", "  <tr><td>{1}</td><td>{2}</td></tr>", e.first, e.second);
+			poutprefix("///", "  </table>");
+#endif
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_3 Connection Diagram", d.id);
 			poutprefix("///", "");
 
 			if (!d.pinalias.empty())
@@ -990,20 +1012,20 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  {}", d.namingconventions);
 			poutprefix("///", "");
-			poutprefix("///", "  @section {}_3 Function Table", d.id);
+			poutprefix("///", "  @section {}_4 Function Table", d.id);
 			poutprefix("///", "");
 			if (d.functiontable == "")
 				poutprefix("///", "  Please refer to the datasheet.");
 			else
 				poutprefix("///", "  {}", d.functiontable);
 			poutprefix("///", "");
-			poutprefix("///", "  @section {}_4 Limitations", d.id);
+			poutprefix("///", "  @section {}_5 Limitations", d.id);
 			poutprefix("///", "");
 			poutprefix("///", "  {}", d.limitations);
 			if (!d.example.empty())
 			{
 				poutprefix("///", "");
-				poutprefix("///", "  @section {}_5 Example", d.id);
+				poutprefix("///", "  @section {}_6 Example", d.id);
 				poutprefix("///", "  @snippet {1} {2}", d.example[0], d.example[1]);
 				poutprefix("///", "");
 				poutprefix("", "");

@@ -746,6 +746,10 @@ NETLIST_END()
 //-
 //- Pinalias: 1GQ,1A,1Y,2GQ,2A,2Y,GND,3Y,3A,3GQ,4Y,4A,4GQ,VCC
 //- Package: DIP
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
 //- NamingConvention: Naming conventions follow Texas instruments datasheet
 //- Limitations:
 //-    No limitations
@@ -768,7 +772,8 @@ static NETLIST_START(TTL_74125_DIP)
 	TTL_74125_GATE(A3)
 	TTL_74125_GATE(A4)
 
-	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	DEFPARAM(FORCE_TRISTATE_LOGIC, "$(@.A1.FORCE_TRISTATE_LOGIC")
+
 	PARAM(A1.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A2.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A3.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")

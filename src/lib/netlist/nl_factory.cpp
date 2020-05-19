@@ -15,11 +15,11 @@ namespace netlist {
 namespace factory {
 
 	// FIXME: this doesn't do anything, check how to remove
-	class NETLIB_NAME(wrapper) : public device_t
+	class NETLIB_NAME(wrapper) : public base_device_t
 	{
 	public:
 		NETLIB_NAME(wrapper)(netlist_state_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
+		: base_device_t(anetlist, name)
 		{
 		}
 	protected:

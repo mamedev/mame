@@ -54,6 +54,8 @@ NETLIST_START(hazelvid)
 	/* signal lookup PROM */
 	PROM_82S126(u71, low, low, u70.QA, u70.QB, u70.QC, u70.QD, u69.QA, u69.QB, u69.QC, low)
 	PARAM(u71.ROM, "u90_702128_82s129.bin")
+	// The prom is always enabled and outputs are only connected to logic inputs
+	PARAM(u71.FORCE_TRISTATE_LOGIC, 1)
 
 	/* signal decoding */
 	TTL_9334(u72, high, u81.Q1Q, u71.O4, u71.O1, u71.O2, u71.O3)
@@ -221,6 +223,9 @@ NETLIST_START(hazelvid)
 
 	EPROM_2716(u78, low, low, lc20, lc21, lc22, lc23, u66.Q1, u66.Q2, u66.Q3, u66.Q4, u66.Q5, u66.Q6, u56.Q1)
 	PARAM(u78.ROM, "u83_chr.bin")
+
+	// The eprom is always enabled and outputs are only connected to logic inputs
+	PARAM(u78.FORCE_TRISTATE_LOGIC, 1)
 
 	TTL_74166(u77, video_clk, low, ndot, low, u78.O0, u78.O1, u78.O2, u78.O3, u78.O4, u78.O5, u78.O6, low, clr_vid_sr)
 	ALIAS(raw_dot, u77.QH)

@@ -162,7 +162,7 @@ NETLIST_END()
  *  Naming conventions follow National Semiconductor datasheet
  *
  */
- 
+
 static NETLIST_START(CD4069_DIP)
 	CD4069_GATE(A)
 	CD4069_GATE(B)
@@ -170,7 +170,7 @@ static NETLIST_START(CD4069_DIP)
 	CD4069_GATE(D)
 	CD4069_GATE(E)
 	CD4069_GATE(F)
-	
+
 	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, E.VDD)
 	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
 
@@ -268,7 +268,7 @@ NETLIST_START(CD4XXX_lib)
 		TT_LINE("1|0|55")
 		TT_FAMILY("CD4XXX")
 	TRUTHTABLE_END()
-	
+
 	TRUTHTABLE_START(CD4070_GATE, 2, 1, "")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,0|0|15")

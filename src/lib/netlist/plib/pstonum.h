@@ -42,7 +42,6 @@ namespace plib
 		}
 		else
 			*idx = constants<std::size_t>::zero();
-		//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
 		return x;
 	}
 

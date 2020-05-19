@@ -118,7 +118,6 @@ namespace plib {
 				mempool &mp = b->m_mempool;
 				b->m_num_alloc--;
 				mp.m_stat_cur_alloc -= size;
-				//printf("Freeing in block %p %lu\n", b, b->m_num_alloc);
 				if (b->m_num_alloc == 0)
 				{
 					auto itb = std::find(mp.m_blocks.begin(), mp.m_blocks.end(), b);

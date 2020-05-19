@@ -270,7 +270,7 @@ namespace netlist
 			std::unordered_map<pstring, pstring>        m_alias;
 			std::vector<link_t>                         m_links;
 			std::unordered_map<pstring, pstring>        m_param_values;
-			models_t::raw_map_t 						m_models;
+			models_t::raw_map_t                         m_models;
 
 			// need to preserve order of device creation ...
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
@@ -491,7 +491,7 @@ namespace netlist
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>              m_proxies;
-		std::vector<plib::unique_ptr<param_t>> 		m_defparam_lifetime;
+		std::vector<plib::unique_ptr<param_t>>      m_defparam_lifetime;
 
 		unsigned m_proxy_cnt;
 	};

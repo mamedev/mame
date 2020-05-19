@@ -177,8 +177,6 @@ namespace analog
 				m_trn = h;
 				return { G, - G * v };
 			}
-			if (step < 1e-9)
-				printf("Help %e\n", step);
 			const nl_fptype Gn = nlconst::two() * cap * m_trn;
 			const nl_fptype inp1 = Gn * v - (m_in + Gn * m_vn);
 			const nl_fptype G(nlconst::two() * cap * h);

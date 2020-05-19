@@ -198,8 +198,6 @@ namespace netlist
 		pstring fqn = build_fqn(param);
 		pstring val(value);
 
-		//printf("RegParam %s %s\n", fqn.c_str(), val.c_str());
-
 		// strip " from stringified strings
 		if (plib::startsWith(value, "\"") && plib::endsWith(value, "\""))
 			val = value.substr(1, value.length() - 2);
@@ -229,8 +227,13 @@ namespace netlist
 
 	void nlparse_t::defparam(const pstring &name, const pstring &def)
 	{
-		//printf("Registering %s\n", name.c_str());
-		m_abstract.m_defparams.emplace_back(namespace_prefix() + name, def);
+		// strip " from stringified strings
+		pstring val(def);
+		if (plib::startsWith(def, "\"") && plib::endsWith(def, "\""))
+			val = def.substr(1, def.length() - 2);
+		// Replace "@." with the current namespace
+		val = plib::replace_all(val, "@.", namespace_prefix());
+		m_abstract.m_defparams.emplace_back(namespace_prefix() + name, val);
 	}
 
 	void nlparse_t::register_lib_entry(const pstring &name, factory::properties &&props)
@@ -422,37 +425,40 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
 	auto i = m_abstract.m_param_values.find(name);
-	pstring v = (i != m_abstract.m_param_values.end()) ? i->second : def;
+	auto found_pat(false);
+	pstring v = (i == m_abstract.m_param_values.end()) ? def : i->second;
 
-	//printf("%s -> %s\n", name.c_str(), v.c_str());
-
-	auto sp(plib::psplit(v, std::vector<pstring>({"$(", ")"})));
-	std::size_t p(0);
-	v = "";
-	while (p < sp.size())
+	do
 	{
-		if (sp[p] == "$(")
+		found_pat = false;
+		auto sp(plib::psplit(v, std::vector<pstring>({"$(", ")"})));
+		std::size_t p(0);
+		v = "";
+		while (p < sp.size())
 		{
-			p++;
-			pstring r;
-			while (p < sp.size() && sp[p] != ")")
-				r += sp[p++];
-			p++;
-			auto k = m_params.find(r);
-			if (k != m_params.end())
+			if (sp[p] == "$(")
 			{
-				v = v + k->second.param().valstr();
+				p++;
+				pstring r;
+				while (p < sp.size() && sp[p] != ")")
+					r += sp[p++];
+				p++;
+				auto k = m_params.find(r);
+				if (k != m_params.end())
+				{
+					v = v + k->second.param().valstr();
+					found_pat = true;
+				}
+				else
+				{
+					// pass - on
+					v = v + "$(" + r + ")";
+				}
 			}
 			else
-			{
-				v = v + "UNDEFINED_" + r;
-			}
-			//v = v + get_initial_param_val(r, "UNDEFINED_" + r);
+				v += sp[p++];
 		}
-		else
-			v += sp[p++];
-
-	}
+	} while (found_pat);
 
 	return v;
 }
@@ -1172,7 +1178,7 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			throw nl_exception(MF_MODEL_NOT_FOUND(model));
+			throw nl_exception(MF_MODEL_NOT_FOUND("xx" + model));
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
@@ -1259,7 +1265,6 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
-	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_fptype>(tmp), factor);
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
 	if (err)

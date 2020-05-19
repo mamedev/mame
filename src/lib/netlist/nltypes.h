@@ -202,7 +202,7 @@ namespace netlist
 			{
 				return NLTIME_FROM_NS(N == 0 ? value0 :
 						N == 1 ? value1 :
-							     value2);
+								 value2);
 			}
 		};
 
@@ -211,7 +211,7 @@ namespace netlist
 		/// See the 74125 implementation
 		///
 		template <std::size_t V>
-		using desc_const = 	std::integral_constant<std::size_t, V>;
+		using desc_const =  std::integral_constant<std::size_t, V>;
 	};
 
 
