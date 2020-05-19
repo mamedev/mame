@@ -78,7 +78,7 @@ constexpr u8 CR_CTRO    = 0x80U;
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS M6500/1");
+DEFINE_DEVICE_TYPE(M6500_1, m6500_1_device, "m6500_1", "MOS Technology 6500/1");
 
 
 m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)

@@ -15,7 +15,7 @@
 #include "m4510.h"
 #include "m4510d.h"
 
-DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG M4510")
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG 4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M4510, tag, owner, clock),
