@@ -185,8 +185,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	case 0x07:
 	case 0x17:
 	{
-		// this decoding / hookup might be incorrect, only seen Store used, and that the decode seems strange for that
-
 		uint16_t imm16_2 = read16(UNSP_LPC);
 		add_lpc(1);
 
@@ -208,40 +206,65 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
-			// a = [A16]
 			write16(imm16_2, lres);
 		}
 
 		return;
 	}
 
-	case 0x08: case 0x09:
+	case 0x08: case 0x09: // Ext Indirect, Rx = Rx op [Ry@]
+	case 0x0a: case 0x0b: // Ext Indirect, Rx = Rx op ds:[Ry@]
 	{
-		// Ext Indirect
-		// Rx = Rx op [Ry@]
-		// A  = B  op C
+		uint16_t r0 = 0;
+		uint16_t r1 = 0;
+		uint32_t r2 = 0;
+		uint32_t lres = 0;
 
-		//uint8_t aluop = (ximm & 0xf000) >> 12;
-		//uint8_t ry = (ximm & 0x0007) >> 0;
-		//uint8_t form = (ximm & 0x0018) >> 3;
-		//uint8_t rx = (ximm & 0x0e00) >> 9;
+		uint16_t aluop = (ximm & 0xf000) >> 12;
+		uint8_t ry = (ximm & 0x0007) + 8;
+		uint8_t rx = ((ximm & 0x0e00) >> 9) + 8;
+		uint8_t use_ds = BIT(ximm, 5);
+		uint8_t form = (ximm & 0x0018) >> 3;
 
-		logerror("(Extended group 4 'Rx=Rx op [Ry@]' form) unimplemented ");
-		unimplemented_opcode(op, ximm);
-		return;
-	}
-	case 0x0a: case 0x0b:
-	{
-		// Ext DS_Indirect Rx=Rx op ds:[Ry@]
+		switch (form)
+		{
+			case 0x0: // Rx, [<ds:>Ry]
+				r2 = use_ds ? UNSP_LREG_I(ry) : m_core->m_r[ry];
+				if (aluop != 0x0d)
+					r1 = read16(r2);
+				break;
+			case 0x1: // Rx, [<ds:>Ry--]
+				r2 = use_ds ? UNSP_LREG_I(ry) : m_core->m_r[ry];
+				if (aluop != 0x0d)
+					r1 = read16(r2);
+				m_core->m_r[ry] = (uint16_t)(m_core->m_r[ry] - 1);
+				if (m_core->m_r[ry] == 0xffff)
+					m_core->m_r[REG_SR] -= 0x0400;
+				break;
+			case 0x2: // Rx, [<ds:>Ry++]
+				r2 = use_ds ? UNSP_LREG_I(ry) : m_core->m_r[ry];
+				if (aluop != 0x0d)
+					r1 = read16(r2);
+				m_core->m_r[ry] = (uint16_t)(m_core->m_r[ry] + 1);
+				if (m_core->m_r[ry] == 0x0000)
+					m_core->m_r[REG_SR] += 0x0400;
+				break;
+			case 0x3: // Rx, [<ds:>++Ry]
+				m_core->m_r[ry] = (uint16_t)(m_core->m_r[ry] + 1);
+				if (m_core->m_r[ry] == 0x0000 && use_ds)
+					m_core->m_r[REG_SR] += 0x0400;
+				r2 = use_ds ? UNSP_LREG_I(ry) : m_core->m_r[ry];
+				if (aluop != 0x0d)
+					r1 = read16(r2);
+				break;
+		}
 
-		//uint8_t aluop = (ximm & 0xf000) >> 12;
-		//uint8_t ry = (ximm & 0x0007) >> 0;
-		//uint8_t form = (ximm & 0x0018) >> 3;
-		//uint8_t rx = (ximm & 0x0e00) >> 9;
+		const bool write = do_basic_alu_ops(aluop, lres, r0, r1, r2, (aluop != 7) ? true : false);
+		if (write)
+		{
+			m_core->m_r[rx] = (uint16_t)lres;
+		}
 
-		logerror("(Extended group 5 'Rx=Rx op ds:[Ry@]' form) unimplemented ");
-
-		unimplemented_opcode(op, ximm);
 		return;
 	}
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
