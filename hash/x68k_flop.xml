@@ -460,7 +460,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="4thunit" supported="yes">
 		<description>The 4th Unit</description>
 		<year>1988</year>
@@ -481,7 +481,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="4thunit2" supported="yes">
 		<description>The 4th Unit 2</description>
 		<year>1988</year>
@@ -1009,7 +1009,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="abart1" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 1</description>
 		<year>1992</year>
@@ -1022,7 +1022,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="abart2" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 2</description>
 		<year>1993</year>
@@ -1035,7 +1035,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="abart3" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 3</description>
 		<year>1993</year>
@@ -1048,7 +1048,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="abart4" supported="yes">
 		<description>All Bishoujo Art Graphics Vol. 4</description>
 		<year>1993</year>
@@ -1149,7 +1149,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, voice samples scratching at gal intro, tiles aren't shown on gameplay -->
+	<!-- boot OK, ADPCM scratches at gal intro, tiles aren't shown on gameplay -->
 	<software name="animjv3" supported="no">
 		<description>Animahjong V3</description>
 		<year>1993</year>
@@ -1376,7 +1376,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="arcus2" supported="yes">
 		<description>Arcus II - Silent Symphony</description>
 		<year>1990</year>
@@ -1474,7 +1474,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="artemis" supported="yes">
 		<description>Artemis</description>
 		<year>1991</year>
@@ -1656,7 +1656,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="btlchess" supported="yes">
 		<description>Battle Chess</description>
 		<year>1989</year>
@@ -1703,7 +1703,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="beast" supported="yes">
 		<description>Beast Injuu no Yakata</description>
 		<year>1991</year>
@@ -2320,7 +2320,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="bretscen" supported="yes">
 		<description>Bretonne Lais Scenario Editor</description>
 		<year>1991</year>
@@ -2607,7 +2607,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="caroll" supported="yes">
 		<description>Caroll</description>
 		<year>1991</year>
@@ -2641,7 +2641,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="castles" supported="yes">
 		<description>Castles</description>
 		<year>1992</year>
@@ -2847,7 +2847,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, Title screen has wrong scroll effect, no "get ready" sample at first life/first stage? -->
+	<!-- boot OK, Title screen has wrong scroll effect, no "get ready" ADPCM at first life/first stage? -->
 	<software name="codezero" supported="partial">
 		<description>Code-Zero</description>
 		<year>1991</year>
@@ -3166,7 +3166,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="dreturn" supported="yes">
 		<description>D-Return</description>
 		<year>1989</year>
@@ -3457,7 +3457,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="dashyar" supported="yes">
 		<description>Dash Yarou</description>
 		<year>1991</year>
@@ -3617,7 +3617,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="deflektr" supported="yes">
 		<description>Deflektor</description>
 		<year>1991</year>
@@ -3814,7 +3814,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="dokicard" supported="yes">
 		<description>Doki Doki Card League</description>
 		<year>1990</year>
@@ -4217,7 +4217,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="drachaku" supported="yes">
 		<description>Dracula Hakushaku</description>
 		<year>1992</year>
@@ -4729,7 +4729,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!-- can't disk swap (Abort, Retry, Fail) -->
+	<!-- disk swap causes Abort Retry Fail -->
 	<software name="emerald" supported="no">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
@@ -4819,7 +4819,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="entfuhr" supported="yes">
 		<description>Entführer</description>
 		<year>1989</year>
@@ -5176,7 +5176,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="fss" supported="yes">
 		<description>FSS Fantasy Saga System</description>
 		<year>1990</year>
@@ -5324,7 +5324,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Window glitches in intro/map-->
+	<!-- boot OK, misaligned window for intro and briefing map -->
 	<software name="fzsenki" supported="partial">
 		<description>FZ Senki Axis</description>
 		<year>1990</year>
@@ -5697,7 +5697,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="genocid2" supported="yes">
 		<description>Genocide 2</description>
 		<year>1991</year>
@@ -5765,7 +5765,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="geoseal" supported="yes">
 		<description>Geograph Seal</description>
 		<year>1994</year>
@@ -5824,8 +5824,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Has a gfx bug at floppy loading, can't swap disk?-->
-	<software name="gingaed2" supported="partial">
+	<software name="gingaed2">
+		<!-- How to create user disk? -->
 		<description>Ginga Eiyuu Densetsu II</description>
 		<year>1990</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -6170,7 +6170,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Has manual copy protection after title screen, cracked?-->
+	<!-- boot OK, has manual copy protection after title screen but game still advances even if it fails (cracked?) -->
 	<software name="gunship" supported="yes">
 		<description>Gunship</description>
 		<year>1990</year>
@@ -6319,8 +6319,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Mouse pointer layer repeats graphics of the first screen house-->
-	<software name="haresawa" supported="partial">
+	<!-- boot OK -->
+	<software name="haresawa" supported="yes">
 		<description>Hare Nochi Oosawagi!</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
@@ -6353,7 +6353,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="himihana" supported="yes">
 		<description>Himitsu no Hanazono</description>
 		<year>1992</year>
@@ -6380,7 +6380,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="fshark" supported="yes">
 		<description>Hishouzame - Flying Shark</description>
 		<year>1991</year>
@@ -6458,7 +6458,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="hoshisu2" supported="yes">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
@@ -6755,7 +6755,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="image" supported="yes">
 		<description>Image</description>
 		<year>1992</year>
@@ -7036,8 +7036,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Doesn't detect disk swap-->
-	<software name="janjaka" supported="partial">
+	<!-- boot OK -->
+	<software name="janjaka" supported="yes">
 		<description>Jan Jaka Jan</description>
 		<year>1992</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -7364,8 +7364,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Has manual copy protection-->
-	<software name="kareinar" supported="partial">
+	<software name="kareinar">
+		<!-- Has manual copy protection -->
 		<description>Karei Naru Jinsei Minasan no Okagedesu</description>
 		<year>1992</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -7597,7 +7597,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="chicago" supported="yes">
 		<description>The King of Chicago</description>
 		<year>1988</year>
@@ -7637,7 +7637,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="kiwame" supported="yes">
 		<description>Kiwame</description>
 		<year>1993</year>
@@ -7696,7 +7696,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Intro effect is clearly wrong-->
+	<!-- boot OK, wrong GFX transitions for intro -->
 	<software name="kohakuir" supported="partial">
 		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
@@ -7868,7 +7868,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Loops indefinitely between Human OS and initial game loading-->
+	<!-- Prints in Japanese "an error occurred, please reset" -->
 	<software name="ku2fr" supported="no">
 		<description>Ku² Front Row</description>
 		<year>1992</year>
@@ -7888,7 +7888,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<software name="kurukaji">
+	<!-- boot OK -->
+	<software name="kurukaji" supported="yes">
 		<description>Kurutta Kajitsu</description>
 		<year>1992</year>
 		<publisher>アイデス (Ides)</publisher>
@@ -8938,7 +8939,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Single black stripe at first screen after starting a game-->
+	<!-- boot OK, "NEW SYSTEM HOUSE OH" speech has some garbage, title screen/gameplay sports a minor horizontal black line GFX glitches -->
 	<software name="kumiko" supported="partial">
 		<description>Makenshi Kumiko</description>
 		<year>1989</year>
@@ -9185,7 +9186,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Doesn't boot-->
+	<!-- loading Abort during Human68k autoexec sequence -->
 	<software name="metaleye" supported="no">
 		<description>Metal Eye</description>
 		<year>1993</year>
@@ -9416,7 +9417,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="misty1" supported="yes">
 		<description>Misty 68K Vol. 1 - Kikai na Zenra Shitai</description>
 		<year>1989</year>
@@ -9630,7 +9631,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--Mode 2 has misplaced tilemaps-->
+	<!-- boot OK, using screen mode 384x256 causes misaligned sprites and layers, works fine in 256x256 (default) -->
 	<software name="motos" supported="partial">
 		<description>Motos</description>
 		<year>1989</year>
@@ -9644,13 +9645,13 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- This format is multi boot disk. Set drive 0 to boot "Mr. Do!", Set drive 1 to boot "Mr. Do! vs Unicorns". -->
 	<software name="mrdo">
 		<description>Video Game Anthology vol. 10 - Mr. Do! / Mr. Do! vs Unicorns</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.10 - ミスター・ドゥ / ミスター・ドゥ対ユニコーン" />
 		<info name="release" value="19940702" />
+		<info name="usage" value="This format is multi boot disk. Set drive 0 to boot Mr. Do!, Set drive 1 to boot Mr. Do! vs Unicorns" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="mr. do &amp; mr. do vs unicorns (1994)(dempa).dim" size="1261824" crc="0c1684cb" sha1="fddbae4756b0a89a714136329b2d92dfb1a6e186" offset="000000" />
@@ -9715,8 +9716,8 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-<!-- Disk 1 & 2 have been recently redumped! These are believed to be OK -->
 	<software name="myeyes">
+		<!-- Disk 1 & 2 have been recently redumped! These are believed to be OK -->
 		<description>My Eyes!</description>
 		<year>1992</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -10049,7 +10050,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="nikoniko" supported="yes">
 		<description>Niko²</description>
 		<year>1991</year>
@@ -10446,7 +10447,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="pacman" supported="yes">
 		<description>Pac-Man (Boot change from Pac-Mania)</description>
 		<year>1988</year>
@@ -10561,8 +10562,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Text layer clearance bugs-->
-	<software name="purupuru" supported="partial">
+	<!-- boot OK -->
+	<software name="purupuru" supported="yes">
 		<description>Pasocomic PuruPuru Paradise - Santa Claus Tokushuu</description>
 		<year>1994</year>
 		<publisher>バビロン (Babylon)</publisher>
@@ -10714,8 +10715,12 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--right bumper key not found?-->
+	<!-- boot OK -->
 	<software name="pbpinbal" supported="yes">
+		<!-- left bumper: Z -->
+		<!-- right bumper: tenkey minus (!) -->
+		<!-- ball shoot: left/right shift -->
+		<!-- tilt: space -->
 		<description>Pinball Pinball</description>
 		<year>1990</year>
 		<publisher>日本ソフテック (Nihon Softek)</publisher>
@@ -10798,7 +10803,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="pipedrem" supported="yes">
 		<description>Pipe Dream</description>
 		<year>1992</year>
@@ -10852,7 +10857,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Offsetted layer, garbage ranking during scroll-->
+	<!-- boot OK, various GFX offsets during in-game and option menu, sports garbage when ranking scrolls -->
 	<software name="ponyon" supported="partial">
 		<description>Ponyon</description>
 		<year>1992</year>
@@ -10931,7 +10936,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="pleague" supported="yes">
 		<description>Power League</description>
 		<year>1988</year>
@@ -11247,7 +11252,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="prodmang" supported="yes">
 		<description>Production Manager</description>
 		<year>1989</year>
@@ -11481,7 +11486,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="rcrobotc" supported="yes">
 		<description>R.C. Robot Construction</description>
 		<year>1993</year>
@@ -11708,7 +11713,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Bogus transparent pen for Ki-->
+	<!-- boot OK, Ki hair is transparent instead of black -->
 	<software name="rtishtar" supported="partial">
 		<description>The Return of Ishtar</description>
 		<year>1988</year>
@@ -11721,8 +11726,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Needs some floppy config-->
-	<software name="ringmst" supported="partial">
+	<software name="ringmst">
+		<!-- TODO: describe steps to create a new game -->
 		<description>Ring Master</description>
 		<year>1989</year>
 		<publisher>ホビージャパン (Hobby Japan)</publisher>
@@ -11955,8 +11960,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Dies with a floppy error-->
-	<software name="sabnack" supported="no">
+	<!-- boot OK -->
+	<software name="sabnack" supported="yes">
 		<description>Sabnack</description>
 		<year>1991</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -12191,7 +12196,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Bus error-->
+	<!-- loading Abort on boot -->
 	<software name="shangh2" supported="no">
 		<description>Shanghai II</description>
 		<year>1989</year>
@@ -12216,7 +12221,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="shangrli" supported="yes">
 		<description>Shangrlia</description>
 		<year>1991</year>
@@ -12909,7 +12914,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="starfrce" supported="yes">
 		<description>Video Game Anthology Vol. 3 - Star Force</description>
 		<year>1993</year>
@@ -13077,8 +13082,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Pretty fussy on disk swapping, didn't get stage 5 to work (system disk?)-->
-	<software name="strider" supported="yes">
+	<!-- boot OK, throws "cannot read file" error when asked to disc swap on end of stage 4 -->
+	<software name="strider" supported="no">
 		<description>Strider Hiryuu</description>
 		<year>1992</year>
 		<publisher>カプコン (Capcom)</publisher>
@@ -13409,7 +13414,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Sound burps out, all gfx modes untested-->
+	<!-- boot OK, serious sound hiccups -->
 	<software name="ssf2" supported="partial">
 		<description>Super Street Fighter II - The New Challengers</description>
 		<year>1994</year>
@@ -13576,7 +13581,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="taikoris" supported="yes">
 		<description>Taikou Risshiden</description>
 		<year>1992</year>
@@ -13642,7 +13647,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="tenkatou" supported="yes">
 		<description>Tenka Touitsu</description>
 		<year>1990</year>
@@ -13682,7 +13687,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="tenkyuh" supported="yes">
 		<description>Tenkyuuhai</description>
 		<year>1989</year>
@@ -13902,7 +13907,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="tetris" supported="yes">
 		<description>Tetris</description>
 		<year>1988</year>
@@ -14123,7 +14128,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="toshinto" supported="yes">
 		<description>Toushin Toshi</description>
 		<year>1991</year>
@@ -14603,13 +14608,14 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Disk swap doesn't work-->
-	<software name="versnag" supported="partial">
+	<!-- hangs during in-game loading, asking Disk C in drive 0 (huh?) -->
+	<software name="versnag" supported="no">
 		<description>War Torn Versnag</description>
 		<year>1993</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="ヴェルスナーグ戦乱 ~ Versnag Senran" />
 		<info name="release" value="19930428" />
+		<info name="usage" value="Disk A is just Opening. To in-game insert discs B and C" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -14693,8 +14699,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Locked at title screen?-->
-	<software name="viperv8t" supported="partial">
+	<!-- Locks up on title screen -->
+	<software name="viperv8t" supported="no">
 		<description>Viper-V8 Twin Turbo</description>
 		<year>1994</year>
 		<publisher>ソニア (Sogna)</publisher>
@@ -14751,7 +14757,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="warning" supported="yes">
 		<description>Warning Type 68</description>
 		<year>1988</year>
@@ -14772,8 +14778,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Locked up during gameplay-->
-	<software name="wings" supported="no">
+	<!-- boot OK -->
+	<software name="wings" supported="yes">
 		<description>Wings</description>
 		<year>1989</year>
 		<publisher>ブローダーバンドジャパン (Brøderbund Japan)</publisher>
@@ -14982,7 +14988,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="wangsp" supported="yes">
 		<description>Wrestle Angels Special - Mouhitori no Top Eventer</description>
 		<year>1994</year>
@@ -15089,7 +15095,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="xenon2" supported="yes">
 		<description>Xenon 2 Megablast</description>
 		<year>1991</year>
@@ -15167,8 +15173,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Can't create user disk-->
-	<software name="yajiuma" supported="no">
+	<software name="yajiuma">
 		<description>Yajiuma Pennant Race 1989</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -15265,7 +15270,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="yaritai1" supported="yes">
 		<description>Yaritai Houdai</description>
 		<year>1988</year>
@@ -16457,7 +16462,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Driver disk for unemulated CD-Rom-->
+	<!-- Driver disk for unemulated CD-ROM -->
 	<software name="cdrom" supported="no">
 		<description>CD-ROM Driver v2.00</description>
 		<year>1994</year>
@@ -16785,7 +16790,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="filemst" supported="yes">
 		<description>The File Master v1.13</description>
 		<year>1990</year>
@@ -17410,7 +17415,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Damaged dump? Not booting even if human.sys is present-->
+	<!-- Damaged dump? Doesn't autoboot, launching "polyphon.x" from Human68k shows a title screen then back to prompt -->
 	<software name="polyphon" supported="no">
 		<description>Polyphon</description>
 		<year>1992</year>
@@ -18499,7 +18504,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="dennoc06" supported="yes">
 		<description>Dennou Club Vol. 06</description>
 		<year>1988</year>
@@ -21181,7 +21186,8 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 		</part>
 	</software>
 
-	<!--Text scrolling is garbled, gfe.bat sports missing layer clearances for character select-->
+	<!-- dshell3: trails when text scrolling occurs. -->
+	<!-- gfe.bat: sports missing layer clearances for character select-->
 	<software name="tokkan3" supported="partial">
 		<description>Tokkan Biwa Freeks Dai 3 Gou</description>
 		<year>1993</year>
@@ -21444,7 +21450,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="cuarto" supported="yes">
 		<description>Cuarto</description>
 		<year>1991</year>
@@ -21860,9 +21866,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- It isn't takeru (sofcon) version -->
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="sekaiss" supported="yes">
+		<!-- It isn't takeru (sofcon) version -->
 		<description>Sekai Seifuku Set (Web Release Ver.)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22059,7 +22065,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<!-- This boot disk is copied file from "The World of X68000" -->
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="aahime" supported="yes">
 		<description>Aa! O-Hime-sama! (Ripped from The World of X68000)</description>
 		<year>1993</year>
@@ -22079,7 +22085,7 @@ sold through Takeru vending machines -->
 
 
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="177" supported="yes">
 		<description>177</description>
 		<year>1996</year>
@@ -22139,9 +22145,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- appears to be some garbage on the background, but otherwise playable -->
-	<!--Garbage layer covers the whole screen-->
-	<software name="accheat" supported="no">
+	<!-- boot OK, corrupted background layer -->
+	<software name="accheat" supported="partial">
 		<description>Access Heat</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22153,7 +22158,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Some projectiles don't seem to want to move...  -->
+	<!-- boot OK --> 
+	<!-- some projectiles don't move (can't reproduce) -->
 	<software name="actshoot">
 		<description>Active Shoot</description>
 		<year>1999</year>
@@ -22178,7 +22184,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="advland2" supported="yes">
 		<description>Adventure Land 2 (v0.99)</description>
 		<year>1995</year>
@@ -22215,7 +22221,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="airhork">
+	<!-- boot OK -->
+	<software name="airhork" supported="yes">
 		<description>Air Hork</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22239,8 +22246,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- same content as the PC98 disk! -->
 	<software name="akazucc" supported="no">
+		<!-- same content as the PC98 disk! -->
 		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22263,7 +22270,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No sound at boss fight?-->
+	<!-- boot OK, no BGM for bosses? -->
 	<software name="alfarne" supported="yes">
 		<description>Alfarne</description>
 		<year>1989</year>
@@ -22288,8 +22295,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Text remains on screen during gameplay -->
-	<!--Doesn't clear text on gameplay screen-->
+	<!-- boot OK, doesn't clear text on gameplay screen (btanb?) -->
 	<software name="amegame" supported="partial">
 		<description>Ame Game (v0.90)</description>
 		<year>19??</year>
@@ -22504,7 +22510,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="atennis" supported="yes">
 		<description>Alien Tennis Chikyuu no Kiki</description>
 		<year>19??</year>
@@ -22573,7 +22579,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="babel" supported="yes">
 		<description>Babel</description>
 		<year>1995</year>
@@ -22692,7 +22698,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="baribar3" supported="yes">
 		<description>Bari Bari Attack 3 - Erice</description>
 		<year>1990</year>
@@ -22717,8 +22723,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Can't start a play-->
-	<software name="batlcity" supported="partial">
+	<!-- inputs doesn't work on main menu -->
+	<software name="batlcity" supported="no">
 		<description>Battle City (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22741,8 +22747,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Untested, needs 1.44MB disk support for Human68k -->
 	<software name="btlmania">
+		<!-- Untested, needs 1.44MB disk support for Human68k -->
 		<description>Battle Mania'</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22778,7 +22784,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
+	<!-- boot OK, sound farts -->
 	<software name="bslfght000" cloneof="bslfght">
 		<description>Bishoujo Senshi Lady Fighter (v0.00)</description>
 		<year>1993</year>
@@ -22791,9 +22797,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<!--Hangs with a note constantly played, irq misfires?-->
-	<software name="bslfght" supported="no">
+	<!-- boot OK, sound farts -->
+	<software name="bslfght" supported="partial">
 		<description>Bishoujo Senshi Lady Fighter (v1.00)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22805,8 +22810,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<software name="bsmnfght210" cloneof="bsmnfght">
+	<!-- boot OK, sound farts -->
+	<software name="bsmnfght210" cloneof="bsmnfght" supported="partial">
 		<description>Bishoujo Senshi Moon Fighter (v2.10)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22818,8 +22823,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- locks up after a bit, likely a missed IRQ or two -->
-	<software name="bsmnfght">
+	<!-- boot OK, sound farts -->
+	<software name="bsmnfght" supported="partial">
 		<description>Bishoujo Senshi Moon Fighter (v2.11)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22831,7 +22836,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="slrmnkdk" supported="yes">
 		<description>Bishoujo Senshi Sailor Moon Kessen Dark Kingdom</description>
 		<year>1993</year>
@@ -22862,8 +22867,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- does not startup after loading -->
-	<!--Doesn't boot, moans with Jp message-->
+	<!-- Prints "An error occurred. Please reset." in Japanese (tries to access all four drives!?) -->
 	<software name="bssmnfgt" supported="no">
 		<description>Bishoujo Senshi Super Moon Fighter (v1.02)</description>
 		<year>1994</year>
@@ -22876,7 +22880,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="bssmnfgx">
+	<!-- boot OK -->
+	<software name="bssmnfgx" supported="yes">
 		<description>Bishoujo Senshi Super Moon Fighter X</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22895,8 +22900,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv3p">
+	<!-- boot OK, loading Abort on gameplay with scratchy ADPCM -->
+	<software name="sailrv3p" supported="no">
 		<description>Bishoujo Senshi Sailor V (3 players)</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22908,8 +22913,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv5p" cloneof="sailrv3p">
+	<!-- boot OK, loading Abort on gameplay with scratchy ADPCM -->
+	<software name="sailrv5p" cloneof="sailrv3p" supported="no">
 		<description>Bishoujo Senshi Sailor V (5 players)</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22921,8 +22926,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrvf3">
+	<!-- boot OK, black screen after character select with scratchy ADPCM -->
+	<software name="sailrvf3" supported="no">
 		<description>Bishoujo Senshi Sailor V Final v3</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22941,8 +22946,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- ADPCM issues -->
-	<software name="sailrv2">
+	<!-- boot OK, hardlock after character select with scratchy ADPCM -->
+	<software name="sailrv2" supported="no">
 		<description>Bishoujo Senshi Sailor V v2</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22997,7 +23002,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="biyoyonc" supported="yes">
 		<description>Biyoyon Car Game</description>
 		<year>199?</year>
@@ -23034,9 +23039,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Doesn't start, locks up waiting for MIDI, which should trigger a bus error, but doesn't for some odd reason -->
-	<!--Layer clearance problems-->
-	<software name="blindspt" supported="partial">
+	<!-- Hangs at title screen, locks up waiting for MIDI (should trigger a bus error and it doesn't) -->
+	<software name="blindspt" supported="no">
 		<description>Blind Spot</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23072,7 +23076,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="blocksto" supported="yes">
 		<description>Block Stocker (v2.00)</description>
 		<year>1989</year>
@@ -23097,8 +23101,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Locks up in-game -->
-	<software name="bluwing2">
+	<!-- boot OK -->
+	<!-- old note: Locks up in-game (cannot repro) -->
+	<software name="bluwing2" supported="yes">
 		<description>Blue Wings 2 - Blue Knights</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23136,8 +23141,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidh2">
+	<!-- boot OK, no SFXs -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidh2" supported="partial">
 		<description>Bodhidharma Mark 2 (v0.01)</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23149,8 +23155,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidha030" cloneof="bodhidha">
+	<!-- boot OK, has SFXs unlike the brother sets (all prints IF ERRORLEVEL 1 GOTO non_pcm8 on autoexec boot) -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidha030" cloneof="bodhidha" supported="yes">
 		<description>Bodhidharma (v0.30)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23162,8 +23169,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Menu remains on screen during gameplay, should be cleared, but isn't -->
-	<software name="bodhidha">
+	<!-- boot OK, no SFXs -->
+	<!-- old note: Menu remains on screen during gameplay, should be cleared, but isn't (cannot repro) -->
+	<software name="bodhidha" supported="partial">
 		<description>Bodhidharma (v1.01) Hehebereke</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23186,8 +23194,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Displays "Disk Read Error" -->
-	<!--DISK READ ERROR after initial screen-->
+	<!-- Returns to Human68k with "DISK READ ERROR" after initial screen -->
 	<software name="bonnou2" supported="no">
 		<description>Bonnou 2</description>
 		<year>19??</year>
@@ -23207,8 +23214,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Displays "Disk Read Error" -->
-	<software name="bonnou2d">
+	<!-- Returns to Human68k with "DISK READ ERROR" after initial screen -->
+	<software name="bonnou2d" supported="no">
 		<description>Bonnou 2 Das</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23254,8 +23261,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- 1.44MB image -->
 	<software name="boyoyon">
+		<!-- 1.44MB image -->
 		<description>Boyoyon (v3.31)</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23298,7 +23305,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="butarian" supported="yes">
 		<description>Butarian</description>
 		<year>1994</year>
@@ -23311,8 +23318,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Game area is black.  Probably priority or layer masking issues. -->
-	<software name="butasanq">
+	<!-- boot OK -->
+	<!-- old note: Game area is black.  Probably priority or layer masking issues. (cannot repro) -->
+	<software name="butasanq" supported="yes">
 		<description>Butasan Quest</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23387,7 +23395,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="celiad" supported="yes">
 		<description>Celia (demo)</description>
 		<year>1993</year>
@@ -23450,7 +23458,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="chaosang" supported="yes">
 		<description>Chaos Angels</description>
 		<year>1996</year>
@@ -23607,8 +23615,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Can't start a play, city_.x has CRTC bug, wrong colors?-->
-	<software name="citycon" supported="partial">
+	<!-- Doesn't have autoexec.bat (bad dump?), can't start a play, city_.x sports flickering scroll, wrong colors? -->
+	<software name="citycon" supported="no">
 		<description>City Connection (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23619,7 +23627,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="clayshot">
+	<!-- boot OK -->
+	<software name="clayshot" supported="yes">
 		<description>Clay Shooting</description>
 		<year>1988</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23631,7 +23640,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="clearlap">
+	<!-- boot OK -->
+	<software name="clearlap" supported="yes">
 		<description>Clear Lap</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23726,7 +23736,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="cryoku" supported="yes">
 		<description>C Ryokukensa V3 (Newer?)</description>
 		<year>1992</year>
@@ -23758,7 +23768,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="crystwr" supported="yes">
 		<description>Crystal Tower</description>
 		<year>1990</year>
@@ -23771,7 +23781,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="cubegrd3" supported="yes">
 		<description>Gradius 3 Cube Simulation</description>
 		<year>1991</year>
@@ -23796,7 +23806,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="cybrfld" supported="yes">
 		<description>Cyber Field</description>
 		<year>1993</year>
@@ -23809,7 +23819,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="cybrrpg" supported="yes">
 		<description>Cyber RPG Pemo Pemo Pro-68k</description>
 		<year>1991</year>
@@ -23924,8 +23934,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- clearly not an official port -->
-	<software name="darius">
+	<!-- no sprites, black screen by pressing fire -->
+	<software name="darius" supported="no">
+		<!-- clearly not an official port -->
 		<description>Darius</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23948,8 +23959,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- this one isn't official, either, boss fights only -->
-	<software name="dariuse">
+	<!-- boot OK -->
+	<software name="dariuse" supported="yes">
+		<!-- this one isn't official, either, boss fights only -->
 		<description>Darius Extra Version</description>
 		<year>198?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24100,7 +24112,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="demslay3" supported="yes">
 		<description>Demon Slayer 3</description>
 		<year>1991</year>
@@ -24328,7 +24340,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="disk9fmv">
+	<!-- boot OK (very poor audiovideo "codec") -->
+	<software name="disk9fmv" supported="yes">
 		<description>Disk9 FMV - Honou no Tenkousei</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24351,8 +24364,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No sound in intro?-->
-	<software name="diveon" supported="yes">
+	<!--boot OK, no sound in intro (btanb?) -->
+	<software name="diveon" supported="partial">
 		<description>Dive On</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24388,8 +24401,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- Disk full of Moria data? -->
 	<software name="dofmoria">
+		<!-- Disk full of Moria data? -->
 		<description>D of Moria Data Shuu</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24448,8 +24461,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Doesn't clear title screen, can be barely seen during gameplay-->
-	<software name="dorix" supported="partial">
+	<!-- boot OK -->
+	<!-- old note: Doesn't clear title screen, can be barely seen during gameplay (cannot repro) -->
+	<software name="dorix" supported="yes">
 		<description>Dorix</description>
 		<year>1998</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24473,7 +24487,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="drasan" supported="yes">
 		<description>Dr. A San Kyoudai Series Tomomichan no Dobon</description>
 		<year>199?</year>
@@ -24497,8 +24511,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Tight loops waiting for a RAM address change, also no sound-->
-	<software name="dslayer" supported="no">
+	<!-- boot OK, no sound (btanb?) -->
+	<software name="dslayer" supported="partial">
 		<description>Dragon Slayer (L1.1)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24595,8 +24609,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- HD install only? -->
 	<software name="duelfgh2">
+		<!-- HD install only? -->
 		<description>Duel Fighter 2</description>
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24651,7 +24665,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="dynamics">
+	<!-- boot OK, no SFXs in-game -->
+	<software name="dynamics" supported="partial">
 		<description>Dynamic Fomesion Soccer</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24752,7 +24767,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="fastlap" supported="yes">
 		<description>F-1 Fastest Lap</description>
 		<year>1991</year>
@@ -24926,7 +24941,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="fcrisis" supported="yes">
 		<description>First Crisis ma Jin no Toubou</description>
 		<year>1992</year>
@@ -24951,8 +24966,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Missing drawing area?-->
-	<software name="fmission" supported="partial">
+	<!-- boot OK, sprite layer boundaries are way bigger than visible area -->
+	<software name="fmission" supported="no">
 		<description>First Mission</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24983,7 +24998,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="flmwing" supported="yes">
 		<description>Flame Wing (v1.02)</description>
 		<year>1994</year>
@@ -25008,7 +25023,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="flipflop" supported="yes">
 		<description>Flip Flop</description>
 		<year>1990</year>
@@ -25118,7 +25133,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="frapull">
+	<!-- boot OK -->
+	<software name="frapull" supported="yes">
 		<description>Frapull</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25329,7 +25345,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="gamex" supported="yes">
 		<description>Game.X</description>
 		<year>1990</year>
@@ -25422,8 +25438,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No sound, has wrong raster effect for playfield-->
-	<software name="gedouret" supported="no">
+	<!-- boot OK, no sound, has wrong raster effect for playfield -->
+	<software name="gedouret" supported="partial">
 		<description>Gedou Retsuden</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25454,8 +25470,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--BGM hangs during gameplay (resumes at stage clear)-->
-	<software name="gemdrop" supported="yes">
+	<!-- boot OK, BGM randomly hangs during gameplay on later stages (resumes at stage clear)-->
+	<software name="gemdrop" supported="partial">
 		<description>Gemdrop</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25467,7 +25483,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="getready" supported="yes">
 		<description>Get Ready</description>
 		<year>19??</year>
@@ -25492,7 +25508,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="gigafght">
+	<!-- boot OK, no sound (btanb?) -->
+	<software name="gigafght" supported="partial">
 		<description>Giga Fight 68k</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25625,7 +25642,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No layer clearances?-->
+	<!-- boot OK, text layer doesn't clear (btanb?), no sound (btanb?) -->
 	<software name="halfmind" supported="partial">
 		<description>Half Mind</description>
 		<year>19??</year>
@@ -25660,7 +25677,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="hanaiko" supported="yes">
 		<description>Hanaikoku Pro Uso-68k</description>
 		<year>1990</year>
@@ -25692,8 +25709,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="hazard">
+		<!-- sold through Takeru vending machines -->
 		<description>Hazard</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25796,7 +25813,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="heroher4" supported="yes">
 		<description>Hero Hero Disk 4 Indojin no Yabou</description>
 		<year>1990</year>
@@ -25833,8 +25850,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- screen doesn't clear after updating each frame -->
-	<software name="hetzer">
+	<!-- boot OK, in-game doesn't sport any GFX but text layer -->
+	<!-- old note: doesn't clear after updating each frame (?) -->
+	<software name="hetzer" supported="no">
 		<description>Hetzer</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -25858,7 +25876,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="heysay" supported="yes">
 		<description>Hey! Say! Education Committee (v0.12)</description>
 		<year>1993</year>
@@ -25919,7 +25937,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="himegas" supported="yes">
 		<description>Hi Mega Sister</description>
 		<year>1990</year>
@@ -25939,7 +25957,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="hiroshi" supported="yes">
 		<description>Hiroshi</description>
 		<year>19??</year>
@@ -25976,9 +25994,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- confirmed as good by pete_j -->
-	<!-- sold through Takeru vending machines -->
 	<software name="hitomiza">
+		<!-- confirmed as good by pete_j -->
+		<!-- sold through Takeru vending machines -->
 		<description>Hitomi Zaka</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26040,7 +26058,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="horiume" supported="yes">
 		<description>Hori Hori Ume Ume</description>
 		<year>199?</year>
@@ -26072,8 +26090,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Needs p1 button 2 to be pressed at Human boot (???)-->
-	<software name="hotjump" supported="yes">
+	<!-- Needs p1 button 2 to be pressed twice at Human68k boot (First message is "Multi-tap is not connected.") -->
+	<software name="hotjump" supported="partial">
 		<description>Hot Jump</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26109,7 +26127,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="hvrcraft" supported="yes">
 		<description>Hover Craft 68k</description>
 		<year>1993</year>
@@ -26181,7 +26199,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="imazoman" supported="yes">
 		<description>Imazoman v1.00</description>
 		<year>199?</year>
@@ -26224,7 +26242,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="intropro" supported="yes">
 		<description>Intro Pro 68K v2.10+</description>
 		<year>1991</year>
@@ -26384,7 +26402,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="junkerpr" supported="yes">
 		<description>Junker Pro-68K</description>
 		<year>1990</year>
@@ -26686,7 +26704,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Bus error-->
+	<!-- doesn't autoboot, loading Abort (illegal opcode with either kmx.x or mmx.x)-->
 	<software name="knightmk" supported="no">
 		<description>Knight Maker</description>
 		<year>1991</year>
@@ -26758,7 +26776,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="kurukuru" supported="yes">
 		<description>Kuru Kuru Puzzle</description>
 		<year>1994</year>
@@ -26905,7 +26923,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Doesn't work, bus error-->
+	<!-- loading Abort on main menu ("bus error") -->
 	<software name="lexus2" supported="no">
 		<description>Lexus 2</description>
 		<year>199?</year>
@@ -26965,7 +26983,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="limeligt" supported="yes">
 		<description>Lime Light</description>
 		<year>1989</year>
@@ -26985,8 +27003,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Pressing return doesn't enter into gameplay, garbled gfxs in gameplay-->
-	<software name="lilchin" supported="partial">
+	<!-- boot OK, pressing return doesn't enter into gameplay (how to enter then?), garbled gfxs in gameplay -->
+	<software name="lilchin" supported="no">
 		<description>Little Chinese</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -26998,7 +27016,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Hangs with gfx garbage at game start-->
+	<!-- Hangs with gfx garbage at game start -->
 	<software name="lilchind" supported="no">
 		<description>Little Chinese Dash</description>
 		<year>199?</year>
@@ -27023,7 +27041,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Intentional wrong pitch on left part?-->
+	<!-- boot OK, intentional wrong pitch on left part (btanb?) -->
 	<software name="lockon" supported="yes">
 		<description>Lock On</description>
 		<year>1989</year>
@@ -27078,7 +27096,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="ldrun1" supported="yes">
 		<description>Lode Runner</description>
 		<year>19??</year>
@@ -27139,7 +27157,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Tries to read drive 2?-->
+	<!-- Abort Retry Fail at boot trying to read drive 2 ("copyall a:message c:" in autoexec.bat!?) -->
+	<!-- doesn't boot even if another image is present in drive 2 -->
 	<software name="lunafant" supported="no">
 		<description>Lunatic Fantasy v2.0</description>
 		<year>199?</year>
@@ -27164,9 +27183,9 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No music-->
+	<!-- boot OK, no BGM (btanb?) -->
 	<software name="lyricalp" supported="yes">
-		<description>Lyrical Party</description>
+		<description>Lyrical Party (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="MIX" />
@@ -27309,7 +27328,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="mahousen" supported="yes">
 		<description>Mahou no Senshi Physical Melon</description>
 		<year>1994</year>
@@ -27329,7 +27348,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="majohall" supported="yes">
 		<description>Majo Halldra no Yabou</description>
 		<year>1993</year>
@@ -27354,7 +27373,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="mappy2" supported="yes">
 		<description>Mappy (Yopino)</description>
 		<year>1990</year>
@@ -27578,7 +27597,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="meteowrs" supported="yes">
 		<description>Meteo Wars</description>
 		<year>19??</year>
@@ -27719,7 +27738,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="mogura" supported="yes">
 		<description>Mogura Attacker</description>
 		<year>1990</year>
@@ -27877,7 +27896,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="moria" supported="yes">
 		<description>Moria v4.87</description>
 		<year>19??</year>
@@ -27974,8 +27993,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="nmfire">
+		<!-- sold through Takeru vending machines -->
 		<description>Nasake Muyou Fire!</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -28132,7 +28151,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Crashes as soon as the title screen shows, sound is crashed as well-->
+	<!-- crashes on title screen, sound farts -->
 	<software name="noutendn" supported="no">
 		<description>Nouten Densetsu</description>
 		<year>1993</year>
@@ -28314,7 +28333,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="pacmen" supported="yes">
 		<description>Pac-Men</description>
 		<year>1995</year>
@@ -28351,7 +28370,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="paikouka" supported="yes">
 		<description>Pai Koukan Kyou Kou Kan Nakoruru Hen</description>
 		<year>1994</year>
@@ -28656,7 +28675,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Attempts to read second drive with a single floppy?-->
+	<!-- Prints in Japanese "an error occurred, please reset" -->
+	<!-- old note: Attempts to read second drive with a single floppy? -->
 	<software name="popjack" supported="no">
 		<description>Popjack</description>
 		<year>1994</year>
@@ -29045,9 +29065,11 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!-- Biwahosi Software later became D.C.S. -->
-	<!--Has layer clearance bugs on title screen-->
-	<software name="quieazum" supported="partial">
+	<!-- boot OK -->
+	<!-- old note: Has layer clearance bugs on title screen (cannot repro) -->
+	<software name="quieazum" supported="yes">
+		<!-- Biwahosi Software later became D.C.S. -->
+		<!-- TODO: Biwahosi or Biwahoshi? -->
 		<description>Quieazum Biwahoshi Quiz System</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29234,7 +29256,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No BGMs, has text layer bug in intro. Sound samples sounds with low pitch-->
+	<!-- No BGMs, has text layer bug in intro, low pitch ADPCM -->
+	<!-- known to have game breaking bug later on (TBD) -->
 	<software name="raguna" supported="partial">
 		<description>Raguna</description>
 		<year>1990</year>
@@ -29295,7 +29318,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="raydefox" supported="yes">
 		<description>Raydefox Full Metal Powerdsuits v1998.12</description>
 		<year>1998</year>
@@ -29320,7 +29343,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Minor glitch at single credit continue screen-->
+	<!-- boot OK, minor GFX glitch appears on game over transition when no credits are available (btanb?) -->
 	<software name="rayersht" supported="yes">
 		<description>Rayer Shoot v1.03</description>
 		<year>1996</year>
@@ -29456,8 +29479,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- sold through Takeru vending machines -->
 	<software name="robotbt2">
+		<!-- sold through Takeru vending machines -->
 		<description>Robot Battle v2</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29468,7 +29491,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="rolldwn2" supported="yes">
 		<description>Roll Down 2</description>
 		<year>1990</year>
@@ -29596,7 +29619,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="sailrmcq" supported="yes">
 		<description>Sailormoon Chou Card Quiz Game Moon Quiz</description>
 		<year>19??</year>
@@ -29633,7 +29656,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="sarumune" supported="yes">
 		<description>The Sarumune of Tetris</description>
 		<year>1990</year>
@@ -29749,7 +29772,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Has text glitches during gameplay-->
+	<!-- boot OK, text layer leaves trails during gameplay -->
 	<software name="sdfightr" supported="partial">
 		<description>SD Fighter</description>
 		<year>1991</year>
@@ -29774,7 +29797,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="sdtoki" supported="yes">
 		<description>SD Toki no Kagi</description>
 		<year>1989</year>
@@ -29925,8 +29948,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Text layer clearance bugs-->
-	<software name="senshasn" supported="partial">
+	<!-- boot OK, text layer leaves trails covering the whole screen -->
+	<software name="senshasn" supported="no">
 		<description>Senshasen v1.0</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -29962,7 +29985,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="shikato" supported="yes">
 		<description>Shikato</description>
 		<year>19??</year>
@@ -30155,7 +30178,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="silvrcry" supported="yes">
 		<description>Silver Crystal</description>
 		<year>19??</year>
@@ -30214,7 +30237,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="snowkibn" supported="yes">
 		<description>Snow na Kibun!</description>
 		<year>1991</year>
@@ -30238,7 +30261,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="solitea" supported="yes">
 		<description>Solitea</description>
 		<year>1990</year>
@@ -30251,7 +30274,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="sorcer" supported="yes">
 		<description>Sorcerian (AQRS)</description>
 		<year>1994</year>
@@ -30326,8 +30349,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-<!--  there also exists a bootable version, but it has been made for emulator usage... -->
 	<software name="souhoutv">
+		<!--  there also exists a bootable version, but it has been made for emulator usage... -->
 		<description>Souhou Blue Phoenix Taste Version</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -30442,7 +30465,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="starblad" supported="yes">
 		<description>Star Blade v1.00</description>
 		<year>19??</year>
@@ -30479,7 +30502,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Flashing graphics, bad timings?-->
+	<!-- boot OK, flashing graphics (bad timings? there's a setting that doesn't clear the screen, btanb?) -->
 	<software name="starcrs2" supported="no">
 		<description>Star Cruiser Sol Will 2</description>
 		<year>1992</year>
@@ -30539,7 +30562,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="starwar" supported="yes">
 		<description>Star War 1991 v2</description>
 		<year>1991</year>
@@ -30695,7 +30718,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Wrong colors for status bar-->
+	<!-- Wrong colors for status bar (raster effect?) -->
 	<software name="sukaparo" supported="partial">
 		<description>Sukaparojii</description>
 		<year>1993</year>
@@ -30786,7 +30809,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="supergft" supported="yes">
 		<description>Super Graphic Theater</description>
 		<year>1990</year>
@@ -30806,7 +30829,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="superjck" supported="yes">
 		<description>Super Jack Pro 68K</description>
 		<year>1988</year>
@@ -30819,7 +30842,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="smb">
+	<!-- boot OK, input doesn't work, wrong colors -->
+	<software name="smb" supported="no">
 		<description>Super Mario Bros. (Doujin?)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31197,7 +31221,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Gameplay structures seems missing, can't shoot most of the time?-->
+	<!-- boot OK, invisible walls (btanb?) -->
+	<!-- doesn't reload bullet state for player and enemies if they hit the edge of screen (btanb?) -->
 	<software name="tankbatt" supported="partial">
 		<description>Tank Battalion (Pineapple)</description>
 		<year>1989</year>
@@ -31234,7 +31259,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="target" supported="yes">
 		<description>Target</description>
 		<year>1991</year>
@@ -31340,7 +31365,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="tekkense" supported="yes">
 		<description>Tekken Seisai</description>
 		<year>1991</year>
@@ -31387,8 +31412,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Time is stopped, advances if you keep a keyboard button pressed?-->
-	<software name="terradrv" supported="partial">
+	<!-- boot OK, busted gameplay timings (slightly advances if you keep a keyboard button pressed?) -->
+	<software name="terradrv" supported="no">
 		<description>Terra Drive</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -31448,7 +31473,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--No graphics if you load tetris.x from Human-OS-->
+	<!-- boot OK -->
+	<!-- No graphics if you load tetris.x from Human68k (btanb, autoboot sequence is load.x then tetris.x)-->
 	<software name="tetriscf" supported="yes">
 		<description>Tetris v5 (Cyber Factory)</description>
 		<year>1991</year>
@@ -31567,7 +31593,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="timpaper" supported="yes">
 		<description>Tim Paper Huzoku Scenario Dairyuuou Alexas</description>
 		<year>1993</year>
@@ -31616,7 +31642,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="tinyclmn" supported="yes">
 		<description>Tiny Columns X68000 Special</description>
 		<year>19??</year>
@@ -31777,7 +31803,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="druaga" supported="partial">
 		<description>The Tower of Druaga</description>
 		<year>1989</year>
@@ -31802,7 +31828,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="triangle" supported="yes">
 		<description>Triangle Hearts</description>
 		<year>1989</year>
@@ -31940,7 +31966,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="vagrantf" supported="yes">
 		<description>Vagrant Fighter FX</description>
 		<year>1995</year>
@@ -32003,7 +32029,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="vision" supported="yes">
 		<description>Vision</description>
 		<year>1991</year>
@@ -32083,7 +32109,8 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Has layer clearance bugs-->
+	<!-- boot OK -->
+	<!-- old note: Has layer clearance bugs (cannot repro) -->
 	<software name="wanders" supported="partial">
 		<description>Wanderers</description>
 		<year>1994</year>
@@ -32360,7 +32387,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="yugachas" supported="yes">
 		<description>Yuugai Chase Aa!! Namida no Shimensoka</description>
 		<year>199?</year>
@@ -32385,7 +32412,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--Doesn't boot, moans about FLOAT2.X-->
+	<!-- Doesn't boot, moans about FLOAT2.X (autoexec.bat has 11 bytes but cannot be read by edit.x) -->
 	<software name="yugaigak" supported="no">
 		<description>Yuugai Gakuen - Noukasuitai Chokugeki</description>
 		<year>1992</year>
@@ -32422,7 +32449,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!--boot OK-->
+	<!-- boot OK -->
 	<software name="yuzurugi" supported="yes">
 		<description>Yuzurugi -nics I</description>
 		<year>1992</year>
@@ -32548,20 +32575,18 @@ a DIM dump with DIFC, these are at least confirmed as coming from real disk (by 
 		</part>
 	</software>
 
-
-
-<!-- This must be loaded in DF1 with Human68k OS in DF0 -->
-
-	<software name="smba" cloneof="smb">
+	<!-- doesn't autoboot, input doesn't work, wrong colors -->
+	<software name="smba" cloneof="smb" supported="no">
 		<description>Famicom - Super Mario Bros.</description>
 		<year>1985</year>
+		<!-- doujin like parent? -->
 		<publisher>Nintendo</publisher>
-		<info name="usage" value="Type S_MARIO.X in Human68k OS" />
+		<!-- This must be loaded in DF1 with Human68k OS in DF0 (correct?) -->
+		<info name="usage" value="Mount Human68k in DF0 and this in DF1, type S_MARIO.X at prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="famicom - super mario bros (1985) (nintendo) [xdf].xdf" size="1261568" crc="2c6d35b3" sha1="c1dfd26c4d7fde821400b37d0c4de60e757dd440" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-
 </softwarelist>
