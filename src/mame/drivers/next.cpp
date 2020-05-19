@@ -1057,7 +1057,7 @@ void next_state::next_fdc_base(machine_config &config)
 {
 	next_base(config);
 
-	N82077AA(config, fdc, n82077aa_device::mode_t::PS2);
+	N82077AA(config, fdc, 24'000'000, n82077aa_device::mode_t::PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);

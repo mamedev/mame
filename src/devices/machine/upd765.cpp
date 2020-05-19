@@ -192,7 +192,7 @@ void upd765_family_device::set_select_lines_connected(bool _select)
 	select_connected = _select;
 }
 
-void upd765_family_device::set_mode(mode_t _mode)
+void ps2_fdc_device::set_mode(mode_t _mode)
 {
 	mode = _mode;
 }
@@ -208,7 +208,6 @@ void upd765_family_device::device_resolve_objects()
 
 void upd765_family_device::device_start()
 {
-	save_item(NAME(motorcfg));
 	save_item(NAME(selected_drive));
 
 	for(int i=0; i != 4; i++) {
@@ -361,7 +360,7 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 		idx_cb(0);
 }
 
-uint8_t upd765_family_device::sra_r()
+uint8_t ps2_fdc_device::sra_r()
 {
 	uint8_t sra = 0;
 	int fid = dor & 3;
@@ -384,7 +383,7 @@ uint8_t upd765_family_device::sra_r()
 	return sra;
 }
 
-uint8_t upd765_family_device::srb_r()
+uint8_t ps2_fdc_device::srb_r()
 {
 	return 0;
 }
@@ -1285,14 +1284,31 @@ int upd765_family_device::check_command()
 	case 0x0d:
 		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
 
-	case 0x0e:
-		return C_DUMP_REG;
-
 	case 0x0f:
 		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
 
 	case 0x11:
 		return command_pos == 9 ? C_SCAN_EQUAL         : C_INCOMPLETE;
+
+	case 0x19:
+		return command_pos == 9 ? C_SCAN_LOW           : C_INCOMPLETE;
+
+	case 0x1d:
+		return command_pos == 9 ? C_SCAN_HIGH          : C_INCOMPLETE;
+
+	default:
+		return C_INVALID;
+	}
+}
+
+int ps2_fdc_device::check_command()
+{
+	switch(command[0] & 0x1f) {
+	case 0x0e:
+		return C_DUMP_REG;
+
+	case 0x10:
+		return C_VERSION;
 
 	case 0x12:
 		return command_pos == 2 ? C_PERPENDICULAR      : C_INCOMPLETE;
@@ -1303,14 +1319,8 @@ int upd765_family_device::check_command()
 	case 0x14:
 		return C_LOCK;
 
-	case 0x19:
-		return command_pos == 9 ? C_SCAN_LOW           : C_INCOMPLETE;
-
-	case 0x1d:
-		return command_pos == 9 ? C_SCAN_HIGH          : C_INCOMPLETE;
-
 	default:
-		return C_INVALID;
+		return upd765_family_device::check_command();
 	}
 }
 
@@ -1327,49 +1337,8 @@ void upd765_family_device::start_command(int cmd)
 void upd765_family_device::execute_command(int cmd)
 {
 	switch(cmd) {
-	case C_CONFIGURE:
-		LOGCOMMAND("command configure %02x %02x %02x\n",
-					command[1], command[2], command[3]);
-		// byte 1 is ignored, byte 3 is precompensation-related
-		motorcfg = command[1];
-		fifocfg = command[2];
-		precomp = command[3];
-		main_phase = PHASE_CMD;
-		break;
-
-	case C_DUMP_REG:
-		LOGCOMMAND("command dump regs\n");
-		main_phase = PHASE_RESULT;
-		result[0] = flopi[0].pcn;
-		result[1] = flopi[1].pcn;
-		result[2] = flopi[2].pcn;
-		result[3] = flopi[3].pcn;
-		result[4] = (spec & 0xff00) >> 8;
-		result[5] = (spec & 0x00ff);
-		result[6] = sector_size;
-		result[7] = locked ? 0x80 : 0x00;
-		result[7] |= (perpmode & 0x30);
-		result[8] = fifocfg;
-		result[9] = precomp;
-		result_pos = 10;
-		break;
-
 	case C_FORMAT_TRACK:
 		format_track_start(flopi[command[1] & 3]);
-		break;
-
-	case C_LOCK:
-		locked = command[0] & 0x80;
-		main_phase = PHASE_RESULT;
-		result[0] = locked ? 0x10 : 0x00;
-		result_pos = 1;
-		LOGCOMMAND("command lock (%s)\n", locked ? "on" : "off");
-		break;
-
-	case C_PERPENDICULAR:
-		LOGCOMMAND("command perpendicular\n");
-		perpmode = command[1];
-		main_phase = PHASE_CMD;
 		break;
 
 	case C_READ_DATA:
@@ -1466,6 +1435,65 @@ void upd765_family_device::execute_command(int cmd)
 	default:
 		LOGWARN("Unknown command %02x\n", cmd);
 		// exit(1);
+	}
+}
+
+void ps2_fdc_device::execute_command(int cmd)
+{
+	switch(cmd) {
+	case C_CONFIGURE:
+		LOGCOMMAND("command configure %02x %02x %02x\n",
+					command[1], command[2], command[3]);
+		// byte 1 is ignored, byte 3 is precompensation-related
+		fifocfg = command[2];
+		precomp = command[3];
+		main_phase = PHASE_CMD;
+		break;
+
+	case C_DUMP_REG:
+		LOGCOMMAND("command dump regs\n");
+		main_phase = PHASE_RESULT;
+		result[0] = flopi[0].pcn;
+		result[1] = flopi[1].pcn;
+		result[2] = flopi[2].pcn;
+		result[3] = flopi[3].pcn;
+		result[4] = (spec & 0xff00) >> 8;
+		result[5] = (spec & 0x00ff);
+		result[6] = sector_size;
+		result[7] = locked ? 0x80 : 0x00;
+		result[7] |= (perpmode & 0x3f);
+		result[8] = fifocfg;
+		result[9] = precomp;
+		result_pos = 10;
+		break;
+
+	case C_VERSION:
+		LOGCOMMAND("command version\n");
+		main_phase = PHASE_RESULT;
+		result[0] = 0x90;
+		result_pos = 1;
+		break;
+
+	case C_LOCK:
+		locked = command[0] & 0x80;
+		main_phase = PHASE_RESULT;
+		result[0] = locked ? 0x10 : 0x00;
+		result_pos = 1;
+		LOGCOMMAND("command lock (%s)\n", locked ? "on" : "off");
+		break;
+
+	case C_PERPENDICULAR:
+		LOGCOMMAND("command perpendicular\n");
+		if(BIT(command[1], 7))
+			perpmode = command[1] & 0x3f;
+		else
+			perpmode = (perpmode & 0x3c) | (command[1] & 3);
+		main_phase = PHASE_CMD;
+		break;
+
+	default:
+		upd765_family_device::execute_command(cmd);
+		break;
 	}
 }
 
@@ -2689,6 +2717,7 @@ void i82072_device::device_start()
 {
 	upd765_family_device::device_start();
 
+	save_item(NAME(motorcfg));
 	save_item(NAME(motor_off_counter));
 	save_item(NAME(motor_on_counter));
 	save_item(NAME(drive_busy));
@@ -2801,11 +2830,30 @@ void i82072_device::start_command(int cmd)
 void i82072_device::execute_command(int cmd)
 {
 	switch(cmd) {
-	case C_DUMP_REG:
-		upd765_family_device::execute_command(cmd);
+	case C_CONFIGURE:
+		LOGCOMMAND("command configure %02x %02x %02x\n",
+					command[1], command[2], command[3]);
+		motorcfg = command[1];
+		fifocfg = command[2];
+		precomp = command[3];
+		main_phase = PHASE_CMD;
+		break;
 
+	case C_DUMP_REG:
+		LOGCOMMAND("command dump regs\n");
+		main_phase = PHASE_RESULT;
+		result[0] = flopi[0].pcn;
+		result[1] = flopi[1].pcn;
+		result[2] = flopi[2].pcn;
+		result[3] = flopi[3].pcn;
+		result[4] = (spec & 0xff00) >> 8;
+		result[5] = (spec & 0x00ff);
+		result[6] = sector_size;
 		// i82072 dumps motor configuration at offset 7
 		result[7] = motorcfg;
+		result[8] = fifocfg;
+		result[9] = precomp;
+		result_pos = 10;
 		break;
 
 	case C_MOTOR_ONOFF: {
@@ -2944,7 +2992,32 @@ void i82072_device::index_callback(floppy_image_device *floppy, int state)
 	upd765_family_device::index_callback(floppy, state);
 }
 
-smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, SMC37C78, tag, owner, clock)
+ps2_fdc_device::ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, type, tag, owner, clock)
+{
+}
+
+void ps2_fdc_device::device_start()
+{
+	upd765_family_device::device_start();
+
+	save_item(NAME(perpmode));
+}
+
+void ps2_fdc_device::device_reset()
+{
+	upd765_family_device::device_reset();
+
+	perpmode = 0;
+}
+
+void ps2_fdc_device::soft_reset()
+{
+	upd765_family_device::soft_reset();
+
+	perpmode &= 0x3c;
+}
+
+smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, SMC37C78, tag, owner, clock)
 {
 	ready_connected = false;
 	select_connected = true;
@@ -2952,7 +3025,7 @@ smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag,
 	recalibrate_steps = 80;
 }
 
-n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, N82077AA, tag, owner, clock)
+n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, N82077AA, tag, owner, clock)
 {
 	ready_connected = false;
 	select_connected = true;
@@ -2975,7 +3048,7 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 	select_multiplexed = false;
 }
 
-pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC8477A, tag, owner, clock)
+pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = false;

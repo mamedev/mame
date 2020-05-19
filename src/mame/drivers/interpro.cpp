@@ -1003,8 +1003,7 @@ void sapphire_state::sapphire(machine_config &config)
 	INTERPRO_FMCC(config, m_mcga, 0);
 
 	// floppy controller
-	N82077AA(config, m_fdc, 24_MHz_XTAL);
-	m_fdc->set_mode(n82077aa_device::mode_t::PS2);
+	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
 	m_fdc->intrq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
