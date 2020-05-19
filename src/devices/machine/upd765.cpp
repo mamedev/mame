@@ -3077,9 +3077,9 @@ wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag,
 uint8_t wd37c65c_device::get_st3(floppy_info &fi)
 {
 	uint8_t st3 = command[1] & 7;
-	result[0] |= 0x20;
+	st3 |= 0x20;
 	if(fi.dev)
-		result[0] |=
+		st3 |=
 			(fi.dev->wpt_r() ? 0x48 : 0x00) |
 			(fi.dev->trk00_r() ? 0x00 : 0x10);
 	return st3;
