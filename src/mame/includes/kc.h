@@ -105,12 +105,12 @@ public:
 	virtual void update_0x0e000();
 
 	// PIO callback
-	DECLARE_READ8_MEMBER( pio_porta_r );
-	DECLARE_READ8_MEMBER( pio_portb_r );
+	uint8_t pio_porta_r();
+	uint8_t pio_portb_r();
 	DECLARE_WRITE_LINE_MEMBER( pio_ardy_cb);
 	DECLARE_WRITE_LINE_MEMBER( pio_brdy_cb);
-	DECLARE_WRITE8_MEMBER( pio_porta_w );
-	DECLARE_WRITE8_MEMBER( pio_portb_w );
+	void pio_porta_w(uint8_t data);
+	void pio_portb_w(uint8_t data);
 
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );

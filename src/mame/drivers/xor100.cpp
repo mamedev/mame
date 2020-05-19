@@ -365,7 +365,7 @@ WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(xor100_state::i8255_pc_r)
+uint8_t xor100_state::i8255_pc_r()
 {
 	/*
 

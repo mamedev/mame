@@ -388,7 +388,7 @@ READ8_MEMBER( thomson_state::to7_cartridge_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_timer_port_out )
+void thomson_state::to7_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
@@ -399,7 +399,7 @@ WRITE8_MEMBER( thomson_state::to7_timer_port_out )
 
 
 
-READ8_MEMBER( thomson_state::to7_timer_port_in )
+uint8_t thomson_state::to7_timer_port_in()
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -449,7 +449,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_sys_portb_out )
+void thomson_state::to7_sys_portb_out(uint8_t data)
 {
 	/* value fetched in to7_sys_porta_in */
 }
@@ -460,7 +460,7 @@ WRITE8_MEMBER( thomson_state::to7_sys_portb_out )
 
 
 
-READ8_MEMBER( thomson_state::to7_sys_porta_in )
+uint8_t thomson_state::to7_sys_porta_in()
 {
 	if ( m_to7_lightpen )
 	{
@@ -485,7 +485,7 @@ READ8_MEMBER( thomson_state::to7_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::to7_sys_portb_in )
+uint8_t thomson_state::to7_sys_portb_in()
 {
 	/* lightpen low */
 	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
@@ -549,7 +549,7 @@ void to7_io_line_device::device_start()
 	m_rs232->write_dtr(0);
 }
 
-WRITE8_MEMBER( to7_io_line_device::porta_out )
+void to7_io_line_device::porta_out(uint8_t data)
 {
 	int txd = (data >> 0) & 1;
 	int rts = (data >> 1) & 1;
@@ -588,7 +588,7 @@ WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
 }
 
 
-READ8_MEMBER( to7_io_line_device::porta_in )
+uint8_t to7_io_line_device::porta_in()
 {
 	LOG_IO(( "%s %f to7_io_porta_in: select=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), m_centronics_busy, m_cts, m_dsr, m_rxd ));
 
@@ -758,7 +758,7 @@ void thomson_state::to7_game_sound_update()
 
 
 
-READ8_MEMBER( thomson_state::to7_game_porta_in )
+uint8_t thomson_state::to7_game_porta_in()
 {
 	uint8_t data;
 	if ( m_io_config->read() & 1 )
@@ -799,7 +799,7 @@ READ8_MEMBER( thomson_state::to7_game_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::to7_game_portb_in )
+uint8_t thomson_state::to7_game_portb_in()
 {
 	uint8_t data;
 	if ( m_io_config->read() & 1 )
@@ -826,7 +826,7 @@ READ8_MEMBER( thomson_state::to7_game_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_game_portb_out )
+void thomson_state::to7_game_portb_out(uint8_t data)
 {
 	/* 6-bit DAC sound */
 	m_to7_game_sound = data & 0x3f;
@@ -1053,7 +1053,7 @@ WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
 
 
 
-READ8_MEMBER( thomson_state::to770_sys_porta_in )
+uint8_t thomson_state::to770_sys_porta_in()
 {
 	/* keyboard */
 	int keyline = m_pia_sys->b_output() & 7;
@@ -1115,7 +1115,7 @@ void thomson_state::to770_update_ram_bank_postload()
 
 
 
-WRITE8_MEMBER( thomson_state::to770_sys_portb_out )
+void thomson_state::to770_sys_portb_out(uint8_t data)
 {
 	to770_update_ram_bank();
 }
@@ -1126,7 +1126,7 @@ WRITE8_MEMBER( thomson_state::to770_sys_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to770_timer_port_out )
+void thomson_state::to770_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
@@ -1295,7 +1295,7 @@ void thomson_state::mo5_init_timer()
 
 
 
-WRITE8_MEMBER( thomson_state::mo5_sys_porta_out )
+void thomson_state::mo5_sys_porta_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
 	thom_set_border_color( (data >> 1) & 15 ); /* bit 1-4: border color */
@@ -1304,7 +1304,7 @@ WRITE8_MEMBER( thomson_state::mo5_sys_porta_out )
 
 
 
-READ8_MEMBER( thomson_state::mo5_sys_porta_in )
+uint8_t thomson_state::mo5_sys_porta_in()
 {
 	return
 		((m_io_lightpen_button->read() & 1) ? 0x20 : 0) | /* bit 5: lightpen button */
@@ -1314,7 +1314,7 @@ READ8_MEMBER( thomson_state::mo5_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::mo5_sys_portb_in )
+uint8_t thomson_state::mo5_sys_portb_in()
 {
 	uint8_t portb = m_pia_sys->b_output();
 	int col = (portb >> 1) & 7;       /* key column */
@@ -2443,7 +2443,7 @@ void thomson_state::to9_kbd_init()
 
 /* ------------ system PIA 6821 ------------ */
 
-READ8_MEMBER( thomson_state::to9_sys_porta_in )
+uint8_t thomson_state::to9_sys_porta_in()
 {
 	uint8_t ktest = to9_kbd_ktest();
 
@@ -2455,7 +2455,7 @@ READ8_MEMBER( thomson_state::to9_sys_porta_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_sys_porta_out )
+void thomson_state::to9_sys_porta_out(uint8_t data)
 {
 	m_centronics->write_data1(BIT(data, 1));
 	m_centronics->write_data2(BIT(data, 2));
@@ -2468,7 +2468,7 @@ WRITE8_MEMBER( thomson_state::to9_sys_porta_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
+void thomson_state::to9_sys_portb_out(uint8_t data)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_strobe(BIT(data, 1));
@@ -2485,7 +2485,7 @@ WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_timer_port_out )
+void thomson_state::to9_timer_port_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 ); /* bit 0: video bank */
 	to9_update_ram_bank();
@@ -3406,7 +3406,7 @@ WRITE8_MEMBER( thomson_state::to8_vreg_w )
 /* ------------ system PIA 6821 ------------ */
 
 
-READ8_MEMBER( thomson_state::to8_sys_porta_in )
+uint8_t thomson_state::to8_sys_porta_in()
 {
 	int ktest = to8_kbd_ktest();
 
@@ -3418,7 +3418,7 @@ READ8_MEMBER( thomson_state::to8_sys_porta_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
+void thomson_state::to8_sys_portb_out(uint8_t data)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_strobe(BIT(data, 1));
@@ -3439,7 +3439,7 @@ WRITE_LINE_MEMBER(thomson_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( thomson_state::to8_timer_port_in )
+uint8_t thomson_state::to8_timer_port_in()
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -3450,7 +3450,7 @@ READ8_MEMBER( thomson_state::to8_timer_port_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_timer_port_out )
+void thomson_state::to8_timer_port_out(uint8_t data)
 {
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	m_to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
@@ -3622,7 +3622,7 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 
 
 
-READ8_MEMBER( thomson_state::to9p_timer_port_in )
+uint8_t thomson_state::to9p_timer_port_in()
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -3632,7 +3632,7 @@ READ8_MEMBER( thomson_state::to9p_timer_port_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to9p_timer_port_out )
+void thomson_state::to9p_timer_port_out(uint8_t data)
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
@@ -4042,7 +4042,7 @@ WRITE_LINE_MEMBER( thomson_state::mo6_centronics_busy )
 }
 
 
-WRITE8_MEMBER( thomson_state::mo6_game_porta_out )
+void thomson_state::mo6_game_porta_out(uint8_t data)
 {
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
 
@@ -4108,7 +4108,7 @@ void thomson_state::mo6_game_reset()
 
 
 
-READ8_MEMBER( thomson_state::mo6_sys_porta_in )
+uint8_t thomson_state::mo6_sys_porta_in()
 {
 	return
 		((m_io_lightpen_button->read() & 1) ? 2 : 0) | /* bit 1: lightpen button */
@@ -4119,7 +4119,7 @@ READ8_MEMBER( thomson_state::mo6_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::mo6_sys_portb_in )
+uint8_t thomson_state::mo6_sys_portb_in()
 {
 	/* keyboard: 9 lines of 8 keys */
 	uint8_t porta = m_pia_sys->a_output();
@@ -4137,7 +4137,7 @@ READ8_MEMBER( thomson_state::mo6_sys_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_sys_porta_out )
+void thomson_state::mo6_sys_porta_out(uint8_t data)
 {
 	thom_set_mode_point( data & 1 );                /* bit 0: video bank switch */
 	m_to7_game_mute = data & 4;                       /* bit 2: sound mute */
@@ -4501,7 +4501,7 @@ WRITE8_MEMBER( thomson_state::mo5nr_prn_w )
 
 
 
-READ8_MEMBER( thomson_state::mo5nr_sys_portb_in )
+uint8_t thomson_state::mo5nr_sys_portb_in()
 {
 	/* keyboard: only 8 lines of 8 keys (MO6 has 9 lines) */
 	uint8_t portb = m_pia_sys->b_output();
@@ -4514,7 +4514,7 @@ READ8_MEMBER( thomson_state::mo5nr_sys_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5nr_sys_porta_out )
+void thomson_state::mo5nr_sys_porta_out(uint8_t data)
 {
 	/* no keyboard LED */
 	thom_set_mode_point( data & 1 );           /* bit 0: video bank switch */

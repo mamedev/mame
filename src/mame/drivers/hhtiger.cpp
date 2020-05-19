@@ -94,29 +94,29 @@ private:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER(display_pixels);
 	UPD7220_DRAW_TEXT_LINE_MEMBER(draw_text);
 
 	/* handlers for logging only, can be removed when more is known */
-	DECLARE_READ8_MEMBER(pio_pa_r);
-	DECLARE_WRITE8_MEMBER(pio_pa_w);
-	DECLARE_WRITE8_MEMBER(pio_pb_w);
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
+	void pio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	DECLARE_WRITE_LINE_MEMBER(brdy_w);
 
-	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_b);
+	uint8_t via_0_in_a();
+	void via_0_out_a(uint8_t data);
+	void via_0_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
 
-	DECLARE_WRITE8_MEMBER(via_1_out_a);
-	DECLARE_WRITE8_MEMBER(via_1_out_b);
+	void via_1_out_a(uint8_t data);
+	void via_1_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
 
@@ -278,25 +278,25 @@ WRITE_LINE_MEMBER(hhtiger_state::busreq_w)
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(hhtiger_state::memory_read_byte)
+uint8_t hhtiger_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(hhtiger_state::memory_write_byte)
+void hhtiger_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(hhtiger_state::io_read_byte)
+uint8_t hhtiger_state::io_read_byte(offs_t offset)
 {
 	address_space& io_space = m_maincpu->space(AS_IO);
 	return io_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(hhtiger_state::io_write_byte)
+void hhtiger_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& io_space = m_maincpu->space(AS_IO);
 	io_space.write_byte(offset, data);
@@ -362,7 +362,7 @@ static INPUT_PORTS_START(hhtiger)
 INPUT_PORTS_END
 
 
-READ8_MEMBER(hhtiger_state::pio_pa_r)
+uint8_t hhtiger_state::pio_pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -370,13 +370,13 @@ READ8_MEMBER(hhtiger_state::pio_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::pio_pa_w)
+void hhtiger_state::pio_pa_w(uint8_t data)
 {
 	LOG("pio_pa_w %02X\n", data);
 	m_via[0]->write_pa(data);
 }
 
-WRITE8_MEMBER(hhtiger_state::pio_pb_w)
+void hhtiger_state::pio_pb_w(uint8_t data)
 {
 	LOG("pio_pb_w %02X\n", data);
 	m_via[0]->write_pb(data);
@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(hhtiger_state::brdy_w)
 }
 
 
-READ8_MEMBER(hhtiger_state::via_0_in_a)
+uint8_t hhtiger_state::via_0_in_a()
 {
 	uint8_t data = 0xff;
 
@@ -404,13 +404,13 @@ READ8_MEMBER(hhtiger_state::via_0_in_a)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::via_0_out_a)
+void hhtiger_state::via_0_out_a(uint8_t data)
 {
 	LOG("via0_out_a %02X\n", data);
 	m_pio->port_a_write(data);
 }
 
-WRITE8_MEMBER(hhtiger_state::via_0_out_b)
+void hhtiger_state::via_0_out_b(uint8_t data)
 {
 	LOG("via0_out_b %02X\n", data);
 }
@@ -427,12 +427,12 @@ WRITE_LINE_MEMBER(hhtiger_state::via_0_out_cb2)
 }
 
 
-WRITE8_MEMBER(hhtiger_state::via_1_out_a)
+void hhtiger_state::via_1_out_a(uint8_t data)
 {
 	LOG("via1_out_a %02X\n", data);
 }
 
-WRITE8_MEMBER(hhtiger_state::via_1_out_b)
+void hhtiger_state::via_1_out_b(uint8_t data)
 {
 	LOG("via1_out_b %02X\n", data);
 }

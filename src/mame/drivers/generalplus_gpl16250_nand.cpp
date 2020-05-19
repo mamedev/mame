@@ -52,7 +52,7 @@ WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
+uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 {
 	if (!m_nandregion)
 		return 0x0000;

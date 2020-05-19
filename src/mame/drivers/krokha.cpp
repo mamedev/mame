@@ -56,8 +56,8 @@ private:
 
 	void krokha_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(status_callback);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void status_callback(uint8_t data);
+	void speaker_w(uint8_t data);
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -70,7 +70,7 @@ private:
 
 //
 
-WRITE8_MEMBER(krokha_state::status_callback)
+void krokha_state::status_callback(uint8_t data)
 {
 	if (data & i8080_cpu_device::STATUS_INTA)
 	{
@@ -79,7 +79,7 @@ WRITE8_MEMBER(krokha_state::status_callback)
 	}
 }
 
-WRITE8_MEMBER(krokha_state::speaker_w)
+void krokha_state::speaker_w(uint8_t data)
 {
 	m_speaker_state = BIT(data, 1);
 	m_speaker->level_w(m_speaker_state);

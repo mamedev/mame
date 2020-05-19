@@ -69,18 +69,18 @@ private:
 
 	// DMA controller handlers
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	// PIT handlers
 	DECLARE_WRITE_LINE_MEMBER(br1_w);
 
 	// PIA handlers
-	DECLARE_WRITE8_MEMBER(pia0_porta_w);
-	DECLARE_READ8_MEMBER(pia1_portb_r);
-	DECLARE_WRITE8_MEMBER(pia1_portb_w);
+	void pia0_porta_w(uint8_t data);
+	uint8_t pia1_portb_r();
+	void pia1_portb_w(uint8_t data);
 
 	// Video
 	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);

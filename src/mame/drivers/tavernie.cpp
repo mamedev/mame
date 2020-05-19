@@ -96,12 +96,12 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(ca1_r);
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pa_ivg_w);
+	uint8_t pa_r();
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void pa_ivg_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_READ8_MEMBER(pb_ivg_r);
+	uint8_t pb_ivg_r();
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(ds_w);
 	DECLARE_MACHINE_RESET(cpu09);
@@ -250,7 +250,7 @@ MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
 }
 
 
-READ8_MEMBER( tavernie_state::pa_r )
+uint8_t tavernie_state::pa_r()
 {
 	return ioport("DSW")->read() | m_pa;
 }
@@ -264,14 +264,14 @@ d5: S3
 d6: S4
 d7: cassout
 */
-WRITE8_MEMBER( tavernie_state::pa_w )
+void tavernie_state::pa_w(uint8_t data)
 {
 	m_pa = data & 0x9f;
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // centronics
-WRITE8_MEMBER( tavernie_state::pb_w )
+void tavernie_state::pb_w(uint8_t data)
 {
 }
 
@@ -281,14 +281,14 @@ READ_LINE_MEMBER( tavernie_state::ca1_r )
 	return m_cassold;
 }
 
-READ8_MEMBER( tavernie_state::pb_ivg_r )
+uint8_t tavernie_state::pb_ivg_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( tavernie_state::pa_ivg_w )
+void tavernie_state::pa_ivg_w(uint8_t data)
 {
 // bits 0-3 are attribute bits
 }

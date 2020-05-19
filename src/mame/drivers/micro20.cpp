@@ -57,8 +57,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
 	DECLARE_WRITE_LINE_MEMBER(h4_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void portb_w(u8 data);
+	void portc_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
 	{
@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
 	m_pit->reset();
 }
 
-WRITE8_MEMBER(micro20_state::portb_w)
+void micro20_state::portb_w(u8 data)
 {
 	m_rtc->d0_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->d1_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -118,7 +118,7 @@ WRITE8_MEMBER(micro20_state::portb_w)
 	m_rtc->d3_w((data & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(micro20_state::portc_w)
+void micro20_state::portc_w(u8 data)
 {
 	// MSM58321 CS1 and CS2 are tied to /RST, inverted RESET.
 	// So they're always high when the system is not reset.

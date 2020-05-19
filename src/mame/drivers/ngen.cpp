@@ -106,8 +106,8 @@ public:
 	void ngen(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(hd_buffer_r);
-	DECLARE_WRITE8_MEMBER(hd_buffer_w);
+	uint8_t hd_buffer_r(offs_t offset);
+	void hd_buffer_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
@@ -119,17 +119,17 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_READ8_MEMBER(dma_read_word);
-	DECLARE_WRITE8_MEMBER(dma_write_word);
+	uint8_t dma_read_word(offs_t offset);
+	void dma_write_word(offs_t offset, uint8_t data);
 	// TODO: sort out what devices use which channels
-	DECLARE_READ8_MEMBER( dma_0_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_1_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_2_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_3_dack_r );
-	DECLARE_WRITE8_MEMBER( dma_0_dack_w ) { popmessage("IOW0: data %02x",data); }
-	DECLARE_WRITE8_MEMBER( dma_1_dack_w ) { }
-	DECLARE_WRITE8_MEMBER( dma_2_dack_w ) { }
-	DECLARE_WRITE8_MEMBER( dma_3_dack_w ) { popmessage("IOW3: data %02x",data); }
+	uint8_t dma_0_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_1_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_2_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_3_dack_r();
+	void dma_0_dack_w(uint8_t data) { popmessage("IOW0: data %02x",data); }
+	void dma_1_dack_w(uint8_t data) { }
+	void dma_2_dack_w(uint8_t data) { }
+	void dma_3_dack_w(uint8_t data) { popmessage("IOW3: data %02x",data); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -155,9 +155,9 @@ protected:
 	optional_device<pit8253_device> m_hdc_timer;
 
 private:
-	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
-	DECLARE_WRITE16_MEMBER(peripheral_w);
-	DECLARE_READ16_MEMBER(peripheral_r);
+	void cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t peripheral_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_WRITE16_MEMBER(xbus_w);
 	DECLARE_READ16_MEMBER(xbus_r);
 
@@ -167,7 +167,7 @@ private:
 	DECLARE_READ16_MEMBER(hfd_r);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
-	DECLARE_READ8_MEMBER(irq_cb);
+	uint8_t irq_cb();
 	DECLARE_WRITE8_MEMBER(hdc_control_w);
 	DECLARE_WRITE8_MEMBER(disk_addr_ext);
 
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
 	}
 }
 
-WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
+void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t addr;
 
@@ -268,13 +268,13 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 		addr = (m_peripheral & 0xffc0) << 4;
 		if(m_middle & 0x0040)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to memory 0x%08x\n",addr);
 		}
 		else
 		{
 			addr &= 0xffff;
-			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
+			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
 		break;
@@ -286,7 +286,7 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 
 // 80186 peripheral space
 // Largely guesswork at this stage
-WRITE16_MEMBER(ngen_state::peripheral_w)
+void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -359,7 +359,7 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	}
 }
 
-READ16_MEMBER(ngen_state::peripheral_r)
+uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 	switch(offset)
@@ -648,12 +648,12 @@ WRITE8_MEMBER(ngen_state::disk_addr_ext)
 	m_disk_page = data & 0x7f;
 }
 
-READ8_MEMBER(ngen_state::hd_buffer_r)
+uint8_t ngen_state::hd_buffer_r(offs_t offset)
 {
 	return m_hd_buffer[offset];
 }
 
-WRITE8_MEMBER(ngen_state::hd_buffer_w)
+void ngen_state::hd_buffer_w(offs_t offset, uint8_t data)
 {
 	m_hd_buffer[offset] = data;
 }
@@ -698,7 +698,7 @@ WRITE_LINE_MEMBER( ngen_state::dack1_w ) { set_dma_channel(1, state); }
 WRITE_LINE_MEMBER( ngen_state::dack2_w ) { set_dma_channel(2, state); }
 WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
 
-READ8_MEMBER(ngen_state::dma_3_dack_r)
+uint8_t ngen_state::dma_3_dack_r()
 {
 	uint16_t ret = 0xffff;
 
@@ -716,7 +716,7 @@ READ8_MEMBER(ngen_state::dma_3_dack_r)
 	return ret;
 }
 
-READ8_MEMBER(ngen_state::dma_read_word)
+uint8_t ngen_state::dma_read_word(offs_t offset)
 {
 	cpu_device* cpu;
 	uint16_t result;
@@ -738,7 +738,7 @@ READ8_MEMBER(ngen_state::dma_read_word)
 }
 
 
-WRITE8_MEMBER(ngen_state::dma_write_word)
+void ngen_state::dma_write_word(offs_t offset, uint8_t data)
 {
 	cpu_device* cpu;
 
@@ -774,7 +774,7 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( ngen_state::irq_cb )
+uint8_t ngen_state::irq_cb()
 {
 	return m_pic->acknowledge();
 }

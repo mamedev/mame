@@ -137,10 +137,10 @@ public:
 	DECLARE_READ16_MEMBER( pcs6_14_15_r );
 	DECLARE_WRITE16_MEMBER( pcs6_14_15_w );
 
-	DECLARE_READ8_MEMBER( compis_irq_callback );
+	uint8_t compis_irq_callback();
 
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 //  I80186_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( compis_state::compis_irq_callback )
+uint8_t compis_state::compis_irq_callback()
 {
 	return m_osp->inta_r();
 }
@@ -609,7 +609,7 @@ WRITE_LINE_MEMBER(compis_state::write_centronics_select)
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( compis_state::ppi_pb_r )
+uint8_t compis_state::ppi_pb_r()
 {
 	/*
 
@@ -644,7 +644,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( compis_state::ppi_pc_w )
+void compis_state::ppi_pc_w(uint8_t data)
 {
 	/*
 

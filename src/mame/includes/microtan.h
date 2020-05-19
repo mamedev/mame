@@ -98,7 +98,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(pgm_chargen_w);
+	void pgm_chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
 

@@ -60,9 +60,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void leds_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void pmi80_io(address_map &map);
 	void pmi80_mem(address_map &map);
@@ -81,7 +81,7 @@ private:
 };
 
 
-READ8_MEMBER( pmi80_state::keyboard_r)
+uint8_t pmi80_state::keyboard_r()
 {
 	u8 data = 0x7f;
 	if (m_keyrow > 0xF6)
@@ -91,13 +91,13 @@ READ8_MEMBER( pmi80_state::keyboard_r)
 	return data;
 }
 
-WRITE8_MEMBER( pmi80_state::keyboard_w )
+void pmi80_state::keyboard_w(uint8_t data)
 {
 	m_keyrow = data;
 	m_ledready = true;
 }
 
-WRITE8_MEMBER( pmi80_state::leds_w )
+void pmi80_state::leds_w(uint8_t data)
 {
 	if (m_ledready)
 	{

@@ -34,22 +34,22 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	DECLARE_WRITE8_MEMBER(fk1_ppi_1_a_w);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_1_b_w);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_1_c_w);
-	DECLARE_READ8_MEMBER(fk1_ppi_1_a_r);
-	DECLARE_READ8_MEMBER(fk1_ppi_1_b_r);
-	DECLARE_READ8_MEMBER(fk1_ppi_1_c_r);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_2_a_w);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_2_c_w);
-	DECLARE_READ8_MEMBER(fk1_ppi_2_b_r);
-	DECLARE_READ8_MEMBER(fk1_ppi_2_c_r);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_3_a_w);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_3_b_w);
-	DECLARE_WRITE8_MEMBER(fk1_ppi_3_c_w);
-	DECLARE_READ8_MEMBER(fk1_ppi_3_a_r);
-	DECLARE_READ8_MEMBER(fk1_ppi_3_b_r);
-	DECLARE_READ8_MEMBER(fk1_ppi_3_c_r);
+	void fk1_ppi_1_a_w(uint8_t data);
+	void fk1_ppi_1_b_w(uint8_t data);
+	void fk1_ppi_1_c_w(uint8_t data);
+	uint8_t fk1_ppi_1_a_r();
+	uint8_t fk1_ppi_1_b_r();
+	uint8_t fk1_ppi_1_c_r();
+	void fk1_ppi_2_a_w(uint8_t data);
+	void fk1_ppi_2_c_w(uint8_t data);
+	uint8_t fk1_ppi_2_b_r();
+	uint8_t fk1_ppi_2_c_r();
+	void fk1_ppi_3_a_w(uint8_t data);
+	void fk1_ppi_3_b_w(uint8_t data);
+	void fk1_ppi_3_c_w(uint8_t data);
+	uint8_t fk1_ppi_3_a_r();
+	uint8_t fk1_ppi_3_b_r();
+	uint8_t fk1_ppi_3_c_r();
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out2);
@@ -91,34 +91,34 @@ Port C:
         2 - INTE keyboard
  */
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_1_a_w )
+void fk1_state::fk1_ppi_1_a_w(uint8_t data)
 {
 //  logerror("fk1_ppi_1_a_w %02x\n",data);
 }
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_1_b_w )
+void fk1_state::fk1_ppi_1_b_w(uint8_t data)
 {
 //  logerror("fk1_ppi_1_b_w %02x\n",data);
 }
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_1_c_w )
+void fk1_state::fk1_ppi_1_c_w(uint8_t data)
 {
 	//logerror("fk1_ppi_1_c_w %02x\n",data);
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_1_a_r )
+uint8_t fk1_state::fk1_ppi_1_a_r()
 {
 	//logerror("fk1_ppi_1_a_r\n");
 	return 0xff;
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_1_b_r )
+uint8_t fk1_state::fk1_ppi_1_b_r()
 {
 //  logerror("fk1_ppi_1_b_r\n");
 	return 0;
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_1_c_r )
+uint8_t fk1_state::fk1_ppi_1_c_r()
 {
 //  logerror("fk1_ppi_1_c_r\n");
 	return 0;
@@ -145,23 +145,23 @@ Port C:
         2 - INTE B - writing data
 */
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_2_a_w )
+void fk1_state::fk1_ppi_2_a_w(uint8_t data)
 {
 //  logerror("write to disk %02x\n",data);
 }
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_2_c_w )
+void fk1_state::fk1_ppi_2_c_w(uint8_t data)
 {
 //  logerror("fk1_ppi_2_c_w %02x\n",data);
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_2_b_r )
+uint8_t fk1_state::fk1_ppi_2_b_r()
 {
 //  logerror("read from disk\n");
 	return 0;
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_2_c_r )
+uint8_t fk1_state::fk1_ppi_2_c_r()
 {
 //  logerror("fk1_ppi_2_c_r\n");
 	return 0;
@@ -193,33 +193,33 @@ Port C
     0 - STEP, move disk (0 1 .. 0.).
 
 */
-WRITE8_MEMBER( fk1_state::fk1_ppi_3_a_w )
+void fk1_state::fk1_ppi_3_a_w(uint8_t data)
 {
 //  logerror("fk1_ppi_3_a_w %02x\n",data);
 }
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_3_b_w )
+void fk1_state::fk1_ppi_3_b_w(uint8_t data)
 {
 	m_video_rol = data;
 }
 
-WRITE8_MEMBER( fk1_state::fk1_ppi_3_c_w )
+void fk1_state::fk1_ppi_3_c_w(uint8_t data)
 {
 //  logerror("fk1_ppi_3_c_w %02x\n",data);
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_3_a_r )
+uint8_t fk1_state::fk1_ppi_3_a_r()
 {
 //  logerror("fk1_ppi_3_a_r\n");
 	return 0;
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_3_b_r )
+uint8_t fk1_state::fk1_ppi_3_b_r()
 {
 	return m_video_rol;
 }
 
-READ8_MEMBER( fk1_state::fk1_ppi_3_c_r )
+uint8_t fk1_state::fk1_ppi_3_c_r()
 {
 //  logerror("fk1_ppi_3_c_r\n");
 	return 0;

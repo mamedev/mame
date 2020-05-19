@@ -145,8 +145,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( handset_interrupt_in );
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(psi_input_4);
-	DECLARE_READ8_MEMBER(psi_input_4a);
+	uint8_t psi_input_4(offs_t offset);
+	uint8_t psi_input_4a(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
@@ -488,7 +488,7 @@ void ti99_4x_state::external_operation(offs_t offset, uint8_t data)
     The typical fix was to insert a diode at the Alphalock key.
 ***************************************************************************/
 
-READ8_MEMBER( ti99_4x_state::psi_input_4)
+uint8_t ti99_4x_state::psi_input_4(offs_t offset)
 {
 	switch (offset)
 	{
@@ -524,7 +524,7 @@ READ8_MEMBER( ti99_4x_state::psi_input_4)
 	}
 }
 
-READ8_MEMBER( ti99_4x_state::psi_input_4a )
+uint8_t ti99_4x_state::psi_input_4a(offs_t offset)
 {
 	int alphabias=0;
 

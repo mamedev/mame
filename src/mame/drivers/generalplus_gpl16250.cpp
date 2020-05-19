@@ -90,38 +90,38 @@ void gcm394_game_state::cs_map_base(address_map& map)
 {
 }
 
-READ16_MEMBER(gcm394_game_state::read_external_space)
+uint16_t gcm394_game_state::read_external_space(offs_t offset)
 {
 	return m_memory->get_program()->read_word(offset);
 }
 
-WRITE16_MEMBER(gcm394_game_state::write_external_space)
+void gcm394_game_state::write_external_space(offs_t offset, uint16_t data)
 {
 	m_memory->get_program()->write_word(offset, data);
 }
 
-READ16_MEMBER(gcm394_game_state::porta_r)
+uint16_t gcm394_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
 	logerror("Port A Read: %04x\n", data);
 	return data;
 }
 
-READ16_MEMBER(gcm394_game_state::portb_r)
+uint16_t gcm394_game_state::portb_r()
 {
 	uint16_t data = m_io[1]->read();
 	logerror("Port B Read: %04x\n", data);
 	return data;
 }
 
-READ16_MEMBER(gcm394_game_state::portc_r)
+uint16_t gcm394_game_state::portc_r()
 {
 	uint16_t data = m_io[2]->read();
 	logerror("Port C Read: %04x\n", data);
 	return data;
 }
 
-WRITE16_MEMBER(gcm394_game_state::porta_w)
+void gcm394_game_state::porta_w(uint16_t data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }

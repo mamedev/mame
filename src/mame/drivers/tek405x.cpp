@@ -111,7 +111,7 @@ void tek4051_state::bankswitch(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( tek4051_state::lbs_w )
+void tek4051_state::lbs_w(uint8_t data)
 {
 	/*
 
@@ -354,7 +354,7 @@ void tek4052_state::video_start()
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-READ8_MEMBER( tek4051_state::x_pia_pa_r )
+uint8_t tek4051_state::x_pia_pa_r()
 {
 	/*
 
@@ -374,7 +374,7 @@ READ8_MEMBER( tek4051_state::x_pia_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tek4051_state::x_pia_pa_w )
+void tek4051_state::x_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -392,7 +392,7 @@ WRITE8_MEMBER( tek4051_state::x_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( tek4051_state::x_pia_pb_w )
+void tek4051_state::x_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER( tek4051_state::x_pia_irqb_w )
 	update_irq();
 }
 
-READ8_MEMBER( tek4051_state::sa_r )
+uint8_t tek4051_state::sa_r()
 {
 	/*
 
@@ -450,7 +450,7 @@ READ8_MEMBER( tek4051_state::sa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tek4051_state::y_pia_pa_w )
+void tek4051_state::y_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -468,7 +468,7 @@ WRITE8_MEMBER( tek4051_state::y_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( tek4051_state::sb_w )
+void tek4051_state::sb_w(uint8_t data)
 {
 	/*
 
@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER( tek4051_state::y_pia_irqb_w )
 }
 
 
-READ8_MEMBER( tek4051_state::kb_pia_pa_r )
+uint8_t tek4051_state::kb_pia_pa_r()
 {
 	/*
 
@@ -532,7 +532,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
 	return data;
 }
 
-READ8_MEMBER( tek4051_state::kb_pia_pb_r )
+uint8_t tek4051_state::kb_pia_pb_r()
 {
 	/*
 
@@ -561,7 +561,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
+void tek4051_state::kb_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -610,7 +610,7 @@ WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqb_w )
 }
 
 
-READ8_MEMBER( tek4051_state::tape_pia_pa_r )
+uint8_t tek4051_state::tape_pia_pa_r()
 {
 	/*
 
@@ -630,7 +630,7 @@ READ8_MEMBER( tek4051_state::tape_pia_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tek4051_state::tape_pia_pa_w )
+void tek4051_state::tape_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -648,7 +648,7 @@ WRITE8_MEMBER( tek4051_state::tape_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( tek4051_state::tape_pia_pb_w )
+void tek4051_state::tape_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -678,7 +678,7 @@ WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
 	update_nmi();
 }
 
-WRITE8_MEMBER( tek4051_state::dio_w )
+void tek4051_state::dio_w(uint8_t data)
 {
 	/*
 
@@ -701,7 +701,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 	}
 }
 
-READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
+uint8_t tek4051_state::gpib_pia_pb_r()
 {
 	/*
 
@@ -738,7 +738,7 @@ READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
+void tek4051_state::gpib_pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -798,7 +798,7 @@ WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
 	update_irq();
 }
 
-WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
+void tek4051_state::com_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -818,7 +818,7 @@ WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
 	bankswitch(data);
 }
 
-READ8_MEMBER( tek4051_state::com_pia_pb_r )
+uint8_t tek4051_state::com_pia_pb_r()
 {
 	/*
 
@@ -844,7 +844,7 @@ READ8_MEMBER( tek4051_state::com_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tek4051_state::com_pia_pb_w )
+void tek4051_state::com_pia_pb_w(uint8_t data)
 {
 	/*
 

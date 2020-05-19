@@ -35,7 +35,7 @@
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( trs80m2_state::read )
+uint8_t trs80m2_state::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -74,7 +74,7 @@ READ8_MEMBER( trs80m2_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::write )
+void trs80m2_state::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x8000)
 	{
@@ -508,13 +508,13 @@ void trs80m2_state::kbd_w(u8 data)
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(trs80m2_state::io_read_byte)
+uint8_t trs80m2_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(trs80m2_state::io_write_byte)
+void trs80m2_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER( trs80m2_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( trs80m2_state::pio_pa_r )
+uint8_t trs80m2_state::pio_pa_r()
 {
 	/*
 
@@ -579,7 +579,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::pio_pa_w )
+void trs80m2_state::pio_pa_w(uint8_t data)
 {
 	/*
 

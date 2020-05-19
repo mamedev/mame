@@ -90,8 +90,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
+	uint8_t pb_r();
+	void pa_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
@@ -235,7 +235,7 @@ void v6809_state::kbd_put(u8 data)
 	m_pia0->cb1_w(1);
 }
 
-READ8_MEMBER( v6809_state::pb_r )
+uint8_t v6809_state::pb_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -243,7 +243,7 @@ READ8_MEMBER( v6809_state::pb_r )
 }
 
 // can support 4 drives
-WRITE8_MEMBER( v6809_state::pa_w )
+void v6809_state::pa_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();

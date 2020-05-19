@@ -92,14 +92,14 @@ private:
 
 	DECLARE_READ8_MEMBER( mailbox_wx319_r );
 	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
-	DECLARE_READ8_MEMBER( tms7020_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7020_portb_w );
-	DECLARE_READ8_MEMBER( tms7041_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portb_w );
-	DECLARE_READ8_MEMBER( tms7041_portc_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portc_w );
-	DECLARE_READ8_MEMBER( tms7041_portd_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
+	uint8_t tms7020_porta_r();
+	void tms7020_portb_w(uint8_t data);
+	uint8_t tms7041_porta_r();
+	void tms7041_portb_w(uint8_t data);
+	uint8_t tms7041_portc_r();
+	void tms7041_portc_w(uint8_t data);
+	uint8_t tms7041_portd_r();
+	void tms7041_portd_w(uint8_t data);
 	DECLARE_READ8_MEMBER( rom_r );
 
 	DECLARE_MACHINE_START(exl100);
@@ -231,7 +231,7 @@ WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
     A6 -
     A7 -
 */
-READ8_MEMBER(exelv_state::tms7020_porta_r)
+uint8_t exelv_state::tms7020_porta_r()
 {
 	logerror("tms7020_porta_r\n");
 	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
@@ -249,7 +249,7 @@ READ8_MEMBER(exelv_state::tms7020_porta_r)
     B6 -
     B7 -
 */
-WRITE8_MEMBER(exelv_state::tms7020_portb_w)
+void exelv_state::tms7020_portb_w(uint8_t data)
 {
 	logerror("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
@@ -267,7 +267,7 @@ WRITE8_MEMBER(exelv_state::tms7020_portb_w)
     A6 - X1 SCLK A9
     A7 - TMS5220 RDY
 */
-READ8_MEMBER(exelv_state::tms7041_porta_r)
+uint8_t exelv_state::tms7041_porta_r()
 {
 	uint8_t data = 0x00;
 	static uint8_t data_last=0;
@@ -302,7 +302,7 @@ READ8_MEMBER(exelv_state::tms7041_porta_r)
     B6 - W - REV6 WX319-11
     B7 - W - TMS7020 port A bit 0 (REV3)
 */
-WRITE8_MEMBER(exelv_state::tms7041_portb_w)
+void exelv_state::tms7041_portb_w(uint8_t data)
 {
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 /*
     TMS7041 PORT C - connected to mailbox WX318 and WX319 data bits
 */
-READ8_MEMBER(exelv_state::tms7041_portc_r)
+uint8_t exelv_state::tms7041_portc_r()
 {
 	uint8_t data = 0xff;
 	logerror("tms7041_portc_r\n");
@@ -339,7 +339,7 @@ READ8_MEMBER(exelv_state::tms7041_portc_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7041_portc_w)
+void exelv_state::tms7041_portc_w(uint8_t data)
 {
 	logerror("tms7041_portc_w: data = 0x%02x\n", data);
 	m_tms7041_portc = data;
@@ -357,7 +357,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
     D6 - TMS5220 D1
     D7 - TMS5220 D0
 */
-READ8_MEMBER(exelv_state::tms7041_portd_r)
+uint8_t exelv_state::tms7041_portd_r()
 {
 	uint8_t data = m_tms5220c->status_r();
 	logerror("tms7041_portd_r: data = 0x%02x\n", data);
@@ -365,7 +365,7 @@ READ8_MEMBER(exelv_state::tms7041_portd_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7041_portd_w)
+void exelv_state::tms7041_portd_w(uint8_t data)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 

@@ -47,10 +47,10 @@ public:
 	void savia84(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
+	uint8_t savia84_8255_portc_r();
+	void savia84_8255_porta_w(uint8_t data);
+	void savia84_8255_portb_w(uint8_t data);
+	void savia84_8255_portc_w(uint8_t data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -132,13 +132,13 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
+void savia84_state::savia84_8255_porta_w(uint8_t data) // OUT F8 - output segments on the selected digit
 {
 	m_seg = ~data;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
+void savia84_state::savia84_8255_portb_w(uint8_t data) // OUT F9 - light the 8 leds down the left side
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -148,13 +148,13 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 	}
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard scanning row; set digit to display
+void savia84_state::savia84_8255_portc_w(uint8_t data) // OUT FA - set keyboard scanning row; set digit to display
 {
 	m_digit = data & 15;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
+uint8_t savia84_state::savia84_8255_portc_r() // IN FA - read keyboard
 {
 	if (m_digit < 9)
 		return m_io_keyboard[m_digit]->read();

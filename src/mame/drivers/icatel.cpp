@@ -48,10 +48,10 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(magic_string);
 
-	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	DECLARE_READ8_MEMBER(i80c31_p3_r);
-	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
-	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
+	uint8_t i80c31_p1_r();
+	uint8_t i80c31_p3_r();
+	void i80c31_p1_w(uint8_t data);
+	void i80c31_p3_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(cn8_extension_r);
 	DECLARE_WRITE8_MEMBER(cn8_extension_w);
@@ -121,21 +121,21 @@ READ8_MEMBER(icatel_state::magic_string)
 	return mstr[offset%5];
 }
 
-READ8_MEMBER(icatel_state::i80c31_p1_r)
+uint8_t icatel_state::i80c31_p1_r()
 {
 	return 0x7f;
 }
 
-READ8_MEMBER(icatel_state::i80c31_p3_r)
+uint8_t icatel_state::i80c31_p3_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p1_w)
+void icatel_state::i80c31_p1_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(icatel_state::i80c31_p3_w)
+void icatel_state::i80c31_p3_w(uint8_t data)
 {
 }
 

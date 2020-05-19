@@ -79,8 +79,8 @@ public:
 	void lola8a(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(lola8a_port_a_r);
-	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
+	uint8_t lola8a_port_a_r();
+	void lola8a_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
@@ -251,13 +251,13 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 }
 
 
-READ8_MEMBER(lola8a_state::lola8a_port_a_r)
+uint8_t lola8a_state::lola8a_port_a_r()
 {
 	logerror("lola8a_port_a_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(lola8a_state::lola8a_port_b_w)
+void lola8a_state::lola8a_port_b_w(uint8_t data)
 {
 	m_portb = data;
 }

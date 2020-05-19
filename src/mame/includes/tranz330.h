@@ -53,9 +53,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(sound_w);
 
-	DECLARE_WRITE8_MEMBER(pio_a_w);
-	DECLARE_READ8_MEMBER( pio_b_r);
-	DECLARE_READ8_MEMBER(card_r);
+	void pio_a_w(uint8_t data);
+	uint8_t pio_b_r();
+	uint8_t card_r();
 
 	void tranz330_mem(address_map &map);
 	void tranz330_io(address_map &map);

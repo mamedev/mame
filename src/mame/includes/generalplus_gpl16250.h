@@ -60,13 +60,13 @@ protected:
 	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
 
-	virtual DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_READ16_MEMBER(portc_r);
-	virtual DECLARE_WRITE16_MEMBER(porta_w);
+	virtual uint16_t porta_r();
+	virtual uint16_t portb_r();
+	virtual uint16_t portc_r();
+	virtual void porta_w(uint16_t data);
 
-	virtual DECLARE_READ16_MEMBER(read_external_space);
-	virtual DECLARE_WRITE16_MEMBER(write_external_space);
+	virtual uint16_t read_external_space(offs_t offset);
+	virtual void write_external_space(offs_t offset, uint16_t data);
 
 private:
 };

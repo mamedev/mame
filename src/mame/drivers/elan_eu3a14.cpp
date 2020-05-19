@@ -120,7 +120,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	// for callback
-	DECLARE_READ8_MEMBER(read_full_space);
+	uint8_t read_full_space(offs_t offset);
 
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
@@ -166,7 +166,7 @@ uint32_t elan_eu3a14_state::screen_update(screen_device& screen, bitmap_ind16& b
 }
 
 // sound callback
-READ8_MEMBER(elan_eu3a14_state::read_full_space)
+uint8_t elan_eu3a14_state::read_full_space(offs_t offset)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);

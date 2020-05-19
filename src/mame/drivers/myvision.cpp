@@ -53,10 +53,10 @@ public:
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	uint8_t ay_port_a_r();
+	uint8_t ay_port_b_r();
+	void ay_port_a_w(uint8_t data);
+	void ay_port_b_w(uint8_t data);
 
 	void myvision_io(address_map &map);
 	void myvision_mem(address_map &map);
@@ -169,7 +169,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_a_r )
+uint8_t myvision_state::ay_port_a_r()
 {
 	uint8_t data = 0xFF;
 
@@ -197,19 +197,19 @@ READ8_MEMBER( myvision_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_b_r )
+uint8_t myvision_state::ay_port_b_r()
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( myvision_state::ay_port_a_w )
+void myvision_state::ay_port_a_w(uint8_t data)
 {
 }
 
 
 // Upper 4 bits select column
-WRITE8_MEMBER( myvision_state::ay_port_b_w )
+void myvision_state::ay_port_b_w(uint8_t data)
 {
 	m_column = data;
 }

@@ -167,8 +167,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( outspkr_w );
 	DECLARE_WRITE_LINE_MEMBER( intbrclk_w );
 	DECLARE_WRITE_LINE_MEMBER( rfrqpulse_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_wben_w );
@@ -178,13 +178,13 @@ private:
 	DECLARE_READ8_MEMBER( hires_status_r );
 	DECLARE_WRITE8_MEMBER( hires_plane_w );
 	DECLARE_WRITE8_MEMBER( hires_palette_w );
-	DECLARE_WRITE8_MEMBER( vidla_w );
-	DECLARE_WRITE8_MEMBER( drb_attr_w );
+	void vidla_w(uint8_t data);
+	void drb_attr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 	DECLARE_READ8_MEMBER( clkmouse_r );
 	DECLARE_WRITE8_MEMBER( clkmouse_w );
-	DECLARE_READ8_MEMBER( irq_callback );
+	uint8_t irq_callback(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hdl_w );
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);

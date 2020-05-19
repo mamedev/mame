@@ -104,15 +104,15 @@ private:
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
 	DECLARE_WRITE8_MEMBER(vram_data_w);
-	DECLARE_WRITE8_MEMBER(mycom_00_w);
-	DECLARE_WRITE8_MEMBER(mycom_04_w);
-	DECLARE_WRITE8_MEMBER(mycom_06_w);
-	DECLARE_WRITE8_MEMBER(mycom_0a_w);
-	DECLARE_READ8_MEMBER(mycom_05_r);
-	DECLARE_READ8_MEMBER(mycom_06_r);
-	DECLARE_READ8_MEMBER(mycom_08_r);
+	void mycom_00_w(uint8_t data);
+	void mycom_04_w(uint8_t data);
+	void mycom_06_w(uint8_t data);
+	void mycom_0a_w(uint8_t data);
+	uint8_t mycom_05_r();
+	uint8_t mycom_06_r();
+	uint8_t mycom_08_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
-	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
+	void mycom_rtc_w(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void mycom_io(address_map &map);
@@ -200,7 +200,7 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( mycom_state::mycom_00_w )
+void mycom_state::mycom_00_w(uint8_t data)
 {
 	switch(data)
 	{
@@ -355,19 +355,19 @@ static GFXDECODE_START( gfx_mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( mycom_state::mycom_04_w )
+void mycom_state::mycom_04_w(uint8_t data)
 {
 	m_i_videoram = (m_i_videoram & 0x700) | data;
 
 	m_sn_we = data;
 }
 
-WRITE8_MEMBER( mycom_state::mycom_06_w )
+void mycom_state::mycom_06_w(uint8_t data)
 {
 	m_i_videoram = (m_i_videoram & 0x0ff) | ((data & 0x007) << 8);
 }
 
-READ8_MEMBER( mycom_state::mycom_08_r )
+uint8_t mycom_state::mycom_08_r()
 {
 	/*
 	x--- ---- display flag
@@ -384,7 +384,7 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 	return data;
 }
 
-READ8_MEMBER( mycom_state::mycom_06_r )
+uint8_t mycom_state::mycom_06_r()
 {
 	/*
 	x--- ---- keyboard s5
@@ -395,12 +395,12 @@ READ8_MEMBER( mycom_state::mycom_06_r )
 	return 0xff;
 }
 
-READ8_MEMBER( mycom_state::mycom_05_r )
+uint8_t mycom_state::mycom_05_r()
 {
 	return m_keyb_press;
 }
 
-WRITE8_MEMBER( mycom_state::mycom_0a_w )
+void mycom_state::mycom_0a_w(uint8_t data)
 {
 	/*
 	x--- ---- width 80/40 (0 = 80, 1 = 40)
@@ -430,7 +430,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 		m_audio->write(m_sn_we);
 }
 
-WRITE8_MEMBER(mycom_state::mycom_rtc_w)
+void mycom_state::mycom_rtc_w(uint8_t data)
 {
 	m_rtc->address_w(data & 0x0f);
 

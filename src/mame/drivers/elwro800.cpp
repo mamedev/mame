@@ -68,8 +68,8 @@ private:
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
 	DECLARE_MACHINE_RESET(elwro800);
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
-	DECLARE_READ8_MEMBER(i8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
+	uint8_t i8255_port_c_r();
+	void i8255_port_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	void elwro800_bank1(address_map &map);
@@ -203,12 +203,12 @@ WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
 	m_i8255->pc2_w(state);
 }
 
-READ8_MEMBER(elwro800_state::i8255_port_c_r)
+uint8_t elwro800_state::i8255_port_c_r()
 {
 	return m_centronics_ack << 2;
 }
 
-WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
+void elwro800_state::i8255_port_c_w(uint8_t data)
 {
 	m_centronics->write_strobe((data >> 7) & 0x01);
 }

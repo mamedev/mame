@@ -179,26 +179,26 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_READ8_MEMBER(bank_sel_r);
 	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_READ8_MEMBER(dma_read);
-	DECLARE_WRITE8_MEMBER(dma_write);
+	uint8_t dma_read(offs_t offset);
+	void dma_write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_READ8_MEMBER(system_r);
 	DECLARE_WRITE8_MEMBER(system_w);
-	DECLARE_READ8_MEMBER(cntl_r);
-	DECLARE_WRITE8_MEMBER(cntl_w);
-	DECLARE_READ8_MEMBER(gpo_r);
-	DECLARE_WRITE8_MEMBER(gpo_w);
+	uint8_t cntl_r();
+	void cntl_w(uint8_t data);
+	uint8_t gpo_r();
+	void gpo_w(uint8_t data);
 	DECLARE_READ8_MEMBER(vidcontrol_r);
 	DECLARE_WRITE8_MEMBER(vidcontrol_w);
 	DECLARE_READ8_MEMBER(z80_io_r);
 	DECLARE_WRITE8_MEMBER(z80_io_w);
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
+	uint8_t rtc_r();
+	void rtc_w(uint8_t data);
 	DECLARE_READ8_MEMBER(z80_vector_r);
 	DECLARE_WRITE8_MEMBER(z80_vector_w);
 	DECLARE_READ8_MEMBER(parallel_r);
@@ -519,7 +519,7 @@ WRITE8_MEMBER(octopus_state::z80_vector_w)
 // bit 1 = PPI Port A strobe?
 // bit 2 = Data strobe?
 // bit 3 = Address strobe?
-READ8_MEMBER(octopus_state::rtc_r)
+uint8_t octopus_state::rtc_r()
 {
 	uint8_t ret = 0xff;
 
@@ -531,7 +531,7 @@ READ8_MEMBER(octopus_state::rtc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(octopus_state::rtc_w)
+void octopus_state::rtc_w(uint8_t data)
 {
 	if(m_rtc_data)
 		m_rtc->write(1,data);
@@ -543,12 +543,12 @@ WRITE8_MEMBER(octopus_state::rtc_w)
 // bits0-3: RTC control lines
 // bit4-5: write precomp.
 // bit6-7: drive select
-READ8_MEMBER(octopus_state::cntl_r)
+uint8_t octopus_state::cntl_r()
 {
 	return m_cntl;
 }
 
-WRITE8_MEMBER(octopus_state::cntl_w)
+void octopus_state::cntl_w(uint8_t data)
 {
 	m_cntl = data;
 
@@ -583,12 +583,12 @@ WRITE8_MEMBER(octopus_state::cntl_w)
 // bit 2 - floppy side select
 // bit 1 - parallel data I/O (0 = output)
 // bit 0 - parallel control I/O (0 = output)
-READ8_MEMBER(octopus_state::gpo_r)
+uint8_t octopus_state::gpo_r()
 {
 	return m_gpo;
 }
 
-WRITE8_MEMBER(octopus_state::gpo_w)
+void octopus_state::gpo_w(uint8_t data)
 {
 	m_gpo = data;
 	switch(m_current_drive)
@@ -715,7 +715,7 @@ WRITE8_MEMBER(octopus_state::parallel_w)
 	}
 }
 
-READ8_MEMBER(octopus_state::dma_read)
+uint8_t octopus_state::dma_read(offs_t offset)
 {
 	uint8_t byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
@@ -725,7 +725,7 @@ READ8_MEMBER(octopus_state::dma_read)
 	return byte;
 }
 
-WRITE8_MEMBER(octopus_state::dma_write)
+void octopus_state::dma_write(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_current_dma == -1)
@@ -867,7 +867,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 	}
 }
 
-READ8_MEMBER( octopus_state::get_slave_ack )
+uint8_t octopus_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7)
 		return m_pic2->acknowledge();

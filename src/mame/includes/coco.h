@@ -98,25 +98,25 @@ public:
 	DECLARE_WRITE8_MEMBER( ff60_write );
 
 	// PIA0
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
 	// PIA1
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	uint8_t pia1_pa_r();
+	uint8_t pia1_pb_r();
+	void pia1_pa_w(uint8_t data);
+	void pia1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
-	DECLARE_READ8_MEMBER( floating_bus_r )   { return floating_bus_read(); }
+	uint8_t floating_bus_r()   { return floating_bus_read(); }
 	uint8_t floating_space_read(offs_t offset);
 	void floating_space_write(offs_t offset, uint8_t data);
 

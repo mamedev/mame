@@ -61,7 +61,7 @@ public:
 private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	void port_a_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	void mem_map(address_map &map);
@@ -174,7 +174,7 @@ static INPUT_PORTS_START( mk14 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")    PORT_CODE(KEYCODE_7)      PORT_CHAR('7')
 INPUT_PORTS_END
 
-WRITE8_MEMBER( mk14_state::port_a_w )
+void mk14_state::port_a_w(uint8_t data)
 {
 }
 

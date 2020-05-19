@@ -132,7 +132,7 @@ void dragon_alpha_state::modem_w(offs_t offset, uint8_t data)
 //  pia2_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
+void dragon_alpha_state::pia2_pa_w(uint8_t data)
 {
 	uint8_t ddr = ~m_pia_2->port_b_z_mask();
 
@@ -212,7 +212,7 @@ bool dragon_alpha_state::firq_get_line(void)
 //  psg_porta_read
 //-------------------------------------------------
 
-READ8_MEMBER( dragon_alpha_state::psg_porta_read )
+uint8_t dragon_alpha_state::psg_porta_read()
 {
 	return 0;
 }
@@ -223,7 +223,7 @@ READ8_MEMBER( dragon_alpha_state::psg_porta_read )
 //  psg_porta_read
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
+void dragon_alpha_state::psg_porta_write(uint8_t data)
 {
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */

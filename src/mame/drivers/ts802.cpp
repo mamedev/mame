@@ -56,10 +56,10 @@ private:
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_WRITE8_MEMBER(port18_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
@@ -124,22 +124,22 @@ WRITE8_MEMBER( ts802_state::port80_w )
 {
 }
 
-READ8_MEMBER( ts802_state::memory_read_byte )
+uint8_t ts802_state::memory_read_byte(offs_t offset)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::memory_write_byte )
+void ts802_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( ts802_state::io_read_byte )
+uint8_t ts802_state::io_read_byte(offs_t offset)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::io_write_byte )
+void ts802_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	m_io->write_byte(offset, data);
 }

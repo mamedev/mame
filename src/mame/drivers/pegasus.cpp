@@ -76,11 +76,11 @@ public:
 	void init_pegasus();
 
 private:
-	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
+	uint8_t pegasus_keyboard_r();
 	DECLARE_READ8_MEMBER(pegasus_protection_r);
 	DECLARE_READ8_MEMBER(pegasus_pcg_r);
-	DECLARE_WRITE8_MEMBER(pegasus_controls_w);
-	DECLARE_WRITE8_MEMBER(pegasus_keyboard_w);
+	void pegasus_controls_w(uint8_t data);
+	void pegasus_keyboard_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(pegasus_pcg_w);
 	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
 	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
@@ -129,7 +129,7 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
+uint8_t pegasus_state::pegasus_keyboard_r()
 {
 	uint8_t i,data = 0xff;
 	for (i = 0; i < 8; i++)
@@ -141,12 +141,12 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_keyboard_w )
+void pegasus_state::pegasus_keyboard_w(uint8_t data)
 {
 	m_kbd_row = data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_controls_w )
+void pegasus_state::pegasus_controls_w(uint8_t data)
 {
 /*  d0,d2 - not emulated
     d0 - Blank - Video blanking

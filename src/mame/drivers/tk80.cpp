@@ -73,11 +73,11 @@ public:
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_READ8_MEMBER(nd80z_key_r);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
+	uint8_t key_matrix_r();
+	uint8_t nd80z_key_r();
+	uint8_t serial_r();
+	void serial_w(uint8_t data);
+	void mikrolab_serial_w(uint8_t data);
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( tk85 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
-READ8_MEMBER( tk80_state::key_matrix_r )
+uint8_t tk80_state::key_matrix_r()
 {
 	// PA0-7 keyscan in
 
@@ -278,7 +278,7 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::nd80z_key_r )
+uint8_t tk80_state::nd80z_key_r()
 {
 	// PA0-7 keyscan in
 
@@ -293,7 +293,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::serial_r )
+uint8_t tk80_state::serial_r()
 {
 	// PB0 - serial in
 	//printf("B R\n");
@@ -301,7 +301,7 @@ READ8_MEMBER( tk80_state::serial_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tk80_state::serial_w )
+void tk80_state::serial_w(uint8_t data)
 {
 	// PC0 - serial out
 	// PC4-6 keyscan out
@@ -309,7 +309,7 @@ WRITE8_MEMBER( tk80_state::serial_w )
 	m_ppi_portc = data ^ 0x70;
 }
 
-WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
+void tk80_state::mikrolab_serial_w(uint8_t data)
 {
 	// PC0 - serial out
 	// PC4-6 keyscan out

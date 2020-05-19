@@ -54,9 +54,9 @@ public:
 	void selz80(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void scanlines_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t kbd_r();
 
 	void selz80_io(address_map &map);
 
@@ -202,19 +202,19 @@ void dagz80_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( selz80_state::scanlines_w )
+void selz80_state::scanlines_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-WRITE8_MEMBER( selz80_state::digit_w )
+void selz80_state::digit_w(uint8_t data)
 {
 	m_seg = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-READ8_MEMBER( selz80_state::kbd_r )
+uint8_t selz80_state::kbd_r()
 {
 	uint8_t data = 0xff;
 

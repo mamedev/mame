@@ -88,9 +88,9 @@ public:
 	void dg680(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	u8 porta_r();
+	u8 portb_r();
+	void portb_w(u8 data);
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
@@ -225,20 +225,20 @@ void dg680_state::kbd_put(u8 data)
 	m_pio->strobe_a(1);
 }
 
-READ8_MEMBER( dg680_state::porta_r )
+u8 dg680_state::porta_r()
 {
 	uint8_t data = m_term_data;
 	m_term_data = 0;
 	return data;
 }
 
-READ8_MEMBER( dg680_state::portb_r )
+u8 dg680_state::portb_r()
 {
 	return m_pio_b | m_cassinbit;
 }
 
 // bit 1 = cassout; bit 2 = motor on
-WRITE8_MEMBER( dg680_state::portb_w )
+void dg680_state::portb_w(u8 data)
 {
 	if (BIT(m_pio_b ^ data, 2))
 		m_cass->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);

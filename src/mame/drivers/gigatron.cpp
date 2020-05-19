@@ -47,7 +47,7 @@ private:
 		return machine().rand() & 0xff;
 	}
 
-	DECLARE_WRITE8_MEMBER(blinkenlights);
+	void blinkenlights(uint8_t data);
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_ioport m_io_inputs;
@@ -76,7 +76,7 @@ void gigatron_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(gigatron_state::blinkenlights)
+void gigatron_state::blinkenlights(uint8_t data)
 {
 	uint16_t light = data & 0xF;
 	lights_changed ^= light;
