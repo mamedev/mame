@@ -529,6 +529,10 @@ public:
 		return new memory_access_cache<Width, AddrShift, Endian>(*this, m_root_read, m_root_write);
 	}
 
+	void *create_specific() override {
+		return new memory_access_specific<Width, AddrShift, Endian>(*this, m_dispatch_read, m_mask_read, m_shift_read, m_dispatch_write, m_mask_write, m_shift_write);
+	}
+
 	void delayed_ref(handler_entry *e) {
 		e->ref();
 		m_delayed_unrefs.insert(e);
@@ -593,43 +597,25 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		g_profiler.start(PROFILER_MEMREAD);
-
-		uX result = dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, mask, m_dispatch_read);;
-
-		g_profiler.stop();
-		return result;
+		return dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, mask, m_dispatch_read);;
 	}
 
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
-		g_profiler.start(PROFILER_MEMREAD);
-
-		uX result = dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, uX(0xffffffffffffffffU), m_dispatch_read);;
-
-		g_profiler.stop();
-		return result;
+		return dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, uX(0xffffffffffffffffU), m_dispatch_read);;
 	}
 
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		g_profiler.start(PROFILER_MEMWRITE);
-
 		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, mask, m_dispatch_write);;
-
-		g_profiler.stop();
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		g_profiler.start(PROFILER_MEMWRITE);
-
 		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
-
-		g_profiler.stop();
 	}
 
 	// virtual access to these functions
