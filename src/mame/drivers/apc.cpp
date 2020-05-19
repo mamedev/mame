@@ -153,17 +153,15 @@ private:
 		uint8_t sh; //shift switches
 	}m_keyb;
 
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(apc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
+	uint8_t apc_dma_read_byte(offs_t offset);
+	void apc_dma_write_byte(offs_t offset, uint8_t data);
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -845,7 +843,7 @@ ir6 Option
 ir7 APU
 */
 
-READ8_MEMBER(apc_state::get_slave_ack)
+uint8_t apc_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_i8259_s->acknowledge();
@@ -876,7 +874,7 @@ WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 //  printf("TC %02x\n",state);
 }
 
-READ8_MEMBER(apc_state::apc_dma_read_byte)
+uint8_t apc_state::apc_dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -887,7 +885,7 @@ READ8_MEMBER(apc_state::apc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(apc_state::apc_dma_write_byte)
+void apc_state::apc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -906,16 +904,6 @@ WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma
 WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
 WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
 WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
-
-READ8_MEMBER(apc_state::fdc_r)
-{
-	return m_fdc->dma_r();
-}
-
-WRITE8_MEMBER(apc_state::fdc_w)
-{
-	m_fdc->dma_w(data);
-}
 
 /*
 CH0: CRT
@@ -964,8 +952,8 @@ void apc_state::apc(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(apc_state::apc_tc_w));
 	m_dmac->in_memr_callback().set(FUNC(apc_state::apc_dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(apc_state::apc_dma_write_byte));
-	m_dmac->in_ior_callback<1>().set(FUNC(apc_state::fdc_r));
-	m_dmac->out_iow_callback<1>().set(FUNC(apc_state::fdc_w));
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(apc_state::apc_dack0_w));
 	m_dmac->out_dack_callback<1>().set(FUNC(apc_state::apc_dack1_w));
 	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));

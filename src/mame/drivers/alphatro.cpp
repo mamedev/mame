@@ -80,8 +80,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER (ram0000_r);
-	DECLARE_WRITE8_MEMBER(ram0000_w);
+	uint8_t ram0000_r(offs_t offset);
+	void ram0000_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER (ram6000_r);
 	DECLARE_WRITE8_MEMBER(ram6000_w);
 	DECLARE_READ8_MEMBER (rama000_r);
@@ -190,7 +190,7 @@ void alphatro_state::update_banking()
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram0000_r)
+uint8_t alphatro_state::ram0000_r(offs_t offset)
 {
 	if (offset < 0xf000)
 	{
@@ -200,7 +200,7 @@ READ8_MEMBER (alphatro_state::ram0000_r)
 	return m_p_videoram[offset & 0xfff];
 }
 
-WRITE8_MEMBER(alphatro_state::ram0000_w)
+void alphatro_state::ram0000_w(offs_t offset, uint8_t data)
 {
 
 	if (offset < 0xf000)

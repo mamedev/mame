@@ -65,11 +65,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void ay8910_portb_w(uint8_t data);
 
 	// game specific
-	DECLARE_WRITE8_MEMBER(chinhero_ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(shangkid_ay8910_porta_w);
+	void chinhero_ay8910_porta_w(uint8_t data);
+	void shangkid_ay8910_porta_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

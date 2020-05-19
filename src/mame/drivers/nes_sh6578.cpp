@@ -105,7 +105,7 @@ private:
 	DECLARE_READ8_MEMBER(psg1_4015_r);
 	DECLARE_WRITE8_MEMBER(psg1_4015_w);
 	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-	DECLARE_READ8_MEMBER(apu_read_mem);
+	uint8_t apu_read_mem(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 
@@ -432,7 +432,7 @@ WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
 	// unimplemented
 }
 
-READ8_MEMBER(nes_sh6578_state::apu_read_mem)
+uint8_t nes_sh6578_state::apu_read_mem(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }

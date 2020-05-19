@@ -275,7 +275,7 @@ void vectrex_base_state::vectrex_multiplexer(int mux)
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
+void vectrex_base_state::v_via_pb_w(uint8_t data)
 {
 	if (!(data & 0x80))
 	{
@@ -339,7 +339,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 
 	/* Cartridge bank-switching */
 	if (m_cart && ((data ^ m_via_out[PORTB]) & 0x40))
-		m_cart->write_bank(space, 0, data);
+		m_cart->write_bank(data);
 
 	/* Sound */
 	if (data & 0x10)
@@ -358,7 +358,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pa_w)
+void vectrex_base_state::v_via_pa_w(uint8_t data)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;

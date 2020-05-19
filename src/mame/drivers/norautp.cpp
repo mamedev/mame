@@ -633,7 +633,7 @@ void norautp_state::norautp_palette(palette_device &palette) const
 *      R/W Handlers      *
 *************************/
 
-WRITE8_MEMBER(norautp_state::mainlamps_w)
+void norautp_state::mainlamps_w(uint8_t data)
 {
 /*  PPI-0 (60h-63h); PortB OUT.
     Lamps:
@@ -660,7 +660,7 @@ WRITE8_MEMBER(norautp_state::mainlamps_w)
 //  popmessage("lamps: %02x", data);
 }
 
-WRITE8_MEMBER(norautp_state::soundlamps_w)
+void norautp_state::soundlamps_w(uint8_t data)
 {
 /*  PPI-1 (a0h-a3h); PortC OUT.
     Sound & Lamps:
@@ -683,7 +683,7 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
 //  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }
 
-WRITE8_MEMBER(norautp_state::counterlamps_w)
+void norautp_state::counterlamps_w(uint8_t data)
 {
 /*  PPI-0 (60h-63h); PortC OUT.
     Lamps & Coin Counters:

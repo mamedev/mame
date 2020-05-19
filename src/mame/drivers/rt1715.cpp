@@ -63,10 +63,10 @@ public:
 	void rt1715w(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
@@ -265,7 +265,7 @@ WRITE8_MEMBER(rt1715_state::rt1715w_set_bank)
 	m_w = w;
 }
 
-READ8_MEMBER(rt1715_state::memory_read_byte)
+uint8_t rt1715_state::memory_read_byte(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -286,7 +286,7 @@ READ8_MEMBER(rt1715_state::memory_read_byte)
 	return data;
 }
 
-WRITE8_MEMBER(rt1715_state::memory_write_byte)
+void rt1715_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	switch (m_w)
 	{
@@ -304,13 +304,13 @@ WRITE8_MEMBER(rt1715_state::memory_write_byte)
 	}
 }
 
-READ8_MEMBER(rt1715_state::io_read_byte)
+uint8_t rt1715_state::io_read_byte(offs_t offset)
 {
 	address_space &prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(rt1715_state::io_write_byte)
+void rt1715_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

@@ -28,7 +28,7 @@ public:
 	void slicer(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sio_out_w);
+	void sio_out_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(drive_size_w);
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
@@ -39,7 +39,7 @@ private:
 	required_device<scsi_port_device> m_sasi;
 };
 
-WRITE8_MEMBER(slicer_state::sio_out_w)
+void slicer_state::sio_out_w(uint8_t data)
 {
 	floppy_image_device *floppy;
 	int state = (data & 0x80) ? 0 : 1;

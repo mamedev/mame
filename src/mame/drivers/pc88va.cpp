@@ -1378,27 +1378,27 @@ static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( nullptr,   0x00000, pc88va_kanji_16x16,  0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(pc88va_state::cpu_8255_c_r)
+uint8_t pc88va_state::cpu_8255_c_r()
 {
 	return m_i8255_1_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
+void pc88va_state::cpu_8255_c_w(uint8_t data)
 {
 	m_i8255_0_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::fdc_8255_c_r)
+uint8_t pc88va_state::fdc_8255_c_r()
 {
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
+void pc88va_state::fdc_8255_c_w(uint8_t data)
 {
 	m_i8255_1_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
+uint8_t pc88va_state::r232_ctrl_porta_r()
 {
 	uint8_t sw5, sw4, sw3, sw2,speed_sw;
 
@@ -1411,7 +1411,7 @@ READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
+uint8_t pc88va_state::r232_ctrl_portb_r()
 {
 	uint8_t xsw1;
 
@@ -1420,27 +1420,27 @@ READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
 	return 0xf7 | xsw1;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portc_r)
+uint8_t pc88va_state::r232_ctrl_portc_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_porta_w)
+void pc88va_state::r232_ctrl_porta_w(uint8_t data)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portb_w)
+void pc88va_state::r232_ctrl_portb_w(uint8_t data)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
+void pc88va_state::r232_ctrl_portc_w(uint8_t data)
 {
 	// ...
 }
 
-READ8_MEMBER(pc88va_state::get_slave_ack)
+uint8_t pc88va_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic2->acknowledge();
@@ -1552,13 +1552,13 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 }
 
 
-READ8_MEMBER(pc88va_state::fdc_dma_r)
+uint8_t pc88va_state::fdc_dma_r()
 {
 	printf("R DMA\n");
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_dma_w)
+void pc88va_state::fdc_dma_w(uint8_t data)
 {
 	printf("W DMA %08x\n",data);
 	m_fdc->dma_w(data);
@@ -1573,13 +1573,13 @@ static void pc88va_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-READ8_MEMBER(pc88va_state::dma_memr_cb)
+uint8_t pc88va_state::dma_memr_cb(offs_t offset)
 {
 	printf("%08x\n",offset);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::dma_memw_cb)
+void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 {
 	printf("%08x %02x\n",offset,data);
 }

@@ -1445,14 +1445,14 @@ void x1_state::x1_io(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_porta_r )
+uint8_t x1_state::x1_porta_r()
 {
 	logerror("PPI Port A read\n");
 	return 0xff;
 }
 
 /* this port is system related */
-READ8_MEMBER( x1_state::x1_portb_r )
+uint8_t x1_state::x1_portb_r()
 {
 	//logerror("PPI Port B read\n");
 	/*
@@ -1495,7 +1495,7 @@ READ8_MEMBER( x1_state::x1_portb_r )
 }
 
 /* I/O system port */
-READ8_MEMBER( x1_state::x1_portc_r )
+uint8_t x1_state::x1_portc_r()
 {
 	//logerror("PPI Port C read\n");
 	/*
@@ -1508,17 +1508,17 @@ READ8_MEMBER( x1_state::x1_portc_r )
 	return (m_io_sys & 0x9f) | m_hres_320 | ~m_io_switch;
 }
 
-WRITE8_MEMBER( x1_state::x1_porta_w )
+void x1_state::x1_porta_w(uint8_t data)
 {
 	//logerror("PPI Port A write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portb_w )
+void x1_state::x1_portb_w(uint8_t data)
 {
 	//logerror("PPI Port B write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portc_w )
+void x1_state::x1_portc_w(uint8_t data)
 {
 	m_hres_320 = data & 0x40;
 
@@ -1534,25 +1534,25 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(x1_state::memory_read_byte)
+uint8_t x1_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::memory_write_byte)
+void x1_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(x1_state::io_read_byte)
+uint8_t x1_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::io_write_byte)
+void x1_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);

@@ -62,7 +62,7 @@ private:
 
 	DECLARE_READ8_MEMBER(ula_high_r);
 	DECLARE_READ8_MEMBER(ula_low_r);
-	DECLARE_WRITE8_MEMBER(refresh_w);
+	void refresh_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(zx80_io_r);
 	DECLARE_READ8_MEMBER(zx81_io_r);
 	DECLARE_READ8_MEMBER(pc8300_io_r);

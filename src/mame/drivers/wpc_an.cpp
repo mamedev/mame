@@ -60,12 +60,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	DECLARE_READ8_MEMBER(wpc_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(wpc_sound_data_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
-	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
+	uint8_t wpc_sound_ctrl_r();
+	void wpc_sound_ctrl_w(uint8_t data);
+	uint8_t wpc_sound_data_r();
+	void wpc_sound_data_w(uint8_t data);
+	void wpc_sound_s11_w(uint8_t data);
+	void wpc_rombank_w(uint8_t data);
 
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
@@ -221,7 +221,7 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_rombank_w)
+void wpc_an_state::wpc_rombank_w(uint8_t data)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
@@ -242,14 +242,14 @@ WRITE_LINE_MEMBER(wpc_an_state::wpc_firq_w)
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_ctrl_r)
+uint8_t wpc_an_state::wpc_sound_ctrl_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->ctrl_r();  // ack FIRQ?
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
+void wpc_an_state::wpc_sound_ctrl_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -260,14 +260,14 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
 		m_wpcsnd->ctrl_w(data);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_data_r)
+uint8_t wpc_an_state::wpc_sound_data_r()
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->data_r();
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
+void wpc_an_state::wpc_sound_data_w(uint8_t data)
 {
 	if(m_bg)
 	{
@@ -278,7 +278,7 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
 		m_wpcsnd->data_w(data);
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
+void wpc_an_state::wpc_sound_s11_w(uint8_t data)
 {
 	if(m_bg)
 	{

@@ -69,7 +69,7 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_WRITE8_MEMBER(port88_w);
+	void port88_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -121,7 +121,7 @@ static const z80_daisy_config z9001_daisy_chain[] =
 };
 
 //Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
-WRITE8_MEMBER( z9001_state::port88_w )
+void z9001_state::port88_w(uint8_t data)
 {
 	m_beeper->set_state(BIT(data, 7));
 }

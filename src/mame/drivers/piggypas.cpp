@@ -42,12 +42,11 @@ private:
 	void output_digits();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
-	DECLARE_WRITE8_MEMBER(led_strobe_w);
-	DECLARE_READ8_MEMBER(lcd_latch_r);
-	DECLARE_WRITE8_MEMBER(lcd_latch_w);
-	DECLARE_WRITE8_MEMBER(lcd_control_w);
+	void ctrl_w(uint8_t data);
+	void mcs51_tx_callback(uint8_t data);
+	void led_strobe_w(uint8_t data);
+	void lcd_latch_w(uint8_t data);
+	void lcd_control_w(uint8_t data);
 	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -72,7 +71,7 @@ void piggypas_state::output_digits()
 	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
 }
 
-WRITE8_MEMBER(piggypas_state::ctrl_w)
+void piggypas_state::ctrl_w(uint8_t data)
 {
 	if (!BIT(data, 2) && BIT(m_ctrl, 2))
 		output_digits();
@@ -82,30 +81,25 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 	m_ctrl = data;
 }
 
-WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
+void piggypas_state::mcs51_tx_callback(uint8_t data)
 {
 	m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
 }
 
-WRITE8_MEMBER(piggypas_state::led_strobe_w)
+void piggypas_state::led_strobe_w(uint8_t data)
 {
 	if (!BIT(data, 0))
 		m_digit_latch = 0;
 }
 
-READ8_MEMBER(piggypas_state::lcd_latch_r)
-{
-	return m_hd44780->db_r();
-}
-
-WRITE8_MEMBER(piggypas_state::lcd_latch_w)
+void piggypas_state::lcd_latch_w(uint8_t data)
 {
 	// P1.7 might also be used to reset DS1232 watchdog
 	m_lcd_latch = data;
 	m_hd44780->db_w(data);
 }
 
-WRITE8_MEMBER(piggypas_state::lcd_control_w)
+void piggypas_state::lcd_control_w(uint8_t data)
 {
 	// RXD (P3.0) = chip select
 	// TXD (P3.1) = register select
@@ -240,7 +234,7 @@ void piggypas_state::fidlstix(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::fidlstix_io);
 	m_maincpu->serial_tx_cb().set_nop();
-	m_maincpu->port_in_cb<1>().set(FUNC(piggypas_state::lcd_latch_r));
+	m_maincpu->port_in_cb<1>().set(m_hd44780, FUNC(hd44780_device::db_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::lcd_latch_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::lcd_control_w));
 }

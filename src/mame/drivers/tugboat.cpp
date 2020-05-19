@@ -78,8 +78,8 @@ private:
 	DECLARE_WRITE8_MEMBER(hd46505_0_w);
 	DECLARE_WRITE8_MEMBER(hd46505_1_w);
 	DECLARE_WRITE8_MEMBER(score_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	uint8_t input_r();
+	void ctrl_w(uint8_t data);
 
 	void tugboat_palette(palette_device &palette) const;
 
@@ -193,7 +193,7 @@ uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 
 
-READ8_MEMBER(tugboat_state::input_r)
+uint8_t tugboat_state::input_r()
 {
 	if (~m_ctrl & 0x80)
 		return ioport("IN0")->read();
@@ -207,7 +207,7 @@ READ8_MEMBER(tugboat_state::input_r)
 		return ioport("IN4")->read();
 }
 
-WRITE8_MEMBER(tugboat_state::ctrl_w)
+void tugboat_state::ctrl_w(uint8_t data)
 {
 	m_ctrl = data;
 }

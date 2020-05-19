@@ -113,10 +113,10 @@ public:
 
 	DECLARE_READ8_MEMBER(pia_r);
 	DECLARE_WRITE8_MEMBER(pia_w);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pa_w);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t pia_pa_r();
+	uint8_t pia_pb_r();
+	void pia_pa_w(uint8_t data);
+	void pia_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 
@@ -129,7 +129,7 @@ public:
 	DECLARE_READ8_MEMBER(adlc_r);
 	DECLARE_WRITE8_MEMBER(adlc_w);
 
-	DECLARE_WRITE8_MEMBER(earom_write);
+	void earom_write(uint8_t data);
 	DECLARE_WRITE8_MEMBER(misccr_write);
 	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
 
@@ -243,14 +243,14 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 	// XXX shut up verbose log
 }
 
-READ8_MEMBER(bitgraph_state::pia_pa_r)
+uint8_t bitgraph_state::pia_pa_r()
 {
 	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
 	LOGDBG("PIA A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia");
 	return data;
 }
 
-WRITE8_MEMBER(bitgraph_state::pia_pa_w)
+void bitgraph_state::pia_pa_w(uint8_t data)
 {
 	LOGDBG("PIA A <- %02X\n", data);
 	m_pia_a = data;
@@ -266,13 +266,13 @@ WRITE8_MEMBER(bitgraph_state::pia_pa_w)
     B6  O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
     B7  I: EVEN field ??
 */
-READ8_MEMBER(bitgraph_state::pia_pb_r)
+uint8_t bitgraph_state::pia_pb_r()
 {
 	LOGDBG("PIA B == %02X\n", m_pia_b);
 	return m_pia_b;
 }
 
-WRITE8_MEMBER(bitgraph_state::pia_pb_w)
+void bitgraph_state::pia_pb_w(uint8_t data)
 {
 	LOGDBG("PIA B <- %02X\n", data);
 	m_pia_b = data;
@@ -302,7 +302,7 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 	}
 }
 
-WRITE8_MEMBER(bitgraph_state::earom_write)
+void bitgraph_state::earom_write(uint8_t data)
 {
 	LOGDBG("EAROM addr <- %02X (%02X)\n", data & 0x3f, data);
 	m_earom->set_address(data & 0x3f);

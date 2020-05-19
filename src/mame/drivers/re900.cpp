@@ -106,14 +106,14 @@ public:
 private:
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
+	void cpu_port_0_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
 
 	// re900 specific
-	DECLARE_READ8_MEMBER(re_psg_portA_r);
-	DECLARE_READ8_MEMBER(re_psg_portB_r);
-	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
-	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
+	uint8_t re_psg_portA_r();
+	uint8_t re_psg_portB_r();
+	void re_mux_port_A_w(uint8_t data);
+	void re_mux_port_B_w(uint8_t data);
 
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
@@ -139,7 +139,7 @@ private:
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(re900_state::re_psg_portA_r)
+uint8_t re900_state::re_psg_portA_r()
 {
 	if ((ioport("IN0")->read() & 0x01) == 0)
 	{
@@ -154,7 +154,7 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 	return ioport("IN0")->read();
 }
 
-READ8_MEMBER(re900_state::re_psg_portB_r)
+uint8_t re900_state::re_psg_portB_r()
 {
 	uint8_t retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
@@ -214,13 +214,13 @@ READ8_MEMBER(re900_state::rom_r)
 *    Write Handlers    *
 ***********************/
 
-WRITE8_MEMBER(re900_state::re_mux_port_A_w)
+void re900_state::re_mux_port_A_w(uint8_t data)
 {
 	m_psg_pa = data;
 	m_mux_data = ((data >> 2) & 0x3f) ^ 0x3f;
 }
 
-WRITE8_MEMBER(re900_state::re_mux_port_B_w)
+void re900_state::re_mux_port_B_w(uint8_t data)
 {
 	uint8_t led;
 	m_psg_pb = data;
@@ -238,7 +238,7 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 	}
 }
 
-WRITE8_MEMBER(re900_state::cpu_port_0_w)
+void re900_state::cpu_port_0_w(uint8_t data)
 {
 //  m_lamps[7] = 1 ^ ( (data >> 4) & 1); /* Cont. Sal */
 //  m_lamps[8] = 1 ^ ( (data >> 5) & 1); /* Cont. Ent */

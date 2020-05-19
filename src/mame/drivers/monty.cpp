@@ -76,7 +76,7 @@ private:
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w) { m_lcd[m_lcd_cs]->write(offset, data); }
+	void lcd_w(offs_t offset, u8 data) { m_lcd[m_lcd_cs]->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
 
 	u64 m_lcd_data[32];

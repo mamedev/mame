@@ -23,7 +23,7 @@
 
 
 
-READ8_MEMBER(orion_state::orion_romdisk_porta_r)
+uint8_t orion_state::orion_romdisk_porta_r()
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
@@ -32,12 +32,12 @@ READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(orion_state::orion_romdisk_portb_w)
+void orion_state::orion_romdisk_portb_w(uint8_t data)
 {
 	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(orion_state::orion_romdisk_portc_w)
+void orion_state::orion_romdisk_portc_w(uint8_t data)
 {
 	m_romdisk_msb = data;
 }

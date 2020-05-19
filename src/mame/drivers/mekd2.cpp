@@ -108,10 +108,10 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
-	DECLARE_READ8_MEMBER(mekd2_key_r);
+	uint8_t mekd2_key_r();
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
-	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
-	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
+	void mekd2_digit_w(uint8_t data);
+	void mekd2_segment_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -237,7 +237,7 @@ READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
 	return BIT(m_keydata, 6);
 }
 
-READ8_MEMBER( mekd2_state::mekd2_key_r )
+uint8_t mekd2_state::mekd2_key_r()
 {
 	char kbdrow[4];
 	uint8_t i;
@@ -275,17 +275,16 @@ READ8_MEMBER( mekd2_state::mekd2_key_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
+void mekd2_state::mekd2_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 }
 
-WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
+void  mekd2_state::mekd2_digit_w(uint8_t data)
 {
-	uint8_t i;
 	if (data < 0x3f)
 	{
-		for (i = 0; i < 6; i++)
+		for (uint8_t i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
 				m_digits[i] = ~m_segment & 0x7f;

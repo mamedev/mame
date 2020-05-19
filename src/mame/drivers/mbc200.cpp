@@ -78,10 +78,10 @@ public:
 	void mbc200(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(p2_porta_r);
-	DECLARE_WRITE8_MEMBER(p1_portc_w);
-	DECLARE_WRITE8_MEMBER(pm_porta_w);
-	DECLARE_WRITE8_MEMBER(pm_portb_w);
+	uint8_t p2_porta_r();
+	void p1_portc_w(uint8_t data);
+	void pm_porta_w(uint8_t data);
+	void pm_portb_w(uint8_t data);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
@@ -115,19 +115,19 @@ void mbc200_state::mbc200_mem(address_map &map)
 	map(0x1000, 0xffff).ram();
 }
 
-WRITE8_MEMBER( mbc200_state::p1_portc_w )
+void mbc200_state::p1_portc_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data,4)); // used by beep command in basic
 }
 
-WRITE8_MEMBER( mbc200_state::pm_porta_w )
+void mbc200_state::pm_porta_w(uint8_t data)
 {
 	machine().scheduler().synchronize(); // force resync
 	//printf("A %02x %c\n",data,data);
 	m_comm_latch = data; // to slave CPU
 }
 
-WRITE8_MEMBER( mbc200_state::pm_portb_w )
+void mbc200_state::pm_portb_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -169,7 +169,7 @@ void mbc200_state::mbc200_sub_mem(address_map &map)
 	map(0x8000, 0xffff).ram().share("vram");
 }
 
-READ8_MEMBER(mbc200_state::p2_porta_r)
+uint8_t mbc200_state::p2_porta_r()
 {
 	machine().scheduler().synchronize(); // force resync
 	uint8_t tmp = m_comm_latch;

@@ -173,7 +173,7 @@ void radio86_state::radio86_pagesel(uint8_t data)
 	m_disk_sel = data;
 }
 
-READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
+uint8_t radio86_state::radio86rom_romdisk_porta_r()
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())

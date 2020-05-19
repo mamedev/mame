@@ -106,13 +106,13 @@ write:
  *
  *************************************/
 
-READ8_MEMBER(mario_state::memory_read_byte)
+uint8_t mario_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(mario_state::memory_write_byte)
+void mario_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);

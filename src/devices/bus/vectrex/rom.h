@@ -38,7 +38,7 @@ public:
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(uint8_t data) override;
 
 protected:
 	// device-level overrides

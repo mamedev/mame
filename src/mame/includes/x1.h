@@ -127,12 +127,12 @@ public:
 	DECLARE_READ8_MEMBER(x1turboz_blackclip_r);
 	DECLARE_READ8_MEMBER(x1turbo_bank_r);
 	DECLARE_WRITE8_MEMBER(x1turbo_bank_w);
-	DECLARE_READ8_MEMBER(x1_porta_r);
-	DECLARE_READ8_MEMBER(x1_portb_r);
-	DECLARE_READ8_MEMBER(x1_portc_r);
-	DECLARE_WRITE8_MEMBER(x1_porta_w);
-	DECLARE_WRITE8_MEMBER(x1_portb_w);
-	DECLARE_WRITE8_MEMBER(x1_portc_w);
+	uint8_t x1_porta_r();
+	uint8_t x1_portb_r();
+	uint8_t x1_portc_r();
+	void x1_porta_w(uint8_t data);
+	void x1_portb_w(uint8_t data);
+	void x1_portc_w(uint8_t data);
 	void init_x1_kanji();
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(x1);
@@ -147,10 +147,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hdl_w);
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_dma;

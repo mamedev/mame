@@ -93,15 +93,15 @@ private:
 	DECLARE_WRITE8_MEMBER(stall_w);
 	DECLARE_READ8_MEMBER(mcustatus_r);
 
-	DECLARE_WRITE64_MEMBER(lcd1_output_w);
-	DECLARE_WRITE64_MEMBER(lcd2_output_w);
+	void lcd1_output_w(u64 data);
+	void lcd2_output_w(u64 data);
 
 	DECLARE_READ8_MEMBER(databus_r);
 	DECLARE_WRITE8_MEMBER(databus_w);
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void lcd_w(u8 data);
+	u8 input_r();
 
 	bool m_wait_in;
 	u8 m_inp_mux;
@@ -173,14 +173,14 @@ READ8_MEMBER(savant_state::mcustatus_r)
 
 // 3870 side
 
-WRITE64_MEMBER(savant_state::lcd1_output_w)
+void savant_state::lcd1_output_w(u64 data)
 {
 	// uses C1-C24
 	m_lcd_data = m_lcd_data << 24 | (data >> 8 & 0xffffff);
 	m_display->matrix(data & 0xff, m_lcd_data);
 }
 
-WRITE64_MEMBER(savant_state::lcd2_output_w)
+void savant_state::lcd2_output_w(u64 data)
 {
 	// uses C6-C32
 	m_lcd_data = data >> 5 & 0x7ffffff;
@@ -235,7 +235,7 @@ WRITE8_MEMBER(savant_state::control_w)
 	m_control = data;
 }
 
-WRITE8_MEMBER(savant_state::lcd_w)
+void savant_state::lcd_w(u8 data)
 {
 	// d0: HLCD0538 data
 	// d4: HLCD0539 data
@@ -250,7 +250,7 @@ WRITE8_MEMBER(savant_state::lcd_w)
 	m_inp_mux = bitswap<8>(data,7,3,6,2,5,1,4,0);
 }
 
-READ8_MEMBER(savant_state::input_r)
+u8 savant_state::input_r()
 {
 	u8 data = 0;
 

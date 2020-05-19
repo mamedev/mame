@@ -469,7 +469,7 @@ WRITE_LINE_MEMBER(mz_state::pit_irq_2)
     8255 PPI
 ***************************************************************************/
 
-READ8_MEMBER(mz_state::pio_port_b_r)
+uint8_t mz_state::pio_port_b_r()
 {
 	const int key_line = m_ls145->read();
 	const char *const keynames[10] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
@@ -490,7 +490,7 @@ READ8_MEMBER(mz_state::pio_port_b_r)
  * bit 5 in     tape data (RDATA)
  * bit 4 in     motor (1 = on)
  */
-READ8_MEMBER(mz_state::pio_port_c_r)
+uint8_t mz_state::pio_port_c_r()
 {
 	uint8_t data = 0;
 
@@ -510,7 +510,7 @@ READ8_MEMBER(mz_state::pio_port_c_r)
 }
 
 
-WRITE8_MEMBER(mz_state::pio_port_a_w)
+void mz_state::pio_port_a_w(uint8_t data)
 {
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),machine());
 
@@ -522,7 +522,7 @@ WRITE8_MEMBER(mz_state::pio_port_a_w)
 }
 
 
-WRITE8_MEMBER(mz_state::pio_port_c_w)
+void mz_state::pio_port_c_w(uint8_t data)
 {
 	/*
 	 * bit 3 out    motor control (0 = on)
@@ -585,7 +585,7 @@ WRITE_LINE_MEMBER(mz_state::write_centronics_perror)
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)
+uint8_t mz_state::mz800_z80pio_port_a_r()
 {
 	uint8_t result = 0;
 
@@ -596,7 +596,7 @@ READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)
 	return result;
 }
 
-WRITE8_MEMBER(mz_state::mz800_z80pio_port_a_w)
+void mz_state::mz800_z80pio_port_a_w(uint8_t data)
 {
 	m_centronics->write_init(BIT(data, 6));
 	m_centronics->write_strobe(BIT(data, 7));

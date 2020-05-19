@@ -387,7 +387,7 @@ void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state
 	m_fdc_index = state;
 }
 
-READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
+uint8_t c1pmf_state::osi470_pia_pa_r()
 {
 	/*
 
@@ -407,7 +407,7 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 	return (m_fdc_index << 7);
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
+void c1pmf_state::osi470_pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
+void c1pmf_state::osi470_pia_pb_w(uint8_t data)
 {
 	/*
 

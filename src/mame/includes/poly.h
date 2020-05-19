@@ -98,11 +98,11 @@ private:
 	void kbd_put(u8 data); // remove when KR2376 is implemented
 	DECLARE_READ_LINE_MEMBER( kbd_shift_r );
 	DECLARE_READ_LINE_MEMBER( kbd_control_r );
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
-	DECLARE_READ8_MEMBER( pia1_b_in );
-	DECLARE_READ8_MEMBER( videoram_1_r );
-	DECLARE_READ8_MEMBER( videoram_2_r );
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
+	uint8_t pia1_b_in();
+	uint8_t videoram_1_r(offs_t offset);
+	uint8_t videoram_2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 	DECLARE_WRITE8_MEMBER( baud_rate_w );

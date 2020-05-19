@@ -82,13 +82,13 @@ private:
 	DECLARE_WRITE8_MEMBER(erik_rc_reg_w);
 	DECLARE_READ8_MEMBER(erik_disk_reg_r);
 	DECLARE_WRITE8_MEMBER(erik_disk_reg_w);
-	DECLARE_READ8_MEMBER(specialist_8255_porta_r);
-	DECLARE_READ8_MEMBER(specialist_8255_portb_r);
-	DECLARE_READ8_MEMBER(specimx_8255_portb_r);
-	DECLARE_READ8_MEMBER(specialist_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
+	uint8_t specialist_8255_porta_r();
+	uint8_t specialist_8255_portb_r();
+	uint8_t specimx_8255_portb_r();
+	uint8_t specialist_8255_portc_r();
+	void specialist_8255_porta_w(uint8_t data);
+	void specialist_8255_portb_w(uint8_t data);
+	void specialist_8255_portc_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(special);
 	DECLARE_MACHINE_RESET(erik);

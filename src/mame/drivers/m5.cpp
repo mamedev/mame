@@ -887,12 +887,12 @@ WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
 //  I8255 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::ppi_pa_r )
+uint8_t m5_state::ppi_pa_r()
 {
 	return m_fd5_data;
 }
 
-READ8_MEMBER(m5_state::ppi_pc_r )
+uint8_t m5_state::ppi_pc_r()
 {
 	/*
 
@@ -919,12 +919,12 @@ READ8_MEMBER(m5_state::ppi_pc_r )
 	);
 }
 
-WRITE8_MEMBER( m5_state::ppi_pa_w )
+void m5_state::ppi_pa_w(uint8_t data)
 {
 	m_fd5_data = data;
 }
 
-WRITE8_MEMBER( m5_state::ppi_pb_w )
+void m5_state::ppi_pb_w(uint8_t data)
 {
 	/*
 
@@ -948,7 +948,7 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 	}
 }
 
-WRITE8_MEMBER( m5_state::ppi_pc_w )
+void m5_state::ppi_pc_w(uint8_t data)
 {
 	/*
 

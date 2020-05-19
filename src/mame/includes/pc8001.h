@@ -64,7 +64,7 @@ public:
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_READ8_MEMBER( dma_mem_r );
+	uint8_t dma_mem_r(offs_t offset);
 
 	/* video state */
 	int m_width80;

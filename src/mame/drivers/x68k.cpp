@@ -497,7 +497,7 @@ uint8_t x68k_state::xpd1lr_r(int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_MEMBER(x68k_state::ppi_port_a_r)
+uint8_t x68k_state::ppi_port_a_r()
 {
 	int ctrl = m_ctrltype->read() & 0x0f;
 
@@ -519,7 +519,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_b_r)
+uint8_t x68k_state::ppi_port_b_r()
 {
 	int ctrl = m_ctrltype->read() & 0xf0;
 
@@ -541,7 +541,7 @@ READ8_MEMBER(x68k_state::ppi_port_b_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_c_r)
+uint8_t x68k_state::ppi_port_c_r()
 {
 	return m_ppi_port[2];
 }
@@ -554,7 +554,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
-WRITE8_MEMBER(x68k_state::ppi_port_c_w)
+void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
 	m_ppi_port[2] = data;
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 	}
 }
 
-WRITE8_MEMBER(x68k_state::ct_w)
+void x68k_state::ct_w(uint8_t data)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -1001,7 +1001,7 @@ WRITE_LINE_MEMBER(x68k_state::dma_irq)
 	update_ipl();
 }
 
-WRITE8_MEMBER(x68k_state::dma_end)
+void x68k_state::dma_end(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{

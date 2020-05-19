@@ -119,12 +119,12 @@ private:
 	DECLARE_WRITE8_MEMBER(pc100_vs_vreg_w);
 	DECLARE_WRITE8_MEMBER(pc100_crtc_addr_w);
 	DECLARE_WRITE8_MEMBER(pc100_crtc_data_w);
-	DECLARE_WRITE8_MEMBER(lower_mask_w);
-	DECLARE_WRITE8_MEMBER(upper_mask_w);
-	DECLARE_WRITE8_MEMBER(crtc_bank_w);
-	DECLARE_WRITE8_MEMBER(rtc_porta_w);
-	DECLARE_READ8_MEMBER(rtc_portc_r);
-	DECLARE_WRITE8_MEMBER(rtc_portc_w);
+	void lower_mask_w(uint8_t data);
+	void upper_mask_w(uint8_t data);
+	void crtc_bank_w(uint8_t data);
+	void rtc_porta_w(uint8_t data);
+	uint8_t rtc_portc_r();
+	void rtc_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irqnmi_w);
 	DECLARE_WRITE_LINE_MEMBER(drqnmi_w);
 	uint16_t m_kanji_addr;
@@ -519,7 +519,7 @@ static GFXDECODE_START( gfx_pc100 )
 GFXDECODE_END
 
 /* TODO: untested */
-WRITE8_MEMBER( pc100_state::rtc_porta_w )
+void pc100_state::rtc_porta_w(uint8_t data)
 {
 /*
     ---- -x-- chip select
@@ -534,7 +534,7 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
 	m_rtc->cs1_w((data >> 2) & 1);
 }
 
-WRITE8_MEMBER( pc100_state::rtc_portc_w )
+void pc100_state::rtc_portc_w(uint8_t data)
 {
 	m_rtc->d0_w((data >> 0) & 1);
 	m_rtc->d1_w((data >> 1) & 1);
@@ -542,22 +542,22 @@ WRITE8_MEMBER( pc100_state::rtc_portc_w )
 	m_rtc->d3_w((data >> 3) & 1);
 }
 
-READ8_MEMBER( pc100_state::rtc_portc_r )
+uint8_t pc100_state::rtc_portc_r()
 {
 	return m_rtc_portc;
 }
 
-WRITE8_MEMBER( pc100_state::lower_mask_w )
+void pc100_state::lower_mask_w(uint8_t data)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff00) | data;
 }
 
-WRITE8_MEMBER( pc100_state::upper_mask_w )
+void pc100_state::upper_mask_w(uint8_t data)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER( pc100_state::crtc_bank_w )
+void pc100_state::crtc_bank_w(uint8_t data)
 {
 	if(data & 0x80)
 	{

@@ -121,8 +121,8 @@ private:
 	u8 m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	u8 pa_r();
+	void pb_w(u8 data);
 	DECLARE_READ8_MEMBER(kbcdata_r);
 	DECLARE_WRITE8_MEMBER(kbcdata_w);
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
@@ -395,12 +395,12 @@ void m24_state::update_nmi()
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(m24_state::pa_r)
+u8 m24_state::pa_r()
 {
 	return m_pa & (m_kbdata ? 0xff : 0xfd);
 }
 
-WRITE8_MEMBER(m24_state::pb_w)
+void m24_state::pb_w(u8 data)
 {
 	m_keyboard->clock_w(!BIT(data, 0));
 	m_keyboard->data_w(!BIT(data, 1));

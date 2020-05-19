@@ -176,10 +176,10 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(mc6846_out_w);
+	uint8_t mc6847_videoram_r(offs_t offset);
+	uint8_t pia_pa_r();
+	uint8_t pia_pb_r();
+	void mc6846_out_w(uint8_t data);
 	void kbd_put(uint8_t data);
 	emu_timer *m_kbd_strobe_timer;
 	bool m_kbd_strobe;
@@ -262,7 +262,7 @@ void uchroma68_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-WRITE8_MEMBER(uchroma68_state::mc6846_out_w)
+void uchroma68_state::mc6846_out_w(uint8_t data)
 {
 	m_mc6847->css_w(!BIT(data, 0));
 	m_mc6847->intext_w(!BIT(data, 1));
@@ -275,7 +275,7 @@ WRITE8_MEMBER(uchroma68_state::mc6846_out_w)
 }
 
 
-READ8_MEMBER(uchroma68_state::mc6847_videoram_r)
+uint8_t uchroma68_state::mc6847_videoram_r(offs_t offset)
 {
 	offset &= 0x1fff;
 	if (offset > 0x17ff) return 0xff;
@@ -303,13 +303,13 @@ void uchroma68_state::kbd_put(uint8_t data)
 	m_kbd_strobe = 0;
 }
 
-READ8_MEMBER(uchroma68_state::pia_pa_r)
+uint8_t uchroma68_state::pia_pa_r()
 {
 	uint8_t data = m_kbd_data;
 	return (m_kbd_strobe << 7) | data;
 }
 
-READ8_MEMBER(uchroma68_state::pia_pb_r)
+uint8_t uchroma68_state::pia_pb_r()
 {
 	// PB0 to PB4 are Up, Down, Left, Right, Home.
 	// PB5 is NC

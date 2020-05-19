@@ -81,8 +81,8 @@ public:
 	DECLARE_READ8_MEMBER( port71_r );
 	DECLARE_WRITE8_MEMBER( port70_w );
 	DECLARE_WRITE8_MEMBER( port71_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
 	void pc8401a_palette(palette_device &palette) const;
 
 	void scan_keyboard();

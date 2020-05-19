@@ -293,12 +293,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(midi_w);
+	void midi_w(u16 data);
 
 	DECLARE_READ8_MEMBER(lcd_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ16_MEMBER(port0_r);
+	u16 port0_r();
 	DECLARE_READ8_MEMBER(pcmrom_r);
 	DECLARE_READ8_MEMBER(dsp_io_r);
 	DECLARE_WRITE8_MEMBER(dsp_io_w);
@@ -397,7 +397,7 @@ WRITE8_MEMBER(cm32p_state::lcd_data_w)
 	lcd->data_w(data);
 }
 
-WRITE16_MEMBER(cm32p_state::midi_w)
+void cm32p_state::midi_w(u16 data)
 {
 	logerror("midi_out %02x\n", data);
 	midi = data;
@@ -413,7 +413,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 		midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(cm32p_state::port0_r)
+u16 cm32p_state::port0_r()
 {
 	return service_port->read();
 }

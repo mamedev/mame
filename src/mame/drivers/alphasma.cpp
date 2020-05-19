@@ -58,10 +58,10 @@ protected:
 	DECLARE_READ8_MEMBER(kb_r);
 	DECLARE_WRITE8_MEMBER(kb_matrixl_w);
 	DECLARE_WRITE8_MEMBER(kb_matrixh_w);
-	DECLARE_READ8_MEMBER(port_a_r);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_READ8_MEMBER(port_d_r);
-	DECLARE_WRITE8_MEMBER(port_d_w);
+	uint8_t port_a_r();
+	virtual void port_a_w(uint8_t data);
+	uint8_t port_d_r();
+	void port_d_w(uint8_t data);
 	void update_lcdc(bool lcdc0, bool lcdc1);
 
 	void alphasmart_mem(address_map &map);
@@ -85,7 +85,7 @@ public:
 private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
+	virtual void port_a_w(uint8_t data) override;
 
 	void asma2k_mem(address_map &map);
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER(alphasmart_state::kb_matrixh_w)
 	m_matrix[1] = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_a_r)
+uint8_t alphasmart_state::port_a_r()
 {
 	return (m_port_a & 0xfd) | (m_battery_status->read() << 1);
 }
@@ -150,7 +150,7 @@ void alphasmart_state::update_lcdc(bool lcdc0, bool lcdc1)
 	}
 }
 
-WRITE8_MEMBER(alphasmart_state::port_a_w)
+void alphasmart_state::port_a_w(uint8_t data)
 {
 	uint8_t changed = (m_port_a ^ data) & data;
 	update_lcdc(changed & 0x80, changed & 0x20);
@@ -158,12 +158,12 @@ WRITE8_MEMBER(alphasmart_state::port_a_w)
 	m_port_a = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_d_r)
+uint8_t alphasmart_state::port_d_r()
 {
 	return m_port_d;
 }
 
-WRITE8_MEMBER(alphasmart_state::port_d_w)
+void alphasmart_state::port_d_w(uint8_t data)
 {
 	m_port_d = data;
 }
@@ -202,7 +202,7 @@ WRITE8_MEMBER(asma2k_state::io_w)
 	//else printf("unknown w: %x %x\n", offset, data);
 }
 
-WRITE8_MEMBER(asma2k_state::port_a_w)
+void asma2k_state::port_a_w(uint8_t data)
 {
 	if ((m_port_a ^ data) & 0x40)
 	{

@@ -159,12 +159,12 @@ WRITE_LINE_MEMBER( elf2_state::q_w )
 	m_led = state ? 1 : 0;
 }
 
-READ8_MEMBER( elf2_state::dma_r )
+uint8_t elf2_state::dma_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( elf2_state::sc_w )
+void elf2_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{

@@ -54,10 +54,10 @@ private:
 
 	required_device<lh5801_cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(ita_r);
+	u8 ita_r();
 };
 
-READ8_MEMBER(compmahj_state::ita_r)
+u8 compmahj_state::ita_r()
 {
 	// f75e/f760
 	return 0;

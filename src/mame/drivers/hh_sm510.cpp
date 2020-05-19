@@ -243,13 +243,13 @@ void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
 	m_display_z_len = z;
 }
 
-WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
+void hh_sm510_state::sm510_lcd_segment_w(offs_t offset, u16 data)
 {
 	set_display_size(2, 16, 2);
 	m_display_state[offset] = data;
 }
 
-WRITE16_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
+void hh_sm510_state::sm500_lcd_segment_w(offs_t offset, u16 data)
 {
 	set_display_size(4, 4, 1);
 	m_display_state[offset] = data;
@@ -287,7 +287,7 @@ INPUT_CHANGED_MEMBER(hh_sm510_state::input_changed)
 	update_k_line();
 }
 
-WRITE8_MEMBER(hh_sm510_state::input_w)
+void hh_sm510_state::input_w(u8 data)
 {
 	m_inp_mux = data;
 	update_k_line();
@@ -307,38 +307,38 @@ INPUT_CHANGED_MEMBER(hh_sm510_state::acl_button)
 
 // other generic output handlers
 
-WRITE8_MEMBER(hh_sm510_state::piezo_r1_w)
+void hh_sm510_state::piezo_r1_w(u8 data)
 {
 	// R1 to piezo (SM511 R pin is melody output)
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(hh_sm510_state::piezo_r2_w)
+void hh_sm510_state::piezo_r2_w(u8 data)
 {
 	// R2 to piezo
 	m_speaker->level_w(data >> 1 & 1);
 }
 
-WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
+void hh_sm510_state::piezo_input_w(u8 data)
 {
 	// R1 to piezo, other to input mux
-	piezo_r1_w(space, 0, data & 1);
-	input_w(space, 0, data >> 1);
+	piezo_r1_w(data & 1);
+	input_w(data >> 1);
 }
 
-WRITE8_MEMBER(hh_sm510_state::piezo2bit_r1_w)
+void hh_sm510_state::piezo2bit_r1_w(u8 data)
 {
 	// R1(+S1) to piezo
 	m_speaker_data = (m_speaker_data & ~1) | (data & 1);
 	m_speaker->level_w(m_speaker_data);
 }
 
-WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
+void hh_sm510_state::piezo2bit_input_w(u8 data)
 {
 	// S1(+R1) to piezo, other to input mux
 	m_speaker_data = (m_speaker_data & ~2) | (data << 1 & 2);
 	m_speaker->level_w(m_speaker_data);
-	input_w(space, 0, data >> 1);
+	input_w(data >> 1);
 }
 
 
@@ -5265,7 +5265,7 @@ public:
 	}
 
 	// R2 connects to a single LED behind the screen
-	DECLARE_WRITE8_MEMBER(led_w) { m_led_out = data >> 1 & 1; }
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
 
 	void tgaiden(machine_config &config);
@@ -7750,16 +7750,16 @@ public:
 		inp_fixed_last();
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(input_w) override;
+	virtual void input_w(u8 data) override;
 	void tnmarebc(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(tnmarebc_state::input_w)
+void tnmarebc_state::input_w(u8 data)
 {
 	// S5 and S6 tied together
-	hh_sm510_state::input_w(space, 0, (data & 0x1f) | (data >> 1 & 0x10));
+	hh_sm510_state::input_w((data & 0x1f) | (data >> 1 & 0x10));
 }
 
 // config

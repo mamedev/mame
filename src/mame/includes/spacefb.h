@@ -73,7 +73,7 @@ private:
 	DECLARE_WRITE8_MEMBER(port_0_w);
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(port_2_w);
-	DECLARE_READ8_MEMBER(audio_p2_r);
+	uint8_t audio_p2_r();
 	DECLARE_READ_LINE_MEMBER(audio_t0_r);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 

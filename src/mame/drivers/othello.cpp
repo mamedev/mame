@@ -114,9 +114,9 @@ private:
 	DECLARE_WRITE8_MEMBER(ack_w);
 	DECLARE_WRITE8_MEMBER(ay_address_w);
 	DECLARE_WRITE8_MEMBER(ay_data_w);
-	DECLARE_READ8_MEMBER(n7751_rom_r);
-	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	uint8_t n7751_rom_r();
+	uint8_t n7751_command_r();
+	void n7751_p2_w(uint8_t data);
 	template<int Shift> void n7751_rom_addr_w(uint8_t data);
 	void n7751_rom_select_w(uint8_t data);
 
@@ -297,17 +297,17 @@ void othello_state::n7751_rom_select_w(uint8_t data)
 	if (!BIT(data, 3)) m_sound_addr |= 0x3000;
 }
 
-READ8_MEMBER(othello_state::n7751_rom_r)
+uint8_t othello_state::n7751_rom_r()
 {
 	return m_n7751_data[m_sound_addr];
 }
 
-READ8_MEMBER(othello_state::n7751_command_r)
+uint8_t othello_state::n7751_command_r()
 {
 	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
-WRITE8_MEMBER(othello_state::n7751_p2_w)
+void othello_state::n7751_p2_w(uint8_t data)
 {
 	/* write to P2; low 4 bits go to 8243 */
 	m_i8243->p2_w(data & 0x0f);

@@ -72,7 +72,7 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE64_MEMBER(lcd_output_w);
+	void lcd_output_w(u64 data);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input1_r);
@@ -101,7 +101,7 @@ void cforte_state::machine_start()
 
 // HLCD0538
 
-WRITE64_MEMBER(cforte_state::lcd_output_w)
+void cforte_state::lcd_output_w(u64 data)
 {
 	// 4 rows used
 	u32 rowdata[4];

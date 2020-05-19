@@ -59,15 +59,15 @@ private:
 	void chesstrv_io(address_map &map);
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(matrix_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void matrix_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
 	// 256 bytes data RAM accessed via I/O ports
-	DECLARE_READ8_MEMBER(ram_address_r) { return m_ram_address; }
-	DECLARE_WRITE8_MEMBER(ram_address_w) { m_ram_address = data; }
-	DECLARE_READ8_MEMBER(ram_data_r) { return m_ram[m_ram_address]; }
-	DECLARE_WRITE8_MEMBER(ram_data_w) { m_ram[m_ram_address] = data; }
+	u8 ram_address_r() { return m_ram_address; }
+	void ram_address_w(u8 data) { m_ram_address = data; }
+	u8 ram_data_r() { return m_ram[m_ram_address]; }
+	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
 
 	std::unique_ptr<u8[]> m_ram;
 	u8 m_ram_address;
@@ -103,21 +103,21 @@ void chesstrv_state::update_display()
 	m_display->matrix(~m_inp_mux, m_7seg_data);
 }
 
-WRITE8_MEMBER(chesstrv_state::digit_w)
+void chesstrv_state::digit_w(u8 data)
 {
 	// digit segments
 	m_7seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7) & 0x7f;
 	update_display();
 }
 
-WRITE8_MEMBER(chesstrv_state::matrix_w)
+void chesstrv_state::matrix_w(u8 data)
 {
 	// d0-d3: input/digit select (active low)
 	m_inp_mux = data;
 	update_display();
 }
 
-READ8_MEMBER(chesstrv_state::input_r)
+u8 chesstrv_state::input_r()
 {
 	u8 data = m_inp_mux;
 

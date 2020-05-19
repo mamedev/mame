@@ -70,8 +70,8 @@ private:
 	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
+	void pcjr_ppi_portb_w(uint8_t data);
+	uint8_t pcjr_ppi_portc_r();
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
@@ -323,7 +323,7 @@ WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
+void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -345,7 +345,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
+uint8_t pcjr_state::pcjr_ppi_portc_r()
 {
 	int data=0xff;
 

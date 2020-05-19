@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_READ8_MEMBER( video_ram_r );
+	uint8_t video_ram_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(ntsc_char_rom_r);
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);
 

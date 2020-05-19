@@ -220,7 +220,7 @@
 *           Read/Write Handlers            *
 *******************************************/
 
-WRITE8_MEMBER(truco_state::porta_w)
+void truco_state::porta_w(uint8_t data)
 {
 	logerror("Port A writes: %2x\n", data);
 }
@@ -238,7 +238,7 @@ WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
 	m_watchdog->watchdog_reset();
 }
 
-WRITE8_MEMBER(truco_state::portb_w)
+void truco_state::portb_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 7)); /* Isolated the bit for Delta-Sigma DAC */
 

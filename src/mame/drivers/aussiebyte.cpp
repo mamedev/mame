@@ -217,7 +217,7 @@ WRITE8_MEMBER( aussiebyte_state::port1c_w )
 {
 }
 
-WRITE8_MEMBER( aussiebyte_state::port20_w )
+void aussiebyte_state::port20_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 7));
 	m_rtc->cs_w(BIT(data, 0));
@@ -256,25 +256,25 @@ WRITE8_MEMBER( aussiebyte_state::rtc_w )
     DMA
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::memory_read_byte )
+uint8_t aussiebyte_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::memory_write_byte )
+void aussiebyte_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( aussiebyte_state::io_read_byte )
+uint8_t aussiebyte_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::io_write_byte )
+void aussiebyte_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

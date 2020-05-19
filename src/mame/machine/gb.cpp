@@ -565,7 +565,7 @@ void gb_state::gb_timer_increment()
 }
 
 // This gets called while the cpu is executing instructions to keep the timer state in sync
-WRITE8_MEMBER(gb_state::gb_timer_callback)
+void gb_state::gb_timer_callback(uint8_t data)
 {
 	uint16_t old_gb_divcount = m_divcount;
 	uint16_t old_internal_serial_clock = m_internal_serial_clock;

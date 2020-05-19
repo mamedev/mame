@@ -106,7 +106,7 @@ private:
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(irq_callback);
+	uint8_t irq_callback();
 
 	void rc759_io(address_map &map);
 	void rc759_map(address_map &map);
@@ -449,7 +449,7 @@ WRITE8_MEMBER( rc759_state::nvram_w )
 		m_nvram_mem[addr >> 1] = (m_nvram_mem[addr >> 1] & 0xf0) | (data & 0x0f);
 }
 
-READ8_MEMBER( rc759_state::irq_callback )
+uint8_t rc759_state::irq_callback()
 {
 	return m_pic->acknowledge();
 }

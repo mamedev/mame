@@ -16,7 +16,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(spacefb_state::audio_p2_r)
+uint8_t spacefb_state::audio_p2_r()
 {
 	return (m_sound_latch & 0x18) << 1;
 }

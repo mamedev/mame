@@ -54,10 +54,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc2_w);
 
-	DECLARE_READ8_MEMBER(pio_porta_r);
-	DECLARE_WRITE8_MEMBER(pio_porta_w);
-	DECLARE_READ8_MEMBER(pio_portb_r);
-	DECLARE_WRITE8_MEMBER(pio_portb_w);
+	uint8_t pio_porta_r();
+	void pio_porta_w(uint8_t data);
+	uint8_t pio_portb_r();
+	void pio_portb_w(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
 	void polyplay_palette(palette_device &palette) const;

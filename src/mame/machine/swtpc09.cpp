@@ -71,12 +71,12 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
 /******* MC6821 PIA on MPID Board *******/
 /* Read/Write handlers for pia */
 
-READ8_MEMBER( swtpc09_state::pia0_a_r )
+uint8_t swtpc09_state::pia0_a_r()
 {
 	return m_pia_counter;
 }
 
-READ8_MEMBER( swtpc09_state::pia0_ca1_r )
+uint8_t swtpc09_state::pia0_ca1_r()
 {
 	return 0;
 }
@@ -435,12 +435,12 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_fdc_w )
 }
 
 /* via on dmaf3 board */
-READ8_MEMBER( swtpc09_state::dmaf3_via_read_porta )
+uint8_t swtpc09_state::dmaf3_via_read_porta()
 {
 	return m_dmaf3_via_porta;
 }
 
-READ8_MEMBER( swtpc09_state::dmaf3_via_read_portb )
+uint8_t swtpc09_state::dmaf3_via_read_portb()
 {
 	// Bit 0 - output ?
 	// Bit 1 - output, tape drive request strobe.
@@ -456,12 +456,12 @@ READ8_MEMBER( swtpc09_state::dmaf3_via_read_portb )
 	return m_dmaf3_via_portb | 0x20;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_porta )
+void swtpc09_state::dmaf3_via_write_porta(uint8_t data)
 {
 	m_dmaf3_via_porta &= data;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_portb )
+void swtpc09_state::dmaf3_via_write_portb(uint8_t data)
 {
 	m_dmaf3_via_portb &= data;
 }

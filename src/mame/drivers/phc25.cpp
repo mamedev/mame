@@ -266,7 +266,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ8_MEMBER( phc25_state::video_ram_r )
+uint8_t phc25_state::video_ram_r(offs_t offset)
 {
 	if (BIT(m_port40, 7)) // graphics
 	{

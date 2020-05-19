@@ -64,7 +64,7 @@ private:
 	u8 m_inp_mux;
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(u8 data);
 	template<int Psen> DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -87,7 +87,7 @@ void talkingfb_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(talkingfb_state::bank_w)
+void talkingfb_state::bank_w(u8 data)
 {
 	// d0-d2: upper rom bank
 	// d3-d5: upper rom enable (bus conflict possible)

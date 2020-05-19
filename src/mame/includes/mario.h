@@ -125,13 +125,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(mario_scroll_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(mario_sh_p1_r);
-	DECLARE_READ8_MEMBER(mario_sh_p2_r);
+	uint8_t mario_sh_p1_r();
+	uint8_t mario_sh_p2_r();
 	DECLARE_READ_LINE_MEMBER(mario_sh_t0_r);
 	DECLARE_READ_LINE_MEMBER(mario_sh_t1_r);
 	DECLARE_READ8_MEMBER(mario_sh_tune_r);
-	DECLARE_WRITE8_MEMBER(mario_sh_p1_w);
-	DECLARE_WRITE8_MEMBER(mario_sh_p2_w);
+	void mario_sh_p1_w(uint8_t data);
+	void mario_sh_p2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(masao_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(mario_sh_tuneselect_w);
 	DECLARE_WRITE8_MEMBER(mario_sh3_w);
@@ -145,8 +145,8 @@ private:
 	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
 	DECLARE_WRITE8_MEMBER(mario_sh1_w);
 	DECLARE_WRITE8_MEMBER(mario_sh2_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
 	void mario_io_map(address_map &map);

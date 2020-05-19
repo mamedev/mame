@@ -458,7 +458,7 @@ private:
 	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
-	DECLARE_WRITE8_MEMBER(write_pa);
+	void write_pa(uint8_t data);
 
 	void dbox_map(address_map &map);
 
@@ -503,7 +503,7 @@ WRITE8_MEMBER (dbox_state::sda5708_clk){
 	m_display->sdclk_w(ASSERT_LINE);
 }
 
-WRITE8_MEMBER (dbox_state::write_pa){
+void dbox_state::write_pa(uint8_t data) {
 	LOGDISPLAY("%s\n", FUNCNAME);
 	m_display->load_w((0x04 & data) == 0 ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -133,7 +133,7 @@ READ8_MEMBER(playch10_state::pc10_detectclr_r)
 	return 0;
 }
 
-WRITE8_MEMBER(playch10_state::cart_sel_w)
+void playch10_state::cart_sel_w(uint8_t data)
 {
 	m_cart_sel = data;
 }

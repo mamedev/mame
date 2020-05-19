@@ -154,21 +154,21 @@ private:
 	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// quizpun2
-	DECLARE_WRITE8_MEMBER(cop_d_w);
-	DECLARE_WRITE8_MEMBER(cop_g_w);
-	DECLARE_READ8_MEMBER(cop_l_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(cop_in_r);
+	void cop_d_w(uint8_t data);
+	void cop_g_w(uint8_t data);
+	uint8_t cop_l_r();
+	void cop_l_w(uint8_t data);
+	uint8_t cop_in_r();
 
 	// quizpun
-	DECLARE_READ8_MEMBER(quizpun_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(quizpun_68705_port_a_w);
+	uint8_t quizpun_68705_port_a_r();
+	void quizpun_68705_port_a_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(quizpun_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(quizpun_68705_port_b_w);
+	uint8_t quizpun_68705_port_b_r();
+	void quizpun_68705_port_b_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(quizpun_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(quizpun_68705_port_c_w);
+	uint8_t quizpun_68705_port_c_r();
+	void quizpun_68705_port_c_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(quizpun_protection_r);
 	DECLARE_WRITE8_MEMBER(quizpun_protection_w);
@@ -278,13 +278,13 @@ void quizpun2_state::machine_reset()
 	m_mcu_pending = m_mcu_written = m_mcu_repeat = false;
 }
 
-WRITE8_MEMBER(quizpun2_state::cop_d_w)
+void quizpun2_state::cop_d_w(uint8_t data)
 {
 	m_eeprom->cs_write(BIT(data, 0));
 	// bit 1 used to control second EEPROM???
 }
 
-WRITE8_MEMBER(quizpun2_state::cop_g_w)
+void quizpun2_state::cop_g_w(uint8_t data)
 {
 	if (BIT(m_mcu_control_port, 0) && !BIT(data, 0))
 	{
@@ -295,18 +295,18 @@ WRITE8_MEMBER(quizpun2_state::cop_g_w)
 	m_mcu_control_port = data;
 }
 
-READ8_MEMBER(quizpun2_state::cop_l_r)
+uint8_t quizpun2_state::cop_l_r()
 {
 	return m_mcu_data_port;
 }
 
-WRITE8_MEMBER(quizpun2_state::cop_l_w)
+void quizpun2_state::cop_l_w(uint8_t data)
 {
 	if (m_mcu_repeat)
 		m_mcu_data_port = data;
 }
 
-READ8_MEMBER(quizpun2_state::cop_in_r)
+uint8_t quizpun2_state::cop_in_r()
 {
 	return 8 | (m_mcu_written ? 4 : 2) | (m_mcu_pending ? 0 : 1);
 }
@@ -411,13 +411,13 @@ WRITE8_MEMBER(quizpun2_state::quizpun_protection_w)
 
 // Port A - I/O with main cpu (data)
 
-READ8_MEMBER(quizpun2_state::quizpun_68705_port_a_r)
+uint8_t quizpun2_state::quizpun_68705_port_a_r()
 {
 //  logerror("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
 	return m_mcu_data_port;
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_a_w)
+void quizpun2_state::quizpun_68705_port_a_w(uint8_t data)
 {
 //  logerror("%s: port A write %02x\n", machine().describe_context(), data);
 	m_mcu_data_port = data;
@@ -425,7 +425,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_a_w)
 
 // Port B - I/O with main cpu (status)
 
-READ8_MEMBER(quizpun2_state::quizpun_68705_port_b_r)
+uint8_t quizpun2_state::quizpun_68705_port_b_r()
 {
 	// bit 3: 0 = pending
 	// bit 1: 0 = main cpu has written
@@ -441,7 +441,7 @@ READ8_MEMBER(quizpun2_state::quizpun_68705_port_b_r)
 	return ret;
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_b_w)
+void quizpun2_state::quizpun_68705_port_b_w(uint8_t data)
 {
 //  logerror("%s: port B write %02x\n", machine().describe_context(), data);
 
@@ -457,14 +457,14 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_b_w)
 
 // Port C - EEPROM
 
-READ8_MEMBER(quizpun2_state::quizpun_68705_port_c_r)
+uint8_t quizpun2_state::quizpun_68705_port_c_r()
 {
 	uint8_t const ret = 0xf7 | (m_eeprom->do_read() ? 0x08 : 0x00);
 //  logerror("%s: port C read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
+void quizpun2_state::quizpun_68705_port_c_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write(BIT(data, 2));

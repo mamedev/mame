@@ -43,9 +43,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(_80_porta_w);
-	DECLARE_READ8_MEMBER(_80_portb_r);
-	DECLARE_WRITE8_MEMBER(_80_portc_w);
+	uint8_t _80_portb_r();
+	void _80_portc_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -123,17 +122,12 @@ void photon_state::set_bank(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(photon_state::_80_porta_w)
-{
-	set_bank(data);
-}
-
-READ8_MEMBER(photon_state::_80_portb_r)
+uint8_t photon_state::_80_portb_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon_state::_80_portc_w)
+void photon_state::_80_portc_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -235,7 +229,7 @@ void photon_state::photon(machine_config &config)
 	PALETTE(config, "palette", FUNC(photon_state::pk8000_palette), 16);
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
-	ppi1.out_pa_callback().set(FUNC(photon_state::_80_porta_w));
+	ppi1.out_pa_callback().set(FUNC(photon_state::set_bank));
 	ppi1.in_pb_callback().set(FUNC(photon_state::_80_portb_r));
 	ppi1.out_pc_callback().set(FUNC(photon_state::_80_portc_w));
 

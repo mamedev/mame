@@ -115,9 +115,9 @@ private:
 	void fdd_index_callback(floppy_image_device *floppy, int state);
 	DECLARE_READ8_MEMBER(fdd_ctrl_r);
 	DECLARE_READ8_MEMBER(fdd_cmd_r);
-	DECLARE_WRITE8_MEMBER(fddcpu_p1_w);
-	DECLARE_READ8_MEMBER(fddcpu_p2_r);
-	DECLARE_WRITE8_MEMBER(fddcpu_p2_w);
+	void fddcpu_p1_w(uint8_t data);
+	uint8_t fddcpu_p2_r();
+	void fddcpu_p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fddcpu_debug_rx);
 
 	void handle_command(uint16_t data);
@@ -140,7 +140,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
-	DECLARE_WRITE16_MEMBER(diskseq_y_w);
+	void diskseq_y_w(uint16_t data);
 	void diskseq_tick();
 
 	required_device<m68000_base_device> m_maincpu;
@@ -757,7 +757,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 }
 
 // NOTE: This function is not used, but is retained in the event we wish for low-level disk sequencer emulation.
-WRITE16_MEMBER(dpb7000_state::diskseq_y_w)
+void dpb7000_state::diskseq_y_w(uint16_t data)
 {
 	uint8_t old_prom_latch[7];
 	memcpy(old_prom_latch, m_diskseq_ucode_latch, 7);
@@ -1609,7 +1609,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 	}
 }
 
-WRITE8_MEMBER(dpb7000_state::fddcpu_p1_w)
+void dpb7000_state::fddcpu_p1_w(uint8_t data)
 {
 	LOGMASKED(LOG_FDC_PORT, "%s: Floppy CPU Port 1 Write: %02x\n", machine().describe_context(), data);
 	const uint8_t old_value = m_fdd_port1;
@@ -1660,12 +1660,12 @@ WRITE8_MEMBER(dpb7000_state::fddcpu_p1_w)
 		m_diskseq_status_out |= 0x08;
 }
 
-WRITE8_MEMBER(dpb7000_state::fddcpu_p2_w)
+void dpb7000_state::fddcpu_p2_w(uint8_t data)
 {
 	m_fdd_serial->write_txd(BIT(data, 4));
 }
 
-READ8_MEMBER(dpb7000_state::fddcpu_p2_r)
+uint8_t dpb7000_state::fddcpu_p2_r()
 {
 	uint8_t ret = 0;
 	if (m_fdd_debug_rx_byte_count)

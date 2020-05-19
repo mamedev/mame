@@ -119,8 +119,8 @@ private:
 	DECLARE_WRITE8_MEMBER(cb_w);
 	DECLARE_READ8_MEMBER(cb_r);
 
-	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
-	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
+	template<int N> void pwm_output_w(offs_t offset, u8 data);
+	template<int N> void lcd_output_w(u64 data);
 
 	u8 m_dac_data = 0;
 	u8 m_lcd_lcd = 0;
@@ -167,13 +167,13 @@ READ8_MEMBER(mark5_state::nvram_r)
 }
 
 template<int N>
-WRITE8_MEMBER(mark5_state::pwm_output_w)
+void mark5_state::pwm_output_w(offs_t offset, u8 data)
 {
 	m_out_x[N][offset & 0x3f][offset >> 6] = data;
 }
 
 template<int N>
-WRITE64_MEMBER(mark5_state::lcd_output_w)
+void mark5_state::lcd_output_w(u64 data)
 {
 	if (N == 0)
 	{

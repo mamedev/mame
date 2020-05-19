@@ -56,7 +56,7 @@ READ8_MEMBER(pc1403_state::asic_read)
 	return data;
 }
 
-READ8_MEMBER(pc1403_state::in_a_r)
+uint8_t pc1403_state::in_a_r()
 {
 	uint8_t data = m_outa;
 
@@ -80,7 +80,7 @@ READ8_MEMBER(pc1403_state::in_a_r)
 	return data;
 }
 
-WRITE8_MEMBER(pc1403_state::out_c_w)
+void pc1403_state::out_c_w(uint8_t data)
 {
 	m_portc = data;
 }

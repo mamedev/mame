@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
-READ8_MEMBER( pc8001_state::dma_mem_r )
+uint8_t pc8001_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

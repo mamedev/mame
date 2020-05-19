@@ -303,14 +303,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(rs232_dcd_route_change);
 
 private:
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_READ8_MEMBER(config_r);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(stop_pia_r);
-	DECLARE_WRITE8_MEMBER(stop_pia_w);
-	DECLARE_WRITE8_MEMBER(stop_pia_pa_w);
-	DECLARE_WRITE8_MEMBER(stop_pia_pb_w);
+	uint8_t main_r(offs_t offset);
+	void main_w(offs_t offset, uint8_t data);
+	uint8_t config_r();
+	void page_w(uint8_t data);
+	uint8_t stop_pia_r(offs_t offset);
+	void stop_pia_w(offs_t offset, uint8_t data);
+	void stop_pia_pa_w(uint8_t data);
+	void stop_pia_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(stop_pia_ca2_r);
 	uint16_t m_stop_address;
 
@@ -326,9 +326,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
-	DECLARE_READ8_MEMBER(keypad_key_r);
-	DECLARE_WRITE8_MEMBER(led_digit_w);
-	DECLARE_WRITE8_MEMBER(led_segment_w);
+	uint8_t keypad_key_r();
+	void led_digit_w(uint8_t data);
+	void led_segment_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(stop_pia_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(stop_pia_cb2_w);
@@ -368,8 +368,8 @@ private:
 
 	// MEK68R2
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(r2_pia_pa_r);
-	DECLARE_READ8_MEMBER(r2_pia_pb_r);
+	uint8_t r2_pia_pa_r();
+	uint8_t r2_pia_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(r2_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(r2_vsync_changed);
 	DECLARE_READ_LINE_MEMBER(r2_pia_cb1_r);
@@ -550,7 +550,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-READ8_MEMBER(mekd4_state::main_r)
+uint8_t mekd4_state::main_r(offs_t offset)
 {
 	if (offset == m_stop_address && !machine().side_effects_disabled())
 	{
@@ -561,7 +561,7 @@ READ8_MEMBER(mekd4_state::main_r)
 	return m_banked_space->read_byte(offset);
 }
 
-WRITE8_MEMBER(mekd4_state::main_w)
+void mekd4_state::main_w(offs_t offset, uint8_t data)
 {
 	if (offset == m_stop_address && !machine().side_effects_disabled())
 	{
@@ -572,33 +572,33 @@ WRITE8_MEMBER(mekd4_state::main_w)
 	m_banked_space->write_byte(offset, data);
 }
 
-READ8_MEMBER(mekd4_state::config_r)
+uint8_t mekd4_state::config_r()
 {
 	return 0xf0 | m_jumper1->read();
 }
 
 // The design reversed the A0 and A1 lines so that
 // a 16 bit write could write both data addresses.
-READ8_MEMBER(mekd4_state::stop_pia_r)
+uint8_t mekd4_state::stop_pia_r(offs_t offset)
 {
 	// Reverse the A0 and A1 address lines;
 	int8_t reversed = BIT(offset, 0) << 1 | BIT(offset, 1);
 	return m_stop_pia->read(reversed);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_w)
+void mekd4_state::stop_pia_w(offs_t offset, uint8_t data)
 {
 	// Reverse the A0 and A1 address lines;
 	int8_t reversed = BIT(offset, 0) << 1 | BIT(offset, 1);
 	m_stop_pia->write(reversed, data);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_pa_w)
+void mekd4_state::stop_pia_pa_w(uint8_t data)
 {
 	m_stop_address = (m_stop_address & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_pb_w)
+void mekd4_state::stop_pia_pb_w(uint8_t data)
 {
 	m_stop_address = (m_stop_address & 0xff00) | data;
 }
@@ -615,7 +615,7 @@ READ_LINE_MEMBER(mekd4_state::stop_pia_ca2_r)
 
 ************************************************************/
 
-WRITE8_MEMBER(mekd4_state::page_w)
+void mekd4_state::page_w(uint8_t data)
 {
 	m_rom_page = data & 0x07;
 	m_ram_page = (data >> 4) & 0x07;
@@ -652,7 +652,7 @@ READ_LINE_MEMBER(mekd4_state::keypad_cb1_r)
 	return mekd4_state::keypad_key_pressed();
 }
 
-READ8_MEMBER(mekd4_state::keypad_key_r)
+uint8_t mekd4_state::keypad_key_r()
 {
 	uint8_t mux = (m_digit & 0xc0) >> 6;
 	uint8_t i = (m_keypad_columns[mux]->read() & m_digit) ? 0 : 0x80;
@@ -667,14 +667,14 @@ READ8_MEMBER(mekd4_state::keypad_key_r)
 ************************************************************/
 
 // PA
-WRITE8_MEMBER(mekd4_state::led_segment_w)
+void mekd4_state::led_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 	m_display->matrix(m_digit, ~m_segment);
 }
 
 // PB
-WRITE8_MEMBER(mekd4_state::led_digit_w)
+void mekd4_state::led_digit_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit, ~m_segment);
@@ -818,7 +818,7 @@ void mekd4_state::kbd_put(uint8_t data)
 
 // PA0 to PA6 - Keyboard data.
 // PA7 - Display nationality, 0 USA, 1 Europe.
-READ8_MEMBER(mekd4_state::r2_pia_pa_r)
+uint8_t mekd4_state::r2_pia_pa_r()
 {
 	uint8_t ret = m_term_data;
 	int8_t display_nationality = m_r2_display_nationality->read();
@@ -835,7 +835,7 @@ READ8_MEMBER(mekd4_state::r2_pia_pa_r)
 //       01 - 16 lines of 64 characters.
 //       10 - 20 lines of 80 characters.
 //       11 - User defined.
-READ8_MEMBER(mekd4_state::r2_pia_pb_r)
+uint8_t mekd4_state::r2_pia_pb_r()
 {
 	int8_t display_format = m_r2_display_format->read();
 	int8_t mode = m_r2_mode->read();

@@ -161,27 +161,27 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_l);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
 	void ctstein(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(ctstein_state::write_g)
+void ctstein_state::write_g(u8 data)
 {
 	// G0-G2: input mux
 	m_inp_mux = data & 7;
 }
 
-WRITE8_MEMBER(ctstein_state::write_l)
+void ctstein_state::write_l(u8 data)
 {
 	// L0-L3: button lamps
 	m_display->matrix(1, data & 0xf);
 }
 
-READ8_MEMBER(ctstein_state::read_l)
+u8 ctstein_state::read_l()
 {
 	// L4-L7: multiplexed inputs
 	return read_inputs(3, 0xf) << 4 | 0xf;
@@ -263,10 +263,10 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_d(u8 data);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_in();
 	void h2hsoccerc(machine_config &config);
 	void h2hbaskbc(machine_config &config);
 	void h2hhockeyc(machine_config &config);
@@ -274,20 +274,20 @@ public:
 
 // handlers
 
-WRITE8_MEMBER(h2hbaskbc_state::write_d)
+void h2hbaskbc_state::write_d(u8 data)
 {
 	// D: led select
 	m_d = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskbc_state::write_g)
+void h2hbaskbc_state::write_g(u8 data)
 {
 	// G: led select, input mux
 	m_inp_mux = data;
 	m_g = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskbc_state::write_l)
+void h2hbaskbc_state::write_l(u8 data)
 {
 	// D2,D3 double as multiplexer
 	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
@@ -298,7 +298,7 @@ WRITE8_MEMBER(h2hbaskbc_state::write_l)
 	m_display->matrix(sel, data);
 }
 
-READ8_MEMBER(h2hbaskbc_state::read_in)
+u8 h2hbaskbc_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(4, 7) | (m_inputs[4]->read() & 8);
@@ -421,11 +421,11 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
+	void write_d(u8 data);
+	void write_g(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_WRITE8_MEMBER(write_l);
+	void write_l(u8 data);
 	void einvaderc(machine_config &config);
 };
 
@@ -439,14 +439,14 @@ void einvaderc_state::update_display()
 	m_display->matrix(grid, l);
 }
 
-WRITE8_MEMBER(einvaderc_state::write_d)
+void einvaderc_state::write_d(u8 data)
 {
 	// D: led grid 0-3 (D0-D2 are 7segs)
 	m_d = data;
 	update_display();
 }
 
-WRITE8_MEMBER(einvaderc_state::write_g)
+void einvaderc_state::write_g(u8 data)
 {
 	// G: led grid 4-7
 	m_g = data;
@@ -468,7 +468,7 @@ WRITE_LINE_MEMBER(einvaderc_state::write_so)
 	update_display();
 }
 
-WRITE8_MEMBER(einvaderc_state::write_l)
+void einvaderc_state::write_l(u8 data)
 {
 	// L: led state/segment
 	m_l = data;
@@ -550,10 +550,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_l);
+	void write_g(u8 data);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
 
 	DECLARE_INPUT_CHANGED_MEMBER(position_changed) { update_display(); }
 	void unkeinv(machine_config &config);
@@ -571,7 +571,7 @@ void unkeinv_state::update_display()
 	m_display->update();
 }
 
-WRITE8_MEMBER(unkeinv_state::write_g)
+void unkeinv_state::write_g(u8 data)
 {
 	// G0-G3: led select part
 	// G2,G3: input mux
@@ -579,21 +579,21 @@ WRITE8_MEMBER(unkeinv_state::write_g)
 	update_display();
 }
 
-WRITE8_MEMBER(unkeinv_state::write_d)
+void unkeinv_state::write_d(u8 data)
 {
 	// D0-D3: led select part
 	m_d = ~data & 0xf;
 	update_display();
 }
 
-WRITE8_MEMBER(unkeinv_state::write_l)
+void unkeinv_state::write_l(u8 data)
 {
 	// L0-L7: led data
 	m_l = ~data & 0xff;
 	update_display();
 }
 
-READ8_MEMBER(unkeinv_state::read_l)
+u8 unkeinv_state::read_l()
 {
 	u8 ret = 0xff;
 
@@ -680,10 +680,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 	DECLARE_READ_LINE_MEMBER(motor_switch_r);
 
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_g);
+	void write_l(u8 data);
+	void write_d(u8 data);
+	void write_g(u8 data);
+	u8 read_g();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_READ_LINE_MEMBER(read_si);
 	void lchicken(machine_config &config);
@@ -717,7 +717,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lchicken_state::motor_sim_tick)
 	}
 }
 
-WRITE8_MEMBER(lchicken_state::write_l)
+void lchicken_state::write_l(u8 data)
 {
 	// L0-L3: led data
 	// L4-L6: led select
@@ -725,7 +725,7 @@ WRITE8_MEMBER(lchicken_state::write_l)
 	m_display->matrix(data >> 4 & 7, ~data & 0xf);
 }
 
-WRITE8_MEMBER(lchicken_state::write_d)
+void lchicken_state::write_d(u8 data)
 {
 	// D0-D3: input mux
 	// D3: motor on
@@ -733,12 +733,12 @@ WRITE8_MEMBER(lchicken_state::write_d)
 	output().set_value("motor_on", ~data >> 3 & 1);
 }
 
-WRITE8_MEMBER(lchicken_state::write_g)
+void lchicken_state::write_g(u8 data)
 {
 	m_g = data;
 }
 
-READ8_MEMBER(lchicken_state::read_g)
+u8 lchicken_state::read_g()
 {
 	// G0-G3: multiplexed inputs
 	return read_inputs(4, m_g);
@@ -835,11 +835,11 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_g);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	void write_g(u8 data);
+	u8 read_l();
+	u8 read_g();
 	void funjacks(machine_config &config);
 };
 
@@ -850,7 +850,7 @@ void funjacks_state::update_display()
 	m_display->matrix(m_d, m_l);
 }
 
-WRITE8_MEMBER(funjacks_state::write_d)
+void funjacks_state::write_d(u8 data)
 {
 	// D: led grid + input mux
 	m_inp_mux = data;
@@ -858,27 +858,27 @@ WRITE8_MEMBER(funjacks_state::write_d)
 	update_display();
 }
 
-WRITE8_MEMBER(funjacks_state::write_l)
+void funjacks_state::write_l(u8 data)
 {
 	// L0,L1: led state
 	m_l = data & 3;
 	update_display();
 }
 
-WRITE8_MEMBER(funjacks_state::write_g)
+void funjacks_state::write_g(u8 data)
 {
 	// G1: speaker out
 	m_speaker->level_w(data >> 1 & 1);
 	m_g = data;
 }
 
-READ8_MEMBER(funjacks_state::read_l)
+u8 funjacks_state::read_l()
 {
 	// L4,L5: multiplexed inputs
 	return read_inputs(3, 0x30) | m_l;
 }
 
-READ8_MEMBER(funjacks_state::read_g)
+u8 funjacks_state::read_g()
 {
 	// G1: speaker out state
 	// G2,G3: inputs
@@ -960,9 +960,9 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_g);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	void write_g(u8 data);
 	void funrlgl(machine_config &config);
 };
 
@@ -973,14 +973,14 @@ void funrlgl_state::update_display()
 	m_display->matrix(m_d, m_l);
 }
 
-WRITE8_MEMBER(funrlgl_state::write_d)
+void funrlgl_state::write_d(u8 data)
 {
 	// D: led grid
 	m_d = ~data & 0xf;
 	update_display();
 }
 
-WRITE8_MEMBER(funrlgl_state::write_l)
+void funrlgl_state::write_l(u8 data)
 {
 	// L0-L3: led state
 	// L4-L7: N/C
@@ -988,7 +988,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 	update_display();
 }
 
-WRITE8_MEMBER(funrlgl_state::write_g)
+void funrlgl_state::write_g(u8 data)
 {
 	// G3: speaker out
 	m_speaker->level_w(data >> 3 & 1);
@@ -1059,10 +1059,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_l(u8 data);
+	void write_d(u8 data);
+	void write_g(u8 data);
+	u8 read_in();
 	void mdallas(machine_config &config);
 };
 
@@ -1073,14 +1073,14 @@ void mdallas_state::update_display()
 	m_display->matrix(~(m_d << 4 | m_g), m_l);
 }
 
-WRITE8_MEMBER(mdallas_state::write_l)
+void mdallas_state::write_l(u8 data)
 {
 	// L: digit segment data
 	m_l = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mdallas_state::write_d)
+void mdallas_state::write_d(u8 data)
 {
 	// D: select digit, input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 3);
@@ -1088,7 +1088,7 @@ WRITE8_MEMBER(mdallas_state::write_d)
 	update_display();
 }
 
-WRITE8_MEMBER(mdallas_state::write_g)
+void mdallas_state::write_g(u8 data)
 {
 	// G: select digit, input mux low
 	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
@@ -1096,7 +1096,7 @@ WRITE8_MEMBER(mdallas_state::write_g)
 	update_display();
 }
 
-READ8_MEMBER(mdallas_state::read_in)
+u8 mdallas_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(6, 0xf);
@@ -1202,26 +1202,26 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_l);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_l();
 	void plus1(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(plus1_state::write_d)
+void plus1_state::write_d(u8 data)
 {
 	// D0?: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(plus1_state::write_l)
+void plus1_state::write_l(u8 data)
 {
 	m_l = data;
 }
 
-READ8_MEMBER(plus1_state::read_l)
+u8 plus1_state::read_l()
 {
 	// L: IN.1, mask with output
 	return m_inputs[1]->read() & m_l;
@@ -1301,9 +1301,9 @@ public:
 
 	void update_display();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_g);
+	void write_d(u8 data);
+	void write_l(u8 data);
+	u8 read_g();
 	void lightfgt(machine_config &config);
 };
 
@@ -1322,14 +1322,14 @@ WRITE_LINE_MEMBER(lightfgt_state::write_so)
 	update_display();
 }
 
-WRITE8_MEMBER(lightfgt_state::write_d)
+void lightfgt_state::write_d(u8 data)
 {
 	// D: led grid 1-4 (and input mux)
 	m_d = data;
 	update_display();
 }
 
-WRITE8_MEMBER(lightfgt_state::write_l)
+void lightfgt_state::write_l(u8 data)
 {
 	// L0-L4: led state
 	// L5-L7: N/C
@@ -1337,7 +1337,7 @@ WRITE8_MEMBER(lightfgt_state::write_l)
 	update_display();
 }
 
-READ8_MEMBER(lightfgt_state::read_g)
+u8 lightfgt_state::read_g()
 {
 	// G: multiplexed inputs
 	m_inp_mux = m_d << 1 | m_so;
@@ -1425,28 +1425,28 @@ public:
 		hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_d(u8 data);
+	u8 read_l();
+	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void bship82(machine_config &config);
 };
 
 // handlers
 
-WRITE8_MEMBER(bship82_state::write_d)
+void bship82_state::write_d(u8 data)
 {
 	// D: input mux
 	m_inp_mux = data;
 }
 
-READ8_MEMBER(bship82_state::read_l)
+u8 bship82_state::read_l()
 {
 	// L: multiplexed inputs
 	return read_inputs(4, 0xff);
 }
 
-READ8_MEMBER(bship82_state::read_in)
+u8 bship82_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(4, 0xf00) >> 8;
@@ -1592,10 +1592,10 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_d(u8 data);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	void qkracer(machine_config &config);
 };
@@ -1607,7 +1607,7 @@ void qkracer_state::update_display()
 	m_display->matrix(~(m_d | m_g << 4 | m_sk << 8), m_l);
 }
 
-WRITE8_MEMBER(qkracer_state::write_d)
+void qkracer_state::write_d(u8 data)
 {
 	// D: select digit, D3: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 1 & 0x10);
@@ -1615,7 +1615,7 @@ WRITE8_MEMBER(qkracer_state::write_d)
 	update_display();
 }
 
-WRITE8_MEMBER(qkracer_state::write_g)
+void qkracer_state::write_g(u8 data)
 {
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
@@ -1623,14 +1623,14 @@ WRITE8_MEMBER(qkracer_state::write_g)
 	update_display();
 }
 
-WRITE8_MEMBER(qkracer_state::write_l)
+void qkracer_state::write_l(u8 data)
 {
 	// L0-L6: digit segment data
 	m_l = data & 0x7f;
 	update_display();
 }
 
-READ8_MEMBER(qkracer_state::read_in)
+u8 qkracer_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(5, 0xf);
@@ -1733,8 +1733,8 @@ public:
 	{ }
 
 	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
+	void write_d(u8 data);
+	void write_l(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	void vidchal(machine_config &config);
 };
@@ -1746,14 +1746,14 @@ void vidchal_state::update_display()
 	m_display->matrix(m_d | m_sk << 6, m_l);
 }
 
-WRITE8_MEMBER(vidchal_state::write_d)
+void vidchal_state::write_d(u8 data)
 {
 	// D: CD4028BE to digit select
 	m_d = 1 << data & 0x3f;
 	update_display();
 }
 
-WRITE8_MEMBER(vidchal_state::write_l)
+void vidchal_state::write_l(u8 data)
 {
 	// L: digit segment data
 	m_l = bitswap<8>(data,0,3,1,5,4,7,2,6);

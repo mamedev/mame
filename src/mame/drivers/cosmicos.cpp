@@ -438,12 +438,12 @@ WRITE_LINE_MEMBER( cosmicos_state::q_w )
 	m_q = state;
 }
 
-READ8_MEMBER( cosmicos_state::dma_r )
+uint8_t cosmicos_state::dma_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::sc_w )
+void cosmicos_state::sc_w(uint8_t data)
 {
 	int sc1 = BIT(data, 1);
 

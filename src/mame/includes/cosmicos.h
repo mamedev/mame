@@ -79,8 +79,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( sc_w );
+	uint8_t dma_r();
+	void sc_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER( data );
 	DECLARE_INPUT_CHANGED_MEMBER( enter );
 	DECLARE_INPUT_CHANGED_MEMBER( single_step );

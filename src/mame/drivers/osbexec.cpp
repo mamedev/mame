@@ -119,10 +119,10 @@ private:
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
-	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
-	DECLARE_READ8_MEMBER(osbexec_pia0_b_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_b_w);
+	uint8_t osbexec_pia0_a_r();
+	void osbexec_pia0_a_w(uint8_t data);
+	uint8_t osbexec_pia0_b_r();
+	void osbexec_pia0_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_txclk_w);
@@ -342,13 +342,13 @@ uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
   CB2 - 60/50 (?)
 */
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_a_r)
+uint8_t osbexec_state::osbexec_pia0_a_r()
 {
 	return m_pia0_porta;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
+void osbexec_state::osbexec_pia0_a_w(uint8_t data)
 {
 	//logerror("osbexec_pia0_a_w: %02x\n", data );
 
@@ -358,13 +358,13 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_b_r)
+uint8_t osbexec_state::osbexec_pia0_b_r()
 {
 	return m_pia0_portb;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
+void osbexec_state::osbexec_pia0_b_w(uint8_t data)
 {
 	m_pia0_portb = (m_pia0_portb & 0xc0) | (data & 0x3f);
 

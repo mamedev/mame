@@ -163,9 +163,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE8_MEMBER(gmode_w);
 	DECLARE_READ8_MEMBER(gmode_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	uint8_t porta_r();
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	uint8_t mc6847_videoram_r(offs_t offset);
 	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
@@ -415,7 +415,7 @@ void spc1000_state::machine_reset()
 	m_IPLK = 1;
 }
 
-READ8_MEMBER(spc1000_state::mc6847_videoram_r)
+uint8_t spc1000_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0)
 		return 0xff;
@@ -436,7 +436,7 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 	}
 }
 
-READ8_MEMBER( spc1000_state::porta_r )
+uint8_t spc1000_state::porta_r()
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;

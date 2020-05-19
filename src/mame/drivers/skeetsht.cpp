@@ -53,7 +53,7 @@ private:
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
 	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_WRITE8_MEMBER(hc11_porta_w);
+	void hc11_porta_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(ay8910_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
@@ -160,7 +160,7 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *
  *************************************/
 
-WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
+void skeetsht_state::hc11_porta_w(uint8_t data)
 {
 	if (!(data & 0x8) && (m_porta_latch & 8))
 		m_ay_sel = m_porta_latch & 0x10;

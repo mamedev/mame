@@ -1155,33 +1155,33 @@ IRQ_CALLBACK_MEMBER(pc6001_state::irq_callback)
 	return m_irq_vector;
 }
 
-READ8_MEMBER(pc6001_state::ppi_porta_r)
+uint8_t pc6001_state::ppi_porta_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pc6001_state::ppi_porta_w)
+void pc6001_state::ppi_porta_w(uint8_t data)
 {
 //  if(data != 0x06)
 //      printf("ppi_porta_w %02x\n",data);
 }
 
-READ8_MEMBER(pc6001_state::ppi_portb_r)
+uint8_t pc6001_state::ppi_portb_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pc6001_state::ppi_portb_w)
+void pc6001_state::ppi_portb_w(uint8_t data)
 {
 	//printf("ppi_portb_w %02x\n",data);
 }
 
-WRITE8_MEMBER(pc6001_state::ppi_portc_w)
+void pc6001_state::ppi_portc_w(uint8_t data)
 {
 	//printf("ppi_portc_w %02x\n",data);
 }
 
-READ8_MEMBER(pc6001_state::ppi_portc_r)
+uint8_t pc6001_state::ppi_portc_r()
 {
 	return 0x88;
 }

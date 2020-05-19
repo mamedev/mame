@@ -1599,14 +1599,14 @@ IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
 	return 0;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_porta_r)
+uint8_t mz2500_state::mz2500_porta_r()
 {
 	logerror("PPI PORTA R\n");
 
 	return 0xff;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portb_r)
+uint8_t mz2500_state::mz2500_portb_r()
 {
 	uint8_t vblank_bit;
 
@@ -1615,24 +1615,24 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 	return 0xfe | vblank_bit;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portc_r)
+uint8_t mz2500_state::mz2500_portc_r()
 {
 	logerror("PPI PORTC R\n");
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_porta_w)
+void mz2500_state::mz2500_porta_w(uint8_t data)
 {
 	logerror("PPI PORTA W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portb_w)
+void mz2500_state::mz2500_portb_w(uint8_t data)
 {
 	logerror("PPI PORTB W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
+void mz2500_state::mz2500_portc_w(uint8_t data)
 {
 	/*
 	---- x--- 0->1 transition = IPL reset
@@ -1665,7 +1665,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
+void mz2500_state::mz2500_pio1_porta_w(uint8_t data)
 {
 //  printf("%02x\n",data);
 
@@ -1679,7 +1679,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
+uint8_t mz2500_state::mz2500_pio1_porta_r()
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -1705,18 +1705,18 @@ READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
 }
 
 #if 0
-READ8_MEMBER(mz2500_state::mz2500_pio1_portb_r)
+uint8_t mz2500_state::mz2500_pio1_portb_r()
 {
 	return m_pio_latchb;
 }
 #endif
 
-READ8_MEMBER(mz2500_state::opn_porta_r)
+uint8_t mz2500_state::opn_porta_r()
 {
 	return m_ym_porta;
 }
 
-WRITE8_MEMBER(mz2500_state::opn_porta_w)
+void mz2500_state::opn_porta_w(uint8_t data)
 {
 	/*
 	---- x--- mouse select

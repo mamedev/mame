@@ -549,17 +549,17 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_0)
+uint8_t huc6272_device::adpcm_update_0()
 {
 	return adpcm_update(0);
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_1)
+uint8_t huc6272_device::adpcm_update_1()
 {
 	return adpcm_update(1);
 }
 
-WRITE8_MEMBER(huc6272_device::cdda_update)
+void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);

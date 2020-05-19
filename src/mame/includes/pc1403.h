@@ -36,8 +36,8 @@ protected:
 	void pc1421_writemem(address_map &map);
 
 	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_READ8_MEMBER(in_a_r);
+	void out_c_w(uint8_t data);
+	uint8_t in_a_r();
 
 	DECLARE_READ8_MEMBER(asic_read);
 	DECLARE_WRITE8_MEMBER(asic_write);

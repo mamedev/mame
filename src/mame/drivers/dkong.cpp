@@ -433,13 +433,13 @@ Donkey Kong Notes
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::memory_read_byte)
+uint8_t dkong_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(dkong_state::memory_write_byte)
+void dkong_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -564,7 +564,7 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::hb_dma_read_byte)
+uint8_t dkong_state::hb_dma_read_byte(offs_t offset)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -577,7 +577,7 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
 	return prog_space.read_byte(addr);
 }
 
-WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
+void dkong_state::hb_dma_write_byte(offs_t offset, uint8_t data)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -590,12 +590,12 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
 	prog_space.write_byte(addr, data);
 }
 
-READ8_MEMBER(dkong_state::p8257_ctl_r)
+uint8_t dkong_state::p8257_ctl_r()
 {
 	return m_dma_latch;
 }
 
-WRITE8_MEMBER(dkong_state::p8257_ctl_w)
+void dkong_state::p8257_ctl_w(uint8_t data)
 {
 	m_dma_latch = data;
 }
