@@ -1518,9 +1518,9 @@ uint8_t upd765_family_device::get_st3(floppy_info &fi)
 {
 	uint8_t st3 = command[1] & 7;
 	if(fi.ready)
-		result[0] |= ST3_RY;
+		st3 |= ST3_RY;
 	if(fi.dev)
-		result[0] |=
+		st3 |=
 			(fi.dev->wpt_r() ? ST3_WP : 0x00) |
 			(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
 			(fi.dev->twosid_r() ? 0x00 : ST3_TS);
