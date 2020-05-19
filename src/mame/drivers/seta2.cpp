@@ -55,7 +55,7 @@ TODO:
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
-- 1 rightmost pixel columns are not drawing when zoomed
+- 1 rightmost pixel columns are not drawn when zoomed
 
 gundamex:
 - slowdowns, music tempo is incorrect
