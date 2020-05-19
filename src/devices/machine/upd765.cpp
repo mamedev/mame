@@ -98,8 +98,10 @@ void smc37c78_device::map(address_map &map)
 
 void n82077aa_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(n82077aa_device::sra_r));
-	map(0x1, 0x1).r(FUNC(n82077aa_device::srb_r));
+	if(mode != mode_t::AT) {
+		map(0x0, 0x0).r(FUNC(n82077aa_device::sra_r));
+		map(0x1, 0x1).r(FUNC(n82077aa_device::srb_r));
+	}
 	map(0x2, 0x2).rw(FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
 	map(0x3, 0x3).rw(FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
 	map(0x4, 0x4).rw(FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
@@ -126,8 +128,10 @@ void dp8473_device::map(address_map &map)
 
 void pc8477a_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(pc8477a_device::sra_r));
-	map(0x1, 0x1).r(FUNC(pc8477a_device::srb_r));
+	if(mode != mode_t::AT) {
+		map(0x0, 0x0).r(FUNC(pc8477a_device::sra_r));
+		map(0x1, 0x1).r(FUNC(pc8477a_device::srb_r));
+	}
 	map(0x2, 0x2).rw(FUNC(pc8477a_device::dor_r), FUNC(pc8477a_device::dor_w));
 	map(0x3, 0x3).rw(FUNC(pc8477a_device::tdr_r), FUNC(pc8477a_device::tdr_w));
 	map(0x4, 0x4).rw(FUNC(pc8477a_device::msr_r), FUNC(pc8477a_device::dsr_w));
