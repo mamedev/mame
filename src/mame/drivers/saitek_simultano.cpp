@@ -10,10 +10,14 @@ Two versions are known: "B" from 1988, and "C" from 1989.
 
 Hardware notes:
 - WDC W65C02P @ 5MHz
-- 64KB ROM (2*AMI 27256), 8KB RAM (SRM2264LC) battery-backed
+- 64KB ROM (2*AMI 27256), socket for 32KB Endgame ROM
+- 8KB RAM (SRM2264LC) battery-backed
 - "HELIOS" NEC gate array
 - Epson SED1502F, LCD screen
 - piezo, 16+3 leds, button sensors chessboard
+
+It also appeared in Tandy's Chess Champion 2150, not as a simple rebrand, but
+with hardware differences: 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
 ***************************************************************************/
 
