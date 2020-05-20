@@ -408,6 +408,9 @@ private:
 	public:
 		dasm_comment(offs_t address, u32 crc, const char *text, rgb_t color);
 
+		// relaxed comparison for comments
+		bool operator < (const dasm_comment& rhs) const { return (m_address < rhs.m_address); }
+
 		std::string  m_text;        // Stores comment text & color for a given address & crc32
 		rgb_t        m_color;
 	};
