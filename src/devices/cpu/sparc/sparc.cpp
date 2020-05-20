@@ -174,7 +174,7 @@ void sparc_base_device::device_start()
 		{
 			continue;
 		}
-		m_asi[i] = &space(i);
+		m_asi[i] = space(i).specific<2, 0, ENDIANNESS_BIG>();
 	}
 
 	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
