@@ -62,9 +62,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
-#define LOG_COP 0
-#define LOG_VFD 0
+#define LOG_COP (1 << 1U)
+#define LOG_VFD (1 << 2U)
+#define VERBOSE 0
+#include "logmacro.h"
 
 
 
@@ -88,7 +89,7 @@ void newbrain_state::check_interrupt()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::mreq_r )
+uint8_t newbrain_state::mreq_r(offs_t offset)
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
@@ -134,7 +135,7 @@ READ8_MEMBER( newbrain_state::mreq_r )
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::mreq_w )
+void newbrain_state::mreq_w(offs_t offset, uint8_t data)
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
@@ -155,7 +156,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::iorq_r )
+uint8_t newbrain_state::iorq_r(offs_t offset)
 {
 	bool prtov = 0;
 	uint8_t data = m_exp->iorq_r(offset, 0xff, prtov);
@@ -180,11 +181,11 @@ READ8_MEMBER( newbrain_state::iorq_r )
 		case 5: // UST
 			if (BIT(offset, 1))
 			{
-				data = ust_b_r(space, offset, data);
+				data = ust_b_r();
 			}
 			else
 			{
-				data = ust_a_r(space, offset, data);
+				data = ust_a_r();
 			}
 			break;
 		}
@@ -198,7 +199,7 @@ READ8_MEMBER( newbrain_state::iorq_r )
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::iorq_w )
+void newbrain_state::iorq_w(offs_t offset, uint8_t data)
 {
 	bool prtov = 0;
 	m_exp->iorq_w(offset, 0xff, prtov);
@@ -219,7 +220,7 @@ WRITE8_MEMBER( newbrain_state::iorq_w )
 				break;
 
 			case 3: // ENRG1
-				enrg_w(space, offset, data);
+				enrg_w(data);
 				break;
 			}
 			break;
@@ -229,7 +230,7 @@ WRITE8_MEMBER( newbrain_state::iorq_w )
 			break;
 
 		case 3: // TVTL
-			tvtl_w(space, offset, data);
+			tvtl_w(data);
 			break;
 		}
 	}
@@ -242,7 +243,7 @@ WRITE8_MEMBER( newbrain_state::iorq_w )
 
 void newbrain_state::clclk()
 {
-	if (LOG) logerror("%s %s CLCLK\n", machine().time().as_string(), machine().describe_context());
+	LOG("%s %s CLCLK\n", machine().time().as_string(), machine().describe_context());
 
 	m_clkint = 1;
 	check_interrupt();
@@ -253,7 +254,7 @@ void newbrain_state::clclk()
 //  enrg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::enrg_w )
+void newbrain_state::enrg_w(uint8_t data)
 {
 	/*
 
@@ -270,7 +271,7 @@ WRITE8_MEMBER( newbrain_state::enrg_w )
 
 	*/
 
-	if (LOG) logerror("%s %s ENRG %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOG("%s %s ENRG %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	// clock enable
 	int clk = BIT(data, 0);
@@ -296,7 +297,7 @@ WRITE8_MEMBER( newbrain_state::enrg_w )
 //  ust_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::ust_a_r )
+uint8_t newbrain_state::ust_a_r()
 {
 	/*
 
@@ -330,7 +331,7 @@ READ8_MEMBER( newbrain_state::ust_a_r )
 //  user_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::ust_b_r )
+uint8_t newbrain_state::ust_b_r()
 {
 	/*
 
@@ -385,7 +386,7 @@ uint8_t newbrain_state::cop_in_r()
 	// keyboard
 	data |= BIT(m_403_q, 2);
 
-	if (LOG_COP) logerror("%s %s IN %01x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOGMASKED(LOG_COP, "%s %s IN %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	return data;
 }
@@ -415,7 +416,7 @@ uint8_t newbrain_state::cop_g_r()
 	data |= BIT(m_403_q, 0) << 2;
 	data |= BIT(m_403_q, 3) << 3;
 
-	if (LOG_COP) logerror("%s %s G %01x\n", machine().time().as_string(), machine().describe_context(), data);
+	LOGMASKED(LOG_COP, "%s %s G %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	return data;
 }
@@ -453,7 +454,7 @@ void newbrain_state::cop_g_w(uint8_t data)
 
 	int copint = !BIT(data, 0);
 
-	if (LOG_COP) logerror("%s %s COPINT %u\n", machine().time().as_string(), machine().describe_context(), copint);
+	LOGMASKED(LOG_COP, "%s %s COPINT %u\n", machine().time().as_string(), machine().describe_context(), copint);
 
 	if (m_copint != copint)
 	{
@@ -486,7 +487,7 @@ void newbrain_state::cop_d_w(uint8_t data)
 	int k4 = !BIT(data, 0);
 	int k6 = !BIT(data, 2);
 
-	if (LOG_COP) logerror("%s %s K4 %u K6 %u\n", machine().time().as_string(), machine().describe_context(), k4, k6);
+	LOGMASKED(LOG_COP, "%s %s K4 %u K6 %u\n", machine().time().as_string(), machine().describe_context(), k4, k6);
 
 	m_cop_tdo = BIT(data, 1);
 	m_cassette1->output(m_cop_tdo ? -1.0 : +1.0);
@@ -495,18 +496,18 @@ void newbrain_state::cop_d_w(uint8_t data)
 	if (k4) {
 		m_405_q = 0;
 
-		if (LOG_COP) logerror("%s %s keylatch reset\n", machine().time().as_string(), machine().describe_context());
+		LOGMASKED(LOG_COP, "%s %s keylatch reset\n", machine().time().as_string(), machine().describe_context());
 	} else if (m_cop_k6 && !k6) {
 		m_405_q++;
 		m_405_q &= 0x7f;
 
-		if (LOG_COP) logerror("%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_405_q);
+		LOGMASKED(LOG_COP, "%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_405_q);
 	}
 
 	if (!m_cop_k6 && k6) {
 		m_403_d = m_y[m_405_q & 0x0f]->read() & 0x0f;
 
-		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_403_d);
+		LOGMASKED(LOG_COP, "%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_403_d);
 	}
 
 	if (k6) {
@@ -514,14 +515,14 @@ void newbrain_state::cop_d_w(uint8_t data)
 	} else {
 		m_403_q = 0xf;
 
-		if (LOG_COP) logerror("%s %s keydata disabled\n", machine().time().as_string(), machine().describe_context());
+		LOGMASKED(LOG_COP, "%s %s keydata disabled\n", machine().time().as_string(), machine().describe_context());
 
 		// COP to VFD serial format, bits 15..0
 		// A B J I x H G2 C x F G1 E K L M D
 		uint16_t value = bitswap<16>(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
 		m_digits[m_405_q & 0x0f] = value;
 
-		if (LOG_VFD) logerror("%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);
+		LOGMASKED(LOG_VFD, "%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);
 	}
 
 	m_cop_k6 = k6;
@@ -535,7 +536,7 @@ void newbrain_state::cop_d_w(uint8_t data)
 
 WRITE_LINE_MEMBER( newbrain_state::k1_w )
 {
-	if (LOG_VFD) logerror("%s %s SO %u\n", machine().time().as_string(), machine().describe_context(), state);
+	LOGMASKED(LOG_VFD, "%s %s SO %u\n", machine().time().as_string(), machine().describe_context(), state);
 
 	m_cop_so = state;
 }
@@ -547,7 +548,7 @@ WRITE_LINE_MEMBER( newbrain_state::k1_w )
 
 WRITE_LINE_MEMBER( newbrain_state::k2_w )
 {
-	if (LOG_VFD) logerror("%s %s SK %u\n", machine().time().as_string(), machine().describe_context(), state);
+	LOGMASKED(LOG_VFD, "%s %s SK %u\n", machine().time().as_string(), machine().describe_context(), state);
 
 	if (state)
 	{
@@ -766,8 +767,7 @@ void newbrain_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_cop->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	enrg_w(space, 0, 0);
+	enrg_w(0);
 
 	timer_set(attotime::from_usec(get_reset_t()), TIMER_ID_RESET);
 }
@@ -782,20 +782,20 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_ID_RESET:
-		if (LOG) logerror("%s %s RESET 1\n", machine().time().as_string(), machine().describe_context());
+		LOG("%s %s RESET 1\n", machine().time().as_string(), machine().describe_context());
 
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_cop->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		break;
 
 	case TIMER_ID_PWRUP:
-		if (LOG) logerror("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
+		LOG("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
 
 		m_pwrup = 1;
 		break;
 
 	case TIMER_ID_CLKINT:
-		if (LOG) logerror("%s CLKINT\n", machine().time().as_string());
+		LOG("%s CLKINT\n", machine().time().as_string());
 
 		m_clkint = 0;
 		check_interrupt();

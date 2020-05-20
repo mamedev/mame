@@ -90,8 +90,8 @@ private:
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
 
-	DECLARE_READ8_MEMBER( mailbox_wx319_r );
-	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
+	uint8_t mailbox_wx319_r();
+	void mailbox_wx318_w(uint8_t data);
 	uint8_t tms7020_porta_r();
 	void tms7020_portb_w(uint8_t data);
 	uint8_t tms7041_porta_r();
@@ -100,7 +100,7 @@ private:
 	void tms7041_portc_w(uint8_t data);
 	uint8_t tms7041_portd_r();
 	void tms7041_portd_w(uint8_t data);
-	DECLARE_READ8_MEMBER( rom_r );
+	uint8_t rom_r(offs_t offset);
 
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
@@ -206,14 +206,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 */
 
 
-READ8_MEMBER(exelv_state::mailbox_wx319_r)
+uint8_t exelv_state::mailbox_wx319_r()
 {
 	logerror("[TMS7220] reading mailbox %d\n", m_wx319);
 	return m_wx319;
 }
 
 
-WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
+void exelv_state::mailbox_wx318_w(uint8_t data)
 {
 	logerror("wx318 write 0x%02x\n", data);
 	m_wx318 = data;
@@ -377,7 +377,7 @@ void exelv_state::tms7041_portd_w(uint8_t data)
 /*
     CARTRIDGE ACCESS
 */
-READ8_MEMBER(exelv_state::rom_r)
+uint8_t exelv_state::rom_r(offs_t offset)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->read_rom(offset + 0x200);
