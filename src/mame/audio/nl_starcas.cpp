@@ -249,8 +249,10 @@ static NETLIST_START(StarCastle_schematics)
 	Q_2N3906(Q14)		// PNP
 	Q_2N3906(Q15)		// PNP
 	Q_2N3906(Q16)		// PNP
+#if EMULATE_FINAL_AMP
 	Q_2N6107(Q17)		// PNP
 	Q_2N6292(Q18)		// NPN
+#endif
 
 #if STARCAS_NETLIST_SHIFTREG
 

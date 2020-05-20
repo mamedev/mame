@@ -6,9 +6,14 @@
 //
 // Derived from the schematics and in the Star Hawk manual.
 //
+// Second pass completed over all components and connections for
+// verification against schematics.
+//
 // Known problems/issues:
 //
-//    * Missing dump of laser waveform PROM.
+//    * Laser waveform PROM dump needs to be verified. Triggering
+//       these sounds requires setting a tiny solver step to
+//       get convergence and thus it is very painful to do so.
 //
 //    * Lots of extraneous noise/clipping during playback.
 //
@@ -40,7 +45,7 @@ NETLIST_START(StarHawk_schematics)
 	RES(R3, RES_K(20))
 	RES(R4, RES_K(10))
 	RES(R5, RES_K(1))
-	RES(R6, RES_K(190))		// 19K?
+	RES(R6, RES_K(150))
 	RES(R7, 330)
 	RES(R8, RES_K(10))
 	RES(R9, RES_K(47))
@@ -49,9 +54,9 @@ NETLIST_START(StarHawk_schematics)
 	RES(R12, RES_K(47))
 	RES(R13, RES_K(10))
 	RES(R14, RES_K(2.7))
-	RES(R15, RES_K(27))
+	RES(R15, RES_K(2.7))
 	RES(R16, RES_K(30))
-	RES(R17, RES_K(510))	// ???
+	RES(R17, RES_K(510))
 	RES(R18, RES_K(10))
 	RES(R19, RES_K(33))
 	RES(R20, 150)
@@ -138,8 +143,10 @@ NETLIST_START(StarHawk_schematics)
 	D_1N914(CR10)
 
 	Q_2N3906(Q1)			// PNP
+#if EMULATE_FINAL_AMP
 	Q_2N6292(Q2)			// NPN
 	Q_2N6107(Q3)			// PNP
+#endif
 	Q_2N3904(Q4)			// NPN
 	Q_2N3904(Q5)			// NPN
 
@@ -354,7 +361,7 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(C9.1, IC4B.2, R34.1)
 	NET_C(IC4B.6, R34.2, R35.1)
 	NET_C(IC4B.3, R35.2, CR4.K, CR5.A)
-	NET_C(R36.1, IC5B.6)
+	NET_C(R36.1, IC5B.6, R38.2, CR4.A)
 	NET_C(R36.2, IC5A.2, R37.1)
 	NET_C(IC5A.3, GND)
 	NET_C(R37.2, IC5A.6, CR5.K)
@@ -398,7 +405,6 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(R32.2, C27.2)
 	NET_C(C21.2, GND)
 	NET_C(IC5B.3, GND)
-	NET_C(IC5B.6, R38.2, CR4.A)
 
 	// pin 5 (OUTPUT) of the 555 timer is not connected;
 	// use this kludge to simulate that
@@ -429,8 +435,8 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(IC7E.2, IC7E.12, GND)
 	NET_C(IC7E.3, IC8E.7)
 	NET_C(IC7E.4, IC8E.4)
-	NET_C(IC7E.5, IC8E.5)
-	NET_C(IC7E.6, IC8E.6, IC7E.13)
+	NET_C(IC7E.5, IC8E.6)
+	NET_C(IC7E.6, IC8E.5, IC7E.13)
 	NET_C(IC7E.8, IC8E.15)
 	NET_C(IC7E.10, IC8E.2)
 	NET_C(IC7E.11, IC8E.3)
@@ -469,8 +475,8 @@ NETLIST_START(StarHawk_schematics)
 	NET_C(IC4E.2, IC4E.12, GND)
 	NET_C(IC4E.3, IC5E.7)
 	NET_C(IC4E.4, IC5E.4)
-	NET_C(IC4E.5, IC5E.5)
-	NET_C(IC4E.6, IC5E.6, IC4E.13)
+	NET_C(IC4E.5, IC5E.6)
+	NET_C(IC4E.6, IC5E.5, IC4E.13)
 	NET_C(IC4E.8, IC5E.15)
 	NET_C(IC4E.10, IC5E.2)
 	NET_C(IC4E.11, IC5E.3)

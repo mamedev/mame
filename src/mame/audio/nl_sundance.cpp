@@ -6,16 +6,13 @@
 //
 // Derived from the schematics in the Sundance manual.
 //
-// Known problems/issues:
+// Second pass completed over all components and connections for
+// verification against schematics.
 //
-//    * Reports a confusing warning:
-//        WARNING: Connecting net net.IC12.VO.OP to itself
+// Known problems/issues:
 //
 //    * Not tested at all, just compiles. Crashes upon execution,
 //       both in MAME and in nltool.
-//
-//    * Waiting on a true tri-state buffer LS125 implementation.
-//       For now this is just cheesed up with an 7408 AND gate!
 //
 
 #include "netlist/devices/net_lib.h"
@@ -156,30 +153,32 @@ static NETLIST_START(Sundance_schematics)
 	CAP(C38, CAP_U(0.1))
 	CAP(C39, CAP_U(1))
 
-    D_1N5240(D1)	// OK
-    D_1N914(D2)		// OK
-    D_1N914(D3)		// OK
+    D_1N5240(D1)
+    D_1N914(D2)
+    D_1N914(D3)
 
-	Q_2N3904(Q1)	// OK: NPN
-	Q_2N3904(Q2)	// OK: NPN
-	Q_2N3906(Q3)	// OK: PNP
-	Q_2N3906(Q4)	// OK: PNP
-	Q_2N3906(Q5)	// OK: PNP
-	Q_2N3906(Q6)	// OK: PNP
-	Q_2N6292(Q7)	// OK: NPN
-	Q_2N3906(Q8)	// OK: PNP
-	Q_2N6107(Q9)	// OK: PNP
-	Q_2N3906(Q10)	// OK: PNP
+	Q_2N3904(Q1)			// NPN
+	Q_2N3904(Q2)			// NPN
+	Q_2N3906(Q3)			// PNP
+	Q_2N3906(Q4)			// PNP
+	Q_2N3906(Q5)			// PNP
+	Q_2N3906(Q6)			// PNP
+#if EMULATE_FINAL_AMP
+	Q_2N6292(Q7)			// NPN
+	Q_2N6107(Q9)			// PNP
+#endif
+	Q_2N3906(Q8)			// PNP
+	Q_2N3906(Q10)			// PNP
 
-	TL081_DIP(IC1)			// OK: Op. Amp.
-	NET_C(IC1.7, I_V15)
+	TL081_DIP(IC1)			// Op. Amp.
+//	NET_C(IC1.7, I_V15)		// (indirectly via R5)
 	NET_C(IC1.4, I_VM15)
 
-	TL081_DIP(IC2)			// OK: Op. Amp.
+	TL081_DIP(IC2)			// Op. Amp.
 	NET_C(IC2.7, I_V15)
 	NET_C(IC2.4, I_VM15)
 
-	TL081_DIP(IC3)			// OK: Op. Amp.
+	TL081_DIP(IC3)			// Op. Amp.
 	NET_C(IC3.7, I_V15)
 	NET_C(IC3.4, I_VM15)
 
@@ -192,7 +191,7 @@ static NETLIST_START(Sundance_schematics)
 
 	LM555_DIP(IC7)
 
-	TL081_DIP(IC8)			// OK: Op. Amp.
+	TL081_DIP(IC8)			// Op. Amp.
 	NET_C(IC8.7, I_V15)
 	NET_C(IC8.4, I_VM15)
 
@@ -232,7 +231,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC19.7, I_V15)
 	NET_C(IC19.4, I_VM15)
 
-	TL081_DIP(IC20)			// OK: Op. Amp.
+	TL081_DIP(IC20)			// Op. Amp.
 	NET_C(IC20.7, I_V15)
 	NET_C(IC20.4, I_VM15)
 
@@ -240,14 +239,14 @@ static NETLIST_START(Sundance_schematics)
 	// Wideband noise gen
 	//
 
-	NET_C(C1.1, C2.1, R1.1, R3.1, C5.1, GND)
-	NET_C(C1.2, C2.2, D1.K, R5.1)
+	NET_C(C1.1, C2.2, R1.1, R3.1, C5.2, GND)
+	NET_C(C1.2, C2.1, D1.K, R5.1, IC1.7)
 	NET_C(R1.2, C3.1, D1.A)
 	NET_C(R3.2, R4.1, C4.1)
 	NET_C(R4.2, C3.2, IC1.3)
 	NET_C(C4.2, IC1.2, R6.1)
 	NET_C(R6.2, IC1.6, R7.1)
-	NET_C(R5.2, C5.2, I_V15)
+	NET_C(R5.2, C5.1, I_V15)
 	NET_C(R7.2, IC2.2, R8.1, D3.A, D2.K)
 	NET_C(IC2.3, GND)
 	NET_C(IC2.6, R8.2, D3.K, D2.A, R9.1)
@@ -255,7 +254,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC3.3, GND)
 	NET_C(IC3.6, R10.2, R43.1, R27.2, R36.1)
 
-	NET_C(I_OUT_1, R2.1, IC11.2, C13.2)
+	NET_C(I_OUT_1, R2.1, IC11.2)
 	NET_C(R2.2, I_V5)
 	NET_C(IC11.8, IC11.4, I_V5)		// -- IC11.4 not documented
 	NET_C(IC11.3, R35.1)
@@ -270,9 +269,9 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R12.1, IC4.2)
 	NET_C(R12.2, R16.2, R18.2, Q2.C, R22.2, I_V15)
 	NET_C(IC4.4, R13.1)
-	NET_C(R13.2, C6.1, IC4.6)
+	NET_C(R13.2, C6.2, IC4.6)
 	NET_C(R14.2, IC4.1)
-	NET_C(IC4.5, C6.2, R15.1, Q1.B)
+	NET_C(IC4.5, C6.1, R15.1, Q1.B)
 	NET_C(R15.2, R16.1, IC4.8)
 
 	NET_C(Q1.C, R18.1, Q2.B)
@@ -297,9 +296,10 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(C15.2, R41.2, IC12.2)
 	NET_C(R41.1, R42.1, GND)
 	NET_C(R42.2, IC12.3)
-	NET_C(IC12.6, IC10.6, IC9.6, IC7.6, IC8.6, IC9.6, R64.1)
+	NET_C(IC12.6, IC10.6, IC9.6, IC17.6, IC18.6, IC19.6, R64.1)
 
-	NET_C(I_OUT_2, R24.1, R25.1, IC7.2, IC7.6, IC7.7, C7.1)
+	NET_C(I_OUT_2, R24.1, IC7.2)
+	NET_C(R25.1, IC7.6, IC7.7, C7.1)
 	NET_C(C7.2, IC7.1, GND)
 	NET_C(R24.2, I_V5)
 	NET_C(R25.2, IC7.8, IC7.4, I_V5)	// IC7.4 -- not documented
@@ -337,7 +337,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R50.1, GND)
 	NET_C(Q5.C, C24.2, R51.1)
 	NET_C(C24.1, I_VM15)
-	NET_C(R51.2, IC9.6)
+	NET_C(R51.2, IC9.5)
 
 	NET_C(I_OUT_3, IC13.4)
 	NET_C(IC13.6, Q6.E)
@@ -345,11 +345,11 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R57.1, GND)
 	NET_C(Q6.C, C28.1, R58.1)
 	NET_C(C28.2, I_VM15)
-	NET_C(R58.2, IC7.5)
+	NET_C(R58.2, IC17.5)
 	NET_C(IC14.4, IC14.8, I_V5)
 	NET_C(IC14.3, R52.1)
 	NET_C(R52.2, C25.1)
-	NET_C(C25.2, R55.2, IC7.2)
+	NET_C(C25.2, R55.2, IC17.2)
 	NET_C(IC14.2, IC14.6, R54.1, R53.2, C27.2)
 	NET_C(R54.2, I_V5)
 	NET_C(C27.1, GND)
@@ -359,7 +359,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC14.1, GND)
 	NET_C(R55.1, GND)
 	NET_C(R56.1, GND)
-	NET_C(R56.2, IC7.3)
+	NET_C(R56.2, IC17.3)
 
 	NET_C(I_OUT_4, IC13.10)
 	NET_C(IC13.8, Q8.E)
@@ -371,7 +371,7 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC15.4, IC15.8, I_V5)
 	NET_C(IC15.3, R59.1)
 	NET_C(R59.2, C29.1)
-	NET_C(C29.2, R62.2, IC8.2)
+	NET_C(C29.2, R62.2, IC18.2)
 	NET_C(IC15.2, IC15.6, R61.1, R60.2, C31.2)
 	NET_C(R61.2, I_V5)
 	NET_C(C31.1, GND)
@@ -389,11 +389,11 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(R77.1, GND)
 	NET_C(Q10.C, C39.1, R78.1)
 	NET_C(C39.2, I_VM15)
-	NET_C(R78.2, IC9.5)
+	NET_C(R78.2, IC19.5)
 	NET_C(IC16.4, IC16.8, I_V5)
 	NET_C(IC16.3, R70.1)
 	NET_C(R70.2, C36.1)
-	NET_C(C36.2, R73.2, IC9.2)
+	NET_C(C36.2, R73.2, IC19.2)
 	NET_C(IC16.2, IC16.6, R72.1, R71.2, C38.2)
 	NET_C(R72.2, I_V5)
 	NET_C(C38.1, GND)
@@ -409,18 +409,18 @@ static NETLIST_START(Sundance_schematics)
 	NET_C(IC20.3, GND)
 	NET_C(R75.2, R76.1)
 	NET_C(R76.2, R76.3)
+	NET_C(IC20.6, C32.2)
 #if EMULATE_FINAL_AMP
-	NET_C(IC20.6, C32.2, R65.1, R66.1, R67.2)
+	NET_C(IC20.6, R65.1, R66.1, R67.2)
 	NET_C(R65.2, C33.1, Q7.B)
 	NET_C(C33.2, I_V25, Q7.C)
 	NET_C(R67.1, Q9.B, C34.1)
 	NET_C(C34.2, Q9.C, I_VM25)
-	NET_C(Q7.E, Q9.E, R76.3)
+	NET_C(R66.2, Q7.E, Q9.E, R76.3)
 	ALIAS(OUTPUT, Q7.E)
 #else
-	NET_C(IC20.6, C32.2)
 	ALIAS(OUTPUT, R76.3)
-	NET_C(GND, R65.1, R65.2, R66.1, R66.2, R67.1, R67.2, C33.1, C33.2, C34.1, C34.2, Q7.B, Q7.C, Q7.E, Q9.B, Q9.C, Q9.E)
+	NET_C(GND, R65.1, R65.2, R66.1, R66.2, R67.1, R67.2, C33.1, C33.2, C34.1, C34.2)
 #endif
 
 
@@ -436,7 +436,7 @@ NETLIST_END()
 NETLIST_START(sundance)
 
 	// 192k is not high enough to make the laser and background pitches high enough
-	SOLVER(Solver, 384000)
+	SOLVER(Solver, 48000)
 //	PARAM(Solver.ACCURACY, 1e-10)
 //	PARAM(Solver.NR_LOOPS, 300)
 //	PARAM(Solver.METHOD, "MAT_CR")
