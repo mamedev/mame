@@ -51,6 +51,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
+		, m_pcg(*this, "pcg")
 		, m_cassette1(*this, "cassette1")
 		, m_cassette2(*this, "cassette2")
 		, m_uart(*this, "uart")
@@ -115,6 +116,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_pcg;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_device<ay31015_device> m_uart;

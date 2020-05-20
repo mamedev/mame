@@ -178,7 +178,7 @@ void sorcerer_state::sorcerer_mem(address_map &map)
 	map(0xe000, 0xefff).rom().region("maincpu", 0).nopw();    // bios
 	map(0xf000, 0xf7ff).ram();                                // screen ram
 	map(0xf800, 0xfbff).rom().region("chargen", 0).nopw();    // inbuilt characters
-	map(0xfc00, 0xffff).ram();                                // PCG
+	map(0xfc00, 0xffff).ram().share("pcg");                   // PCG
 }
 
 void sorcerer_state::sorcererb_mem(address_map &map)
@@ -369,7 +369,7 @@ INPUT_PORTS_END
 
 /**************************** F4 CHARACTER DISPLAYER ******************************************************/
 
-static const gfx_layout sorcerer_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	128,                    /* 256 characters */
@@ -384,7 +384,8 @@ static const gfx_layout sorcerer_charlayout =
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
 static GFXDECODE_START( gfx_sorcerer )
-	GFXDECODE_ENTRY( "chargen", 0x0000, sorcerer_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
+	GFXDECODE_RAM  ( "pcg",     0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 uint32_t sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
