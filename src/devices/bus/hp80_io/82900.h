@@ -58,7 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(cpu_io_w);
 	void cpu_mem_map(address_map &map);
 	void cpu_io_map(address_map &map);
-	DECLARE_WRITE8_MEMBER(z80_m1_w);
+	void z80_m1_w(uint8_t data);
 };
 
 // device type definition

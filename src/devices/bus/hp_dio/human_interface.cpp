@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER(human_interface_device::gpib_dreq)
 	update_gpib_dma();
 }
 
-WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
+void human_interface_device::ieee488_dio_w(uint8_t data)
 {
 	if (m_ieee488->atn_r() || m_ieee488->eoi_r())
 		return;
@@ -217,7 +217,7 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 		if (m_ppoll_sc & PPOLL_IE) {
 			LOG("%s: start parallel poll\n", __func__);
-			ieee488_dio_w(space, 0, m_ieee488->dio_r());
+			ieee488_dio_w(m_ieee488->dio_r());
 		}
 		break;
 	case 4:
@@ -266,7 +266,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 }
 
 
-WRITE8_MEMBER(human_interface_device::iocpu_port1_w)
+void human_interface_device::iocpu_port1_w(uint8_t data)
 {
 	m_hil_data = data;
 	m_rtc->d0_w(data & 0x01 ? ASSERT_LINE : CLEAR_LINE);
@@ -275,12 +275,12 @@ WRITE8_MEMBER(human_interface_device::iocpu_port1_w)
 	m_rtc->d3_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(human_interface_device::iocpu_port2_w)
+void human_interface_device::iocpu_port2_w(uint8_t data)
 {
 	bool latch_enable = data & LATCH_EN;
 
 	if ((data & (HIL_CS|HIL_WE)) == 0)
-		m_mlc->write(space, (m_latch_data & 0xc0) >> 6, m_hil_data, 0xff);
+		m_mlc->write((m_latch_data & 0xc0) >> 6, m_hil_data);
 
 	if ((data & SN76494_EN) == 0)
 		m_sound->write(m_hil_data);
@@ -307,16 +307,16 @@ WRITE8_MEMBER(human_interface_device::iocpu_port2_w)
 	m_old_latch_enable = latch_enable;
 }
 
-READ8_MEMBER(human_interface_device::iocpu_port1_r)
+uint8_t human_interface_device::iocpu_port1_r()
 {
 	if (m_hil_read)
-		return m_mlc->read(space, (m_latch_data & 0xc0) >> 6, 0xff);
+		return m_mlc->read((m_latch_data & 0xc0) >> 6);
 	if (m_latch_data & 0x20)
 		return m_rtc_data;
 	return 0xff;
 }
 
-READ8_MEMBER(human_interface_device::iocpu_test0_r)
+uint8_t human_interface_device::iocpu_test0_r()
 {
 	return !m_mlc->get_int();
 }

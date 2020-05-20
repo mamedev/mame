@@ -435,7 +435,7 @@ WRITE8_MEMBER(hp98035_io_card_device::clr_inten_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(hp98035_io_card_device::dc_w)
+void hp98035_io_card_device::dc_w(uint8_t data)
 {
 	if (data != m_dc) {
 		//LOG(("DC=%02x\n" , data));

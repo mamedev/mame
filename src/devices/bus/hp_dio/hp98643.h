@@ -63,8 +63,8 @@ private:
 	WRITE16_MEMBER(novram_w);
 
 	DECLARE_WRITE_LINE_MEMBER(lance_int_w);
-	DECLARE_WRITE16_MEMBER(lance_dma_out);
-	DECLARE_READ16_MEMBER(lance_dma_in);
+	void lance_dma_out(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lance_dma_in(offs_t offset);
 
 	uint16_t m_novram[32] = {
 		0xfff0, 0xfff0, 0xfff0, 0xfff0,

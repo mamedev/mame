@@ -1400,7 +1400,7 @@ WRITE_LINE_MEMBER(gtdb_device::serial_irq)
 	irq0(state);
 }
 
-WRITE32_MEMBER(gtdb_device::mouse_status_w)
+void gtdb_device::mouse_status_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask & interpro_mouse_device::state_mask::MOUSE_XPOS)
 	{

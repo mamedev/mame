@@ -146,7 +146,7 @@ void hp82900_io_card_device::cpu_io_map(address_map &map)
 	map(0x00 , 0xff).rw(FUNC(hp82900_io_card_device::cpu_io_r) , FUNC(hp82900_io_card_device::cpu_io_w));
 }
 
-WRITE8_MEMBER(hp82900_io_card_device::z80_m1_w)
+void hp82900_io_card_device::z80_m1_w(uint8_t data)
 {
 	// 1 wait state on each M1 cycle
 	m_cpu->adjust_icount(-1);

@@ -53,10 +53,10 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(dio_r);
-	DECLARE_WRITE8_MEMBER(dio_w);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t dio_r();
+	void dio_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);

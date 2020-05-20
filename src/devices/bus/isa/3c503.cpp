@@ -9,8 +9,8 @@ void el2_3c503_device::device_add_mconfig(machine_config &config)
 {
 	DP8390D(config, m_dp8390, 0);
 	m_dp8390->irq_callback().set(FUNC(el2_3c503_device::el2_3c503_irq_w));
-	m_dp8390->mem_read_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_r));
-	m_dp8390->mem_write_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_w));
+	m_dp8390->mem_read_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_read));
+	m_dp8390->mem_write_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_write));
 }
 
 DEFINE_DEVICE_TYPE(EL2_3C503, el2_3c503_device, "el2_3c503", "3C503 Network Adapter")
@@ -169,10 +169,10 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
 		return (m_regs.vptr & 0x0f) << 4;
 	case 14:
 		if(!(m_regs.ctrl & 0x80)) return 0xff;
-		return el2_3c503_mem_r(space, machine().side_effects_disabled() ? m_regs.da : m_regs.da++, mem_mask);
+		return el2_3c503_mem_read(machine().side_effects_disabled() ? m_regs.da : m_regs.da++);
 	case 15:
 		if(!(m_regs.ctrl & 0x80)) return 0xff;
-		return el2_3c503_mem_r(space, machine().side_effects_disabled() ? m_regs.da : m_regs.da++, mem_mask);
+		return el2_3c503_mem_read(machine().side_effects_disabled() ? m_regs.da : m_regs.da++);
 	}
 	return 0;
 }
@@ -268,11 +268,11 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		return;
 	case 14:
 		if(!(m_regs.ctrl & 0x80)) return;
-		el2_3c503_mem_w(space, m_regs.da++, data, mem_mask);
+		el2_3c503_mem_write(m_regs.da++, data);
 		return;
 	case 15:
 		if(!(m_regs.ctrl & 0x80)) return;
-		el2_3c503_mem_w(space, m_regs.da++, data, mem_mask);
+		el2_3c503_mem_write(m_regs.da++, data);
 		return;
 	default:
 		logerror("3c503: invalid high register write %02x\n", offset);

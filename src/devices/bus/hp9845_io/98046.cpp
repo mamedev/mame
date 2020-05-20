@@ -414,7 +414,7 @@ WRITE8_MEMBER(hp98046_io_card_device::cpu_w)
 	}
 }
 
-READ8_MEMBER(hp98046_io_card_device::p1_r)
+uint8_t hp98046_io_card_device::p1_r()
 {
 	uint8_t res = 0;
 	// b7: b8 of word @ txFIFO head
@@ -453,7 +453,7 @@ READ8_MEMBER(hp98046_io_card_device::p1_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98046_io_card_device::p2_w)
+void hp98046_io_card_device::p2_w(uint8_t data)
 {
 	LOG_MCU("p2=%02x\n" , data);
 	uint8_t diff = data ^ m_port_2;

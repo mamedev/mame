@@ -52,11 +52,11 @@ protected:
 	virtual void ecbbus_io_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( sti_gpio_r );
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	void ppi_pc_w(uint8_t data);
+	uint8_t sti_gpio_r();
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
 
 	void kb_w(uint8_t data);

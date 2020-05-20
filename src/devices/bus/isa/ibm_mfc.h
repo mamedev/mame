@@ -42,15 +42,15 @@ protected:
 	virtual const tiny_rom_entry*        device_rom_region() const override;
 
 private:
-	DECLARE_READ8_MEMBER( ppi0_i_a );
-	DECLARE_WRITE8_MEMBER( ppi0_o_b );
-	DECLARE_READ8_MEMBER( ppi0_i_c );
-	DECLARE_WRITE8_MEMBER( ppi0_o_c );
+	uint8_t ppi0_i_a();
+	void ppi0_o_b(uint8_t data);
+	uint8_t ppi0_i_c();
+	void ppi0_o_c(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ppi1_o_a );
-	DECLARE_READ8_MEMBER( ppi1_i_b );
+	void ppi1_o_a(uint8_t data);
+	uint8_t ppi1_i_b();
 
-	DECLARE_WRITE8_MEMBER( ppi1_o_c );
+	void ppi1_o_c(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( d8253_out0 );
 	DECLARE_WRITE_LINE_MEMBER( d8253_out1 );

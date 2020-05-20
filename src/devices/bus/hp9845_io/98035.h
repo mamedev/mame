@@ -38,7 +38,7 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(dc_w);
+	void dc_w(uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(ram_addr_w);
 	DECLARE_READ8_MEMBER(ram_data_r);

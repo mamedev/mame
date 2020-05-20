@@ -223,7 +223,7 @@ static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER( ecb_grip21_device::ppi_pa_r )
+uint8_t ecb_grip21_device::ppi_pa_r()
 {
 	/*
 
@@ -243,7 +243,7 @@ READ8_MEMBER( ecb_grip21_device::ppi_pa_r )
 	return m_ppi_pa;
 }
 
-WRITE8_MEMBER( ecb_grip21_device::ppi_pa_w )
+void ecb_grip21_device::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER( ecb_grip21_device::ppi_pa_w )
 	m_ppi_pa = data;
 }
 
-READ8_MEMBER( ecb_grip21_device::ppi_pb_r )
+uint8_t ecb_grip21_device::ppi_pb_r()
 {
 	/*
 
@@ -283,7 +283,7 @@ READ8_MEMBER( ecb_grip21_device::ppi_pb_r )
 	return m_keydata;
 }
 
-WRITE8_MEMBER( ecb_grip21_device::ppi_pc_w )
+void ecb_grip21_device::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -324,7 +324,7 @@ WRITE_LINE_MEMBER(ecb_grip21_device::write_centronics_busy)
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( ecb_grip21_device::sti_gpio_r )
+uint8_t ecb_grip21_device::sti_gpio_r()
 {
 	/*
 

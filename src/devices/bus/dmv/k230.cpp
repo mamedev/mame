@@ -252,24 +252,24 @@ READ8_MEMBER(dmv_k230_device::rom_r)
 	return m_rom->base()[offset & 0x0fff];
 }
 
-READ8_MEMBER( dmv_k230_device::io_r )
+uint8_t dmv_k230_device::io_r(offs_t offset)
 {
 	return iospace().read_byte(offset);
 }
 
-WRITE8_MEMBER( dmv_k230_device::io_w )
+void dmv_k230_device::io_w(offs_t offset, uint8_t data)
 {
 	iospace().write_byte(offset, data);
 }
 
-READ8_MEMBER( dmv_k230_device::program_r )
+uint8_t dmv_k230_device::program_r(offs_t offset)
 {
-	return prog_read(space, offset);
+	return prog_read(offset);
 }
 
-WRITE8_MEMBER( dmv_k230_device::program_w )
+void dmv_k230_device::program_w(offs_t offset, uint8_t data)
 {
-	prog_write(space, offset, data);
+	prog_write(offset, data);
 }
 
 void dmv_k234_device::hold_w(int state)

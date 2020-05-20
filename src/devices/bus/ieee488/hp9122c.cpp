@@ -255,12 +255,12 @@ void hp9122c_device::update_intsel()
 	m_cpufirq = firq;
 }
 
-READ8_MEMBER(hp9122c_device::i8291a_dio_r)
+uint8_t hp9122c_device::i8291a_dio_r()
 {
 	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER(hp9122c_device::i8291a_dio_w)
+void hp9122c_device::i8291a_dio_w(uint8_t data)
 {
 	m_bus->dio_w(this, data);
 }

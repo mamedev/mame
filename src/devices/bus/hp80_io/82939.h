@@ -46,9 +46,9 @@ private:
 	required_device<ins8250_device> m_uart;
 	required_ioport m_sw12;
 
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
 	DECLARE_READ8_MEMBER(cpu_r);
 	DECLARE_WRITE8_MEMBER(cpu_w);
 	void cpu_io_map(address_map &map);

@@ -262,7 +262,7 @@ protected:
 	virtual void map_dynamic(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(serial_irq);
-	DECLARE_WRITE32_MEMBER(mouse_status_w);
+	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_WRITE32_MEMBER(srx_mapping_w);
 
 	enum int_status_mask

@@ -471,12 +471,12 @@ WRITE_LINE_MEMBER(hp9895_device::phi_ren_w)
 	m_bus->ren_w(this , state);
 }
 
-READ8_MEMBER(hp9895_device::phi_dio_r)
+uint8_t hp9895_device::phi_dio_r()
 {
 	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER(hp9895_device::phi_dio_w)
+void hp9895_device::phi_dio_w(uint8_t data)
 {
 	m_bus->dio_w(this , data);
 }
@@ -503,7 +503,7 @@ READ8_MEMBER(hp9895_device::phi_reg_r)
 	return (uint8_t)reg;
 }
 
-WRITE8_MEMBER(hp9895_device::z80_m1_w)
+void hp9895_device::z80_m1_w(uint8_t data)
 {
 	// Every M1 cycle of Z80 clears the IRQ line
 	if (m_cpu_irq) {

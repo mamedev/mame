@@ -77,8 +77,8 @@ private:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_READ8_MEMBER(cpu_r);
 	DECLARE_WRITE8_MEMBER(cpu_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sio_int_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txd_w);
 	DECLARE_WRITE_LINE_MEMBER(rs232_rxd_w);

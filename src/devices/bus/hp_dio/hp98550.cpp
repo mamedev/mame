@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER(dio32_98550_device::vblank_w)
 		ce->vblank_w(state);
 }
 
-WRITE8_MEMBER(dio32_98550_device::int_w)
+void dio32_98550_device::int_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: plane%d = %s\n", __func__, offset, data ? "assert" : "deassert");
 	m_ints &= ~(1 << offset);

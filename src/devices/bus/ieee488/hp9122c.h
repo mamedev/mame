@@ -100,8 +100,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(i8291a_atn_w);
 	DECLARE_WRITE_LINE_MEMBER(i8291a_ren_w);
 
-	DECLARE_READ8_MEMBER(i8291a_dio_r);
-	DECLARE_WRITE8_MEMBER(i8291a_dio_w);
+	uint8_t i8291a_dio_r();
+	void i8291a_dio_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(i8291a_int_w);
 	DECLARE_WRITE_LINE_MEMBER(i8291a_dreq_w);
