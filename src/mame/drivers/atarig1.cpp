@@ -1327,7 +1327,7 @@ ROM_END
 
 void atarig1_state::init_hydra()
 {
-	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = false;
 }
 
@@ -1338,7 +1338,7 @@ void atarig1_state::init_hydrap()
 
 void atarig1_state::init_pitfight()
 {
-	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = true;
 }
 

@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "includes/slapstic.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "tilemap.h"

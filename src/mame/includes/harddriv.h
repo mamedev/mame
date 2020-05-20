@@ -11,7 +11,7 @@
 #pragma once
 
 #include "audio/atarijsa.h"
-#include "includes/slapstic.h"
+#include "machine/slapstic.h"
 
 #include "bus/rs232/rs232.h"
 

@@ -9,6 +9,7 @@
 #include "audio/atarijsa.h"
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
+#include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
@@ -19,6 +20,7 @@ class atarig1_state : public atarigen_state
 public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_slapstic(*this, "slapstic"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -27,6 +29,7 @@ public:
 			m_in1(*this, "IN1"),
 			m_mo_command(*this, "mo_command") { }
 
+	optional_device<atari_slapstic_device> m_slapstic;
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;

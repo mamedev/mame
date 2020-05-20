@@ -340,7 +340,7 @@ void rampart_state::rampart(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
-	SLAPSTIC(config, m_slapstic_device, 118, true);
+	SLAPSTIC(config, m_slapstic, 118, true);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(rampart_state::scanline_interrupt), m_screen, 0, 32);
 
@@ -508,7 +508,7 @@ void rampart_state::init_rampart()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	slapstic_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x140000, 0x438000, memregion("maincpu")->base() + 0x140000);
 }
 
 

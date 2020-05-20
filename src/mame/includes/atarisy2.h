@@ -10,6 +10,7 @@
 #include "cpu/t11/t11.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
@@ -18,7 +19,6 @@
 #include "video/atarimo.h"
 #include "emupal.h"
 #include "screen.h"
-#include "slapstic.h"
 #include "tilemap.h"
 
 class atarisy2_state : public driver_device

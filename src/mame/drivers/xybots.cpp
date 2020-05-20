@@ -387,7 +387,7 @@ ROM_END
 void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
-	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
 }
 
 

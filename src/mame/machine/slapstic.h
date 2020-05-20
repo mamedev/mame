@@ -110,13 +110,13 @@ class atari_slapstic_device :  public device_t
 public:
 	// construction/destruction
 	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, int chipnum, bool m68k_mode)
-		: atari_slapstic_device(mconfig, tag, owner, (uint32_t)0)
+		: atari_slapstic_device(mconfig, tag, owner, u32(0))
 	{
 		set_chipnum(chipnum);
 		set_access68k(m68k_mode ? 1 : 0);
 	}
 
-	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void slapstic_init();
 	void slapstic_reset();
@@ -132,14 +132,14 @@ public:
 
 	int m_chipnum;
 
-	uint8_t state;
-	uint8_t current_bank;
+	u8 state;
+	u8 current_bank;
 	int access_68k;
 
-	uint8_t alt_bank;
-	uint8_t bit_bank;
-	uint8_t add_bank;
-	uint8_t bit_xor;
+	u8 alt_bank;
+	u8 bit_bank;
+	u8 add_bank;
+	u8 bit_xor;
 
 	struct slapstic_data slapstic;
 
@@ -147,11 +147,25 @@ public:
 	void slapstic_log(running_machine &machine, offs_t offset);
 	FILE *slapsticlog;
 
+	// legacy interface
+	void legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
+
+private:
+	// legacy helpers
+	void legacy_update_bank(int bank);
+	void slapstic_w(address_space &space, offs_t offset, u16 data, u16 mem_mask);
+	uint16_t slapstic_r(address_space &space, offs_t offset, u16 mem_mask);
+
+	bool             m_legacy_configured;
+	u16 *            m_legacy_memptr;
+	u8               m_legacy_bank;
+	std::vector<u8>  m_legacy_bank0;
 };
 
 #endif // MAME_INCLUDES_SLAPSTIC_H

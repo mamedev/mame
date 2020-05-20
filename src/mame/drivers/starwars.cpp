@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "includes/starwars.h"
-#include "includes/slapstic.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"

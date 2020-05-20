@@ -7,8 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/atarimo.h"
-#include "includes/slapstic.h"
 #include "includes/atarisy2.h"
 
 

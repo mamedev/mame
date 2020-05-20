@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/slapstic.h"
 #include "includes/harddriv.h"
 
 

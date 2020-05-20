@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
+#include "machine/slapstic.h"
 #include "audio/atarijsa.h"
 #include "audio/atarisac.h"
 #include "video/atarimo.h"
@@ -20,11 +20,13 @@
 #include "screen.h"
 #include "tilemap.h"
 
-class cyberbal_base_state : public atarigen_state
+class cyberbal_base_state : public driver_device
 {
 protected:
 	cyberbal_base_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_playfield(*this, "playfield"),
 		m_alpha(*this, "alpha"),
 		m_mob(*this, "mob")
@@ -40,6 +42,8 @@ protected:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<tilemap_device> m_playfield;
 	required_device<tilemap_device> m_alpha;
 	required_device<atari_motion_objects_device> m_mob;
@@ -58,6 +62,7 @@ class cyberbal2p_state : public cyberbal_base_state
 public:
 	cyberbal2p_state(const machine_config &mconfig, device_type type, const char *tag) :
 		cyberbal_base_state(mconfig, type, tag),
+		m_screen(*this, "screen"),
 		m_jsa(*this, "jsa")
 	{ }
 
@@ -79,6 +84,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
+	required_device<screen_device> m_screen;
 	required_device<atari_jsa_ii_device> m_jsa;
 };
 
@@ -88,6 +94,7 @@ class cyberbal_state : public cyberbal_base_state
 public:
 	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		cyberbal_base_state(mconfig, type, tag),
+		m_slapstic(*this, "slapstic"),
 		m_extracpu(*this, "extra"),
 		m_sac(*this, "sac"),
 		m_playfield2(*this, "playfield2"),
@@ -124,6 +131,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
+	optional_device<atari_slapstic_device> m_slapstic;
 	required_device<cpu_device> m_extracpu;
 	required_device<atari_sac_device> m_sac;
 	required_device<tilemap_device> m_playfield2;

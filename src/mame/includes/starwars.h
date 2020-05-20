@@ -12,10 +12,10 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "includes/slapstic.h"
 
 
 class starwars_state : public driver_device

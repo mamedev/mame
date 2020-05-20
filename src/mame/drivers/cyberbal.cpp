@@ -415,7 +415,7 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	cyberbal_base(config);
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	SLAPSTIC(config, "slapstic", 116, true);
+	SLAPSTIC(config, m_slapstic, 116, true);
 }
 
 void cyberbal2p_state::cyberbal2p(machine_config &config)
@@ -994,7 +994,7 @@ ROM_END
 
 void cyberbal_state::init_cyberbalt()
 {
-	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
+	m_slapstic->legacy_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }
 
 
