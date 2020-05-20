@@ -12,6 +12,9 @@
     Known bugs:
         * none at this time
 
+    The video sync chain is almost identical to System 2, though many other
+    hardware aspects are very different.
+
 ****************************************************************************
 
     Memory map (TBA)
