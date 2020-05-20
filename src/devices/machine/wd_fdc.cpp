@@ -23,7 +23,7 @@
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
 
-#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_MATCH)
+#define VERBOSE (LOG_GENERAL )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -456,7 +456,7 @@ void wd_fdc_device_base::seek_continue()
 			return;
 
 		default:
-			logerror("seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -577,7 +577,7 @@ void wd_fdc_device_base::read_sector_continue()
 			break;
 
 		default:
-			logerror("read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -656,7 +656,7 @@ void wd_fdc_device_base::read_track_continue()
 			return;
 
 		default:
-			logerror("read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -733,7 +733,7 @@ void wd_fdc_device_base::read_id_continue()
 			return;
 
 		default:
-			logerror("read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -843,7 +843,7 @@ void wd_fdc_device_base::write_track_continue()
 			return;
 
 		default:
-			logerror("write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -942,7 +942,7 @@ void wd_fdc_device_base::write_sector_continue()
 			break;
 
 		default:
-			logerror("write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
