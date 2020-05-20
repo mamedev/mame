@@ -705,8 +705,9 @@ ROM_START(sorcererb)
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE            INIT           COMPANY      FULLNAME */
-COMP( 1979, sorcerer,  0,        0,      sorcerer,  sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer",                     0 )
-COMP( 1979, sorcerer2, sorcerer, 0,      sorcerer,  sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer 2",                   0 )
-COMP( 1979, sorcererd, sorcerer, 0,      sorcererd, sorcerer, sorcererd_state, empty_init, "Exidy Inc", "Sorcerer (with Micropolis fdc)", 0 )
-COMP( 1979, sorcerera, sorcerer, 0,      sorcerera, sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer (with Dreamdisk fdc)", 0 )
-COMP( 1979, sorcererb, sorcerer, 0,      sorcererb, sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer (with Digitrio fdc)", 0 )
+COMP( 1979, sorcerer,  0,        0,      sorcerer,  sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, sorcerer2, sorcerer, 0,      sorcerer,  sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer 2", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, sorcererd, sorcerer, 0,      sorcererd, sorcerer, sorcererd_state, empty_init, "Exidy Inc", "Sorcerer (with Micropolis fdc)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, sorcerera, sorcerer, 0,      sorcerera, sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer (with Dreamdisk fdc)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, sorcererb, sorcerer, 0,      sorcererb, sorcerer, sorcerer_state,  empty_init, "Exidy Inc", "Sorcerer (with Digitrio fdc)", MACHINE_SUPPORTS_SAVE )
+

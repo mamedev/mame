@@ -108,7 +108,7 @@ protected:
 	void sorcerera_io(address_map &map);
 	void sorcererb_io(address_map &map);
 
-	u8 m_fe;
+	u8 m_portfe;
 	u8 m_keyboard_line;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
@@ -178,7 +178,7 @@ private:
 	void port2c_w(u8 data);
 	void intrq2_w(bool state);
 	void drq2_w(bool state);
-	u8 m_2c;
+	u8 m_port2c;
 	bool m_wait;
 	bool m_drq_off;
 	bool m_intrq_off;

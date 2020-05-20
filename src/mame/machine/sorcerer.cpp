@@ -19,7 +19,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 	Transmit and receive clocks are connected to the same clock. */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (BIT(m_fe, 7))
+	if (BIT(m_portfe, 7))
 	{
 		/* connect to rs232 */
 		m_rs232->write_txd(m_uart->so_r());
@@ -49,7 +49,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 {
 	u8 cass_ws = 0;
-	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
+	switch (m_portfe & 0xc0)        /*/ bit 7 low indicates cassette */
 	{
 		case 0x00:              /* Cassette 300 baud */
 
@@ -58,7 +58,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 
 			m_cass_data.input.length++;
 
-			cass_ws = ((((m_fe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((((m_portfe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level)
 			{
@@ -87,7 +87,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					((m_fe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
+					((m_portfe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -96,7 +96,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 			/* loading a tape */
 			m_cass_data.input.length++;
 
-			cass_ws = ((((m_fe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((((m_portfe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level || m_cass_data.input.length == 10)
 			{
@@ -127,7 +127,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					((m_fe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
+					((m_portfe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -146,7 +146,7 @@ void sorcererd_state::intrq2_w(bool state)
 		m_wait = false;
 	}
 	else
-	if (BIT(m_2c, 0) && m_drq_off && !m_wait)
+	if (BIT(m_port2c, 0) && m_drq_off && !m_wait)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_wait = true;
@@ -163,7 +163,7 @@ void sorcererd_state::drq2_w(bool state)
 		m_wait = false;
 	}
 	else
-	if (BIT(m_2c, 0) && m_intrq_off && !m_wait)
+	if (BIT(m_port2c, 0) && m_intrq_off && !m_wait)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_wait = true;
@@ -176,7 +176,7 @@ void sorcererd_state::drq2_w(bool state)
 // bit 0 = enable wait generator, bit 2 = drive 0 select, bit 5 = ??
 void sorcererd_state::port2c_w(u8 data)
 {
-	m_2c = data;
+	m_port2c = data;
 
 	if (BIT(data, 0))
 	{
@@ -321,8 +321,8 @@ void sorcerer_state::portfd_w(u8 data)
 
 void sorcerer_state::portfe_w(u8 data)
 {
-	u8 changed_bits = (m_fe ^ data) & 0xf0;
-	m_fe = data;
+	u8 changed_bits = (m_portfe ^ data) & 0xf0;
+	m_portfe = data;
 
 	/* bits 0..3 */
 	m_keyboard_line = data & 0x0f;
@@ -440,6 +440,10 @@ void sorcerer_state::machine_start_common(offs_t endmem)
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
+	// register for savestates
+	save_item(NAME(m_portfe));
+	save_item(NAME(m_keyboard_line));
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
 	switch (m_ram->size())
@@ -464,11 +468,18 @@ void sorcerer_state::machine_start_common(offs_t endmem)
 void sorcerer_state::machine_start()
 {
 	machine_start_common(0xbfff);
+	save_item(NAME(m_port48));
+	save_item(NAME(m_port34));
+	save_item(NAME(m_halt));
 }
 
 void sorcererd_state::machine_start()
 {
 	machine_start_common(0xbbff);
+	save_item(NAME(m_port2c));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_drq_off));
+	save_item(NAME(m_intrq_off));
 }
 
 void sorcerer_state::machine_reset_common()
@@ -481,7 +492,7 @@ void sorcerer_state::machine_reset_common()
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
-	m_fe = 0xff;
+	m_portfe = 0xff;
 	portfe_w(0);
 
 	space.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
@@ -511,7 +522,7 @@ void sorcererd_state::machine_reset()
 	m_drq_off = true;
 	m_intrq_off = true;
 	m_wait = false;
-	m_2c = 0;
+	m_port2c = 0;
 	machine_reset_common();
 }
 
