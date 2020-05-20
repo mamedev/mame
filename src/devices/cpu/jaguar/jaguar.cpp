@@ -506,7 +506,7 @@ void jaguargpu_cpu_device::execute_run()
 	do
 	{
 		/* debugging */
-		//if (m_pc < 0xf03000 || m_pc > 0xf04000) { fatalerror("GPU: m_pc = %06X (ppc = %06X)\n", m_pc, m_ppc); }
+		//if ((m_version < 3) && (m_pc < 0xf03000 || m_pc > 0xf04000)) { fatalerror("GPU: m_pc = %06X (ppc = %06X)\n", m_pc, m_ppc); }
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
