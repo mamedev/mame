@@ -72,12 +72,12 @@ private:
 	void pp01_palette(palette_device &palette) const;
 	uint32_t screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(z2_w);
-	DECLARE_READ8_MEMBER(ppi1_porta_r);
-	DECLARE_WRITE8_MEMBER(ppi1_porta_w);
-	DECLARE_READ8_MEMBER(ppi1_portb_r);
-	DECLARE_WRITE8_MEMBER(ppi1_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi1_portc_w);
-	DECLARE_READ8_MEMBER(ppi1_portc_r);
+	uint8_t ppi1_porta_r();
+	void ppi1_porta_w(uint8_t data);
+	uint8_t ppi1_portb_r();
+	void ppi1_portb_w(uint8_t data);
+	void ppi1_portc_w(uint8_t data);
+	uint8_t ppi1_portc_r();
 	void video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part);
 	void set_memory(uint8_t block, uint8_t data);
 	void io_map(address_map &map);

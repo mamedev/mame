@@ -372,25 +372,25 @@ void epson_ex800_device::device_reset()
 }
 
 
-READ8_MEMBER(epson_ex800_device::porta_r)
+uint8_t epson_ex800_device::porta_r()
 {
 	logerror("PA R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_device::portb_r)
+uint8_t epson_ex800_device::portb_r()
 {
 	logerror("PB R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_device::portc_r)
+uint8_t epson_ex800_device::portc_r()
 {
 	logerror("PC R %s\n", machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::porta_w)
+void epson_ex800_device::porta_w(uint8_t data)
 {
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
@@ -398,7 +398,7 @@ WRITE8_MEMBER(epson_ex800_device::porta_w)
 	logerror("PA W %x %s\n", data, machine().describe_context());
 }
 
-WRITE8_MEMBER(epson_ex800_device::portb_w)
+void epson_ex800_device::portb_w(uint8_t data)
 {
 	if (data & 3)
 		logerror("PB0/1 Line feed %s\n", machine().describe_context());
@@ -422,7 +422,7 @@ WRITE8_MEMBER(epson_ex800_device::portb_w)
 //  logerror("PB W %x %s\n", data, machine().describe_context());
 }
 
-WRITE8_MEMBER(epson_ex800_device::portc_w)
+void epson_ex800_device::portc_w(uint8_t data)
 {
 	if (data & 0x80)
 		m_beeper->set_state(0);

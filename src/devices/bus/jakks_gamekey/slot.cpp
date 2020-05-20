@@ -231,7 +231,7 @@ uint8_t jakks_gamekey_slot_device::read_cart_seeprom(void)
  write seeprom
  -------------------------------------------------*/
 
-WRITE16_MEMBER(jakks_gamekey_slot_device::write_cart_seeprom)
+void jakks_gamekey_slot_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_cart->write_cart_seeprom(space, offset, data);
+	m_cart->write_cart_seeprom(offset, data);
 }

@@ -35,8 +35,8 @@ public:
 	DECLARE_READ16_MEMBER( host_ram_r );
 	DECLARE_WRITE16_MEMBER( host_ram_w );
 
-	DECLARE_READ16_MEMBER( lance_ram_r );
-	DECLARE_WRITE16_MEMBER( lance_ram_w );
+	uint16_t lance_ram_r(offs_t offset);
+	void lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( lance_irq_w );
 
 protected:

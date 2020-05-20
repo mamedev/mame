@@ -453,19 +453,19 @@ private:
 	}
 
 
-	DECLARE_READ8_MEMBER(adc0_r) { return m_an_in[0]->read(); };
-	DECLARE_READ8_MEMBER(adc1_r) { return m_an_in[1]->read(); };
-	DECLARE_READ8_MEMBER(adc2_r) { return m_an_in[2]->read(); };
-	DECLARE_READ8_MEMBER(adc3_r) { return m_an_in[3]->read(); };
-	DECLARE_READ8_MEMBER(adc4_r) { return m_an_in[4]->read(); };
-	DECLARE_READ8_MEMBER(adc5_r) { return m_an_in[5]->read(); };
-	DECLARE_READ8_MEMBER(adc6_r) { return m_an_in[6]->read(); };
-	DECLARE_READ8_MEMBER(adc7_r) { return m_an_in[7]->read(); };
+	uint8_t adc0_r() { return m_an_in[0]->read(); };
+	uint8_t adc1_r() { return m_an_in[1]->read(); };
+	uint8_t adc2_r() { return m_an_in[2]->read(); };
+	uint8_t adc3_r() { return m_an_in[3]->read(); };
+	uint8_t adc4_r() { return m_an_in[4]->read(); };
+	uint8_t adc5_r() { return m_an_in[5]->read(); };
+	uint8_t adc6_r() { return m_an_in[6]->read(); };
+	uint8_t adc7_r() { return m_an_in[7]->read(); };
 
-	DECLARE_READ8_MEMBER(anport0_r) { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport1_r) { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport2_r) { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
-	DECLARE_READ8_MEMBER(anport3_r) { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; };
+	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; };
 
 	void update_irqs();
 	uint8_t m_irqsource;
@@ -559,7 +559,7 @@ private:
 	required_device<xavix_sound_device> m_sound;
 
 
-	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+	uint8_t sound_regram_read_cb(offs_t offset);
 
 protected:
 	required_device<xavix_adc_device> m_adc;
@@ -592,7 +592,7 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(guru_anport2_r) { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
+	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
 
@@ -608,10 +608,10 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(sdb_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(sdb_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t sdb_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t sdb_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t sdb_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t sdb_anport3_r() { return m_mouse1y->read()^0x7f; }
 
 };
 
@@ -666,10 +666,10 @@ private:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(tam_anport0_r) { return m_mouse0x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport1_r) { return m_mouse0y->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport2_r) { return m_mouse1x->read()^0x7f; }
-	DECLARE_READ8_MEMBER(tam_anport3_r) { return m_mouse1y->read()^0x7f; }
+	uint8_t tam_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t tam_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t tam_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
 
@@ -683,12 +683,12 @@ public:
 	void xavix2002_i2c_jmat(machine_config &config);
 
 private:
-	READ8_MEMBER(read_extended_io0);
-	READ8_MEMBER(read_extended_io1);
-	READ8_MEMBER(read_extended_io2);
-	WRITE8_MEMBER(write_extended_io0);
-	WRITE8_MEMBER(write_extended_io1);
-	WRITE8_MEMBER(write_extended_io2);
+	uint8_t read_extended_io0();
+	uint8_t read_extended_io1();
+	uint8_t read_extended_io2();
+	void write_extended_io0(uint8_t data);
+	void write_extended_io1(uint8_t data);
+	void write_extended_io2(uint8_t data);
 };
 
 
@@ -978,8 +978,8 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 private:
-	DECLARE_READ8_MEMBER(popira2_adc0_r);
-	DECLARE_READ8_MEMBER(popira2_adc1_r);
+	uint8_t popira2_adc0_r();
+	uint8_t popira2_adc1_r();
 
 	required_ioport m_p2;
 };

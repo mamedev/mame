@@ -792,7 +792,7 @@ void bullet_state::update_dma_rdy()
 	m_dmac->rdy_w(rdy);
 }
 
-READ8_MEMBER( bullet_state::dma_mreq_r )
+uint8_t bullet_state::dma_mreq_r(offs_t offset)
 {
 	uint8_t data = m_ram->pointer()[(m_buf << 16) | offset];
 
@@ -804,7 +804,7 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 	return data;
 }
 
-WRITE8_MEMBER( bullet_state::dma_mreq_w )
+void bullet_state::dma_mreq_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[(m_buf << 16) | offset] = data;
 
@@ -814,12 +814,12 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 	}
 }
 
-READ8_MEMBER(bullet_state::io_read_byte)
+uint8_t bullet_state::io_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER(bullet_state::io_write_byte)
+void bullet_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
@@ -844,12 +844,12 @@ void bulletf_state::update_dma_rdy()
 	m_dmac->rdy_w(rdy);
 }
 
-READ8_MEMBER( bulletf_state::dma_mreq_r )
+uint8_t bulletf_state::dma_mreq_r(offs_t offset)
 {
 	return m_ram->pointer()[(DMB4 << 16) | offset];
 }
 
-WRITE8_MEMBER( bulletf_state::dma_mreq_w )
+void bulletf_state::dma_mreq_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[(DMB6 << 16) | offset] = data;
 }
@@ -878,7 +878,7 @@ DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_fault )
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( bullet_state::pio_pb_r )
+uint8_t bullet_state::pio_pb_r()
 {
 	/*
 
@@ -907,7 +907,7 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 }
 
 
-WRITE8_MEMBER( bulletf_state::pio_pa_w )
+void bulletf_state::pio_pa_w(uint8_t data)
 {
 	/*
 

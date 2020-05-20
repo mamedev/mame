@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
 
 /* Z80 PIO */
 
-READ8_MEMBER( xerox820_state::kbpio_pa_r )
+uint8_t xerox820_state::kbpio_pa_r()
 {
 	/*
 
@@ -265,7 +265,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
+void xerox820_state::kbpio_pa_w(uint8_t data)
 {
 	/*
 
@@ -315,9 +315,9 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 	bankswitch(BIT(data, 7));
 }
 
-WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
+void bigboard_state::kbpio_pa_w(uint8_t data)
 {
-	xerox820_state::kbpio_pa_w(space, offset, data);
+	xerox820_state::kbpio_pa_w(data);
 
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
@@ -328,7 +328,7 @@ WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
 	m_bit5 = BIT(data, 5);
 }
 
-READ8_MEMBER( xerox820_state::kbpio_pb_r )
+uint8_t xerox820_state::kbpio_pb_r()
 {
 	/*
 
@@ -348,7 +348,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 	return m_kb->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
+void xerox820ii_state::rdpio_pb_w(uint8_t data)
 {
 	/*
 

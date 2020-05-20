@@ -75,10 +75,10 @@ protected:
 	virtual void abcbus_c3(uint8_t data) override;
 
 private:
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );

@@ -306,7 +306,7 @@ void bbc_cumana68k_device::mc146818_set(int as, int ds, int rw)
 }
 
 
-WRITE8_MEMBER(bbc_cumana68k_device::pia_rtc_pb_w)
+void bbc_cumana68k_device::pia_rtc_pb_w(uint8_t data)
 {
 	/* bit 0, 1: drive select */
 	floppy_image_device *floppy = m_floppy[data & 0x03]->get_device();
@@ -328,7 +328,7 @@ WRITE8_MEMBER(bbc_cumana68k_device::pia_rtc_pb_w)
 }
 
 
-WRITE8_MEMBER(bbc_cumana68k_device::pia_sasi_pb_w)
+void bbc_cumana68k_device::pia_sasi_pb_w(uint8_t data)
 {
 	/* bit 0: masknmi */
 	m_masknmi = BIT(data, 0);

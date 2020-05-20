@@ -164,18 +164,18 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
-	DECLARE_READ8_MEMBER( memr_r );
-	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_READ8_MEMBER( ior2_r );
-	DECLARE_WRITE8_MEMBER( iow2_w );
+	uint8_t memr_r(offs_t offset);
+	void memw_w(offs_t offset, uint8_t data);
+	uint8_t ior2_r();
+	void iow2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	uint8_t ppi_pb_r();
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
@@ -857,7 +857,7 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 	m_bus->tc_w(state);
 }
 
-READ8_MEMBER( wangpc_state::memr_r )
+uint8_t wangpc_state::memr_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
@@ -865,7 +865,7 @@ READ8_MEMBER( wangpc_state::memr_r )
 	return program.read_byte(addr);
 }
 
-WRITE8_MEMBER( wangpc_state::memw_w )
+void wangpc_state::memw_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
@@ -873,7 +873,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 	program.write_byte(addr, data);
 }
 
-READ8_MEMBER( wangpc_state::ior2_r )
+uint8_t wangpc_state::ior2_r()
 {
 	if (m_disable_dreq2)
 		return m_bus->dack_r(2);
@@ -881,7 +881,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 		return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER( wangpc_state::iow2_w )
+void wangpc_state::iow2_w(uint8_t data)
 {
 	if (m_disable_dreq2)
 		m_bus->dack_w(2, data);
@@ -931,7 +931,7 @@ void wangpc_state::check_level2_interrupts()
 //  I8255A INTERFACE
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::ppi_pa_r )
+uint8_t wangpc_state::ppi_pa_r()
 {
 	/*
 
@@ -959,7 +959,7 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 	return data;
 }
 
-READ8_MEMBER( wangpc_state::ppi_pb_r )
+uint8_t wangpc_state::ppi_pb_r()
 {
 	/*
 
@@ -1003,7 +1003,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	return data;
 }
 
-READ8_MEMBER( wangpc_state::ppi_pc_r )
+uint8_t wangpc_state::ppi_pc_r()
 {
 	/*
 
@@ -1023,7 +1023,7 @@ READ8_MEMBER( wangpc_state::ppi_pc_r )
 	return m_sw->read() << 4;
 }
 
-WRITE8_MEMBER( wangpc_state::ppi_pc_w )
+void wangpc_state::ppi_pc_w(uint8_t data)
 {
 	/*
 

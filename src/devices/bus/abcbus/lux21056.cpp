@@ -177,22 +177,22 @@ static const z80_daisy_config daisy_chain[] =
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::memory_read_byte )
+uint8_t luxor_55_21056_device::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21056_device::memory_write_byte )
+void luxor_55_21056_device::memory_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21056_device::io_read_byte )
+uint8_t luxor_55_21056_device::io_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21056_device::io_write_byte )
+void luxor_55_21056_device::io_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }

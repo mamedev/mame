@@ -79,7 +79,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 
 	// keyboard state
 	uint8_t m_keylatch;

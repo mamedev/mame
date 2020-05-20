@@ -32,7 +32,7 @@ public:
 	void tvgame(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -69,7 +69,7 @@ INPUT_PORTS_START( tvgame )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( tvgame_state::speaker_w )
+void tvgame_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 }

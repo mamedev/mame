@@ -1797,7 +1797,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 }
 
 // see code at 028060, using table from 00eb6d for conversion
-READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
+uint8_t xavix_popira2_cart_state::popira2_adc0_r()
 {
 	uint8_t p2 = m_p2->read() & 0x03;
 	switch (p2)
@@ -1811,7 +1811,7 @@ READ8_MEMBER(xavix_popira2_cart_state::popira2_adc0_r)
 	return 0x00;
 }
 
-READ8_MEMBER(xavix_popira2_cart_state::popira2_adc1_r)
+uint8_t xavix_popira2_cart_state::popira2_adc1_r()
 {
 	uint8_t p2 = (m_p2->read() >> 2) & 0x03;
 	switch (p2)

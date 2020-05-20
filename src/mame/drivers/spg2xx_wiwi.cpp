@@ -19,7 +19,7 @@ public:
 	void init_wiwi18();
 
 private:
-	DECLARE_WRITE16_MEMBER(portb_w) override;
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 static INPUT_PORTS_START( wiwi18 )
@@ -244,7 +244,7 @@ void spg2xx_game_wiwi18_state::init_wiwi18()
 
 
 
-WRITE16_MEMBER(spg2xx_game_wiwi18_state::portb_w)
+void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',

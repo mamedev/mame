@@ -53,10 +53,10 @@ protected:
 private:
 	void set_rdy(int state);
 
-	DECLARE_READ8_MEMBER( memory_read_byte );
-	DECLARE_WRITE8_MEMBER( memory_write_byte );
-	DECLARE_READ8_MEMBER( io_read_byte );
-	DECLARE_WRITE8_MEMBER( io_write_byte );
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );

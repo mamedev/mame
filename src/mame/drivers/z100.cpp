@@ -216,9 +216,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vidint_w);
 	DECLARE_WRITE_LINE_MEMBER(vidint_enable_w);
 
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(video_pia_A_w);
-	DECLARE_WRITE8_MEMBER(video_pia_B_w);
+	u8 get_slave_ack(offs_t offset);
+	void video_pia_A_w(u8 data);
+	void video_pia_B_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
 
@@ -683,7 +683,7 @@ INPUT_PORTS_START( z100 )
 	PORT_DIPSETTING( 0x01, "64K" )
 INPUT_PORTS_END
 
-READ8_MEMBER( z100_state::get_slave_ack )
+u8 z100_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pics->acknowledge();
@@ -691,7 +691,7 @@ READ8_MEMBER( z100_state::get_slave_ack )
 	return 0;
 }
 
-WRITE8_MEMBER( z100_state::video_pia_A_w )
+void z100_state::video_pia_A_w(u8 data)
 {
 	/*
 	all bits are active low
@@ -711,7 +711,7 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	m_display_mask = bitswap<8>((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
-WRITE8_MEMBER( z100_state::video_pia_B_w )
+void z100_state::video_pia_B_w(u8 data)
 {
 	m_start_addr = data;
 }

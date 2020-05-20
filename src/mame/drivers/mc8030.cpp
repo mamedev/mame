@@ -44,14 +44,14 @@ private:
 	DECLARE_WRITE8_MEMBER(zve_write_protect_w);
 	DECLARE_WRITE8_MEMBER(vis_w);
 	DECLARE_WRITE8_MEMBER(eprom_prog_w);
-	DECLARE_READ8_MEMBER(zve_port_a_r);
-	DECLARE_READ8_MEMBER(zve_port_b_r);
-	DECLARE_WRITE8_MEMBER(zve_port_a_w);
-	DECLARE_WRITE8_MEMBER(zve_port_b_w);
-	DECLARE_READ8_MEMBER(asp_port_a_r);
-	DECLARE_READ8_MEMBER(asp_port_b_r);
-	DECLARE_WRITE8_MEMBER(asp_port_a_w);
-	DECLARE_WRITE8_MEMBER(asp_port_b_w);
+	uint8_t zve_port_a_r();
+	uint8_t zve_port_b_r();
+	void zve_port_a_w(u8 data);
+	void zve_port_b_w(u8 data);
+	uint8_t asp_port_a_r();
+	uint8_t asp_port_b_r();
+	void asp_port_a_w(u8 data);
+	void asp_port_b_w(u8 data);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -122,22 +122,22 @@ WRITE8_MEMBER( mc8030_state::eprom_prog_w )
 {
 }
 
-READ8_MEMBER( mc8030_state::zve_port_a_r )
+u8 mc8030_state::zve_port_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mc8030_state::zve_port_b_r )
+u8 mc8030_state::zve_port_b_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mc8030_state::asp_port_a_r )
+u8 mc8030_state::asp_port_a_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mc8030_state::asp_port_b_r )
+u8 mc8030_state::asp_port_b_r()
 {
 	return 0xff;
 }

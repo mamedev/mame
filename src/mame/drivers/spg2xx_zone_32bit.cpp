@@ -24,17 +24,17 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-	DECLARE_READ16_MEMBER(z32_rom_r);
+	uint16_t z32_rom_r(offs_t offset);
 
 	required_region_ptr<uint16_t> m_romregion;
 
-	virtual DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_READ16_MEMBER(portc_r);
+	virtual uint16_t porta_r();
+	virtual uint16_t portb_r();
+	virtual uint16_t portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	int m_porta_dat;
 	int m_portb_dat;
@@ -54,7 +54,7 @@ public:
 	{ }
 
 protected:
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	virtual void machine_reset() override;
 };
@@ -72,9 +72,9 @@ public:
 
 
 protected:
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
-	virtual DECLARE_READ16_MEMBER(portc_r) override;
+	virtual uint16_t porta_r() override;
+	virtual uint16_t portb_r() override;
+	virtual uint16_t portc_r() override;
 };
 
 class denver_200in1_state : public mywicodx_state
@@ -89,11 +89,11 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
-	virtual DECLARE_READ16_MEMBER(portc_r) override;
+	virtual uint16_t porta_r() override;
+	virtual uint16_t portb_r() override;
+	virtual uint16_t portc_r() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 void zon32bit_state::device_post_load()
@@ -102,13 +102,13 @@ void zon32bit_state::device_post_load()
 	m_maincpu->invalidate_cache();
 }
 
-READ16_MEMBER(zon32bit_state::porta_r)
+uint16_t zon32bit_state::porta_r()
 {
 	return m_porta_dat;
 }
 
 
-WRITE16_MEMBER(zon32bit_state::porta_w)
+void zon32bit_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
@@ -142,7 +142,7 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 }
 
 
-WRITE16_MEMBER(mywicodx_state::porta_w)
+void mywicodx_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
@@ -191,7 +191,7 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 }
 
 
-WRITE16_MEMBER(denver_200in1_state::porta_w)
+void denver_200in1_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (0)
 	{
@@ -263,7 +263,7 @@ WRITE16_MEMBER(denver_200in1_state::porta_w)
 }
 
 
-READ16_MEMBER(zon32bit_state::portc_r)
+uint16_t zon32bit_state::portc_r()
 {
 	// 0x03ff seem to be inputs for buttons (and some kind of output?)
 	// 0xfc00 gets masked for other reasons (including banking?)
@@ -278,12 +278,12 @@ READ16_MEMBER(zon32bit_state::portc_r)
 }
 
 
-READ16_MEMBER(zon32bit_state::portb_r)
+uint16_t zon32bit_state::portb_r()
 {
 	return m_portb_dat;
 }
 
-WRITE16_MEMBER(zon32bit_state::portb_w)
+void zon32bit_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data != 0x0001)
 		logerror("%s: portb_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
@@ -291,7 +291,7 @@ WRITE16_MEMBER(zon32bit_state::portb_w)
 	m_portb_dat = data;
 }
 
-WRITE16_MEMBER(zon32bit_state::portc_w)
+void zon32bit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// very noisy
 	// is the code actually sending the sound to the remotes?
@@ -339,17 +339,17 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 }
 
 
-READ16_MEMBER(oplayer_100in1_state::portc_r)
+uint16_t oplayer_100in1_state::portc_r()
 {
 	return m_io_p3->read();
 }
 
-READ16_MEMBER(oplayer_100in1_state::portb_r)
+uint16_t oplayer_100in1_state::portb_r()
 {
 	return m_io_p2->read();
 }
 
-READ16_MEMBER(oplayer_100in1_state::porta_r)
+uint16_t oplayer_100in1_state::porta_r()
 {
 	return 0x0ff8 | (machine().rand()&1);
 }
@@ -359,7 +359,7 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 	map(0x000000, 0x3fffff).r(FUNC(zon32bit_state::z32_rom_r));
 }
 
-READ16_MEMBER(zon32bit_state::z32_rom_r)
+uint16_t zon32bit_state::z32_rom_r(offs_t offset)
 {
 	/*
 	    This has upper and lower bank, which can be changed independently.
@@ -390,17 +390,17 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 	return 0x0000;// m_romregion[offset];
 }
 
-READ16_MEMBER(denver_200in1_state::portc_r)
+uint16_t denver_200in1_state::portc_r()
 {
 	return m_io_p3->read();
 }
 
-READ16_MEMBER(denver_200in1_state::portb_r)
+uint16_t denver_200in1_state::portb_r()
 {
 	return m_io_p2->read();
 }
 
-READ16_MEMBER(denver_200in1_state::porta_r)
+uint16_t denver_200in1_state::porta_r()
 {
 	return 0x0ff8 | (machine().rand()&1);
 }

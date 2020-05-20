@@ -128,10 +128,10 @@ private:
 
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	DECLARE_READ8_MEMBER(pc_dma_read_word);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t pc_dma_read_word(offs_t offset);
+	void pc_dma_write_word(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(eisa_irq_read);
 	DECLARE_WRITE8_MEMBER(eisa_irq_write);
 };

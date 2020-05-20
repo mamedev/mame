@@ -180,12 +180,12 @@ WRITE8_MEMBER(pc9801_amd98_device::write)
 	}
 }
 
-WRITE8_MEMBER(pc9801_amd98_device::ay3_address_w)
+void pc9801_amd98_device::ay3_address_w(uint8_t data)
 {
 	m_ay3_latch = data;
 }
 
-WRITE8_MEMBER(pc9801_amd98_device::ay3_data_latch_w)
+void pc9801_amd98_device::ay3_data_latch_w(uint8_t data)
 {
 	// TODO: this actually uses a flip flop mechanism, not quite sure about how it works yet
 	switch(data)

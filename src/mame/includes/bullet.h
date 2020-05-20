@@ -68,9 +68,9 @@ public:
 	DECLARE_WRITE8_MEMBER( exdma_w );
 	DECLARE_WRITE8_MEMBER( hdcon_w );
 	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
+	uint8_t dma_mreq_r(offs_t offset);
+	void dma_mreq_w(offs_t offset, uint8_t data);
+	uint8_t pio_pb_r();
 	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
 	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
@@ -81,8 +81,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	void bullet(machine_config &config);
 	void bullet_io(address_map &map);
@@ -157,9 +157,9 @@ public:
 	DECLARE_READ8_MEMBER( scsi_r );
 	DECLARE_WRITE8_MEMBER( scsi_w );
 
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t dma_mreq_r(offs_t offset);
+	void dma_mreq_w(offs_t offset, uint8_t data);
+	void pio_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 

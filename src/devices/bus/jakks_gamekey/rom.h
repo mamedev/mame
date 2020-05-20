@@ -22,7 +22,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cart) override;
 
 	virtual uint8_t read_cart_seeprom(void) override { return 1; };
-	virtual DECLARE_WRITE16_MEMBER(write_cart_seeprom) override { };
+	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { };
 
 	virtual READ16_MEMBER(read_rom);
 	virtual WRITE16_MEMBER(write_rom);
@@ -53,7 +53,7 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 
 	virtual uint8_t read_cart_seeprom(void) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cart_seeprom) override;
+	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 

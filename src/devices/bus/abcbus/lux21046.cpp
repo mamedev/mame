@@ -232,22 +232,22 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-READ8_MEMBER( luxor_55_21046_device::memory_read_byte )
+uint8_t luxor_55_21046_device::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::memory_write_byte )
+void luxor_55_21046_device::memory_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21046_device::io_read_byte )
+uint8_t luxor_55_21046_device::io_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
+void luxor_55_21046_device::io_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }

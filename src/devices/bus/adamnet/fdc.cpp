@@ -213,7 +213,7 @@ READ8_MEMBER( adam_fdc_device::data_r )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_fdc_device::p1_r )
+uint8_t adam_fdc_device::p1_r()
 {
 	/*
 
@@ -250,7 +250,7 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_fdc_device::p1_w )
+void adam_fdc_device::p1_w(uint8_t data)
 {
 	/*
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_fdc_device::p2_r )
+uint8_t adam_fdc_device::p2_r()
 {
 	/*
 
@@ -319,7 +319,7 @@ READ8_MEMBER( adam_fdc_device::p2_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_fdc_device::p2_w )
+void adam_fdc_device::p2_w(uint8_t data)
 {
 	/*
 

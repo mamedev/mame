@@ -90,7 +90,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vtech1_latch_w);
 
 	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	uint8_t mc6847_videoram_r(offs_t offset);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER( vtech1_state::vtech1_video_bank_w )
     VIDEO EMULATION
 ***************************************************************************/
 
-READ8_MEMBER( vtech1_state::mc6847_videoram_r )
+uint8_t vtech1_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

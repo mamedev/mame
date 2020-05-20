@@ -357,17 +357,17 @@ WRITE8_MEMBER( a2232_device::cia_w )
 	m_cia->write(offset >> 1, data);
 }
 
-READ8_MEMBER( a2232_device::cia_port_a_r )
+uint8_t a2232_device::cia_port_a_r()
 {
 	return m_cia_port_a;
 }
 
-READ8_MEMBER( a2232_device::cia_port_b_r )
+uint8_t a2232_device::cia_port_b_r()
 {
 	return m_cia_port_b;
 }
 
-WRITE8_MEMBER( a2232_device::cia_port_b_w )
+void a2232_device::cia_port_b_w(uint8_t data)
 {
 	// tod clock connected to pb7
 	m_cia->tod_w(BIT(data, 7));

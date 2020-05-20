@@ -343,7 +343,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-READ8_MEMBER(vidbrain_state::memory_read_byte)
+uint8_t vidbrain_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);

@@ -32,7 +32,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cart) { }
 
 	virtual uint8_t read_cart_seeprom(void) { return 1; }
-	virtual DECLARE_WRITE16_MEMBER(write_cart_seeprom) { }
+	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -92,7 +92,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cart);
 
 	virtual uint8_t read_cart_seeprom(void);
-	virtual DECLARE_WRITE16_MEMBER(write_cart_seeprom);
+	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	bool has_cart() { return m_cart ? true : false; }
 

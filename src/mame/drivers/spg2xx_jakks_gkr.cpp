@@ -39,17 +39,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
 
 protected:
-	DECLARE_READ16_MEMBER(jakks_porta_r);
-	DECLARE_WRITE16_MEMBER(jakks_porta_w);
-	DECLARE_WRITE16_MEMBER(jakks_portb_w);
+	uint16_t jakks_porta_r();
+	void jakks_porta_w(uint16_t data);
+	void jakks_portb_w(uint16_t data);
 
 private:
 	virtual void machine_start() override;
 
-	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
+	uint16_t jakks_porta_key_io_r();
 
-	DECLARE_WRITE16_MEMBER(gkr_portc_w);
-	DECLARE_WRITE16_MEMBER(jakks_porta_key_io_w);
+	void gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void jakks_porta_key_io_w(uint16_t data);
 	bool m_porta_key_mode;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
@@ -70,11 +70,11 @@ READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
 	}
 }
 
-WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
+void jakks_gkr_state::gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart && m_cart->exists())
 	{
-		m_cart->write_cart_seeprom(space,offset,data,mem_mask);
+		m_cart->write_cart_seeprom(offset, data, mem_mask);
 	}
 	else
 	{
@@ -88,23 +88,23 @@ WRITE16_MEMBER(jakks_gkr_state::gkr_portc_w)
 	}
 }
 
-READ16_MEMBER(jakks_gkr_state::jakks_porta_r)
+uint16_t jakks_gkr_state::jakks_porta_r()
 {
 	//logerror("%s: jakks_porta_r\n", machine().describe_context());
 	return m_io_p1->read();
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_porta_w)
+void jakks_gkr_state::jakks_porta_w(uint16_t data)
 {
 	//logerror("%s: jakks_porta_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_portb_w)
+void jakks_gkr_state::jakks_portb_w(uint16_t data)
 {
 	//logerror("%s: jakks_portb_w %04x\n", machine().describe_context(), data);
 }
 
-READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
+uint16_t jakks_gkr_state::jakks_porta_key_io_r()
 {
 	//logerror("%s: jakks_porta_key_io_r\n", machine().describe_context());
 	if (m_porta_key_mode == false)
@@ -120,7 +120,7 @@ READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
 	}
 }
 
-WRITE16_MEMBER(jakks_gkr_state::jakks_porta_key_io_w)
+void jakks_gkr_state::jakks_porta_key_io_w(uint16_t data)
 {
 	logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
 	// only seen 0xffff and 0x0000 written here.. writes 0xffff before the 2nd part of the port a gamekey check read.

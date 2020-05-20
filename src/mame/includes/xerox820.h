@@ -79,9 +79,9 @@ public:
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( scroll_w );
 	//DECLARE_WRITE8_MEMBER( x120_system_w );
-	DECLARE_READ8_MEMBER( kbpio_pa_r );
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
-	DECLARE_READ8_MEMBER( kbpio_pb_r );
+	uint8_t kbpio_pa_r();
+	void kbpio_pa_w(uint8_t data);
+	uint8_t kbpio_pb_r();
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
@@ -138,7 +138,7 @@ public:
 		, m_beeper(*this, "beeper")
 	{ }
 
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
+	void kbpio_pa_w(uint8_t data);
 
 	void bigboard(machine_config &config);
 protected:
@@ -167,7 +167,7 @@ public:
 	DECLARE_WRITE8_MEMBER( lowlite_w );
 	DECLARE_WRITE8_MEMBER( sync_w );
 
-	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
+	void rdpio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 
 	void xerox168(machine_config &config);

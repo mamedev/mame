@@ -142,14 +142,14 @@ private:
 
 	DECLARE_READ8_MEMBER(p1_ppi_r);
 	DECLARE_WRITE8_MEMBER(p1_ppi_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi_porta_w);
-	DECLARE_READ8_MEMBER(p1_ppi_porta_r);
-	DECLARE_READ8_MEMBER(p1_ppi_portb_r);
-	DECLARE_READ8_MEMBER(p1_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(p1_ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
-	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
+	void p1_ppi_porta_w(uint8_t data);
+	uint8_t p1_ppi_porta_r();
+	uint8_t p1_ppi_portb_r();
+	uint8_t p1_ppi_portc_r();
+	void p1_ppi_portc_w(uint8_t data);
+	void p1_ppi2_porta_w(uint8_t data);
+	void p1_ppi2_portb_w(uint8_t data);
+	uint8_t p1_ppi2_portc_r();
 
 	void poisk1_io(address_map &map);
 	void poisk1_map(address_map &map);
@@ -223,7 +223,7 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
         7   HIRES       1: 640x200  0: 320x200
 */
 
-WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
+void p1_state::p1_ppi2_porta_w(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -268,7 +268,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
         7   Enable/Disable D7H/D7L
 */
 
-WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
+void p1_state::p1_ppi_portc_w(uint8_t data)
 {
 	LOG("mode_control_6a W $%02x\n", data);
 
@@ -475,13 +475,13 @@ WRITE_LINE_MEMBER(p1_state::p1_pit8253_out2_changed)
 
 // Keyboard (via PPI)
 
-WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
+void p1_state::p1_ppi_porta_w(uint8_t data)
 {
 	m_kbpoll_mask = data;
 	LOGDBG("p1_ppi_porta_w %02X <- %02X\n", m_kbpoll_mask, data);
 }
 
-READ8_MEMBER(p1_state::p1_ppi_porta_r)
+uint8_t p1_state::p1_ppi_porta_r()
 {
 	uint8_t ret;
 
@@ -490,7 +490,7 @@ READ8_MEMBER(p1_state::p1_ppi_porta_r)
 	return ret;
 }
 
-READ8_MEMBER(p1_state::p1_ppi_portb_r)
+uint8_t p1_state::p1_ppi_portb_r()
 {
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
@@ -508,7 +508,7 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	return ret;
 }
 
-READ8_MEMBER(p1_state::p1_ppi_portc_r)
+uint8_t p1_state::p1_ppi_portc_r()
 {
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
@@ -528,7 +528,7 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 
 // XXX
 
-READ8_MEMBER(p1_state::p1_ppi2_portc_r)
+uint8_t p1_state::p1_ppi2_portc_r()
 {
 	int data = 0xff;
 	double tap_val = m_cassette->input();
@@ -539,7 +539,7 @@ READ8_MEMBER(p1_state::p1_ppi2_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
+void p1_state::p1_ppi2_portb_w(uint8_t data)
 {
 	m_pit8253->write_gate2(BIT(data, 0));
 	p1_speaker_set_spkrdata(data & 0x02);

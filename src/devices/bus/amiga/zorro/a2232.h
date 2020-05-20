@@ -73,9 +73,9 @@ private:
 	template<int N> DECLARE_WRITE8_MEMBER( acia_w );
 
 	// cia
-	DECLARE_READ8_MEMBER( cia_port_a_r );
-	DECLARE_READ8_MEMBER( cia_port_b_r );
-	DECLARE_WRITE8_MEMBER( cia_port_b_w );
+	uint8_t cia_port_a_r();
+	uint8_t cia_port_b_r();
+	void cia_port_b_w(uint8_t data);
 	DECLARE_READ8_MEMBER( cia_r );
 	DECLARE_WRITE8_MEMBER( cia_w );
 

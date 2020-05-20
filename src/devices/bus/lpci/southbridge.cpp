@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 	m_dma8237_2->hack_w( state );
 }
 
-READ8_MEMBER(southbridge_device::pc_dma_read_byte)
+uint8_t southbridge_device::pc_dma_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -374,7 +374,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
+void southbridge_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -385,7 +385,7 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
 }
 
 
-READ8_MEMBER(southbridge_device::pc_dma_read_word)
+uint8_t southbridge_device::pc_dma_read_word(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -400,7 +400,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 }
 
 
-WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
+void southbridge_device::pc_dma_write_word(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)

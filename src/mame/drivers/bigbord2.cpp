@@ -128,10 +128,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	void init_bigbord2();
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void bigbord2(machine_config &config);
@@ -229,22 +229,22 @@ WRITE_LINE_MEMBER( bigbord2_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( bigbord2_state::memory_read_byte )
+uint8_t bigbord2_state::memory_read_byte(offs_t offset)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::memory_write_byte )
+void bigbord2_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( bigbord2_state::io_read_byte )
+uint8_t bigbord2_state::io_read_byte(offs_t offset)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::io_write_byte )
+void bigbord2_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	m_io->write_byte(offset, data);
 }

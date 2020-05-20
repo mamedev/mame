@@ -185,7 +185,7 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 	}
 }
 
-WRITE16_MEMBER(spg2xx_game_state::porta_w)
+void spg2xx_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
@@ -206,7 +206,7 @@ WRITE16_MEMBER(spg2xx_game_state::porta_w)
 		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 }
 
-WRITE16_MEMBER(spg2xx_game_state::portb_w)
+void spg2xx_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
@@ -227,7 +227,7 @@ WRITE16_MEMBER(spg2xx_game_state::portb_w)
 		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 }
 
-WRITE16_MEMBER(spg2xx_game_state::portc_w)
+void spg2xx_game_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
@@ -248,46 +248,46 @@ WRITE16_MEMBER(spg2xx_game_state::portc_w)
 		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 }
 
-WRITE8_MEMBER(spg2xx_game_state::i2c_w)
+void spg2xx_game_state::i2c_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: i2c_w %05x %04x\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(spg2xx_game_state::i2c_r)
+uint8_t spg2xx_game_state::i2c_r(offs_t offset)
 {
 	logerror("%s: i2c_r %04x\n", machine().describe_context(), offset);
 	return 0x0000;
 }
 
-READ16_MEMBER(spg2xx_game_state::base_porta_r)
+uint16_t spg2xx_game_state::base_porta_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_io_p1->read();
 	logerror("%s: Port A Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-READ16_MEMBER(spg2xx_game_state::base_portb_r)
+uint16_t spg2xx_game_state::base_portb_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_io_p2->read();
 	logerror("%s: Port B Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-READ16_MEMBER(spg2xx_game_state::base_portc_r)
+uint16_t spg2xx_game_state::base_portc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_io_p3->read();
 	logerror("%s: Port C Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-READ16_MEMBER(spg2xx_game_state::base_guny_r)
+uint16_t spg2xx_game_state::base_guny_r()
 {
 	uint16_t data = m_io_guny->read();
 	logerror("%s: Gun Y Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
-READ16_MEMBER(spg2xx_game_state::base_gunx_r)
+uint16_t spg2xx_game_state::base_gunx_r()
 {
 	uint16_t data = m_io_gunx->read();
 	logerror("%s: Gun X Read: %04x\n", machine().describe_context(), data);
@@ -1166,20 +1166,20 @@ void spg2xx_game_state::abltenni(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-READ16_MEMBER(spg2xx_game_comil_state::porta_r)
+uint16_t spg2xx_game_comil_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_porta_data;
 	logerror("%s: Port A Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-WRITE16_MEMBER(spg2xx_game_comil_state::porta_w)
+void spg2xx_game_comil_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: Port A Write: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 	m_porta_data = data;
 }
 
-READ16_MEMBER(spg2xx_game_comil_state::portb_r)
+uint16_t spg2xx_game_comil_state::portb_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_io_p2->read() & 0xfff0;
 
@@ -1241,7 +1241,7 @@ void spg2xx_game_state::tvsprt10(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
 }
 
-READ16_MEMBER(spg2xx_game_tmntmutm_state::guny_r)
+uint16_t spg2xx_game_tmntmutm_state::guny_r()
 {
 	int frame = m_screen->frame_number() & 1; // game will not register shots if the co-ordinates are exactly the same as previous shot
 	uint16_t data = m_io_guny->read() ^ frame;
@@ -1249,7 +1249,7 @@ READ16_MEMBER(spg2xx_game_tmntmutm_state::guny_r)
 	return data;
 }
 
-READ16_MEMBER(spg2xx_game_tmntmutm_state::gunx_r)
+uint16_t spg2xx_game_tmntmutm_state::gunx_r()
 {
 	int frame = (m_screen->frame_number() >> 1) & 1;
 	uint16_t data = m_io_gunx->read() ^ frame;
@@ -1276,7 +1276,7 @@ void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
-READ16_MEMBER(spg2xx_game_albkickb_state::portb_r)
+uint16_t spg2xx_game_albkickb_state::portb_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = machine().rand();// TODO
 	logerror("%s: Port B Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
@@ -1296,7 +1296,7 @@ void spg2xx_game_albkickb_state::ablkickb(machine_config &config)
 }
 
 
-READ16_MEMBER(spg2xx_game_pballpup_state::porta_r)
+uint16_t spg2xx_game_pballpup_state::porta_r()
 {
 	uint16_t ret = m_io_p1->read() & 0xfff7;
 //  logerror("%s: spg2xx_game_pballpup_state::porta_r\n", machine().describe_context());
@@ -1304,7 +1304,7 @@ READ16_MEMBER(spg2xx_game_pballpup_state::porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(spg2xx_game_pballpup_state::porta_w)
+void spg2xx_game_pballpup_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: spg2xx_game_pballpup_state::porta_w (%04x)\n", machine().describe_context(), data);
 	m_eeprom->di_write(BIT(data, 2));
@@ -1337,7 +1337,7 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
 }
 
-READ16_MEMBER(spg2xx_game_swclone_state::porta_r)
+uint16_t spg2xx_game_swclone_state::porta_r()
 {
 	uint16_t ret = m_io_p1->read() & 0xfffe;
 	ret |= m_i2cmem->read_sda() ? 0x1: 0x0;
@@ -1346,7 +1346,7 @@ READ16_MEMBER(spg2xx_game_swclone_state::porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(spg2xx_game_swclone_state::porta_w)
+void spg2xx_game_swclone_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: spg2xx_game_swclone_state::porta_w (%04x & %04x)\n", machine().describe_context(), data, mem_mask);
 
@@ -1382,7 +1382,7 @@ void spg2xx_game_swclone_state::swclone(machine_config &config)
 
 
 
-READ16_MEMBER(spg2xx_game_dreamlss_state::porta_r)
+uint16_t spg2xx_game_dreamlss_state::porta_r()
 {
 	uint16_t ret = m_io_p1->read()&0xefff;
 	ret |= m_porta_data & 0x1000; // needs to be able to read back current bank
@@ -1390,7 +1390,7 @@ READ16_MEMBER(spg2xx_game_dreamlss_state::porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(spg2xx_game_dreamlss_state::porta_w)
+void spg2xx_game_dreamlss_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: spg2xx_game_dreamlss_state::porta_w (%04x)\n", machine().describe_context(), data);
 
@@ -1401,7 +1401,7 @@ WRITE16_MEMBER(spg2xx_game_dreamlss_state::porta_w)
 
 
 // TODO: how does the SEEPROM hook up? (will need hack removing in init_dreamlss )
-READ16_MEMBER(spg2xx_game_dreamlss_state::portb_r)
+uint16_t spg2xx_game_dreamlss_state::portb_r()
 {
 	uint16_t ret = m_portb_data & 0xfffe;
 	ret |= m_i2cmem->read_sda() ? 0x1: 0x0;
@@ -1410,7 +1410,7 @@ READ16_MEMBER(spg2xx_game_dreamlss_state::portb_r)
 	return ret;
 }
 
-WRITE16_MEMBER(spg2xx_game_dreamlss_state::portb_w)
+void spg2xx_game_dreamlss_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: spg2xx_game_dreamlss_state::portb_w (%04x & %04x)\n", machine().describe_context(), data, mem_mask);
 
@@ -1441,7 +1441,7 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
-WRITE16_MEMBER(spg2xx_game_gssytts_state::portc_w)
+void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
 

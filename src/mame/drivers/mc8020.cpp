@@ -36,9 +36,9 @@ public:
 	void mc8020(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	u8 port_b_r();
+	void port_a_w(u8 data);
+	void port_b_w(u8 data);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -142,7 +142,7 @@ static INPUT_PORTS_START( mc8020 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mc8020_state::port_b_r )
+u8 mc8020_state::port_b_r()
 {
 	if (m_row == 0x40)
 		return m_keyboard[0]->read();
@@ -168,12 +168,12 @@ READ8_MEMBER( mc8020_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( mc8020_state::port_a_w )
+void mc8020_state::port_a_w(u8 data)
 {
 	m_row = data;
 }
 
-WRITE8_MEMBER( mc8020_state::port_b_w )
+void mc8020_state::port_b_w(u8 data)
 {
 }
 

@@ -197,17 +197,17 @@ void luxor_55_10828_device::luxor_55_10828_io(address_map &map)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_10828_device::pio_pa_r )
+uint8_t luxor_55_10828_device::pio_pa_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pa_w )
+void luxor_55_10828_device::pio_pa_w(uint8_t data)
 {
 	m_data = data;
 }
 
-READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
+uint8_t luxor_55_10828_device::pio_pb_r()
 {
 	/*
 
@@ -252,7 +252,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
+void luxor_55_10828_device::pio_pb_w(uint8_t data)
 {
 	/*
 

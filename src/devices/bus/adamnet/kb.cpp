@@ -243,7 +243,7 @@ void adam_keyboard_device::adamnet_reset_w(int state)
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_keyboard_device::p1_r )
+uint8_t adam_keyboard_device::p1_r()
 {
 	/*
 
@@ -275,7 +275,7 @@ READ8_MEMBER( adam_keyboard_device::p1_r )
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_keyboard_device::p2_r )
+uint8_t adam_keyboard_device::p2_r()
 {
 	/*
 
@@ -302,7 +302,7 @@ READ8_MEMBER( adam_keyboard_device::p2_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_keyboard_device::p2_w )
+void adam_keyboard_device::p2_w(uint8_t data)
 {
 	/*
 
@@ -324,7 +324,7 @@ WRITE8_MEMBER( adam_keyboard_device::p2_w )
 //  p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_keyboard_device::p3_r )
+uint8_t adam_keyboard_device::p3_r()
 {
 	return 0xff;
 }
@@ -334,7 +334,7 @@ READ8_MEMBER( adam_keyboard_device::p3_r )
 //  p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_keyboard_device::p3_w )
+void adam_keyboard_device::p3_w(uint8_t data)
 {
 	/*
 
@@ -359,7 +359,7 @@ WRITE8_MEMBER( adam_keyboard_device::p3_w )
 //  p4_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_keyboard_device::p4_r )
+uint8_t adam_keyboard_device::p4_r()
 {
 	return 0xff;
 }
@@ -369,7 +369,7 @@ READ8_MEMBER( adam_keyboard_device::p4_r )
 //  p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_keyboard_device::p4_w )
+void adam_keyboard_device::p4_w(uint8_t data)
 {
 	/*
 

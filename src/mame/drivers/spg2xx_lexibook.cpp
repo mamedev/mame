@@ -35,7 +35,7 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 
@@ -198,7 +198,7 @@ INPUT_PORTS_END
 
 
 
-WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
+void spg2xx_lexiseal_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: portb_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 

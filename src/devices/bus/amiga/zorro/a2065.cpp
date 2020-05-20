@@ -142,14 +142,14 @@ WRITE16_MEMBER( a2065_device::host_ram_w )
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER( a2065_device::lance_ram_r )
+uint16_t a2065_device::lance_ram_r(offs_t offset)
 {
 	offset = (offset >> 1) & 0x3fff;
 	// logerror("lance read offset %04x\n", offset);
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( a2065_device::lance_ram_w )
+void a2065_device::lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset >> 1) & 0x3fff;
 	// logerror("lance write %04x = %04x\n", offset, data);

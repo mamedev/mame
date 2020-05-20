@@ -69,12 +69,12 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	uint8_t porta_r(offs_t offset);
+	void porta_w(offs_t offset, uint8_t data);
+	uint8_t portb_r(offs_t offset);
+	void portb_w(offs_t offset, uint8_t data);
+	uint8_t portc_r(offs_t offset);
+	void portc_w(offs_t offset, uint8_t data);
 
 	/* fake memory I/O to get past memory reset check */
 	DECLARE_READ8_MEMBER(fakemem_r);
@@ -84,20 +84,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(co0_w);
 
 	/* ADC */
-	DECLARE_READ8_MEMBER(an0_r);
-	DECLARE_READ8_MEMBER(an1_r);
-	DECLARE_READ8_MEMBER(an2_r);
-	DECLARE_READ8_MEMBER(an3_r);
-	DECLARE_READ8_MEMBER(an4_r);
-	DECLARE_READ8_MEMBER(an5_r);
-	DECLARE_READ8_MEMBER(an6_r);
-	DECLARE_READ8_MEMBER(an7_r);
+	uint8_t an0_r();
+	uint8_t an1_r();
+	uint8_t an2_r();
+	uint8_t an3_r();
+	uint8_t an4_r();
+	uint8_t an5_r();
+	uint8_t an6_r();
+	uint8_t an7_r();
 
 
 	/* GATE ARRAY */
-	DECLARE_WRITE16_MEMBER(printhead);
-	DECLARE_WRITE8_MEMBER(pf_stepper);
-	DECLARE_WRITE8_MEMBER(cr_stepper);
+	void printhead(uint16_t data);
+	void pf_stepper(uint8_t data);
+	void cr_stepper(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(e05a30_ready);
 
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_ack) { output_ack(state); }

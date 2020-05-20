@@ -69,14 +69,14 @@ private:
 	inline void set_iec_data();
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	virtual DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	virtual uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_READ8_MEMBER( via1_pb_r );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
@@ -139,8 +139,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	// not really public
-	virtual DECLARE_READ8_MEMBER( via0_pa_r ) override;
+	virtual uint8_t via0_pa_r() override;
 };
 
 
@@ -267,9 +266,9 @@ private:
 
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	void pia_pa_w(uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

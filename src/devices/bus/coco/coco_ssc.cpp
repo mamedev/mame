@@ -84,12 +84,12 @@ namespace
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void device_reset() override;
 
-		DECLARE_READ8_MEMBER(ssc_port_a_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_b_w);
-		DECLARE_READ8_MEMBER(ssc_port_c_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_c_w);
-		DECLARE_READ8_MEMBER(ssc_port_d_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_d_w);
+		uint8_t ssc_port_a_r();
+		void ssc_port_b_w(uint8_t data);
+		uint8_t ssc_port_c_r();
+		void ssc_port_c_w(uint8_t data);
+		uint8_t ssc_port_d_r();
+		void ssc_port_d_w(uint8_t data);
 
 	protected:
 		// device-level overrides
@@ -391,7 +391,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 //  Handlers for secondary CPU ports
 //-------------------------------------------------
 
-READ8_MEMBER(coco_ssc_device::ssc_port_a_r)
+uint8_t coco_ssc_device::ssc_port_a_r()
 {
 	if (LOG_SSC)
 	{
@@ -403,7 +403,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_a_r)
 	return m_tms7000_porta;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
+void coco_ssc_device::ssc_port_b_w(uint8_t data)
 {
 	if (LOG_SSC)
 	{
@@ -413,7 +413,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
 	m_tms7000_portb = data;
 }
 
-READ8_MEMBER(coco_ssc_device::ssc_port_c_r)
+uint8_t coco_ssc_device::ssc_port_c_r()
 {
 	if (LOG_SSC)
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_c_r)
 	return m_tms7000_portc;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
+void coco_ssc_device::ssc_port_c_w(uint8_t data)
 {
 	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
 	{
@@ -475,7 +475,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 	m_tms7000_portc = data;
 }
 
-READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
+uint8_t coco_ssc_device::ssc_port_d_r()
 {
 	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
@@ -505,7 +505,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 	return m_tms7000_portd;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
+void coco_ssc_device::ssc_port_d_w(uint8_t data)
 {
 	if (LOG_SSC)
 	{

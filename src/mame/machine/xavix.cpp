@@ -514,13 +514,13 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 
 /* SuperXavix IO port handliner (per game) */
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
+uint8_t xavix_i2c_jmat_state::read_extended_io0()
 {
 	LOG("%s: read_extended_io0\n", machine().describe_context());
 	return 0x00;
 }
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
+uint8_t xavix_i2c_jmat_state::read_extended_io1()
 {
 	LOG("%s: read_extended_io1\n", machine().describe_context());
 
@@ -529,18 +529,18 @@ READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
 	//return 0x00;
 }
 
-READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io2)
+uint8_t xavix_i2c_jmat_state::read_extended_io2()
 {
 	LOG("%s: read_extended_io2\n", machine().describe_context());
 	return 0x00;
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io0)
+void xavix_i2c_jmat_state::write_extended_io0(uint8_t data)
 {
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
+void xavix_i2c_jmat_state::write_extended_io1(uint8_t data)
 {
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 
@@ -549,7 +549,7 @@ WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
 
 }
 
-WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
+void xavix_i2c_jmat_state::write_extended_io2(uint8_t data)
 {
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }

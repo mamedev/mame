@@ -191,16 +191,16 @@ WRITE_LINE_MEMBER(pp01_state::z2_w)
 		m_cass->output((m_txd ^ state) ? -1.0 : 1.0);
 }
 
-READ8_MEMBER(pp01_state::ppi1_porta_r)
+uint8_t pp01_state::ppi1_porta_r()
 {
 	return m_video_scroll;
 }
-WRITE8_MEMBER(pp01_state::ppi1_porta_w)
+void pp01_state::ppi1_porta_w(uint8_t data)
 {
 	m_video_scroll = data;
 }
 
-READ8_MEMBER(pp01_state::ppi1_portb_r)
+uint8_t pp01_state::ppi1_portb_r()
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
@@ -209,13 +209,13 @@ READ8_MEMBER(pp01_state::ppi1_portb_r)
 
 	return (ioport(keynames[m_key_line])->read() & 0x3F) | (ioport("LINEALL")->read() & 0xC0);
 }
-WRITE8_MEMBER(pp01_state::ppi1_portb_w)
+void pp01_state::ppi1_portb_w(uint8_t data)
 {
 	//logerror("pp01_8255_portb_w %02x\n",data);
 
 }
 
-WRITE8_MEMBER(pp01_state::ppi1_portc_w)
+void pp01_state::ppi1_portc_w(uint8_t data)
 {
 	if (BIT(data, 4))
 		m_key_line = data & 0x0f;
@@ -223,7 +223,7 @@ WRITE8_MEMBER(pp01_state::ppi1_portc_w)
 		m_speaker->level_w(BIT(data, 0));
 }
 
-READ8_MEMBER(pp01_state::ppi1_portc_r)
+uint8_t pp01_state::ppi1_portc_r()
 {
 	return 0xff;
 }
