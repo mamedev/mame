@@ -89,9 +89,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void mux_w(u8 data);
+	void control_w(u8 data);
+	u8 input_r();
 
 	bool m_kp_select = false;
 	u8 m_inp_mux = 0;
@@ -127,14 +127,14 @@ void micro2_state::update_display()
 	m_display->matrix(m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(micro2_state::mux_w)
+void micro2_state::mux_w(u8 data)
 {
 	// D0-D7: input mux, led data
 	m_inp_mux = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(micro2_state::control_w)
+void micro2_state::control_w(u8 data)
 {
 	// P21: keypad select
 	m_kp_select = bool(~data & 2);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(micro2_state::control_w)
 	update_display();
 }
 
-READ8_MEMBER(micro2_state::input_r)
+u8 micro2_state::input_r()
 {
 	u8 data = 0;
 

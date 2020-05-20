@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( osborne1_state::irqack_w )
 }
 
 
-READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
+uint8_t osborne1_state::ieee_pia_pb_r()
 {
 	/*
 	    bit     description
@@ -191,7 +191,7 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
+void osborne1_state::ieee_pia_pb_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -218,14 +218,14 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 }
 
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
+void osborne1_state::video_pia_port_a_w(uint8_t data)
 {
 	m_scroll_x = data >> 1;
 
 	m_fdc->dden_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
+void osborne1_state::video_pia_port_b_w(uint8_t data)
 {
 	m_speaker->level_w((BIT(data, 5) && m_beep_state) ? 1 : 0);
 

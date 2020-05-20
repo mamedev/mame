@@ -71,9 +71,9 @@ public:
 	void emma2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	void segment_w(uint8_t data);
+	void digit_w(uint8_t data);
+	uint8_t keyboard_r();
 	virtual void machine_reset() override;
 
 	void mem_map(address_map &map);
@@ -150,7 +150,7 @@ S   -   3   7   B   F
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( emma2_state::digit_w )
+void emma2_state::digit_w(uint8_t data)
 {
 	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
 
@@ -158,13 +158,13 @@ WRITE8_MEMBER( emma2_state::digit_w )
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-WRITE8_MEMBER( emma2_state::segment_w )
+void emma2_state::segment_w(uint8_t data)
 {
 	m_seg = data;
 	m_display->matrix(1 << m_digit, m_seg);
 }
 
-READ8_MEMBER( emma2_state::keyboard_r )
+uint8_t emma2_state::keyboard_r()
 {
 	u8 data = m_io_keyboard[m_digit]->read();
 	data |= ((m_cassette)->input() < 0.0) ? 0x80 : 0;

@@ -530,7 +530,7 @@ void pc8401a_state::machine_start()
 	save_item(NAME(m_io_addr));
 }
 
-READ8_MEMBER( pc8401a_state::ppi_pc_r )
+uint8_t pc8401a_state::ppi_pc_r()
 {
 	/*
 
@@ -550,7 +550,7 @@ READ8_MEMBER( pc8401a_state::ppi_pc_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
+void pc8401a_state::ppi_pc_w(uint8_t data)
 {
 	/*
 

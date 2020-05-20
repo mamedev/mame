@@ -333,7 +333,7 @@ void coco_state::floating_space_write(offs_t offset, uint8_t data)
 //  pia0_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pa_w )
+void coco_state::pia0_pa_w(uint8_t data)
 {
 	poll_keyboard();
 }
@@ -344,7 +344,7 @@ WRITE8_MEMBER( coco_state::pia0_pa_w )
 //  pia0_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pb_w )
+void coco_state::pia0_pb_w(uint8_t data)
 {
 	poll_keyboard();
 }
@@ -436,7 +436,7 @@ WRITE8_MEMBER( coco_state::ff20_write )
 //  pia1_pa_r
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pa_r )
+uint8_t coco_state::pia1_pa_r()
 {
 	// Port A: we need to specify the values of all the lines, regardless of whether
 	// they are in input or output mode in the DDR
@@ -452,7 +452,7 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 //  serial-in (PB0)
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pb_r )
+uint8_t coco_state::pia1_pb_r()
 {
 	// Port B: lines in output mode are handled automatically by the PIA object.
 	// We only need to specify the input lines here
@@ -481,7 +481,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 //  pia1_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pa_w )
+void coco_state::pia1_pa_w(uint8_t data)
 {
 	pia1_pa_changed(data);
 }
@@ -492,7 +492,7 @@ WRITE8_MEMBER( coco_state::pia1_pa_w )
 //  pia1_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pb_w )
+void coco_state::pia1_pb_w(uint8_t data)
 {
 	pia1_pb_changed(data);
 }

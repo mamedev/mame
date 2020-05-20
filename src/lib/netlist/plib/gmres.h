@@ -242,7 +242,6 @@ namespace plib
 		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
 		{
 			plib::unused_var(dummy);
-			//printf("%d\n", k);
 			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_khelper<k-1>::value))
 				return true;
 

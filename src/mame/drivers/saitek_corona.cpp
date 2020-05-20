@@ -19,6 +19,8 @@ different compared to Stratos/Turbo King.
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -119,11 +121,11 @@ void corona_state::machine_reset()
 void corona_state::update_leds()
 {
 	// button leds
-	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), (~m_led_data1 & 0xff), false);
+	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff, false);
 	m_display->write_row(2, ~m_select1 >> 4 & 0xf);
 
 	// chessboard leds
-	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2);
+	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2, true);
 }
 
 WRITE8_MEMBER(corona_state::leds1_w)
@@ -192,7 +194,7 @@ READ8_MEMBER(corona_state::control1_r)
 	// d6: FREQ. SEL related?
 
 	// d7: battery low
-	data |= m_inputs[8]->read();
+	data |= m_inputs[8]->read() << 7;
 
 	return data;
 }
@@ -245,7 +247,7 @@ void corona_state::rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
-	map(0x10000, 0x17fff).r(m_extrom, FUNC(generic_slot_device::read_rom));
+	map(0x10000, 0x17fff).r("extrom", FUNC(generic_slot_device::read_rom));
 }
 
 
@@ -292,9 +294,7 @@ void corona_state::corona(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(corona_state::extrom_load));
-
+	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }
 

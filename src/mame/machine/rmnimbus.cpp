@@ -188,7 +188,7 @@ void rmnimbus_state::external_int(uint8_t vector, bool state)
 	m_maincpu->int0_w(state);
 }
 
-READ8_MEMBER(rmnimbus_state::cascade_callback)
+uint8_t rmnimbus_state::cascade_callback()
 {
 	m_maincpu->int0_w(0);
 	return m_vector;
@@ -1247,7 +1247,7 @@ void rmnimbus_state::ipc_dumpregs()
 }
 #endif
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
+uint8_t rmnimbus_state::nimbus_pc8031_r(offs_t offset)
 {
 	int pc=m_maincpu->pc();
 	uint8_t   result;
@@ -1271,7 +1271,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
+void rmnimbus_state::nimbus_pc8031_w(offs_t offset, uint8_t data)
 {
 	int pc=m_maincpu->pc();
 
@@ -1361,7 +1361,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_r)
+uint8_t rmnimbus_state::nimbus_pc8031_port1_r()
 {
 	int pc=m_iocpu->pc();
 	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
@@ -1372,7 +1372,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_r)
 	return result;
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_r)
+uint8_t rmnimbus_state::nimbus_pc8031_port3_r()
 {
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
@@ -1383,7 +1383,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_w)
+void rmnimbus_state::nimbus_pc8031_port1_w(uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
@@ -1406,7 +1406,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_w)
 		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_w)
+void rmnimbus_state::nimbus_pc8031_port3_w(uint8_t data)
 {
 	int pc=m_iocpu->pc();
 
@@ -1476,7 +1476,7 @@ void rmnimbus_state::rmni_sound_reset()
 	m_ay8910_a=0;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
+void rmnimbus_state::nimbus_sound_ay8910_porta_w(uint8_t data)
 {
 	m_msm->data_w(data);
 
@@ -1484,7 +1484,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 	m_ay8910_a=data;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
+void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 {
 	if ((data & 0x07) != m_last_playmode)
 	{
@@ -1699,6 +1699,6 @@ collector output only. It usially acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
+void rmnimbus_state::nimbus_via_write_portb(uint8_t data)
 {
 }

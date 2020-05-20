@@ -123,15 +123,15 @@ private:
 	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(mz2000_porta_r);
-	DECLARE_READ8_MEMBER(mz2000_portb_r);
-	DECLARE_READ8_MEMBER(mz2000_portc_r);
-	DECLARE_WRITE8_MEMBER(mz2000_porta_w);
-	DECLARE_WRITE8_MEMBER(mz2000_portb_w);
-	DECLARE_WRITE8_MEMBER(mz2000_portc_w);
-	DECLARE_WRITE8_MEMBER(mz2000_pio1_porta_w);
-	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
-	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
+	uint8_t mz2000_porta_r();
+	uint8_t mz2000_portb_r();
+	uint8_t mz2000_portc_r();
+	void mz2000_porta_w(uint8_t data);
+	void mz2000_portb_w(uint8_t data);
+	void mz2000_portc_w(uint8_t data);
+	void mz2000_pio1_porta_w(uint8_t data);
+	uint8_t mz2000_pio1_portb_r();
+	uint8_t mz2000_pio1_porta_r();
 
 	void mz2000_io(address_map &map);
 	void mz2000_map(address_map &map);
@@ -701,13 +701,13 @@ static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(mz2000_state::mz2000_porta_r)
+uint8_t mz2000_state::mz2000_porta_r()
 {
 	printf("A R\n");
 	return 0xff;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_portb_r)
+uint8_t mz2000_state::mz2000_portb_r()
 {
 	/*
 	x--- ---- break key
@@ -733,13 +733,13 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	return res;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_portc_r)
+uint8_t mz2000_state::mz2000_portc_r()
 {
 	printf("C R\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_porta_w)
+void mz2000_state::mz2000_porta_w(uint8_t data)
 {
 	/*
 	These are enabled thru a 0->1 transition
@@ -798,14 +798,14 @@ WRITE8_MEMBER(mz2000_state::mz2000_porta_w)
 	m_tape_ctrl = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_portb_w)
+void mz2000_state::mz2000_portb_w(uint8_t data)
 {
 	//printf("B W %02x\n",data);
 
 	// ...
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
+void mz2000_state::mz2000_portc_w(uint8_t data)
 {
 	/*
 	    x--- ---- tape data write
@@ -833,7 +833,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	m_old_portc = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
+void mz2000_state::mz2000_pio1_porta_w(uint8_t data)
 {
 	m_tvram_enable = ((data & 0xc0) == 0xc0);
 	m_gvram_enable = ((data & 0xc0) == 0x80);
@@ -843,7 +843,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 	m_porta_latch = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
+uint8_t mz2000_state::mz2000_pio1_portb_r()
 {
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -859,7 +859,7 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
-READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
+uint8_t mz2000_state::mz2000_pio1_porta_r()
 {
 	return m_porta_latch;
 }

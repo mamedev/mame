@@ -78,7 +78,7 @@ INPUT_PORTS_END
 
 /* 8355 Interface */
 
-READ8_MEMBER( exp85_state::i8355_a_r )
+uint8_t exp85_state::i8355_a_r()
 {
 	/*
 
@@ -98,7 +98,7 @@ READ8_MEMBER( exp85_state::i8355_a_r )
 	return 0x02;
 }
 
-WRITE8_MEMBER( exp85_state::i8355_a_w )
+void exp85_state::i8355_a_w(uint8_t data)
 {
 	/*
 

@@ -12,7 +12,7 @@
 #include "m6509.h"
 #include "m6509d.h"
 
-DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "MOS Technology M6509")
+DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "MOS Technology 6509")
 
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6509, tag, owner, clock), bank_i(0), bank_y(0)

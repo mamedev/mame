@@ -15,8 +15,8 @@
 #include "m6510.h"
 #include "m6510d.h"
 
-DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology M6510")
-DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology M6508")
+DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology 6510")
+DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology 6508")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)

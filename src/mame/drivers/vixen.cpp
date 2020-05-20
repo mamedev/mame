@@ -456,7 +456,7 @@ DISCRETE_SOUND_END
 //  I8155 interface
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::i8155_pa_r )
+uint8_t vixen_state::i8155_pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -466,12 +466,12 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pb_w )
+void vixen_state::i8155_pb_w(uint8_t data)
 {
 	m_col = data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pc_w )
+void vixen_state::i8155_pc_w(uint8_t data)
 {
 	/*
 
@@ -513,7 +513,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 //  I8155 IO interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
+void vixen_state::io_i8155_pb_w(uint8_t data)
 {
 	/*
 
@@ -555,7 +555,7 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 	m_ieee488->host_ren_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
+void vixen_state::io_i8155_pc_w(uint8_t data)
 {
 	/*
 

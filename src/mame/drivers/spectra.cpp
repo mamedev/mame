@@ -60,10 +60,10 @@ public:
 	void spectra(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	uint8_t porta_r();
+	uint8_t portb_r();
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 	void spectra_map(address_map &map);
@@ -138,7 +138,7 @@ void spectra_state::machine_reset()
 	m_t_c = 0;
 }
 
-READ8_MEMBER( spectra_state::porta_r )
+uint8_t spectra_state::porta_r()
 {
 	uint8_t row = (m_porta & 0x18) >> 3;
 	uint8_t key = m_switch[row]->read();
@@ -150,7 +150,7 @@ READ8_MEMBER( spectra_state::porta_r )
 	return ret;
 }
 
-READ8_MEMBER( spectra_state::portb_r )
+uint8_t spectra_state::portb_r()
 {
 	if (m_p_ram[0xf0] != 1)
 		return 0x5a; // factory reset if first time
@@ -158,13 +158,13 @@ READ8_MEMBER( spectra_state::portb_r )
 		return m_portb;
 }
 
-WRITE8_MEMBER( spectra_state::porta_w )
+void spectra_state::porta_w(uint8_t data)
 {
 	m_porta = data;
 }
 
 // sound port
-WRITE8_MEMBER( spectra_state::portb_w )
+void spectra_state::portb_w(uint8_t data)
 {
 	m_portb = data;
 	float vco = 5.0;

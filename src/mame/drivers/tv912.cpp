@@ -101,9 +101,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
 
 private:
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void p1_w(u8 data);
+	u8 p2_r();
+	void p2_w(u8 data);
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(uart_status_r);
@@ -154,12 +154,12 @@ private:
 	std::unique_ptr<u8[]> m_dispram;
 };
 
-WRITE8_MEMBER(tv912_state::p1_w)
+void tv912_state::p1_w(u8 data)
 {
 	m_keyboard_scan = data;
 }
 
-READ8_MEMBER(tv912_state::p2_r)
+u8 tv912_state::p2_r()
 {
 	ioport_value dup = m_half_duplex->read();
 
@@ -177,7 +177,7 @@ READ8_MEMBER(tv912_state::p2_r)
 	return result | 0x5f;
 }
 
-WRITE8_MEMBER(tv912_state::p2_w)
+void tv912_state::p2_w(u8 data)
 {
 	// P20-P23: Address Signals (4MSBS)
 	m_bankdev->set_bank(data & 0x0f);

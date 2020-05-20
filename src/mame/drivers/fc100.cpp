@@ -72,7 +72,7 @@ public:
 	void init_fc100();
 
 private:
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
+	uint8_t mc6847_videoram_r(offs_t offset);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port33_w);
@@ -350,7 +350,7 @@ WRITE8_MEMBER( fc100_state::ay_port_a_w )
 
 //******************** VIDEO **********************************
 
-READ8_MEMBER( fc100_state::mc6847_videoram_r )
+uint8_t fc100_state::mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

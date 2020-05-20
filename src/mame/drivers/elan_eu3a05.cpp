@@ -263,7 +263,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// for callback
-	DECLARE_READ8_MEMBER(read_full_space);
+	uint8_t read_full_space(offs_t offset);
 
 	void elan_eu3a05_bank_map(address_map &map);
 	void elan_eu3a05_map(address_map &map);
@@ -305,8 +305,8 @@ protected:
 
 private:
 	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	uint8_t porta_r();
+	void portb_w(uint8_t data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -366,13 +366,13 @@ void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 	SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
 }
 
-READ8_MEMBER(elan_eu3a05_buzztime_state::porta_r)
+uint8_t elan_eu3a05_buzztime_state::porta_r()
 {
 	logerror("%s: porta_r\n", machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(elan_eu3a05_buzztime_state::portb_w)
+void elan_eu3a05_buzztime_state::portb_w(uint8_t data)
 {
 	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
 }
@@ -389,7 +389,7 @@ uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_ind16& b
 }
 
 // sound callback
-READ8_MEMBER(elan_eu3a05_state::read_full_space)
+uint8_t elan_eu3a05_state::read_full_space(offs_t offset)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);

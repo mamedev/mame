@@ -164,7 +164,7 @@ INPUT_PORTS_END
 //  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+void sage2_state::ppi0_pc_w(uint8_t data)
 {
 	/*
 
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( sage2_state::ppi1_pb_r )
+uint8_t sage2_state::ppi1_pb_r()
 {
 	/*
 
@@ -277,7 +277,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+void sage2_state::ppi1_pc_w(uint8_t data)
 {
 	/*
 

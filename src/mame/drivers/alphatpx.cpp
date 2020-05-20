@@ -115,9 +115,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(uint8_t data);
+	uint8_t kbd_port2_r();
+	void kbd_port2_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -187,9 +187,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
+	void kbd_matrix_w(uint8_t data);
+	uint8_t kbd_port2_r();
+	void kbd_port2_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -469,7 +469,7 @@ READ_LINE_MEMBER(alphatp_12_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
+void alphatp_12_state::kbd_matrix_w(uint8_t data)
 {
 	if ((data & 0x80) && (!m_kbdclk))
 	{
@@ -482,13 +482,13 @@ WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_12_state::kbd_port2_w)
+void alphatp_12_state::kbd_port2_w(uint8_t data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_12_state::kbd_port2_r)
+uint8_t alphatp_12_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }
@@ -502,7 +502,7 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
+void alphatp_34_state::kbd_matrix_w(uint8_t data)
 {
 	if (data & 0x80)
 	{
@@ -516,13 +516,13 @@ WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(alphatp_34_state::kbd_port2_w)
+void alphatp_34_state::kbd_port2_w(uint8_t data)
 {
 	m_kbdport2 = data;
 
 }
 
-READ8_MEMBER(alphatp_34_state::kbd_port2_r)
+uint8_t alphatp_34_state::kbd_port2_r()
 {
 	return m_kbdport2;
 }

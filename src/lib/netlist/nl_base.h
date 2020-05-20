@@ -547,6 +547,11 @@ namespace netlist
 		private:
 		};
 
+		/// \brief Base class for all objects bejng owned by a netlist
+		///
+		/// The object provides adds \ref netlist_state_t and \ref netlist_t
+		/// accessors.
+		///
 		class netlist_object_t : public object_t
 		{
 		public:
@@ -851,18 +856,31 @@ namespace netlist
 		solver::matrix_solver_t *solver() const noexcept;
 	};
 
-	// -----------------------------------------------------------------------------
-	// terminal_t
-	// -----------------------------------------------------------------------------
-
+	/// \brief Base clase for terminals.
+	///
+	/// Each \ref nld_twoterm object consists of two terminals. Terminals
+	/// are at the core of analog netlists and provide. \ref net_t objects
+	/// connect terminals.
+	///
 	class terminal_t : public analog_t
 	{
 	public:
 
+		/// \brief constructor
+		///
+		/// @param dev core_devict_t object owning the terminal
+		/// @param aname name of this terminal
+		/// @param otherterm pointer to the sibling terminal
 		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm);
 
+		/// \brief Returns voltage of connected net
+		///
+		/// @return voltage of net this terminal is connected to
 		nl_fptype operator ()() const  noexcept;
 
+		/// @brief sets conductivity value of this terminal
+		///
+		/// @param G Conductivity
 		void set_conductivity(nl_fptype G) const noexcept
 		{
 			set_go_gt_I(-G, G, nlconst::zero());
@@ -884,14 +902,17 @@ namespace netlist
 			}
 		}
 
-		void solve_now() const;
+		/// @brief Solve the system this terminal is connected to.
+		///
+		/// \note deprecated - will be removed
+		void solve_now() const; // FIXME: remove this
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
 	private:
-		nl_fptype *m_Idr; // drive current
-		nl_fptype *m_go;  // conductance for Voltage from other term
-		nl_fptype *m_gt;  // conductance for total conductance
+		nl_fptype *m_Idr; ///< drive current
+		nl_fptype *m_go;  ///< conductance for Voltage from other term
+		nl_fptype *m_gt;  ///< conductance for total conductance
 
 	};
 
@@ -1007,7 +1028,16 @@ namespace netlist
 	{
 	public:
 
-		logic_output_t(device_t &dev, const pstring &aname);
+		/// \brief logic output constructor
+		///
+		/// The third parameter does nothing. It is provided only for
+		/// compatibility with tristate_output_t in templatized device models
+		///
+		/// \param dev Device owning this output
+		/// \param aname The name of this output
+		/// \param dummy Dummy parameter to allow construction like tristate output
+		///
+		logic_output_t(device_t &dev, const pstring &aname, bool dummy = false);
 
 		void initial(netlist_sig_t val) noexcept;
 
@@ -1021,6 +1051,20 @@ namespace netlist
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}
 
+		/// \brief Dummy implementation for templatized generic devices
+		///
+		/// This function shall never be called. It is defined here so that
+		/// templatized generic device models do not have to do tons of
+		/// template magic.
+		///
+		/// This function throws an exception if actually called.
+		///
+		[[noreturn]] void set_tristate(bool v,
+			netlist_time ts_off_on, netlist_time ts_on_off) const
+		{
+			plib::unused_var(v, ts_off_on, ts_on_off);
+			throw nl_exception("set_tristate on logic_output should never be called!");
+		}
 	private:
 		logic_net_t m_my_net;
 	};
@@ -1049,7 +1093,7 @@ namespace netlist
 		tristate_output_t(device_t &dev, const pstring &aname, bool force_logic)
 		: logic_output_t(dev, aname)
 		, m_last_logic(dev, name() + "." + "m_last_logic", 1) // force change
-		, m_tristate(dev, name() + "." + "m_tristate", 2) // force change
+		, m_tristate(dev, name() + "." + "m_tristate", force_logic ? 0 : 2) // force change
 		, m_force_logic(force_logic)
 		{}
 
@@ -1063,7 +1107,6 @@ namespace netlist
 		void set_tristate(bool v,
 			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
 		{
-			//printf("%s %d\n", this->name().c_str(), (int) m_force_logic);
 			if (!m_force_logic)
 				if (v != m_tristate)
 				{
@@ -1103,10 +1146,9 @@ namespace netlist
 		analog_net_t m_my_net;
 	};
 
-	// -----------------------------------------------------------------------------
-	// param_t
-	// -----------------------------------------------------------------------------
-
+	/// @brief Base class for all device parameters
+	///
+	/// All device parameters classes derive from this object.
 	class param_t : public detail::device_object_t
 	{
 	public:
@@ -1119,7 +1161,10 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(core_device_t *device, const pstring &name);
+		//deviceless, it's the responsibility of the owner to register!
+		param_t(const pstring &name);
+
+		param_t(core_device_t &device, const pstring &name);
 
 		PCOPYASSIGNMOVE(param_t, delete)
 		virtual ~param_t() noexcept = default;
@@ -1132,7 +1177,7 @@ namespace netlist
 
 		void update_param() noexcept;
 
-		pstring get_initial(const core_device_t &dev, bool *found) const;
+		pstring get_initial(const core_device_t *dev, bool *found) const;
 
 		template<typename C>
 		void set_and_update_param(C &p, const C v) noexcept
@@ -1226,7 +1271,7 @@ namespace netlist
 		param_str_t(core_device_t &device, const pstring &name, const pstring &val);
 		param_str_t(netlist_state_t &state, const pstring &name, const pstring &val);
 
-		const pstring &operator()() const noexcept { return str(); }
+		pstring operator()() const noexcept { return str(); }
 		void set(const pstring &param)
 		{
 			if (*m_param != param)
@@ -1242,7 +1287,7 @@ namespace netlist
 		}
 	protected:
 		virtual void changed() noexcept;
-		const pstring &str() const noexcept { return *m_param; }
+		pstring str() const noexcept { pstring ret = *m_param; return ret;}
 	private:
 		plib::unique_ptr<pstring> m_param;
 	};
@@ -1279,7 +1324,9 @@ namespace netlist
 		using value_str_t = value_base_t<pstring>;
 
 		param_model_t(core_device_t &device, const pstring &name, const pstring &val)
-		: param_str_t(device, name, val) { }
+		: param_str_t(device, name, val)
+		{
+		}
 
 		pstring value_str(const pstring &entity);
 		nl_fptype value(const pstring &entity);
@@ -1926,10 +1973,10 @@ namespace netlist
 		}
 
 		template<class D>
-		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt)
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt,  bool force_logic = false)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset));
+				this->emplace(i, dev, formatted(fmt, i+offset), force_logic);
 		}
 
 		template<class D>
@@ -1980,7 +2027,7 @@ namespace netlist
 
 		template<class D, std::size_t ND>
 		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
-//			const pstring &fmt, std::initializer_list<nldelegate> &delegates)
+//          const pstring &fmt, std::initializer_list<nldelegate> &delegates)
 			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
 		{
 			passert_always_msg(delegates.size() >= N, "initializer_list size mismatch");
@@ -2052,6 +2099,47 @@ namespace netlist
 			for (std::size_t i = 8; i < N; i++)
 				(*this)[i].push((v >> i) & 1, t);
 		}
+
+		void set_tristate(bool v,
+			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
+		{
+			for (std::size_t i = 0; i < N; i++)
+				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);
+		}
+
+	};
+
+	template<std::size_t N>
+	class object_array_t<tristate_output_t,N> : public object_array_base_t<tristate_output_t, N>
+	{
+	public:
+		using base_type = object_array_base_t<tristate_output_t, N>;
+		using base_type::base_type;
+
+		using value_type = std::uint_fast32_t;
+		//using value_type = typename plib::least_type_for_bits<N>::type;
+
+		void push(value_type v, netlist_time t)
+		{
+			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
+			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
+			if (N >= 3) (*this)[2].push((v >> 2) & 1, t);
+			if (N >= 4) (*this)[3].push((v >> 3) & 1, t);
+			if (N >= 5) (*this)[4].push((v >> 4) & 1, t);
+			if (N >= 6) (*this)[5].push((v >> 5) & 1, t);
+			if (N >= 7) (*this)[6].push((v >> 6) & 1, t);
+			if (N >= 8) (*this)[7].push((v >> 7) & 1, t);
+
+			for (std::size_t i = 8; i < N; i++)
+				(*this)[i].push((v >> i) & 1, t);
+		}
+
+		void set_tristate(bool v,
+			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
+		{
+			for (std::size_t i = 0; i < N; i++)
+				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);
+		}
 	};
 
 	// -----------------------------------------------------------------------------
@@ -2108,7 +2196,6 @@ namespace netlist
 		return state().make_object<T>(std::forward<Args>(args)...);
 	}
 
-
 	inline void param_t::update_param() noexcept
 	{
 		device().update_param();
@@ -2116,11 +2203,11 @@ namespace netlist
 
 	template <typename T>
 	param_num_t<T>::param_num_t(core_device_t &device, const pstring &name, const T val)
-	: param_t(&device, name)
+	: param_t(device, name)
+	, m_param(val)
 	{
-		//m_param = device.setup().get_initial_param_val(this->name(),val);
 		bool found = false;
-		pstring p = this->get_initial(device, &found);
+		pstring p = this->get_initial(&device, &found);
 		if (found)
 		{
 			plib::pfunction<nl_fptype> func;
@@ -2131,18 +2218,17 @@ namespace netlist
 					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
 			m_param = static_cast<T>(valx);
 		}
-		else
-			m_param = val;
 
 		device.state().save(*this, m_param, this->name(), "m_param");
 	}
 
 	template <typename T>
 	param_enum_t<T>::param_enum_t(core_device_t &device, const pstring &name, const T val)
-	: param_t(&device, name), m_param(val)
+	: param_t(device, name)
+	, m_param(val)
 	{
 		bool found = false;
-		pstring p = this->get_initial(device, &found);
+		pstring p = this->get_initial(&device, &found);
 		if (found)
 		{
 			T temp(val);
@@ -2317,8 +2403,6 @@ namespace netlist
 	inline netlist_sig_t logic_input_t::Q() const noexcept
 	{
 		nl_assert(terminal_state() != STATE_INP_PASSIVE);
-		//if (net().Q() != m_Q)
-		//  printf("term: %s, %d %d TS %d\n", this->name().c_str(), net().Q(), m_Q, terminal_state());
 #if NL_USE_COPY_INSTEAD_OF_REFERENCE
 		return m_Q;
 #else

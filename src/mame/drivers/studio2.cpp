@@ -300,7 +300,7 @@ private:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
 };
@@ -322,7 +322,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -506,7 +506,7 @@ WRITE_LINE_MEMBER( studio2_state::q_w )
 	m_beeper->set_state(state);
 }
 
-WRITE8_MEMBER( visicom_state::dma_w )
+void visicom_state::dma_w(offs_t offset, uint8_t data)
 {
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
@@ -524,7 +524,7 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	}
 }
 
-WRITE8_MEMBER( mpt02_state::dma_w )
+void mpt02_state::dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 

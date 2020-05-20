@@ -25,7 +25,7 @@ void special_state::init_special()
 	m_bank1->configure_entries(0, 2, RAM, 0xc000);
 }
 
-READ8_MEMBER( special_state::specialist_8255_porta_r )
+uint8_t special_state::specialist_8255_porta_r()
 {
 	for (int i = 0; i < 8; i++)
 		if (m_io_line[i]->read() != 0xff)
@@ -34,7 +34,7 @@ READ8_MEMBER( special_state::specialist_8255_porta_r )
 	return 0xff;
 }
 
-READ8_MEMBER( special_state::specialist_8255_portb_r )
+uint8_t special_state::specialist_8255_portb_r()
 {
 	uint8_t dat = 0xff;
 
@@ -60,7 +60,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	return dat;
 }
 
-READ8_MEMBER( special_state::specimx_8255_portb_r )
+uint8_t special_state::specimx_8255_portb_r()
 {
 	uint8_t dat = 0xff;
 
@@ -83,7 +83,7 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 	return dat;
 }
 
-READ8_MEMBER( special_state::specialist_8255_portc_r )
+uint8_t special_state::specialist_8255_portc_r()
 {
 	for (int i = 0; i < 4; i++)
 		if (m_io_line[8 + i]->read() != 0xff)
@@ -92,17 +92,17 @@ READ8_MEMBER( special_state::specialist_8255_portc_r )
 	return 0x0f;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_porta_w )
+void special_state::specialist_8255_porta_w(uint8_t data)
 {
 	m_specialist_8255_porta = data;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_portb_w )
+void special_state::specialist_8255_portb_w(uint8_t data)
 {
 	m_specialist_8255_portb = data;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_portc_w )
+void special_state::specialist_8255_portc_w(uint8_t data)
 {
 	m_specialist_8255_portc = data;
 

@@ -322,17 +322,17 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::reikaids_upd7807_porta_r)
+uint8_t homedata_state::reikaids_upd7807_porta_r()
 {
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_porta_w)
+void homedata_state::reikaids_upd7807_porta_w(uint8_t data)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
+void homedata_state::reikaids_upd7807_portc_w(uint8_t data)
 {
 	/* port C layout:
 	   7 coin counter
@@ -402,7 +402,7 @@ READ8_MEMBER(homedata_state::pteacher_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::pteacher_keyboard_r)
+uint8_t homedata_state::pteacher_keyboard_r()
 {
 	int dips = ioport("DSW")->read();
 
@@ -424,7 +424,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	return 0xff;
 }
 
-READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
+uint8_t homedata_state::pteacher_upd7807_porta_r()
 {
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_soundlatch->read();
@@ -434,12 +434,12 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
+void homedata_state::pteacher_upd7807_porta_w(uint8_t data)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
+void homedata_state::pteacher_upd7807_portc_w(uint8_t data)
 {
 	/* port C layout:
 	   7 coin counter
@@ -1235,10 +1235,8 @@ MACHINE_RESET_MEMBER(homedata_state,mrokumei)
 
 MACHINE_RESET_MEMBER(homedata_state,pteacher)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(space, 0, 0xff);
+	pteacher_upd7807_portc_w(0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 
@@ -1249,10 +1247,8 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 
 MACHINE_RESET_MEMBER(homedata_state,reikaids)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	reikaids_upd7807_portc_w(space, 0, 0xff);
+	reikaids_upd7807_portc_w(0xff);
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 

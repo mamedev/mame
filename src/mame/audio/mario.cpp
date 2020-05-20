@@ -467,12 +467,12 @@ void mario_state::sound_reset()
  *
  ****************************************************************/
 
-READ8_MEMBER(mario_state::mario_sh_p1_r)
+uint8_t mario_state::mario_sh_p1_r()
 {
 	return I8035_P1_R();
 }
 
-READ8_MEMBER(mario_state::mario_sh_p2_r)
+uint8_t mario_state::mario_sh_p2_r()
 {
 	return I8035_P2_R() & 0xEF; /* Bit 4 connected to GND! */
 }
@@ -508,12 +508,12 @@ WRITE8_MEMBER(mario_state::mario_sh_sound_w)
 #endif
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_p1_w)
+void mario_state::mario_sh_p1_w(uint8_t data)
 {
 	I8035_P1_W(data);
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_p2_w)
+void mario_state::mario_sh_p2_w(uint8_t data)
 {
 	I8035_P2_W(data);
 }

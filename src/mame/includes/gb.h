@@ -82,7 +82,7 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	void gbc_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	void gb_timer_callback(uint8_t data);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
 	DECLARE_READ8_MEMBER(gbc_cart_r);

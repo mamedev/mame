@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald, Robbbert, 68bit
+// copyright-holders:Barry Rodewald, 68bit
 /*
     Gimix 6809-Based Computers
 
@@ -96,10 +96,10 @@ private:
 	DECLARE_WRITE8_MEMBER(dma_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_WRITE8_MEMBER(pia_pa_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t pia_pa_r();
+	void pia_pa_w(uint8_t data);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -418,23 +418,23 @@ WRITE8_MEMBER(gimix_state::fdc_w)
 	m_fdc->write(offset,data);
 }
 
-READ8_MEMBER(gimix_state::pia_pa_r)
+uint8_t gimix_state::pia_pa_r()
 {
 	return m_pia1_pa;
 }
 
-WRITE8_MEMBER(gimix_state::pia_pa_w)
+void gimix_state::pia_pa_w(uint8_t data)
 {
 	m_pia1_pa = data;
 	logerror("PIA: Port A write %02x\n",data);
 }
 
-READ8_MEMBER(gimix_state::pia_pb_r)
+uint8_t gimix_state::pia_pb_r()
 {
 	return m_pia1_pb;
 }
 
-WRITE8_MEMBER(gimix_state::pia_pb_w)
+void gimix_state::pia_pb_w(uint8_t data)
 {
 	m_pia1_pb = data;
 	logerror("PIA: Port B write %02x\n",data);

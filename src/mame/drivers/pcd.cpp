@@ -56,7 +56,7 @@ public:
 	void pcd(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( irq_callback );
+	uint8_t irq_callback(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
 
@@ -140,7 +140,7 @@ void pcd_state::machine_reset()
 		m_mmu.type = 0;
 }
 
-READ8_MEMBER( pcd_state::irq_callback )
+uint8_t pcd_state::irq_callback(offs_t offset)
 {
 	return (offset ? m_pic2 : m_pic1)->acknowledge();
 }

@@ -169,11 +169,11 @@ private:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
-	DECLARE_WRITE8_MEMBER( ipc_port1_w );
-	DECLARE_WRITE8_MEMBER( ipc_port2_w );
-	DECLARE_READ8_MEMBER( ipc_port2_r );
+	void ipc_port1_w(uint8_t data);
+	void ipc_port2_w(uint8_t data);
+	uint8_t ipc_port2_r();
 	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
-	DECLARE_READ8_MEMBER( ipc_bus_r );
+	uint8_t ipc_bus_r();
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );
@@ -340,7 +340,7 @@ WRITE8_MEMBER( ql_state::ipc_w )
 //  ipc_port1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port1_w )
+void ql_state::ipc_port1_w(uint8_t data)
 {
 	/*
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 //  ipc_port2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_port2_r )
+uint8_t ql_state::ipc_port2_r()
 {
 	/*
 
@@ -398,7 +398,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 //  ipc_port2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port2_w )
+void ql_state::ipc_port2_w(uint8_t data)
 {
 	/*
 
@@ -458,7 +458,7 @@ READ_LINE_MEMBER( ql_state::ipc_t1_r )
 //  ipc_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_bus_r )
+uint8_t ql_state::ipc_bus_r()
 {
 	/*
 

@@ -68,8 +68,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_WRITE8_MEMBER(port1c_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
@@ -301,12 +301,12 @@ WRITE_LINE_MEMBER( rc702_state::hreq_w )
 	m_dma->hack_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( rc702_state::memory_read_byte )
+uint8_t rc702_state::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( rc702_state::memory_write_byte )
+void rc702_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }

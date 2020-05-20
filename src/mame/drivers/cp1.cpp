@@ -44,18 +44,18 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t port1_r();
+	uint8_t port2_r();
+	void port1_w(uint8_t data);
+	void port2_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	DECLARE_READ8_MEMBER(i8155_read);
 	DECLARE_WRITE8_MEMBER(i8155_write);
-	DECLARE_WRITE8_MEMBER(i8155_porta_w);
-	DECLARE_READ8_MEMBER(i8155_portb_r);
-	DECLARE_WRITE8_MEMBER(i8155_portb_w);
-	DECLARE_WRITE8_MEMBER(i8155_portc_w);
+	void i8155_porta_w(uint8_t data);
+	uint8_t i8155_portb_r();
+	void i8155_portb_w(uint8_t data);
+	void i8155_portc_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8155_device> m_i8155;
@@ -70,7 +70,7 @@ private:
 	uint8_t   m_matrix;
 };
 
-READ8_MEMBER(cp1_state::port1_r)
+uint8_t cp1_state::port1_r()
 {
 	logerror("Read from expansion port 1\n");
 
@@ -82,7 +82,7 @@ READ8_MEMBER(cp1_state::port1_r)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::port1_w)
+void cp1_state::port1_w(uint8_t data)
 {
 	logerror("Write to expansion port 1 %x\n", data);
 
@@ -90,7 +90,7 @@ WRITE8_MEMBER(cp1_state::port1_w)
 		m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(cp1_state::port2_r)
+uint8_t cp1_state::port2_r()
 {
 	// x--- ----   I8155 IO/M
 	// -x-- ----   I8155 RESET
@@ -107,7 +107,7 @@ READ8_MEMBER(cp1_state::port2_r)
 	return (data & 0x0f) | (m_port2 & 0xf0);
 }
 
-WRITE8_MEMBER(cp1_state::port2_w)
+void cp1_state::port2_w(uint8_t data)
 {
 	if (data & 0x40)
 	{
@@ -154,24 +154,24 @@ WRITE8_MEMBER(cp1_state::i8155_write)
 	}
 }
 
-WRITE8_MEMBER(cp1_state::i8155_porta_w)
+void cp1_state::i8155_porta_w(uint8_t data)
 {
 	m_7seg = data & 0x7f; // PA7 is not connected
 	m_display->matrix(~m_matrix, m_7seg);
 }
 
-READ8_MEMBER(cp1_state::i8155_portb_r)
+uint8_t cp1_state::i8155_portb_r()
 {
 	logerror("read from expansion port 2\n");
 	return 0;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portb_w)
+void cp1_state::i8155_portb_w(uint8_t data)
 {
 	logerror("Write to expansion port 2 %x\n", data);
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portc_w)
+void cp1_state::i8155_portc_w(uint8_t data)
 {
 	// --xx xxxx   keyboard matrix, 7seg select
 	m_matrix = data & 0x3f;

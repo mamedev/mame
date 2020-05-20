@@ -517,7 +517,7 @@ WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
 
-READ8_MEMBER( pc9801_state::sasi_data_r )
+uint8_t pc9801_state::sasi_data_r()
 {
 	uint8_t data = m_sasi_data_in->read();
 
@@ -526,7 +526,7 @@ READ8_MEMBER( pc9801_state::sasi_data_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc9801_state::sasi_data_w )
+void pc9801_state::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
@@ -1816,7 +1816,7 @@ ir7
 */
 
 
-READ8_MEMBER(pc9801_state::get_slave_ack)
+uint8_t pc9801_state::get_slave_ack(offs_t offset)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pic2->acknowledge();
@@ -1864,7 +1864,7 @@ WRITE_LINE_MEMBER(pc9801_state::tc_w )
 //  logerror("TC %02x\n",state);
 }
 
-READ8_MEMBER(pc9801_state::dma_read_byte)
+uint8_t pc9801_state::dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -1890,7 +1890,7 @@ READ8_MEMBER(pc9801_state::dma_read_byte)
 }
 
 
-WRITE8_MEMBER(pc9801_state::dma_write_byte)
+void pc9801_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -1936,12 +1936,12 @@ ch3 SCSI
 *
 ****************************************/
 
-WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
+void pc9801_state::ppi_sys_portc_w(uint8_t data)
 {
 	m_beeper->set_state(!(data & 0x08));
 }
 
-READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
+uint8_t pc9801_state::ppi_mouse_porta_r()
 {
 	uint8_t res;
 	uint8_t isporthi;
@@ -1964,17 +1964,17 @@ READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 	return res;
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
+void pc9801_state::ppi_mouse_porta_w(uint8_t data)
 {
 //  logerror("A %02x\n",data);
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
+void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 {
 //  logerror("B %02x\n",data);
 }
 
-WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
+void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 {
 	if((m_mouse.control & 0x80) == 0 && data & 0x80)
 	{

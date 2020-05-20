@@ -275,9 +275,6 @@ namespace plib {
 			postfix.push_back(opstk.top());
 			opstk.pop();
 		}
-		//printf("e : %s\n", expr.c_str());
-		//for (auto &s : postfix)
-		//  printf("x : %s\n", s.c_str());
 		compile_postfix(inputs, postfix, expr);
 	}
 

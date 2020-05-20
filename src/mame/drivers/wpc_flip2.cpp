@@ -197,10 +197,10 @@ void wpc_flip2_state::wpc_flip2(machine_config &config)
 	m_wpc->irq_callback().set(FUNC(wpc_flip2_state::wpc_irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_flip2_state::wpc_firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_flip2_state::wpc_rombank_w));
-	m_wpc->sound_ctrl_read().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_r));
-	m_wpc->sound_ctrl_write().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_w));
-	m_wpc->sound_data_read().set(FUNC(wpc_flip2_state::wpc_sound_data_r));
-	m_wpc->sound_data_write().set(FUNC(wpc_flip2_state::wpc_sound_data_w));
+	m_wpc->sound_ctrl_read().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_r));
+	m_wpc->sound_ctrl_write().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_w));
+	m_wpc->sound_data_read().set(m_wpcsnd, FUNC(wpcsnd_device::data_r));
+	m_wpc->sound_data_write().set(m_wpcsnd, FUNC(wpcsnd_device::data_w));
 	m_wpc->dmdbank_write().set(FUNC(wpc_flip2_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();

@@ -213,21 +213,21 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
 	DECLARE_WRITE8_MEMBER( to7_cartridge_w );
 	DECLARE_READ8_MEMBER( to7_cartridge_r );
-	DECLARE_WRITE8_MEMBER( to7_timer_port_out );
-	DECLARE_READ8_MEMBER( to7_timer_port_in );
+	void to7_timer_port_out(uint8_t data);
+	uint8_t to7_timer_port_in();
 	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette );
 	DECLARE_WRITE_LINE_MEMBER( to7_sys_cb2_out );
-	DECLARE_WRITE8_MEMBER( to7_sys_portb_out );
-	DECLARE_READ8_MEMBER( to7_sys_porta_in );
-	DECLARE_READ8_MEMBER( to7_sys_portb_in );
+	void to7_sys_portb_out(uint8_t data);
+	uint8_t to7_sys_porta_in();
+	uint8_t to7_sys_portb_in();
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 	DECLARE_READ8_MEMBER( to7_modem_mea8000_r );
 	DECLARE_WRITE8_MEMBER( to7_modem_mea8000_w );
-	DECLARE_READ8_MEMBER( to7_game_porta_in );
-	DECLARE_READ8_MEMBER( to7_game_portb_in );
-	DECLARE_WRITE8_MEMBER( to7_game_portb_out );
+	uint8_t to7_game_porta_in();
+	uint8_t to7_game_portb_in();
+	void to7_game_portb_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( to7_game_cb2_out );
 	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
 	DECLARE_READ8_MEMBER( to7_midi_r );
@@ -235,11 +235,11 @@ private:
 	DECLARE_MACHINE_RESET( to7 );
 	DECLARE_MACHINE_START( to7 );
 	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
-	DECLARE_READ8_MEMBER( to770_sys_porta_in );
+	uint8_t to770_sys_porta_in();
 	void to7_update_cart_bank_postload();
 	void to770_update_ram_bank_postload();
-	DECLARE_WRITE8_MEMBER( to770_sys_portb_out );
-	DECLARE_WRITE8_MEMBER( to770_timer_port_out );
+	void to770_sys_portb_out(uint8_t data);
+	void to770_timer_port_out(uint8_t data);
 	DECLARE_READ8_MEMBER( to770_gatearray_r );
 	DECLARE_WRITE8_MEMBER( to770_gatearray_w );
 	DECLARE_MACHINE_RESET( to770 );
@@ -247,9 +247,9 @@ private:
 	void to7_lightpen_cb( int step );
 	void mo5_lightpen_cb( int step );
 	TIMER_CALLBACK_MEMBER( mo5_periodic_cb );
-	DECLARE_WRITE8_MEMBER( mo5_sys_porta_out );
-	DECLARE_READ8_MEMBER( mo5_sys_porta_in );
-	DECLARE_READ8_MEMBER( mo5_sys_portb_in );
+	void mo5_sys_porta_out(uint8_t data);
+	uint8_t mo5_sys_porta_in();
+	uint8_t mo5_sys_portb_in();
 	DECLARE_READ8_MEMBER( mo5_gatearray_r );
 	DECLARE_WRITE8_MEMBER( mo5_gatearray_w );
 	void mo5_update_cart_bank_postload();
@@ -271,10 +271,10 @@ private:
 	DECLARE_READ8_MEMBER( to9_kbd_r );
 	DECLARE_WRITE8_MEMBER( to9_kbd_w );
 	TIMER_CALLBACK_MEMBER( to9_kbd_timer_cb );
-	DECLARE_READ8_MEMBER( to9_sys_porta_in );
-	DECLARE_WRITE8_MEMBER( to9_sys_porta_out );
-	DECLARE_WRITE8_MEMBER( to9_sys_portb_out );
-	DECLARE_WRITE8_MEMBER( to9_timer_port_out );
+	uint8_t to9_sys_porta_in();
+	void to9_sys_porta_out(uint8_t data);
+	void to9_sys_portb_out(uint8_t data);
+	void to9_timer_port_out(uint8_t data);
 	DECLARE_MACHINE_RESET( to9 );
 	DECLARE_MACHINE_START( to9 );
 	TIMER_CALLBACK_MEMBER( to8_kbd_timer_cb );
@@ -289,16 +289,16 @@ private:
 	DECLARE_WRITE8_MEMBER( to8_gatearray_w );
 	DECLARE_READ8_MEMBER( to8_vreg_r );
 	DECLARE_WRITE8_MEMBER( to8_vreg_w );
-	DECLARE_READ8_MEMBER( to8_sys_porta_in );
-	DECLARE_WRITE8_MEMBER( to8_sys_portb_out );
-	DECLARE_READ8_MEMBER( to8_timer_port_in );
-	DECLARE_WRITE8_MEMBER( to8_timer_port_out );
+	uint8_t to8_sys_porta_in();
+	void to8_sys_portb_out(uint8_t data);
+	uint8_t to8_timer_port_in();
+	void to8_timer_port_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( to8_timer_cp2_out );
 	void to8_lightpen_cb( int step );
 	DECLARE_MACHINE_RESET( to8 );
 	DECLARE_MACHINE_START( to8 );
-	DECLARE_READ8_MEMBER( to9p_timer_port_in );
-	DECLARE_WRITE8_MEMBER( to9p_timer_port_out );
+	uint8_t to9p_timer_port_in();
+	void to9p_timer_port_out(uint8_t data);
 	DECLARE_MACHINE_RESET( to9p );
 	DECLARE_MACHINE_START( to9p );
 	void mo6_update_ram_bank_postload();
@@ -307,12 +307,12 @@ private:
 	DECLARE_READ8_MEMBER( mo6_cartridge_r );
 	DECLARE_WRITE8_MEMBER( mo6_ext_w );
 	DECLARE_WRITE_LINE_MEMBER( mo6_centronics_busy );
-	DECLARE_WRITE8_MEMBER( mo6_game_porta_out );
+	void mo6_game_porta_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( mo6_game_cb2_out );
 	TIMER_CALLBACK_MEMBER( mo6_game_update_cb );
-	DECLARE_READ8_MEMBER( mo6_sys_porta_in );
-	DECLARE_READ8_MEMBER( mo6_sys_portb_in );
-	DECLARE_WRITE8_MEMBER( mo6_sys_porta_out );
+	uint8_t mo6_sys_porta_in();
+	uint8_t mo6_sys_portb_in();
+	void mo6_sys_porta_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( mo6_sys_cb2_out );
 	DECLARE_READ8_MEMBER( mo6_gatearray_r );
 	DECLARE_WRITE8_MEMBER( mo6_gatearray_w );
@@ -324,8 +324,8 @@ private:
 	DECLARE_WRITE8_MEMBER( mo5nr_net_w );
 	DECLARE_READ8_MEMBER( mo5nr_prn_r );
 	DECLARE_WRITE8_MEMBER( mo5nr_prn_w );
-	DECLARE_READ8_MEMBER( mo5nr_sys_portb_in );
-	DECLARE_WRITE8_MEMBER( mo5nr_sys_porta_out );
+	uint8_t mo5nr_sys_portb_in();
+	void mo5nr_sys_porta_out(uint8_t data);
 	DECLARE_MACHINE_RESET( mo5nr );
 	DECLARE_MACHINE_START( mo5nr );
 
@@ -698,10 +698,10 @@ private:
 	int m_dsr;
 
 	/* read data register */
-	DECLARE_READ8_MEMBER(porta_in);
+	uint8_t porta_in();
 
 	/* write data register */
-	DECLARE_WRITE8_MEMBER(porta_out);
+	void porta_out(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	DECLARE_WRITE_LINE_MEMBER(write_cts);

@@ -78,7 +78,7 @@ private:
 	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE16_MEMBER(charram_w);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
@@ -86,8 +86,8 @@ private:
 	DECLARE_WRITE8_MEMBER(p7c_w);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
@@ -141,7 +141,7 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 	}
 }
 
-READ8_MEMBER(peoplepc_state::get_slave_ack)
+uint8_t peoplepc_state::get_slave_ack(offs_t offset)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -189,13 +189,13 @@ WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(peoplepc_state::memory_read_byte)
+uint8_t peoplepc_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(peoplepc_state::memory_write_byte)
+void peoplepc_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);

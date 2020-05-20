@@ -72,10 +72,10 @@ private:
 	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
 	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
 	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
-	DECLARE_READ8_MEMBER( eacc_keyboard_r );
+	uint8_t eacc_keyboard_r();
 	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
-	DECLARE_WRITE8_MEMBER( eacc_digit_w );
-	DECLARE_WRITE8_MEMBER( eacc_segment_w );
+	void eacc_digit_w(uint8_t data);
+	void eacc_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 	void eacc_mem(address_map &map);
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
 	m_cb2 = state;
 }
 
-READ8_MEMBER( eacc_state::eacc_keyboard_r )
+uint8_t eacc_state::eacc_keyboard_r()
 {
 	uint8_t data = m_digit;
 
@@ -196,7 +196,7 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( eacc_state::eacc_segment_w )
+void eacc_state::eacc_segment_w(uint8_t data)
 {
 	//d7 segment dot
 	//d6 segment c
@@ -230,7 +230,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 	}
 }
 
-WRITE8_MEMBER( eacc_state::eacc_digit_w )
+void eacc_state::eacc_digit_w(uint8_t data)
 {
 	if (m_nmi)
 	{

@@ -71,14 +71,14 @@ private:
 	DECLARE_WRITE16_MEMBER(memmap_w);
 	DECLARE_WRITE_LINE_MEMBER(adir_w);
 	DECLARE_WRITE_LINE_MEMBER(bdir_w);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(videosram_store_w);
 	DECLARE_WRITE8_MEMBER(videosram_recall_w);
 	DECLARE_READ8_MEMBER(video_timer_r);
 	DECLARE_WRITE8_MEMBER(video_timer_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(video_status_r);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
@@ -366,13 +366,13 @@ WRITE_LINE_MEMBER(wicat_state::bdir_w)
 	// parallel port B direction (0 = input, 1 = output)
 }
 
-WRITE8_MEMBER( wicat_state::via_a_w )
+void wicat_state::via_a_w(uint8_t data)
 {
 	m_portA = data;
 	logerror("VIA: write %02x to port A\n",data);
 }
 
-WRITE8_MEMBER( wicat_state::via_b_w )
+void wicat_state::via_b_w(uint8_t data)
 {
 	m_portB = data;
 	logerror("VIA: write %02x to port B\n",data);
@@ -535,12 +535,12 @@ WRITE16_MEMBER(wicat_state::via_w)
 		m_via->write(offset,data>>8);
 }
 
-READ8_MEMBER( wicat_state::vram_r )
+uint8_t wicat_state::vram_r(offs_t offset)
 {
 	return m_videocpu->space(AS_IO).read_byte(offset*2);
 }
 
-WRITE8_MEMBER( wicat_state::vram_w )
+void wicat_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videocpu->space(AS_IO).write_byte(offset*2,data);
 }

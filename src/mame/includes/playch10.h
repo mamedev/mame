@@ -68,7 +68,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
 	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
 	DECLARE_READ8_MEMBER(pc10_detectclr_r);
-	DECLARE_WRITE8_MEMBER(cart_sel_w);
+	void cart_sel_w(uint8_t data);
 	DECLARE_READ8_MEMBER(pc10_prot_r);
 	DECLARE_WRITE8_MEMBER(pc10_prot_w);
 	DECLARE_WRITE8_MEMBER(pc10_in0_w);

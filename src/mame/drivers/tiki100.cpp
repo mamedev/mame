@@ -32,7 +32,7 @@
 
 /* Memory Banking */
 
-READ8_MEMBER( tiki100_state::mrq_r )
+uint8_t tiki100_state::mrq_r(offs_t offset)
 {
 	bool mdis = 1;
 
@@ -66,7 +66,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::mrq_w )
+void tiki100_state::mrq_w(offs_t offset, uint8_t data)
 {
 	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
@@ -541,7 +541,7 @@ DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( tiki100_state::pio_pb_r )
+uint8_t tiki100_state::pio_pb_r()
 {
 	/*
 
@@ -571,7 +571,7 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::pio_pb_w )
+void tiki100_state::pio_pb_w(uint8_t data)
 {
 	/*
 
@@ -637,7 +637,7 @@ static void tiki100_floppies(device_slot_interface &device)
 
 /* AY-3-8912 Interface */
 
-WRITE8_MEMBER( tiki100_state::video_scroll_w )
+void tiki100_state::video_scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }

@@ -10,6 +10,13 @@
 #include "emumem_hedw.h"
 
 
+template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+{
+	dispatch = m_dispatch;
+	mask = BITMASK;
+	shift = LowBits;
+}
+
 template<int HighBits, int Width, int AddrShift, int Endian> handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::handler_entry_write_dispatch(address_space *space, const handler_entry::range &init, handler_entry_write<Width, AddrShift, Endian> *handler) : handler_entry_write<Width, AddrShift, Endian>(space, handler_entry::F_DISPATCH)
 {
 	if (!handler)
@@ -49,7 +56,7 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 
 template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)
 {
-	m_dispatch[(offset >> LowBits) & BITMASK]->write(offset, data, mem_mask);
+	dispatch_write<Width, AddrShift, Endian>(BITMASK, LowBits, offset, data, mem_mask, m_dispatch);
 }
 
 template<int HighBits, int Width, int AddrShift, int Endian> void *handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>::get_ptr(offs_t offset) const

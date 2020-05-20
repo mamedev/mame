@@ -41,7 +41,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(p2000t_port_888b_w);
 	DECLARE_WRITE8_MEMBER(p2000t_port_8c90_w);
 	DECLARE_WRITE8_MEMBER(p2000t_port_9494_w);
-	DECLARE_READ8_MEMBER(videoram_r);
+	uint8_t videoram_r(offs_t offset);
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 

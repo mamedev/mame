@@ -356,21 +356,21 @@ private:
 
 	DECLARE_READ8_MEMBER(swyft_via0_r);
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
-	DECLARE_READ8_MEMBER(via0_pa_r);
-	DECLARE_WRITE8_MEMBER(via0_pa_w);
+	uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
-	DECLARE_READ8_MEMBER(via0_pb_r);
-	DECLARE_WRITE8_MEMBER(via0_pb_w);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
 
 	DECLARE_READ8_MEMBER(swyft_via1_r);
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
-	DECLARE_READ8_MEMBER(via1_pa_r);
-	DECLARE_WRITE8_MEMBER(via1_pa_w);
+	uint8_t via1_pa_r();
+	void via1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
-	DECLARE_READ8_MEMBER(via1_pb_r);
-	DECLARE_WRITE8_MEMBER(via1_pb_w);
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 
@@ -671,13 +671,13 @@ WRITE8_MEMBER( swyft_state::swyft_via1_w )
 }
 
 // first via
-READ8_MEMBER( swyft_state::via0_pa_r )
+uint8_t swyft_state::via0_pa_r()
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pa_w )
+void swyft_state::via0_pa_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port A written with data of 0x%02x!\n", data);
 }
@@ -687,13 +687,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
 	LOGMASKED(LOG_VIA0, "VIA0: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via0_pb_r )
+uint8_t swyft_state::via0_pb_r()
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pb_w )
+void swyft_state::via0_pb_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA0, "VIA0: Port B written with data of 0x%02x!\n", data);
 }
@@ -709,13 +709,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_cb2_w )
 }
 
 // second via
-READ8_MEMBER( swyft_state::via1_pa_r )
+uint8_t swyft_state::via1_pa_r()
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pa_w )
+void swyft_state::via1_pa_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port A written with data of 0x%02x!\n", data);
 }
@@ -725,13 +725,13 @@ WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
 	LOGMASKED(LOG_VIA1, "VIA1: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via1_pb_r )
+uint8_t swyft_state::via1_pb_r()
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pb_w )
+void swyft_state::via1_pb_w(uint8_t data)
 {
 	LOGMASKED(LOG_VIA1, "VIA1: Port B written with data of 0x%02x!\n", data);
 }

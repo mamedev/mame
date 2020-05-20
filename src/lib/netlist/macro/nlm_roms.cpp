@@ -17,11 +17,19 @@
 //-    for optimization of word expansion in bused organizations.
 //-
 //.
-//- Pinalias: A6,A5,A4,A3,A0,A1,A2,GND,O3,O2,O1,O0,CE1Q,CE2Q,A7,VCC
+//- Pinalias: A6,A5,A4,A3,A0,A1,A2,GND,O4,O3,O2,O1,CE1Q,CE2Q,A7,VCC
 //- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
+//- Param: MODEL
+//-    Overwrite the default model of the device. Use with care.
 //- NamingConvention: Naming conventions follow Philips Components-Signetics datasheet
 //- Limitations:
-//-    Currently neither OC nor Tristate is supported.
+//-    Currently OC is not supported.
 //-
 //- Example: 82S126.cpp,82S126_example
 //- FunctionTable:
@@ -33,7 +41,11 @@ static NETLIST_START(PROM_82S126_DIP)
 	PROM_82S126(A)
 
 	DEFPARAM(ROM, "unknown")
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	DEFPARAM(MODEL, "$(A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A.MODEL, "$(@.MODEL)")
 	ALIAS(1, A.A6)
 	ALIAS(2, A.A5)
 	ALIAS(3, A.A4)
@@ -42,22 +54,58 @@ static NETLIST_START(PROM_82S126_DIP)
 	ALIAS(6, A.A1)
 	ALIAS(7, A.A2)
 	ALIAS(8, A.GND)
-	ALIAS(9, A.O3)
-	ALIAS(10, A.O2)
-	ALIAS(11, A.O1)
-	ALIAS(12, A.O0)
+	ALIAS(9, A.O4)
+	ALIAS(10, A.O3)
+	ALIAS(11, A.O2)
+	ALIAS(12, A.O1)
 	ALIAS(13, A.CE1Q)
 	ALIAS(14, A.CE2Q)
 	ALIAS(15, A.A7)
 	ALIAS(16, A.VCC)
 NETLIST_END()
 
+//- Identifier:  PROM_74S287_DIP
+//- Title: 74S287 (256 x 4) 1024-Bit TTL PROM
+//- Description: This Schottky memory is organized in the popular 256 words by
+//-    4 bits configuration. Memory enable inputs are provided to control the
+//-    output states. When the device is enabled, the outputs represent the
+//-    contents of the selected word. When disabled, the 4 outputs go to the
+//-    or high impedance state.
+//-
+//-    PROMs are shipped from the factory with lows in all locations. A high
+//-    may be programmed into any selected location by following the
+//-    programming instructions.
+//-
+//.
+//- Pinalias: A6,A5,A4,A3,A0,A1,A2,GND,O3,O2,O1,O0,CE1Q,CE2Q,A7,VCC
+//- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
+//- Param: MODEL
+//-    Overwrite the default model of the device. Use with care.
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    None.
+//-
+//- Example: 74S287.cpp,74S287_example
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet_pdf/national-semiconductor/DM54S287AJ_to_DM74S287V.pdf
+//-
+
 static NETLIST_START(PROM_74S287_DIP)
 
 	PROM_74S287(A)
 
 	DEFPARAM(ROM, "unknown")
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	DEFPARAM(MODEL, "$(A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A.MODEL, "$(@.MODEL)")
 	ALIAS(1, A.A6)
 	ALIAS(2, A.A5)
 	ALIAS(3, A.A4)
@@ -88,12 +136,20 @@ NETLIST_END()
 //-    memory expansion. They feature either open collector or 3-State outputs
 //-    for optimization of word expansion in bused organizations.
 //-
-//.
+//-
 //- Pinalias: O1,O2,O3,O4,O5,O6,O7,GND,O8,A0,A1,A2,A3,A4,CEQ,VCC
 //- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
+//- Param: MODEL
+//-    Overwrite the default model of the device. Use with care.
 //- NamingConvention: Naming conventions follow Philips Components-Signetics datasheet
 //- Limitations:
-//-    Currently neither OC nor Tristate is supported.
+//-    Currently OC is not supported.
 //-
 //- Example: 82S123.cpp,82S123_example
 //- FunctionTable:
@@ -105,7 +161,11 @@ static NETLIST_START(PROM_82S123_DIP)
 	PROM_82S123(A)
 
 	DEFPARAM(ROM, "unknown")
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	DEFPARAM(MODEL, "$(A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A.MODEL, "$(@.MODEL)")
 	ALIAS(1, A.O0)
 	ALIAS(2, A.O1)
 	ALIAS(3, A.O2)
@@ -151,9 +211,17 @@ NETLIST_END()
 //-
 //- Pinalias: A7,A6,A6,A4,A4,A2,A1,A0,O0,O1,O2,GND,O3,O4,O5,O6,O7,CE1Q/CE,A10,CE2Q/OE,VPP,A9,A8,VCC
 //- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- Param: FORCE_TRISTATE_LOGIC
+//-    Set this parameter to 1 force tristate outputs into logic mode.
+//-    This should be done only if the device enable inputs are connected
+//-    in a way which always enables the device.
+//- Param: MODEL
+//-    Overwrite the default model of the device. Use with care.
 //- NamingConvention: Naming conventions follow Intel datasheet
 //- Limitations:
-//-    Currently Tristate is not supported.
+//-    Currently OC is not supported.
 //-
 //- Example: 2716.cpp,2716_example
 //- FunctionTable:
@@ -164,7 +232,11 @@ static NETLIST_START(EPROM_2716_DIP)
 	EPROM_2716(A)
 
 	DEFPARAM(ROM, "unknown")
+	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
+	DEFPARAM(MODEL, "$(A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
+	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
+	PARAM(A.MODEL, "$(@.MODEL)")
 	ALIAS(1, A.A7)
 	ALIAS(2, A.A6)
 	ALIAS(3, A.A5)

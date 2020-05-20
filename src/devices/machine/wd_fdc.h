@@ -358,8 +358,11 @@ private:
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);
 
-	void drop_drq();
 	void set_drq();
+	void drop_drq();
+
+	void set_hld();
+	void drop_hld();
 
 	void update_sso();
 };

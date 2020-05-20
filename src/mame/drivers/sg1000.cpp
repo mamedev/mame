@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( sf7000_state::ppi_pa_r )
+uint8_t sf7000_state::ppi_pa_r()
 {
 	/*
 	    Signal  Description
@@ -399,7 +399,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( sf7000_state::ppi_pc_w )
+void sf7000_state::ppi_pc_w(uint8_t data)
 {
 	/*
 	    Signal  Description

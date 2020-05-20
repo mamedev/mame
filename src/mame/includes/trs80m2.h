@@ -66,8 +66,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER( drvslt_w );
 	DECLARE_WRITE8_MEMBER( rom_enable_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
@@ -78,16 +78,16 @@ public:
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE_LINE_MEMBER( de_w );
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
 	void kbd_w(u8 data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);

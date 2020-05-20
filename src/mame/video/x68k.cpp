@@ -93,22 +93,22 @@ bitmap_rgb32* ::x68k_get_gfx_page(int pri,int type)
 }
 */
 
-READ16_MEMBER(x68k_state::tvram_read)
+uint16_t x68k_state::tvram_read(offs_t offset)
 {
 	return m_tvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::tvram_write)
+void x68k_state::tvram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tvram[offset]);
 }
 
-READ16_MEMBER(x68k_state::gvram_read)
+uint16_t x68k_state::gvram_read(offs_t offset)
 {
 	return m_gvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::gvram_write)
+void x68k_state::gvram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gvram[offset]);
 }

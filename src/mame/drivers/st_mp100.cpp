@@ -50,13 +50,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 private:
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
+	uint8_t u10_a_r();
+	void u10_a_w(uint8_t data);
+	uint8_t u10_b_r();
+	void u10_b_w(uint8_t data);
+	uint8_t u11_a_r();
+	void u11_a_w(uint8_t data);
+	void u11_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
@@ -526,12 +526,12 @@ WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( st_mp100_state::u10_a_r )
+uint8_t st_mp100_state::u10_a_r()
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( st_mp100_state::u10_a_w )
+void st_mp100_state::u10_a_w(uint8_t data)
 {
 	m_u10a = data;
 
@@ -556,7 +556,7 @@ WRITE8_MEMBER( st_mp100_state::u10_a_w )
 	}
 }
 
-READ8_MEMBER( st_mp100_state::u10_b_r )
+uint8_t st_mp100_state::u10_b_r()
 {
 	uint8_t data = 0;
 
@@ -590,17 +590,17 @@ READ8_MEMBER( st_mp100_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( st_mp100_state::u10_b_w )
+void st_mp100_state::u10_b_w(uint8_t data)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( st_mp100_state::u11_a_r )
+uint8_t st_mp100_state::u11_a_r()
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( st_mp100_state::u11_a_w )
+void st_mp100_state::u11_a_w(uint8_t data)
 {
 	m_u11a = data;
 
@@ -631,7 +631,7 @@ WRITE8_MEMBER( st_mp100_state::u11_a_w )
 	}
 }
 
-WRITE8_MEMBER( st_mp100_state::u11_b_w )
+void st_mp100_state::u11_b_w(uint8_t data)
 {
 	m_u11b = data;
 	if (!m_u11_cb2)

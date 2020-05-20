@@ -50,6 +50,16 @@ Gambit(v3) hardware notes:
 MCU ports I/O again identical to SC6.
 The same MCU+ROM was also used in Designer 1500(PCB label 510.1131A01).
 
+Gambit Voice hardware notes:
+- TMP80C50AP-6-9311 MCU, 4KB internal ROM, 6MHz XTAL
+- 510.1117A01 sound PCB, the one from Excel Voice, but with 2332 ROM
+- speaker, 16 leds, 8*8 chessboard buttons
+
+To summarize, known MCU chip ROM serials+year:
+- 100-1020B01 (1989), The Gambit
+- 100-1020B02 (1987), The Classic
+- 100-1020C01 (1987), Gambit Voice
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -306,7 +316,7 @@ void sc6_state::msc(machine_config &config)
 
 void sc6_state::sc6(machine_config &config)
 {
-	msc(config);
+	gambit(config);
 
 	/* basic machine hardware */
 	I8040(config.replace(), m_maincpu, 11_MHz_XTAL);
@@ -322,8 +332,8 @@ void sc6_state::sc6(machine_config &config)
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "fidel_sc6").set_must_be_loaded(true);
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("fidel_sc6");
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_sc6").set_must_be_loaded(true);
+	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
 }
 
 

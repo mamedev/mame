@@ -399,9 +399,7 @@ namespace plib {
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
-		//auto t = reinterpret_cast<std::uintptr_t>(p);
-		//if (t & (ALIGN-1))
-		//  printf("alignment error!");
+
 #if (PUSE_ALIGNED_HINTS)
 		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
 #else

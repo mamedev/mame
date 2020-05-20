@@ -100,9 +100,9 @@ private:
 	DECLARE_READ8_MEMBER(mz3500_fdc_r);
 	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
 	DECLARE_READ8_MEMBER(mz3500_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(mz3500_pa_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
+	void mz3500_pa_w(uint8_t data);
+	void mz3500_pb_w(uint8_t data);
+	void mz3500_pc_w(uint8_t data);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -636,12 +636,12 @@ void mz3500_state::mz3500_slave_io(address_map &map)
 	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
+void mz3500_state::mz3500_pa_w(uint8_t data)
 {
 	// printer data
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
+void mz3500_state::mz3500_pb_w(uint8_t data)
 {
 	/*
 	x--- ---- CG select (ROM and/or upd7220 clock?)
@@ -654,7 +654,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
 	m_srdy = (data & 0x40) >> 6;
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
+void mz3500_state::mz3500_pc_w(uint8_t data)
 {
 	/*
 	x--- ---- printer OBF output

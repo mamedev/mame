@@ -564,12 +564,12 @@ bit 1: ACCESS RAM 0
 bit 0: CAOS ROM E
 */
 
-READ8_MEMBER( kc_state::pio_porta_r )
+uint8_t kc_state::pio_porta_r()
 {
 	return m_pio_data[0];
 }
 
-WRITE8_MEMBER( kc_state::pio_porta_w )
+void kc_state::pio_porta_w(uint8_t data)
 {
 	if (m_pio_data[0] != data) // to avoid a severe slowdown during cassette loading
 	{
@@ -595,12 +595,12 @@ bit 2: TONE 2
 bit 1: TONE 1
 bit 0: TRUCK */
 
-READ8_MEMBER( kc_state::pio_portb_r )
+uint8_t kc_state::pio_portb_r()
 {
 	return m_pio_data[1];
 }
 
-WRITE8_MEMBER( kc_state::pio_portb_w )
+void kc_state::pio_portb_w(uint8_t data)
 {
 	m_pio_data[1] = data;
 

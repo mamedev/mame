@@ -131,7 +131,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 }
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
+void pce_state::mess_pce_joystick_w(uint8_t data)
 {
 	int joy_i;
 	uint8_t joy_type = m_joy_type->read();
@@ -158,7 +158,7 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 	}
 }
 
-READ8_MEMBER(pce_state::mess_pce_joystick_r)
+uint8_t pce_state::mess_pce_joystick_r()
 {
 	uint8_t joy_type = m_joy_type->read();
 	uint8_t ret, data;

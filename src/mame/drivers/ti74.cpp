@@ -108,9 +108,9 @@ private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	u8 keyboard_r();
+	void keyboard_w(u8 data);
+	void bankswitch_w(u8 data);
 
 	void ti74_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -240,7 +240,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 ***************************************************************************/
 
-READ8_MEMBER(ti74_state::keyboard_r)
+u8 ti74_state::keyboard_r()
 {
 	u8 ret = 0;
 
@@ -254,13 +254,13 @@ READ8_MEMBER(ti74_state::keyboard_r)
 	return ret;
 }
 
-WRITE8_MEMBER(ti74_state::keyboard_w)
+void ti74_state::keyboard_w(u8 data)
 {
 	// d(0-7): select keyboard column
 	m_key_select = data;
 }
 
-WRITE8_MEMBER(ti74_state::bankswitch_w)
+void ti74_state::bankswitch_w(u8 data)
 {
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);

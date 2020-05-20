@@ -78,7 +78,7 @@ READ8_MEMBER(vectrex_rom64k_device::read_rom)
 	return m_rom[(offset + m_bank * 0x8000) & (m_rom_size - 1)];
 }
 
-WRITE8_MEMBER(vectrex_rom64k_device::write_bank)
+void vectrex_rom64k_device::write_bank(uint8_t data)
 {
 	m_bank = data >> 6;
 }

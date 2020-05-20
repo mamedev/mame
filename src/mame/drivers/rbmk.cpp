@@ -115,7 +115,7 @@ private:
 	DECLARE_WRITE16_MEMBER(tilebank_w);
 	DECLARE_READ8_MEMBER(mcu_io_r);
 	DECLARE_WRITE8_MEMBER(mcu_io_w);
-	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
+	void mcu_io_mux_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -240,7 +240,7 @@ WRITE8_MEMBER(rbmk_state::mcu_io_w)
 		printf("Warning: mux data W = %02x",m_mux_data);
 }
 
-WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
+void rbmk_state::mcu_io_mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 }

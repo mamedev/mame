@@ -98,12 +98,12 @@ protected:
 	required_device<pia6821_device>         m_pia1;
 
 private:
-	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
-	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
+	uint8_t ieee_pia_pb_r();
+	void ieee_pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
 
-	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
-	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
+	void video_pia_port_a_w(uint8_t data);
+	void video_pia_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
 

@@ -76,9 +76,9 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_READ8_MEMBER(vt03_410x_r);
 	void scrambled_410x_w(uint16_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(spr_r);
-	DECLARE_READ8_MEMBER(chr_r);
-	DECLARE_WRITE8_MEMBER(chr_w);
+	uint8_t spr_r(offs_t offset);
+	uint8_t chr_r(offs_t offset);
+	void chr_w(offs_t offset, uint8_t data);
 	void scanline_irq(int scanline, int vblank, int blanked);
 	void hblank_irq(int scanline, int vblank, int blanked);
 	void video_irq(bool hblank, int scanline, int vblank, int blanked);
@@ -130,7 +130,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_chrram;
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
-	DECLARE_READ8_MEMBER(apu_read_mem);
+	uint8_t apu_read_mem(offs_t offset);
 
 	DECLARE_READ8_MEMBER(external_space_read);
 	DECLARE_WRITE8_MEMBER(external_space_write);

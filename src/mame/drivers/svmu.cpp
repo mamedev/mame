@@ -47,7 +47,7 @@ protected:
 private:
 	LC8670_LCD_UPDATE(svmu_lcd_update);
 	void svmu_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(page_w);
+	void page_w(uint8_t data);
 	DECLARE_READ8_MEMBER(prog_r);
 	DECLARE_WRITE8_MEMBER(prog_w);
 	DECLARE_READ8_MEMBER(p1_r);
@@ -67,7 +67,7 @@ private:
 };
 
 
-WRITE8_MEMBER(svmu_state::page_w)
+void svmu_state::page_w(uint8_t data)
 {
 	m_page = data & 0x03;
 }

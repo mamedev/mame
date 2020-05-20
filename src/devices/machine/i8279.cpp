@@ -348,16 +348,16 @@ void i8279_device::timer_mainloop()
 							m_key_down = addr << 3 | i;
 							m_debounce = 1;
 						}
-#if EMULATE_KEY_LOCKOUT
 						else if (m_key_down != (addr << 3 | i))
 						{
+#if EMULATE_KEY_LOCKOUT
 							if (m_se_mode && !BIT(m_status, 6))
 							{
 								m_status |= 0x40;
 								set_irq(1);
 							}
-						}
 #endif // EMULATE_KEY_LOCKOUT
+						}
 						else if (m_debounce++ > 1)
 						{
 							new_fifo((ctrl_key << 7) | (shift_key << 6) | m_key_down);

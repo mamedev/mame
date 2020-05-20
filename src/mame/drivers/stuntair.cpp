@@ -145,7 +145,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void ay8910_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -483,7 +483,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
+void stuntair_state::ay8910_portb_w(uint8_t data)
 {
 	// it writes $e8 and $f0 for music drums?
 	// possibly to discrete sound circuitry?

@@ -76,7 +76,7 @@ namespace netlist
 		nld_power_pins     m_power_pins;
 	};
 
-	struct desc_74125
+	struct desc_74125 : public desc_base
 	{
 		using invert_g = desc_const<1>;
 		using ts_off_on = time_ns<11>;

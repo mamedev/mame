@@ -117,9 +117,9 @@ private:
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
 	DECLARE_WRITE16_MEMBER(dac_latch_w);
 	DECLARE_WRITE16_MEMBER(video_latch_w);
-	DECLARE_READ8_MEMBER(applix_pb_r);
-	DECLARE_WRITE8_MEMBER(applix_pa_w);
-	DECLARE_WRITE8_MEMBER(applix_pb_w);
+	uint8_t applix_pb_r();
+	void applix_pa_w(uint8_t data);
+	void applix_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port08_r);
@@ -139,12 +139,12 @@ private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_READ8_MEMBER( internal_data_read );
 	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
+	uint8_t p1_read();
+	void p1_write(uint8_t data);
+	uint8_t p2_read();
+	void p2_write(uint8_t data);
+	uint8_t p3_read();
+	void p3_write(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -279,7 +279,7 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 	return m_io_dsw->read() | m_cass_data[2];
 }
 
-READ8_MEMBER( applix_state::applix_pb_r )
+uint8_t applix_state::applix_pb_r()
 {
 	return m_pb;
 }
@@ -294,7 +294,7 @@ d5 = /(out) clear cass IRQ and output line
 d6 = /(out) reset keyboard by pulling kbd clock low
 d7 = /(out) reset keyboard flipflop
 */
-WRITE8_MEMBER( applix_state::applix_pa_w )
+void applix_state::applix_pa_w(uint8_t data)
 {
 	// Reset flipflop counter
 	if (!BIT(data, 7))
@@ -325,7 +325,7 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 d0-6 = user
 d7   = square wave output for cassette IRQ
 */
-WRITE8_MEMBER( applix_state::applix_pb_w )
+void applix_state::applix_pb_w(uint8_t data)
 {
 	// low-to-high of PB7 when writing cassette - CLK on IC49
 	if (!BIT(m_pb, 7) && BIT(data, 7))
@@ -1115,31 +1115,31 @@ WRITE8_MEMBER( applix_state::internal_data_write )
 }
 
 
-READ8_MEMBER( applix_state::p1_read )
+uint8_t applix_state::p1_read()
 {
 	return m_p1 & m_p1_data;
 }
 
 
-WRITE8_MEMBER( applix_state::p1_write )
+void applix_state::p1_write(uint8_t data)
 {
 	m_p1 = data;
 }
 
 
-READ8_MEMBER( applix_state::p2_read )
+uint8_t applix_state::p2_read()
 {
 	return m_p2;
 }
 
 
-WRITE8_MEMBER( applix_state::p2_write )
+void applix_state::p2_write(uint8_t data)
 {
 	m_p2 = data;
 }
 
 
-READ8_MEMBER( applix_state::p3_read )
+uint8_t applix_state::p3_read()
 {
 	uint8_t data = m_p3;
 
@@ -1155,7 +1155,7 @@ READ8_MEMBER( applix_state::p3_read )
 }
 
 
-WRITE8_MEMBER( applix_state::p3_write )
+void applix_state::p3_write(uint8_t data)
 {
 	m_p3 = data;
 }

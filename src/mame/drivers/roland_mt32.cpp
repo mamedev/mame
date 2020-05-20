@@ -212,12 +212,12 @@ private:
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
-	DECLARE_WRITE16_MEMBER(midi_w);
+	void midi_w(uint16_t data);
 
 	DECLARE_READ8_MEMBER(lcd_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ16_MEMBER(port0_r);
+	uint16_t port0_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
@@ -293,7 +293,7 @@ WRITE8_MEMBER(mt32_state::bank_w)
 	membank("bank")->set_entry(data);
 }
 
-WRITE16_MEMBER(mt32_state::midi_w)
+void mt32_state::midi_w(uint16_t data)
 {
 	logerror("midi_out %02x\n", data);
 	midi = data;
@@ -309,7 +309,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::midi_timer_cb)
 		midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(mt32_state::port0_r)
+uint16_t mt32_state::port0_r()
 {
 	return port0;
 }

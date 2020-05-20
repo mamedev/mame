@@ -44,9 +44,9 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port09_w);
+	uint8_t port08_r();
+	void port08_w(uint8_t data);
+	void port09_w(uint8_t data);
 
 	void brandt8641(machine_config &config);
 	void brandt8641_io(address_map &map);
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( brandt8641 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
 INPUT_PORTS_END
 
-READ8_MEMBER( brandt8641_state::port08_r )
+uint8_t brandt8641_state::port08_r()
 {
 	uint8_t i, data = 7;
 
@@ -136,13 +136,13 @@ READ8_MEMBER( brandt8641_state::port08_r )
 	return data | m_port08;
 }
 
-WRITE8_MEMBER( brandt8641_state::port08_w )
+void brandt8641_state::port08_w(uint8_t data)
 {
 	m_port08 = data & 0xf8;
 	m_beep->set_state(BIT(data, 4));
 }
 
-WRITE8_MEMBER( brandt8641_state::port09_w )
+void brandt8641_state::port09_w(uint8_t data)
 {
 	m_port09 = data ^ 0xff;
 }

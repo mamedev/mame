@@ -122,13 +122,13 @@ private:
 	void ssystem4_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE32_MEMBER(lcd_q_w) { m_lcd_q = data; }
+	void lcd_q_w(u32 data) { m_lcd_q = data; }
 	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
+	void input_w(u8 data);
+	u8 input_r();
+	void control_w(u8 data);
+	u8 control_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_control = 0;
@@ -164,13 +164,13 @@ READ8_MEMBER(ssystem3_state::nvram_r)
 	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
 }
 
-WRITE8_MEMBER(ssystem3_state::input_w)
+void ssystem3_state::input_w(u8 data)
 {
 	// PA0-PA7: input mux
 	m_inp_mux = ~data;
 }
 
-READ8_MEMBER(ssystem3_state::input_r)
+u8 ssystem3_state::input_r()
 {
 	u8 data = m_inp_mux;
 
@@ -192,7 +192,7 @@ READ8_MEMBER(ssystem3_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(ssystem3_state::control_w)
+void ssystem3_state::control_w(u8 data)
 {
 	// PB0: speaker out
 	m_dac->write(~data & m_inputs[4]->read() & 1);
@@ -226,7 +226,7 @@ WRITE8_MEMBER(ssystem3_state::control_w)
 	m_control = data;
 }
 
-READ8_MEMBER(ssystem3_state::control_r)
+u8 ssystem3_state::control_r()
 {
 	// PB4: device busy
 	// PB5: device attached?

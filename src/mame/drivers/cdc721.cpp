@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert,AJR
+// copyright-holders:AJR
 /************************************************************************************************************
 
 Control Data Corporation CDC 721 Terminal (Viking)
@@ -47,8 +47,8 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cdc721_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(interrupt_mask_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	void interrupt_mask_w(u8 data);
+	void misc_w(u8 data);
 	DECLARE_WRITE8_MEMBER(lights_w);
 	DECLARE_WRITE8_MEMBER(block_select_w);
 	DECLARE_WRITE8_MEMBER(nvram_w);
@@ -82,7 +82,7 @@ private:
 	required_shared_ptr<u8> m_nvram;
 };
 
-WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
+void cdc721_state::interrupt_mask_w(u8 data)
 {
 	m_interrupt_mask = data ^ 0xff;
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
@@ -122,7 +122,7 @@ IRQ_CALLBACK_MEMBER(cdc721_state::restart_cb)
 	return vector;
 }
 
-WRITE8_MEMBER(cdc721_state::misc_w)
+void cdc721_state::misc_w(u8 data)
 {
 	// 7: Stop Refresh Operation
 	// 6: Enable RAM Char Gen

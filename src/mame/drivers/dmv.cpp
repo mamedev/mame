@@ -96,14 +96,14 @@ private:
 	DECLARE_READ8_MEMBER(romsel_r);
 	DECLARE_WRITE8_MEMBER(ramsel_w);
 	DECLARE_WRITE8_MEMBER(romsel_w);
-	DECLARE_READ8_MEMBER(kb_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(kb_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(kb_mcu_port2_w);
+	uint8_t kb_mcu_port1_r();
+	void kb_mcu_port1_w(uint8_t data);
+	void kb_mcu_port2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(program_r);
-	DECLARE_WRITE8_MEMBER(program_w);
-	DECLARE_READ8_MEMBER(exp_program_r);
-	DECLARE_WRITE8_MEMBER(exp_program_w);
+	uint8_t program_r(offs_t offset);
+	void program_w(offs_t offset, uint8_t data);
+	uint8_t exp_program_r(offs_t offset);
+	void exp_program_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(thold7_w);
 
 	void update_busint(int slot, int state);
@@ -440,22 +440,22 @@ void dmv_state::ifsel_w(int ifsel, offs_t offset, uint8_t data)
 		slot->io_write(ifsel, offset, data);
 }
 
-WRITE8_MEMBER(dmv_state::exp_program_w)
+void dmv_state::exp_program_w(offs_t offset, uint8_t data)
 {
 	program_write((offset >> 16) & 0x07, offset, data);
 }
 
-READ8_MEMBER(dmv_state::exp_program_r)
+uint8_t dmv_state::exp_program_r(offs_t offset)
 {
 	return program_read((offset >> 16) & 0x07, offset);
 }
 
-WRITE8_MEMBER(dmv_state::program_w)
+void dmv_state::program_w(offs_t offset, uint8_t data)
 {
 	program_write(m_ram_bank, offset, data);
 }
 
-READ8_MEMBER(dmv_state::program_r)
+uint8_t dmv_state::program_r(offs_t offset)
 {
 	return program_read(m_ram_bank, offset);
 }
@@ -592,18 +592,18 @@ void dmv_state::dmv_io(address_map &map)
 	map(0xc0, 0xcf).rw(FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
 }
 
-READ8_MEMBER(dmv_state::kb_mcu_port1_r)
+uint8_t dmv_state::kb_mcu_port1_r()
 {
 	return !(m_keyboard->sd_poll_r() & !m_sd_poll_state);
 }
 
-WRITE8_MEMBER(dmv_state::kb_mcu_port1_w)
+void dmv_state::kb_mcu_port1_w(uint8_t data)
 {
 	m_sd_poll_state = BIT(data, 1);
 	m_keyboard->sd_poll_w(!m_sd_poll_state);
 }
 
-WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
+void dmv_state::kb_mcu_port2_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 	m_slot7a->keyint_w(BIT(data, 4));

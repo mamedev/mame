@@ -82,8 +82,8 @@ public:
 private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
@@ -312,12 +312,12 @@ WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 	m_votrax->write(m_votrax_cmd);
 }
 
-READ8_MEMBER( taito_state::pia_pb_r )
+uint8_t taito_state::pia_pb_r()
 {
 	return ~m_sndcmd;
 }
 
-WRITE8_MEMBER( taito_state::pia_pb_w )
+void taito_state::pia_pb_w(uint8_t data)
 {
 	m_votrax_cmd = data;
 }

@@ -84,11 +84,13 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 // FIXME: Need to pass in parameter definition
 #define LOCAL_LIB_ENTRY_1(name)                                                \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, "", PSOURCELOC());
+		setup.register_lib_entry(# name,                                       \
+			netlist::factory::properties("", PSOURCELOC()));
 
 #define LOCAL_LIB_ENTRY_2(name, param_spec)                                    \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
+		setup.register_lib_entry(# name,                                       \
+			netlist::factory::properties(param_spec, PSOURCELOC()));
 
 #define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
 
@@ -107,14 +109,14 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 // truthtable defines
 // -----------------------------------------------------------------------------
 
-#define TRUTHTABLE_START(cname, in, out, def_params) \
+#define TRUTHTABLE_START(cname, in, out, def_params)                           \
 	{ \
-		netlist::tt_desc desc; \
-		desc.name = #cname ; \
-		desc.ni = in; \
-		desc.no = out; \
-		desc.def_param = def_params; \
-		desc.family = "";
+		netlist::tt_desc desc;                                                 \
+		desc.name = #cname ;                                                   \
+		desc.ni = in;                                                          \
+		desc.no = out;                                                         \
+		desc.family = "";                                                      \
+		auto props(netlist::factory::properties(def_params, PSOURCELOC()));
 
 #define TT_HEAD(x) \
 		desc.desc.emplace_back(x);
@@ -126,7 +128,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truthtable_create(desc, PSOURCELOC());       \
+		setup.truthtable_create(desc, std::move(props)); \
 	}
 
 namespace netlist
@@ -160,7 +162,6 @@ namespace netlist
 		pstring name;
 		unsigned long ni;
 		unsigned long no;
-		pstring def_param;
 		std::vector<pstring> desc;
 		pstring family;
 	};
@@ -269,7 +270,7 @@ namespace netlist
 			std::unordered_map<pstring, pstring>        m_alias;
 			std::vector<link_t>                         m_links;
 			std::unordered_map<pstring, pstring>        m_param_values;
-			models_t::raw_map_t 						m_models;
+			models_t::raw_map_t                         m_models;
 
 			// need to preserve order of device creation ...
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
@@ -309,7 +310,7 @@ namespace netlist
 			register_param(param, static_cast<nl_fptype>(value));
 		}
 
-		void register_lib_entry(const pstring &name, const pstring &paramdef, plib::source_location &&sourceloc);
+		void register_lib_entry(const pstring &name, factory::properties &&props);
 
 		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
@@ -323,7 +324,7 @@ namespace netlist
 			m_sources.add_source(std::move(src));
 		}
 
-		void truthtable_create(tt_desc &desc, plib::source_location &&sourceloc);
+		void truthtable_create(tt_desc &desc, factory::properties &&props);
 
 		// handle namespace
 
@@ -490,7 +491,7 @@ namespace netlist
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>              m_proxies;
-		std::vector<plib::unique_ptr<param_t>> 		m_defparam_lifetime;
+		std::vector<plib::unique_ptr<param_t>>      m_defparam_lifetime;
 
 		unsigned m_proxy_cnt;
 	};

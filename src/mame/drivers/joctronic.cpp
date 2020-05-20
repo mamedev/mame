@@ -59,7 +59,7 @@ private:
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_READ8_MEMBER(soundlatch_nmi_r);
 	DECLARE_WRITE8_MEMBER(resint_w);
-	DECLARE_WRITE8_MEMBER(slalom03_oki_bank_w);
+	void slalom03_oki_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 
 	virtual void machine_start() override;
@@ -251,7 +251,7 @@ WRITE8_MEMBER(joctronic_state::resint_w)
 	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
+void joctronic_state::slalom03_oki_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0xc0) >> 6);
 	m_oki->s1_w(BIT(data, 1));

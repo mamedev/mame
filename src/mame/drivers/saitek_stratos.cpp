@@ -8,10 +8,8 @@ SciSys/Saitek Stratos chesscomputer family (1987-1990)
 
 - Stratos
 - Turbo King
-- Corona --> it's in saitek_corona.cpp
-- *Simultano
-
-*: not dumped yet
+- Corona --> saitek_corona.cpp
+- Simultano --> saitek_simultano.cpp
 
 IMPORTANT: The user is expected to press the STOP button to turn off the computer.
 When not using -autosave, press that button before exiting MAME, or NVRAM can get corrupt.
@@ -60,6 +58,8 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -77,6 +77,7 @@ public:
 		m_nvram(*this, "nvram.u7"),
 		m_rombank(*this, "rombank"),
 		m_nvrambank(*this, "nvrambank"),
+		m_extrom(*this, "extrom"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -98,6 +99,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_memory_bank m_rombank;
 	required_memory_bank m_nvrambank;
+	required_device<generic_slot_device> m_extrom;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+2> m_inputs;
@@ -224,32 +226,6 @@ void saitek_stratos_state::power_off()
 }
 
 
-// Endgame ROM
-
-DEVICE_IMAGE_LOAD_MEMBER(saitek_stratos_state::extrom_load)
-{
-	u32 size = m_extrom->common_get_size("rom");
-
-	// 32KB ROM only?
-	if (size != 0x8000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return image_init_result::FAIL;
-	}
-
-	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-READ8_MEMBER(stratos_state::extrom_r)
-{
-	u16 bank = BIT(m_control, 1) * 0x4000;
-	return (m_extrom->exists()) ? m_extrom->read_rom(offset | bank) : 0xff;
-}
-
-
 // LCD HLE
 
 void saitek_stratos_state::update_lcd()
@@ -350,7 +326,7 @@ READ8_MEMBER(stratos_state::control_r)
 			m_lcd_ready = false;
 
 		// d7: battery low
-		data |= m_inputs[8]->read();
+		data |= m_inputs[8]->read() << 7;
 	}
 
 	// read button panel
@@ -378,6 +354,12 @@ WRITE8_MEMBER(stratos_state::control_w)
 	// d6 falling edge: power-off request
 	if (~data & prev & 0x40)
 		power_off();
+}
+
+READ8_MEMBER(stratos_state::extrom_r)
+{
+	u16 bank = BIT(m_control, 1) * 0x4000;
+	return (m_extrom->exists()) ? m_extrom->read_rom(offset | bank) : 0xff;
 }
 
 
@@ -447,9 +429,9 @@ INPUT_PORTS_START( saitek_stratos )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Normal")
 
 	PORT_START("IN.8")
-	PORT_CONFNAME( 0x80, 0x80, "Battery Status" )
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Low" )
-	PORT_CONFSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, go_button, 0) PORT_NAME("Go")
@@ -512,9 +494,7 @@ void stratos_state::stratos(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr");
-	m_extrom->set_device_load(FUNC(stratos_state::extrom_load));
-
+	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }
 

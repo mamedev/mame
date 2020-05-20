@@ -65,11 +65,11 @@ private:
 	DECLARE_WRITE8_MEMBER( cmd_w );
 	DECLARE_READ8_MEMBER( ieee488_r );
 	DECLARE_READ8_MEMBER( port3_r );
-	DECLARE_READ8_MEMBER( i8155_pa_r );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( i8155_pc_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pc_w );
+	uint8_t i8155_pa_r();
+	void i8155_pb_w(uint8_t data);
+	void i8155_pc_w(uint8_t data);
+	void io_i8155_pb_w(uint8_t data);
+	void io_i8155_pc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER( srq_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );

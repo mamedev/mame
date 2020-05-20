@@ -40,7 +40,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(read_nand);
+	uint8_t read_nand(offs_t offset);
 	std::vector<uint16_t> m_sdram;
 	std::vector<uint16_t> m_sdram2;
 

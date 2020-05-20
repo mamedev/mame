@@ -71,11 +71,11 @@ private:
 	DECLARE_READ8_MEMBER(video5_flip_r);
 	DECLARE_WRITE8_MEMBER(screen_flip_w);
 	DECLARE_READ8_MEMBER(screen_flip_r);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(lights1_w);
-	DECLARE_WRITE8_MEMBER(lights2_w);
-	DECLARE_WRITE8_MEMBER(common_w);
+	uint8_t input_r();
+	uint8_t status_r();
+	void lights1_w(uint8_t data);
+	void lights2_w(uint8_t data);
+	void common_w(uint8_t data);
 
 	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -240,7 +240,7 @@ void meyc8088_state::meyc8088_map(address_map &map)
 }
 
 
-READ8_MEMBER(meyc8088_state::input_r)
+uint8_t meyc8088_state::input_r()
 {
 	uint8_t ret = 0xff;
 
@@ -253,7 +253,7 @@ READ8_MEMBER(meyc8088_state::input_r)
 	return ret;
 }
 
-READ8_MEMBER(meyc8088_state::status_r)
+uint8_t meyc8088_state::status_r()
 {
 	// d0: /CR2
 	// d1: screen on
@@ -265,21 +265,21 @@ READ8_MEMBER(meyc8088_state::status_r)
 }
 
 
-WRITE8_MEMBER(meyc8088_state::lights1_w)
+void meyc8088_state::lights1_w(uint8_t data)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(~data, i);
 }
 
-WRITE8_MEMBER(meyc8088_state::lights2_w)
+void meyc8088_state::lights2_w(uint8_t data)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
 		m_lamps[i + 8] = BIT(~data, i);
 }
 
-WRITE8_MEMBER(meyc8088_state::common_w)
+void meyc8088_state::common_w(uint8_t data)
 {
 	// d0: /CR2
 	m_status = (m_status & ~1) | (data & 1);

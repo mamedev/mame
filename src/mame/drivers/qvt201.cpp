@@ -37,7 +37,7 @@ private:
 	DECLARE_WRITE8_MEMBER(offset_w);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(duart_out_w);
+	void duart_out_w(uint8_t data);
 
 	void mem_map(address_map &map);
 
@@ -68,7 +68,7 @@ READ8_MEMBER(qvt201_state::keyboard_r)
 	return 1;
 }
 
-WRITE8_MEMBER(qvt201_state::duart_out_w)
+void qvt201_state::duart_out_w(uint8_t data)
 {
 	// OP0 = RTS (EIA pin 4)
 	// OP1 = DTR (EIA pin 20)

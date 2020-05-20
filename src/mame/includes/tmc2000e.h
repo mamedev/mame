@@ -51,7 +51,7 @@ private:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(offs_t offset, uint8_t data);
 
 	/* video state */
 	int m_cdp1864_efx;      /* EFx */

@@ -1306,14 +1306,15 @@ void m68000_base_device::init8(address_space &space, address_space &ospace)
 	m_space = &space;
 	m_ospace = &ospace;
 	auto ocache = ospace.cache<0, 0, ENDIANNESS_BIG>();
+	auto pspec = space.specific<0, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_byte(address, data); };
-	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word(address, data); };
-	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword(address, data); };
+	m_read8   = [pspec](offs_t address) -> u8     { return pspec->read_byte(address); };
+	m_read16  = [pspec](offs_t address) -> u16    { return pspec->read_word(address); };
+	m_read32  = [pspec](offs_t address) -> u32    { return pspec->read_dword(address); };
+	m_write8  = [pspec](offs_t address, u8 data)  { pspec->write_byte(address, data); };
+	m_write16 = [pspec](offs_t address, u16 data)  { pspec->write_word(address, data); };
+	m_write32 = [pspec](offs_t address, u32 data)  { pspec->write_dword(address, data); };
 }
 
 /****************************************************************************
@@ -1325,14 +1326,15 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 	m_space = &space;
 	m_ospace = &ospace;
 	auto ocache = ospace.cache<1, 0, ENDIANNESS_BIG>();
+	auto pspec = space.specific<1, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
-	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word(address, data); };
-	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword(address, data); };
+	m_read8   = [pspec](offs_t address) -> u8     { return pspec->read_byte(address); };
+	m_read16  = [pspec](offs_t address) -> u16    { return pspec->read_word(address); };
+	m_read32  = [pspec](offs_t address) -> u32    { return pspec->read_dword(address); };
+	m_write8  = [pspec](offs_t address, u8 data)  { pspec->write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
+	m_write16 = [pspec](offs_t address, u16 data)  { pspec->write_word(address, data); };
+	m_write32 = [pspec](offs_t address, u32 data)  { pspec->write_dword(address, data); };
 }
 
 /****************************************************************************
@@ -1349,53 +1351,54 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 	m_space = &space;
 	m_ospace = &ospace;
 	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	auto pspec = space.specific<2, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word_unaligned(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword_unaligned(address); };
-	m_write8  = [this](offs_t address, u8 data)  {
-		m_space->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+	m_read8   = [pspec](offs_t address) -> u8     { return pspec->read_byte(address); };
+	m_read16  = [pspec](offs_t address) -> u16    { return pspec->read_word_unaligned(address); };
+	m_read32  = [pspec](offs_t address) -> u32    { return pspec->read_dword_unaligned(address); };
+	m_write8  = [pspec](offs_t address, u8 data)  {
+		pspec->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
 	};
-	m_write16 = [this](offs_t address, u16 data)  {
+	m_write16 = [pspec](offs_t address, u16 data)  {
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address, dword_from_word(data), 0xffff0000U);
+			pspec->write_dword(address, dword_from_word(data), 0xffff0000U);
 			break;
 
 		case 1:
-			m_space->write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			pspec->write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
 			break;
 
 		case 2:
-			m_space->write_dword(address - 2, dword_from_word(data), 0x0000ffff);
+			pspec->write_dword(address - 2, dword_from_word(data), 0x0000ffff);
 			break;
 
 		case 3:
-			m_space->write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
-			m_space->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
+			pspec->write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
+			pspec->write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
 			break;
 		}
 	};
-	m_write32 = [this](offs_t address, u32 data)  {
+	m_write32 = [pspec](offs_t address, u32 data)  {
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address, data, 0xffffffffU);
+			pspec->write_dword(address, data, 0xffffffffU);
 			break;
 
 		case 1:
-			m_space->write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
-			m_space->write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			pspec->write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			pspec->write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
 			break;
 
 		case 2:
-			m_space->write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
-			m_space->write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			pspec->write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			pspec->write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
 			break;
 
 		case 3:
-			m_space->write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_space->write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			pspec->write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			pspec->write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
 			break;
 		}
 	};
@@ -1407,6 +1410,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 	m_space = &space;
 	m_ospace = &ospace;
 	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	auto pspec = space.specific<2, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [this, ocache](offs_t address) -> u16 {
 		if (m_pmmu_enabled) {
@@ -1418,32 +1422,32 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		return ocache->read_word(address);
 	};
 
-	m_read8   = [this](offs_t address) -> u8     {
+	m_read8   = [this, pspec](offs_t address) -> u8     {
 		if (m_pmmu_enabled) {
 				address = pmmu_translate_addr(address, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 		}
-		return m_space->read_byte(address);
+		return pspec->read_byte(address);
 	};
 
-	m_read16  = [this](offs_t address) -> u16    {
+	m_read16  = [this, pspec](offs_t address) -> u16    {
 		if (m_pmmu_enabled) {
 			u32 address0 = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			if (WORD_ALIGNED(address))
-				return m_space->read_word(address0);
+				return pspec->read_word(address0);
 			u32 address1 = pmmu_translate_addr(address + 1, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
-			u16 result = m_space->read_byte(address0) << 8;
-			return result | m_space->read_byte(address1);
+			u16 result = pspec->read_byte(address0) << 8;
+			return result | pspec->read_byte(address1);
 		}
-		return m_space->read_word_unaligned(address);
+		return pspec->read_word_unaligned(address);
 	};
 
-	m_read32  = [this](offs_t address) -> u32    {
+	m_read32  = [this, pspec](offs_t address) -> u32    {
 		if (m_pmmu_enabled) {
 			u32 address0 = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
@@ -1452,37 +1456,37 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				// not at page boundary; use default code
 				address = address0;
 			else if (DWORD_ALIGNED(address)) // 0
-				return m_space->read_dword(address0);
+				return pspec->read_dword(address0);
 			else {
 				u32 address2 = pmmu_translate_addr(address+2, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				if (WORD_ALIGNED(address)) { // 2
-					u32 result = m_space->read_word(address0) << 16;
-					return result | m_space->read_word(address2);
+					u32 result = pspec->read_word(address0) << 16;
+					return result | pspec->read_word(address2);
 				}
 				u32 address1 = pmmu_translate_addr(address+1, 1);
 				u32 address3 = pmmu_translate_addr(address+3, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
-				u32 result = m_space->read_byte(address0) << 24;
-				result |= m_space->read_word(address1) << 8;
-				return result | m_space->read_byte(address3);
+				u32 result = pspec->read_byte(address0) << 24;
+				result |= pspec->read_word(address1) << 8;
+				return result | pspec->read_byte(address3);
 			}
 		}
-		return m_space->read_dword_unaligned(address);
+		return pspec->read_dword_unaligned(address);
 	};
 
-	m_write8  = [this](offs_t address, u8  data) {
+	m_write8  = [this, pspec](offs_t address, u8  data) {
 		if (m_pmmu_enabled) {
 			address = pmmu_translate_addr(address, 0);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 		}
-		m_space->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+		pspec->write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
 	};
 
-	m_write16 = [this](offs_t address, u16 data) {
+	m_write16 = [this, pspec](offs_t address, u16 data) {
 		u32 address0 = address;
 		if (m_pmmu_enabled) {
 			address0 = pmmu_translate_addr(address0, 0);
@@ -1491,15 +1495,15 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		}
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address0, dword_from_word(data), 0xffff0000U);
+			pspec->write_dword(address0, dword_from_word(data), 0xffff0000U);
 			break;
 
 		case 1:
-			m_space->write_dword(address0 - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			pspec->write_dword(address0 - 1, dword_from_unaligned_word(data), 0x00ffff00);
 			break;
 
 		case 2:
-			m_space->write_dword(address0 - 2, dword_from_word(data), 0x0000ffff);
+			pspec->write_dword(address0 - 2, dword_from_word(data), 0x0000ffff);
 			break;
 
 		case 3:
@@ -1510,14 +1514,14 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 3, dword_from_unaligned_word(data), 0x000000ff);
-			m_space->write_dword(address1, dword_from_byte(data & 0x00ff), 0xff000000U);
+			pspec->write_dword(address0 - 3, dword_from_unaligned_word(data), 0x000000ff);
+			pspec->write_dword(address1, dword_from_byte(data & 0x00ff), 0xff000000U);
 			break;
 		}
 		}
 	};
 
-	m_write32 = [this](offs_t address, u32 data) {
+	m_write32 = [this, pspec](offs_t address, u32 data) {
 		u32 address0 = address;
 		if (m_pmmu_enabled) {
 			address0 = pmmu_translate_addr(address0, 0);
@@ -1526,7 +1530,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 		}
 		switch (address & 3) {
 		case 0:
-			m_space->write_dword(address0, data, 0xffffffffU);
+			pspec->write_dword(address0, data, 0xffffffffU);
 			break;
 
 		case 1:
@@ -1537,8 +1541,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
-			m_space->write_dword(address3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			pspec->write_dword(address0 - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			pspec->write_dword(address3, dword_from_byte(data & 0x000000ff), 0xff000000U);
 			break;
 		}
 
@@ -1550,8 +1554,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
-			m_space->write_dword(address2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			pspec->write_dword(address0 - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			pspec->write_dword(address2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
 			break;
 		}
 
@@ -1563,8 +1567,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 			}
-			m_space->write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_space->write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			pspec->write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			pspec->write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
 			break;
 		}
 		}
@@ -1576,6 +1580,7 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 	m_space = &space;
 	m_ospace = &ospace;
 	auto ocache = ospace.cache<2, 0, ENDIANNESS_BIG>();
+	auto pspec = space.specific<2, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [this, ocache](offs_t address) -> u16 {
 		if (m_hmmu_enabled)
@@ -1583,69 +1588,69 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 		return ocache->read_word(address);
 	};
 
-	m_read8   = [this](offs_t address) -> u8     {
+	m_read8   = [this, pspec](offs_t address) -> u8     {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
-		return m_space->read_byte(address);
+		return pspec->read_byte(address);
 	};
 
-	m_read16  = [this](offs_t address) -> u16    {
+	m_read16  = [this, pspec](offs_t address) -> u16    {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 		if (WORD_ALIGNED(address))
-			return m_space->read_word(address);
-		u16 result = m_space->read_byte(address) << 8;
-		return result | m_space->read_byte(address + 1);
+			return pspec->read_word(address);
+		u16 result = pspec->read_byte(address) << 8;
+		return result | pspec->read_byte(address + 1);
 	};
 
-	m_read32  = [this](offs_t address) -> u32    {
+	m_read32  = [this, pspec](offs_t address) -> u32    {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 
 		if (DWORD_ALIGNED(address))
-			return m_space->read_dword(address);
+			return pspec->read_dword(address);
 		if (WORD_ALIGNED(address)) {
-			u32 result = m_space->read_word(address) << 16;
-			return result | m_space->read_word(address + 2);
+			u32 result = pspec->read_word(address) << 16;
+			return result | pspec->read_word(address + 2);
 		}
-		u32 result = m_space->read_byte(address) << 24;
-		result |= m_space->read_word(address + 1) << 8;
-		return result | m_space->read_byte(address + 3);
+		u32 result = pspec->read_byte(address) << 24;
+		result |= pspec->read_word(address + 1) << 8;
+		return result | pspec->read_byte(address + 3);
 	};
 
-	m_write8  = [this](offs_t address, u8 data)  {
+	m_write8  = [this, pspec](offs_t address, u8 data)  {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
-		m_space->write_byte(address, data);
+		pspec->write_byte(address, data);
 	};
 
-	m_write16 = [this](offs_t address, u16 data)  {
+	m_write16 = [this, pspec](offs_t address, u16 data)  {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 		if (WORD_ALIGNED(address)) {
-			m_space->write_word(address, data);
+			pspec->write_word(address, data);
 			return;
 		}
-		m_space->write_byte(address, data >> 8);
-		m_space->write_byte(address + 1, data);
+		pspec->write_byte(address, data >> 8);
+		pspec->write_byte(address + 1, data);
 	};
 
-	m_write32 = [this](offs_t address, u32 data)  {
+	m_write32 = [this, pspec](offs_t address, u32 data)  {
 		if (m_hmmu_enabled)
 			address = hmmu_translate_addr(address);
 
 		if (DWORD_ALIGNED(address)) {
-			m_space->write_dword(address, data);
+			pspec->write_dword(address, data);
 			return;
 		}
 		if (WORD_ALIGNED(address)) {
-			m_space->write_word(address, data >> 16);
-			m_space->write_word(address + 2, data);
+			pspec->write_word(address, data >> 16);
+			pspec->write_word(address + 2, data);
 			return;
 		}
-		m_space->write_byte(address, data >> 24);
-		m_space->write_word(address + 1, data >> 8);
-		m_space->write_byte(address + 3, data);
+		pspec->write_byte(address, data >> 24);
+		pspec->write_word(address + 1, data >> 8);
+		pspec->write_byte(address + 3, data);
 	};
 }
 

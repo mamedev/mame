@@ -624,7 +624,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc2000_state::dma_w )
+void tmc2000_state::dma_w(offs_t offset, uint8_t data)
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 

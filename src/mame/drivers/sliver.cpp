@@ -128,7 +128,7 @@ private:
 	DECLARE_WRITE16_MEMBER(io_offset_w);
 	DECLARE_WRITE16_MEMBER(io_data_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(oki_setbank);
+	void oki_setbank(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
 
@@ -386,7 +386,7 @@ void sliver_state::sliver_map(address_map &map)
 
 // Sound CPU
 
-WRITE8_MEMBER(sliver_state::oki_setbank)
+void sliver_state::oki_setbank(uint8_t data)
 {
 	int bank=(data^0xff)&3; //xor or not ?
 	membank("okibank")->set_entry(bank);

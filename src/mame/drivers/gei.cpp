@@ -125,12 +125,12 @@ private:
 	template <unsigned N> DECLARE_READ8_MEMBER(banksel_r);
 	DECLARE_READ8_MEMBER(signature_r);
 	DECLARE_WRITE8_MEMBER(signature_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_READ8_MEMBER(portC_r);
+	void lamps_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void nmi_w(uint8_t data);
+	uint8_t portC_r();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -216,7 +216,7 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER(gei_state::lamps_w)
+void gei_state::lamps_w(uint8_t data)
 {
 	/* 5 button lamps */
 	m_lamps[0] = BIT(data, 0);
@@ -232,7 +232,7 @@ WRITE8_MEMBER(gei_state::lamps_w)
 	m_lamps[6] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(gei_state::sound_w)
+void gei_state::sound_w(uint8_t data)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
@@ -249,7 +249,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::sound2_w)
+void gei_state::sound2_w(uint8_t data)
 {
 	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
@@ -266,13 +266,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::lamps2_w)
+void gei_state::lamps2_w(uint8_t data)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
 	m_lamps[8] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(gei_state::nmi_w)
+void gei_state::nmi_w(uint8_t data)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	m_lamps[8] = BIT(data, 4);
@@ -291,7 +291,7 @@ READ8_MEMBER(gei_state::catchall)
 	return 0xff;
 }
 
-READ8_MEMBER(gei_state::portC_r)
+uint8_t gei_state::portC_r()
 {
 	return 4;
 }

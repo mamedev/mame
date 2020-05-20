@@ -129,8 +129,8 @@ private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(clock_control_r);
 	DECLARE_WRITE8_MEMBER(clock_control_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	u8 keyboard_r();
+	void keyboard_w(u8 data);
 
 	void cc40_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -352,7 +352,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 	}
 }
 
-READ8_MEMBER(cc40_state::keyboard_r)
+u8 cc40_state::keyboard_r()
 {
 	u8 ret = 0;
 
@@ -366,7 +366,7 @@ READ8_MEMBER(cc40_state::keyboard_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cc40_state::keyboard_w)
+void cc40_state::keyboard_w(u8 data)
 {
 	// d(0-7): select keyboard column
 	m_key_select = data;

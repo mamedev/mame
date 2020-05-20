@@ -629,17 +629,17 @@ public:
 	void intech_interact(machine_config& config);
 	void intech_interact_bank(machine_config& config);
 
-	virtual DECLARE_READ8_MEMBER(porta_r);
-	virtual DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
-	virtual DECLARE_READ8_MEMBER(portc_r);
-	virtual DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual uint8_t porta_r();
+	virtual uint8_t portb_r() { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual uint8_t portc_r();
+	virtual uint8_t portd_r() { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
 
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w) { LOGMASKED(LOG_OTHER, "%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
-	DECLARE_WRITE8_MEMBER(portd_w) { LOGMASKED(LOG_OTHER, "%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data) { LOGMASKED(LOG_OTHER, "%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	void portd_w(uint8_t data) { LOGMASKED(LOG_OTHER, "%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 
-	DECLARE_WRITE8_MEMBER(ext_rombank_w);
+	void ext_rombank_w(uint8_t data);
 
 protected:
 	virtual void machine_start() override;
@@ -669,8 +669,8 @@ public:
 	void vt1682_dance(machine_config& config);
 
 protected:
-	DECLARE_READ8_MEMBER(uio_porta_r);
-	DECLARE_WRITE8_MEMBER(uio_porta_w);
+	uint8_t uio_porta_r();
+	void uio_porta_w(uint8_t data);
 
 private:
 	required_ioport m_io_p1;
@@ -688,8 +688,8 @@ public:
 	void vt1682_exsport(machine_config& config);
 	void vt1682_exsportp(machine_config& config);
 
-	virtual DECLARE_READ8_MEMBER(uiob_r);
-	DECLARE_WRITE8_MEMBER(uiob_w);
+	virtual uint8_t uiob_r();
+	void uiob_w(uint8_t data);
 
 protected:
 	virtual void machine_start() override;
@@ -5570,7 +5570,7 @@ void vt1682_exsport_state::machine_reset()
 	m_p2_latch = 0;
 }
 
-WRITE8_MEMBER(intec_interact_state::ext_rombank_w)
+void intec_interact_state::ext_rombank_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: ext_rombank_w writing: %1x\n", machine().describe_context(), data);
 
@@ -5588,7 +5588,7 @@ WRITE8_MEMBER(intec_interact_state::ext_rombank_w)
 };
 
 
-WRITE8_MEMBER(intec_interact_state::porta_w)
+void intec_interact_state::porta_w(uint8_t data)
 {
 	if (data != 0xf)
 	{
@@ -5692,7 +5692,7 @@ INPUT_PORTS_END
 // to move between games, why not?  ram address 0x6c contains current selection if you want to manually change it to start
 // other games.  maybe it's waiting on some status from the sound cpu?
 
-READ8_MEMBER(intec_interact_state::porta_r)
+uint8_t intec_interact_state::porta_r()
 {
 	uint8_t ret = 0x0;// = machine().rand() & 0xf;
 
@@ -5708,7 +5708,7 @@ READ8_MEMBER(intec_interact_state::porta_r)
 	return ret;
 }
 
-READ8_MEMBER(intec_interact_state::portc_r)
+uint8_t intec_interact_state::portc_r()
 {
 	uint8_t ret = 0x0;
 	ret |= m_input_sense ^1;
@@ -5716,7 +5716,7 @@ READ8_MEMBER(intec_interact_state::portc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(intec_interact_state::portb_w)
+void intec_interact_state::portb_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
 
@@ -5779,7 +5779,7 @@ void vt1682_exsport_state::clock_joy2()
 	m_portb_shiftpos++;
 }
 
-READ8_MEMBER(vt1682_exsport_state::uiob_r)
+uint8_t vt1682_exsport_state::uiob_r()
 {
 	int p1bit = (m_p1_latch >> m_portb_shiftpos) & 1;
 	int p2bit = (m_p2_latch >> m_portb_shiftpos) & 1;
@@ -5787,7 +5787,7 @@ READ8_MEMBER(vt1682_exsport_state::uiob_r)
 	return (p1bit << 1) | (p2bit << 3);
 };
 
-WRITE8_MEMBER(vt1682_exsport_state::uiob_w)
+void vt1682_exsport_state::uiob_w(uint8_t data)
 {
 	if ((m_old_portb & 0x01) != (data & 0x01))
 	{
@@ -5835,14 +5835,14 @@ void intec_interact_state::intech_interact(machine_config& config)
 
 
 
-READ8_MEMBER(vt1682_dance_state::uio_porta_r)
+uint8_t vt1682_dance_state::uio_porta_r()
 {
 	uint8_t ret = m_io_p1->read();
 	logerror("%s: porta_r returning: %02x (INPUTS)\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vt1682_dance_state::uio_porta_w)
+void vt1682_dance_state::uio_porta_w(uint8_t data)
 {
 	logerror("%s: porta_w writing: %02x (INPUTS)\n", machine().describe_context(), data);
 }

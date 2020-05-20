@@ -13,8 +13,8 @@
 #include "m6502.h"
 #include "m6502d.h"
 
-DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "MOS Technology M6502")
-DEFINE_DEVICE_TYPE(M6512, m6512_device, "m6512", "MOS Technology M6512")
+DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "MOS Technology 6502")
+DEFINE_DEVICE_TYPE(M6512, m6512_device, "m6512", "MOS Technology 6512")
 
 m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6502, tag, owner, clock)

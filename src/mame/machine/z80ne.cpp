@@ -539,7 +539,7 @@ READ_LINE_MEMBER(z80net_state::lx387_control_r)
 	return BIT(m_io_modifiers->read(), 1);
 }
 
-READ8_MEMBER(z80net_state::lx388_mc6847_videoram_r)
+uint8_t z80net_state::lx388_mc6847_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 

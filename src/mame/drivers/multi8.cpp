@@ -60,10 +60,10 @@ private:
 	DECLARE_WRITE8_MEMBER(pal_w);
 	DECLARE_READ8_MEMBER(kanji_r);
 	DECLARE_WRITE8_MEMBER(kanji_w);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
+	uint8_t porta_r();
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	void ym2203_porta_w(uint8_t data);
 	DECLARE_READ8_MEMBER(ay8912_0_r);
 	DECLARE_READ8_MEMBER(ay8912_1_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
@@ -559,7 +559,7 @@ static GFXDECODE_START( gfx_multi8 )
 GFXDECODE_END
 
 
-READ8_MEMBER( multi8_state::porta_r )
+uint8_t multi8_state::porta_r()
 {
 	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
 	/*
@@ -572,7 +572,7 @@ READ8_MEMBER( multi8_state::porta_r )
 }
 
 
-WRITE8_MEMBER( multi8_state::portb_w )
+void multi8_state::portb_w(uint8_t data)
 {
 	/*
 	    x--- ---- color mode
@@ -584,7 +584,7 @@ WRITE8_MEMBER( multi8_state::portb_w )
 	m_display_reg = data;
 }
 
-WRITE8_MEMBER( multi8_state::portc_w )
+void multi8_state::portc_w(uint8_t data)
 {
 //  printf("Port C w = %02x\n",data);
 	m_vram_bank = data & 0x1f;
@@ -595,7 +595,7 @@ WRITE8_MEMBER( multi8_state::portc_w )
 }
 
 
-WRITE8_MEMBER( multi8_state::ym2203_porta_w )
+void multi8_state::ym2203_porta_w(uint8_t data)
 {
 	m_beeper->set_state(BIT(data, 3));
 }

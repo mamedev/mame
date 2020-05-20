@@ -51,7 +51,7 @@ namespace netlist
 			m_Q.push(stateQ, delay);
 			m_QQ.push(!stateQ, delay);
 		}
-		
+
 		void newstate_setreset(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 		{
 			// Q: 150 ns, QQ: 200 ns

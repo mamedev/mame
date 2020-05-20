@@ -104,7 +104,7 @@ private:
 
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
 	void magtouch_io(address_map &map);
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( magtouch )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( magtouch_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void magtouch_state::dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 
 void magtouch_state::machine_start()
 {

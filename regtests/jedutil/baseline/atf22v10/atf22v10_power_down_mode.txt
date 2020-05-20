@@ -1,0 +1,100 @@
+Inputs:
+
+1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+
+Outputs:
+
+15 (Combinatorial, Output feedback output, Active high)
+16 (Combinatorial, Output feedback output, Active high)
+17 (Combinatorial, Output feedback output, Active high)
+18 (Combinatorial, Output feedback output, Active low)
+19 (Combinatorial, Output feedback output, Active high)
+20 (Combinatorial, Output feedback output, Active high)
+21 (Combinatorial, Output feedback output, Active low)
+22 (Combinatorial, Output feedback output, Active high)
+
+Equations:
+
+o15 = i1 & /i2 +
+      i3 +
+      /i5 & i6 & i7 & /i8 & i9 +
+      /i10 & /i11 +
+      i13 +
+      i14 +
+      i23
+o15.oe = /i23
+
+o16 = i1 & i2 & i3 & i5 +
+      i6 & i7 & i8 & i9 & i10 +
+      i13 +
+      i14 & /o21 +
+      i23 +
+      /i5 & o17 & o18 +
+      /i2
+o16.oe = vcc
+
+o17 = /i7 & o21 +
+      i8 +
+      /i3 +
+      /i1 & /i2 & i3 +
+      /i5 +
+      /i6 & /i7 & /i8 & /i9 & /i10 +
+      /o18
+o17.oe = vcc
+
+/o18 = i1 +
+       i3 +
+       i5 +
+       i7 +
+       i9 +
+       i11 +
+       i13
+o18.oe = vcc
+
+o19 = /i13 +
+      /i11 +
+      /i9 +
+      /i7 +
+      /i5 +
+      /i3 +
+      /i1
+o19.oe = vcc
+
+o20 = i6 +
+      i13 & o19 +
+      i1 & /i7 +
+      o18 +
+      i9 & /i13 +
+      i14 & /o17 +
+      /o16
+o20.oe = vcc
+
+/o21 = /i1 & i2 +
+       /i3 +
+       i5 & /i6 & /i7 & i8 & /i9 +
+       i10 & i11 +
+       /i13 +
+       /i14 +
+       /i23
+o21.oe = /i23
+
+o22 = /i8 & i23 +
+      /o19 & i23 +
+      /o18 +
+      o17 +
+      o16 +
+      /i2 & i8 & i14 +
+      /i2 & /i6 & /i8 & /i10 & /i14
+o22.oe = vcc
+
+Synchronous Preset:
+
+o19 & /o20 & o21 & /o22 & i23
+
+Asynchronous Reset:
+
+/i2 & o15 & /o16 & o17 & /o18
+
+Pin 4 (DIP/SOIC package) and Pin 5 (PLCC package) Controls Power Down Mode
+
+

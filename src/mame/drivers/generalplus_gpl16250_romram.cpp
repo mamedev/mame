@@ -253,14 +253,14 @@ void wrlshunt_game_state::paccon(machine_config &config)
 	m_maincpu->set_clock(96000000); // needs to be somewhere in this region or the emulator running on the SunPlus is too slow
 }
 
-READ16_MEMBER(wrlshunt_game_state::porta_r)
+uint16_t wrlshunt_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::porta_w)
+void wrlshunt_game_state::porta_w(uint16_t data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
@@ -273,7 +273,7 @@ WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 
 
 
-READ16_MEMBER(jak_s500_game_state::porta_r)
+uint16_t jak_s500_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
@@ -295,7 +295,7 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	return data;
 }
 
-READ16_MEMBER(jak_s500_game_state::portb_r)
+uint16_t jak_s500_game_state::portb_r()
 {
 	uint16_t data = m_io[1]->read();
 	logerror("%s: Port B Read: %04x\n", machine().describe_context(), data);

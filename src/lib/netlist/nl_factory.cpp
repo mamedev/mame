@@ -15,11 +15,11 @@ namespace netlist {
 namespace factory {
 
 	// FIXME: this doesn't do anything, check how to remove
-	class NETLIB_NAME(wrapper) : public device_t
+	class NETLIB_NAME(wrapper) : public base_device_t
 	{
 	public:
 		NETLIB_NAME(wrapper)(netlist_state_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
+		: base_device_t(anetlist, name)
 		{
 		}
 	protected:
@@ -27,16 +27,9 @@ namespace factory {
 		NETLIB_UPDATEI() { }
 	};
 
-	element_t::element_t(const pstring &name, const pstring &def_param,
-		plib::source_location &&sourceloc)
-		: m_name(name), m_def_param(def_param),
-		  m_sourceloc(sourceloc)
-	{
-	}
-
-	element_t::element_t(const pstring &name, const pstring &def_param)
-		: m_name(name), m_def_param(def_param),
-		  m_sourceloc("<unknown>", 1)
+	element_t::element_t(const pstring &name, properties &&props)
+	: m_name(name)
+	, m_properties(props)
 	{
 	}
 

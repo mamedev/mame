@@ -80,7 +80,7 @@ private:
 	void mrgame_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void portb_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(row_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(triple_w);
@@ -93,8 +93,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
 	DECLARE_READ8_MEMBER(col_r);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portc_r);
+	uint8_t porta_r();
+	uint8_t portc_r();
 	DECLARE_READ8_MEMBER(rsw_r);
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
@@ -349,18 +349,18 @@ WRITE8_MEMBER(mrgame_state::ack2_w)
 	m_ack2 = BIT(data, 0);
 }
 
-READ8_MEMBER(mrgame_state::porta_r)
+uint8_t mrgame_state::porta_r()
 {
 	return m_video_data;
 }
 
-WRITE8_MEMBER(mrgame_state::portb_w)
+void mrgame_state::portb_w(uint8_t data)
 {
 	m_video_status = data;
 	m_ackv = 0;
 }
 
-READ8_MEMBER(mrgame_state::portc_r)
+uint8_t mrgame_state::portc_r()
 {
 	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
 }

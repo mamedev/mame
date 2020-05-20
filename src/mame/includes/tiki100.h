@@ -74,8 +74,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mrq_r );
-	DECLARE_WRITE8_MEMBER( mrq_w );
+	uint8_t mrq_r(offs_t offset);
+	void mrq_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER( iorq_r );
 	DECLARE_WRITE8_MEMBER( iorq_w );
 
@@ -86,10 +86,10 @@ private:
 	DECLARE_WRITE8_MEMBER( system_w );
 	DECLARE_WRITE_LINE_MEMBER( bar0_w );
 	DECLARE_WRITE_LINE_MEMBER( bar2_w );
-	DECLARE_WRITE8_MEMBER( video_scroll_w );
+	void video_scroll_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pb_r();
+	void pio_pb_w(uint8_t data);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

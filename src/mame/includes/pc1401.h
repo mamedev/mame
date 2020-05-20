@@ -35,10 +35,10 @@ protected:
 	void pc1402_mem(address_map &map);
 
 	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_WRITE8_MEMBER(out_b_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_READ8_MEMBER(in_a_r);
-	DECLARE_READ8_MEMBER(in_b_r);
+	void out_b_w(uint8_t data);
+	void out_c_w(uint8_t data);
+	uint8_t in_a_r();
+	uint8_t in_b_r();
 	DECLARE_READ8_MEMBER(lcd_read);
 	DECLARE_WRITE8_MEMBER(lcd_write);
 

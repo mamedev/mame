@@ -173,7 +173,7 @@ protected:
 	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
 	DECLARE_READ8_MEMBER(lx387_data_r);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
+	uint8_t lx388_mc6847_videoram_r(offs_t offset);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
 
 	required_shared_ptr<uint8_t> m_videoram;

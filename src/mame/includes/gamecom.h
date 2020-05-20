@@ -249,8 +249,8 @@ private:
 	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
-	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
-	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
+	void gamecom_handle_dma(uint8_t data);
+	void gamecom_update_timers(uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart1_load );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart2_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -387,23 +387,23 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(zorba_state::memory_read_byte)
+uint8_t zorba_state::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::memory_write_byte)
+void zorba_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER(zorba_state::io_read_byte)
+uint8_t zorba_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::io_write_byte)
+void zorba_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
@@ -431,7 +431,7 @@ WRITE_LINE_MEMBER( zorba_state::br1_w )
 //  PIA handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::pia0_porta_w )
+void zorba_state::pia0_porta_w(uint8_t data)
 {
 	m_beep->set_state(BIT(data, 7));
 	m_fdc->dden_w(BIT(data, 6));
@@ -449,7 +449,7 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-READ8_MEMBER( zorba_state::pia1_portb_r )
+uint8_t zorba_state::pia1_portb_r()
 {
 	// 0  (output only)
 	// 1  (output only)
@@ -470,7 +470,7 @@ READ8_MEMBER( zorba_state::pia1_portb_r )
 			(BIT(outputs, 2) ? 0x00 : 0x28);
 }
 
-WRITE8_MEMBER( zorba_state::pia1_portb_w )
+void zorba_state::pia1_portb_w(uint8_t data)
 {
 	// 0  DIO direction
 	// 1  NDAC/NRFD data direction, SRQ gate

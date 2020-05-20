@@ -81,7 +81,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
-	DECLARE_WRITE8_MEMBER(video_w);
+	void video_w(uint8_t data);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
 /******************************************************************************
  Video
 ******************************************************************************/
-WRITE8_MEMBER( proteus3_state::video_w )
+void proteus3_state::video_w(uint8_t data)
 {
 	m_video_data = data;
 }

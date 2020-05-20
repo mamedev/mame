@@ -229,9 +229,9 @@ void nes_vt_soc_device::device_start()
 	m_ppu->set_hblank_callback(*this, FUNC(nes_vt_soc_device::hblank_irq));
 
 	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
-	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
+	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_soc_device::nt_r)), write8_delegate(*this, FUNC(nes_vt_soc_device::nt_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_soc_device::chr_r)), write8_delegate(*this, FUNC(nes_vt_soc_device::chr_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(nes_vt_soc_device::chr_r)), write8sm_delegate(*this, FUNC(nes_vt_soc_device::chr_w)));
 
 	m_write_0_callback.resolve_safe();
 	m_read_0_callback.resolve_safe(0xff);
@@ -451,7 +451,7 @@ void nes_vt_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 
 
 
-READ8_MEMBER(nes_vt_soc_device::spr_r)
+uint8_t nes_vt_soc_device::spr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04)
 	{
@@ -466,7 +466,7 @@ READ8_MEMBER(nes_vt_soc_device::spr_r)
 	}
 }
 
-READ8_MEMBER(nes_vt_soc_device::chr_r)
+uint8_t nes_vt_soc_device::chr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04)
 	{
@@ -482,7 +482,7 @@ READ8_MEMBER(nes_vt_soc_device::chr_r)
 }
 
 
-WRITE8_MEMBER(nes_vt_soc_device::chr_w)
+void nes_vt_soc_device::chr_w(offs_t offset, uint8_t data)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04)
 	{
@@ -1174,7 +1174,7 @@ WRITE_LINE_MEMBER(nes_vt_soc_device::apu_irq)
 //  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nes_vt_soc_device::apu_read_mem)
+uint8_t nes_vt_soc_device::apu_read_mem(offs_t offset)
 {
 	// TODO
 	return 0x00;//mintf->program->read_byte(offset);

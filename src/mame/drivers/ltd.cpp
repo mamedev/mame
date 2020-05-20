@@ -74,10 +74,10 @@ public:
 private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port2_r();
+	void port2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd3_map(address_map &map);
@@ -274,7 +274,7 @@ WRITE8_MEMBER( ltd_state::io_w )
 	offset >>= 10; // reduces offsets to 1 per bank
 }
 
-READ8_MEMBER( ltd_state:: port1_r )
+uint8_t ltd_state:: port1_r()
 {
 	if (~m_port2 & 0x10)
 	{
@@ -307,7 +307,7 @@ READ8_MEMBER( ltd_state:: port1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ltd_state::port1_w )
+void ltd_state::port1_w(uint8_t data)
 {
 	if (m_port2 & 0x10)
 	{
@@ -348,12 +348,12 @@ WRITE8_MEMBER( ltd_state::port1_w )
 	}
 }
 
-READ8_MEMBER( ltd_state:: port2_r )
+uint8_t ltd_state:: port2_r()
 {
 	return m_port2;
 }
 
-WRITE8_MEMBER( ltd_state::port2_w )
+void ltd_state::port2_w(uint8_t data)
 {
 	if (~m_port2 & data & 0x10)
 		m_counter++;

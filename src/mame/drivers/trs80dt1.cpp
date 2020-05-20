@@ -68,10 +68,10 @@ public:
 private:
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(port1_r);
+	u8 port1_r();
 	DECLARE_WRITE8_MEMBER(store_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port3_w);
+	void port1_w(u8 data);
+	void port3_w(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 	void io_map(address_map &map);
@@ -125,7 +125,7 @@ WRITE8_MEMBER( trs80dt1_state::store_w )
 	m_nvram->store(0);
 }
 
-READ8_MEMBER( trs80dt1_state::port1_r )
+u8 trs80dt1_state::port1_r()
 {
 	u8 data = m_cent_busy << 6;
 	return data;
@@ -140,7 +140,7 @@ d4 : BOW (applies reverse video to entire screen)
 d5 : /DTR
 d6 : PP BUSY (parallel printer busy - input)
 d7 : n/c */
-WRITE8_MEMBER( trs80dt1_state::port1_w )
+void trs80dt1_state::port1_w(u8 data)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 	m_bow = BIT(data, 4);
@@ -151,7 +151,7 @@ WRITE8_MEMBER( trs80dt1_state::port1_w )
 /*
 d4 : beeper
 d5 : Printer enable */
-WRITE8_MEMBER( trs80dt1_state::port3_w )
+void trs80dt1_state::port3_w(u8 data)
 {
 	m_rs232->write_txd(BIT(data, 1));
 	m_beep->set_state(BIT(data, 4));

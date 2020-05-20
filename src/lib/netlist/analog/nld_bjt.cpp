@@ -293,6 +293,8 @@ namespace analog
 
 	NETLIB_RESET(QBJT_switch)
 	{
+		if (m_RB.solver() == nullptr && m_RC.solver() == nullptr)
+			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
 		NETLIB_NAME(QBJT)::reset();
 		const auto zero(nlconst::zero());
 
@@ -307,13 +309,11 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_switch)
 	{
-		// FIXME: this should never be called
-		if (!m_RB.P().net().is_rail_net())
-			m_RB.P().solve_now();   // Basis
-		else if (!m_RB.N().net().is_rail_net())
-			m_RB.N().solve_now();   // Emitter
-		else if (!m_RC.P().net().is_rail_net())
-			m_RC.P().solve_now();   // Collector
+		auto solv(m_RB.solver());
+		if (solv)
+			solv->solve_now();
+		else
+			m_RC.solver()->solve_now();
 	}
 
 
@@ -371,20 +371,19 @@ namespace analog
 	// nld_Q - Ebers Moll
 	// ----------------------------------------------------------------------------------------
 
-
 	NETLIB_UPDATE(QBJT_EB)
 	{
-		// FIXME: this should never be called
-		if (!m_D_EB.P().net().is_rail_net())
-			m_D_EB.P().solve_now();   // Basis
-		else if (!m_D_EB.N().net().is_rail_net())
-			m_D_EB.N().solve_now();   // Emitter
+		auto solv(m_D_EB.solver());
+		if (solv)
+			solv->solve_now();
 		else
-			m_D_CB.N().solve_now();   // Collector
+			m_D_CB.solver()->solve_now();
 	}
 
 	NETLIB_RESET(QBJT_EB)
 	{
+		if (m_D_EB.solver() == nullptr && m_D_CB.solver() == nullptr)
+			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
 		NETLIB_NAME(QBJT)::reset();
 		if (m_CJE)
 		{
@@ -396,7 +395,6 @@ namespace analog
 			m_CJC->reset();
 			m_CJC->set_cap_embedded(m_modacc.m_CJC);
 		}
-
 	}
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
@@ -424,7 +422,6 @@ namespace analog
 		m_D_EC.set_mat(        0,      -gec,    0,
 							-gce,         0,    0);
 	}
-
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{

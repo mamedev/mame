@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Dirk Best
+// copyright-holders:Dirk Best
 /****************************************************************************
 
     Qume QVT-102/QVT-102A video terminal
@@ -121,12 +121,12 @@ private:
 	int m_kbd_data;
 
 	// keyboard mcu
-	DECLARE_READ8_MEMBER(mcu_bus_r);
-	DECLARE_WRITE8_MEMBER(mcu_bus_w);
+	uint8_t mcu_bus_r();
+	void mcu_bus_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
+	void mcu_p1_w(uint8_t data);
+	void mcu_p2_w(uint8_t data);
 
 	uint8_t m_kbd_bus, m_kbd_p1, m_kbd_p2;
 };
@@ -354,12 +354,12 @@ INPUT_PORTS_END
 // -----21- unused
 // -------0 speaker
 
-READ8_MEMBER(qvt102_state::mcu_bus_r)
+uint8_t qvt102_state::mcu_bus_r()
 {
 	return m_kbd_bus;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_bus_w)
+void qvt102_state::mcu_bus_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 0));
 	m_kbd_bus = data;
@@ -396,12 +396,12 @@ READ_LINE_MEMBER(qvt102_state::mcu_t1_r)
 	return state;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_p1_w)
+void qvt102_state::mcu_p1_w(uint8_t data)
 {
 	m_kbd_p1 = data;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_p2_w)
+void qvt102_state::mcu_p2_w(uint8_t data)
 {
 	m_kbd_p2 = data;
 

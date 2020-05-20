@@ -113,7 +113,7 @@ void epos_state::dealer_io_map(address_map &map)
 	map(0x40, 0x40).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
-READ8_MEMBER(epos_state::i8255_porta_r)
+uint8_t epos_state::i8255_porta_r()
 {
 	uint8_t data = 0xff;
 
@@ -131,18 +131,18 @@ READ8_MEMBER(epos_state::i8255_porta_r)
    There's a separate ROM check for banked U04 at 30F3.
    It looks like dealer/revenger uses ppi8255 to control bankswitching.
 */
-WRITE8_MEMBER(epos_state::i8255_portc_w)
+void epos_state::i8255_portc_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x01);
 	m_input_multiplex = (data >> 5) & 3;
 }
 
-READ8_MEMBER(epos_state::ay_porta_mpx_r)
+uint8_t epos_state::ay_porta_mpx_r()
 {
 	return (m_ay_porta_multiplex ? 0xFF : ioport("DSW")->read());
 }
 
-WRITE8_MEMBER(epos_state::flip_screen_w)
+void epos_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(BIT(data, 7));
 	// bit 6: ay8910 port A/B multiplexer read

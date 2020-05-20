@@ -129,16 +129,16 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(pio_portA_r);
-	DECLARE_READ8_MEMBER(pio_portB_r);
-	DECLARE_WRITE8_MEMBER(pio_portA_w);
-	DECLARE_WRITE8_MEMBER(pio_portB_w);
+	uint8_t pio_portA_r();
+	uint8_t pio_portB_r();
+	void pio_portA_w(uint8_t data);
+	void pio_portB_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+	uint8_t fdc_dma_r();
+	void fdc_dma_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
@@ -188,7 +188,7 @@ protected:
 	DECLARE_READ8_MEMBER(memmap_r);
 	DECLARE_WRITE8_MEMBER(memmap_w);
 
-	void operation_strobe(address_space& space,uint8_t data);
+	void operation_strobe(uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
@@ -262,9 +262,9 @@ public:
 	void attache816(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(x86_comms_w);
-	DECLARE_READ8_MEMBER(x86_comms_r);
-	DECLARE_WRITE8_MEMBER(x86_irq_enable);
+	void x86_comms_w(uint8_t data);
+	uint8_t x86_comms_r();
+	void x86_irq_enable(uint8_t data);
 	DECLARE_WRITE8_MEMBER(x86_iobf_enable_w);
 	DECLARE_READ8_MEMBER(z80_comms_r);
 	DECLARE_WRITE8_MEMBER(z80_comms_w);
@@ -498,7 +498,7 @@ void attache_state::keyboard_clock_w(bool state)
 }
 
 // TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
-READ8_MEMBER(attache_state::pio_portA_r)
+uint8_t attache_state::pio_portA_r()
 {
 	uint8_t ret = 0xff;
 	uint8_t porta = m_pio_porta;
@@ -547,14 +547,14 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	return ret;
 }
 
-READ8_MEMBER(attache_state::pio_portB_r)
+uint8_t attache_state::pio_portB_r()
 {
 	uint8_t ret = m_pio_portb & 0xbf;
 	ret |= keyboard_data_r();
 	return ret;
 }
 
-void attache_state::operation_strobe(address_space& space, uint8_t data)
+void attache_state::operation_strobe(uint8_t data)
 {
 	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
 	switch(m_pio_select)
@@ -605,7 +605,7 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(attache_state::pio_portA_w)
+void attache_state::pio_portA_w(uint8_t data)
 {
 	//  AO-7 = LATCH DATA OUT:
 	//  LO = MOTOR ON
@@ -620,7 +620,7 @@ WRITE8_MEMBER(attache_state::pio_portA_w)
 	m_pio_porta = data;
 }
 
-WRITE8_MEMBER(attache_state::pio_portB_w)
+void attache_state::pio_portB_w(uint8_t data)
 {
 	//  BO-1 = 5101 A4-5
 	//  B2-4 = OPERATION SELECT
@@ -639,7 +639,7 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	if(!(data & 0x20) && (m_pio_portb & 0x20))
 	{
 		m_pio_select = (data & 0x1c) >> 2;
-		operation_strobe(space,m_pio_porta);
+		operation_strobe(m_pio_porta);
 	}
 	m_pio_portb = data;
 	keyboard_clock_w(data & 0x80);
@@ -779,23 +779,23 @@ WRITE8_MEMBER(attache_state::dma_mask_w)
 	m_dma->write(0x0f,data);
 }
 
-READ8_MEMBER(attache_state::fdc_dma_r)
+uint8_t attache_state::fdc_dma_r()
 {
 	uint8_t ret = m_fdc->dma_r();
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::fdc_dma_w)
+void attache_state::fdc_dma_w(uint8_t data)
 {
 	m_fdc->dma_w(data);
 }
 
-READ8_MEMBER(attache_state::dma_mem_r)
+uint8_t attache_state::dma_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(attache_state::dma_mem_w)
+void attache_state::dma_mem_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
@@ -820,14 +820,14 @@ WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
  * Z80 <-> 8086 communication
  */
 
-WRITE8_MEMBER(attache816_state::x86_comms_w)
+void attache816_state::x86_comms_w(uint8_t data)
 {
 	m_comms_val = data;
 	m_ppi->pc6_w(1);
 	m_z80_rx_ready = false;
 }
 
-READ8_MEMBER(attache816_state::x86_comms_r)
+uint8_t attache816_state::x86_comms_r()
 {
 	m_z80_tx_ready = false;
 	m_ppi->pc4_w(1);
@@ -841,7 +841,7 @@ READ8_MEMBER(attache816_state::x86_comms_r)
 // bit 3: 8087 FPU
 // bit 4: enable WAIT logic
 // bit 5: enable high-resolution graphics
-WRITE8_MEMBER(attache816_state::x86_irq_enable)
+void attache816_state::x86_irq_enable(uint8_t data)
 {
 	m_x86_irq_enable = data;
 }

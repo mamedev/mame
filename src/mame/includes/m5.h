@@ -85,11 +85,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 private:
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	void ppi_pb_w(uint8_t data);
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER( fd5_data_r );
 	DECLARE_WRITE8_MEMBER( fd5_data_w );

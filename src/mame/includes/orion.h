@@ -82,9 +82,9 @@ protected:
 	void orion128_palette(palette_device &palette) const;
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
-	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
-	DECLARE_WRITE8_MEMBER(orion_romdisk_portb_w);
-	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
+	uint8_t orion_romdisk_porta_r();
+	void orion_romdisk_portb_w(uint8_t data);
+	void orion_romdisk_portc_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 
 	void orion128_io(address_map &map);

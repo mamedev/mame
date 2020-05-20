@@ -102,8 +102,8 @@ public:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
-	DECLARE_WRITE8_MEMBER(keyboard_line_write);
-	DECLARE_READ8_MEMBER(keyboard_data_read);
+	void keyboard_line_write(uint8_t data);
+	uint8_t keyboard_data_read();
 	DECLARE_READ8_MEMBER(reset_r);
 	DECLARE_WRITE8_MEMBER(reset_w);
 	DECLARE_READ8_MEMBER(rom_r);
@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( einstein_state::keyboard_timer_callback )
 		m_keyboard_daisy->int_w(ASSERT_LINE);
 }
 
-WRITE8_MEMBER( einstein_state::keyboard_line_write )
+void einstein_state::keyboard_line_write(uint8_t data)
 {
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
@@ -236,7 +236,7 @@ WRITE8_MEMBER( einstein_state::keyboard_line_write )
 	einstein_scan_keyboard();
 }
 
-READ8_MEMBER( einstein_state::keyboard_data_read )
+uint8_t einstein_state::keyboard_data_read()
 {
 	/* re-scan the keyboard */
 	einstein_scan_keyboard();

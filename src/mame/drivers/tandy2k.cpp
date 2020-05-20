@@ -584,12 +584,12 @@ READ8_MEMBER( tandy2k_state::hires_status_r )
 	return 2;
 }
 
-WRITE8_MEMBER( tandy2k_state::vidla_w )
+void tandy2k_state::vidla_w(uint8_t data)
 {
 	m_vidla = data;
 }
 
-WRITE8_MEMBER( tandy2k_state::drb_attr_w )
+void tandy2k_state::drb_attr_w(uint8_t data)
 {
 	/*
 
@@ -729,7 +729,7 @@ WRITE_LINE_MEMBER( tandy2k_state::write_centronics_fault )
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( tandy2k_state::ppi_pb_r )
+uint8_t tandy2k_state::ppi_pb_r()
 {
 	/*
 
@@ -781,7 +781,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
+void tandy2k_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -883,7 +883,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	m_kbddat = state;
 }
 
-READ8_MEMBER( tandy2k_state::irq_callback )
+uint8_t tandy2k_state::irq_callback(offs_t offset)
 {
 	return (offset ? m_pic1 : m_pic0)->acknowledge();
 }

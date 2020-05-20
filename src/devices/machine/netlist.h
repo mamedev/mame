@@ -113,6 +113,8 @@ protected:
 
 	plib::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
+	attotime m_cur_time;
+	attotime m_attotime_per_clock;
 private:
 	void save_state();
 
@@ -230,6 +232,7 @@ public:
 
 
 	inline sound_stream *get_stream() { return m_stream; }
+	void update_to_current_time();
 
 
 	// device_sound_interface overrides
@@ -242,11 +245,14 @@ protected:
 
 	// device_t overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 private:
 	std::map<int, nld_sound_out *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
+	bool m_is_device_call;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -278,11 +284,14 @@ public:
 	inline void update_to_current_time()
 	{
 		if (m_sound != nullptr)
-			m_sound->get_stream()->update();
+		{
+			m_sound->update_to_current_time();
+		}
 	}
 
 	void set_mult_offset(const double mult, const double offset);
 
+	netlist_mame_sound_device *sound() { return m_sound;}
 protected:
 	double m_offset;
 	double m_mult;

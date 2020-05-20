@@ -61,7 +61,7 @@ private:
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 
-	DECLARE_READ8_MEMBER(i8255_pc_r);
+	uint8_t i8255_pc_r();
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);

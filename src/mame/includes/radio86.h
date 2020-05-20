@@ -63,7 +63,7 @@ public:
 	uint8_t rk7007_8255_portc_r();
 	uint8_t kr03_8255_portb_r2();
 	void hrq_w(int state);
-	DECLARE_READ8_MEMBER(radio86rom_romdisk_porta_r);
+	uint8_t radio86rom_romdisk_porta_r();
 	uint8_t radio86ram_romdisk_porta_r();
 	void radio86_romdisk_portb_w(uint8_t data);
 	void radio86_romdisk_portc_w(uint8_t data);

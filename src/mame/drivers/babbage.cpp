@@ -47,9 +47,9 @@ public:
 	void babbage(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(pio2_a_r);
-	DECLARE_WRITE8_MEMBER(pio1_b_w);
-	DECLARE_WRITE8_MEMBER(pio2_b_w);
+	uint8_t pio2_a_r();
+	void pio1_b_w(uint8_t data);
+	void pio2_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 
 // The 8 LEDs
 // bios never writes here - you need to set PIO for output yourself - see test program above
-WRITE8_MEMBER( babbage_state::pio1_b_w )
+void babbage_state::pio1_b_w(uint8_t data)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -160,13 +160,13 @@ WRITE8_MEMBER( babbage_state::pio1_b_w )
 	}
 }
 
-READ8_MEMBER( babbage_state::pio2_a_r )
+uint8_t babbage_state::pio2_a_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
 	return m_key;
 }
 
-WRITE8_MEMBER( babbage_state::pio2_b_w )
+void babbage_state::pio2_b_w(uint8_t data)
 {
 	if (BIT(data, 7))
 		m_step = false;

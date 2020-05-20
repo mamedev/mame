@@ -62,7 +62,7 @@ void einstein_userport_device::device_start()
 //  I/O PORTS
 //**************************************************************************
 
-READ8_MEMBER( einstein_userport_device::read )
+uint8_t einstein_userport_device::read()
 {
 	if (m_card)
 		return m_card->read();
@@ -70,7 +70,7 @@ READ8_MEMBER( einstein_userport_device::read )
 		return 0xff;
 }
 
-WRITE8_MEMBER( einstein_userport_device::write )
+void einstein_userport_device::write(uint8_t data)
 {
 	if (m_card)
 		m_card->write(data);

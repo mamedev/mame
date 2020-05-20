@@ -108,7 +108,7 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(ladyfrog_state::unk_w)
+void ladyfrog_state::unk_w(uint8_t data)
 {
 }
 

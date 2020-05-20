@@ -103,10 +103,10 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port3_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port3_r);
+	void port1_w(uint8_t data);
+	void port3_w(uint8_t data);
+	uint8_t port1_r();
+	uint8_t port3_r();
 
 	DECLARE_WRITE8_MEMBER ( dev_crtl_reg_w );
 	DECLARE_READ8_MEMBER ( dev_keyb_ser_r );
@@ -140,7 +140,7 @@ void minitel_state::machine_start()
 	m_palette->set_pen_color( 7, 255, 255, 255);
 }
 
-WRITE8_MEMBER(minitel_state::port1_w)
+void minitel_state::port1_w(uint8_t data)
 {
 	LOG("port_w: write %02X to PORT1\n", data);
 
@@ -192,19 +192,19 @@ WRITE8_MEMBER(minitel_state::port1_w)
 	port1 = data;
 }
 
-WRITE8_MEMBER(minitel_state::port3_w)
+void minitel_state::port3_w(uint8_t data)
 {
 	LOG("port_w: write %02X to PORT3\n", data);
 	port3 = data;
 }
 
-READ8_MEMBER(minitel_state::port1_r)
+uint8_t minitel_state::port1_r()
 {
 	LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
 	return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
 }
 
-READ8_MEMBER(minitel_state::port3_r)
+uint8_t minitel_state::port3_r()
 {
 	LOG("port_r: read %02X from PORT3\n", port3);
 	return port3;

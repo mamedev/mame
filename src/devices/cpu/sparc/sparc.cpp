@@ -45,7 +45,13 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
-	m_default_config = address_space_config("program", ENDIANNESS_BIG, 32, 32);
+	char asi_buf[10];
+	m_debugger_config = address_space_config("debug", ENDIANNESS_BIG, 32, 32);
+	for (int i = 0; i < 0x10; i++)
+	{
+		snprintf(asi_buf, ARRAY_LENGTH(asi_buf), "asi%X", i);
+		m_asi_config[i] = address_space_config(asi_buf, ENDIANNESS_BIG, 32, 32);
+	}
 }
 
 
@@ -161,6 +167,15 @@ void sparc_base_device::device_start()
 	m_pb_block_ldst_word = false;
 	m_bp_irl = 0;
 	m_irq_state = 0;
+
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (i > 0 && i < 0x10)
+		{
+			continue;
+		}
+		m_asi[i] = &space(i);
+	}
 
 	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
 
@@ -522,38 +537,24 @@ void sparc_base_device::device_post_load()
 device_memory_interface::space_config_vector sparc_base_device::memory_space_config() const
 {
 	space_config_vector config_vector;
-	config_vector.push_back(std::make_pair(AS_PROGRAM, &m_default_config));
+	config_vector.push_back(std::make_pair(0, &m_debugger_config));
+	for (int i = 0; i < 0x10; i++)
+	{
+		config_vector.push_back(std::make_pair(0x10 + i, &m_asi_config[i]));
+	}
 	return config_vector;
 }
 
-
-//-------------------------------------------------
-//  read_sized_word - read a value from a given
-//  address space and address, shifting the data
-//  that is read into the appropriate location of
-//  a 32-bit word in a big-endian system.
-//-------------------------------------------------
-
-uint32_t sparc_base_device::read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask)
+inline uint32_t sparc_base_device::read_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask)
 {
-	assert(asi < 0x20); // We do not currently support ASIs outside the range used by actual Sun machines.
-	return m_mmu->read_asi(asi, address >> 2, mem_mask);
+	assert(asi < 0x10); // We do not currently support ASIs outside the range used by actual Sun machines.
+	return m_asi[asi | 0x10]->read_dword(address, mem_mask);
 }
 
-
-//-------------------------------------------------
-//  write_sized_word - write a value to a given
-//  address space and address, shifting the data
-//  that is written into the least significant
-//  bits as appropriate in order to write the
-//  value to a memory system with separate data
-//  size handlers
-//-------------------------------------------------
-
-void sparc_base_device::write_sized_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask)
+inline void sparc_base_device::write_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask)
 {
-	assert(asi < 0x20); // We do not currently support ASIs outside the range used by actual Sun machines.
-	m_mmu->write_asi(asi, address >> 2, data, mem_mask);
+	assert(asi < 0x10); // We do not currently support ASIs outside the range used by actual Sun machines.
+	return m_asi[asi | 0x10]->write_dword(address, data, mem_mask);
 }
 
 
@@ -2165,7 +2166,7 @@ void sparc_base_device::execute_store(uint32_t op)
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
-	m_mmu->write_asi(addr_space, address >> 2, data0, (ST || STA || STD || STDA || STF || STDF || STDFQ || STFSR || STC || STDC || STDCQ || STCSR) ? 0xffffffff : ((STH || STHA) ? mask16[address & 2] : mask8[address & 3]));
+	write_word(addr_space, address, data0, (ST || STA || STD || STDA || STF || STDF || STDFQ || STFSR || STC || STDC || STDCQ || STCSR) ? 0xffffffff : ((STH || STHA) ? mask16[address & 2] : mask8[address & 3]));
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2177,7 +2178,7 @@ void sparc_base_device::execute_store(uint32_t op)
 
 	if (STD || STDA || STDF || STDC || STDFQ || STDCQ)
 	{
-		m_mmu->write_asi(addr_space, (address + 4) >> 2, data1, 0xffffffff);
+		write_word(addr_space, address + 4, data1);
 		if (MAE)
 		{
 			m_trap = 1;
@@ -2304,7 +2305,7 @@ inline void sparc_base_device::execute_ldd(uint32_t op)
 		m_icount = 0;
 	}
 
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(m_data_space, address);
 
 	if (MAE)
 	{
@@ -2318,7 +2319,7 @@ inline void sparc_base_device::execute_ldd(uint32_t op)
 	if (RDBITS)
 		RDREG = data;
 
-	const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	const uint32_t word1 = read_word(m_data_space, address + 4);
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2347,7 +2348,7 @@ inline void sparc_base_device::execute_ld(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(m_data_space, address);
 
 	if (m_mae)
 	{
@@ -2379,7 +2380,7 @@ inline void sparc_base_device::execute_ldsh(uint32_t op)
 	}
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
+	const uint32_t data = read_word(m_data_space, address, mask16[address & 2]);
 
 	if (m_mae)
 	{
@@ -2414,7 +2415,7 @@ inline void sparc_base_device::execute_lduh(uint32_t op)
 	}
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask16[address & 2]);
+	const uint32_t data = read_word(m_data_space, address, mask16[address & 2]);
 
 	if (m_mae)
 	{
@@ -2440,7 +2441,7 @@ inline void sparc_base_device::execute_ldsb(uint32_t op)
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[address & 3]);
+	const uint32_t data = read_word(m_data_space, address, mask8[address & 3]);
 
 	if (m_mae)
 	{
@@ -2469,7 +2470,7 @@ inline void sparc_base_device::execute_ldub(uint32_t op)
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
 	const uint32_t byte_idx = address & 3;
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, mask8[byte_idx]);
+	const uint32_t data = read_word(m_data_space, address, mask8[byte_idx]);
 
 	if (m_mae)
 	{
@@ -2512,7 +2513,7 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(m_data_space, address);
 
 	if (m_mae)
 	{
@@ -2528,7 +2529,7 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 		return;
 	}
 
-	const uint32_t word1 = m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	const uint32_t word1 = read_word(m_data_space, address + 4);
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2572,7 +2573,7 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(m_data_space, address);
 
 	if (m_mae)
 	{
@@ -2616,7 +2617,7 @@ inline void sparc_base_device::execute_ldfsr(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(m_data_space, address);
 
 	if (m_mae)
 	{
@@ -2673,7 +2674,7 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 		return;
 	}
 
-	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	read_word(m_data_space, address);
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2685,7 +2686,7 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 
 	// implementation-dependent actions
 
-	m_mmu->read_asi(m_data_space, (address + 4) >> 2, 0xffffffff);
+	read_word(m_data_space, address + 4);
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2733,7 +2734,7 @@ inline void sparc_base_device::execute_ldcpr(uint32_t op)
 		return;
 	}
 
-	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	read_word(m_data_space, address);
 
 	if (MAE)
 	{
@@ -2782,7 +2783,7 @@ inline void sparc_base_device::execute_ldcsr(uint32_t op)
 		return;
 	}
 
-	m_mmu->read_asi(m_data_space, address >> 2, 0xffffffff);
+	read_word(m_data_space, address);
 
 	if (MAE)
 	{
@@ -2830,7 +2831,7 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(addr_space, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(addr_space, address);
 
 	if (m_mae)
 	{
@@ -2844,7 +2845,7 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 	if (RDBITS)
 		RDREG = data;
 
-	uint32_t word1 = m_mmu->read_asi(addr_space, (address + 4) >> 2, 0xffffffff);
+	uint32_t word1 = read_word(addr_space, address + 4);
 	if (MAE)
 	{
 		m_trap = 1;
@@ -2890,7 +2891,7 @@ inline void sparc_base_device::execute_lda(uint32_t op)
 		return;
 	}
 
-	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, 0xffffffff);
+	const uint32_t data = read_word(ASI, address);
 
 	if (m_mae)
 	{
@@ -2939,7 +2940,7 @@ inline void sparc_base_device::execute_ldsha(uint32_t op)
 	}
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
-	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
+	const uint32_t data = read_word(ASI, address, mask16[address & 2]);
 
 	if (m_mae)
 	{
@@ -2990,7 +2991,7 @@ inline void sparc_base_device::execute_lduha(uint32_t op)
 	}
 
 	static const uint32_t mask16[4] = { 0xffff0000, 0x00000000, 0x0000ffff, 0x00000000 };
-	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask16[address & 2]);
+	const uint32_t data = read_word(ASI, address, mask16[address & 2]);
 
 	if (m_mae)
 	{
@@ -3032,7 +3033,7 @@ inline void sparc_base_device::execute_ldsba(uint32_t op)
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
 	const uint32_t address = RS1REG + RS2REG;
-	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
+	const uint32_t data = read_word(ASI, address, mask8[address & 3]);
 
 	if (m_mae)
 	{
@@ -3076,7 +3077,7 @@ inline void sparc_base_device::execute_lduba(uint32_t op)
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
 	const uint32_t address = RS1REG + RS2REG;
-	const uint32_t data = m_mmu->read_asi(ASI, address >> 2, mask8[address & 3]);
+	const uint32_t data = read_word(ASI, address, mask8[address & 3]);
 
 	if (m_mae)
 	{
@@ -3210,7 +3211,7 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 	m_pb_block_ldst_byte = 1;
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
-	data = m_mmu->read_asi(addr_space, address >> 2, mask8[address & 3]);
+	data = read_word(addr_space, address, mask8[address & 3]);
 
 	if (MAE)
 	{
@@ -3221,7 +3222,7 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 		return;
 	}
 
-	m_mmu->write_asi(addr_space, address >> 2, 0xffffffff, mask8[address & 3]);
+	write_word(addr_space, address, 0xffffffff, mask8[address & 3]);
 
 	m_pb_block_ldst_byte = 0;
 
@@ -4555,7 +4556,7 @@ void sparcv8_device::execute_swap(uint32_t op)
 
 		m_pb_block_ldst_word = 1;
 
-		word = read_sized_word(addr_space, address, 4);
+		word = read_word(addr_space, address);
 
 		if (MAE)
 		{
@@ -4565,7 +4566,7 @@ void sparcv8_device::execute_swap(uint32_t op)
 	}
 	if (!m_trap)
 	{
-		write_sized_word(addr_space, address, temp, 4);
+		write_word(addr_space, address, temp);
 
 		m_pb_block_ldst_word = 0;
 		if (MAE)
@@ -4807,7 +4808,7 @@ inline void sparc_base_device::execute_step()
 
 	// write-state-register delay not yet implemented
 
-	const uint32_t op = m_mmu->fetch_insn(m_s, PC >> 2);
+	const uint32_t op = read_word(8 + (IS_SUPERVISOR ? 1 : 0), PC);
 
 #if LOG_FCODES
 	//if (m_log_fcodes)

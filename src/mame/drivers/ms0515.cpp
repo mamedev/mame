@@ -93,9 +93,9 @@ private:
 	DECLARE_READ16_MEMBER(ms0515_halt_r);
 	DECLARE_WRITE16_MEMBER(ms0515_halt_w);
 
-	DECLARE_WRITE8_MEMBER(ms0515_porta_w);
-	DECLARE_READ8_MEMBER(ms0515_portb_r);
-	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
+	void ms0515_porta_w(uint8_t data);
+	uint8_t ms0515_portb_r();
+	void ms0515_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
@@ -254,7 +254,7 @@ WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
  *
  * MZ1 = drive 1 side 0-1
  */
-WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
+void ms0515_state::ms0515_porta_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg A <- %02x\n", data);
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_porta_w)
  * b1 -- floppy drq (1 -- ready)
  * b0 -- floppy intrq (0 -- ready)
  */
-READ8_MEMBER(ms0515_state::ms0515_portb_r)
+uint8_t ms0515_state::ms0515_portb_r()
 {
 	uint8_t data;
 
@@ -325,7 +325,7 @@ READ8_MEMBER(ms0515_state::ms0515_portb_r)
  * b3 -- video resolution, 0: 320x200, 1: 640x200
  * b2-0 -- overscan color
  */
-WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
+void ms0515_state::ms0515_portc_w(uint8_t data)
 {
 	LOGSYSREG("Sysreg C <- %02x\n", data);
 

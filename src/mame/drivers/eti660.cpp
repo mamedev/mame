@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( eti660_state::dma_w )
+void eti660_state::dma_w(offs_t offset, uint8_t data)
 {
 	offset -= 0x480;
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 
 /* PIA6821 Interface */
 
-READ8_MEMBER( eti660_state::pia_pa_r )
+uint8_t eti660_state::pia_pa_r()
 {
 	/*
 
@@ -214,7 +214,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( eti660_state::pia_pa_w )
+void eti660_state::pia_pa_w(uint8_t data)
 {
 	/*
 

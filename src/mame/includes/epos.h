@@ -36,10 +36,10 @@ protected:
 private:
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_READ8_MEMBER(i8255_porta_r);
-	DECLARE_WRITE8_MEMBER(i8255_portc_w);
-	DECLARE_READ8_MEMBER(ay_porta_mpx_r);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	uint8_t i8255_porta_r();
+	void i8255_portc_w(uint8_t data);
+	uint8_t ay_porta_mpx_r();
+	void flip_screen_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);

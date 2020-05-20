@@ -187,7 +187,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::vectrex_via_irq)
 }
 
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_pb_r)
+uint8_t vectrex_base_state::vectrex_via_pb_r()
 {
 	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
@@ -200,7 +200,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pb_r)
 }
 
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
+uint8_t vectrex_base_state::vectrex_via_pa_r()
 {
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
@@ -212,7 +212,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
 }
 
 
-READ8_MEMBER(raaspec_state::vectrex_s1_via_pb_r)
+uint8_t raaspec_state::vectrex_s1_via_pb_r()
 {
 	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
@@ -264,7 +264,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::vectrex_psg_port_w)
+void vectrex_base_state::vectrex_psg_port_w(uint8_t data)
 {
 	double wavel, ang_acc, tmp;
 	int mcontrol;

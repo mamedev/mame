@@ -1054,7 +1054,7 @@ public:
 private:
 	void nforce_map(address_map &map);
 	void nforce_map_io(address_map &map);
-	DECLARE_WRITE8_MEMBER(boot_state_award_w);
+	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
 
@@ -1088,7 +1088,7 @@ const nforcepc_state::boot_state_info nforcepc_state::boot_state_infos_award[] =
 	{ 0, nullptr }
 };
 
-WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
+void nforcepc_state::boot_state_award_w(uint8_t data)
 {
 	const char *desc = "";
 	for (int i = 0; boot_state_infos_award[i].message; i++)

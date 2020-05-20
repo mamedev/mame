@@ -98,12 +98,12 @@ namespace netlist
 
 	PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,             1, "Found terminal {1} without a net")
 	PERRMSGV(MF_TERMINALS_WITHOUT_NET,              0, "Found terminals without a net")
-	PERRMSGV(ME_TRISTATE_NO_PROXY_FOUND_2,			2,
+	PERRMSGV(ME_TRISTATE_NO_PROXY_FOUND_2,          2,
 		"Tristate output {1} on device {2} is not connected to a proxy. You "
 		"need to set parameter FORCE_TRISTATE_LOGIC for device {2} if "
 		"tristate enable inputs are all connected to fixed inputs. If this "
 		"is not the case: Review your netlist. Something is wrong.")
-	PERRMSGV(ME_TRISTATE_PROXY_FOUND_2,				2,
+	PERRMSGV(ME_TRISTATE_PROXY_FOUND_2,             2,
 		"The tristate output {1} on device {2} is connected to an analog net "
 		"but has been forced to act as a logic output. Parameter "
 		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
@@ -146,6 +146,14 @@ namespace netlist
 	// nld_mosfet.cpp
 
 	PERRMSGV(MW_MOSFET_THRESHOLD_VOLTAGE,           1, "Mosfet: Threshold voltage not specified for {1}")
+
+	// nld_bjt.cpp
+
+	PERRMSGV(MF_DEVICE_FRY_1,                       1,
+		"Please don't fry device {}. Most likely this error is caused by the"
+		" fact that you want to exclude the analog device from the netlist."
+		" This is not the right approach. If you want to exclude the device,"
+		" exclude the device altogether, i.e. by using #ifdef/#if statements.")
 
 	// nl_tool.cpp
 

@@ -89,7 +89,7 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(vico_w);
 
-	DECLARE_READ8_MEMBER(kbd_get);
+	uint8_t kbd_get();
 	void kbd_put(u8 data);
 
 	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
@@ -131,13 +131,11 @@ public:
 		, m_ptm(*this, "ptm")
 	{ }
 
-	DECLARE_READ8_MEMBER(waveterm_kb_r);
-	DECLARE_WRITE8_MEMBER(waveterm_kb_w);
+	uint8_t waveterm_kb_r();
+	void waveterm_kb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
 
-	DECLARE_READ8_MEMBER(pia3_pa_r);
-	DECLARE_WRITE8_MEMBER(pia3_pa_w);
-	DECLARE_WRITE8_MEMBER(pia3_pb_w);
+	void pia3_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(pia3_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia3_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w);
@@ -255,7 +253,7 @@ READ_LINE_MEMBER(eurocom2_state::pia1_ca1_r)
 }
 
 /* bit 7 may be connected to something else -- see section 6.2 of Eurocom manual */
-READ8_MEMBER(eurocom2_state::kbd_get)
+uint8_t eurocom2_state::kbd_get()
 {
 	return m_kbd_data;
 }
@@ -269,7 +267,7 @@ void eurocom2_state::kbd_put(u8 data)
 }
 
 
-READ8_MEMBER(waveterm_state::waveterm_kb_r)
+uint8_t waveterm_state::waveterm_kb_r()
 {
 	uint8_t data = 0xff;
 
@@ -282,7 +280,7 @@ READ8_MEMBER(waveterm_state::waveterm_kb_r)
 	return data;
 }
 
-WRITE8_MEMBER(waveterm_state::waveterm_kb_w)
+void waveterm_state::waveterm_kb_w(uint8_t data)
 {
 	m_drive = (~data) >> 4;
 }
@@ -292,7 +290,7 @@ WRITE_LINE_MEMBER(waveterm_state::waveterm_kbh_w)
 	m_driveh = !state;
 }
 
-WRITE8_MEMBER(waveterm_state::pia3_pb_w)
+void waveterm_state::pia3_pb_w(uint8_t data)
 {
 }
 

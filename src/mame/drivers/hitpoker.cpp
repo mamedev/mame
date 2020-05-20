@@ -84,8 +84,8 @@ private:
 	DECLARE_WRITE8_MEMBER(hitpoker_cram_w);
 	DECLARE_READ8_MEMBER(hitpoker_paletteram_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_paletteram_w);
-	DECLARE_READ8_MEMBER(hitpoker_pic_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
+	uint8_t hitpoker_pic_r(offs_t offset);
+	void hitpoker_pic_w(offs_t offset, uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<mc68hc11_cpu_device> m_maincpu;
@@ -190,7 +190,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
 }
 
 
-READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
+uint8_t hitpoker_state::hitpoker_pic_r(offs_t offset)
 {
 //  logerror("R\n");
 
@@ -208,7 +208,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 	return m_sys_regs;
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
+void hitpoker_state::hitpoker_pic_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;

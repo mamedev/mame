@@ -4,7 +4,7 @@
 #include "includes/taxidriv.h"
 
 
-WRITE8_MEMBER(taxidriv_state::spritectrl_w)
+void taxidriv_state::spritectrl_w(offs_t offset, uint8_t data)
 {
 	m_spritectrl[offset] = data;
 }

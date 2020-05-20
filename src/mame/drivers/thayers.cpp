@@ -84,14 +84,14 @@ private:
 	DECLARE_READ8_MEMBER(irqstate_r);
 	DECLARE_WRITE8_MEMBER(timer_int_ack_w);
 	DECLARE_WRITE8_MEMBER(data_rdy_int_ack_w);
-	DECLARE_WRITE8_MEMBER(cop_d_w);
+	void cop_d_w(uint8_t data);
 	DECLARE_READ8_MEMBER(cop_data_r);
 	DECLARE_WRITE8_MEMBER(cop_data_w);
-	DECLARE_READ8_MEMBER(cop_l_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(cop_g_r);
+	uint8_t cop_l_r();
+	void cop_l_w(uint8_t data);
+	uint8_t cop_g_r();
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(cop_g_w);
+	void cop_g_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kbdata_r);
 	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
@@ -196,7 +196,7 @@ WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::cop_d_w)
+void thayers_state::cop_d_w(uint8_t data)
 {
 	/*
 
@@ -244,7 +244,7 @@ WRITE8_MEMBER(thayers_state::cop_data_w)
 	if (LOG) logerror("COP DATA %02x\n", m_cop_data_latch);
 }
 
-READ8_MEMBER(thayers_state::cop_l_r)
+uint8_t thayers_state::cop_l_r()
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -256,13 +256,13 @@ READ8_MEMBER(thayers_state::cop_l_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_l_w)
+void thayers_state::cop_l_w(uint8_t data)
 {
 	m_cop_l = data;
 	if (LOG) logerror("COP L %02x\n", m_cop_l);
 }
 
-READ8_MEMBER(thayers_state::cop_g_r)
+uint8_t thayers_state::cop_g_r()
 {
 	/*
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(thayers_state::control_w)
 	if (LOG) logerror("COP G0..2 %u\n", m_cop_cmd_latch);
 }
 
-WRITE8_MEMBER(thayers_state::cop_g_w)
+void thayers_state::cop_g_w(uint8_t data)
 {
 	/*
 

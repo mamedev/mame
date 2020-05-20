@@ -35,8 +35,8 @@ protected:
 
 	std::vector<uint16_t> m_sdram;
 
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual uint16_t porta_r() override;
+	virtual void porta_w(uint16_t data) override;
 
 private:
 
@@ -63,8 +63,8 @@ protected:
 	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
+	virtual uint16_t porta_r() override;
+	virtual uint16_t portb_r() override;
 
 private:
 };

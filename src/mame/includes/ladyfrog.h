@@ -83,7 +83,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ladyfrog_gfxctrl2_w);
 	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	void unk_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(toucheme);
 	DECLARE_VIDEO_START(ladyfrog_common);

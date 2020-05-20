@@ -247,8 +247,8 @@ WRITE8_MEMBER(vectrex_cart_slot_device::write_ram)
  write_bank
  -------------------------------------------------*/
 
-WRITE8_MEMBER(vectrex_cart_slot_device::write_bank)
+void vectrex_cart_slot_device::write_bank(uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data);
+		m_cart->write_bank(data);
 }

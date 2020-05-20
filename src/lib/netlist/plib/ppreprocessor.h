@@ -101,7 +101,6 @@ namespace plib {
 					if (bytes > m_buf.size())
 						bytes = m_buf.size();
 					std::copy(m_strm->m_outbuf.c_str() + m_strm->m_pos, m_strm->m_outbuf.c_str() + m_strm->m_pos + bytes, m_buf.data());
-					//printf("%ld\n", (long int)bytes);
 					this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
 					m_strm->m_pos += static_cast<long>(bytes);

@@ -1605,14 +1605,14 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-READ8_MEMBER(pc8801_state::cpu_8255_c_r)
+uint8_t pc8801_state::cpu_8255_c_r()
 {
 //  machine().scheduler().synchronize(); // force resync
 
 	return m_i8255_1_pc >> 4;
 }
 
-WRITE8_MEMBER(pc8801_state::cpu_8255_c_w)
+void pc8801_state::cpu_8255_c_w(uint8_t data)
 {
 //  machine().scheduler().synchronize(); // force resync
 
@@ -1620,14 +1620,14 @@ WRITE8_MEMBER(pc8801_state::cpu_8255_c_w)
 }
 
 
-READ8_MEMBER(pc8801_state::fdc_8255_c_r)
+uint8_t pc8801_state::fdc_8255_c_r()
 {
 //  machine().scheduler().synchronize(); // force resync
 
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(pc8801_state::fdc_8255_c_w)
+void pc8801_state::fdc_8255_c_w(uint8_t data)
 {
 //  machine().scheduler().synchronize(); // force resync
 
@@ -2311,7 +2311,7 @@ void pc8801_state::pc8801_palette(palette_device &palette) const
 
 /* YM2203 Interface */
 
-READ8_MEMBER(pc8801_state::opn_porta_r)
+uint8_t pc8801_state::opn_porta_r()
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
@@ -2327,7 +2327,7 @@ READ8_MEMBER(pc8801_state::opn_porta_r)
 
 	return ioport("OPN_PA")->read();
 }
-READ8_MEMBER(pc8801_state::opn_portb_r){ return ioport("OPN_PB")->read(); }
+uint8_t pc8801_state::opn_portb_r(){ return ioport("OPN_PB")->read(); }
 
 /* Cassette Configuration */
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
