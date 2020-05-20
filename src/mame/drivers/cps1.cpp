@@ -694,6 +694,20 @@ void cps_state::sf2m10_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
+void cps_state::varthb2_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::varthb2_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).ram().share("mainram");
+}
+
 /***********************************************************
              INPUT PORTS, DIPs
 ***********************************************************/
@@ -3624,6 +3638,12 @@ void cps_state::sf2m10(machine_config &config)
 {
 	cps1_12MHz(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::sf2m10_map);
+}
+
+void cps_state::varthb2(machine_config &config)
+{
+	cps1_12MHz(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::varthb2_map);
 }
 
 
@@ -11452,6 +11472,39 @@ ROM_START( varthjr )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
 ROM_END
 
+/* varthr1 bootleg (runs on identical pcb to sf2amf3)
+   only prg roms have been dumped, everything else is from parent set for now...
+   some minor priority and transparency issues, unknown if present on real pcb
+*/
+ROM_START( varthb2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "varth-u222", 0x00000, 0x80000, CRC(fd2f93a8) SHA1(d76c2f063f9e1ed32b451c97ff94ec80aef5e9ba) )
+	ROM_LOAD16_BYTE( "varth-u196", 0x00001, 0x80000, CRC(3b187dc3) SHA1(0fcd17e934e89928f46b73f3eebbb5ad71a7cf2f) )
+
+	// pcb picture shows 4x 42-pin mask roms which suggests 4x 27c800 (4MB) for gfx vs originals 4x 27c400 (2MB)
+	// roms u18,19 might just be duplicates of u68,70 (although markings are different?) or just half empty
+	// games expects sprites to start at 0x8000 so reloading in upper region
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
+	ROM_RELOAD(                  0x400000, 0x80000)
+	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )
+	ROM_RELOAD(                  0x400002, 0x80000)
+	ROM_LOAD64_WORD( "va-1m.3a", 0x000004, 0x80000, CRC(0b1ace37) SHA1(6f9493c22f667f683db2789972fd16bb94724679) )
+	ROM_RELOAD(                  0x400004, 0x80000)
+	ROM_LOAD64_WORD( "va-3m.5a", 0x000006, 0x80000, CRC(44dfe706) SHA1(a013a434df3161a91aafbb35dc4e20dfb3f177f4) )
+	ROM_RELOAD(                  0x400006, 0x80000)
+
+	// a 27c512 in some way related to gfx  NO DUMP
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "va_09.12b", 0x00000, 0x08000, CRC(7a99446e) SHA1(ca027f41e3e58be5abc33ad7380746658cb5380a) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "va_18.11c", 0x00000, 0x20000, CRC(de30510e) SHA1(8e878696192606b76a3a0e53553e638d9621cff7) )
+	ROM_LOAD( "va_19.12c", 0x20000, 0x20000, CRC(0610a4ac) SHA1(3da02ea6a7a56c85de898806d2a1cf6bc526c1b3) )
+ROM_END
+
 /* B-Board 89625B-1 */
 ROM_START( qad )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -13728,9 +13781,42 @@ WRITE16_MEMBER( cps_state::sf2m3_layer_w )
 	cps1_cps_b_w(space,0x0a,data);
 }
 
+WRITE16_MEMBER(cps_state::varthb2_cps_a_w)
+{
+	// cps-a regs are updated as normal by original code,
+	// but bootleg code ignores them and uses these regions instead:
+	if (offset == 0x00 / 2)
+	{
+		m_cps_a_regs[offset] = 0x9100;
+		return;
+	}
+	if (offset == 0x02 / 2)
+	{
+		m_cps_a_regs[offset] = 0x90c0;
+		return;
+	}
+	if (offset == 0x04 / 2)
+	{
+		m_cps_a_regs[offset] = 0x9040;
+		return;
+	}
+	if (offset == 0x06 / 2)
+	{
+		m_cps_a_regs[offset] = 0x9080;
+		return;
+	}
+	if (offset == 0x0a / 2)
+	{
+		m_cps_a_regs[offset] = 0x9000;
+		return;
+	}
+
+	m_cps_a_regs[offset] = data;
+}
+
 
 /*
-    A note reguarding bootlegs:
+    A note regarding bootlegs:
     In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
     derived classes and source files.
 
@@ -13925,6 +14011,7 @@ GAME( 1992, varthr1,     varth,    cps1_12MHz, varth,    cps_state, init_cps1,  
 GAME( 1992, varthu,      varth,    cps1_12MHz, varth,    cps_state, init_cps1,     ROT270, "Capcom (Romstar license)", "Varth: Operation Thunderstorm (USA 920612)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, varthj,      varth,    cps1_12MHz, varth,    cps_state, init_cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan 920714)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, varthjr,     varth,    cps1_12MHz, varth,    cps_state, init_cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan Resale Ver. 920714)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, varthb2,     varth,    varthb2,    varth,    cps_state, init_cps1,     ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // World 920612
 GAME( 1992, qad,         0,        cps1_12MHz, qad,      cps_state, init_cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (USA 920701)", MACHINE_SUPPORTS_SAVE ) // 12MHz verified
 GAME( 1994, qadjr,       qad,      cps1_12MHz, qadjr,    cps_state, init_cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (Japan Resale Ver. 940921)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, wof,         0,        qsound,     wof,      cps_state, init_wof,      ROT0,   "Capcom", "Warriors of Fate (World 921031)", MACHINE_SUPPORTS_SAVE )   // "ETC"
