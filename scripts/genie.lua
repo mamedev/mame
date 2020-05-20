@@ -505,6 +505,11 @@ configuration { "Release", "vs20*" }
 		"NoEditAndContinue",
 		"NoIncrementalLink",
 	}
+	if _OPTIONS["SYMBOLS"] then
+		flags {
+			"Symbols",
+		}
+	end
 
 configuration { "vsllvm" }
 	buildoptions {
