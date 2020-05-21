@@ -1944,7 +1944,7 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 	}
 }
 
-void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
+void nv2a_renderer::render_color(int32_t scanline, const nv2a_rasterizer::extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x, lx;
 
@@ -1974,7 +1974,7 @@ void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const
 	}
 }
 
-void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
+void nv2a_renderer::render_texture_simple(int32_t scanline, const nv2a_rasterizer::extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x, lx;
 	uint32_t a8r8g8b8;
@@ -2011,7 +2011,7 @@ void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &exte
 	}
 }
 
-void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
+void nv2a_renderer::render_register_combiners(int32_t scanline, const nv2a_rasterizer::extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x, lx, xp;
 	int up, vp;
@@ -2471,7 +2471,7 @@ void nv2a_renderer::compute_supersample_factors(float &horizontal, float &vertic
 	vertical = my;
 }
 
-void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count)
+void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination, int count)
 {
 	vertex_nv vert[4];
 	int m, u;
@@ -2489,8 +2489,8 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 					v[i] += matrix.composite[i][j] * source[m].attribute[0].fv[j];
 			};
 			destination[m].w = v[3];
-			destination[m].x = (v[0] / v[3])*supersample_factor_x; // source[m].attribute[0].fv[0];
-			destination[m].y = (v[1] / v[3])*supersample_factor_y; // source[m].attribute[0].fv[1];
+			destination[m].x = (v[0] / v[3]) * supersample_factor_x; // source[m].attribute[0].fv[0];
+			destination[m].y = (v[1] / v[3]) * supersample_factor_y; // source[m].attribute[0].fv[1];
 			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
@@ -2734,13 +2734,13 @@ void nv2a_renderer::clear_depth_buffer(int what, uint32_t value)
 		}
 }
 
-uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
 	float areax2;
 	NV2A_GL_CULL_FACE face = NV2A_GL_CULL_FACE::FRONT;
 
 	if (backface_culling_enabled == false)
-		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+		return rasterizer.render_triangle(cliprect, render_spans_callback, paramcount, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
 	{
 		triangles_bfculled++;
@@ -2762,10 +2762,10 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 	}
 	if (face == NV2A_GL_CULL_FACE::FRONT)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::BACK)
-			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+			return rasterizer.render_triangle(cliprect, render_spans_callback, paramcount, _v1, _v2, _v3);
 	if (face == NV2A_GL_CULL_FACE::BACK)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT)
-			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+			return rasterizer.render_triangle(cliprect, render_spans_callback, paramcount, _v1, _v2, _v3);
 	triangles_bfculled++;
 	return 0;
 }
@@ -2812,14 +2812,14 @@ int nv2a_renderer::clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo)
 	return idx;
 }
 
-uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
 	nv2avertex_t *vi[3];
 	nv2avertex_t vo[8];
 	int nv;
 
 	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
-		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
+		return render_triangle_culling(cliprect, paramcount, _v1, _v2, _v3);
 	if (enable_clipping_w == false)
 		return 0;
 	if ((_v1.w <= 0) && (_v2.w <= 0) && (_v3.w <= 0))
@@ -2877,47 +2877,47 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		}
 	}
 	for (int n = 1; n <= (nv - 2); n++)
-		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[n], vo[n + 1]);
+		render_triangle_culling(cliprect, paramcount, vo[0], vo[n], vo[n + 1]);
 	return 0;
 }
 
-void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans)
+void nv2a_renderer::assemble_primitive(vertex_nv *source, int count)
 {
 	uint32_t pc = primitives_count;
 
 	for (; count > 0; count--) {
 		if (primitive_type == NV2A_BEGIN_END::QUADS) {
-			convert_vertices_poly(source, vertex_xy + vertex_count + vertex_accumulated, 1);
+			convert_vertices(source, vertex_xy + vertex_count + vertex_accumulated, 1);
 			vertex_accumulated++;
 			if (vertex_accumulated == 4) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
-				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
+				render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 1], vertex_xy[vertex_count + 2]);
+				render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[vertex_count + 2], vertex_xy[vertex_count + 3]);
 				vertex_count = (vertex_count + 4) & 1023;
-				wait();
+				rasterizer.wait();
 			}
 		}
 		else if (primitive_type == NV2A_BEGIN_END::TRIANGLES) {
-			convert_vertices_poly(source, vertex_xy + vertex_count + vertex_accumulated, 1);
+			convert_vertices(source, vertex_xy + vertex_count + vertex_accumulated, 1);
 			vertex_accumulated++;
 			if (vertex_accumulated == 3) {
 				primitives_count++;
 				vertex_accumulated = 0;
-				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
+				render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[vertex_count], vertex_xy[(vertex_count + 1) & 1023], vertex_xy[(vertex_count + 2) & 1023]); // 4 rgba, 4 texture units 2 uv
 				vertex_count = (vertex_count + 3) & 1023;
-				wait();
+				rasterizer.wait();
 			}
 		}
 		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_FAN) {
 			if (vertex_accumulated == 0)
 			{
-				convert_vertices_poly(source, vertex_xy + 1024, 1);
+				convert_vertices(source, vertex_xy + 1024, 1);
 				vertex_accumulated = 1;
 			}
 			else if (vertex_accumulated == 1)
 			{
-				convert_vertices_poly(source, vertex_xy, 1);
+				convert_vertices(source, vertex_xy, 1);
 				vertex_accumulated = 2;
 				vertex_count = 1;
 			}
@@ -2926,21 +2926,21 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				primitives_count++;
 				// if software sends the vertices 0 1 2 3 4 5 6
 				// hardware will draw triangles made by (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,5,6)
-				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
-				render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+				convert_vertices(source, vertex_xy + vertex_count, 1);
+				render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[1024], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				vertex_count = (vertex_count + 1) & 1023;
-				wait();
+				rasterizer.wait();
 			}
 		}
 		else if (primitive_type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
 			if (vertex_accumulated == 0)
 			{
-				convert_vertices_poly(source, vertex_xy, 1);
+				convert_vertices(source, vertex_xy, 1);
 				vertex_accumulated = 1;
 			}
 			else if (vertex_accumulated == 1)
 			{
-				convert_vertices_poly(source, vertex_xy + 1, 1);
+				convert_vertices(source, vertex_xy + 1, 1);
 				vertex_accumulated = 2;
 				vertex_count = 2;
 			}
@@ -2949,40 +2949,40 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				primitives_count++;
 				// if software sends the vertices 0 1 2 3 4 5 6
 				// hardware will draw triangles made by (0,1,2) (1,3,2) (2,3,4) (3,5,4) (4,5,6)
-				convert_vertices_poly(source, vertex_xy + vertex_count, 1);
+				convert_vertices(source, vertex_xy + vertex_count, 1);
 				if ((vertex_count & 1) == 0)
-					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
+					render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[(vertex_count - 1) & 1023], vertex_xy[vertex_count]);
 				else
-					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
+					render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[(vertex_count - 2) & 1023], vertex_xy[vertex_count], vertex_xy[(vertex_count - 1) & 1023]);
 				vertex_count = (vertex_count + 1) & 1023;
-				wait();
+				rasterizer.wait();
 			}
 		}
 		else if (primitive_type == NV2A_BEGIN_END::QUAD_STRIP) {
 			if (vertex_accumulated == 0)
 			{
-				convert_vertices_poly(source, vertex_xy, 1);
+				convert_vertices(source, vertex_xy, 1);
 				vertex_accumulated = 1;
 			}
 			else if (vertex_accumulated == 1)
 			{
-				convert_vertices_poly(source, vertex_xy + 1, 1);
+				convert_vertices(source, vertex_xy + 1, 1);
 				vertex_accumulated = 2;
 				vertex_count = 0;
 			}
 			else
 			{
-				convert_vertices_poly(source, vertex_xy + ((vertex_count + vertex_accumulated) & 1023), 1);
+				convert_vertices(source, vertex_xy + ((vertex_count + vertex_accumulated) & 1023), 1);
 				vertex_accumulated++;
 				if (vertex_accumulated == 4)
 				{
 					primitives_count++;
 					// quad is made of vertices vertex count +0 +1 +3 +2
-					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
-					render_triangle_clipping(limits_rendertarget, renderspans, 5 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
+					render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[vertex_count + 0], vertex_xy[vertex_count + 1], vertex_xy[(vertex_count + 3) & 1023]);
+					render_triangle_clipping(limits_rendertarget, 5 + 4 * 2, vertex_xy[(vertex_count + 3) & 1023], vertex_xy[(vertex_count + 2) & 1023], vertex_xy[vertex_count + 0]);
 					vertex_accumulated = 2;
 					vertex_count = (vertex_count + 2) & 1023;
-					wait();
+					rasterizer.wait();
 				}
 			}
 		}
@@ -3072,11 +3072,11 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		primitive_type = (NV2A_BEGIN_END)data;
 		if (data != 0) {
 			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0))
-				render_spans_callback = render_delegate(&nv2a_renderer::render_register_combiners, this);
+				render_spans_callback = nv2a_rasterizer::render_delegate(&nv2a_renderer::render_register_combiners, this);
 			else if (texture[0].enabled)
-				render_spans_callback = render_delegate(&nv2a_renderer::render_texture_simple, this);
+				render_spans_callback = nv2a_rasterizer::render_delegate(&nv2a_renderer::render_texture_simple, this);
 			else
-				render_spans_callback = render_delegate(&nv2a_renderer::render_color, this);
+				render_spans_callback = nv2a_rasterizer::render_delegate(&nv2a_renderer::render_color, this);
 		}
 		countlen--;
 	}
@@ -3092,7 +3092,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 #endif
 		for (n = 0; n <= count; n++) {
 			read_vertices_0x1810(space, vertex_software + vertex_first, n + offset, 1);
-			assemble_primitive(vertex_software + vertex_first, 1, render_spans_callback);
+			assemble_primitive(vertex_software + vertex_first, 1);
 			vertex_first = (vertex_first + 1) & 1023;
 		}
 		countlen--;
@@ -3124,7 +3124,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			address += 4;
 			countlen--;
 			read_vertices_0x180x(space, vertex_software + vertex_first, address, mult);
-			assemble_primitive(vertex_software + vertex_first, mult, render_spans_callback);
+			assemble_primitive(vertex_software + vertex_first, mult);
 			vertex_first = (vertex_first + mult) & 1023;
 		}
 	}
@@ -3145,7 +3145,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 				break;
 			}
 			address = address + c * 4;
-			assemble_primitive(vertex_software + vertex_first, 1, render_spans_callback);
+			assemble_primitive(vertex_software + vertex_first, 1);
 			vertex_first = (vertex_first + 1) & 1023;
 		}
 	}
@@ -3161,7 +3161,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			persistvertexattr.attribute[attr].fv[2] = 0;
 			persistvertexattr.attribute[attr].fv[3] = 1;
 			if (attr == 0)
-				assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+				assemble_primitive(&persistvertexattr, 1);
 		}
 	}
 	if ((maddress >= 0x1900) && (maddress < 0x1940))
@@ -3176,7 +3176,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		persistvertexattr.attribute[attr].fv[2] = 0;
 		persistvertexattr.attribute[attr].fv[3] = 1;
 		if (attr == 0)
-			assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+			assemble_primitive(&persistvertexattr, 1);
 	}
 	if ((maddress >= 0x1940) && (maddress < 0x1980))
 	{
@@ -3192,7 +3192,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		persistvertexattr.attribute[attr].fv[2] = (float)d3;
 		persistvertexattr.attribute[attr].fv[3] = (float)d4;
 		if (attr == 0)
-			assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+			assemble_primitive(&persistvertexattr, 1);
 	}
 	if ((maddress >= 0x1980) && (maddress < 0x1a00))
 	{
@@ -3206,7 +3206,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		persistvertexattr.attribute[attr].fv[comp+1] = (float)((int16_t)d2);
 		if (comp == 2)
 			if (attr == 0)
-				assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+				assemble_primitive(&persistvertexattr, 1);
 	}
 	if ((maddress >= 0x1a00) && (maddress < 0x1b00))
 	{
@@ -3217,7 +3217,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		persistvertexattr.attribute[attr].iv[comp] = data;
 		if (comp == 3)
 			if (attr == 0)
-				assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+				assemble_primitive(&persistvertexattr, 1);
 	}
 	if ((maddress >= 0x1518) && (maddress < 0x1528))
 	{
@@ -3226,7 +3226,7 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 
 		persistvertexattr.attribute[(int)NV2A_VERTEX_ATTR::POS].iv[comp] = data;
 		if (comp == 3)
-			assemble_primitive(&persistvertexattr, 1, render_spans_callback);
+			assemble_primitive(&persistvertexattr, 1);
 	}
 	if ((maddress >= 0x1720) && (maddress < 0x1760)) {
 		int bit = maddress / 4 - 0x1720 / 4;
