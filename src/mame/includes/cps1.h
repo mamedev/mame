@@ -143,6 +143,7 @@ public:
 	void sf2m3(machine_config &config);
 	void sf2cems6(machine_config &config);
 	void sf2m10(machine_config &config);
+	void varthb2(machine_config &config);
 
 	void init_cps1();
 	void init_sf2ee();
@@ -200,6 +201,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(sf2ceblp_prot_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_READ16_MEMBER(dinohunt_sound_r);
+	DECLARE_WRITE16_MEMBER(varthb2_cps_a_w);
 
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
@@ -229,6 +231,7 @@ protected:
 	void sf2m3_map(address_map &map);
 	void sf2cems6_map(address_map &map);
 	void sf2m10_map(address_map &map);
+	void varthb2_map(address_map &map);
 
 	// game-specific
 	uint16_t sf2ceblp_prot;
