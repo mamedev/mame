@@ -83,7 +83,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		const uint16_t addr =  m_core->m_r[rd];
 		const uint16_t orig =  read16(addr);
 		m_core->m_r[REG_SR] &= ~UNSP_Z;
-		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
 
 		switch (bitop)
 		{
@@ -113,7 +113,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		const uint32_t addr =  m_core->m_r[rd] | (get_ds() << 16);
 		const uint16_t orig =  read16(addr);
 		m_core->m_r[REG_SR] &= ~UNSP_Z;
-		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
 
 		switch (bitop)
 		{
@@ -140,11 +140,11 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		const uint8_t bitop =  (op & 0x0030) >> 4;
 		const uint8_t rd =     (op & 0x0e00) >> 9;
 		const uint8_t rs =     (op & 0x0007) >> 0;
-		const uint8_t offset = (1 << m_core->m_r[rs]);
+		const uint8_t offset = (1 << (m_core->m_r[rs] & 0xf));
 		const uint16_t addr =  m_core->m_r[rd];
 		const uint16_t orig =  read16(addr);
 		m_core->m_r[REG_SR] &= ~UNSP_Z;
-		m_core->m_r[REG_SR] |= BIT(m_core->m_r[rd], offset) ? 0 : UNSP_Z;
+		m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
 
 		switch (bitop)
 		{

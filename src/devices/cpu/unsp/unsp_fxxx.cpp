@@ -250,7 +250,6 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 
 void unsp_12_device::execute_divq(uint16_t op)
 {
-	uint32_t orig_dividend = 0;
 	if (m_core->m_divq_bit == UINT_MAX)
 	{
 		m_core->m_divq_bit = 15;
@@ -258,7 +257,6 @@ void unsp_12_device::execute_divq(uint16_t op)
 		m_core->m_divq_divisor = m_core->m_r[REG_R2];
 		m_core->m_divq_a = 0;
 	}
-	orig_dividend = m_core->m_divq_dividend;
 	m_core->m_aq = BIT(m_core->m_divq_a, 31);
 	if (m_core->m_aq)
 	{
