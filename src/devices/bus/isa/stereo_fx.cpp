@@ -27,12 +27,12 @@ WRITE8_MEMBER( stereo_fx_device::dev_dsp_data_w )
 }
 
 // port 1 is the left DAC but is written and read bitwise during capture
-READ8_MEMBER( stereo_fx_device::p1_r )
+uint8_t stereo_fx_device::p1_r()
 {
 	return 0x80;
 }
 
-READ8_MEMBER( stereo_fx_device::p3_r )
+uint8_t stereo_fx_device::p3_r()
 {
 	uint8_t ret = 0;
 
@@ -43,7 +43,7 @@ READ8_MEMBER( stereo_fx_device::p3_r )
 	return ret;
 }
 
-WRITE8_MEMBER( stereo_fx_device::p3_w )
+void stereo_fx_device::p3_w(uint8_t data)
 {
 	m_t1 = (data & 0x20) >> 5;
 }

@@ -669,19 +669,19 @@ READ32_MEMBER(pxa255_periphs_device::gpio_r)
 	{
 		case PXA255_GPLR0:
 		{
-			const uint32_t value = (m_gpio_regs.gplr0 & m_gpio_regs.gpdr0) | m_gpio0_r(space, 0, ~m_gpio_regs.gpdr0);
+			const uint32_t value = (m_gpio_regs.gplr0 & m_gpio_regs.gpdr0) | m_gpio0_r(0, ~m_gpio_regs.gpdr0);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", m_gpio_regs.gplr0, mem_mask);
 			return value;
 		}
 		case PXA255_GPLR1:
 		{
-			const uint32_t value = (m_gpio_regs.gplr1 & m_gpio_regs.gpdr1) | m_gpio1_r(space, 0, ~m_gpio_regs.gpdr1);
+			const uint32_t value = (m_gpio_regs.gplr1 & m_gpio_regs.gpdr1) | m_gpio1_r(0, ~m_gpio_regs.gpdr1);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 1: %08x & %08x\n", m_gpio_regs.gplr1, mem_mask);
 			return value;
 		}
 		case PXA255_GPLR2:
 		{
-			const uint32_t value = (m_gpio_regs.gplr2 & m_gpio_regs.gpdr2) | m_gpio2_r(space, 0, ~m_gpio_regs.gpdr2);
+			const uint32_t value = (m_gpio_regs.gplr2 & m_gpio_regs.gpdr2) | m_gpio2_r(0, ~m_gpio_regs.gpdr2);
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_r: GPIO Pin-Level Register 2: %08x & %08x\n", m_gpio_regs.gplr2, mem_mask);
 			return value;
 		}
@@ -792,32 +792,32 @@ WRITE32_MEMBER(pxa255_periphs_device::gpio_w)
 		case PXA255_GPSR0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr0 |= data & m_gpio_regs.gpdr0;
-			m_gpio0_w(space, 0, data, m_gpio_regs.gpdr0);
+			m_gpio0_w(0, data, m_gpio_regs.gpdr0);
 			break;
 		case PXA255_GPSR1:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 1: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr1 |= data & m_gpio_regs.gpdr1;
-			m_gpio1_w(space, 0, data, m_gpio_regs.gpdr1);
+			m_gpio1_w(0, data, m_gpio_regs.gpdr1);
 			break;
 		case PXA255_GPSR2:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Set Register 2: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr2 |= data & m_gpio_regs.gpdr2;
-			m_gpio2_w(space, 0, data, m_gpio_regs.gpdr2);
+			m_gpio2_w(0, data, m_gpio_regs.gpdr2);
 			break;
 		case PXA255_GPCR0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr0 &= ~(data & m_gpio_regs.gpdr0);
-			m_gpio0_w(space, 0, data, m_gpio_regs.gpdr0);
+			m_gpio0_w(0, data, m_gpio_regs.gpdr0);
 			break;
 		case PXA255_GPCR1:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 1: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr1 &= ~(data & m_gpio_regs.gpdr1);
-			m_gpio1_w(space, 0, data, m_gpio_regs.gpdr1);
+			m_gpio1_w(0, data, m_gpio_regs.gpdr1);
 			break;
 		case PXA255_GPCR2:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Pin Output Clear Register 2: %08x & %08x\n", data, mem_mask);
 			m_gpio_regs.gpsr2 &= ~(data & m_gpio_regs.gpdr2);
-			m_gpio2_w(space, 0, data, m_gpio_regs.gpdr2);
+			m_gpio2_w(0, data, m_gpio_regs.gpdr2);
 			break;
 		case PXA255_GRER0:
 			LOGMASKED(LOG_GPIO, "pxa255_gpio_w: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", data, mem_mask);

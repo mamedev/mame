@@ -558,14 +558,14 @@ void vme_fccpu20_device::update_irq_to_maincpu()
 #define BR8N38400  0x08
 #define FORCEBUG   0x30
 
-READ8_MEMBER (vme_fccpu20_device::pita_r)
+uint8_t vme_fccpu20_device::pita_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return FORCEBUG | BR7N9600;
 }
 
 /* Enabling/Disabling of VME IRQ 1-7 */
-READ8_MEMBER (vme_fccpu20_device::pitb_r)
+uint8_t vme_fccpu20_device::pitb_r()
 {
 	LOG("%s\n", FUNCNAME);
 	return 0xff;
@@ -573,7 +573,7 @@ READ8_MEMBER (vme_fccpu20_device::pitb_r)
 
 /* VME board ID bit and bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
 /* Bit 4 is bus available */
-READ8_MEMBER (vme_fccpu20_device::pitc_r)
+uint8_t vme_fccpu20_device::pitc_r()
 {
 	uint8_t board_id = 0;
 

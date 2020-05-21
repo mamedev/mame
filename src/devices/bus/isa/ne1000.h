@@ -28,8 +28,8 @@ protected:
 
 private:
 	void ne1000_irq_w(int state);
-	DECLARE_READ8_MEMBER(ne1000_mem_read);
-	DECLARE_WRITE8_MEMBER(ne1000_mem_write);
+	uint8_t ne1000_mem_read(offs_t offset);
+	void ne1000_mem_write(offs_t offset, uint8_t data);
 
 	required_device<dp8390d_device> m_dp8390;
 	uint8_t m_irq;

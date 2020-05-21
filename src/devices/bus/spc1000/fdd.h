@@ -51,9 +51,9 @@ private:
 	uint8_t m_i8255_1_pc;
 	uint8_t m_i8255_portb;
 
-	DECLARE_WRITE8_MEMBER(i8255_b_w);
-	DECLARE_READ8_MEMBER(i8255_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_c_w);
+	void i8255_b_w(uint8_t data);
+	uint8_t i8255_c_r();
+	void i8255_c_w(uint8_t data);
 
 	DECLARE_READ8_MEMBER(tc_r);
 	DECLARE_WRITE8_MEMBER(control_w);

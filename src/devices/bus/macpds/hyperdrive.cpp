@@ -180,12 +180,12 @@ READ16_MEMBER( macpds_hyperdrive_device::hyperdrive_r )
 	return m_hdc->read(offset);
 }
 
-WRITE8_MEMBER( macpds_hyperdrive_device::hdd_w )
+void macpds_hyperdrive_device::hdd_w(offs_t offset, uint8_t data)
 {
 //  printf("hdd_w: %02x @ %x\n", data, offset);
 }
 
-READ8_MEMBER( macpds_hyperdrive_device::hdd_r )
+uint8_t macpds_hyperdrive_device::hdd_r(offs_t offset)
 {
 //  printf("hdd_r: @ %x\n", offset);
 	return 0;

@@ -74,7 +74,7 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
 
-READ16_MEMBER(spg110_device::space_r)
+uint16_t spg110_device::space_r(offs_t offset)
 {
 	address_space &cpuspace = this->space(AS_PROGRAM);
 	return cpuspace.read_word(offset);

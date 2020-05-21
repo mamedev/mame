@@ -157,7 +157,7 @@ sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag,
 //  configuration addiitons
 //-------------------------------------------------
 
-READ16_MEMBER(sega_scu_device::scudsp_dma_r)
+uint16_t sega_scu_device::scudsp_dma_r(offs_t offset, uint16_t mem_mask)
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = offset;
@@ -168,7 +168,7 @@ READ16_MEMBER(sega_scu_device::scudsp_dma_r)
 }
 
 
-WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
+void sega_scu_device::scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = offset;

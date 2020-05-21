@@ -218,8 +218,8 @@ public:
 	void flush_xa(const unsigned int sector=0);
 	void flush_cdda(const unsigned int sector=0);
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
 };
 
 // device type definition

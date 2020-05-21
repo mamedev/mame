@@ -39,8 +39,8 @@ protected:
 
 private:
 	void dp_irq_w(int state);
-	DECLARE_READ8_MEMBER(dp_mem_read);
-	DECLARE_WRITE8_MEMBER(dp_mem_write);
+	uint8_t dp_mem_read(offs_t offset);
+	void dp_mem_write(offs_t offset, uint8_t data);
 
 	uint8_t m_ram[0x20000];
 	uint8_t m_prom[16];

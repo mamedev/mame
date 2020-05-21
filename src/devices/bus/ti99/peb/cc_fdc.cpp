@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::clock_in )
 	m_tms9901->phi_line(state);
 }
 
-READ8_MEMBER( corcomp_fdc_device::tms9901_input )
+uint8_t corcomp_fdc_device::tms9901_input(offs_t offset)
 {
 	// Inputs
 	// INT1: Switch 8

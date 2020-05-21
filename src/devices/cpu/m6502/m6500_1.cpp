@@ -299,7 +299,7 @@ READ8_MEMBER(m6500_1_device::read_port)
 	if (!machine().side_effects_disabled() && m_port_in_cb[offset])
 	{
 		u8 const prev(m_port_in[offset]);
-		m_port_in[offset] = m_port_in_cb[offset](space);
+		m_port_in[offset] = m_port_in_cb[offset]();
 		if (!offset)
 		{
 			u8 const diff((prev ^ m_port_in[0]) & m_port_buf[0]);
@@ -318,12 +318,12 @@ WRITE8_MEMBER(m6500_1_device::write_port)
 {
 	u8 const prev(m_port_in[offset] & m_port_buf[offset]);
 	if (m_port_buf[offset] != data)
-		m_port_out_cb[offset](space, m_port_buf[offset] = data);
+		m_port_out_cb[offset](m_port_buf[offset] = data);
 
 	if (!offset)
 	{
 		if (!machine().side_effects_disabled() && m_port_in_cb[0])
-			m_port_in[0] = m_port_in_cb[0](space);
+			m_port_in[0] = m_port_in_cb[0]();
 		u8 const effective(m_port_in[0] & data);
 		u8 const diff(prev ^ effective);
 		if (BIT(diff, 0) && BIT(effective, 0))

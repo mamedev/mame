@@ -53,8 +53,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { m_write_a_tx(state); }
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { m_write_b_tx(state);  }
-	DECLARE_READ8_MEMBER(m68307_duart_input_r) { return m_read_inport();  }
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w) { m_write_outport(data);  }
+	uint8_t m68307_duart_input_r() { return m_read_inport();  }
+	void m68307_duart_output_w(uint8_t data) { m_write_outport(data);  }
 
 	void init16_m68307(address_space &space);
 

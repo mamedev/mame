@@ -255,7 +255,7 @@ void spectrum_opus_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-WRITE8_MEMBER(spectrum_opus_device::pia_out_a)
+void spectrum_opus_device::pia_out_a(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(spectrum_opus_device::pia_out_a)
 	m_fdc->dden_w(BIT(data, 5));
 }
 
-WRITE8_MEMBER(spectrum_opus_device::pia_out_b)
+void spectrum_opus_device::pia_out_b(uint8_t data)
 {
 	m_centronics->write_data1(BIT(data, 1));
 	m_centronics->write_data2(BIT(data, 2));

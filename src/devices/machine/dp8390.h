@@ -16,8 +16,8 @@ public:
 	auto mem_read_callback() { return m_mem_read_cb.bind(); }
 	auto mem_write_callback() { return m_mem_write_cb.bind(); }
 
-	DECLARE_WRITE16_MEMBER( dp8390_w );
-	DECLARE_READ16_MEMBER( dp8390_r );
+	void dp8390_w(offs_t offset, uint16_t data);
+	uint16_t dp8390_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
 	void recv_cb(uint8_t *buf, int len) override;

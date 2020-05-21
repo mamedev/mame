@@ -451,7 +451,7 @@ INPUT_PORTS_START( ie15 )
 
 INPUT_PORTS_END
 
-WRITE16_MEMBER( ie15_device::kbd_put )
+void ie15_device::kbd_put(uint16_t data)
 {
 	DBG_LOG(2,"keyboard",("W %02X<-%02X '%c' %02X (%c)\n", m_kb_data, data, 'x' /* data < 0x20 ? ' ' : (data & 255) */,
 		m_kb_flag, m_kb_flag ? 'n' : 'y'));

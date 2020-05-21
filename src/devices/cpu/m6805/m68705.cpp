@@ -285,7 +285,7 @@ template <std::size_t N> READ8_MEMBER(m6805_hmos_device::port_r)
 {
 	if (!m_port_cb_r[N].isnull())
 	{
-		u8 const newval(m_port_cb_r[N](space, 0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
+		u8 const newval(m_port_cb_r[N](0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
 		if (newval != m_port_input[N])
 		{
 			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02X)\n",
@@ -322,7 +322,7 @@ template <std::size_t N> void m6805_hmos_device::port_cb_w()
 {
 	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
-	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
+	m_port_cb_w[N](0, data, mask);
 }
 
 READ8_MEMBER(m68705_device::pcr_r)

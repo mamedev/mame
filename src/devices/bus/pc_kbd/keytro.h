@@ -49,12 +49,12 @@ protected:
 
 	DECLARE_READ8_MEMBER( internal_data_read );
 	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
+	uint8_t p1_read();
+	void p1_write(uint8_t data);
+	uint8_t p2_read();
+	void p2_write(uint8_t data);
+	uint8_t p3_read();
+	void p3_write(uint8_t data);
 
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);

@@ -59,7 +59,7 @@ private:
 	required_device<spg110_video_device> m_spg_video;
 	required_device<spg110_audio_device> m_spg_audio;
 
-	DECLARE_READ16_MEMBER(space_r);
+	uint16_t space_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
 	devcb_write16 m_porta_out;
@@ -73,19 +73,19 @@ private:
 
 	devcb_write8 m_chip_sel;
 
-	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); }
-	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); }
-	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); }
-	DECLARE_WRITE16_MEMBER(porta_w) { m_porta_out(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(portb_w) { m_portb_out(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); }
+	uint16_t porta_r() { return m_porta_in(); }
+	uint16_t portb_r() { return m_portb_in(); }
+	uint16_t portc_r() { return m_portc_in(); }
+	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_porta_out(offset, data, mem_mask); }
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portb_out(offset, data, mem_mask); }
+	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portc_out(offset, data, mem_mask); }
 
 	DECLARE_WRITE_LINE_MEMBER(ffreq1_w);
 	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
 
-	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); }
-	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); }
-	DECLARE_READ16_MEMBER(get_pal_r) { return 0; /*m_pal_flag;*/ }
+	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
+	void cs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_chip_sel(offset, data, mem_mask); }
+	uint16_t get_pal_r() { return 0; /*m_pal_flag;*/ }
 	void configure_spg_io(spg2xx_io_device* io);
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);

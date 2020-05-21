@@ -41,11 +41,11 @@ protected:
 private:
 	// DSP ROM access
 	DECLARE_READ16_MEMBER(dsp_sample_r);
-	DECLARE_WRITE16_MEMBER(dsp_pio_w);
+	void dsp_pio_w(offs_t offset, u16 data);
 
 	// for synchronised DSP communication
 	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
-	DECLARE_READ16_MEMBER(dsp_pio_r);
+	u16 dsp_pio_r();
 	void set_dsp_ready(void *ptr, s32 param);
 	void set_cmd(void *ptr, s32 param);
 

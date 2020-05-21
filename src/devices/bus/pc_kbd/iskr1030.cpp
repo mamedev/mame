@@ -417,7 +417,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::ram_r )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
+uint8_t iskr_1030_keyboard_device::p1_r()
 {
 	/*
 	    bit     description
@@ -444,7 +444,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
+void iskr_1030_keyboard_device::p2_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -468,7 +468,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
 //  p1_w - OK
 //-------------------------------------------------
 
-WRITE8_MEMBER( iskr_1030_keyboard_device::p1_w )
+void iskr_1030_keyboard_device::p1_w(uint8_t data)
 {
 	/*
 	    bit     description

@@ -3403,32 +3403,32 @@ void psxcpu_device::setcp3cr( int reg, uint32_t value )
 
 READ32_MEMBER( psxcpu_device::gpu_r )
 {
-	return m_gpu_read_handler( space, offset, mem_mask );
+	return m_gpu_read_handler( offset, mem_mask );
 }
 
 WRITE32_MEMBER( psxcpu_device::gpu_w )
 {
-	m_gpu_write_handler( space, offset, data, mem_mask );
+	m_gpu_write_handler( offset, data, mem_mask );
 }
 
 READ16_MEMBER( psxcpu_device::spu_r )
 {
-	return m_spu_read_handler( space, offset, mem_mask );
+	return m_spu_read_handler( offset, mem_mask );
 }
 
 WRITE16_MEMBER( psxcpu_device::spu_w )
 {
-	m_spu_write_handler( space, offset, data, mem_mask );
+	m_spu_write_handler( offset, data, mem_mask );
 }
 
 READ8_MEMBER( psxcpu_device::cd_r )
 {
-	return m_cd_read_handler( space, offset, mem_mask );
+	return m_cd_read_handler( offset, mem_mask );
 }
 
 WRITE8_MEMBER( psxcpu_device::cd_w )
 {
-	m_cd_write_handler( space, offset, data, mem_mask );
+	m_cd_write_handler( offset, data, mem_mask );
 }
 
 void psxcpu_device::set_disable_rom_berr(bool mode)

@@ -406,7 +406,7 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::tcr_w){
 	return;
 }
 
-WRITE8_MEMBER (vme_fcscsi1_card_device::led_w){
+void vme_fcscsi1_card_device::led_w(uint8_t data) {
 	LOG("%s [%02x]\n", FUNCNAME, data);
 
 	m_fdc->dden_w(BIT(data, 7));
@@ -450,12 +450,12 @@ WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(vme_fcscsi1_card_device::fdc_read_byte)
+uint8_t vme_fcscsi1_card_device::fdc_read_byte()
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_write_byte)
+void vme_fcscsi1_card_device::fdc_write_byte(uint8_t data)
 {
 	m_fdc->data_w(data & 0xff);
 }

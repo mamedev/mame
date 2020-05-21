@@ -111,7 +111,7 @@ void spg2xx_device::device_reset()
 	m_fiq_vector = 0xff;
 }
 
-WRITE8_MEMBER(spg2xx_device::fiq_vector_w)
+void spg2xx_device::fiq_vector_w(uint8_t data)
 {
 	m_fiq_vector = data;
 }
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER(spg2xx_device::ffreq2_w)
 
 
 
-READ16_MEMBER(spg2xx_device::space_r)
+uint16_t spg2xx_device::space_r(offs_t offset)
 {
 	address_space &cpuspace = this->space(AS_PROGRAM);
 	return cpuspace.read_word(offset);

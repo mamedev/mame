@@ -111,7 +111,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(space, offset, mem_mask);
+		return m_dp8390->dp8390_r(offset);
 	case 1:
 		return m_prom[offset];
 	case 2:
@@ -126,7 +126,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_w(space, offset, data, mem_mask);
+		return m_dp8390->dp8390_w(offset, data);
 	case 1:
 	case 2:
 		logerror("3c503: invalid attempt to write to prom\n");

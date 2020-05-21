@@ -200,7 +200,7 @@ READ8_MEMBER(m68hc05_device::port_read)
 	offset &= PORT_COUNT - 1;
 	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
 	{
-		u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
+		u8 const newval(m_port_cb_r[offset](0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 		u8 const diff(newval ^ m_port_input[offset]);
 		if (diff)
 		{
@@ -226,7 +226,7 @@ WRITE8_MEMBER(m68hc05_device::port_latch_w)
 	}
 	m_port_latch[offset] = data;
 	if (diff & m_port_ddr[offset])
-		m_port_cb_w[offset](space, 0, port_value(offset), m_port_ddr[offset]);
+		m_port_cb_w[offset](0, port_value(offset), m_port_ddr[offset]);
 }
 
 READ8_MEMBER(m68hc05_device::port_ddr_r)
@@ -247,7 +247,7 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 		{
 			if (!m_port_cb_r[offset].isnull())
 			{
-				u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
+				u8 const newval(m_port_cb_r[offset](0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 				u8 const diff(newval ^ m_port_input[offset]);
 				if (diff)
 				{
@@ -258,7 +258,7 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 			}
 			update_port_irq();
 		}
-		m_port_cb_w[offset](space, 0, port_value(offset), m_port_ddr[offset]);
+		m_port_cb_w[offset](0, port_value(offset), m_port_ddr[offset]);
 	}
 }
 

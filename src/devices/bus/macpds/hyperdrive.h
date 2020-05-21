@@ -42,8 +42,8 @@ private:
 	DECLARE_READ16_MEMBER(hyperdrive_r);
 	DECLARE_WRITE16_MEMBER(hyperdrive_w);
 
-	DECLARE_READ8_MEMBER(hdd_r);
-	DECLARE_WRITE8_MEMBER(hdd_w);
+	uint8_t hdd_r(offs_t offset);
+	void hdd_w(offs_t offset, uint8_t data);
 };
 
 

@@ -585,13 +585,13 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p1_read()
 {
 	return m_p1 & m_p1_data;
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_write )
+void pc_kbd_keytronic_pc3270_device::p1_write(uint8_t data)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p1_write(): write %02x\n", data);
@@ -600,13 +600,13 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p2_read()
 {
 	return m_p2;
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
+void pc_kbd_keytronic_pc3270_device::p2_write(uint8_t data)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p2_write(): write %02x\n", data);
@@ -615,7 +615,7 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p3_read()
 {
 	uint8_t data = m_p3;
 
@@ -628,7 +628,7 @@ READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_write )
+void pc_kbd_keytronic_pc3270_device::p3_write(uint8_t data)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p3_write(): write %02x\n", data);

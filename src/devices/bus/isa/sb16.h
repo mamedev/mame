@@ -45,10 +45,10 @@ private:
 	// mcu ports
 	DECLARE_READ8_MEMBER( dsp_data_r );
 	DECLARE_WRITE8_MEMBER( dsp_data_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( rate_w );
 	DECLARE_READ8_MEMBER( dma8_r );
 	DECLARE_WRITE8_MEMBER( dma8_w );

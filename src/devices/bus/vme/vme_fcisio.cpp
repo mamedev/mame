@@ -449,7 +449,7 @@ WRITE8_MEMBER (vme_fcisio1_card_device::not_implemented_w){
 }
 
 // TODO: Get a manual to understand the config options for real
-READ8_MEMBER (vme_fcisio1_card_device::config_rd){
+uint8_t vme_fcisio1_card_device::config_rd(){
 	uint8_t ret = 0;
 	LOG("%s\n", FUNCNAME);
 

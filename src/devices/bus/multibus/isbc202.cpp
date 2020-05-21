@@ -341,7 +341,7 @@ WRITE_LINE_MEMBER(isbc202_device::co_w)
 	m_cpes[ 3 ]->li_w(state);
 }
 
-READ8_MEMBER(isbc202_device::px_r)
+uint8_t isbc202_device::px_r()
 {
 	if (BIT(m_px_s1s0 , 0)) {
 		return m_cmd & 7;

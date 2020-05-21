@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hld_w );
-	DECLARE_READ8_MEMBER( tms9901_input );
+	uint8_t tms9901_input(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( select_dsk );
 	DECLARE_WRITE_LINE_MEMBER( side_select );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );

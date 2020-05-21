@@ -63,7 +63,7 @@ WRITE8_MEMBER( sb16_lle_device::dac_data_w )
 	m_rdac->write(data << 8);
 }
 
-READ8_MEMBER( sb16_lle_device::p1_r )
+uint8_t sb16_lle_device::p1_r()
 {
 	uint8_t ret = 0;
 	ret |= m_data_out << 0;
@@ -71,7 +71,7 @@ READ8_MEMBER( sb16_lle_device::p1_r )
 	return ret;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p1_w )
+void sb16_lle_device::p1_w(uint8_t data)
 {
 	/* port P1
 	 * bit0 - output byte ready
@@ -85,12 +85,12 @@ WRITE8_MEMBER( sb16_lle_device::p1_w )
 	*/
 }
 
-READ8_MEMBER( sb16_lle_device::p2_r )
+uint8_t sb16_lle_device::p2_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p2_w )
+void sb16_lle_device::p2_w(uint8_t data)
 {
 	/* port P2
 	 * bit0 -

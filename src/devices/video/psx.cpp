@@ -3264,7 +3264,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-WRITE32_MEMBER( psxgpu_device::write )
+void psxgpu_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -3459,7 +3459,7 @@ void psxgpu_device::gpu_read( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-READ32_MEMBER( psxgpu_device::read )
+uint32_t psxgpu_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 

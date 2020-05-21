@@ -63,15 +63,15 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	if(offset < 0x100+16)
 	{
 		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return (m_dp8390->dp8390_r(space, offset, 0xff) << 8)|
-				m_dp8390->dp8390_r(space, offset+1, 0xff);
+		return (m_dp8390->dp8390_r(offset) << 8)|
+				m_dp8390->dp8390_r(offset+1);
 	}
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
 	{
 	case 0x100+16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
-		data = m_dp8390->dp8390_r(space, offset, mem_mask);
+		data = m_dp8390->dp8390_r(offset);
 		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
 		return data;
 	case 0x100+31:
@@ -95,8 +95,8 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 			data <<= 8;
 			offset++;
 		}
-		m_dp8390->dp8390_w(space, offset, data>>8, 0xff);
-		if(mem_mask == 0xffff) m_dp8390->dp8390_w(space, offset+1, data & 0xff, 0xff);
+		m_dp8390->dp8390_w(offset, data>>8);
+		if(mem_mask == 0xffff) m_dp8390->dp8390_w(offset+1, data & 0xff);
 		return;
 	}
 	//if(mem_mask == 0x00ff) offset++;
@@ -105,7 +105,7 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 	case 0x100+16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
 		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
-		m_dp8390->dp8390_w(space, offset, data, mem_mask);
+		m_dp8390->dp8390_w(offset, data);
 		return;
 	case 0x100+31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);
@@ -116,7 +116,7 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 	return;
 }
 
-READ8_MEMBER(x68k_neptune_device::x68k_neptune_mem_read)
+uint8_t x68k_neptune_device::x68k_neptune_mem_read(offs_t offset)
 {
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024)))
@@ -127,7 +127,7 @@ READ8_MEMBER(x68k_neptune_device::x68k_neptune_mem_read)
 	return m_board_ram[offset - (16*1024)];
 }
 
-WRITE8_MEMBER(x68k_neptune_device::x68k_neptune_mem_write)
+void x68k_neptune_device::x68k_neptune_mem_write(offs_t offset, uint8_t data)
 {
 	if((offset < (16*1024)) || (offset >= (32*1024)))
 	{

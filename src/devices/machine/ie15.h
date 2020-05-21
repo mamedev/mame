@@ -75,7 +75,7 @@ private:
 
 	void ie15core(machine_config &config);
 
-	DECLARE_WRITE16_MEMBER(kbd_put);
+	void kbd_put(uint16_t data);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_addr_lo_w);

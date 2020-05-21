@@ -14,17 +14,17 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-READ8_MEMBER(spc1000_fdd_exp_device::i8255_c_r)
+uint8_t spc1000_fdd_exp_device::i8255_c_r()
 {
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_b_w)
+void spc1000_fdd_exp_device::i8255_b_w(uint8_t data)
 {
 	m_i8255_portb = data;
 }
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
+void spc1000_fdd_exp_device::i8255_c_w(uint8_t data)
 {
 	m_i8255_1_pc = data;
 }

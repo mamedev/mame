@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 	m_old = old;
 }
 
-WRITE16_MEMBER(qsound_device::dsp_pio_w)
+void qsound_device::dsp_pio_w(offs_t offset, u16 data)
 {
 	// PDX0 is used for QSound ROM offset, and PDX1 is used for ADPCM ROM offset
 	// this prevents spurious PSEL transitions between sending samples to the DAC
@@ -340,7 +340,7 @@ WRITE16_MEMBER(qsound_device::dsp_pio_w)
 }
 
 
-READ16_MEMBER(qsound_device::dsp_pio_r)
+u16 qsound_device::dsp_pio_r()
 {
 	LOGCOMMAND(
 			"QSound: DSP PIO read returning %s = %04X\n",

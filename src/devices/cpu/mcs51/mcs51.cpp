@@ -1000,7 +1000,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			m_uart.bits_to_send--;
 			if(m_uart.bits_to_send == 0) {
 				//Call the callback function
-				m_serial_tx_cb(*m_io, 0, m_uart.data_out, 0xff);
+				m_serial_tx_cb(0, m_uart.data_out, 0xff);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -1018,7 +1018,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			{
 				int data = 0;
 				//Call our callball function to retrieve the data
-				data = m_serial_rx_cb(*m_io, 0, 0xff);
+				data = m_serial_rx_cb(0, 0xff);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ

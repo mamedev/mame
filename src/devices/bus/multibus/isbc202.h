@@ -37,7 +37,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(co_w);
 
-	DECLARE_READ8_MEMBER(px_r);
+	uint8_t px_r();
 
 protected:
 	// device_t overrides
