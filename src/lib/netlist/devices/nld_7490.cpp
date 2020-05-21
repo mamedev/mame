@@ -39,18 +39,45 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI();
+		NETLIB_UPDATEI()
+		{
+			const netlist_sig_t new_A = m_A();
+			const netlist_sig_t new_B = m_B();
+
+			if (m_R91() & m_R92())
+			{
+				m_cnt = 9;
+				m_Q.push(9, delay);
+			}
+			else if (m_R1() & m_R2())
+			{
+				m_cnt = 0;
+				m_Q.push(0, delay);
+			}
+			else
+			{
+				if (m_last_A && !new_A)  // High - Low
+				{
+					m_cnt ^= 1;
+					m_Q[0].push(m_cnt & 1, delay[0]);
+				}
+				if (m_last_B && !new_B)  // High - Low
+				{
+					m_cnt += 2;
+					if (m_cnt >= 10)
+						m_cnt &= 1; /* Output A is not reset! */
+					m_Q.push(m_cnt, delay);
+				}
+			}
+			m_last_A = new_A;
+			m_last_B = new_B;
+		}
+
 		NETLIB_RESETI()
 		{
 			m_cnt = 0;
 			m_last_A = 0;
 			m_last_B = 0;
-		}
-
-		void update_outputs() noexcept
-		{
-			for (std::size_t i=0; i<4; i++)
-				m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 		}
 
 		logic_input_t m_A;
@@ -95,40 +122,6 @@ namespace devices
 	private:
 		NETLIB_SUB(7490) A;
 	};
-
-	NETLIB_UPDATE(7490)
-	{
-		const netlist_sig_t new_A = m_A();
-		const netlist_sig_t new_B = m_B();
-
-		if (m_R91() & m_R92())
-		{
-			m_cnt = 9;
-			update_outputs();
-		}
-		else if (m_R1() & m_R2())
-		{
-			m_cnt = 0;
-			update_outputs();
-		}
-		else
-		{
-			if (m_last_A && !new_A)  // High - Low
-			{
-				m_cnt ^= 1;
-				m_Q[0].push(m_cnt & 1, delay[0]);
-			}
-			if (m_last_B && !new_B)  // High - Low
-			{
-				m_cnt += 2;
-				if (m_cnt >= 10)
-					m_cnt &= 1; /* Output A is not reset! */
-				update_outputs();
-			}
-		}
-		m_last_A = new_A;
-		m_last_B = new_B;
-	}
 
 	NETLIB_DEVICE_IMPL(7490,     "TTL_7490",        "+A,+B,+R1,+R2,+R91,+R92,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7490_dip, "TTL_7490_DIP",    "")

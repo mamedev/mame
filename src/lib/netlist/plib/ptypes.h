@@ -89,7 +89,7 @@ namespace plib
 #endif
 
 	template<unsigned bits>
-	struct least_size_for_bits
+	struct size_for_bits
 	{
 		enum { value =
 			bits <= 8       ?   1 :
@@ -105,10 +105,22 @@ namespace plib
 	template<> struct least_type_for_size<4> { using type = uint_least32_t; };
 	template<> struct least_type_for_size<8> { using type = uint_least64_t; };
 
+	template<unsigned N> struct fast_type_for_size;
+	template<> struct fast_type_for_size<1> { using type = uint_fast8_t; };
+	template<> struct fast_type_for_size<2> { using type = uint_fast16_t; };
+	template<> struct fast_type_for_size<4> { using type = uint_fast32_t; };
+	template<> struct fast_type_for_size<8> { using type = uint_fast64_t; };
+
 	template<unsigned bits>
 	struct least_type_for_bits
 	{
-		using type = typename least_type_for_size<least_size_for_bits<bits>::value>::type;
+		using type = typename least_type_for_size<size_for_bits<bits>::value>::type;
+	};
+
+	template<unsigned bits>
+	struct fast_type_for_bits
+	{
+		using type = typename fast_type_for_size<size_for_bits<bits>::value>::type;
 	};
 
 	//============================================================

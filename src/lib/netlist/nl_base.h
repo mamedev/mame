@@ -2027,7 +2027,6 @@ namespace netlist
 
 		template<class D, std::size_t ND>
 		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
-//          const pstring &fmt, std::initializer_list<nldelegate> &delegates)
 			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
 		{
 			passert_always_msg(delegates.size() >= N, "initializer_list size mismatch");
@@ -2045,10 +2044,33 @@ namespace netlist
 			}
 		}
 
+		//using value_type = typename plib::fast_type_for_bits<N>::type;
+		using value_type = std::uint32_t;
+#if 0
 
-		//using value_type = typename plib::least_type_for_bits<N>::type;
-		using value_type = std::uint_fast32_t;
+		value_type operator ()()
+		{
+#if 0
+			if (N <= 8)
+				return tobits(N, *this);
+			else
+#endif
+			{
+				value_type r(0);
+				for (std::size_t i = 0; i < N; i++)
+					r = r | static_cast<value_type>((*this)[i]() << i);
+				return r;
+			}
+		}
 
+	private:
+		template <typename T>
+		static constexpr value_type tobits(std::size_t n, T &a)
+		{
+			return (n == 0 ? 0 : (tobits(n-1, a) | static_cast<value_type>(a[n-1]() << (n-1))));
+		}
+
+#else
 		value_type operator ()()
 		{
 			if (N == 1) return e<0>();
@@ -2073,6 +2095,7 @@ namespace netlist
 	private:
 		template <std::size_t P>
 		inline constexpr value_type e() const { return (*this)[P](); }
+#endif
 	};
 
 	template<std::size_t N>
@@ -2082,10 +2105,8 @@ namespace netlist
 		using base_type = object_array_base_t<logic_output_t, N>;
 		using base_type::base_type;
 
-		using value_type = std::uint_fast32_t;
-		//using value_type = typename plib::least_type_for_bits<N>::type;
-
-		void push(value_type v, netlist_time t)
+		template <typename T>
+		inline void push(const T &v, const netlist_time &t)
 		{
 			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
 			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
@@ -2095,9 +2116,25 @@ namespace netlist
 			if (N >= 6) (*this)[5].push((v >> 5) & 1, t);
 			if (N >= 7) (*this)[6].push((v >> 6) & 1, t);
 			if (N >= 8) (*this)[7].push((v >> 7) & 1, t);
-
 			for (std::size_t i = 8; i < N; i++)
 				(*this)[i].push((v >> i) & 1, t);
+		}
+
+		template<typename T, std::size_t NT>
+		void push(const T &v, const std::array<netlist_time, NT> &t)
+		{
+			static_assert(NT >= N, "Not enough timing entries provided");
+
+			if (N >= 1) (*this)[0].push((v >> 0) & 1, t[0]);
+			if (N >= 2) (*this)[1].push((v >> 1) & 1, t[1]);
+			if (N >= 3) (*this)[2].push((v >> 2) & 1, t[2]);
+			if (N >= 4) (*this)[3].push((v >> 3) & 1, t[3]);
+			if (N >= 5) (*this)[4].push((v >> 4) & 1, t[4]);
+			if (N >= 6) (*this)[5].push((v >> 5) & 1, t[5]);
+			if (N >= 7) (*this)[6].push((v >> 6) & 1, t[6]);
+			if (N >= 8) (*this)[7].push((v >> 7) & 1, t[7]);
+			for (std::size_t i = 8; i < N; i++)
+				(*this)[i].push((v >> i) & 1, t[i]);
 		}
 
 		void set_tristate(bool v,
@@ -2106,7 +2143,6 @@ namespace netlist
 			for (std::size_t i = 0; i < N; i++)
 				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);
 		}
-
 	};
 
 	template<std::size_t N>
@@ -2116,10 +2152,8 @@ namespace netlist
 		using base_type = object_array_base_t<tristate_output_t, N>;
 		using base_type::base_type;
 
-		using value_type = std::uint_fast32_t;
-		//using value_type = typename plib::least_type_for_bits<N>::type;
-
-		void push(value_type v, netlist_time t)
+		template <typename T>
+		inline void push(const T &v, const netlist_time &t)
 		{
 			if (N >= 1) (*this)[0].push((v >> 0) & 1, t);
 			if (N >= 2) (*this)[1].push((v >> 1) & 1, t);
@@ -2129,7 +2163,6 @@ namespace netlist
 			if (N >= 6) (*this)[5].push((v >> 5) & 1, t);
 			if (N >= 7) (*this)[6].push((v >> 6) & 1, t);
 			if (N >= 8) (*this)[7].push((v >> 7) & 1, t);
-
 			for (std::size_t i = 8; i < N; i++)
 				(*this)[i].push((v >> i) & 1, t);
 		}

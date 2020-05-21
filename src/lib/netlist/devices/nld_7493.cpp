@@ -88,9 +88,7 @@ namespace netlist
 		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(7493, updA))
 		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(7493, updB))
 		, m_QA(*this, "QA")
-		, m_QB(*this, "QB")
-		, m_QC(*this, "QC")
-		, m_QD(*this, "QD")
+		, m_QB(*this, {"QB", "QC", "QD"})
 		, m_power_pins(*this)
 		{
 		}
@@ -116,8 +114,6 @@ namespace netlist
 				m_CLKB.inactivate();
 				m_QA.push(0, NLTIME_FROM_NS(40));
 				m_QB.push(0, NLTIME_FROM_NS(40));
-				m_QC.push(0, NLTIME_FROM_NS(40));
-				m_QD.push(0, NLTIME_FROM_NS(40));
 				m_a = m_bcd = 0;
 			}
 		}
@@ -131,9 +127,9 @@ namespace netlist
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
-			m_QD.push((cnt >> 2) & 1, out_delay3);
-			m_QC.push((cnt >> 1) & 1, out_delay2);
-			m_QB.push(cnt & 1, out_delay);
+			m_QB[2].push((cnt >> 2) & 1, out_delay3);
+			m_QB[1].push((cnt >> 1) & 1, out_delay2);
+			m_QB[0].push(cnt & 1, out_delay);
 		}
 
 		logic_input_t m_R1;
@@ -146,9 +142,7 @@ namespace netlist
 		logic_input_t m_CLKB;
 
 		logic_output_t m_QA;
-		logic_output_t m_QB;
-		logic_output_t m_QC;
-		logic_output_t m_QD;
+		object_array_t<logic_output_t, 3> m_QB;
 		nld_power_pins m_power_pins;
 	};
 
