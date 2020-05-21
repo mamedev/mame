@@ -2046,34 +2046,9 @@ namespace netlist
 
 		//using value_type = typename plib::fast_type_for_bits<N>::type;
 		using value_type = std::uint32_t;
-#if 0
-
 		value_type operator ()()
 		{
-#if 0
-			if (N <= 8)
-				return tobits(N, *this);
-			else
-#endif
-			{
-				value_type r(0);
-				for (std::size_t i = 0; i < N; i++)
-					r = r | static_cast<value_type>((*this)[i]() << i);
-				return r;
-			}
-		}
-
-	private:
-		template <typename T>
-		static constexpr value_type tobits(std::size_t n, T &a)
-		{
-			return (n == 0 ? 0 : (tobits(n-1, a) | static_cast<value_type>(a[n-1]() << (n-1))));
-		}
-
-#else
-		value_type operator ()()
-		{
-			if (N == 1) return e<0>();
+			if (N == 1) return e<0>() ;
 			if (N == 2) return e<0>() | (e<1>() << 1);
 			if (N == 3) return e<0>() | (e<1>() << 1) | (e<2>() << 2);
 			if (N == 4) return e<0>() | (e<1>() << 1) | (e<2>() << 2) | (e<3>() << 3);
@@ -2095,7 +2070,6 @@ namespace netlist
 	private:
 		template <std::size_t P>
 		inline constexpr value_type e() const { return (*this)[P](); }
-#endif
 	};
 
 	template<std::size_t N>

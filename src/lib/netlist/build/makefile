@@ -164,7 +164,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74125.o \
 	$(NLOBJ)/devices/nld_74153.o \
-	$(NLOBJ)/devices/nld_74161.o \
 	$(NLOBJ)/devices/nld_74164.o \
 	$(NLOBJ)/devices/nld_74165.o \
 	$(NLOBJ)/devices/nld_74166.o \
@@ -179,7 +178,6 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S115.o \
-	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9316.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
