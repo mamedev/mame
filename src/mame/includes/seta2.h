@@ -43,7 +43,9 @@ public:
 	{ }
 
 	void seta2(machine_config &config);
+	void seta2_32m(machine_config &config);
 	void grdians(machine_config &config);
+	void grdiansa(machine_config &config);
 	void myangel(machine_config &config);
 	void penbros(machine_config &config);
 	void pzlbowl(machine_config &config);
@@ -58,6 +60,8 @@ public:
 	void init_namcostr();
 
 protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(grdians_lockout_w);
 
@@ -111,9 +115,6 @@ protected:
 	void samshoot_map(address_map &map);
 	void telpacfl_map(address_map &map);
 	void x1_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_sub;
