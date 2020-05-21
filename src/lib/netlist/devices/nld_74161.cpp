@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_9316.cpp
+ * nld_74161.cpp
  *
  */
 
@@ -22,8 +22,10 @@ namespace netlist
 	namespace devices
 	{
 
-		NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
-		NETLIB_DEVICE_IMPL(9316_dip, "TTL_9316_DIP", "")
+		NETLIB_DEVICE_IMPL(74161,     "TTL_74161",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
+		NETLIB_DEVICE_IMPL(74161_dip, "TTL_74161_DIP", "")
+		// FIXME: This happens on copy/paste
+		NETLIB_DEVICE_IMPL(74161_fixme, "TTL_74161_FIXME", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENP,+ENT,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

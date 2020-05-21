@@ -206,20 +206,6 @@ namespace netlist
 			}
 		};
 
-		template<typename T, T V>
-		struct fintegral_constant
-		{
-			static constexpr const T value() noexcept { return V; }
-			typedef T value_type;
-			typedef fintegral_constant<T, V> type;
-		};
-
-		template <std::size_t V>
-		using fdesc_const =  fintegral_constant<std::size_t, V>;
-
-		template <typename T, T V>
-		using fdesc_const_t =  fintegral_constant<T, V>;
-
 		/// \brief: used define a constant in device description struct
 		///
 		/// See the 74125 implementation
