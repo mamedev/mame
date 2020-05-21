@@ -248,6 +248,7 @@ int mame_machine_manager::execute()
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
+
 		// create the machine configuration
 		machine_config config(*system, m_options);
 
@@ -272,6 +273,8 @@ int mame_machine_manager::execute()
 			if (machine.exit_pending())
 			{
 				m_options.set_system_name("");
+				// In this case, we are going back to the __empty driver
+				// so we need to clear this here
 				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
 			}
 		}
