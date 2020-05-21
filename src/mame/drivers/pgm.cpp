@@ -50,9 +50,13 @@ Known Games on this Platform
 
 (add more)
 
-ToDo:
+TODO:
 
- IRQ4 generation - Puzzli 2 doesn't like this, many other games require it for coins / inputs to work.
+- IRQ4 generation - Puzzli 2 doesn't like this, many other games require it for coins / inputs to work.
+- Verify/Implement unemulated vreg usage (b04000, b0e000)
+  b04000 is 210h or 610h, bit 10 unknown
+  b0e000 bit 2/0 related to VRAM access / DMA / or others?
+- Zooming function is not fully verified; sprite zoom table is bit different in drgw2
 
 
 Protection Devices / Co-processors
