@@ -193,8 +193,10 @@ protected:
 		uint32_t m_ine;
 		uint32_t m_pri;
 
-		uint32_t m_divq_active;
+		uint32_t m_divq_bit;
 		uint32_t m_divq_dividend;
+		uint32_t m_divq_divisor;
+		uint32_t m_divq_a;
 
 		uint32_t m_arg0;
 		uint32_t m_arg1;

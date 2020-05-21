@@ -250,24 +250,29 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 
 void unsp_12_device::execute_divq(uint16_t op)
 {
-	const uint16_t sign_a = m_core->m_aq;
-	if (m_core->m_divq_active == 0)
+	uint32_t orig_dividend = 0;
+	if (m_core->m_divq_bit == UINT_MAX)
 	{
-		m_core->m_divq_active = 1;
+		m_core->m_divq_bit = 15;
 		m_core->m_divq_dividend = (m_core->m_r[REG_R4] << 16) | m_core->m_r[REG_R3];
-		m_core->m_r[REG_R3] = 0;
+		m_core->m_divq_divisor = m_core->m_r[REG_R2];
+		m_core->m_divq_a = 0;
 	}
-	m_core->m_aq = BIT(m_core->m_divq_dividend, 31);
-	if (sign_a)
+	orig_dividend = m_core->m_divq_dividend;
+	m_core->m_aq = BIT(m_core->m_divq_a, 31);
+	if (m_core->m_aq)
 	{
-		m_core->m_r[REG_R3] += m_core->m_r[REG_R2];
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) + m_core->m_divq_divisor;
 	}
 	else
 	{
-		m_core->m_r[REG_R3] -= m_core->m_r[REG_R3];
+		m_core->m_divq_a += m_core->m_divq_a + BIT(m_core->m_divq_dividend, 15) - m_core->m_divq_divisor;
 	}
 	m_core->m_divq_dividend <<= 1;
-	m_core->m_divq_dividend |= m_core->m_aq ? 0 : 1;
+	m_core->m_divq_dividend++;
+	m_core->m_divq_dividend ^= BIT(m_core->m_divq_a, 31);
+	m_core->m_r[REG_R3] = (uint16_t)m_core->m_divq_dividend;
+	m_core->m_divq_bit--;
 }
 
 bool unsp_12_device::op_is_divq(const uint16_t op)
@@ -550,23 +555,18 @@ void unsp_device::execute_fxxx_group(uint16_t op)
 	switch ((op & 0x01c0) >> 6)
 	{
 	case 0x0:
-		m_core->m_divq_active = 0;
 		return execute_fxxx_000_group(op);
 
 	case 0x1:
-		m_core->m_divq_active = 0;
 		return execute_fxxx_001_group(op);
 
 	case 0x2:
-		m_core->m_divq_active = 0;
 		return execute_fxxx_010_group(op);
 
 	case 0x3:
-		m_core->m_divq_active = 0;
 		return execute_fxxx_011_group(op);
 
 	case 0x4:
-		m_core->m_divq_active = 0;
 		return execute_fxxx_100_group(op);
 
 	case 0x5:

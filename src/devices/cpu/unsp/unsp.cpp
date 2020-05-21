@@ -281,6 +281,9 @@ void unsp_device::device_start()
 	save_item(NAME(m_core->m_bnk));
 	save_item(NAME(m_core->m_ine));
 	save_item(NAME(m_core->m_pri));
+	save_item(NAME(m_core->m_divq_bit));
+	save_item(NAME(m_core->m_divq_dividend));
+	save_item(NAME(m_core->m_divq_divisor));
 
 	set_icountptr(m_core->m_icount);
 }
@@ -328,6 +331,7 @@ void unsp_device::device_reset()
 	m_core->m_fiq = 0;
 	m_core->m_irq = 0;
 	m_core->m_sirq = 0;
+	m_core->m_divq_bit = UINT_MAX;
 }
 
 void unsp_20_device::device_reset()
@@ -505,9 +509,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 	const uint16_t op0 = (op >> 12) & 15;
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t op1 = (op >> 6) & 7;
-
-	if (!op_is_divq(op))
-		m_core->m_divq_active = 0;
 
 	if (op0 == 0xf)
 		return execute_fxxx_group(op);
