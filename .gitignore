@@ -48,5 +48,3 @@ regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
 /samples
-src/devices/cpu/m68000/*.exe
-src/devices/cpu/m68000/*.o
