@@ -57,6 +57,7 @@ private:
 
 	uint8_t m_digit;
 	uint8_t m_seg;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
@@ -160,6 +161,12 @@ uint8_t savia84_state::savia84_8255_portc_r() // IN FA - read keyboard
 		return m_io_keyboard[m_digit]->read();
 	else
 		return 0xff;
+}
+
+void savia84_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
 }
 
 void savia84_state::savia84(machine_config &config)

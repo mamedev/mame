@@ -63,6 +63,7 @@ protected:
 	u8 m_digit;
 	u8 m_seg;
 	void setup_baud();
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<u8> m_p_ram;
 	required_ioport_array<4> m_io_keyboard;
@@ -188,6 +189,12 @@ void selz80_state::setup_baud()
 	}
 }
 
+void selz80_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
 void selz80_state::machine_reset()
 {
 	setup_baud();
@@ -286,5 +293,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, dagz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, dagz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

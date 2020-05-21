@@ -284,6 +284,9 @@ void trs80dt1_state::machine_start()
 	m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00)); // black
 	m_palette->set_pen_color(1, rgb_t(0x00,0xa0,0x00)); // normal
 	m_palette->set_pen_color(2, rgb_t(0x00,0xff,0x00)); // highlight
+
+	save_item(NAME(m_bow));
+	save_item(NAME(m_cent_busy));
 }
 
 const gfx_layout trs80dt1_charlayout =
@@ -388,4 +391,5 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1982, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1 Data Terminal", 0 )
+COMP( 1982, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1 Data Terminal", MACHINE_SUPPORTS_SAVE )
+

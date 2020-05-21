@@ -74,6 +74,7 @@ private:
 	void segment_w(uint8_t data);
 	void digit_w(uint8_t data);
 	uint8_t keyboard_r();
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void mem_map(address_map &map);
@@ -177,6 +178,12 @@ void emma2_state::machine_reset()
 	m_digit = 0;
 }
 
+void emma2_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+}
+
 void emma2_state::emma2(machine_config &config)
 {
 	/* basic machine hardware */
@@ -221,4 +228,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1979, emma2,  0,      0,      emma2,   emma2,  emma2_state,  empty_init, "L.J.Technical Systems",   "Emma II trainer", 0 )
+COMP( 1979, emma2,  0,      0,      emma2,   emma2,  emma2_state,  empty_init, "L.J.Technical Systems",   "Emma II trainer", MACHINE_SUPPORTS_SAVE )
