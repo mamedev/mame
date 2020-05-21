@@ -80,7 +80,7 @@ void handler_entry::enumerate_references(handler_entry::reflist &refs) const
 {
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
@@ -131,7 +131,7 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, Ad
 }
 
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
@@ -301,8 +301,6 @@ class address_space_specific : public address_space
 public:
 	handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
 	handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
-	offs_t m_mask_read;
-	offs_t m_mask_write;
 	u8 m_shift_read;
 	u8 m_shift_write;
 
@@ -521,8 +519,8 @@ public:
 			default: fatalerror("Unhandled address bus width %d\n", address_width);
 		}
 
-		m_root_read->get_dispatch(m_dispatch_read, m_mask_read, m_shift_read);
-		m_root_write->get_dispatch(m_dispatch_write, m_mask_write, m_shift_write);
+		m_root_read->get_dispatch(m_dispatch_read, m_shift_read);
+		m_root_write->get_dispatch(m_dispatch_write, m_shift_write);
 	}
 
 	void *create_cache() override {
@@ -530,7 +528,7 @@ public:
 	}
 
 	void *create_specific() override {
-		return new memory_access_specific<Width, AddrShift, Endian>(*this, m_dispatch_read, m_mask_read, m_shift_read, m_dispatch_write, m_mask_write, m_shift_write);
+		return new memory_access_specific<Width, AddrShift, Endian>(*this, m_dispatch_read, m_shift_read, m_dispatch_write, m_shift_write);
 	}
 
 	void delayed_ref(handler_entry *e) {
@@ -597,25 +595,25 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, mask, m_dispatch_read);;
+		return dispatch_read<Width, AddrShift, Endian>(offs_t(-1), m_shift_read, offset, mask, m_dispatch_read);;
 	}
 
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
-		return dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, offset, uX(0xffffffffffffffffU), m_dispatch_read);;
+		return dispatch_read<Width, AddrShift, Endian>(offs_t(-1), m_shift_read, offset, uX(0xffffffffffffffffU), m_dispatch_read);;
 	}
 
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, mask, m_dispatch_write);;
+		dispatch_write<Width, AddrShift, Endian>(offs_t(-1), m_shift_write, offset, data, mask, m_dispatch_write);;
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
+		dispatch_write<Width, AddrShift, Endian>(offs_t(-1), m_shift_write, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
 	}
 
 	// virtual access to these functions

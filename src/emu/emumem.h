@@ -599,7 +599,7 @@ public:
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
 
 	// Return the internal structures of the root dispatch
-	virtual void get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const;
+	virtual void get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const;
 };
 
 // =====================-> The parent class of all write handlers
@@ -671,7 +671,7 @@ public:
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
 
 	// Return the internal structures of the root dispatch
-	virtual void get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const;
+	virtual void get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const;
 };
 
 // =====================-> Passthrough handler management structure
@@ -989,10 +989,8 @@ template<int Width, int AddrShift, int Endian> class memory_access_specific
 public:
 	// construction/destruction
 	memory_access_specific(address_space &space,
-						   handler_entry_read <Width, AddrShift, Endian> *const *dispatch_read,
-						   offs_t mask_read, u8 shift_read,
-						   handler_entry_write<Width, AddrShift, Endian> *const *dispatch_write,
-						   offs_t mask_write, u8 shift_write);
+						   handler_entry_read <Width, AddrShift, Endian> *const *dispatch_read, u8 shift_read,
+						   handler_entry_write<Width, AddrShift, Endian> *const *dispatch_write, u8 shift_write);
 
 
 	// getters
@@ -1033,17 +1031,15 @@ private:
 
 	handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
 	handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
-	offs_t m_mask_read;
-	offs_t m_mask_write;
 	u8 m_shift_read;
 	u8 m_shift_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read<Width, AddrShift, Endian>(m_mask_read, m_shift_read, address, mask, m_dispatch_read);;
+		return dispatch_read<Width, AddrShift, Endian>(offs_t(-1), m_shift_read, address, mask, m_dispatch_read);;
 	}
 
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		dispatch_write<Width, AddrShift, Endian>(m_mask_write, m_shift_write, address, data, mask, m_dispatch_write);;
+		dispatch_write<Width, AddrShift, Endian>(offs_t(-1), m_shift_write, address, data, mask, m_dispatch_write);;
 	}
 };
 
@@ -1934,16 +1930,12 @@ void memory_passthrough_handler::remove()
 }
 
 template<int Width, int AddrShift, int Endian> memory_access_specific<Width, AddrShift, Endian>::memory_access_specific(address_space &space,
-																														handler_entry_read <Width, AddrShift, Endian> *const *dispatch_read,
-																														offs_t mask_read, u8 shift_read,
-																														handler_entry_write<Width, AddrShift, Endian> *const *dispatch_write,
-																														offs_t mask_write, u8 shift_write)
+																														handler_entry_read <Width, AddrShift, Endian> *const *dispatch_read, u8 shift_read,
+																														handler_entry_write<Width, AddrShift, Endian> *const *dispatch_write, u8 shift_write)
 	: m_space(space),
 	  m_addrmask(space.addrmask()),
 	  m_dispatch_read(dispatch_read),
 	  m_dispatch_write(dispatch_write),
-	  m_mask_read(mask_read),
-	  m_mask_write(mask_write),
 	  m_shift_read(shift_read),
 	  m_shift_write(shift_write)
 {

@@ -35,7 +35,7 @@ public:
 
 	void enumerate_references(handler_entry::reflist &refs) const override;
 
-	virtual void get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const override;
+	virtual void get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const override;
 
 protected:
 	static constexpr u32    LowBits  = emu::detail::handler_entry_dispatch_lowbits(HighBits, Width, AddrShift);

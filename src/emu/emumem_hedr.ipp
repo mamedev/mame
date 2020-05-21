@@ -9,10 +9,9 @@
 #include "emumem_hep.h"
 #include "emumem_hedr.h"
 
-template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, offs_t &mask, u8 &shift) const
+template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_read_dispatch<HighBits, Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const
 {
 	dispatch = m_dispatch;
-	mask = BITMASK;
 	shift = LowBits;
 }
 
