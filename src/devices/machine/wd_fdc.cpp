@@ -253,19 +253,6 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-std::string wd_fdc_device_base::tts(const attotime &t)
-{
-	char buf[256];
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
-	return buf;
-}
-
-std::string wd_fdc_device_base::ttsn()
-{
-	return tts(machine().time());
-}
-
 void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
@@ -456,7 +443,7 @@ void wd_fdc_device_base::seek_continue()
 			return;
 
 		default:
-			logerror("%s: seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: seek unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -577,7 +564,7 @@ void wd_fdc_device_base::read_sector_continue()
 			break;
 
 		default:
-			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read sector unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -656,7 +643,7 @@ void wd_fdc_device_base::read_track_continue()
 			return;
 
 		default:
-			logerror("%s: read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read track unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -733,7 +720,7 @@ void wd_fdc_device_base::read_id_continue()
 			return;
 
 		default:
-			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: read id unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -843,7 +830,7 @@ void wd_fdc_device_base::write_track_continue()
 			return;
 
 		default:
-			logerror("%s: write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: write track unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -942,7 +929,7 @@ void wd_fdc_device_base::write_sector_continue()
 			break;
 
 		default:
-			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: write sector unknown sub-state %d\n", machine().time().to_string(), sub_state);
 			return;
 		}
 	}
@@ -977,7 +964,7 @@ void wd_fdc_device_base::interrupt_start()
 	}
 
 	if(command & 0x03) {
-		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().c_str(), command);
+		logerror("%s: unhandled interrupt generation (%02x)\n", machine().time().to_string(), command);
 	}
 }
 
@@ -1012,7 +999,7 @@ void wd_fdc_device_base::general_continue()
 		write_sector_continue();
 		break;
 	default:
-		logerror("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), main_state);
+		logerror("%s: general_continue on unknown main-state %d\n", machine().time().to_string(), main_state);
 		break;
 	}
 }
@@ -1048,7 +1035,7 @@ void wd_fdc_device_base::do_generic()
 
 	default:
 		if(cur_live.tm.is_never())
-			logerror("%s: do_generic on unknown sub-state %d\n", ttsn().c_str(), sub_state);
+			logerror("%s: do_generic on unknown sub-state %d\n", machine().time().to_string(), sub_state);
 		break;
 	}
 }
@@ -1063,8 +1050,8 @@ void wd_fdc_device_base::do_cmd_w()
 	command = cmd_buffer;
 	cmd_buffer = -1;
 
-	LOGCOMMAND("%s %02x: %s\n", FUNCNAME, cmd_buffer, std::array<char const *, 16>
-		   {{"RESTORE", "SEEK", "STEP", "STEP", "STEP", "STEP", "STEP", "STEP",
+	LOGCOMMAND("%s %02x: %s\n", FUNCNAME, command, std::array<char const *, 16>
+		   {{"RESTORE", "SEEK", "STEP", "STEP", "STEP in", "STEP in", "STEP out", "STEP out",
 			 "READ sector start", "READ sector start", "WRITE sector start", "WRITE sector start",
 			 "READ ID start",     "INTERRUPT start",   "READ track start",   "WRITE track start"}}[(command >> 4) & 0x0f]);
 	switch(command & 0xf0) {
@@ -1343,7 +1330,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	live_sync();
 
 	if(!state) {
-		general_continue();
+		//general_continue();
 		return;
 	}
 
@@ -1418,7 +1405,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 		break;
 
 	default:
-		logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), sub_state);
+		logerror("%s: Index pulse on unknown sub-state %d\n", machine().time().to_string(), sub_state);
 		break;
 	}
 
@@ -1499,12 +1486,12 @@ void wd_fdc_device_base::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
-			LOGSYNC("%s: Rolling back and replaying (%s)\n", ttsn().c_str(), tts(cur_live.tm).c_str());
+			LOGSYNC("%s: Rolling back and replaying (%s)\n", machine().time().to_string(), cur_live.tm.to_string());
 			rollback();
 			live_run(machine().time());
 			pll_commit(floppy, cur_live.tm);
 		} else {
-			LOGSYNC("%s: Committing (%s)\n", ttsn().c_str(), tts(cur_live.tm).c_str());
+			LOGSYNC("%s: Committing (%s)\n", machine().time().to_string(), cur_live.tm.to_string());
 			pll_commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
@@ -1625,7 +1612,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 		}
 	}
 
-	//  fprintf(stderr, "%s: live_run(%s)\n", ttsn().c_str(), tts(limit).c_str());
+	//  logerror("%s: live_run(%s)\n", machine().time().to_string(), limit.to_string());
 
 	for(;;) {
 		switch(cur_live.state) {
@@ -1634,7 +1621,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1668,7 +1655,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1711,7 +1698,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			//          logerror("%s: slot[%d] = %02x  crc = %04x\n", cur_live.tm.to_string(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -1755,7 +1742,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", cur_live.tm.to_string(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1807,7 +1794,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", cur_live.tm.to_string(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -2119,7 +2106,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 				break;
 
 			default:
-				logerror("%s: Unknown sub state %d in WRITE_BYTE_DONE\n", tts(cur_live.tm).c_str(), sub_state);
+				logerror("%s: Unknown sub state %d in WRITE_BYTE_DONE\n", cur_live.tm.to_string(), sub_state);
 				live_abort();
 				return;
 			}
@@ -2182,7 +2169,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		default:
-			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
+			logerror("%s: Unknown live state %d\n", cur_live.tm.to_string(), cur_live.state);
 			return;
 		}
 	}
@@ -2404,12 +2391,12 @@ int wd_fdc_digital_device_base::digital_pll_t::get_next_bit(attotime &tm, floppy
 
 	/*
 	    if(!when.is_never())
-	        LOGTRANSITION("transition_time=%s\n", tts(when).c_str());
+	        LOGTRANSITION("transition_time=%s\n", when.to_string());
 	*/
 	for(;;) {
 		// LOGTRANSITION("slot=%2d, counter=%03x\n", slot, counter);
 		attotime etime = ctime+delays[slot];
-		// LOGTRANSITION("etime=%s\n", tts(etime).c_str());
+		// LOGTRANSITION("etime=%s\n", etime.to_string());
 		if(etime > limit)
 			return -1;
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
