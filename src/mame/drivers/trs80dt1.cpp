@@ -37,7 +37,7 @@ the printer data goes to B800 which is a spare address range in the real machine
 #include "video/i8275.h"
 #include "machine/7474.h"
 #include "machine/x2212.h"
-#include "sound/spkrdev.h"
+#include "sound/beep.h"
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
 #include "emupal.h"
@@ -88,7 +88,7 @@ private:
 	required_device<i8276_device> m_crtc;
 	required_device<x2210_device> m_nvram;
 	required_ioport_array<9> m_io_keyboard;
-	required_device<speaker_sound_device> m_buzzer;
+	required_device<beep_device> m_buzzer;
 	required_device<ttl7474_device> m_7474;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
@@ -155,7 +155,7 @@ d5 : Printer enable */
 void trs80dt1_state::port3_w(u8 data)
 {
 	m_rs232->write_txd(BIT(data, 1));
-	m_buzzer->level_w(BIT(data, 4));
+	m_buzzer->set_state(BIT(data, 4));
 }
 
 void trs80dt1_state::prg_map(address_map &map)
@@ -365,7 +365,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_buzzer, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
