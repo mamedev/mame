@@ -59,7 +59,7 @@ private:
 	int         m_sprites_scrolldx;
 	int         m_sprites_scrolldy;
 
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -82,7 +82,7 @@ protected:
 	void main_map(address_map &map);
 
 private:
-	DECLARE_WRITE8_MEMBER(magicbub_sound_command_w);
+	void magicbub_sound_command_w(uint8_t data);
 
 	void sound_map(address_map &map);
 	void sound_port_map(address_map &map);
@@ -109,7 +109,7 @@ protected:
 	void main_map(address_map &map);
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	void sound_bank_w(uint8_t data);
 
 	void oki_map(address_map &map);
 

@@ -141,13 +141,13 @@ void zaccaria_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(zaccaria_state::videoram_w)
+void zaccaria_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(zaccaria_state::attributes_w)
+void zaccaria_state::attributes_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{

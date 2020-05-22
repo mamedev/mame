@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER(zaxxon_state::fg_color_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::bg_position_w)
+void zaxxon_state::bg_position_w(offs_t offset, uint8_t data)
 {
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -238,14 +238,14 @@ WRITE_LINE_MEMBER(zaxxon_state::congo_color_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
+void zaxxon_state::zaxxon_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
+void zaxxon_state::congo_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -259,10 +259,8 @@ WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
+void zaxxon_state::congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data)
 {
-	uint8_t *spriteram = m_spriteram;
-
 	m_congo_custom[offset] = data;
 
 	/* seems to trigger on a write of 1 to the 4th byte */
@@ -278,10 +276,10 @@ WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
 		while (count-- >= 0)
 		{
 			uint8_t daddr = space.read_byte(saddr + 0) * 4;
-			spriteram[(daddr + 0) & 0xff] = space.read_byte(saddr + 1);
-			spriteram[(daddr + 1) & 0xff] = space.read_byte(saddr + 2);
-			spriteram[(daddr + 2) & 0xff] = space.read_byte(saddr + 3);
-			spriteram[(daddr + 3) & 0xff] = space.read_byte(saddr + 4);
+			m_spriteram[(daddr + 0) & 0xff] = space.read_byte(saddr + 1);
+			m_spriteram[(daddr + 1) & 0xff] = space.read_byte(saddr + 2);
+			m_spriteram[(daddr + 2) & 0xff] = space.read_byte(saddr + 3);
+			m_spriteram[(daddr + 3) & 0xff] = space.read_byte(saddr + 4);
 			saddr += 0x20;
 		}
 	}

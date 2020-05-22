@@ -1447,20 +1447,20 @@ private:
 	required_shared_ptr<uint32_t> m_ram;
 
 	uint8_t m_rtc_tick;
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_WRITE32_MEMBER(rtc_w);
+	uint32_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint32_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
 };
 
 
-READ32_MEMBER(zaurus_state::rtc_r)
+uint32_t zaurus_state::rtc_r(offs_t offset)
 {
 	osd_printf_debug("%08x\n", offset << 2);
 
 	return 0;
 }
 
-WRITE32_MEMBER(zaurus_state::rtc_w)
+void zaurus_state::rtc_w(offs_t offset, uint32_t data)
 {
 	osd_printf_debug("%08x %08x\n", offset << 2, data);
 }

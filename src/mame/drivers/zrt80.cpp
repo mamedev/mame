@@ -49,9 +49,9 @@ private:
 		TIMER_BEEP_OFF
 	};
 
-	DECLARE_READ8_MEMBER(zrt80_10_r);
-	DECLARE_WRITE8_MEMBER(zrt80_30_w);
-	DECLARE_WRITE8_MEMBER(zrt80_38_w);
+	uint8_t zrt80_10_r();
+	void zrt80_30_w(uint8_t data);
+	void zrt80_38_w(uint8_t data);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -71,7 +71,7 @@ private:
 };
 
 
-READ8_MEMBER( zrt80_state::zrt80_10_r )
+uint8_t zrt80_state::zrt80_10_r()
 {
 	uint8_t ret = m_term_data;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -91,13 +91,13 @@ void zrt80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-WRITE8_MEMBER(zrt80_state::zrt80_30_w)
+void zrt80_state::zrt80_30_w(uint8_t data)
 {
 	timer_set(attotime::from_msec(100), TIMER_BEEP_OFF);
 	m_beep->set_state(1);
 }
 
-WRITE8_MEMBER(zrt80_state::zrt80_38_w)
+void zrt80_state::zrt80_38_w(uint8_t data)
 {
 	timer_set(attotime::from_msec(400), TIMER_BEEP_OFF);
 	m_beep->set_state(1);

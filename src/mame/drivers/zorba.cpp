@@ -309,26 +309,26 @@ void zorba_state::machine_reset()
 // Memory banking control
 //-------------------------------------------------
 
-READ8_MEMBER( zorba_state::ram_r )
+uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(0);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::ram_w )
+void zorba_state::ram_w(uint8_t data)
 {
 	m_read_bank->set_entry(0);
 }
 
-READ8_MEMBER( zorba_state::rom_r )
+uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
 		m_read_bank->set_entry(1);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::rom_w )
+void zorba_state::rom_w(uint8_t data)
 {
 	m_read_bank->set_entry(1);
 }
@@ -338,7 +338,7 @@ WRITE8_MEMBER( zorba_state::rom_w )
 //  Interrupt vectoring glue
 //-------------------------------------------------
 
-WRITE8_MEMBER( zorba_state::intmask_w )
+void zorba_state::intmask_w(uint8_t data)
 {
 	m_intmask = data & 0x3f; // only six lines physically present
 	irq_w<3>(BIT(m_intmask & m_tx_rx_rdy, 0) | BIT(m_intmask & m_tx_rx_rdy, 1));

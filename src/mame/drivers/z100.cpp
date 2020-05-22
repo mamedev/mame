@@ -201,14 +201,14 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	void memory_ctrl_w(uint8_t data);
 	offs_t vram_map(offs_t offset) const;
-	DECLARE_READ8_MEMBER(z100_vram_r);
-	DECLARE_WRITE8_MEMBER(z100_vram_w);
+	uint8_t z100_vram_r(offs_t offset);
+	void z100_vram_w(offs_t offset, uint8_t data);
 	void kbd_col_w(uint8_t data);
 	uint8_t kbd_rows_r();
 	DECLARE_READ_LINE_MEMBER(kbd_shift_row_r);
 	DECLARE_WRITE_LINE_MEMBER(beep_update);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_motor_w);
+	void floppy_select_w(uint8_t data);
+	void floppy_motor_w(uint8_t data);
 	uint8_t tmr_status_r();
 	void tmr_status_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(timer_flipflop0_w);
@@ -344,12 +344,12 @@ offs_t z100_state::vram_map(offs_t offset) const
 		| ((m_vrmm[(offset & 0xf800) >> 8 | (offset & 0x0070) >> 4] + m_start_addr) & (m_vram_config->read() ? 0xff : 0x7f)) << 8;
 }
 
-READ8_MEMBER( z100_state::z100_vram_r )
+uint8_t z100_state::z100_vram_r(offs_t offset)
 {
 	return m_gvram[vram_map(offset)];
 }
 
-WRITE8_MEMBER( z100_state::z100_vram_w )
+void z100_state::z100_vram_w(offs_t offset, uint8_t data)
 {
 	if(m_vram_enable)
 	{
@@ -407,13 +407,13 @@ WRITE_LINE_MEMBER(z100_state::beep_update)
 
 // todo: side select?
 
-WRITE8_MEMBER( z100_state::floppy_select_w )
+void z100_state::floppy_select_w(uint8_t data)
 {
 	m_floppy = m_floppies[data & 0x03]->get_device();
 	m_fdc->set_floppy(m_floppy);
 }
 
-WRITE8_MEMBER( z100_state::floppy_motor_w )
+void z100_state::floppy_motor_w(uint8_t data)
 {
 	if (m_floppy)
 		m_floppy->mon_w(!BIT(data, 1));

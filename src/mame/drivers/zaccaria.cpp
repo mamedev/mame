@@ -83,7 +83,7 @@ void zaccaria_state::dsw_sel_w(uint8_t data)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::dsw_r)
+uint8_t zaccaria_state::dsw_r()
 {
 	return m_dsw_port[m_dsw_sel]->read();
 }
@@ -91,7 +91,7 @@ READ8_MEMBER(zaccaria_state::dsw_r)
 
 GAME_EXTERN(monymony);
 
-READ8_MEMBER(zaccaria_state::prot1_r)
+uint8_t zaccaria_state::prot1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -111,7 +111,7 @@ READ8_MEMBER(zaccaria_state::prot1_r)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::prot2_r)
+uint8_t zaccaria_state::prot2_r(offs_t offset)
 {
 	switch (offset)
 	{

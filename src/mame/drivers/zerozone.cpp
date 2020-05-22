@@ -40,7 +40,7 @@
 #include "speaker.h"
 
 
-WRITE16_MEMBER( zerozone_state::sound_w )
+void zerozone_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

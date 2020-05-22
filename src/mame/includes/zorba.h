@@ -57,13 +57,13 @@ private:
 	void zorba_mem(address_map &map);
 
 	// Memory banking control
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
+	uint8_t ram_r();
+	void ram_w(uint8_t data);
+	uint8_t rom_r();
+	void rom_w(uint8_t data);
 
 	// Interrupt vectoring glue
-	DECLARE_WRITE8_MEMBER(intmask_w);
+	void intmask_w(uint8_t data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(tx_rx_rdy_w);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq_w);
 

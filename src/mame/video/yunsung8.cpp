@@ -39,13 +39,13 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::videobank_w)
+void yunsung8_state::videobank_w(uint8_t data)
 {
 	m_videobank = data;
 }
 
 
-READ8_MEMBER(yunsung8_state::videoram_r)
+uint8_t yunsung8_state::videoram_r(offs_t offset)
 {
 	int bank;
 
@@ -64,7 +64,7 @@ READ8_MEMBER(yunsung8_state::videoram_r)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::videoram_w)
+void yunsung8_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
@@ -107,7 +107,7 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::flipscreen_w)
+void yunsung8_state::flipscreen_w(uint8_t data)
 {
 	machine().tilemap().set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
