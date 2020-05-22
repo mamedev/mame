@@ -53,8 +53,10 @@ to CC1, or CC3.
 Note that although these 2 newer versions are known as "Chess Challenger 3" and
 "Chess Challeger 10 C" nowadays, those are not the official titles. CC3 simply
 says "upgraded version" on the 1st page of the manual (even the newly sold ones,
-not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Fidelity
-started adding level numbers to their chesscomputer titles with CCX and CC7.
+not just the literal CC1 upgrades). UCC10 mentions "10 levels of play". Consumenta
+Computer(reseller of Fidelity chesscomputers) did name it Chess-Challenger 10 C.
+Officially, Fidelity started adding level numbers to their chesscomputer titles
+with CCX and CC7.
 
 ******************************************************************************/
 
