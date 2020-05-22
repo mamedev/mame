@@ -42,7 +42,7 @@ arcadia_golf_device::arcadia_golf_device(const machine_config &mconfig, const ch
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(arcadia_rom_device::read_rom)
+uint8_t arcadia_rom_device::read_rom(offs_t offset)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -51,7 +51,7 @@ READ8_MEMBER(arcadia_rom_device::read_rom)
 }
 
 
-READ8_MEMBER(arcadia_rom_device::extra_rom)
+uint8_t arcadia_rom_device::extra_rom(offs_t offset)
 {
 	if (offset + 0x1000 < m_rom_size)
 		return m_rom[offset + 0x1000];

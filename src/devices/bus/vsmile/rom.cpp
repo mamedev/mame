@@ -62,7 +62,7 @@ void vsmile_rom_device::device_reset()
  Cart with NVRAM
  -------------------------------------------------*/
 
-READ16_MEMBER(vsmile_rom_nvram_device::bank2_r)
+uint16_t vsmile_rom_nvram_device::bank2_r(offs_t offset)
 {
 	if (!m_nvram.empty() && offset < m_nvram.size())
 		return m_nvram[offset];
@@ -70,10 +70,10 @@ READ16_MEMBER(vsmile_rom_nvram_device::bank2_r)
 		return 0;
 }
 
-WRITE16_MEMBER(vsmile_rom_nvram_device::bank2_w)
+void vsmile_rom_nvram_device::bank2_w(offs_t offset, uint16_t data)
 {
 	if (!m_nvram.empty() && offset < m_nvram.size())
-		COMBINE_DATA(&m_nvram[offset]);
+		m_nvram[offset] = data;
 }
 
 /*-------------------------------------------------

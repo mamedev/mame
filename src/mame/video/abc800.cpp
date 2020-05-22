@@ -26,7 +26,7 @@
 //  hrs_w - high resolution scanline write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrs_w )
+void abc800_state::hrs_w(uint8_t data)
 {
 	m_hrs = data;
 }
@@ -36,7 +36,7 @@ WRITE8_MEMBER( abc800_state::hrs_w )
 //  hrc_w - high resolution color write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrc_w )
+void abc800_state::hrc_w(uint8_t data)
 {
 	m_fgctl = data;
 }

@@ -45,16 +45,16 @@ explains why the extra checks are done
 */
 
 // cartridges read
-READ8_MEMBER(z88_state::bank0_cart_r) { return m_carts[m_bank[0].slot]->read(space, (m_bank[0].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank1_cart_r) { return m_carts[m_bank[1].slot]->read(space, (m_bank[1].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank2_cart_r) { return m_carts[m_bank[2].slot]->read(space, (m_bank[2].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank3_cart_r) { return m_carts[m_bank[3].slot]->read(space, (m_bank[3].page<<14) + offset); }
+uint8_t z88_state::bank0_cart_r(offs_t offset) { return m_carts[m_bank[0].slot]->read((m_bank[0].page<<14) + offset); }
+uint8_t z88_state::bank1_cart_r(offs_t offset) { return m_carts[m_bank[1].slot]->read((m_bank[1].page<<14) + offset); }
+uint8_t z88_state::bank2_cart_r(offs_t offset) { return m_carts[m_bank[2].slot]->read((m_bank[2].page<<14) + offset); }
+uint8_t z88_state::bank3_cart_r(offs_t offset) { return m_carts[m_bank[3].slot]->read((m_bank[3].page<<14) + offset); }
 
 // cartridges write
-WRITE8_MEMBER(z88_state::bank0_cart_w) { m_carts[m_bank[0].slot]->write(space, (m_bank[0].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank1_cart_w) { m_carts[m_bank[1].slot]->write(space, (m_bank[1].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank2_cart_w) { m_carts[m_bank[2].slot]->write(space, (m_bank[2].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank3_cart_w) { m_carts[m_bank[3].slot]->write(space, (m_bank[3].page<<14) + offset, data); }
+void z88_state::bank0_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[0].slot]->write((m_bank[0].page<<14) + offset, data); }
+void z88_state::bank1_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[1].slot]->write((m_bank[1].page<<14) + offset, data); }
+void z88_state::bank2_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[2].slot]->write((m_bank[2].page<<14) + offset, data); }
+void z88_state::bank3_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[3].slot]->write((m_bank[3].page<<14) + offset, data); }
 
 
 UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
@@ -107,16 +107,16 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(*this, FUNC(z88_state::bank0_cart_r)), write8_delegate(*this, FUNC(z88_state::bank0_cart_w)));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8sm_delegate(*this, FUNC(z88_state::bank0_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank0_cart_w)));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(*this, FUNC(z88_state::bank1_cart_r)), write8_delegate(*this, FUNC(z88_state::bank1_cart_w)));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(z88_state::bank1_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank1_cart_w)));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(z88_state::bank2_cart_r)), write8_delegate(*this, FUNC(z88_state::bank2_cart_w)));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(z88_state::bank2_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank2_cart_w)));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(*this, FUNC(z88_state::bank3_cart_r)), write8_delegate(*this, FUNC(z88_state::bank3_cart_w)));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8sm_delegate(*this, FUNC(z88_state::bank3_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank3_cart_w)));
 					break;
 			}
 

@@ -781,7 +781,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -805,7 +805,7 @@ protected:
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->read_cart(*m_cpuspace, offset);
+				return m_cartslot->read_cart(offset);
 			}
 			else
 			{
@@ -827,7 +827,7 @@ protected:
 		if (offset < 3)
 		{
 			if (m_cartslot->has_cart())
-				m_cartslot->write_bus_control(space,offset,data,mem_mask);
+				m_cartslot->write_bus_control(offset,data);
 		}
 	};
 
@@ -836,7 +836,7 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return m_cartslot->read_extra(*m_cpuspace, offset);
+			return m_cartslot->read_extra(offset);
 		}
 		else
 		{
@@ -848,7 +848,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -862,13 +862,13 @@ protected:
 		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
-			return m_cartslot->write_extra(*m_cpuspace, offset, data);
+			return m_cartslot->write_extra(offset, data);
 		}
 		else
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->write_cart(*m_cpuspace, offset, data);
+				return m_cartslot->write_cart(offset, data);
 			}
 			else
 			{
@@ -891,7 +891,7 @@ protected:
 			{
 				if (m_cartslot->has_cart())
 				{
-					return m_cartslot->read_cart(*m_cpuspace, offset);
+					return m_cartslot->read_cart(offset);
 				}
 				else
 				{
@@ -911,7 +911,7 @@ protected:
 				{
 					if (m_cartslot->has_cart())
 					{
-						return m_cartslot->read_cart(*m_cpuspace, offset);
+						return m_cartslot->read_cart(offset);
 					}
 					else
 					{

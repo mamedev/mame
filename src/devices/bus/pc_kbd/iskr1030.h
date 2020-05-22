@@ -49,8 +49,8 @@ private:
 	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 
 	void iskr_1030_keyboard_io(address_map &map);
 

@@ -160,7 +160,7 @@ void tk02_device::device_start()
 void tk02_device::device_reset()
 {
 	io_space().install_device(0x40, 0x4f, *this, &tk02_device::map);
-	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(*this, FUNC(tk02_device::ram_r)), write8_delegate(*this, FUNC(tk02_device::ram_w)));
+	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8sm_delegate(*this, FUNC(tk02_device::ram_r)), write8sm_delegate(*this, FUNC(tk02_device::ram_w)));
 }
 
 
@@ -203,17 +203,17 @@ WRITE_LINE_MEMBER( tk02_device::de_w )
 
 // lower 3 bits of address define a 256-byte "row"
 // upper 8 bits define the offset in the row
-READ8_MEMBER( tk02_device::ram_r )
+uint8_t tk02_device::ram_r(offs_t offset)
 {
 	return m_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
 }
 
-WRITE8_MEMBER( tk02_device::ram_w )
+void tk02_device::ram_w(offs_t offset, uint8_t data)
 {
 	m_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
 }
 
-READ8_MEMBER( tk02_device::status_r )
+uint8_t tk02_device::status_r()
 {
 	// 7654----  unused
 	// ----3---  link M001

@@ -468,7 +468,7 @@ WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::data_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_read )
+uint8_t pc_kbd_keytronic_pc3270_device::internal_data_read(offs_t offset)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::internal_data_read(): read from %04x\n", offset);
@@ -483,7 +483,7 @@ READ8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_write )
+void pc_kbd_keytronic_pc3270_device::internal_data_write(offs_t offset, uint8_t data)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::internal_data_write(): write to offset %04x\n", offset);

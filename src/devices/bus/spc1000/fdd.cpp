@@ -33,18 +33,21 @@ void spc1000_fdd_exp_device::i8255_c_w(uint8_t data)
 //  fdc interrupt
 //-------------------------------------------------
 
-READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
+uint8_t spc1000_fdd_exp_device::tc_r()
 {
-	logerror("%s: tc_r\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		logerror("%s: tc_r\n", machine().describe_context());
 
-	// toggle tc on read
-	m_fdc->tc_w(true);
-	m_timer_tc->adjust(attotime::zero);
+		// toggle tc on read
+		m_fdc->tc_w(true);
+		m_timer_tc->adjust(attotime::zero);
+	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
+void spc1000_fdd_exp_device::control_w(uint8_t data)
 {
 	logerror("%s: control_w(%02x)\n", machine().describe_context(), data);
 
@@ -182,7 +185,7 @@ void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, 
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(spc1000_fdd_exp_device::read)
+uint8_t spc1000_fdd_exp_device::read(offs_t offset)
 {
 	// this should be m_ppi->read on the whole 0x00-0x03 range?
 	if (offset >= 3)
@@ -207,7 +210,7 @@ READ8_MEMBER(spc1000_fdd_exp_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::write)
+void spc1000_fdd_exp_device::write(offs_t offset, uint8_t data)
 {
 	// this should be m_ppi->write on the whole 0x00-0x03 range?
 	if (offset < 3)

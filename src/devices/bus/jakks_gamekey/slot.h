@@ -28,8 +28,8 @@ public:
 	virtual ~device_jakks_gamekey_interface();
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_cart) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_cart) { }
+	virtual uint16_t read_cart(offs_t offset) { return 0xffff; }
+	virtual void write_cart(offs_t offset, uint16_t data) { }
 
 	virtual uint8_t read_cart_seeprom(void) { return 1; }
 	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
@@ -88,8 +88,8 @@ public:
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_cart);
-	virtual DECLARE_WRITE16_MEMBER(write_cart);
+	uint16_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint16_t data);
 
 	virtual uint8_t read_cart_seeprom(void);
 	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

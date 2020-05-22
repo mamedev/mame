@@ -47,8 +47,8 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
 
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
+	uint8_t internal_data_read(offs_t offset);
+	void internal_data_write(offs_t offset, uint8_t data);
 	uint8_t p1_read();
 	void p1_write(uint8_t data);
 	uint8_t p2_read();

@@ -12,10 +12,10 @@ public:
 	virtual ~device_astrocade_exp_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual uint8_t read_io(offs_t offset) { return 0xff; }
+	virtual void write_io(offs_t offset, uint8_t data) { }
 
 protected:
 	device_astrocade_exp_interface(const machine_config &mconfig, device_t &device);
@@ -46,10 +46,10 @@ public:
 	bool get_card_mounted() { return m_card_mounted; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read_io(offs_t offset);
+	void write_io(offs_t offset, uint8_t data);
 
 protected:
 	bool m_card_mounted;

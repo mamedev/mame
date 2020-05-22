@@ -220,10 +220,10 @@ std::string m5_cart_slot_device::get_default_card_software(get_default_card_soft
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(m5_cart_slot_device::read_rom)
+uint8_t m5_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -232,10 +232,10 @@ READ8_MEMBER(m5_cart_slot_device::read_rom)
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(m5_cart_slot_device::read_ram)
+uint8_t m5_cart_slot_device::read_ram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset);
+		return m_cart->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -244,8 +244,8 @@ READ8_MEMBER(m5_cart_slot_device::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(m5_cart_slot_device::write_ram)
+void m5_cart_slot_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data);
+		m_cart->write_ram(offset, data);
 }

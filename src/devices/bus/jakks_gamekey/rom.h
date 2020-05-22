@@ -18,14 +18,14 @@ public:
 	jakks_gamekey_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cart) override;
+	virtual uint16_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint16_t data) override;
 
 	virtual uint8_t read_cart_seeprom(void) override { return 1; };
 	virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { };
 
-	virtual READ16_MEMBER(read_rom);
-	virtual WRITE16_MEMBER(write_rom);
+	virtual uint16_t read_rom(offs_t offset);
+	virtual void write_rom(offs_t offset, uint16_t data);
 
 protected:
 	jakks_gamekey_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -47,8 +47,8 @@ protected:
 	jakks_gamekey_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual READ16_MEMBER(read_rom) override;
-	virtual WRITE16_MEMBER(write_rom) override;
+	virtual uint16_t read_rom(offs_t offset) override;
+	virtual void write_rom(offs_t offset, uint16_t data) override;
 
 	optional_device<i2cmem_device> m_i2cmem;
 

@@ -23,7 +23,7 @@
 //  hrs_w - high resolution memory banking
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::hrs_w )
+void abc806_state::hrs_w(uint8_t data)
 {
 	/*
 
@@ -50,7 +50,7 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 //  hrc_w - high resolution color write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::hrc_w )
+void abc806_state::hrc_w(offs_t offset, uint8_t data)
 {
 	int reg = (offset >> 8) & 0x0f;
 
@@ -62,9 +62,10 @@ WRITE8_MEMBER( abc806_state::hrc_w )
 //  charram_r - character RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::charram_r )
+uint8_t abc806_state::charram_r(offs_t offset)
 {
-	m_attr_data = m_attr_ram[offset];
+	if (!machine().side_effects_disabled())
+		m_attr_data = m_attr_ram[offset];
 
 	return m_char_ram[offset];
 }
@@ -74,9 +75,10 @@ READ8_MEMBER( abc806_state::charram_r )
 //  charram_w - character RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::charram_w )
+void abc806_state::charram_w(offs_t offset, uint8_t data)
 {
-	m_attr_ram[offset] = m_attr_data;
+	if (!machine().side_effects_disabled())
+		m_attr_ram[offset] = m_attr_data;
 
 	m_char_ram[offset] = data;
 }
@@ -86,7 +88,7 @@ WRITE8_MEMBER( abc806_state::charram_w )
 //  ami_r - attribute memory read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::ami_r )
+uint8_t abc806_state::ami_r()
 {
 	return m_attr_data;
 }
@@ -96,7 +98,7 @@ READ8_MEMBER( abc806_state::ami_r )
 //  amo_w - attribute memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::amo_w )
+void abc806_state::amo_w(uint8_t data)
 {
 	m_attr_data = data;
 }
@@ -106,7 +108,7 @@ WRITE8_MEMBER( abc806_state::amo_w )
 //  cli_r - palette PROM read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::cli_r )
+uint8_t abc806_state::cli_r(offs_t offset)
 {
 	/*
 
@@ -138,7 +140,7 @@ READ8_MEMBER( abc806_state::cli_r )
 //  sti_r - protection device read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::sti_r )
+uint8_t abc806_state::sti_r()
 {
 	/*
 
@@ -209,7 +211,7 @@ void abc806_state::sto_w(uint8_t data)
 //  sso_w - sync offset write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::sso_w )
+void abc806_state::sso_w(uint8_t data)
 {
 	m_sync = data & 0x3f;
 }

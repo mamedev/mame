@@ -92,12 +92,12 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_WRITE8_MEMBER( _4b_w );
-	DECLARE_WRITE8_MEMBER( _9b_w );
-	DECLARE_WRITE8_MEMBER( _8a_w );
-	DECLARE_READ8_MEMBER( _9a_r );
+	uint8_t out_r();
+	void inp_w(uint8_t data);
+	void _4b_w(uint8_t data);
+	void _9b_w(uint8_t data);
+	void _8a_w(uint8_t data);
+	uint8_t _9a_r(offs_t offset);
 
 	void luxor_55_21046_io(address_map &map);
 	void luxor_55_21046_mem(address_map &map);
