@@ -9,6 +9,8 @@
 
 #include "unspdasm.h"
 
+#include <climits>
+
 #define LOG_UNSP_MULS            (1U << 1)
 
 #define VERBOSE             (0)
