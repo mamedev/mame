@@ -31,14 +31,15 @@ TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
 TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
 TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
-#TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
+TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements,
+TIDY_FLAGSX += -readability-magic-numbers,-readability-braces-around-statements,
+#TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
@@ -290,7 +291,12 @@ gcc9:
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
+		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template \
+		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -304,9 +310,8 @@ nvcc:
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
 #
-# -Wno-c++11-narrowing : seems a bit broken
 # Mostly done: -Wno-weak-vtables -Wno-cast-align
-# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
+# FIXME:  -Wno-weak-vtables -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
 # -Wweak-template-vtables

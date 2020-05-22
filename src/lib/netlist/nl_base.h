@@ -1059,8 +1059,8 @@ namespace netlist
 		///
 		/// This function throws an exception if actually called.
 		///
-		[[noreturn]] void set_tristate(bool v,
-			netlist_time ts_off_on, netlist_time ts_on_off) const
+		[[noreturn]] static void set_tristate(netlist_sig_t v,
+			netlist_time ts_off_on, netlist_time ts_on_off)
 		{
 			plib::unused_var(v, ts_off_on, ts_on_off);
 			throw nl_exception("set_tristate on logic_output should never be called!");
@@ -1104,7 +1104,7 @@ namespace netlist
 			m_last_logic = newQ;
 		}
 
-		void set_tristate(bool v,
+		void set_tristate(netlist_sig_t v,
 			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
 		{
 			if (!m_force_logic)
@@ -1980,10 +1980,10 @@ namespace netlist
 		}
 
 		template<class D>
-		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate &&delegate)
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate delegate)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, formatted(fmt, i+offset), std::move(delegate));
+				this->emplace(i, dev, formatted(fmt, i+offset), delegate);
 		}
 
 		template<class D>
@@ -2000,13 +2000,11 @@ namespace netlist
 	protected:
 		object_array_base_t() = default;
 
-	protected:
 		static pstring formatted(const pstring &fmt, std::size_t n)
 		{
 			if (N != 1)
 				return plib::pfmt(fmt)(n);
-			else
-				return plib::pfmt(fmt)("");
+			return plib::pfmt(fmt)("");
 		}
 	};
 
@@ -2111,7 +2109,7 @@ namespace netlist
 				(*this)[i].push((v >> i) & 1, t[i]);
 		}
 
-		void set_tristate(bool v,
+		void set_tristate(netlist_sig_t v,
 			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
 		{
 			for (std::size_t i = 0; i < N; i++)
@@ -2141,7 +2139,7 @@ namespace netlist
 				(*this)[i].push((v >> i) & 1, t);
 		}
 
-		void set_tristate(bool v,
+		void set_tristate(netlist_sig_t v,
 			netlist_time ts_off_on, netlist_time ts_on_off) noexcept
 		{
 			for (std::size_t i = 0; i < N; i++)
@@ -2387,6 +2385,7 @@ namespace netlist
 
 	inline void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
 	{
+		// NOLINTNEXTLINE(readability-implicit-bool-conversion)
 		if (!(gt && go && Idr) && (gt || go || Idr))
 		{
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());

@@ -40,11 +40,11 @@ namespace netlist
 					/*detail::terminal_type::INPUT,*/ false));
 			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
 				/*detail::terminal_type::INPUT,*/ false));
-			if (tp_ct && tp_cn)
+			if ((tp_ct != nullptr) && (tp_cn != nullptr))
 			{
-				if (tp_ct && !tp_ct->is_analog())
+				if (!tp_ct->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_ct->name()));
-				if (tp_cn && !tp_cn->is_analog())
+				if (!tp_cn->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
 
 				auto *tp_t = static_cast<analog_t* >(tp_ct);
@@ -52,8 +52,8 @@ namespace netlist
 				if (f && (tp_t != nullptr && tn_t != nullptr))
 					log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
 						m_tp->name(), m_tn->name(),
-						tp_t ? tp_t->name() : "",
-						tn_t ? tn_t->name() : ""));
+						tp_t != nullptr ? tp_t->name() : "",
+						tn_t != nullptr ? tn_t->name() : ""));
 				else if (tp_t != nullptr && tn_t != nullptr)
 				{
 					m_tp = tp_t;
@@ -64,8 +64,8 @@ namespace netlist
 		}
 		if (!f)
 			throw nl_exception(MF_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
-		else
-			log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
+
+		log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
 	}
 
 	// ----------------------------------------------------------------------------------------

@@ -67,7 +67,7 @@ namespace devices
 
 		NETLIB_UPDATEI()
 		{
-			m_Q.push(!m_feedback(), m_inc);
+			m_Q.push(m_feedback() ^ 1, m_inc);
 		}
 
 	private:
@@ -104,7 +104,7 @@ namespace devices
 		{
 			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
 			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_funcparam));
-			m_Q.push(!m_feedback(), m_inc);
+			m_Q.push(m_feedback() ^ 1, m_inc);
 		}
 
 	private:

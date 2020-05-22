@@ -56,7 +56,7 @@ namespace netlist
 		NETLIB_HANDLERI(clk_strb);
 
 		friend class NETLIB_NAME(7497_dip);
-	private:
+
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
 		logic_input_t m_STRBQ;

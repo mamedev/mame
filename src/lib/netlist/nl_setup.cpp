@@ -53,7 +53,7 @@ namespace netlist
 		std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
-		const auto *i(more_parameters.begin());
+		auto i(more_parameters.begin());
 		pstring name(*i);
 		++i;
 		for (; i != more_parameters.end(); ++i)
@@ -1527,7 +1527,7 @@ void setup_t::prepare_to_run()
 			d.second->set_hint_deactivate(false);
 	}
 
-	if (errcnt)
+	if (errcnt > 0)
 	{
 		log().fatal(MF_ERRORS_FOUND(errcnt));
 		throw nl_exception(MF_ERRORS_FOUND(errcnt));

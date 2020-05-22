@@ -191,7 +191,7 @@ namespace netlist
 			}
 		};
 
-		/// \brief: used to hold two static netlist_time values
+		/// \brief: used to hold three static netlist_time values
 		///
 		template<netlist_time::internal_type value0,
 			netlist_time::internal_type value1,

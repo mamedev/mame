@@ -33,6 +33,7 @@
 		return devtype::create(p_name, std::move(sl)); \
 	} \
 	\
+	extern factory::constructor_ptr_t decl_ ## p_alias; \
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
@@ -50,6 +51,7 @@ namespace factory {
 		, m_sourceloc(std::move(sourceloc))
 		{ }
 
+		~properties() = default;
 		PCOPYASSIGNMOVE(properties, default)
 
 		const pstring &defparam() const noexcept
@@ -153,7 +155,7 @@ namespace factory {
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using constructor_ptr_t = plib::unique_ptr<element_t> (*)();
+	using constructor_ptr_t = plib::unique_ptr<element_t> (*const)();
 
 	template <typename T>
 	plib::unique_ptr<element_t> constructor_t(const pstring &name, properties &&props)

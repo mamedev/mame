@@ -401,13 +401,13 @@ namespace netlist
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-			total_time, total_time / static_cast<decltype(total_time)>(total_count ? total_count : 1));
+			total_time, total_time / static_cast<decltype(total_time)>((total_count > 0) ? total_count : 1));
 
 		log().verbose("Total loop     {1:15}", si.m_stat_mainloop());
 		log().verbose("Total time     {1:15}", total_time);
 
 		// FIXME: clang complains about unreachable code without
-		const auto clang_workaround_unreachable_code = NL_USE_QUEUE_STATS;
+		const bool clang_workaround_unreachable_code(NL_USE_QUEUE_STATS>0);
 		if (clang_workaround_unreachable_code)
 		{
 			// Only one serialization should be counted in total time
@@ -714,7 +714,7 @@ namespace netlist
 	{
 		const auto *solv(solver());
 		// Nets may belong to railnets which do not have a solver attached
-		if (solv)
+		if (solv != nullptr)
 				solver()->solve_now();
 	}
 

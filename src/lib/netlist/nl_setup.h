@@ -177,6 +177,8 @@ namespace netlist
 		: m_device(&device)
 		, m_param(&param)
 		{ }
+
+		~param_ref_t() = default;
 		PCOPYASSIGNMOVE(param_ref_t, default)
 
 		const core_device_t &device() const noexcept { return *m_device; }
