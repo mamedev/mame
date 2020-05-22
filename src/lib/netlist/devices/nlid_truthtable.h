@@ -26,7 +26,7 @@ namespace devices
 	{
 	public:
 
-		using type_t = typename plib::least_type_for_bits<m_NO + m_NI>::type;
+		using type_t = typename plib::fast_type_for_bits<m_NO + m_NI>::type;
 
 		static constexpr const std::size_t m_num_bits = m_NI;
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
@@ -161,16 +161,18 @@ namespace devices
 
 			m_ign = outstate >> m_NO;
 
-			const std::size_t timebase(nstate * m_NO);
-			const auto *t(&m_ttp.m_timing_index[timebase]);
-			const auto *tim = m_ttp.m_timing_nt.data();
+			const auto *t(&m_ttp.m_timing_index[nstate * m_NO]);
 
 			if (doOUT)
-				for (std::size_t i = 0; i < m_NO; ++i)
-					m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				//for (std::size_t i = 0; i < m_NO; ++i)
+				//	m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				this->push(out, t);
 			else
+			{
+				const auto *tim = m_ttp.m_timing_nt.data();
 				for (std::size_t i = 0; i < m_NO; ++i)
 					m_Q[i].set_Q_time((out >> i) & 1, mt + tim[t[i]]);
+			}
 
 			ign = m_ign;
 			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
@@ -180,6 +182,22 @@ namespace devices
 			m_state = nstate;
 #endif
 		}
+
+		template<typename T>
+		void push(const T &v, const std::uint_least8_t * t)
+		{
+			if (m_NO >= 1) m_Q[0].push((v >> 0) & 1, m_ttp.m_timing_nt[t[0]]);
+			if (m_NO >= 2) m_Q[1].push((v >> 1) & 1, m_ttp.m_timing_nt[t[1]]);
+			if (m_NO >= 3) m_Q[2].push((v >> 2) & 1, m_ttp.m_timing_nt[t[2]]);
+			if (m_NO >= 4) m_Q[3].push((v >> 3) & 1, m_ttp.m_timing_nt[t[3]]);
+			if (m_NO >= 5) m_Q[4].push((v >> 4) & 1, m_ttp.m_timing_nt[t[4]]);
+			if (m_NO >= 6) m_Q[5].push((v >> 5) & 1, m_ttp.m_timing_nt[t[5]]);
+			if (m_NO >= 7) m_Q[6].push((v >> 6) & 1, m_ttp.m_timing_nt[t[6]]);
+			if (m_NO >= 8) m_Q[7].push((v >> 7) & 1, m_ttp.m_timing_nt[t[7]]);
+			for (std::size_t i = 8; i < m_NO; i++)
+				m_Q[i].push((v >> i) & 1, m_ttp.m_timing_nt[t[i]]);
+		}
+
 
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
 		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;

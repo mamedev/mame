@@ -117,32 +117,40 @@ namespace plib
 			return ptime(m_time / rhs);
 		}
 
-		friend constexpr bool operator<(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator<(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
-			return (lhs.m_time < rhs.m_time);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return (lhs.m_time < rhs.as_raw());
+			//return (lhs.m_time < rhs.m_time);
 		}
 
-		friend constexpr bool operator>(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator>(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return (rhs < lhs);
 		}
 
-		friend constexpr bool operator<=(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator<=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs > rhs);
 		}
 
-		friend constexpr bool operator>=(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator>=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs < rhs);
 		}
 
-		friend constexpr bool operator==(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator==(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return lhs.m_time == rhs.m_time;
 		}
 
-		friend constexpr bool operator!=(const ptime &lhs, const ptime &rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator!=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}

@@ -2092,11 +2092,9 @@ namespace netlist
 				(*this)[i].push((v >> i) & 1, t);
 		}
 
-		template<typename T, std::size_t NT>
-		void push(const T &v, const std::array<netlist_time, NT> &t)
+		template<typename T>
+		void push(const T &v, const netlist_time * t)
 		{
-			static_assert(NT >= N, "Not enough timing entries provided");
-
 			if (N >= 1) (*this)[0].push((v >> 0) & 1, t[0]);
 			if (N >= 2) (*this)[1].push((v >> 1) & 1, t[1]);
 			if (N >= 3) (*this)[2].push((v >> 2) & 1, t[2]);
@@ -2107,6 +2105,14 @@ namespace netlist
 			if (N >= 8) (*this)[7].push((v >> 7) & 1, t[7]);
 			for (std::size_t i = 8; i < N; i++)
 				(*this)[i].push((v >> i) & 1, t[i]);
+		}
+
+		template<typename T, std::size_t NT>
+		void push(const T &v, const std::array<netlist_time, NT> &t)
+		{
+			static_assert(NT >= N, "Not enough timing entries provided");
+
+			push(v, t.data());
 		}
 
 		void set_tristate(netlist_sig_t v,

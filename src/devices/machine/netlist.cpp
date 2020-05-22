@@ -524,7 +524,7 @@ public:
 
 	NETLIB_NAME(sound_in)(netlist::netlist_state_t &anetlist, const pstring &name)
 	: netlist::device_t(anetlist, name)
-	, m_sample_time(attotime::zero)
+	, m_sample_time(netlist::netlist_time::zero())
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
 	, m_pos(0)
@@ -570,14 +570,14 @@ protected:
 		}
 		m_pos++;
 
-		m_Q.net().toggle_and_push_to_queue(nltime_from_attotime(m_sample_time));
+		m_Q.net().toggle_and_push_to_queue(m_sample_time);
 	}
 
 public:
 	void resolve(attotime sample_time)
 	{
 		m_pos = 0;
-		m_sample_time = sample_time;
+		m_sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_time).as_raw()));
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
@@ -597,7 +597,7 @@ public:
 	void buffer_reset(attotime sample_time, int num_samples, S **inputs)
 	{
 		m_samples = num_samples;
-		m_sample_time = sample_time;
+		m_sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_time).as_raw()));
 
 		m_pos = 0;
 		for (int i=0; i < m_num_channels; i++)
@@ -619,7 +619,7 @@ public:
 
 private:
 	channel m_channels[MAX_INPUT_CHANNELS];
-	attotime m_sample_time;
+	netlist::netlist_time m_sample_time;
 
 	netlist::logic_input_t m_feedback;
 	netlist::logic_output_t m_Q;
@@ -1497,7 +1497,7 @@ void netlist_mame_sound_device::device_start()
 			fatalerror("illegal channel number");
 		m_out[chan] = outdev;
 		m_out[chan]->m_sample_time = netlist::netlist_time::from_hz(clock());
-		m_out[chan]->buffer_reset(netlist::netlist_time::zero());
+		m_out[chan]->buffer_reset(netlist::netlist_time_ext::zero());
 	}
 
 	// Configure inputs
