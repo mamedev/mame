@@ -4834,6 +4834,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/itgambl3.cpp",
 	MAME_DIR .. "src/mame/drivers/itgamble.cpp",
 	MAME_DIR .. "src/mame/drivers/jackpool.cpp",
+	MAME_DIR .. "src/mame/drivers/jackpot.cpp",
 	MAME_DIR .. "src/mame/drivers/jankenmn.cpp",
 	MAME_DIR .. "src/mame/drivers/jokrwild.cpp",
 	MAME_DIR .. "src/mame/drivers/joystand.cpp",
