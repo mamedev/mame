@@ -111,7 +111,7 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPl
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394_VIDEO          (1U << 1)
 
-#define VERBOSE             (LOG_GCM394_TMAP | LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO)
+#define VERBOSE             (LOG_GCM394_TMAP | LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO |LOG_GCM394_VIDEO_PALETTE)
 
 #include "logmacro.h"
 
@@ -130,6 +130,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
 	m_pal_displaybank_high(0),
+	m_pal_sprites(0x500),
 	m_alt_tile_addressing(0)
 {
 }
@@ -392,7 +393,7 @@ void gcm394_base_video_device::device_reset()
 		m_spriteram[i] = 0x0000;
 	}
 
-	for (int i=0;i<0x100;i++)
+	for (int i=0;i<0x100 * 0x10;i++)
 		m_paletteram[i] = machine().rand()&0x7fff;
 
 
@@ -503,6 +504,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		int pen = bits >> 16;
 
 		int current_palette_offset = palette_offset;
+
 
 		// for planes above 4bpp palette ends up being pulled from different places?
 		if (nc_bpp < 6)
@@ -883,7 +885,7 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	}
 
 	//palette_offset |= 0x0d00;
-	palette_offset |= 0x0500;
+	palette_offset |= m_pal_sprites;
 
 	if (blend)
 	{
@@ -1412,6 +1414,9 @@ READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 {
+	// I don't think bit 1 is a bank select, it might be a 'mode select' for how the palette operates.
+	// neither lazertag or tkmag220 set it, and they only use 2 banks (0 and 8)
+
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
 }

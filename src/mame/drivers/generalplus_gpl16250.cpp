@@ -61,6 +61,10 @@
     jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
                 the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
 
+
+	--- the individual CS spaces could (and probably should?) be done with a bunch of extra memory spaces rather than the cs0_r / cs0_w etc. but that would mean yet
+	    another trip through the memory system for almost everything and at ~100Mhz that is slow.
+
 */
 
 #include "emu.h"
@@ -159,14 +163,7 @@ void gcm394_game_state::base(machine_config &config)
 }
 
 
-void tkmag220_game_state::tkmag220(machine_config &config)
-{
-	gcm394_game_state::base(config);
 
-	m_maincpu->porta_in().set_ioport("IN0");
-	m_maincpu->portb_in().set_ioport("IN1");
-	m_maincpu->portc_in().set_ioport("IN2");
-}
 
 void gcm394_game_state::machine_start()
 {

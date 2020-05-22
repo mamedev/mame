@@ -415,6 +415,33 @@ ROM_END
 
 
 
+void tkmag220_game_state::tkmag220(machine_config &config)
+{
+	gcm394_game_state::base(config);
+
+	m_maincpu->porta_in().set_ioport("IN0");
+	m_maincpu->portb_in().set_ioport("IN1");
+	m_maincpu->portc_in().set_ioport("IN2");
+}
+
+READ16_MEMBER(tkmag220_game_state::cs0_r)
+{
+	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
+	return m_romregion[(offset & 0x07fffff) + m_upperbase];
+}
+
+
+void tkmag220_game_state::machine_reset()
+{
+	// as with the Family Sport multi-game versions on spg2xx hardware, there are actually 8 programs in here, externally banked
+	// each of those programs is 16MBytes, so is either going to have the upper half banked externally like the older hardware types, os possibly using the CS registers on this hardware type
+	m_upperbase = 0 * (0x1000000 / 2);
+	gcm394_game_state::machine_reset();
+
+	m_maincpu->set_paldisplaybank_high_hack(0);
+	m_maincpu->set_pal_sprites_hack(0x000);
+}
+
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
