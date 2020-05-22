@@ -55,7 +55,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	}
 	case 0x02:
 	{
-		// register decoding could be incorrect here
 		// Ext Push/Pop
 		if (ximm & 0x8000)
 		{
@@ -67,9 +66,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if ((rx - (size - 1)) >= 0)
 			{
-				//logerror("(Ext) push %s, %s to [%s]\n",
-				//  extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-
 				while (size--)
 				{
 					push(m_core->m_r[(rx--) + 8], &m_core->m_r[rb]);
@@ -94,16 +90,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if ((rx - (size - 1)) >= 0)
 			{
-				//logerror("(Ext) pop %s, %s from [%s]\n",
-				//  extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 				int realrx = 7 - rx;
 
 				while (size--)
 				{
-					if (rb & 0x8)
-						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[(rb & 0x07) + 8]);
-					else
-						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb & 0x07]);
+					m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb]);
 				}
 			}
 			else
