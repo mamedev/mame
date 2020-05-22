@@ -142,6 +142,10 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
+	$(NLOBJ)/solver/nld_solver.o \
+	$(NLOBJ)/solver/nld_matrix_solver.o \
+	$(NLOBJ)/tools/nl_convert.o \
+	$(NLOBJ)/generated/static_solvers.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4006.o \
@@ -205,10 +209,6 @@ NLOBJS := \
 	$(NLOBJ)/macro/nlm_other.o \
 	$(NLOBJ)/macro/nlm_roms.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
-	$(NLOBJ)/solver/nld_solver.o \
-	$(NLOBJ)/solver/nld_matrix_solver.o \
-	$(NLOBJ)/tools/nl_convert.o \
-	$(NLOBJ)/generated/static_solvers.o \
 
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \

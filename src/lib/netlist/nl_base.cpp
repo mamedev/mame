@@ -280,7 +280,6 @@ namespace netlist
 	void netlist_state_t::reset()
 	{
 		m_setup = nullptr;
-
 		// Reset all nets once !
 		log().verbose("Call reset on all nets:");
 		for (auto & n : nets())
@@ -360,10 +359,9 @@ namespace netlist
 			break;
 		}
 
-	#if 1
 		// the above may screw up m_active and the list
 		rebuild_lists();
-	#endif
+
 	}
 
 	void netlist_t::print_stats() const

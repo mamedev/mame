@@ -166,11 +166,11 @@ namespace devices
 			const auto *tim = m_ttp.m_timing_nt.data();
 
 			if (doOUT)
-				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)
-					m_Q[i].push(out & 1, tim[t[i]]);
+				for (std::size_t i = 0; i < m_NO; ++i)
+					m_Q[i].push((out >> i) & 1, tim[t[i]]);
 			else
-				for (std::size_t i = 0; i < m_NO; out >>= 1, ++i)
-					m_Q[i].set_Q_time(out & 1, mt + tim[t[i]]);
+				for (std::size_t i = 0; i < m_NO; ++i)
+					m_Q[i].set_Q_time((out >> i) & 1, mt + tim[t[i]]);
 
 			ign = m_ign;
 			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
@@ -188,7 +188,7 @@ namespace devices
 		state_var<type_t>   m_state;
 #endif
 		state_var<type_t>   m_ign;
-		const truthtable_t &m_ttp;
+		const truthtable_t  m_ttp;
 		/* FIXME: the family should provide the names of the power-terminals! */
 		nld_power_pins m_power_pins;
 	};
