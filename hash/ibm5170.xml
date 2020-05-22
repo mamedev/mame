@@ -9571,6 +9571,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cruisecr">
+		<description>Cruise for a Corpse</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="3783f600" sha1="874ed3004b6b867377107d019df780a4aa4dd556"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="8c2ff3c9" sha1="13bdf7b34d1321011c5be0c457455160c25f7dbe"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cruise For A Corpse [U.S. Gold] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="f9ffe21a" sha1="5ccc25bda8b0a6cbadbaceb8f6c280f8c4bbec78"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="crystalc">
 		<description>Crystal Caves (1.0a)</description>
 		<year>1991</year>
