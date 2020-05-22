@@ -75,6 +75,8 @@ public:
 
 	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
+	void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
+
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
 protected:
@@ -290,6 +292,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_78d8_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78f0_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7904_r);
 
 	DECLARE_READ16_MEMBER(unkarea_7934_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7934_w);

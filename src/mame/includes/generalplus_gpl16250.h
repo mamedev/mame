@@ -86,6 +86,8 @@ public:
 
 protected:
 
+	virtual void machine_reset() override;
+
 	/*
 	virtual DECLARE_READ16_MEMBER(porta_r) override
 	{
@@ -103,11 +105,10 @@ protected:
 	*/
 
 private:
+	int m_upperbase;
 
-	virtual DECLARE_READ16_MEMBER(cs0_r) override
-	{
-		return m_romregion[offset & 0x3ffffff];
-	}
+	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+
 };
 
 

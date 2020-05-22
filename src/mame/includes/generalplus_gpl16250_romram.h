@@ -69,6 +69,23 @@ protected:
 private:
 };
 
+class lazertag_game_state : public jak_s500_game_state
+{
+public:
+	lazertag_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		jak_s500_game_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+};
+
+
+
 
 #endif // MAME_INCLUDES_GENERALPLUS_GPL16250_ROMRAM_H
 

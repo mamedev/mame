@@ -148,7 +148,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	else if ((mode & 0x50) == 0x10)
 		destdelta = -1;
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), mode, source, dest, length, m_membankswitch_7810 );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), mode, source, dest, length, m_membankswitch_7810 );
 
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
@@ -560,11 +560,33 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78d8_r)
 
 // **************************************** 793x uknown region stubs *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return 0x0000; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_w %04x\n", machine().describe_context(), data); m_7934 = data; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7904_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7904_r\n", machine().describe_context());
+	return machine().rand(); // lazertag waits on a bit, status flag for something?
+
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r)
+{
+	// does this return data written, or is it a status flag?
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context());
+	return m_7934;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_w %04x\n", machine().describe_context(), data);
+	m_7934 = data;
+}
 
 // value of 7935 is read then written in irq6, nothing happens unless bit 0x0100 was set, which could be some kind of irq source being acked?
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_r\n", machine().describe_context()); return m_7935; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_r\n", machine().describe_context());
+	return m_7935;
+}
+
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_w %04x\n", machine().describe_context(), data);
@@ -835,6 +857,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 	// 793x - misc?
 	// ######################################################################################################################################################################################
+
+	map(0x007904, 0x007904).r(FUNC(sunplus_gcm394_base_device::unkarea_7904_r)); // lazertag after a while
 
 	// possible rtc?
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
