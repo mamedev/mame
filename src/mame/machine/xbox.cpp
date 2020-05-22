@@ -405,8 +405,8 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 	if (params.size() < 3)
 		return;
 
-	uint64_t address;
-	if (!machine().debugger().commands().validate_number_parameter(params[1], address))
+	uint64_t addr;
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
 		return;
 
 	uint64_t length;
@@ -424,8 +424,8 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 		uint32_t instruction[4];
 		if (type == 1)
 		{
-			offs_t addr = (offs_t)address;
-			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+			offs_t address = (offs_t)addr;
+			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 				return;
 			instruction[0] = space.read_dword_unaligned(address);
 			instruction[1] = space.read_dword_unaligned(address + 4);
@@ -434,7 +434,7 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 		}
 		else
 		{
-			nvidia_nv2a->debug_grab_vertex_program_slot((int)address, instruction);
+			nvidia_nv2a->debug_grab_vertex_program_slot((int)addr, instruction);
 		}
 
 		char line[64];
@@ -442,9 +442,9 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 			machine().debugger().console().printf("%s\n", line);
 
 		if (type == 1)
-			address = address + 4 * 4;
+			addr = addr + 4 * 4;
 		else
-			address++;
+			addr++;
 
 		length--;
 	}
