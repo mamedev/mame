@@ -12277,4 +12277,375 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="frakfaeb">
+		<description>Fraktured Faebles</description>
+		<year>1985</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-05-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234831">
+				<rom name="fraktured faebles side a.woz" size="234831" crc="e6d11525" sha1="68252011379e9e2d1d98479424e87fd456e67556"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234830">
+				<rom name="fraktured faebles side b.woz" size="234830" crc="d826ac22" sha1="619e4716fa89b8946fb9627cccaef4e4c858b565"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewkill">
+		<description>A View To A Kill</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="a view to a kill.woz" size="234774" crc="e5baa6cc" sha1="23b5f4e4cc226a9bf6db8ca01d1019b7d66f65a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballyhr97">
+		<description>Ballyhoo (Release 97 / 851218)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="ballyhoo r97.woz" size="234797" crc="4a4edff2" sha1="c1e73096b7d23753e6e42517a80fbb96b8e73964"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2020-05-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234798">
+				<rom name="championship golf.woz" size="234798" crc="9d1a193f" sha1="e7b0eb6e3272044046a9373ea7acabe598cabd46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunjnqrn">
+		<description>Dunjonquest: The Datestones of Ryn</description>
+		<year>1980</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-05-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive and a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234844">
+				<rom name="dunjonquest- the datestones of ryn.woz" size="234844" crc="05154f9f" sha1="0d749206c8d00f872a253387dd9e7e69f1e35ca6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graforth">
+		<description>GraFORTH</description>
+		<year>1981</year>
+		<publisher>Insoft</publisher>
+		<info name="release" value="2020-05-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="graforth.woz" size="234776" crc="75e75e89" sha1="758fd362cf28f8dc46516e01c4fde5b66b589311"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml5nega">
+		<description>Micro-LADS 5: Negatives</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235546">
+				<rom name="micro-lads 5- negatives.woz" size="235546" crc="376818fe" sha1="2f905e6f18a2d3eca7d29141ce78a1f9046ab568"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml6deiex">
+		<description>Micro-LADS 6: Deictic Expressions, Passive, WH-questions</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235579">
+				<rom name="micro-lads 6- deictic expressions, passive, wh-questions.woz" size="235579" crc="40052717" sha1="8e5417ba687db72a75baf6526019acfb9bf2f14b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml7prep2">
+		<description>Micro-LADS 7: Prepositions II</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235552">
+				<rom name="micro-lads 7- prepositions ii.woz" size="235552" crc="2b2093b8" sha1="0c3b5bb04dae1a7a9da4fdea03842f9ee311bae4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastglad">
+		<description>The Last Gladiator</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228120">
+				<rom name="the last gladiator.woz" size="228120" crc="f9736689" sha1="eb37bdffc2c2bbafa728a2123be7856a00506f81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incrdlab">
+		<description>The Incredible Laboratory</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-05-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235496">
+				<rom name="the incredible laboratory.woz" size="235496" crc="d12528f2" sha1="c84d9c1b164bb2bce2f57c44aa0c68adf07b5c8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odd1out">
+		<description>Odd One Out</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-05-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235503">
+				<rom name="odd one out.woz" size="235503" crc="5dced466" sha1="5dc7d46ab444124f0cbc21b0d3686a6cb11b400a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algplogc">
+		<description>Algernon: An Introduction to Programming Logic</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-05-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241430">
+				<rom name="algernon.woz" size="241430" crc="64fe4b81" sha1="3dabbf3283441447dc5aa8c31a13d3a33aa6d507"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persec11">
+		<description>The Personal Secretary (Version 1.1)</description>
+		<year>1983</year>
+		<publisher>Sof/Sys, Inc.</publisher>
+		<info name="release" value="2020-05-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="the personal secretary.woz" size="234800" crc="8700ff3c" sha1="1b8326d192942605c520f829b03ea6d72182fd82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exsec42">
+		<description>The Executive Secretary (Version 4.2)</description>
+		<year>1983</year>
+		<publisher>Sof/Sys, Inc.</publisher>
+		<info name="release" value="2020-05-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="the executive secretary.woz" size="234777" crc="9f296a33" sha1="7f418c31e51acf4be47586fd2f84634e8b85d28b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loblkslv">
+		<description>The Legend of Blacksilver</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2020-05-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234839">
+				<rom name="the legend of blacksilver - side 1.woz" size="234839" crc="e3cea8ba" sha1="b775a5569c381768538a788205b992e5d5799bd5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234839">
+				<rom name="the legend of blacksilver - side 2.woz" size="234839" crc="4bd45825" sha1="b44caee849ca7747491ff2412aaee17e995469f1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="241495">
+				<rom name="the legend of blacksilver - side 3.woz" size="241495" crc="1561dbf4" sha1="64ed937cc62dca73415b9adb5b2078124b70fe8a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234839">
+				<rom name="the legend of blacksilver - side 4.woz" size="234839" crc="0c2a4503" sha1="f86c0f1294104e01969a0d3c26505dd2664af9be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmyths">
+		<description>Magical Myths</description>
+		<year>1984</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2020-05-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="magical myths.woz" size="234779" crc="6c1e2dea" sha1="c61e912e6b2fd8d68bc4a7b3f8bf56f7756c2f28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthscrmr">
+		<description>Matterhorn Screamer</description>
+		<year>1988</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="matterhorn screamer.woz" size="234790" crc="715e1d31" sha1="579a29afe4084073e8704807a092b43637b44787"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmnforge">
+		<description>The Demon's Forge</description>
+		<year>1983</year>
+		<publisher>Boone Corporation</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="the demon's forge.woz" size="234796" crc="0076712b" sha1="2ddbbcadb8463a7d419e914f313d4091f47f3e12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml1plnva">
+		<description>Micro-LADS 1: Plurals &amp; Noun/Verb Agreement</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235566">
+				<rom name="micro-lads 1- plurals and noun-verb agreement.woz" size="235566" crc="5248d8a7" sha1="cb3c599b370c46b4f7ac11f23122a37c598595b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml2verbf">
+		<description>Micro-LADS 2: Verb Forms</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235547">
+				<rom name="micro-lads 2- verb forms.woz" size="235547" crc="b934c2e5" sha1="e764770d7642a5301f2795f75fd1df987019976c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml3preps">
+		<description>Micro-LADS 3: Prepositions</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235549">
+				<rom name="micro-lads 3- prepositions.woz" size="235549" crc="99f1445b" sha1="3dcff367953157133b7c4ef46d5b49834f169209"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ml4pron">
+		<description>Micro-LADS 4: Pronouns</description>
+		<year>1989</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2020-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235545">
+				<rom name="micro-lads 4- pronouns.woz" size="235545" crc="5e1e3e45" sha1="d7ac4d69ac97e660ea7fa3dc535a52e8957e6e46"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
