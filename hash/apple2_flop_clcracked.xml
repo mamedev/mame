@@ -36788,4 +36788,83 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mpvrb2r2">
+		<description>Verbs II (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2020-05-10"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs ii rev. 2 (4am crack).dsk" size="143360" crc="6a23f644" sha1="ea1bfa8af5aefea3f67265a068aa090fdb146cb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deuakt1">
+		<description>Deutsch: Aktuell 1 (Second Edition) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>EMC Corporation</publisher>
+		<info name="release" value="2020-05-20"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 1.dsk" size="143360" crc="c907eb28" sha1="02094e0cd8d353246e608c16a8e0b5a02dc17a64"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 2.dsk" size="143360" crc="0a113ea9" sha1="b059d2b1cec601456ea68c0df6a0152ab32e9222"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 3.dsk" size="143360" crc="43c9ad38" sha1="33b55020c5f93a36eb72745198c80ec7d52d7580"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 4.dsk" size="143360" crc="e406ed5e" sha1="1dd7a2578a4f0ff32b72d997df52d39a032d6a84"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 5.dsk" size="143360" crc="594cd186" sha1="fcdb6f58d4a7c956cf1e6eba3541bf839eab7212"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 6.dsk" size="143360" crc="5789939a" sha1="f5e090c239b493e089cd028af2481e058f775a0b"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 7.dsk" size="143360" crc="93002be8" sha1="205a1159d85d99014064343277f4ca23fe767afa"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 8.dsk" size="143360" crc="c6f115dd" sha1="3277fbba80c58e2b902df2576755b2ba492639b7"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 9.dsk" size="143360" crc="54552a20" sha1="c4db06a8cca563e8af45d14712cd98dbab81c64a"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="deutsch aktuell 1 (4am crack) disk 10.dsk" size="143360" crc="c6e470cd" sha1="3ddc13f93becc5b48ca015b08cae3536f76b2323"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
