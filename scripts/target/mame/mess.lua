@@ -873,6 +873,7 @@ BUSES["PSI_KEYBOARD"] = true
 BUSES["PSX_CONTROLLER"] = true
 BUSES["PSX_PARALLEL"] = true
 BUSES["QL"] = true
+BUSES["QBUS"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
 BUSES["SAT_CTRL"] = true

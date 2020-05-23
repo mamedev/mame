@@ -3661,6 +3661,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/qbus/qbus.h,BUSES["QBUS"] = true
+---------------------------------------------------
+
+if (BUSES["QBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/qbus/pc11.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/pc11.h",
+		MAME_DIR .. "src/devices/bus/qbus/qbus.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/qbus.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ql/exp.h,BUSES["QL"] = true
 ---------------------------------------------------
 
