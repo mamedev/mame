@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -33,8 +32,21 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "video/i8275.h"
+
+#include "bus/rs232/rs232.h"
+#include "machine/keyboard.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+
+#define LOG_BANK    (1U <<  1)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
 
 class rt1715_state : public driver_device
@@ -44,9 +56,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
-		, m_bankdev(*this, "bankdev%u", 0U)
 		, m_sio0(*this, "sio0")
 		, m_ctc0(*this, "ctc0")
+		, m_rs232(*this, "rs232")
 		, m_fdc(*this, "i8272")
 		, m_floppy(*this, "i8272:%u", 0U)
 		, m_dma(*this, "z80dma")
@@ -55,7 +67,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "i8275")
 		, m_p_chargen(*this, "gfx")
-		, m_p_videoram(*this, "videoram")
+		, m_videoram(*this, "videoram")
+		, m_p_cas(*this, "prom")
 	{
 	}
 
@@ -89,8 +102,6 @@ private:
 	void rt1715w_io(address_map &map);
 	void rt1715_mem(address_map &map);
 	void rt1715w_mem(address_map &map);
-	void rt1715w_m1(address_map &map);
-	void rt1715w_banked_mem(address_map &map);
 
 	DECLARE_MACHINE_START(rt1715);
 	DECLARE_MACHINE_RESET(rt1715);
@@ -99,9 +110,9 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	optional_device_array<address_map_bank_device, 3> m_bankdev;
 	required_device<z80sio_device> m_sio0;
 	required_device<z80ctc_device> m_ctc0;
+	required_device<rs232_port_device> m_rs232;
 	optional_device<i8272a_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
 	optional_device<z80dma_device> m_dma;
@@ -110,7 +121,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
 	required_region_ptr<uint8_t> m_p_chargen;
-	optional_shared_ptr<uint8_t> m_p_videoram;
+	optional_device<ram_device> m_videoram;
+	optional_region_ptr<uint8_t> m_p_cas;
 
 	int m_led1_val;
 	int m_led2_val;
@@ -126,12 +138,12 @@ private:
 
 WRITE8_MEMBER(rt1715_state::rt1715_floppy_enable)
 {
-	logerror("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(rt1715_state::rt1715w_floppy_motor)
 {
-	logerror("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
 
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(data & 0x80 ? 1 : 0);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(data & 0x08 ? 1 : 0);
@@ -139,7 +151,7 @@ WRITE8_MEMBER(rt1715_state::rt1715w_floppy_motor)
 
 WRITE8_MEMBER(rt1715_state::rt1715w_krfd_w)
 {
-	logerror("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
+	LOG("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
 	m_krfd = data;
 }
 
@@ -156,7 +168,7 @@ WRITE_LINE_MEMBER(rt1715_state::tc_w)
 READ8_MEMBER(rt1715_state::k7658_led1_r)
 {
 	m_led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
+	LOG("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
 	return 0xff;
 }
 
@@ -164,7 +176,7 @@ READ8_MEMBER(rt1715_state::k7658_led1_r)
 READ8_MEMBER(rt1715_state::k7658_led2_r)
 {
 	m_led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
+	LOG("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
 	return 0xff;
 }
 
@@ -193,7 +205,7 @@ READ8_MEMBER(rt1715_state::k7658_data_r)
 /* serial output on D0 */
 WRITE8_MEMBER(rt1715_state::k7658_data_w)
 {
-	logerror("%s: k7658_data_w %02x\n", machine().describe_context(), BIT(data, 0));
+	LOG("%s: k7658_data_w %02x\n", machine().describe_context(), BIT(data, 0));
 }
 
 
@@ -215,7 +227,7 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715)
 
 WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 {
-	logerror("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
+	LOGBANK("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
 	membank("bank1")->set_base(m_ram->pointer());
@@ -223,8 +235,6 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 
 MACHINE_START_MEMBER(rt1715_state, rt1715w)
 {
-	membank("bank2")->set_base(m_ram->pointer() + 0x4000);
-	membank("bank3")->set_base(m_ram->pointer());
 }
 
 MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
@@ -234,13 +244,11 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
 	m_dma_adr = 0;
 	m_r = 0;
 	m_w = 0;
-
-	m_bankdev[0]->set_bank(m_r);
-	m_bankdev[1]->set_bank(m_w);
-	m_bankdev[2]->set_bank(m_r);
 }
 
 /*
+   BR (A62, A63)
+
    b2..0 = AB18..16
 
    0 - Hintergrundbank (Bildschirm, Zeichengeneratoren)
@@ -252,14 +260,10 @@ MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
 */
 WRITE8_MEMBER(rt1715_state::rt1715w_set_bank)
 {
-	int r = data >> 4;
-	int w = data & 15;
+	int w = (data >> 4) & 7;
+	int r = data & 7;
 
-	logerror("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), w, r, r == w ? "" : " DIFF");
-
-	m_bankdev[0]->set_bank(r);
-	m_bankdev[1]->set_bank(w);
-	if (r < 2) m_bankdev[2]->set_bank(r);
+	LOGBANK("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), w, r, r == w ? "" : " DIFF");
 
 	m_r = r;
 	m_w = w;
@@ -272,15 +276,55 @@ uint8_t rt1715_state::memory_read_byte(offs_t offset)
 	switch (m_r)
 	{
 	case 0:
-		data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+		switch (offset >> 12)
+		{
+		case 0:
+			data = memregion("ipl")->base()[offset & 0x7ff];
+			break;
+
+		case 1:
+			break;
+
+		case 2:
+			data = m_p_chargen[offset & 0xfff];
+			break;
+
+		case 3:
+			data = m_videoram->pointer()[offset & 0xfff];
+			break;
+
+		default:
+			data = m_ram->pointer()[offset];
+			break;
+		}
+		LOGBANK("mem r %04x bank %d == %02x\n", offset, m_r, data);
 		break;
 
-	case 1:
-		data = m_ram->pointer()[offset];
-		break;
+	default:
+		uint8_t cas_addr = 128 + (m_r << 4) + ((offset >> 12) & 15);
+		uint8_t cas_data = m_p_cas[cas_addr] ^ 15;
+		switch (cas_data)
+		{
+		case 1:
+			data = m_ram->pointer()[offset];
+			break;
 
-	case 2: case 3: case 4: case 5:
-		data = m_ram->pointer()[offset + (m_r - 2) * 0x10000];
+		case 2:
+			data = m_ram->pointer()[offset + 0x10000];
+			break;
+
+		case 4:
+			data = m_ram->pointer()[offset + 0x20000];
+			break;
+
+		case 8:
+			data = m_ram->pointer()[offset + 0x30000];
+			break;
+
+		default:
+			break;
+		}
+		LOGBANK("mem r %04x bank %d cas %d(%02x) == %02x\n", offset, m_r, cas_data, cas_addr, data);
 		break;
 	}
 	return data;
@@ -291,15 +335,52 @@ void rt1715_state::memory_write_byte(offs_t offset, uint8_t data)
 	switch (m_w)
 	{
 	case 0:
-		m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+		switch (offset >> 12)
+		{
+		case 0:
+		case 1:
+			break;
+
+		case 2:
+			m_p_chargen[offset & 0xfff] = data;
+			break;
+
+		case 3:
+			m_videoram->pointer()[offset & 0xfff] = data;
+			break;
+
+		default:
+			m_ram->pointer()[offset] = data;
+			break;
+		}
+		LOGBANK("mem w %04x bank %d <- %02x\n", offset, m_w, data);
 		break;
 
-	case 1:
-		m_ram->pointer()[offset] = data;
-		break;
+	default:
+		uint8_t cas_addr = 128 + (m_w << 4) + ((offset >> 12) & 15);
+		uint8_t cas_data = m_p_cas[cas_addr] ^ 15;
+		switch (cas_data)
+		{
+		case 1:
+			m_ram->pointer()[offset] = data;
+			break;
 
-	case 2: case 3: case 4: case 5:
-		m_ram->pointer()[offset + (m_w - 2) * 0x10000] = data;
+		case 2:
+			m_ram->pointer()[offset + 0x10000] = data;
+			break;
+
+		case 4:
+			m_ram->pointer()[offset + 0x20000] = data;
+			break;
+
+		case 8:
+			m_ram->pointer()[offset + 0x30000] = data;
+			break;
+
+		default:
+			break;
+		}
+		LOGBANK("mem w %04x bank %d cas %d(%02x) <- %02x\n", offset, m_w, cas_data, cas_addr, data);
 		break;
 	}
 }
@@ -331,7 +412,7 @@ WRITE_LINE_MEMBER(rt1715_state::crtc_drq_w)
 {
 	if (state)
 	{
-		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
+		m_crtc->dack_w(m_videoram->pointer()[m_dma_adr++]);
 		m_dma_adr %= (80 * 24);
 	}
 }
@@ -342,7 +423,7 @@ I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 	u8 gfx = (lten) ? 0xff : 0;
 
 	if (!vsp)
-		gfx = m_p_chargen[linecount << 7 | charcode];
+		gfx = m_p_chargen[((gpa & 1) << 11) | (linecount << 7) | charcode];
 
 	if (rvv)
 		gfx ^= 0xff;
@@ -398,9 +479,10 @@ void rt1715_state::rt1715_base_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x08, 0x0b).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x0c, 0x0f).rw(m_sio0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0c, 0x0f).rw(m_sio0, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x10, 0x17).noprw();
 //  map(0x10, 0x13).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-//  map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+//  map(0x14, 0x17).rw(m_sio1, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x18, 0x19).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 //  map(0x2c, 0x2f) // LT107CS -- serial DSR?
 //  map(0x30, 0x33) // LT111CS -- serial SEL? (data rate selector)
@@ -420,24 +502,7 @@ void rt1715_state::rt1715_io(address_map &map)
 
 void rt1715_state::rt1715w_mem(address_map &map)
 {
-	map(0x0000, 0xffff).r(m_bankdev[0], FUNC(address_map_bank_device::read8)).w(m_bankdev[1], FUNC(address_map_bank_device::write8));
-}
-
-void rt1715_state::rt1715w_m1(address_map &map)
-{
-	map(0x0000, 0xffff).r(m_bankdev[2], FUNC(address_map_bank_device::read8)).w(m_bankdev[2], FUNC(address_map_bank_device::write8));
-}
-
-void rt1715_state::rt1715w_banked_mem(address_map &map)
-{
-	// map 0
-	map(0x00000, 0x007ff).rom().region("ipl", 0);
-	map(0x02000, 0x02fff).ram().region("gfx", 0);
-	map(0x03000, 0x03fff).ram().share("videoram");
-	map(0x04000, 0x0ffff).bankrw("bank2");
-	// maps 1-5
-	map(0x10000, 0x1ffff).bankrw("bank3");
-	map(0x20000, 0x5ffff).bankrw("bank3");
+	map(0x0000, 0xffff).rw(FUNC(rt1715_state::memory_read_byte), FUNC(rt1715_state::memory_write_byte));
 }
 
 // rt1715w -- decoders A13, A14, page C
@@ -547,6 +612,16 @@ static INPUT_PORTS_START( k7658 )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x00 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -564,7 +639,6 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 static const z80_daisy_config rt1715w_daisy_chain[] =
 {
-	{ "ctc0" },
 	{ "sio0" },
 	{ nullptr }
 };
@@ -607,10 +681,24 @@ void rt1715_state::rt1715(machine_config &config)
 
 	/* keyboard */
 	Z80SIO(config, m_sio0, 9.832_MHz_XTAL / 4);
+	m_sio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio0->out_txda_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_sio0->out_dtra_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_sio0->out_rtsa_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	Z80CTC(config, m_ctc0, 9.832_MHz_XTAL / 4);
-	m_ctc0->zc_callback<0>().set(m_sio0, FUNC(z80sio_device::txca_w));
+	Z80CTC(config, m_ctc0, 15.9744_MHz_XTAL / 4);
+	m_ctc0->zc_callback<0>().set(m_sio0, FUNC(z80sio_device::rxca_w));
 	m_ctc0->zc_callback<2>().set(m_sio0, FUNC(z80sio_device::rxtxcb_w));
+
+	// X3 connector on motherboard
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set(m_sio0, FUNC(z80sio_device::rxa_w));
+	m_rs232->cts_handler().set(m_sio0, FUNC(z80sio_device::ctsa_w));
+	m_rs232->dsr_handler().set(m_sio0, FUNC(z80sio_device::synca_w));
+	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
+
+	// X4 connector -- printer
+	// X5 connector -- V24 port
 
 	/* floppy */
 	Z80PIO(config, "a71", 9.832_MHz_XTAL / 4);
@@ -625,13 +713,9 @@ void rt1715_state::rt1715w(machine_config &config)
 	rt1715(config);
 
 	m_maincpu->set_clock(15.9744_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715w_m1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715w_mem);
 	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715w_io);
 	m_maincpu->set_daisy_config(rt1715w_daisy_chain);
-
-	ADDRESS_MAP_BANK(config, "bankdev0").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
-	ADDRESS_MAP_BANK(config, "bankdev1").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
-	ADDRESS_MAP_BANK(config, "bankdev2").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
 
 	MCFG_MACHINE_START_OVERRIDE(rt1715_state, rt1715w)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715w)
@@ -658,6 +742,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	Z80CTC(config, m_ctc2, 15.9744_MHz_XTAL / 4);
 
 	m_ram->set_default_size("256K");
+	RAM(config, m_videoram).set_default_size("4K").set_default_value(0x00);
 }
 
 
