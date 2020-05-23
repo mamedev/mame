@@ -11485,13 +11485,13 @@ ROM_START( varthb2 )
 	// roms u18,19 might just be duplicates of u68,70 (although markings are different?) or just half empty
 	// games expects sprites to start at 0x8000 so reloading in upper region
 	ROM_REGION( 0x600000, "gfx", 0 )
-	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
+	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, BAD_DUMP CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
 	ROM_RELOAD(                  0x400000, 0x80000)
-	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )
+	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, BAD_DUMP CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )
 	ROM_RELOAD(                  0x400002, 0x80000)
-	ROM_LOAD64_WORD( "va-1m.3a", 0x000004, 0x80000, CRC(0b1ace37) SHA1(6f9493c22f667f683db2789972fd16bb94724679) )
+	ROM_LOAD64_WORD( "va-1m.3a", 0x000004, 0x80000, BAD_DUMP CRC(0b1ace37) SHA1(6f9493c22f667f683db2789972fd16bb94724679) )
 	ROM_RELOAD(                  0x400004, 0x80000)
-	ROM_LOAD64_WORD( "va-3m.5a", 0x000006, 0x80000, CRC(44dfe706) SHA1(a013a434df3161a91aafbb35dc4e20dfb3f177f4) )
+	ROM_LOAD64_WORD( "va-3m.5a", 0x000006, 0x80000, BAD_DUMP CRC(44dfe706) SHA1(a013a434df3161a91aafbb35dc4e20dfb3f177f4) )
 	ROM_RELOAD(                  0x400006, 0x80000)
 
 	// a 27c512 in some way related to gfx  NO DUMP
