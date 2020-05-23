@@ -7436,6 +7436,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="spidermn">
+		<description>The Amazing Spider-Man</description>
+		<year>1990</year>
+		<publisher>Paragon Software</publisher>
+		<info name="developer" value="Oxford Digital" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Amazing Spider-Man [Paragon Software] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="ebc34334" sha1="b929a4e2bc3b4178e245ba77bc4ca95bbb1011dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="The Amazing Spider-Man [Paragon Software] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="a259af07" sha1="9f2a6b71982cd8d0bc8da1e64290bcac3032c3c1"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="aaow">
 		<description>The Ancient Art of War</description>
 		<year>1984</year>
