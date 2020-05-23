@@ -4740,7 +4740,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	IWM(config, m_iwm, &apple2_fdc_interface);
+	LEGACY_IWM(config, m_iwm, &apple2_fdc_interface);
 
 	FLOPPY_APPLE(config, FLOPPY_0, &apple2gs_floppy525_floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &apple2gs_floppy525_floppy_interface, 15, 16);

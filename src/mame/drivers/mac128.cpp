@@ -997,7 +997,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
-	IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
+	LEGACY_IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
 	SCC85C30(config, m_scc, C7M);

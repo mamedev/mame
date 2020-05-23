@@ -920,9 +920,9 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, bool super_wo
 		RTC3430042(config, m_rtc, XTAL(32'768));
 
 	if (super_woz)
-		SWIM(config, m_fdc, &mac_iwm_interface);
+		LEGACY_SWIM(config, m_fdc, &mac_iwm_interface);
 	else
-		IWM(config, m_fdc, &mac_iwm_interface);
+		LEGACY_IWM(config, m_fdc, &mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
 	SCC8530(config, m_scc, C7M);
@@ -1314,7 +1314,15 @@ void mac_state::maclc2(machine_config &config, bool egret)
 
 void mac_state::maccclas(machine_config &config)
 {
-	maclc2(config, false);
+	maclc(config, false, false, asc_device::asc_type::VASP);
+
+	M68030(config, m_maincpu, C15M);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc_map);
+	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("6M,8M,10M");
+
 	add_cuda(config, CUDA_341S0788); // should be 0417, but that version won't sync up properly with the '030 right now
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
 }

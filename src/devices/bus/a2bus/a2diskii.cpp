@@ -69,14 +69,14 @@ ROM_END
 
 void a2bus_floppy_device::device_add_mconfig(machine_config &config)
 {
-	APPLEFDC(config, m_fdc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_fdc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 }
 
 void a2bus_iwmflop_device::device_add_mconfig(machine_config &config)
 {
-	IWM(config, m_fdc, &fdc_interface);
+	LEGACY_IWM(config, m_fdc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 }

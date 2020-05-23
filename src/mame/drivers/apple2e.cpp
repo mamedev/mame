@@ -4546,7 +4546,7 @@ void apple2e_state::apple2cp(machine_config &config)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	IWM(config, m_iicpiwm, &a2cp_interface);
+	LEGACY_IWM(config, m_iicpiwm, &a2cp_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
@@ -4592,7 +4592,7 @@ void apple2e_state::laser128(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	APPLEFDC(config, m_laserudc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 
@@ -4616,7 +4616,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
-	APPLEFDC(config, m_laserudc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 

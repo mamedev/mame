@@ -30,8 +30,8 @@
 #define APPLEFDC_PH2    0x04
 #define APPLEFDC_PH3    0x08
 
-DECLARE_DEVICE_TYPE(APPLEFDC, applefdc_device)
-DECLARE_DEVICE_TYPE(IWM, iwm_device)
+DECLARE_DEVICE_TYPE(LEGACY_APPLEFDC, applefdc_device)
+DECLARE_DEVICE_TYPE(LEGACY_IWM, iwm_device)
 
 
 
