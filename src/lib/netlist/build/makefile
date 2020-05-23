@@ -287,13 +287,14 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -finline-limit=100 -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
+		-mllvm -inline-threshold=2000 \
 		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
 		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
@@ -311,7 +312,7 @@ tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
 #
 # Mostly done: -Wno-weak-vtables -Wno-cast-align
-# FIXME:  -Wno-weak-vtables -Wno-exit-time-destructors
+# FIXME:  -Wno-weak-vtables -Wno-weak-template-vtables -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
 # -Wweak-template-vtables

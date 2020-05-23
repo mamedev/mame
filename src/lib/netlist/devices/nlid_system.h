@@ -9,7 +9,7 @@
 
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 #include "netlist/plib/putil.h"
 #include "netlist/plib/prandom.h"
 

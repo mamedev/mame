@@ -52,7 +52,7 @@ namespace netlist
 		}
 		NETLIB_HANDLERI(enq)
 		{
-			const auto last = m_enq;
+			const decltype(m_enq)::value_type last = m_enq;
 			m_enq = m_CE1Q() || m_CE2Q() || m_CE3Q();
 			if (!last && m_enq)
 			{
@@ -127,7 +127,7 @@ namespace netlist
 	{
 		if (!m_enq)
 		{
-			const auto adr(m_addr);
+			const decltype(m_addr)::value_type adr(m_addr);
 			if (!m_WEQ())
 			{
 				m_ram[adr >> 6] = (m_ram[adr >> 6]

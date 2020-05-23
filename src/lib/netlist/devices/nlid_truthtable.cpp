@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 
 #include "nlid_truthtable.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 #include "plib/palloc.h"
 #include "plib/plists.h"
 

@@ -59,16 +59,18 @@ namespace plib {
 					(*this)[i].~C();
 		}
 
-		size_t size() const noexcept { return N; }
+		constexpr size_t size() const noexcept { return N; }
+
+		constexpr bool empty() const noexcept { return size() == 0; }
 
 		reference operator[](size_type index) noexcept
 		{
-			return *reinterpret_cast<pointer>(&m_buf[index]);
+			return reinterpret_cast<reference>(m_buf[index]);
 		}
 
-		const_reference operator[](size_type index) const noexcept
+		constexpr const_reference operator[](size_type index) const noexcept
 		{
-			return *reinterpret_cast<const_pointer>(&m_buf[index]);
+			return reinterpret_cast<const_reference>(m_buf[index]);
 		}
 
 		template<typename... Args>
@@ -200,7 +202,7 @@ namespace plib {
 			}
 		}
 
-		LC *front() const noexcept { return m_head; }
+		constexpr LC *front() const noexcept { return m_head; }
 		constexpr bool empty() const noexcept { return (m_head == nullptr); }
 		void clear() noexcept
 		{
@@ -247,36 +249,48 @@ namespace plib {
 	// timed queue
 	// ----------------------------------------------------------------------------------------
 
-	template <class Element, class Time>
+
+	// Note: Don't even try the following approach for element:
+	//
+	//    template <typename Time, typename Element>
+	//    struct pqentry_t : public std::pair<Time, Element>
+	//
+	// This degrades performance significantly.
+
+	template <typename Time, typename Element>
 	struct pqentry_t final
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
-		constexpr pqentry_t(const Time t, const Element o) noexcept : m_exec_time(t), m_object(o) { }
+		constexpr pqentry_t(Time t, Element o) noexcept : m_exec_time(t), m_object(o) { }
 
-		inline bool operator ==(const pqentry_t &rhs) const noexcept
+		PCOPYASSIGNMOVE(pqentry_t, default)
+
+		~pqentry_t() = default;
+
+		constexpr bool operator ==(const pqentry_t &rhs) const noexcept
 		{
 			return m_object == rhs.m_object;
 		}
 
-		inline bool operator ==(const Element &rhs) const noexcept
+		constexpr bool operator ==(const Element &rhs) const noexcept
 		{
 			return m_object == rhs;
 		}
 
-		inline bool operator <=(const pqentry_t &rhs) const noexcept
+		constexpr bool operator <=(const pqentry_t &rhs) const noexcept
 		{
 			return (m_exec_time <= rhs.m_exec_time);
 		}
 
-		inline bool operator <(const pqentry_t &rhs) const noexcept
+		constexpr bool operator <(const pqentry_t &rhs) const noexcept
 		{
 			return (m_exec_time < rhs.m_exec_time);
 		}
 
-		inline static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
+		static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
 
-		Time exec_time() const noexcept { return m_exec_time; }
-		Element object() const noexcept { return m_object; }
+		constexpr Time exec_time() const noexcept { return m_exec_time; }
+		constexpr Element object() const noexcept { return m_object; }
 	private:
 		Time m_exec_time;
 		Element m_object;
@@ -299,6 +313,23 @@ namespace plib {
 
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
+
+	    template<bool KEEPSTAT, typename... Args>
+		void emplace(Args&&... args) noexcept
+		{
+			// Lock
+			lock_guard_type lck(m_lock);
+			T * i(m_end++);
+			*i = T(std::forward<Args>(args)...);
+			for (; *(i-1) < *i; --i)
+			{
+				std::swap(*(i-1), *(i));
+				if (KEEPSTAT)
+					m_prof_sortmove.inc();
+			}
+			if (KEEPSTAT)
+				m_prof_call.inc();
+		}
 
 		template<bool KEEPSTAT>
 		void push(T && e) noexcept
@@ -398,13 +429,13 @@ namespace plib {
 		std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
 		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
-		using mutex_type = pspin_mutex<TS>;
-		using lock_guard_type = std::lock_guard<mutex_type>;
+		using mutex_type       = pspin_mutex<TS>;
+		using lock_guard_type  = std::lock_guard<mutex_type>;
 
-		mutex_type              m_lock;
+		mutex_type               m_lock;
 		PALIGNAS_CACHELINE()
-		T *                     m_end;
-		aligned_vector<T> m_list;
+		T *                      m_end;
+		aligned_vector<T>        m_list;
 
 	public:
 		// profiling

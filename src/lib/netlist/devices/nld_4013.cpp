@@ -1,14 +1,12 @@
-
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_4013.c
+ * nld_4013.cpp
  *
  */
 
-#include "nld_4013.h"
 #include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 
 namespace netlist
 {

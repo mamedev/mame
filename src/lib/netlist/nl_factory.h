@@ -39,7 +39,6 @@
 namespace netlist {
 	class core_device_t;
 	class nlparse_t;
-	class setup_t;
 	class netlist_state_t;
 
 namespace factory {

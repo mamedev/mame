@@ -85,6 +85,7 @@ namespace netlist
 		, m_R2(*this, "R2")
 		, m_a(*this, "_m_a", 0)
 		, m_bcd(*this, "_m_b", 0)
+		, m_r(*this, "_m_r", 0)
 		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(7493, updA))
 		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(7493, updB))
 		, m_QA(*this, "QA")
@@ -103,7 +104,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			if (!(m_R1() & m_R2()))
+			if (!(m_R1() && m_R2()))
 			{
 				m_CLKA.activate_hl();
 				m_CLKB.activate_hl();
@@ -127,16 +128,23 @@ namespace netlist
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
+#if 1
 			m_QB[2].push((cnt >> 2) & 1, out_delay3);
 			m_QB[1].push((cnt >> 1) & 1, out_delay2);
 			m_QB[0].push(cnt & 1, out_delay);
+#else
+			m_QB[0].push(cnt & 1, out_delay);
+			m_QB[1].push((cnt >> 1) & 1, out_delay2);
+			m_QB[2].push((cnt >> 2) & 1, out_delay3);
+#endif
 		}
 
 		logic_input_t m_R1;
 		logic_input_t m_R2;
 
 		state_var_sig m_a;
-		state_var_u8  m_bcd;
+		state_var_sig m_bcd;
+		state_var_sig m_r;
 
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;

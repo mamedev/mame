@@ -145,7 +145,6 @@ namespace netlist
 	} // namespace detail
 
 #if (PHAS_INT128)
-	//using netlist_time = plib::ptime<INT128, NETLIST_INTERNAL_RES>;
 	using netlist_time = plib::ptime<std::int64_t, NETLIST_INTERNAL_RES>;
 	using netlist_time_ext = plib::ptime<INT128, NETLIST_INTERNAL_RES>;
 #else

@@ -39,7 +39,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl, const pstring &name)
-		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(nlconst::max_queue_size())
+		: timed_queue<plib::pqentry_t<netlist_time_ext, net_t *>, false>(nlconst::max_queue_size())
 		, netlist_object_t(nl, name)
 		, m_qsize(0)
 		, m_times(nlconst::max_queue_size())
@@ -718,6 +718,19 @@ namespace netlist
 				solver()->solve_now();
 	}
 
+	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
+	{
+		// NOLINTNEXTLINE(readability-implicit-bool-conversion)
+		if (!(gt && go && Idr) && (gt || go || Idr))
+		{
+			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
+		}
+
+		m_gt = gt;
+		m_go = go;
+		m_Idr = Idr;
+	}
+
 	// ----------------------------------------------------------------------------------------
 	// net_input_t
 	// ----------------------------------------------------------------------------------------
@@ -816,6 +829,11 @@ namespace netlist
 		device.state().setup().register_param_t(*this);
 	}
 
+	param_t::~param_t() noexcept
+	{
+		// placed here to avoid weak vtable warnings
+	}
+
 	param_t::param_type_t param_t::param_type() const noexcept(false)
 	{
 		if (dynamic_cast<const param_str_t *>(this) != nullptr)
@@ -832,6 +850,7 @@ namespace netlist
 		state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
 		throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
 	}
+
 
 
 	pstring param_t::get_initial(const core_device_t *dev, bool *found) const
@@ -944,5 +963,50 @@ namespace netlist
 
 	nlparse_t &netlist_state_t::parser() { return m_setup->parser(); }
 	const nlparse_t &netlist_state_t::parser() const { return m_setup->parser(); }
+
+	template struct state_var<std::uint8_t>;
+	template struct state_var<std::uint16_t>;
+	template struct state_var<std::uint32_t>;
+	template struct state_var<std::uint64_t>;
+	template struct state_var<std::int8_t>;
+	template struct state_var<std::int16_t>;
+	template struct state_var<std::int32_t>;
+	template struct state_var<std::int64_t>;
+	template struct state_var<bool>;
+
+	template class param_num_t<std::uint8_t>;
+	template class param_num_t<std::uint16_t>;
+	template class param_num_t<std::uint32_t>;
+	template class param_num_t<std::uint64_t>;
+	template class param_num_t<std::int8_t>;
+	template class param_num_t<std::int16_t>;
+	template class param_num_t<std::int32_t>;
+	template class param_num_t<std::int64_t>;
+	template class param_num_t<long double>;
+	template class param_num_t<double>;
+	template class param_num_t<float>;
+	template class param_num_t<bool>;
+
+	template class param_model_t::value_base_t<float>;
+	template class param_model_t::value_base_t<double>;
+	template class param_model_t::value_base_t<long double>;
+
+	template class object_array_t<logic_input_t, 1>;
+	template class object_array_t<logic_input_t, 2>;
+	template class object_array_t<logic_input_t, 3>;
+	template class object_array_t<logic_input_t, 4>;
+	template class object_array_t<logic_input_t, 5>;
+	template class object_array_t<logic_input_t, 6>;
+	template class object_array_t<logic_input_t, 7>;
+	template class object_array_t<logic_input_t, 8>;
+
+	template class object_array_t<logic_output_t, 1>;
+	template class object_array_t<logic_output_t, 2>;
+	template class object_array_t<logic_output_t, 3>;
+	template class object_array_t<logic_output_t, 4>;
+	template class object_array_t<logic_output_t, 5>;
+	template class object_array_t<logic_output_t, 6>;
+	template class object_array_t<logic_output_t, 7>;
+	template class object_array_t<logic_output_t, 8>;
 
 } // namespace netlist

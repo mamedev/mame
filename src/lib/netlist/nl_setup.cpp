@@ -73,6 +73,8 @@ namespace netlist
 		auto *f = m_factory.factory_by_name(classname);
 
 		// make sure we parse macro library entries
+		// FIXME: this could be done here if e.g. f
+		//        would have an indication that this is macro element.
 		f->macro_actions(*this, name);
 		pstring key = build_fqn(name);
 		if (device_exists(key))
