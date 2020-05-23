@@ -11,6 +11,7 @@
 #include "pstring.h"
 #include "ptypes.h"
 #include "putil.h"
+#include "penum.h"
 
 #include <limits>
 #include <locale>
@@ -26,7 +27,7 @@
 
 namespace plib {
 
-	P_ENUM(plog_level,
+	PENUM(plog_level,
 		DEBUG,
 		VERBOSE,
 		INFO,

@@ -245,8 +245,10 @@ namespace netlist
 		ENTRY_EX(sizeof(param_logic_t))
 		ENTRY_EX(sizeof(state_var<int>))
 		ENTRY_EX(sizeof(pstring))
-
+		ENTRY_EX(sizeof(core_device_t::stats_t))
+		ENTRY_EX(sizeof(plib::plog_level))
 	#undef ENTRY
+	#undef ENTRY_EX
 	}
 
 	pstring netlist_state_t::version()

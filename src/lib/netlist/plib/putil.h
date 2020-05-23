@@ -319,40 +319,6 @@ namespace plib
 		return result;
 	}
 
-	//============================================================
-	//  penum - strongly typed enumeration
-	//============================================================
-
-	struct penum_base
-	{
-	protected:
-		static int from_string_int(const pstring &str, const pstring &x);
-		static std::string nthstr(int n, const pstring &str);
-	};
-
 } // namespace plib
-
-#define P_ENUM(ename, ...) \
-	struct ename : public plib::penum_base { \
-		enum E { __VA_ARGS__ }; \
-		ename (E v) : m_v(v) { } \
-		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
-		bool set_from_string (const pstring &s) { \
-			int f = from_string_int(strings(), s); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } \
-			return false;\
-		} \
-		operator E() const noexcept {return m_v;} \
-		bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \
-		bool operator==(const E &rhs) const noexcept {return m_v == rhs;} \
-		std::string name() const { \
-			return nthstr(static_cast<int>(m_v), strings()); \
-		} \
-		private: E m_v; \
-		static pstring strings() {\
-			static const pstring lstrings = # __VA_ARGS__; \
-			return lstrings; \
-		} \
-	};
 
 #endif // PUTIL_H_

@@ -52,6 +52,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.h",
+		MAME_DIR .. "src/lib/netlist/plib/penum.h",
 		MAME_DIR .. "src/lib/netlist/plib/pexception.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pexception.h",
 		MAME_DIR .. "src/lib/netlist/plib/pfunction.cpp",

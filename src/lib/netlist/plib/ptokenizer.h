@@ -13,6 +13,7 @@
 #include "pstring.h"
 
 #include "putil.h" // psource_t
+#include "penum.h"
 
 #include <unordered_map>
 #include <vector>
@@ -39,7 +40,7 @@ namespace plib {
 
 		virtual ~ptokenizer() = default;
 
-		P_ENUM(token_type,
+		PENUM(token_type,
 			IDENTIFIER,
 			NUMBER,
 			TOKEN,

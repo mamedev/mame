@@ -2,6 +2,8 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
+#include "plib/putil.h"
+#include "plib/penum.h"
 #include "analog/nld_twoterm.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -10,7 +12,7 @@
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
-#include "plib/putil.h"
+
 #include "solver/nld_solver.h"
 
 namespace netlist
@@ -1275,7 +1277,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 
 // FIXME: all this belongs elsewhere
 
-P_ENUM(family_type,
+PENUM(family_type,
 	CUSTOM,
 	TTL,
 	MOS,
