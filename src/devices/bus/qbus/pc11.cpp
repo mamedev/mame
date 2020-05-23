@@ -58,6 +58,7 @@ pc11_device::pc11_device(const machine_config &mconfig, const char *tag, device_
 	, m_rxvec(070)
 	, m_txvec(074)
 {
+	(void)pc11_regnames;
 }
 
 
