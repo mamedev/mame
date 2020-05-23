@@ -2286,6 +2286,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2applicard.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2hsscsi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2hsscsi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/a2iwm.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/a2iwm.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2ultraterm.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2ultraterm.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2pic.cpp",

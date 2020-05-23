@@ -4352,3 +4352,58 @@ if (MACHINES["CXD1185"]~=null) then
 		MAME_DIR .. "src/devices/machine/cxd1185.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/applefdc.h,MACHINES["APPLE_FDINTF"] = true
+---------------------------------------------------
+if (MACHINES["APPLE_FDINTF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/applefdintf.cpp",
+		MAME_DIR .. "src/devices/machine/applefdintf.h",
+	}
+end
+
+---------------------------------------------------
+ --
+ --@src/devices/machine/iwm.h,MACHINES["IWM"] = true
+ ---------------------------------------------------
+ if (MACHINES["IWM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/iwm.cpp",
+		MAME_DIR .. "src/devices/machine/iwm.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim1.h,MACHINES["SWIM1"] = true
+---------------------------------------------------
+if (MACHINES["SWIM1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim1.cpp",
+		MAME_DIR .. "src/devices/machine/swim1.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim2.h,MACHINES["SWIM2"] = true
+---------------------------------------------------
+if (MACHINES["SWIM2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim2.cpp",
+		MAME_DIR .. "src/devices/machine/swim2.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swim3.h,MACHINES["SWIM3"] = true
+---------------------------------------------------
+if (MACHINES["SWIM3"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swim3.cpp",
+		MAME_DIR .. "src/devices/machine/swim3.h",
+	}
+end

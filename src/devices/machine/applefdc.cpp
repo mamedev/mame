@@ -578,9 +578,9 @@ applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag,
     IWM - Used on early Macs
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(LEGACY_IWM, iwm_device, "iwml", "Apple IWM (Integrated Woz Machine) (legacy)")
+DEFINE_DEVICE_TYPE(LEGACY_IWM, legacy_iwm_device, "iwml", "Apple IWM (Integrated Woz Machine) (legacy)")
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+legacy_iwm_device::legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: applefdc_base_device(APPLEFDC_IWM, mconfig, LEGACY_IWM, tag, owner, clock)
 {
 }

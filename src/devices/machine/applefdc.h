@@ -31,7 +31,7 @@
 #define APPLEFDC_PH3    0x08
 
 DECLARE_DEVICE_TYPE(LEGACY_APPLEFDC, applefdc_device)
-DECLARE_DEVICE_TYPE(LEGACY_IWM, iwm_device)
+DECLARE_DEVICE_TYPE(LEGACY_IWM, legacy_iwm_device)
 
 
 
@@ -135,16 +135,16 @@ public:
     IWM - Used on early Macs
 ***************************************************************************/
 
-class iwm_device : public applefdc_base_device
+class legacy_iwm_device : public applefdc_base_device
 {
 public:
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
-		: iwm_device(mconfig, tag, owner, (uint32_t)0)
+	legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: legacy_iwm_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_config(intrf);
 	}
 
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type imperfect_features() { return feature::DISK; }
 };
