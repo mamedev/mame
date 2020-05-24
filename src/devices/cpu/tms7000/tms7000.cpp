@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "Texas Instruments TMS
 // internal memory maps
 void tms7000_device::tms7000_mem(address_map &map)
 {
-	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
+	map(0x0000, 0x007f).ram().share("rf"); // 128 bytes internal RAM
 	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
 	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
 	map(0x0104, 0x0105).nopw(); // no port A write or ddr
@@ -62,7 +62,7 @@ void tms7000_device::tms7000_mem(address_map &map)
 
 void tms7000_device::tms7001_mem(address_map &map)
 {
-	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
+	map(0x0000, 0x007f).ram().share("rf"); // 128 bytes internal RAM
 	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
 	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
 	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
@@ -70,7 +70,7 @@ void tms7000_device::tms7001_mem(address_map &map)
 
 void tms7000_device::tms7002_mem(address_map &map)
 {
-	map(0x0000, 0x00ff).ram(); // 256 bytes internal RAM
+	map(0x0000, 0x00ff).ram().share("rf"); // 256 bytes internal RAM
 	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
 	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
 }
@@ -250,12 +250,16 @@ void tms7000_device::device_start()
 	save_item(NAME(m_timer_capture_latch));
 
 	// register for debugger
-	state_add(TMS7000_PC, "PC", m_pc).formatstr("%02X");
-	state_add(TMS7000_SP, "S", m_sp).formatstr("%02X");
+	state_add(TMS7000_PC, "PC", m_pc).formatstr("%04X");
+	state_add(TMS7000_SP, "SP", m_sp).formatstr("%02X");
 	state_add(TMS7000_ST, "ST", m_sr).formatstr("%02X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%02X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
+	uint8_t *rf = static_cast<uint8_t *>(memshare("rf")->ptr());
+	state_add(TMS7000_A, "A", rf[0]).formatstr("%02X");
+	state_add(TMS7000_B, "B", rf[1]).formatstr("%02X");
+
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENSP, "GENSP", m_sp).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
