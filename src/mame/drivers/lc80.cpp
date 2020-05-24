@@ -36,7 +36,7 @@
     - HALT led
     - KSD11 switch
     - banking for ROM 4-5
-    - Schachcomputer SC-80
+    - lc80e
     - CTC clock inputs
 
 */
