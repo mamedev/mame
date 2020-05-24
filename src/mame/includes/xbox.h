@@ -164,6 +164,7 @@ private:
 	void grab_texture_command(int ref, const std::vector<std::string> &params);
 	void grab_vprog_command(int ref, const std::vector<std::string> &params);
 	void vprogdis_command(int ref, const std::vector<std::string> &params);
+	void vdeclaration_command(int ref, const std::vector<std::string> &params);
 	void help_command(int ref, const std::vector<std::string> &params);
 	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
 	int find_bios_index();

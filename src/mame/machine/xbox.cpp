@@ -21,6 +21,18 @@ const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
 	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
+const struct {
+	const char *name;
+	const int value;
+} vertex_format_names[] = {
+	{"NONE", 0x02}, {"NORMSHORT1", 0x11}, {"FLOAT1", 0x12}, {"PBYTE1", 0x14},
+	{"SHORT1", 0x15}, {"NORMPACKED3", 0x16}, {"NORMSHORT2", 0x21},
+	{"FLOAT2", 0x22}, {"PBYTE2", 0x24}, {"SHORT2", 0x25}, {"NORMSHORT3", 0x31},
+	{"FLOAT3", 0x32}, {"PBYTE3", 0x34}, {"SHORT3", 0x35}, {"D3DCOLOR", 0x40},
+	{"FLOAT4", 0x42}, {"NORMSHORT4", 0x41}, {"PBYTE4", 0x44}, {"SHORT4", 0x45},
+	{"FLOAT2H", 0x72}, { nullptr, 0}
+};
+
 int xbox_base_state::find_bios_index()
 {
 	u8 sb = system_bios();
@@ -450,6 +462,87 @@ void xbox_base_state::vprogdis_command(int ref, const std::vector<std::string> &
 	}
 }
 
+void xbox_base_state::vdeclaration_command(int ref, const std::vector<std::string> &params)
+{
+	address_space &space = m_maincpu->space();
+
+	if (params.size() < 1)
+		return;
+
+	uint64_t addr;
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+		return;
+
+	debugger_console &con = machine().debugger().console();
+	for (int n = 128; n > 0; n--)
+	{
+		offs_t address = (offs_t)addr;
+		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+			return;
+		uint32_t w = space.read_dword_unaligned(address);
+
+		if (w == 0xffffffff)
+		{
+			con.printf("D3DVSD_END()\n");
+			break;
+		}
+		switch ((w >> 29) & 7)
+		{
+		case 0:
+			con.printf("D3DVSD_NOP()\n");
+			break;
+		case 1:
+			if (w & (1 << 28))
+				con.printf("D3DVSD_STREAM_TESS()\n");
+			else
+				con.printf("D3DVSD_STREAM(%d)\n", w & 0x1fffffff);
+			break;
+		case 2:
+			if (w & 0x18000000)
+				con.printf("D3DVSD_SKIPBYTES(%d)\n", (w >> 16) & 0xfff);
+			else if (w & 0x10000000)
+				con.printf("D3DVSD_SKIP(%d)\n", (w >> 16) & 0xfff);
+			else
+			{
+				const char *t = "???";
+
+				for (int s = 0; vertex_format_names[s].value != 0; s++)
+				{
+					if (vertex_format_names[s].value == ((w >> 16) & 0xfff))
+					{
+						t = vertex_format_names[s].name;
+						break;
+					}
+				}
+				con.printf("D3DVSD_REG(%d, D3DVSDT_%s)\n", w & 0xffff, t);
+			}
+			break;
+		case 3:
+			if (w & 0x10000000)
+				con.printf("D3DVSD_TESSUV(%d)\n", w & 0xf);
+			else
+				con.printf("D3DVSD_TESSNORMAL(%d, %d)\n", (w >> 20) & 0xf, w & 0xf);
+			break;
+		case 4:
+			con.printf("D3DVSD_CONST(%d, %d)\n", (w & 0xff) - 96, (w >> 25) & 0xf);
+			for (int n = 0; n < ((w >> 23) & 0x3c); n++)
+			{
+				addr += 4;
+				address = (offs_t)addr;
+				if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+					return;
+				w = space.read_dword_unaligned(address);
+				con.printf("%08x\n", w);
+			}
+			break;
+		default:
+			con.printf("??? %08x\n", w);
+			n = 0;
+		}
+		addr += 4;
+	}
+}
+
 void xbox_base_state::help_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
@@ -469,6 +562,7 @@ void xbox_base_state::help_command(int ref, const std::vector<std::string> &para
 	con.printf("  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	con.printf("  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
 	con.printf("  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
+	con.printf("  xbox vdeclaration,<address> -- decode vertex program declaration at <address>\n");
 	con.printf("  xbox help -- this list\n");
 }
 
@@ -504,6 +598,8 @@ void xbox_base_state::xbox_debug_commands(int ref, const std::vector<std::string
 		grab_vprog_command(ref, params);
 	else if (params[0] == "vprogdis")
 		vprogdis_command(ref, params);
+	else if (params[0] == "vdeclaration")
+		vdeclaration_command(ref, params);
 	else
 		help_command(ref, params);
 }
