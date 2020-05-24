@@ -27,6 +27,9 @@ PCB: GAME CPU MOD.02
 1x green LED
 1x red LED
 
+NOTE: the PCB from which Version 16 was dumped has the following components removed (cost cutting measure?): YM3256, 1 LM358N, Y3014B, 16 TTL74xx
+and some resistors and caps. Strangely, the sound ROMs are unchanged.
+
 In the same period Electronic Projects also released games on different platforms (see jackpool.cpp and spool99.cpp)
 */
 
