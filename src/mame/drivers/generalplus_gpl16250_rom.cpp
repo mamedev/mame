@@ -440,12 +440,20 @@ void tkmag220_game_state::machine_reset()
 
 	m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_pal_sprites_hack(0x000);
+	m_maincpu->set_pal_back_hack(0x000);
+	m_maincpu->set_alt_tile_addressing_hack(1);
+
 }
 
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// This is a port of the 'Family Sport' games to GPL16250 type hardware, but it doesn't seem to use any unSP 2.0 instructions.
+// The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
+// do "go A1595" then "r1 = 0" in debugger to show menu, controls not yet working (which might be why it drops to test mode by default) will need banking hookup later.
+// This could be useful for figuring out how the sound registers have been remapped when compared to spg2xx
 CONS(200?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'

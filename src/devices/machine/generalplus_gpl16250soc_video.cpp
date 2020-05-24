@@ -131,6 +131,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_rowzoom(*this, "^rowzoom"),
 	m_pal_displaybank_high(0),
 	m_pal_sprites(0x500),
+	m_pal_back(0x100),
 	m_alt_tile_addressing(0)
 {
 }
@@ -747,7 +748,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 
 			//palette_offset |= 0x0900;
-			palette_offset |= 0x0100;
+			palette_offset |= m_pal_back;
 
 			const uint8_t bpp = tileattr & 0x0003;
 
@@ -1414,8 +1415,10 @@ READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 {
-	// I don't think bit 1 is a bank select, it might be a 'mode select' for how the palette operates.
-	// neither lazertag or tkmag220 set it, and they only use 2 banks (0 and 8)
+	// I don't think bit 0 (0x01) is a bank select, it might be a 'mode select' for how the palette operates.
+	// neither lazertag or tkmag220 set it
+	// lazertag uses 2 banks (0 and 8)
+	// tkmag220 only uses 1 bank (0)
 
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
