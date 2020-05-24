@@ -52,7 +52,6 @@ Super Constellation:
 - 2*32KB ROM custom label
 
 TODO:
-- ssensor4 nvram doesn't work, at boot it always starts a new game
 - is Dynamic S a program update of ssensor4 or identical?
 - verify IRQ active time for ssensor4
 
@@ -91,6 +90,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+
 	// machine configs
 	void nconst(machine_config &config);
 	void nconst36(machine_config &config);
@@ -103,6 +104,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { m_power = true; }
 
 private:
 	// devices/pointers
@@ -129,19 +131,26 @@ private:
 	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_READ8_MEMBER(input2_r);
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	void power_off();
+	bool m_power = false;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void const_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
+	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
+}
+
+void const_state::power_off()
+{
+	// NMI at power-off (clears peripherals, and ssensor4 prepares nvram for next power-on)
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_power = false;
 }
 
 void const_state::init_const()
@@ -298,6 +307,9 @@ static INPUT_PORTS_START( ssensor4 )
 
 	PORT_MODIFY("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
+
+	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -320,6 +332,9 @@ static INPUT_PORTS_START( sconst )
 	PORT_MODIFY("IN.5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Form Size")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
+
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
 INPUT_PORTS_END
 
 
