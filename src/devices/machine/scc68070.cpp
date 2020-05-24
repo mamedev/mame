@@ -32,9 +32,10 @@ TODO:
 #define LOG_MMU         (1 << 5)
 #define LOG_IRQS        (1 << 6)
 #define LOG_UNKNOWN     (1 << 7)
+#define LOG_MORE_UART	(1 << 8)
 #define LOG_ALL         (LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
 
-#define VERBOSE         (LOG_UART)
+#define VERBOSE         (0)
 
 #include "logmacro.h"
 
@@ -84,6 +85,7 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 	, m_iack5_callback(*this)
 	, m_iack7_callback(*this)
 	, m_uart_tx_callback(*this)
+	, m_uart_rtsn_callback(*this)
 	, m_ipl(0)
 	, m_in2_line(CLEAR_LINE)
 	, m_in4_line(CLEAR_LINE)
@@ -110,6 +112,7 @@ void scc68070_device::device_resolve_objects()
 	m_iack5_callback.resolve_safe(autovector(5));
 	m_iack7_callback.resolve_safe(autovector(7));
 	m_uart_tx_callback.resolve_safe();
+	m_uart_rtsn_callback.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -148,8 +151,13 @@ void scc68070_device::device_start()
 	save_item(NAME(m_uart.status_register));
 	save_item(NAME(m_uart.clock_select));
 	save_item(NAME(m_uart.command_register));
-	save_item(NAME(m_uart.transmit_holding_register));
 	save_item(NAME(m_uart.receive_holding_register));
+	save_item(NAME(m_uart.receive_pointer));
+	save_item(NAME(m_uart.receive_buffer));
+	save_item(NAME(m_uart.transmit_holding_register));
+	save_item(NAME(m_uart.transmit_pointer));
+	save_item(NAME(m_uart.transmit_buffer));
+	save_item(NAME(m_uart.transmit_ctsn));
 
 	save_item(NAME(m_timers.timer_status_register));
 	save_item(NAME(m_timers.timer_control_register));
@@ -175,13 +183,13 @@ void scc68070_device::device_start()
 	save_item(STRUCT_MEMBER(m_mmu.desc, segment));
 	save_item(STRUCT_MEMBER(m_mmu.desc, base));
 
-	m_timers.timer0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::timer0_callback), this));
+	m_timers.timer0_timer = timer_alloc(TIMER_TMR0);
 	m_timers.timer0_timer->adjust(attotime::never);
 
-	m_uart.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::rx_callback), this));
+	m_uart.rx_timer = timer_alloc(TIMER_UART_RX);
 	m_uart.rx_timer->adjust(attotime::never);
 
-	m_uart.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::tx_callback), this));
+	m_uart.tx_timer = timer_alloc(TIMER_UART_TX);
 	m_uart.tx_timer->adjust(attotime::never);
 }
 
@@ -216,6 +224,7 @@ void scc68070_device::device_reset()
 	m_uart.receive_holding_register = 0;
 	m_uart.receive_pointer = -1;
 	m_uart.transmit_pointer = -1;
+	m_uart.transmit_ctsn = true;
 
 	m_timers.timer_status_register = 0;
 	m_timers.timer_control_register = 0;
@@ -248,6 +257,24 @@ void scc68070_device::device_reset()
 	}
 
 	update_ipl();
+
+	m_uart.rx_timer->adjust(attotime::never);
+	m_uart.tx_timer->adjust(attotime::never);
+	m_timers.timer0_timer->adjust(attotime::never);
+}
+
+//-------------------------------------------------
+//  device_timer - device-specific timer callback
+//-------------------------------------------------
+
+void scc68070_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_TMR0)
+		timer0_callback();
+	else if (id == TIMER_UART_RX)
+		rx_callback();
+	else if (id == TIMER_UART_TX)
+		tx_callback();
 }
 
 void scc68070_device::m68k_reset_peripherals()
@@ -274,6 +301,10 @@ void scc68070_device::m68k_reset_peripherals()
 
 	m_timers.timer_status_register = 0;
 	m_timers.timer_control_register = 0;
+
+	m_uart.rx_timer->adjust(attotime::never);
+	m_uart.tx_timer->adjust(attotime::never);
+	m_timers.timer0_timer->adjust(attotime::never);
 
 	update_ipl();
 }
@@ -438,7 +469,7 @@ void scc68070_device::set_timer_callback(int channel)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( scc68070_device::timer0_callback )
+void scc68070_device::timer0_callback()
 {
 	m_timers.timer0 = m_timers.reload_register;
 	m_timers.timer_status_register |= TSR_OV0;
@@ -451,60 +482,25 @@ TIMER_CALLBACK_MEMBER( scc68070_device::timer0_callback )
 	set_timer_callback(0);
 }
 
-void scc68070_device::uart_rx_check()
+void scc68070_device::uart_ctsn(int state)
 {
-	if ((m_uart.command_register & 3) == 1)
-	{
-		uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
-		m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
-	}
-	else
-	{
-		m_uart.status_register &= ~USR_RXRDY;
-		m_uart.rx_timer->adjust(attotime::never);
-	}
-}
-
-void scc68070_device::uart_tx_check()
-{
-	if (((m_uart.command_register >> 2) & 3) == 1)
-	{
-		if (m_uart.transmit_pointer >= 0)
-		{
-			m_uart.status_register &= ~USR_TXRDY;
-		}
-		else
-		{
-			m_uart.status_register |= USR_TXRDY;
-		}
-
-		if (m_uart.tx_timer->remaining() == attotime::never)
-		{
-			uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
-			m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
-		}
-	}
-	else
-	{
-		m_uart.tx_timer->adjust(attotime::never);
-	}
+	m_uart.transmit_ctsn = state ? true : false;
 }
 
 void scc68070_device::uart_rx(uint8_t data)
 {
 	m_uart.receive_pointer++;
 	m_uart.receive_buffer[m_uart.receive_pointer] = data;
-	uart_rx_check();
 }
 
 void scc68070_device::uart_tx(uint8_t data)
 {
 	m_uart.transmit_pointer++;
 	m_uart.transmit_buffer[m_uart.transmit_pointer] = data;
-	uart_tx_check();
+	m_uart.status_register &= ~USR_TXEMT;
 }
 
-TIMER_CALLBACK_MEMBER( scc68070_device::rx_callback )
+void scc68070_device::rx_callback()
 {
 	if ((m_uart.command_register & 3) == 1)
 	{
@@ -527,8 +523,6 @@ TIMER_CALLBACK_MEMBER( scc68070_device::rx_callback )
 			update_ipl();
 
 			m_uart.status_register |= USR_RXRDY;
-			uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
-			m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 		else
 		{
@@ -539,43 +533,40 @@ TIMER_CALLBACK_MEMBER( scc68070_device::rx_callback )
 	{
 		m_uart.status_register &= ~USR_RXRDY;
 	}
-
-	uart_rx_check();
 }
 
-TIMER_CALLBACK_MEMBER( scc68070_device::tx_callback )
+void scc68070_device::tx_callback()
 {
 	if (((m_uart.command_register >> 2) & 3) == 1)
 	{
+		m_uart.status_register |= USR_TXRDY;
+
 		m_uart_tx_int = true;
 		update_ipl();
 
 		if (m_uart.transmit_pointer > -1)
 		{
+			if (m_uart.transmit_ctsn && BIT(m_uart.mode_register, 4))
+			{
+				return;
+			}
+
 			m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
 			m_uart_tx_callback(m_uart.transmit_holding_register);
 
-			LOGMASKED(LOG_UART, "tx_callback: Transmitting %02x\n", machine().describe_context(), m_uart.transmit_holding_register);
+			LOGMASKED(LOG_MORE_UART, "tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
 			for(int index = 0; index < m_uart.transmit_pointer; index++)
 			{
 				m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
 			}
 			m_uart.transmit_pointer--;
-
-			uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
-			m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
-		else
+
+		if (m_uart.transmit_pointer < 0)
 		{
-			m_uart.tx_timer->adjust(attotime::never);
+			m_uart.status_register |= USR_TXEMT;
 		}
 	}
-	else
-	{
-		m_uart.tx_timer->adjust(attotime::never);
-	}
-
-	uart_tx_check();
 }
 
 uint8_t scc68070_device::lir_r()
@@ -746,13 +737,13 @@ uint8_t scc68070_device::umr_r()
 {
 	// UART mode register: 80002011
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_UART, "%s: UART Mode Register Read: %02x\n", machine().describe_context(), m_uart.mode_register);
+		LOGMASKED(LOG_MORE_UART, "%s: UART Mode Register Read: %02x\n", machine().describe_context(), m_uart.mode_register);
 	return m_uart.mode_register | 0x20;
 }
 
 void scc68070_device::umr_w(uint8_t data)
 {
-	LOGMASKED(LOG_UART, "%s: UART Mode Register Write: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_MORE_UART, "%s: UART Mode Register Write: %02x\n", machine().describe_context(), data);
 	m_uart.mode_register = data;
 }
 
@@ -762,7 +753,7 @@ uint8_t scc68070_device::usr_r()
 	if (!machine().side_effects_disabled())
 	{
 		m_uart.status_register |= (1 << 1);
-		LOGMASKED(LOG_UART, "%s: UART Status Register Read: %02x\n", machine().describe_context(), m_uart.status_register);
+		LOGMASKED(LOG_MORE_UART, "%s: UART Status Register Read: %02x\n", machine().describe_context(), m_uart.status_register);
 	}
 	return m_uart.status_register | 0x08; // hack for magicard
 }
@@ -779,6 +770,13 @@ void scc68070_device::ucsr_w(uint8_t data)
 {
 	LOGMASKED(LOG_UART, "%s: UART Clock Select Write: %02x\n", machine().describe_context(), data);
 	m_uart.clock_select = data;
+
+	static const uint32_t s_baud_divisors[8] = { 65536, 32768, 16384, 4096, 2048, 1024, 512, 256 };
+
+	attotime rx_rate = attotime::from_ticks(s_baud_divisors[(data >> 4) & 7] * 10, 49152000);
+	attotime tx_rate = attotime::from_ticks(s_baud_divisors[data & 7] * 10, 49152000);
+	m_uart.rx_timer->adjust(rx_rate, 0, rx_rate);
+	m_uart.tx_timer->adjust(tx_rate, 0, tx_rate);
 }
 
 uint8_t scc68070_device::ucr_r()
@@ -791,10 +789,36 @@ uint8_t scc68070_device::ucr_r()
 
 void scc68070_device::ucr_w(uint8_t data)
 {
-	LOGMASKED(LOG_UART, "%s: UART Command Register Write: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_MORE_UART, "%s: UART Command Register Write: %02x\n", machine().describe_context(), data);
 	m_uart.command_register = data;
-	uart_rx_check();
-	uart_tx_check();
+	const uint8_t misc_command = (data & 0x70) >> 4;
+	switch (misc_command)
+	{
+	case 0x2: // Reset receiver
+		LOGMASKED(LOG_MORE_UART, "%s: Reset receiver\n", machine().describe_context());
+		m_uart.receive_pointer = -1;
+		m_uart.command_register &= 0xf0;
+		m_uart.receive_holding_register = 0x00;
+		break;
+	case 0x3: // Reset transmitter
+		LOGMASKED(LOG_MORE_UART, "%s: Reset transmitter\n", machine().describe_context());
+		m_uart.transmit_pointer = -1;
+		m_uart.status_register |= USR_TXEMT;
+		m_uart.command_register &= 0xf0;
+		m_uart.transmit_holding_register = 0x00;
+		break;
+	case 0x4: // Reset error status
+		LOGMASKED(LOG_MORE_UART, "%s: Reset error status\n", machine().describe_context());
+		m_uart.status_register &= 0x87; // Clear error bits in USR
+		m_uart.command_register &= 0xf0;
+		break;
+	case 0x6: // Start break
+		LOGMASKED(LOG_MORE_UART, "%s: Start break (not yet implemented)\n", machine().describe_context());
+		break;
+	case 0x7: // Stop break
+		LOGMASKED(LOG_MORE_UART, "%s: Stop break (not yet implemented)\n", machine().describe_context());
+		break;
+	}
 }
 
 uint8_t scc68070_device::uth_r()
@@ -807,7 +831,7 @@ uint8_t scc68070_device::uth_r()
 
 void scc68070_device::uth_w(uint8_t data)
 {
-	LOGMASKED(LOG_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
+	LOGMASKED(LOG_MORE_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
 	uart_tx(data);
 	m_uart.transmit_holding_register = data;
 }
