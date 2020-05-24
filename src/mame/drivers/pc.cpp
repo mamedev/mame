@@ -1436,6 +1436,28 @@ ROM_START( cadd810 )
 	ROM_LOAD("wd_ide_bios_rev_2.0.bin",0x0000,0x2000, NO_DUMP) //missing: dump of hd controller
 ROM_END
 
+/************************************************* Juko Nest 8 bit variants ***
+
+CPU: 8088 or NEC V20
+
+******************************************************************************/
+
+ROM_START( juko8 )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: BIOS ver 2.00 VEGAS COMPUTER COMMUNICATIONS.
+	ROM_SYSTEM_BIOS(0, "nestv200", "JUKO NEST v2.00")
+	ROMX_LOAD( "jukoa.bin", 0xe000, 0x2000, CRC(7d78707e) SHA1(8b09a32658a850e7f03254d1328fe6e336e91871),ROM_BIOS(0))
+	// 1: Flytek (Protek) ST-12 (a 15MHz ST-15 was also available)
+	ROM_SYSTEM_BIOS(1, "st-12", "ST-12")
+	ROMX_LOAD( "flytek_st-12_bios_ver_2.20_c_nel_electronics_ltd.bin", 0xe000, 0x2000, CRC(448c3089) SHA1(779d4138d841783d0e2e5ad29c83d9a8cb4497b6), ROM_BIOS(1))
+	// 2: Juko ST BIOS ver 2.30 / Copyright 1988 Juko Electronics Industrial Co., Ltd.
+	ROM_SYSTEM_BIOS(2, "nest230", "JUKO NEST v2.30")
+	ROMX_LOAD( "juko_st_v2.30.bin", 0xe000, 0x2000, CRC(7a1c6dfa) SHA1(0b343f3028ca06c9e6dc69427d1b15a47c74b9fc),ROM_BIOS(2))
+	// 3: BIOS Ver 2.32
+	ROM_SYSTEM_BIOS(3, "nest232", "JUKO NEST v2.32")
+	ROMX_LOAD( "xt-juko-st-2.32.bin", 0xe000, 0x2000, CRC(0768524e) SHA1(259520bb7a6796e5b987c2b9bef1acd501df1670),ROM_BIOS(3))
+ROM_END
+
 /**************************************** JUKO NEST N3 true 16 bit variants ***
 
 https://www.vogons.org/viewtopic.php?f=46&t=60077
@@ -1873,6 +1895,43 @@ ROM_START( mbc16lt ) // screen remains blank
 	ROM_LOAD("fc2x.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
+/************************************************** DTK-Group PC-XT-Clones ***
+
+DTK-Group is the manufacturer of those popular motherboards, utilising a BIOS developed by the Taiwanese
+Industrial Technology Research Institute's Electronics Research and Service Organization (ERSO)
+
+*****************************************************************************/
+
+ROM_START( dtkerso )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: DTK Corp. COMPUTER XT / DTK/ERSO/BIOS 2.26 (C) 1986
+	ROM_SYSTEM_BIOS(0, "dtk226", "XT DTK Erso bios 2.26")
+	ROMX_LOAD( "dtk-ers0.rom", 0xe000, 0x2000, CRC(85fd5e10) SHA1(2ae152f042e7e43e27621f071af763e3f9dc68d2),ROM_BIOS(0))
+	// 1: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.37 (C) 1986
+	ROM_SYSTEM_BIOS(1, "dtk237", "XT DTK Erso bios 2.37")
+	ROMX_LOAD( "dtk2.37.bin", 0xe000, 0x2000, CRC(d29884a5) SHA1(217c949b4188f638a7ae82a408c5a18d77707009), ROM_BIOS(1))
+	// 2: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.38 (C) 1986
+	ROM_SYSTEM_BIOS(2, "tava238", "Tava DTK Erso V2.38")
+	ROMX_LOAD( "tava_dtk_erso_bios_2.38_u87.bin", 0xe000, 0x2000, CRC(34f5c0e5) SHA1(5a1590f948670a5ef85a1ee7cbb40387fced8a1f), ROM_BIOS(2))
+	// 3: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.40 (C) 1986
+	ROM_SYSTEM_BIOS(3, "dtk240", "XT DTK Erso bios 2.40") // 8 MHz Turbo
+	ROMX_LOAD( "dtk2.40.bin", 0xe000, 0x2000, CRC(a4ed27c3) SHA1(66b67540d94c0d049ebc14ee14eadd2ab7304818),ROM_BIOS(3))
+	// 4: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.42 (C) 1986
+	ROM_SYSTEM_BIOS(4, "dtk242", "XT DTK Erso bios 2.42") // 10 MHz Turbo
+	ROMX_LOAD( "dtk2.42.bin", 0xe000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(4))
+ROM_END
+
+/************************************************** DTK-Group PC-XT-Clones ***
+
+identical to the Olivetti M18P (one online source shows a ROM version 3.06 with the Olivetti)
+
+*****************************************************************************/
+
+ROM_START( coppc21 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "corona_ppc_21_3,10_8k_rom.bin", 0xe000, 0x2000, CRC(4c243424) SHA1(55910035b49679beddb43a0728a10dc32c73e3e8))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1889,10 +1948,12 @@ COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state,
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
+COMP( 198?, coppc21,        ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Corona PPC-21",         MACHINE_NOT_WORKING )
 COMP( 198?, coppc400,       ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Cordata PPC-400",       MACHINE_NOT_WORKING )
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
+COMP( 198?, dtkerso,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "DTK Group", "PC-XT-Clones with DTK/ERSO-BIOS", 0 )
 COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "Eagle 1600" ,           MACHINE_NOT_WORKING )
 COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
@@ -1900,6 +1961,7 @@ COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
+COMP( 198?, juko8,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8088 and V20",     MACHINE_NOT_WORKING )
 COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
 COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",             0 )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )

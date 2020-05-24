@@ -32445,16 +32445,19 @@ ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
 comport                         // Compaq Portable
+coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
+dtkerso							// 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
 eppc                            // 1985 Ericsson Portable PC
 hyo88t                          // Hyosung Topstar 88T
 ibm5550                         //
 iskr3104                        //
 ittxtra                         // 1984 ITT XTRA
-juko16
+juko8							// JUKO NEST motherboards with 8088/V20 CPU
+juko16							// JUKO NEST motherboards with 8086/V30 CPU
 kaypro16                        // Kaypro 16
 kaypropc                        // Kaypro PC
 kyoxt                           // Kyocera XT
