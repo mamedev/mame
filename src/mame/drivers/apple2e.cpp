@@ -4165,6 +4165,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
 	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card, cycle-accurate version */
 	device.option_add("diskiing13", A2BUS_DISKIING13);  /* Disk II Controller Card, cycle-accurate version */
+	device.option_add("diskiiiwm", A2BUS_IWM_CARD);  /* IWM Disk II Controller Card */
 	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
 	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
 	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */

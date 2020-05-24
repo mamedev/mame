@@ -29,7 +29,7 @@ class a2bus_iwm_device:
 {
 public:
 	// construction/destruction
-	a2bus_iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	a2bus_iwm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -48,7 +48,28 @@ private:
 	void phases_w(u8 data);
 };
 
+class a2bus_iwm_int_device: public a2bus_iwm_device
+{
+public:
+	a2bus_iwm_int_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class a2bus_iwm_card_device: public a2bus_iwm_device
+{
+public:
+	a2bus_iwm_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+
+private:
+	uint8_t *m_rom;
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_IWM, a2bus_iwm_device)
+DECLARE_DEVICE_TYPE(A2BUS_IWM, a2bus_iwm_int_device)
+DECLARE_DEVICE_TYPE(A2BUS_IWM_CARD, a2bus_iwm_card_device)
 
 #endif  // MAME_BUS_A2BUS_A2IWM_H
