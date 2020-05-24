@@ -2750,6 +2750,7 @@ td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
 euroat                          // Schneider Euro AT
+towerat2xx  					// Schneider Tower AT 201, 202, 220, 240 and 260 (286, EGA)
 pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12

@@ -2152,7 +2152,7 @@ ROM_END
 
 // Schneider EuroAT - Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
 // Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
-// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
+// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773 (cf. EuroPC 2/EuroXT), WD37C65BJM, Siemens SAB 16C450-N
 // EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
 // CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix
 // Connectors: Keyboard, Printer, Serial, Floppy (can use the same external floppy disk drives as the EuroXT), EGA monitor
@@ -2162,7 +2162,7 @@ ROM_END
 // blank screen, beeps 1-2-4
 ROM_START( euroat )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" )
+	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" ) // also used on Tower AT
 	ROMX_LOAD( "euro_at_v201a_l.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "euro_at_v201a_h.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(0) )
 	// EGA ROM dump missing
@@ -2174,6 +2174,51 @@ ROM_START( euroat )
 	ROM_REGION( 0x10000, "vga", 0 )
 	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
 ROM_END
+
+// Schneider Tower AT 220 (other designations for the 10 MHz 80826, 512KB RAM series are 201, 202, 240), the last two digits are related to the originally installed 
+// number of 3.5" 720K floppy drives or the size of the MFM harddisk), // Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and 
+// probably what was available in Schneider's part bin), systems with a "mega" in the name have 1MB RAM and 1.44MB floppy drives. All have an EGA graphcis card on board
+// The case looks like a stack of three thinner slices, and extra modules were available that clamped on: a tape streamer, and a 5.25" 1.2MB or a 360KB drive. They were 
+// connected to the "External drive" port of the Tower AT, much like with Schneider's other PCs. The mainboard as such is divided between the I/O and video portion that resides on
+// the backplane board and the CPU and RAM on the CPU card that also contains the keyboard connector.
+// Model 220, Schneider Tower-EGA I/O: Chipset: JIM 50101-1 (cf. EuroPC), WD37C65BJM, Gemini VC-001, VLSI VL16C450-PC, Paradise Systems Inc PPC1 38302C
+// 104 pin CPU card connector, 3xISA16, 1xISA8 - on board: parallel, serial, bus mouse (Atari compatible), EGA, external floppy
+// Model 220, Schneider Tower-CPU 286 (Baugr.Nr. 50229 Rev.3B): Dallas DS1287, MBL8042H (Compatibility Software 1986/K Phoenix Technologies Ltd - 805931) - Chipset: 2x G2 GC102, G2 GC101
+// OSC: 20.000MHz, 14.318180, beeper, CPU: AMD N80L286-10/S, FPU socket provided - RAM: solder pads for 4xSIMM30, 4x16pin (empty), 4x or 8x51C4256 (512KB or 1MB)
+// blank screen, beeps 1-2-4
+ROM_START( towerat2xx )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_SYSTEM_BIOS(0, "v2.02", "V2.02" ) // from a model 220
+	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" )
+	ROM_SYSTEM_BIOS(2, "v1.07", "V1.07" ) // seen on a model 240 "mega"
+	ROM_SYSTEM_BIOS(3, "v1.06", "V1.06" ) // from a model 220
+	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" ) 
+	ROM_SYSTEM_BIOS(5, "v1.01a", "V1.01a" ) // from a model 220
+	
+	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_0_id.nr.50445_v2.02.bin", 0x10000, 0x8000, CRC(8566b3f2) SHA1(a12b5e9e848de123c62374f78ee1d2b4b53dd468), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_1_id.nr.50445_v2.02.bin", 0x10001, 0x8000, CRC(7d8249cf) SHA1(d894332aad4c26798e6b41a5e94c471b0235bd50), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "schneider_tower_at_bios_0_low_v2.01a.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "schneider_tower_at_bios_1_high_v2.01a.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "schneider_tower_at_bios_0_low_v1.07.bin", 0x10000, 0x8000, CRC(70a9421d) SHA1(bf6529f259d5bc7c28df19655c57ecce1c57260f), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_tower_at_bios_1_high_v1.07.bin", 0x10001, 0x8000, CRC(995a62db) SHA1(42e9a866b5f02509d3094c42842eafed1d577f4e), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_ag_50444_v1.06.u3", 0x10000, 0x8000, CRC(42891d5a) SHA1(d94292b14f9155b4e05c78960f9722fffca976be), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "schneider_ag_50445_v1.06.u4", 0x10001, 0x8000, CRC(bdced2b9) SHA1(cba58c70420695ec69dbb4817d0c6b14b8bdbadd), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "schneider_tower_at_bios_low_v1.05a.bin", 0x10000, 0x8000, CRC(94ad1628) SHA1(bf7319ed9b37a57e67b0b4bf7845d95d0f593d68), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_tower_at_bios_high_v1.05a.bin", 0x10001, 0x8000, CRC(f3d48773) SHA1(9386313b6d05acb30e7ba7e1353c259deaaa77bc), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_tower_at_bios_low_v1.01.bin", 0x10000, 0x8000, CRC(a94ca070) SHA1(2acca0601c00e76d510c81dfe92d33397fbeccd1), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "schneider_tower_at_bios_high_v1.01.bin", 0x10001, 0x8000, CRC(d8f67320) SHA1(3ddf7fdb1370f745c4f1902101605477ee0bb392), ROM_SKIP(1) | ROM_BIOS(5) )
+
+	// todo: find matching EGA ROMs for BIOS V2.01, 1.07 and 1.05
+	ROM_REGION( 0x8000, "gfx", 0)
+	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(0) ) // R1.04 matched with system BIOS V2.02
+	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(1) ) 
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(3) ) // R1.02 matched with system BIOS V1.06
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_ega_r1.00.bin", 0x0000, 0x8000, CRC(4e14cb0a) SHA1(6cef69274a52b11201a3477631fa343a7e1a5970), ROM_BIOS(5) ) // R1.00 matched with system BIOS V1.01 */
+ROM_END
+
+
 
 // Victor V286C - a VGA version exists as well
 // CPU: AMD 802L86-10/S  - one ISA16 extended to ISA8: 1, ISA16: 3 on a riser card - Keyboard-BIOS: AT-KB M5L8042
@@ -5200,6 +5245,7 @@ COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 1989, euroat,    ibm5170, 0,       euroat,    0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Euro AT", MACHINE_NOT_WORKING )
+COMP( 198?, towerat2xx,ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Schneider Rundfunkwerke", "Tower AT 201, 202, 220, 240 and 260 (286,EGA)", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )
