@@ -19149,8 +19149,8 @@ lbpc                            // Ampro Little Board/PC
 
 @source:lc80.cpp
 lc80                            //
+lc80e                           //
 lc80_2                          //
-sc80                            //
 
 @source:lckydraw.cpp
 lckydraw                        // (c) 1979 Mirco

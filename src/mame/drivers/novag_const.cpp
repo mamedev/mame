@@ -148,7 +148,7 @@ void const_state::machine_start()
 
 void const_state::power_off()
 {
-	// NMI at power-off (clears peripherals, and ssensor4 prepares nvram for next power-on)
+	// NMI at power-off (ssensor4 prepares nvram for next power-on)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_power = false;
 }
@@ -180,7 +180,8 @@ WRITE8_MEMBER(const_state::mux_w)
 
 WRITE8_MEMBER(const_state::control_w)
 {
-	// d0-d3: ?
+	// d0-d2: ?
+	// d3: ? (goes high at power-off NMI)
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
 	update_display();

@@ -14,6 +14,9 @@ Hardware notes:
 
 I/O is similar to supercon
 
+TODO:
+- add power-off NMI? does nothing, it will just go into an infinite loop
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -147,7 +150,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_lcd->clk_w(data >> 1 & 1);
 	m_lcd->lcd_w(data >> 2 & 1);
 
-	// d3: unused?
+	// d3: ? (goes high at power-off NMI)
 
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
