@@ -412,7 +412,6 @@ public:
 		objectdata = &(rasterizer.object_data_alloc());
 		objectdata->data = this;
 		combiner.used = 0;
-		enabled_vertex_attributes = 0;
 		primitives_total_count = 0;
 		indexesleft_count = 0;
 		triangles_bfculled = 0;
@@ -469,8 +468,7 @@ public:
 		debug_grab_textfile = nullptr;
 		enable_waitvblank = true;
 		enable_clipping_w = false;
-		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
-		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));
+		memset(&vertexbuffer, 0, sizeof(vertexbuffer));
 		memset(&persistvertexattr, 0, sizeof(persistvertexattr));
 		for (int n = 0; n < 16; n++)
 			persistvertexattr.attribute[n].fv[3] = 1;
@@ -592,10 +590,16 @@ public:
 	uint32_t *rendertarget;
 	uint32_t *depthbuffer;
 	uint32_t *displayedtarget;
-	uint32_t vertexbuffer_address[16];
-	int vertexbuffer_stride[16];
-	NV2A_VTXBUF_TYPE vertexbuffer_kind[16];
-	int vertexbuffer_size[16];
+	struct {
+		uint32_t address[16];
+		int type[16];
+		int stride[16];
+		NV2A_VTXBUF_TYPE kind[16];
+		int size[16];
+		int words[16];
+		int offset[16];
+		int enabled; // bitmask
+	} vertexbuffer;
 	struct {
 		int enabled;
 		int sizeu;
@@ -780,9 +784,6 @@ public:
 		int upload_parameter_component;
 	} vertexprogram;
 	int vertex_pipeline;
-	int enabled_vertex_attributes;
-	int vertex_attribute_words[16];
-	int vertex_attribute_offset[16];
 
 	struct {
 		int format;

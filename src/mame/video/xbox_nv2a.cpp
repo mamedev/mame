@@ -2326,8 +2326,8 @@ void nv2a_renderer::read_vertex(address_space &space, offs_t address, vertex_nv 
 	uint32_t u;
 	int c, d, l;
 
-	l = vertexbuffer_size[attrib];
-	switch (vertexbuffer_kind[attrib]) {
+	l = vertexbuffer.size[attrib];
+	switch (vertexbuffer.kind[attrib]) {
 	case NV2A_VTXBUF_TYPE::FLOAT:
 		vertex.attribute[attrib].fv[0] = 0;
 		vertex.attribute[attrib].fv[1] = 0;
@@ -2377,10 +2377,10 @@ int nv2a_renderer::read_vertices_0x180x(address_space &space, vertex_nv *destina
 #endif
 	for (m = 0; m < limit; m++) {
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
-		b = enabled_vertex_attributes;
+		b = vertexbuffer.enabled;
 		for (a = 0; a < 16; a++) {
 			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + vertex_indexes[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
+				read_vertex(space, vertexbuffer.address[a] + vertex_indexes[indexesleft_first] * vertexbuffer.stride[a], destination[m], a);
 			}
 			b = b >> 1;
 		}
@@ -2401,10 +2401,10 @@ int nv2a_renderer::read_vertices_0x1810(address_space &space, vertex_nv *destina
 #endif
 	for (m = 0; m < limit; m++) {
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
-		b = enabled_vertex_attributes;
+		b = vertexbuffer.enabled;
 		for (a = 0; a < 16; a++) {
 			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + (m + offset)*vertexbuffer_stride[a], destination[m], a);
+				read_vertex(space, vertexbuffer.address[a] + (m + offset) * vertexbuffer.stride[a], destination[m], a);
 			}
 			b = b >> 1;
 		}
@@ -2421,13 +2421,13 @@ int nv2a_renderer::read_vertices_0x1818(address_space &space, vertex_nv *destina
 #ifdef MAME_DEBUG
 	memset(destination, 0, sizeof(vertex_nv)*limit);
 #endif
-	vwords = vertex_attribute_words[15] + vertex_attribute_offset[15];
+	vwords = vertexbuffer.words[15] + vertexbuffer.offset[15];
 	for (m = 0; m < limit; m++) {
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
-		b = enabled_vertex_attributes;
+		b = vertexbuffer.enabled;
 		for (a = 0; a < 16; a++) {
 			if (b & 1) {
-				read_vertex(space, address + vertex_attribute_offset[a] * 4, destination[m], a);
+				read_vertex(space, address + vertexbuffer.offset[a] * 4, destination[m], a);
 			}
 			b = b >> 1;
 		}
@@ -3232,44 +3232,45 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 		int bit = maddress / 4 - 0x1720 / 4;
 
 		if (data & 0x80000000)
-			vertexbuffer_address[bit] = (data & 0x0fffffff) + dma_offset[7];
+			vertexbuffer.address[bit] = (data & 0x0fffffff) + dma_offset[7];
 		else
-			vertexbuffer_address[bit] = (data & 0x0fffffff) + dma_offset[6];
+			vertexbuffer.address[bit] = (data & 0x0fffffff) + dma_offset[6];
 	}
 	if ((maddress >= 0x1760) && (maddress < 0x17A0)) {
 		int bit = maddress / 4 - 0x1760 / 4;
 
-		vertexbuffer_stride[bit] = (data >> 8) & 255;
-		vertexbuffer_kind[bit] = (NV2A_VTXBUF_TYPE)(data & 15);
-		vertexbuffer_size[bit] = (data >> 4) & 15;
-		switch (vertexbuffer_kind[bit]) {
+		vertexbuffer.type[bit] = data & 255;
+		vertexbuffer.stride[bit] = (data >> 8) & 255;
+		vertexbuffer.kind[bit] = (NV2A_VTXBUF_TYPE)(vertexbuffer.type[bit] & 15);
+		vertexbuffer.size[bit] = (vertexbuffer.type[bit] >> 4) & 15;
+		switch (vertexbuffer.kind[bit]) {
 		case NV2A_VTXBUF_TYPE::UBYTE_D3D:
-			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
+			vertexbuffer.words[bit] = (vertexbuffer.size[bit] * 1) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::FLOAT:
-			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
+			vertexbuffer.words[bit] = (vertexbuffer.size[bit] * 4) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::UBYTE_OGL:
-			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
+			vertexbuffer.words[bit] = (vertexbuffer.size[bit] * 1) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::USHORT:
-			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 2) >> 2;
+			vertexbuffer.words[bit] = (vertexbuffer.size[bit] * 2) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::FLOAT_PACKED:
-			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
+			vertexbuffer.words[bit] = (vertexbuffer.size[bit] * 4) >> 2;
 			break;
 		default:
-			vertex_attribute_words[bit] = 0;
+			vertexbuffer.words[bit] = 0;
 		}
-		if (vertexbuffer_size[bit] > 0)
-			enabled_vertex_attributes |= (1 << bit);
+		if (vertexbuffer.size[bit] > 0)
+			vertexbuffer.enabled |= (1 << bit);
 		else
-			enabled_vertex_attributes &= ~(1 << bit);
+			vertexbuffer.enabled &= ~(1 << bit);
 		for (int n = bit + 1; n < 16; n++) {
-			if ((enabled_vertex_attributes & (1 << (n - 1))) != 0)
-				vertex_attribute_offset[n] = vertex_attribute_offset[n - 1] + vertex_attribute_words[n - 1];
+			if ((vertexbuffer.enabled & (1 << (n - 1))) != 0)
+				vertexbuffer.offset[n] = vertexbuffer.offset[n - 1] + vertexbuffer.words[n - 1];
 			else
-				vertex_attribute_offset[n] = vertex_attribute_offset[n - 1];
+				vertexbuffer.offset[n] = vertexbuffer.offset[n - 1];
 		}
 		countlen--;
 	}
