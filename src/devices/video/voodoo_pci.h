@@ -19,8 +19,8 @@ public:
 	void set_tmumem(int tmumem0, int tmumem1) { m_tmumem0 = tmumem0; m_tmumem1 = tmumem1; }
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ32_MEMBER(vga_r);
-	DECLARE_WRITE32_MEMBER(vga_w);
+	uint32_t vga_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vga_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void voodoo_reg_map(address_map &map);
 	void banshee_reg_map(address_map &map);
@@ -47,8 +47,8 @@ protected:
 
 	uint32_t m_pcictrl_reg[0x20];
 
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	uint32_t pcictrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 class voodoo_1_pci_device : public voodoo_pci_device

@@ -190,7 +190,7 @@ void huc6272_device::write_microprg_data(offs_t address, uint16_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ32_MEMBER( huc6272_device::read )
+uint32_t huc6272_device::read(offs_t offset)
 {
 	uint32_t res = 0;
 
@@ -264,7 +264,7 @@ READ32_MEMBER( huc6272_device::read )
 	return res;
 }
 
-WRITE32_MEMBER( huc6272_device::write )
+void huc6272_device::write(offs_t offset, uint32_t data)
 {
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;

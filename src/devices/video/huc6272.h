@@ -36,8 +36,8 @@ public:
 	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(offs_t offset, uint32_t data);
+	uint32_t read(offs_t offset);
 
 	// ADPCM operations
 	uint8_t adpcm_update_0();

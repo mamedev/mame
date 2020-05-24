@@ -37,7 +37,7 @@ public:
 
 private:
 	void video_int_ack_w(uint16_t data = 0);
-	DECLARE_READ16_MEMBER(special_port1_r);
+	uint16_t special_port1_r();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_xybots(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
