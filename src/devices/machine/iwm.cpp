@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "iwm.h"
 
-DEFINE_DEVICE_TYPE(IWM_FDC, iwm_device, "iwm", "Apple IWM floppy controller")
+DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
 iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
-	applefdintf_device(mconfig, IWM_FDC, tag, owner, clock),
+	applefdintf_device(mconfig, IWM, tag, owner, clock),
 	m_q3_clock(q3_clock)
 {
 	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
