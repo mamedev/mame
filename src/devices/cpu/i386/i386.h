@@ -12,7 +12,6 @@
 #include "softfloat/softfloat.h"
 #endif
 
-#include "debug/debugcpu.h"
 #include "divtlb.h"
 
 #include "i386dasm.h"

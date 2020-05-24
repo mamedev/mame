@@ -27,6 +27,7 @@
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/express.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
