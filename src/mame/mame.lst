@@ -2589,7 +2589,12 @@ hot409                          // Shuttle HOT-409
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
 ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
-ibmps1es                        // IBM PS/1 (Spanish)
+ibm2011                         // IBM PS/1 2011
+ibm2011rd                       // IBM PS/1 2011 (international models with ROM DOS)
+ibm2121                         // IBM PS/1 2121
+ibm2121rd                       // IBM PS/1 2021 (international models with ROM DOS)
+ibm2123							// IBM PS/1 2123
+ibm2133                         // IBM PS/1 2133
 k286i                           // 1985 Kaypro 286i
 elanht286                       // Leanord Elan High Tech 286
 kt216wb5                        // KT216WB5-HI Rev.2

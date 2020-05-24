@@ -1069,10 +1069,118 @@ ROM_END
 // According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
 // the IBM PS/1 Model 2011 use a customised version of the XTA (8-bit IDE) harddisk interface
 
-ROM_START( ibmps1es )
-	ROM_REGION16_LE(0x40000, "bios", 0)
-	ROM_LOAD16_BYTE( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe))
-	ROM_LOAD16_BYTE( "ibm_1057757_29-15-90.bin", 0x00001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6))
+// https://en.wikipedia.org/wiki/IBM_PS/1
+// http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
+// https://ps1stuff.wordpress.com/documentation/ibm-ps1-model-2011/
+// https://barotto.github.io/IBMulator/#download
+
+ROM_START( ibm2011 )
+	ROM_REGION16_LE( 0x40000, "bios", 0)
+	// Spanish version 
+	ROM_SYSTEM_BIOS( 0, "2011es", "IBM PS/1 2011 ES")
+	ROMX_LOAD( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "ibm_1057757_29-15-90.bin", 0x00001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(0))
+    // US version
+	ROM_SYSTEM_BIOS( 1, "2011us", "IBM PS/1 2011 US") // constant resets
+	ROMX_LOAD( "1057754.bin", 0x00000, 0x20000, CRC(648a6a61) SHA1(6cebaf9f2431e67fea37f34b06916264d6737ab6), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "1057756.bin", 0x00001, 0x20000, CRC(862f94ac) SHA1(1eba7fa20301403db7c4f53032267902191ea2c7), ROM_SKIP(1) |  ROM_BIOS(1))
+ROM_END
+	
+ROM_START( ibm2011rd ) // these international versions were shipped with DOS in a ROM disk and require a different memory map, they don't yet load properly
+	ROM_REGION16_LE( 0x80000, "bios", 0)
+	// Swedish version
+	ROM_SYSTEM_BIOS( 0, "2011se", "IBM PS/1 2011 SE")
+	ROMX_LOAD( "ibm2011se_f80000.bin", 0x00000, 0x40000, CRC(1b90693b) SHA1(2cdcfda55fea25a991c1568ff398d97c5e07e96d),  ROM_BIOS(0))
+	ROMX_LOAD( "ibm2011se_fc0000.bin", 0x40000, 0x40000, CRC(ef7aa453) SHA1(993dd6e17c6fd5c2ef513d94383f36b1929d1936),  ROM_BIOS(0))
+    // Portuguese version
+	ROM_SYSTEM_BIOS( 1, "2011pt", "IBM PS/1 2011 PT")
+	ROMX_LOAD( "u18_x1_1057451.bin", 0x00000, 0x20000, CRC(0484e15d) SHA1(39fb05843c8371f4b716679e6ce512bcf5a05dac), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u36_x4_1057449.bin", 0x00001, 0x20000, CRC(23d7e4fe) SHA1(9c89efa61fc77485b65fff9133d6a19caca553e9), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u23_x2_1057757.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u28_x3_1057759.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(1))
+	// German version
+	ROM_SYSTEM_BIOS( 2, "2011de", "IBM PS/1 2011 DE")
+	ROMX_LOAD( "x1_1057866_u10.bin", 0x00000, 0x20000, CRC(ef0f0bb4) SHA1(d1e4c081f1a74732eb6e37a3bfb9403819b7d891), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x4_1057864_u36.bin", 0x00001, 0x20000, CRC(16d357ff) SHA1(6521b160bf0dd05b890ad197d9c9359d806da18a), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x2_1057757_u23.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x3_1057759_u28.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(2))
+	// Italian version
+	ROM_SYSTEM_BIOS( 3, "2011it", "IBM_PS/1 2011 IT")
+	ROMX_LOAD( "x1-1057630-u18.bin", 0x00000, 0x20000, CRC(3843830c) SHA1(68b2f443b6ceadbc94a725fe66ad9c9685490dcb), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x4-1057628-u36.bin", 0x00001, 0x20000, CRC(1ddf3afb) SHA1(da55abaf4f775e2e3efdd952beb9f97769e3cac3), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x2_1057757_u23.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x3_1057759_u28.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(3))
+	// UK version
+	ROM_SYSTEM_BIOS( 4, "2011uk", "IBM_PS/1 2011 UK")
+	ROMX_LOAD( "u18_x1.bin", 0x00000, 0x20000, CRC(029c4d8a) SHA1(bf2f56ac2e03098144b3dcc34f7daa09c8e08288), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u36_x4.bin", 0x00001, 0x20000, CRC(bf6c5631) SHA1(68cbff7e229cd77ae8c2e8835dbb9b3047f41e4c), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u23_x2.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u28_x3.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(4))
+ROM_END
+
+// From Wikipedia:
+// Model 	 MB FRU    CPU 	                 ISA Sl.  RAM   VRAM   Hard-Drive 	      Serial/Modem
+// 2121-C42  92F9690   Intel 80386SX @ 16 MHz  0 	  2 MB 	256KB  95F4720  40MB IDE  2400 baud modem
+// 2121-B82  92F9690   Intel 80386SX @ 16 MHz  2 	  2 MB 	256KB  92F9943  80MB IDE  2400 baud modem
+// 2121-C92            Intel 80386SX @ 16 MHz  0 	  2 MB 	256KB          129MB IDE  2400 baud modem
+// 2121-G42 	       Intel 80386SX @ 20 MHz  0 	  2 MB 	256KB           40MB IDE  2400 baud modem
+// 2121-A82       	   Intel 80386SX @ 20 MHz  2 	  2 MB 	256KB           40MB IDE  2400 baud modem
+// 2121-S92       	   Intel 80386SX @ 20 MHz  0 	  2 MB 	256KB          129MB IDE  2400 baud modem
+// 2121-M82       	   Intel 80386SX @ 20 MHz  2 	  2 MB 	256KB           80MB IDE  2400 baud modem
+// 2121-A62          	                              2 	256KB  56F8863 160MB IDE  2400 baud modem
+// 2121-A92 	                                        	256KB                     serial port
+// 2121-A94       	   Intel 80386SX @ 20 MHz  2 	6 MB 	256KB          129MB IDE  2400 baud modem
+
+ROM_START( ibm2121 )
+	ROM_REGION16_LE( 0x40000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "2121", "IBM PS/1 2121" )
+	ROMX_LOAD( "fc0000.bin", 0x00000, 0x40000, CRC(96bbaf52) SHA1(8737d805444837023a58702279f8fe6e7f08e7ba), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "2121us", "IBM PS/1 2121 US" )
+	ROMX_LOAD( "ibm2121us_fc0000.bin", 0x00000, 0x40000, CRC(817aad71) SHA1(43b7b84390fcc081a946cdb4bdce4ba7a4a88074), ROM_BIOS(1))
+ROM_END
+	
+ROM_START( ibm2121rd ) // international versions shipped with ROM DOS, need a different memory map at least
+	ROM_REGION16_LE( 0x80000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "2121sp", "IBM PS/1 2121 Spanish" )
+	ROMX_LOAD( "ibm2121sp_f80000.bin", 0x00000, 0x40000, CRC(90505c4b) SHA1(59becaec25644820a78464d66e472a8a225d94cc), ROM_BIOS(0))
+	ROMX_LOAD( "ibm2121sp_fc0000.bin", 0x40000, 0x40000, CRC(f83fac75) SHA1(a42b1b9465983392eaa0159d4bfc30620a7af499), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "2121fr", "IBM PS/1 2121 French" )
+	ROMX_LOAD( "ibm2121fr_f80000.bin", 0x00000, 0x40000, CRC(9c6de65d) SHA1(6b219c9480a06bc9218e8212acc7cfd1ceaccd4b), ROM_BIOS(1))
+	ROMX_LOAD( "ibm2121fr_fc0000.bin", 0x40000, 0x40000, CRC(f83fac75) SHA1(a42b1b9465983392eaa0159d4bfc30620a7af499), ROM_BIOS(1))
+ROM_END 
+
+// http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
+ROM_START( ibm2123 )
+	ROM_REGION16_LE( 0x20000, "bios", 0)
+	ROM_LOAD( "ps1_2123_87f4794_rom.bin", 0x00000, 0x20000, CRC(64f921b8) SHA1(e1856bf3dd3ce21f44078aeca1f58c491b202ad2))
+ROM_END
+
+// From Wikipedia:
+// 2133 Desktop case. The 3x3 references the available slots and drive bays.
+// 2155 Desktop case larger than 2133. The 5x5 references the available slots and drive bays. Including a 5.25" bay.
+// 2168 Tower unit. The 6x8 references the available slots and bays. Including 5.25" bays.
+// Model 	 MB FRU 	 CPU 	                    RAM   SIMM 	        Video chip 	 VRAM 	Hard-Drive 	        Notes
+// 2133-711  93F2397  Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM 		             256KB 	59G9567  85MB IDE
+// 2133-811          Intel 80386SX @ 25 MHz 	4 MB 			                                     85MB IDE
+// 2133-13 	 ???      Intel 80386SX @ 25 MHz 	2 MB  2x72 Pin FPM 	                 256KB 	 	
+// 2133-W13        	 Intel 80386SX @ 25 MHz 	2 MB 	                                       		129MB IDE
+// 2133-13T  65G3766  Intel 80486SX @ 25 MHz 	4 MB  2×72 Pin FPM 	                 256KB 	93F2329 129MB IDE
+// 2133-?43  34G1885  Intel 80486SX @ 20 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
+// 2133-?50  34G1848  Intel 80486SX @ 25 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
+// 2133-?53  34G1848  Intel 80486SX @ 25 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
+// 2133-652          Intel 80486SX @ 33 MHz 	4 MB  4×72 Pin FPM  Cirrus CL-GD5424 512KB 	84G3927 171MB IDE
+// 2133-575        	 Intel 80486DX @ 33 MHz 	4 MB  4×72 Pin FPM 	                 512KB 	        170MB IDE 	
+// 2133-594          Intel 80486DX2 @66 MHz 	4 MB  4×72 Pin FPM 	                 512KB 	        253MB IDE 	
+// 2133-E11        	 Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB     	 85MB IDE 	Canada models, English model
+// 2133-F11       	 Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB     	 85MB IDE 	Canada models, French model
+// 2133-E43       	 Intel 80486SX @ 20 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F43        	 Intel 80486SX @ 20 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
+// 2133-E53        	 Intel 80486SX @ 25 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F53        	 Intel 80486SX @ 25 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model 
+
+ROM_START( ibm2133 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
+	ROM_LOAD( "ps1_2133_52g2974_rom.bin", 0x00000, 0x20000, CRC(89fc7600) SHA1(758e161353f6781c39ac67f1ba293c14038b17dc))
 ROM_END
 
 
@@ -5135,7 +5243,12 @@ ROM_END
 COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "PC/XT-286 5162", MACHINE_NOT_WORKING )
-COMP( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 (Spanish)", MACHINE_NOT_WORKING )
+COMP( 1989, ibm2011,   ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 2011", MACHINE_NOT_WORKING )
+COMP( 1989, ibm2011rd, ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 2011 (international models with ROM DOS)", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2121,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2121", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2121rd, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2121 (international models with ROM DOS)", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2123,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2123", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2133,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "International Business Machines",  "PS/1 2133", MACHINE_NOT_WORKING )
 COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (6 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1987, atturbo,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<generic>",   "PC/AT Turbo (12 MHz, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (16 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
