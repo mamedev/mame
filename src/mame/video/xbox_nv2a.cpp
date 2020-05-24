@@ -3802,6 +3802,12 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			vertexprogram.upload_parameter_index++;
 		}
 	}
+	if ((maddress >= 0x1e80) && (maddress < 0x1e90)) {
+		machine().logerror("Setting v0 vertex program input component %d to %f\n", (maddress - 0x1e80) / 4, *((float *)&data));
+	}
+	if (maddress == 0x1e90) {
+		machine().logerror("Received explicit method to run vertex program\n");
+	}
 	// Register combiners
 	if (maddress == 0x1e60) {
 		combiner.stages = data & 15;
