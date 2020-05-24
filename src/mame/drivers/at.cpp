@@ -1076,23 +1076,23 @@ ROM_END
 
 ROM_START( ibm2011 )
 	ROM_REGION16_LE( 0x40000, "bios", 0)
-	// Spanish version 
+	// Spanish version
 	ROM_SYSTEM_BIOS( 0, "2011es", "IBM PS/1 2011 ES")
 	ROMX_LOAD( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "ibm_1057757_29-15-90.bin", 0x00001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(0))
-    // US version
+	// US version
 	ROM_SYSTEM_BIOS( 1, "2011us", "IBM PS/1 2011 US") // constant resets
 	ROMX_LOAD( "1057754.bin", 0x00000, 0x20000, CRC(648a6a61) SHA1(6cebaf9f2431e67fea37f34b06916264d6737ab6), ROM_SKIP(1) |  ROM_BIOS(1))
 	ROMX_LOAD( "1057756.bin", 0x00001, 0x20000, CRC(862f94ac) SHA1(1eba7fa20301403db7c4f53032267902191ea2c7), ROM_SKIP(1) |  ROM_BIOS(1))
 ROM_END
-	
+
 ROM_START( ibm2011rd ) // these international versions were shipped with DOS in a ROM disk and require a different memory map, they don't yet load properly
 	ROM_REGION16_LE( 0x80000, "bios", 0)
 	// Swedish version
 	ROM_SYSTEM_BIOS( 0, "2011se", "IBM PS/1 2011 SE")
 	ROMX_LOAD( "ibm2011se_f80000.bin", 0x00000, 0x40000, CRC(1b90693b) SHA1(2cdcfda55fea25a991c1568ff398d97c5e07e96d),  ROM_BIOS(0))
 	ROMX_LOAD( "ibm2011se_fc0000.bin", 0x40000, 0x40000, CRC(ef7aa453) SHA1(993dd6e17c6fd5c2ef513d94383f36b1929d1936),  ROM_BIOS(0))
-    // Portuguese version
+	// Portuguese version
 	ROM_SYSTEM_BIOS( 1, "2011pt", "IBM PS/1 2011 PT")
 	ROMX_LOAD( "u18_x1_1057451.bin", 0x00000, 0x20000, CRC(0484e15d) SHA1(39fb05843c8371f4b716679e6ce512bcf5a05dac), ROM_SKIP(1) |  ROM_BIOS(1))
 	ROMX_LOAD( "u36_x4_1057449.bin", 0x00001, 0x20000, CRC(23d7e4fe) SHA1(9c89efa61fc77485b65fff9133d6a19caca553e9), ROM_SKIP(1) |  ROM_BIOS(1))
@@ -1119,17 +1119,17 @@ ROM_START( ibm2011rd ) // these international versions were shipped with DOS in 
 ROM_END
 
 // From Wikipedia:
-// Model 	 MB FRU    CPU 	                 ISA Sl.  RAM   VRAM   Hard-Drive 	      Serial/Modem
-// 2121-C42  92F9690   Intel 80386SX @ 16 MHz  0 	  2 MB 	256KB  95F4720  40MB IDE  2400 baud modem
-// 2121-B82  92F9690   Intel 80386SX @ 16 MHz  2 	  2 MB 	256KB  92F9943  80MB IDE  2400 baud modem
-// 2121-C92            Intel 80386SX @ 16 MHz  0 	  2 MB 	256KB          129MB IDE  2400 baud modem
-// 2121-G42 	       Intel 80386SX @ 20 MHz  0 	  2 MB 	256KB           40MB IDE  2400 baud modem
-// 2121-A82       	   Intel 80386SX @ 20 MHz  2 	  2 MB 	256KB           40MB IDE  2400 baud modem
-// 2121-S92       	   Intel 80386SX @ 20 MHz  0 	  2 MB 	256KB          129MB IDE  2400 baud modem
-// 2121-M82       	   Intel 80386SX @ 20 MHz  2 	  2 MB 	256KB           80MB IDE  2400 baud modem
-// 2121-A62          	                              2 	256KB  56F8863 160MB IDE  2400 baud modem
-// 2121-A92 	                                        	256KB                     serial port
-// 2121-A94       	   Intel 80386SX @ 20 MHz  2 	6 MB 	256KB          129MB IDE  2400 baud modem
+// Model     MB FRU    CPU                   ISA Sl.  RAM   VRAM   Hard-Drive         Serial/Modem
+// 2121-C42  92F9690   Intel 80386SX @ 16 MHz  0      2 MB  256KB  95F4720  40MB IDE  2400 baud modem
+// 2121-B82  92F9690   Intel 80386SX @ 16 MHz  2      2 MB  256KB  92F9943  80MB IDE  2400 baud modem
+// 2121-C92            Intel 80386SX @ 16 MHz  0      2 MB  256KB          129MB IDE  2400 baud modem
+// 2121-G42            Intel 80386SX @ 20 MHz  0      2 MB  256KB           40MB IDE  2400 baud modem
+// 2121-A82            Intel 80386SX @ 20 MHz  2      2 MB  256KB           40MB IDE  2400 baud modem
+// 2121-S92            Intel 80386SX @ 20 MHz  0      2 MB  256KB          129MB IDE  2400 baud modem
+// 2121-M82            Intel 80386SX @ 20 MHz  2      2 MB  256KB           80MB IDE  2400 baud modem
+// 2121-A62                                           2     256KB  56F8863 160MB IDE  2400 baud modem
+// 2121-A92                                                 256KB                     serial port
+// 2121-A94            Intel 80386SX @ 20 MHz  2    6 MB    256KB          129MB IDE  2400 baud modem
 
 ROM_START( ibm2121 )
 	ROM_REGION16_LE( 0x40000, "bios", 0)
@@ -1138,7 +1138,7 @@ ROM_START( ibm2121 )
 	ROM_SYSTEM_BIOS( 1, "2121us", "IBM PS/1 2121 US" )
 	ROMX_LOAD( "ibm2121us_fc0000.bin", 0x00000, 0x40000, CRC(817aad71) SHA1(43b7b84390fcc081a946cdb4bdce4ba7a4a88074), ROM_BIOS(1))
 ROM_END
-	
+
 ROM_START( ibm2121rd ) // international versions shipped with ROM DOS, need a different memory map at least
 	ROM_REGION16_LE( 0x80000, "bios", 0)
 	ROM_SYSTEM_BIOS( 0, "2121sp", "IBM PS/1 2121 Spanish" )
@@ -1147,7 +1147,7 @@ ROM_START( ibm2121rd ) // international versions shipped with ROM DOS, need a di
 	ROM_SYSTEM_BIOS( 1, "2121fr", "IBM PS/1 2121 French" )
 	ROMX_LOAD( "ibm2121fr_f80000.bin", 0x00000, 0x40000, CRC(9c6de65d) SHA1(6b219c9480a06bc9218e8212acc7cfd1ceaccd4b), ROM_BIOS(1))
 	ROMX_LOAD( "ibm2121fr_fc0000.bin", 0x40000, 0x40000, CRC(f83fac75) SHA1(a42b1b9465983392eaa0159d4bfc30620a7af499), ROM_BIOS(1))
-ROM_END 
+ROM_END
 
 // http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
 ROM_START( ibm2123 )
@@ -1159,24 +1159,24 @@ ROM_END
 // 2133 Desktop case. The 3x3 references the available slots and drive bays.
 // 2155 Desktop case larger than 2133. The 5x5 references the available slots and drive bays. Including a 5.25" bay.
 // 2168 Tower unit. The 6x8 references the available slots and bays. Including 5.25" bays.
-// Model 	 MB FRU 	 CPU 	                    RAM   SIMM 	        Video chip 	 VRAM 	Hard-Drive 	        Notes
-// 2133-711  93F2397  Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM 		             256KB 	59G9567  85MB IDE
-// 2133-811          Intel 80386SX @ 25 MHz 	4 MB 			                                     85MB IDE
-// 2133-13 	 ???      Intel 80386SX @ 25 MHz 	2 MB  2x72 Pin FPM 	                 256KB 	 	
-// 2133-W13        	 Intel 80386SX @ 25 MHz 	2 MB 	                                       		129MB IDE
-// 2133-13T  65G3766  Intel 80486SX @ 25 MHz 	4 MB  2×72 Pin FPM 	                 256KB 	93F2329 129MB IDE
-// 2133-?43  34G1885  Intel 80486SX @ 20 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
-// 2133-?50  34G1848  Intel 80486SX @ 25 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
-// 2133-?53  34G1848  Intel 80486SX @ 25 MHz 	4 MB  2×30 Pin FPM 	                 512KB 	93F2329 129MB IDE
-// 2133-652          Intel 80486SX @ 33 MHz 	4 MB  4×72 Pin FPM  Cirrus CL-GD5424 512KB 	84G3927 171MB IDE
-// 2133-575        	 Intel 80486DX @ 33 MHz 	4 MB  4×72 Pin FPM 	                 512KB 	        170MB IDE 	
-// 2133-594          Intel 80486DX2 @66 MHz 	4 MB  4×72 Pin FPM 	                 512KB 	        253MB IDE 	
-// 2133-E11        	 Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB     	 85MB IDE 	Canada models, English model
-// 2133-F11       	 Intel 80386SX @ 25 MHz 	2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB     	 85MB IDE 	Canada models, French model
-// 2133-E43       	 Intel 80486SX @ 20 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
-// 2133-F43        	 Intel 80486SX @ 20 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
-// 2133-E53        	 Intel 80486SX @ 25 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
-// 2133-F53        	 Intel 80486SX @ 25 MHz 	2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model 
+// Model     MB FRU      CPU                        RAM   SIMM          Video chip   VRAM   Hard-Drive          Notes
+// 2133-711  93F2397  Intel 80386SX @ 25 MHz    2 MB  2×72 Pin FPM                   256KB  59G9567  85MB IDE
+// 2133-811          Intel 80386SX @ 25 MHz     4 MB                                                 85MB IDE
+// 2133-13   ???      Intel 80386SX @ 25 MHz    2 MB  2x72 Pin FPM                   256KB
+// 2133-W13          Intel 80386SX @ 25 MHz     2 MB                                                129MB IDE
+// 2133-13T  65G3766  Intel 80486SX @ 25 MHz    4 MB  2×72 Pin FPM                   256KB  93F2329 129MB IDE
+// 2133-?43  34G1885  Intel 80486SX @ 20 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-?50  34G1848  Intel 80486SX @ 25 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-?53  34G1848  Intel 80486SX @ 25 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-652          Intel 80486SX @ 33 MHz     4 MB  4×72 Pin FPM  Cirrus CL-GD5424 512KB  84G3927 171MB IDE
+// 2133-575          Intel 80486DX @ 33 MHz     4 MB  4×72 Pin FPM                   512KB          170MB IDE
+// 2133-594          Intel 80486DX2 @66 MHz     4 MB  4×72 Pin FPM                   512KB          253MB IDE
+// 2133-E11          Intel 80386SX @ 25 MHz     2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB          85MB IDE   Canada models, English model
+// 2133-F11          Intel 80386SX @ 25 MHz     2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB          85MB IDE   Canada models, French model
+// 2133-E43          Intel 80486SX @ 20 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F43          Intel 80486SX @ 20 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
+// 2133-E53          Intel 80486SX @ 25 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F53          Intel 80486SX @ 25 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
 
 ROM_START( ibm2133 )
 	ROM_REGION32_LE( 0x20000, "bios", 0 )
@@ -2283,10 +2283,10 @@ ROM_START( euroat )
 	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
 ROM_END
 
-// Schneider Tower AT 220 (other designations for the 10 MHz 80826, 512KB RAM series are 201, 202, 240), the last two digits are related to the originally installed 
-// number of 3.5" 720K floppy drives or the size of the MFM harddisk), // Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and 
+// Schneider Tower AT 220 (other designations for the 10 MHz 80826, 512KB RAM series are 201, 202, 240), the last two digits are related to the originally installed
+// number of 3.5" 720K floppy drives or the size of the MFM harddisk), // Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and
 // probably what was available in Schneider's part bin), systems with a "mega" in the name have 1MB RAM and 1.44MB floppy drives. All have an EGA graphcis card on board
-// The case looks like a stack of three thinner slices, and extra modules were available that clamped on: a tape streamer, and a 5.25" 1.2MB or a 360KB drive. They were 
+// The case looks like a stack of three thinner slices, and extra modules were available that clamped on: a tape streamer, and a 5.25" 1.2MB or a 360KB drive. They were
 // connected to the "External drive" port of the Tower AT, much like with Schneider's other PCs. The mainboard as such is divided between the I/O and video portion that resides on
 // the backplane board and the CPU and RAM on the CPU card that also contains the keyboard connector.
 // Model 220, Schneider Tower-EGA I/O: Chipset: JIM 50101-1 (cf. EuroPC), WD37C65BJM, Gemini VC-001, VLSI VL16C450-PC, Paradise Systems Inc PPC1 38302C
@@ -2300,9 +2300,9 @@ ROM_START( towerat2xx )
 	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" )
 	ROM_SYSTEM_BIOS(2, "v1.07", "V1.07" ) // seen on a model 240 "mega"
 	ROM_SYSTEM_BIOS(3, "v1.06", "V1.06" ) // from a model 220
-	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" ) 
+	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" )
 	ROM_SYSTEM_BIOS(5, "v1.01a", "V1.01a" ) // from a model 220
-	
+
 	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_0_id.nr.50445_v2.02.bin", 0x10000, 0x8000, CRC(8566b3f2) SHA1(a12b5e9e848de123c62374f78ee1d2b4b53dd468), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_1_id.nr.50445_v2.02.bin", 0x10001, 0x8000, CRC(7d8249cf) SHA1(d894332aad4c26798e6b41a5e94c471b0235bd50), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "schneider_tower_at_bios_0_low_v2.01a.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(1) )
@@ -2319,7 +2319,7 @@ ROM_START( towerat2xx )
 	// todo: find matching EGA ROMs for BIOS V2.01, 1.07 and 1.05
 	ROM_REGION( 0x8000, "gfx", 0)
 	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(0) ) // R1.04 matched with system BIOS V2.02
-	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(1) ) 
+	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(1) )
 	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(2) )
 	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(3) ) // R1.02 matched with system BIOS V1.06
 	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(4) )
@@ -2504,7 +2504,7 @@ ROM_START( ncr3302 )
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD( "f000-flex_drive_test.bin", 0x10000, 0x8000, CRC(09c9eb6b) SHA1(5eb00f65659cee018726e7a4122da1c42b2bbef9))
 	ROM_LOAD( "f800-setup_ncr3.5-013190.bin", 0x18000, 0x8000, CRC(31e6a1ba) SHA1(2ff7dc233d167775ec3641c7a4b2d891db5f8ba7))
-	
+
 	// on board Paradise VGA PVGA1A-JK
 	// DIP switches (x8 near the Paradise PVGA1A-JK) are undocumented. Setting switch 7 to 'open' generates VGA compatible (yet monochrome) signal, closing switch 7
 	// causes 'out of range' on a fixed frequency VGA LCD - Graphics RAM: 8xD6164, 8 empty sockets (18 pin) provided

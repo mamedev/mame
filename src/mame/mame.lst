@@ -2593,7 +2593,7 @@ ibm2011                         // IBM PS/1 2011
 ibm2011rd                       // IBM PS/1 2011 (international models with ROM DOS)
 ibm2121                         // IBM PS/1 2121
 ibm2121rd                       // IBM PS/1 2021 (international models with ROM DOS)
-ibm2123							// IBM PS/1 2123
+ibm2123                         // IBM PS/1 2123
 ibm2133                         // IBM PS/1 2133
 k286i                           // 1985 Kaypro 286i
 elanht286                       // Leanord Elan High Tech 286
@@ -2755,7 +2755,7 @@ td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
 euroat                          // Schneider Euro AT
-towerat2xx  					// Schneider Tower AT 201, 202, 220, 240 and 260 (286, EGA)
+towerat2xx                      // Schneider Tower AT 201, 202, 220, 240 and 260 (286, EGA)
 pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
@@ -32449,15 +32449,15 @@ coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
-dtkerso							// 198? PC-XT clones with a DTK/ERSO BIOS
+dtkerso                         // 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
 eppc                            // 1985 Ericsson Portable PC
 hyo88t                          // Hyosung Topstar 88T
 ibm5550                         //
 iskr3104                        //
 ittxtra                         // 1984 ITT XTRA
-juko8							// JUKO NEST motherboards with 8088/V20 CPU
-juko16							// JUKO NEST motherboards with 8086/V30 CPU
+juko8                           // JUKO NEST motherboards with 8088/V20 CPU
+juko16                          // JUKO NEST motherboards with 8086/V30 CPU
 kaypro16                        // Kaypro 16
 kaypropc                        // Kaypro PC
 kyoxt                           // Kyocera XT
