@@ -2,27 +2,21 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-
     CD-i Mono-I SLAVE MCU simulation
     -------------------
-
-    written by Ryan Holtz
-
 
 *******************************************************************************
 
 STATUS:
-
 - Just enough for the Mono-I CD-i board to work somewhat properly.
 
 TODO:
-
-- Decapping and proper emulation.
+- Proper LLE.
 
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/cdislave.h"
+#include "machine/cdislavehle.h"
 
 #define LOG_IRQS        (1 << 0)
 #define LOG_COMMANDS    (1 << 1)
@@ -34,21 +28,21 @@ TODO:
 #include "logmacro.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(CDI_SLAVE, cdislave_device, "cdislave", "CD-i Mono-I Slave")
+DEFINE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device, "cdislavehle", "CD-i Mono-I Slave HLE")
 
 
 //**************************************************************************
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
+TIMER_CALLBACK_MEMBER( cdislave_hle_device::trigger_readback_int )
 {
 	LOGMASKED(LOG_IRQS, "Asserting IRQ2\n");
 	m_int_callback(ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
 }
 
-void cdislave_device::prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd)
+void cdislave_hle_device::prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd)
 {
 	m_channel[channel].m_out_index = 0;
 	m_channel[channel].m_out_count = count;
@@ -61,7 +55,7 @@ void cdislave_device::prepare_readback(const attotime &delay, uint8_t channel, u
 	m_interrupt_timer->adjust(delay);
 }
 
-void cdislave_device::perform_mouse_update()
+void cdislave_hle_device::perform_mouse_update()
 {
 	uint16_t x = m_mousex->read();
 	uint16_t y = m_mousey->read();
@@ -101,30 +95,30 @@ void cdislave_device::perform_mouse_update()
 	}
 }
 
-INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
+INPUT_CHANGED_MEMBER( cdislave_hle_device::mouse_update )
 {
 	perform_mouse_update();
 }
 
 static INPUT_PORTS_START(cdislave_mouse)
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_device, mouse_update, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdislave_hle_device, mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-ioport_constructor cdislave_device::device_input_ports() const
+ioport_constructor cdislave_hle_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(cdislave_mouse);
 }
 
-READ16_MEMBER( cdislave_device::slave_r )
+READ16_MEMBER( cdislave_hle_device::slave_r )
 {
 	if (m_channel[offset].m_out_count)
 	{
@@ -159,7 +153,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 	return 0xff;
 }
 
-void cdislave_device::set_mouse_position()
+void cdislave_hle_device::set_mouse_position()
 {
 //    uint16_t x, y;
 
@@ -177,7 +171,7 @@ void cdislave_device::set_mouse_position()
 	}
 }
 
-WRITE16_MEMBER( cdislave_device::slave_w )
+WRITE16_MEMBER( cdislave_hle_device::slave_w )
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
 	switch (offset)
@@ -412,11 +406,11 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  cdislave_device - constructor
+//  cdislave_hle_device - constructor
 //-------------------------------------------------
 
-cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDI_SLAVE, tag, owner, clock)
+cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CDI_SLAVE_HLE, tag, owner, clock)
 	, m_int_callback(*this)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_mousex(*this, "MOUSEX")
@@ -431,7 +425,7 @@ cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag,
 //  initial conditions at start time
 //-------------------------------------------------
 
-void cdislave_device::device_resolve_objects()
+void cdislave_hle_device::device_resolve_objects()
 {
 	m_int_callback.resolve_safe();
 }
@@ -440,7 +434,7 @@ void cdislave_device::device_resolve_objects()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void cdislave_device::device_start()
+void cdislave_hle_device::device_start()
 {
 	save_item(NAME(m_channel[0].m_out_buf[0]));
 	save_item(NAME(m_channel[0].m_out_buf[1]));
@@ -487,7 +481,7 @@ void cdislave_device::device_start()
 	save_item(NAME(m_fake_mouse_x));
 	save_item(NAME(m_fake_mouse_y));
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdislave_device::trigger_readback_int), this));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdislave_hle_device::trigger_readback_int), this));
 	m_interrupt_timer->adjust(attotime::never);
 }
 
@@ -495,7 +489,7 @@ void cdislave_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void cdislave_device::device_reset()
+void cdislave_hle_device::device_reset()
 {
 	for (auto & elem : m_channel)
 	{

@@ -2,27 +2,21 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-
-    CD-i Mono-I SLAVE MCU simulation
+    CD-i Mono-I SLAVE MCU HLE
     -------------------
-
-    written by Ryan Holtz
-
 
 *******************************************************************************
 
 STATUS:
-
 - Just enough for the Mono-I CD-i board to work somewhat properly.
 
 TODO:
-
-- Decapping and proper emulation.
+- Proper LLE.
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_CDISLAVE_H
-#define MAME_MACHINE_CDISLAVE_H
+#ifndef MAME_MACHINE_CDISLAVEHLE_H
+#define MAME_MACHINE_CDISLAVEHLE_H
 
 #pragma once
 
@@ -32,13 +26,13 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdislave_device
+// ======================> cdislave_hle_device
 
-class cdislave_device : public device_t
+class cdislave_hle_device : public device_t
 {
 public:
 	// construction/destruction
-	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
 
@@ -110,6 +104,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDI_SLAVE, cdislave_device)
+DECLARE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device)
 
-#endif // MAME_MACHINE_CDISLAVE_H
+#endif // MAME_MACHINE_CDISLAVEHLE_H

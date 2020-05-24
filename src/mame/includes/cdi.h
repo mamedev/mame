@@ -5,7 +5,7 @@
 #define MAME_INCLUDES_CDI_H
 
 #include "machine/scc68070.h"
-#include "machine/cdislave.h"
+#include "machine/cdislavehle.h"
 #include "machine/cdicdic.h"
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
@@ -65,7 +65,7 @@ private:
 	DECLARE_WRITE16_MEMBER(dvc_w);
 
 	required_shared_ptr<uint16_t> m_planea;
-	optional_device<cdislave_device> m_slave_hle;
+	optional_device<cdislave_hle_device> m_slave_hle;
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
 	optional_device<cdicdic_device> m_cdic;
@@ -83,8 +83,8 @@ class quizard_state : public cdi_state
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
-		, m_input1(*this, "INPUT1")
-		, m_input2(*this, "INPUT2")
+		, m_mcu(*this, "mcu")
+		, m_inputs(*this, "P%u", 0U)
 	{ }
 
 	void quizard(machine_config &config);
@@ -99,15 +99,22 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	uint8_t mcu_p0_r();
 	uint8_t mcu_p1_r();
-
+	uint8_t mcu_p2_r();
+	uint8_t mcu_p3_r();
+	void mcu_p2_w(uint8_t data);
+	void mcu_p3_w(uint8_t data);
 	void mcu_tx(uint8_t data);
+	uint8_t mcu_rx();
+
+	void mcu_hle_tx(uint8_t data);
 	void mcu_calculate_state();
 	void mcu_set_seeds(uint8_t *rx);
-	void mcu_rx(uint8_t data);
+	void mcu_hle_rx(uint8_t data);
 
-	required_ioport m_input1;
-	required_ioport m_input2;
+	required_device<i8751_device> m_mcu;
+	required_ioport_array<4> m_inputs;
 
 	uint16_t m_seeds[10];
 	uint8_t m_state[8];
