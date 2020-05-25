@@ -15,6 +15,7 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "video/tms3556.h"
+#include "video/t6963c.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -62,7 +63,7 @@ protected:
 	optional_device<address_map_bank_device> m_io;
 	required_device<wd_fdc_digital_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy;
-	required_device<tms3556_device> m_vdp;
+	optional_device<tms3556_device> m_vdp;
 	//required_device<sa16_device> m_wave;
 	optional_device<mb63h149_device> m_keyscan;
 };
@@ -85,7 +86,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	u8 unknown_status_r();
-	u8 unknown2_status_r();
 
 	void w30_mem_map(address_map &map);
 #ifdef UNUSED_DEFINITION
@@ -149,11 +149,6 @@ u8 roland_w30_state::unknown_status_r()
 	return 0x1c;
 }
 
-u8 roland_w30_state::unknown2_status_r()
-{
-	return 0x23;
-}
-
 
 void roland_s50_state::mem_map(address_map &map)
 {
@@ -170,8 +165,7 @@ void roland_s50_state::s50_io_map(address_map &map)
 	map(0x0300, 0x0300).r(FUNC(roland_s50_state::floppy_unknown_r));
 	map(0x0800, 0x0807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x1200, 0x1200).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0x1202, 0x1203).nopr();
-	map(0x1202, 0x1202).w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0x1202, 0x1202).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
 	map(0x1204, 0x1204).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
 	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
 	map(0x4000, 0x4fff).mirror(0x3000).rw(FUNC(roland_s50_state::key_r), FUNC(roland_s50_state::key_w));
@@ -184,8 +178,7 @@ void roland_s50_state::s550_io_map(address_map &map)
 	map(0x0300, 0x0300).r(FUNC(roland_s50_state::floppy_unknown_r));
 	map(0x0800, 0x0807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x1000, 0x1000).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0x1002, 0x1003).nopr();
-	map(0x1002, 0x1002).w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0x1002, 0x1002).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
 	map(0x1004, 0x1004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
 	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
 }
@@ -195,8 +188,10 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("program", 0);
 	map(0x4000, 0x7fff).ram().share("common");
 	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16)); // TODO: banking differs
+	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
-	map(0xe402, 0xe402).r(FUNC(roland_w30_state::unknown2_status_r));
+	//map(0xe000, 0xe01f).rw("scsic", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
+	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	//map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 
@@ -329,24 +324,7 @@ void roland_w30_state::w30(machine_config &config)
 
 	//MB89352(config, "scsic", 8_MHz_XTAL); // by option
 
-	// LCD unit: LM240142
-
-	TMS3556(config, m_vdp, 14.3496_MHz_XTAL); // TMS3556NL
-	m_vdp->set_addrmap(0, &roland_w30_state::vram_map);
-	m_vdp->set_screen("screen");
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_screen_update(m_vdp, FUNC(tms3556_device::screen_update));
-	screen.set_size(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2);
-	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::RGB_3BIT);
-
-	TIMER(config, "vdp_timer").configure_scanline(FUNC(roland_w30_state::vdp_timer), "screen", 0, 1);
+	LM24014H(config, "lcd"); // LCD unit: LM240142
 
 	//R15229874(config, m_wave, 26.88_MHz_XTAL);
 	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
