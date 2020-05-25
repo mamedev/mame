@@ -59,7 +59,7 @@ private:
 
 protected:
 	required_device<i8x9x_device> m_maincpu;
-	required_device<address_map_bank_device> m_sram;
+	optional_device<address_map_bank_device> m_sram;
 	optional_device<address_map_bank_device> m_io;
 	required_device<wd_fdc_digital_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy;
@@ -73,6 +73,8 @@ class roland_w30_state : public roland_s50_state
 public:
 	roland_w30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: roland_s50_state(mconfig, type, tag)
+		, m_psram(*this, "psram%u", 1U)
+		, m_psram_bank(0)
 	{
 	}
 
@@ -81,19 +83,35 @@ public:
 	void s330(machine_config &config);
 #endif
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	u8 psram_bank_r();
+	void psram_bank_w(u8 data);
 	u8 unknown_status_r();
 
 	void w30_mem_map(address_map &map);
 #ifdef UNUSED_DEFINITION
 	void s330_mem_map(address_map &map);
 #endif
+	void psram1_map(address_map &map);
+	void psram2_map(address_map &map);
+
+	required_device_array<address_map_bank_device, 2> m_psram;
+
+	u8 m_psram_bank;
 };
 
 void roland_s50_state::machine_start()
 {
 	m_fdc->set_floppy(m_floppy->get_device());
 	m_fdc->dden_w(0);
+}
+
+void roland_w30_state::machine_start()
+{
+	save_item(NAME(m_psram_bank));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_s50_state::vdp_timer)
@@ -113,9 +131,21 @@ void roland_s50_state::ioga_out_w(u8 data)
 	m_sram->set_bank(BIT(data, 6, 2));
 }
 
+u8 roland_w30_state::psram_bank_r()
+{
+	return m_psram_bank;
+}
+
+void roland_w30_state::psram_bank_w(u8 data)
+{
+	m_psram_bank = data;
+	m_psram[1]->set_bank(BIT(data, 0, 3));
+	m_psram[0]->set_bank(BIT(data, 3, 4));
+}
+
 u8 roland_s50_state::floppy_status_r()
 {
-	return m_fdc->intrq_r() << 2 | m_fdc->drq_r() << 3;
+	return 1 | m_fdc->intrq_r() << 2 | m_fdc->drq_r() << 3;
 }
 
 u8 roland_s50_state::floppy_unknown_r()
@@ -174,23 +204,28 @@ void roland_s50_state::s550_io_map(address_map &map)
 
 void roland_w30_state::w30_mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("program", 0);
+	map(0x0000, 0x1fff).m(m_psram[0], FUNC(address_map_bank_device::amap16));
+	map(0x2000, 0x3fff).rom().region("program", 0x2000);
 	map(0x4000, 0x7fff).ram().share("common");
-	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16)); // TODO: banking differs
+	map(0x8000, 0xbfff).m(m_psram[1], FUNC(address_map_bank_device::amap16));
 	map(0xc200, 0xc200).r(FUNC(roland_w30_state::floppy_status_r));
+	map(0xc600, 0xc600).rw(FUNC(roland_w30_state::psram_bank_r), FUNC(roland_w30_state::psram_bank_w));
 	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
 	//map(0xe000, 0xe01f).rw("scsic", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
 	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
+	//map(0xe800, 0xe83f).w("output", FUNC(upd65006gf_376_3b8_device::write)).umask16(0x00ff);
+	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
 	//map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 
 #ifdef UNUSED_DEFINITION
 void roland_w30_state::s330_mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("program", 0);
+	map(0x0000, 0x1fff).m(m_psram[0], FUNC(address_map_bank_device::amap16));
+	map(0x2000, 0x3fff).rom().region("program", 0x2000);
 	map(0x4000, 0x7fff).ram().share("common");
-	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16)); // TODO: banking differs?
+	map(0x8000, 0xbfff).m(m_psram[1], FUNC(address_map_bank_device::amap16));
 	//map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 #endif
@@ -199,6 +234,19 @@ void roland_s50_state::sram_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("common");
 	map(0x4000, 0xffff).ram();
+}
+
+void roland_w30_state::psram1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("program", 0);
+	map(0x2000, 0xffff).ram();
+}
+
+void roland_w30_state::psram2_map(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("program", 0);
+	map(0x04000, 0x0ffff).mirror(0x10000).ram();
+	map(0x10000, 0x13fff).ram().share("common");
 }
 
 void roland_s50_state::vram_map(address_map &map)
@@ -295,12 +343,19 @@ void roland_w30_state::w30(machine_config &config)
 	N8097BH(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::w30_mem_map);
 
-	ADDRESS_MAP_BANK(config, m_sram);
-	m_sram->set_endianness(ENDIANNESS_LITTLE);
-	m_sram->set_data_width(16);
-	m_sram->set_addr_width(16);
-	m_sram->set_stride(0x4000);
-	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
+	ADDRESS_MAP_BANK(config, m_psram[0]);
+	m_psram[0]->set_endianness(ENDIANNESS_LITTLE);
+	m_psram[0]->set_data_width(16);
+	m_psram[0]->set_addr_width(16);
+	m_psram[0]->set_stride(0x2000);
+	m_psram[0]->set_addrmap(0, &roland_w30_state::psram1_map);
+
+	ADDRESS_MAP_BANK(config, m_psram[1]);
+	m_psram[1]->set_endianness(ENDIANNESS_LITTLE);
+	m_psram[1]->set_data_width(16);
+	m_psram[1]->set_addr_width(17);
+	m_psram[1]->set_stride(0x4000);
+	m_psram[1]->set_addrmap(0, &roland_w30_state::psram2_map);
 
 	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
 	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
@@ -316,6 +371,10 @@ void roland_w30_state::w30(machine_config &config)
 
 	//R15229874(config, m_wave, 26.88_MHz_XTAL);
 	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+
+	//UPD65006GF_376_3B8(config, "output", 26.88_MHz_XTAL);
+
+	//MB654419U(config, m_tvf, 20_MHz_XTAL);
 }
 
 #ifdef UNUSED_DEFINITION
@@ -324,12 +383,19 @@ void roland_w30_state::s330(machine_config &config)
 	P8097(config, m_maincpu, 24_MHz_XTAL / 2); // P8097-90
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::s330_mem_map);
 
-	ADDRESS_MAP_BANK(config, m_sram);
-	m_sram->set_endianness(ENDIANNESS_LITTLE);
-	m_sram->set_data_width(16);
-	m_sram->set_addr_width(16);
-	m_sram->set_stride(0x4000);
-	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
+	ADDRESS_MAP_BANK(config, m_psram[0]);
+	m_psram[0]->set_endianness(ENDIANNESS_LITTLE);
+	m_psram[0]->set_data_width(16);
+	m_psram[0]->set_addr_width(16);
+	m_psram[0]->set_stride(0x2000);
+	m_psram[0]->set_addrmap(0, &roland_w30_state::psram1_map);
+
+	ADDRESS_MAP_BANK(config, m_psram[1]);
+	m_psram[1]->set_endianness(ENDIANNESS_LITTLE);
+	m_psram[1]->set_data_width(16);
+	m_psram[1]->set_addr_width(17);
+	m_psram[1]->set_stride(0x4000);
+	m_psram[1]->set_addrmap(0, &roland_w30_state::psram2_map);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
@@ -356,6 +422,10 @@ void roland_w30_state::s330(machine_config &config)
 
 	//R15229874(config, m_wave, 26.88_MHz_XTAL);
 	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+
+	//BU3905S(config, "output");
+
+	//MB654419U(config, m_tvf, 20_MHz_XTAL);
 }
 #endif
 
