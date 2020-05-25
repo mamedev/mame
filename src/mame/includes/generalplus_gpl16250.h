@@ -112,4 +112,21 @@ private:
 };
 
 
+class gormiti_game_state : public gcm394_game_state
+{
+public:
+	gormiti_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+
+protected:
+
+	virtual void machine_reset() override;
+
+private:
+};
+
+
 #endif

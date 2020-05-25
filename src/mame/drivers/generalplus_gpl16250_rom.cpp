@@ -445,6 +445,11 @@ void tkmag220_game_state::machine_reset()
 
 }
 
+void gormiti_game_state::machine_reset()
+{
+	gcm394_game_state::machine_reset();
+	m_maincpu->set_alt_tile_addressing_hack(1);
+}
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -457,6 +462,6 @@ CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 CONS(200?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
-CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?

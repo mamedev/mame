@@ -196,55 +196,33 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		}
 		return;
 	}
-	else if (((op & 0xf0f8) == 0xe008))
+	else if (((op & 0xf1f8) == 0xe008))
 	{
 		// MUL operations
 		// MUL      1 1 1 0*  r r r S*  0 0 0 0   1 r r r     (* = sign bit, fixed here)
 		/*
-		print_mul(stream, op); // MUL uu or MUL su
+		print_mul(stream, op); // MUL uu
 		*/
+		// only valid if S is 1, otherwise falls through to shifter
 
-		if (op & 0x0100)
-		{
-			// MUL su ( unsigned * signed )
-			const uint16_t opa = (op >> 9) & 7;
-			const uint16_t opb = op & 7;
-			m_core->m_icount -= 12;
+		// MUL uu (unsigned * unsigned)
+		uint32_t lres = 0;
+		const uint16_t opa = (op >> 9) & 7;
+		const uint16_t opb = op & 7;
 
-			LOGMASKED(LOG_UNSP_MULS, "%s: MUL su with %04x (signed) * %04x (unsigned) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
-
-			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
-			if (m_core->m_r[opa] & 0x8000)
-			{
-				lres -= m_core->m_r[opb] << 16;
-			}
-			m_core->m_r[REG_R4] = lres >> 16;
-			m_core->m_r[REG_R3] = (uint16_t)lres;
-
-			LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
-
-			return;
-		}
-		else
-		{
-			// MUL uu (unsigned * unsigned)
-			uint32_t lres = 0;
-			const uint16_t opa = (op >> 9) & 7;
-			const uint16_t opb = op & 7;
-
-			m_core->m_icount -= 12; // unknown
-			lres = m_core->m_r[opa] * m_core->m_r[opb];
-			m_core->m_r[REG_R4] = lres >> 16;
-			m_core->m_r[REG_R3] = (uint16_t)lres;
-			return;
-		}
+		m_core->m_icount -= 12; // unknown
+		lres = m_core->m_r[opa] * m_core->m_r[opb];
+		m_core->m_r[REG_R4] = lres >> 16;
+		m_core->m_r[REG_R3] = (uint16_t)lres;
 		return;
-	}
-	else if (((op & 0xf080) == 0xe080))
+			}
+	else if (((op & 0xf180) == 0xe080))
 	{
 		// MULS     1 1 1 0*  r r r S*  1 s s s   s r r r    (* = sign bit, fixed here)
 		/*
-		// MULS uu or MULS su (invalid?)
+		// MULS uu
+		// only valid if S is 1? otherwise falls through to shifter
+
 		print_muls(stream, op);
 		*/
 		LOGMASKED(LOG_UNSP_MULS, "MULS uu or su\n");
