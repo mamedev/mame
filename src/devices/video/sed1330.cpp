@@ -174,7 +174,7 @@ const tiny_rom_entry *sed1330_device::device_rom_region() const
 
 void sed1330_device::device_start()
 {
-	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
+	space().cache(m_cache);
 
 	// register for state saving
 	save_item(NAME(m_bf));
@@ -611,8 +611,8 @@ void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &c
 	{
 		if (m_m0 && !m_m1)
 		{
-			uint8_t c = m_cache->read_byte(va + sx);
-			uint8_t data = m_cache->read_byte(0xf000 | (m_m2 ? u16(c) << 4 | r : u16(c) << 3 | (r & 7)));
+			uint8_t c = m_cache.read_byte(va + sx);
+			uint8_t data = m_cache.read_byte(0xf000 | (m_m2 ? u16(c) << 4 | r : u16(c) << 3 | (r & 7)));
 			for (int x = 0; x < m_fx; x++, data <<= 1)
 				if (BIT(data, 7))
 					p[x] = 1;

@@ -156,11 +156,9 @@ void m6809_base_device::device_start()
 	if (!m_mintf)
 		m_mintf = std::make_unique<mi_default>();
 
-	m_mintf->m_program  = &space(AS_PROGRAM);
-	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
-
-	m_mintf->m_cache  = m_mintf->m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_mintf->m_scache = m_mintf->m_sprogram->cache<0, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_mintf->cprogram);
+	space(AS_PROGRAM).specific(m_mintf->program);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_mintf->csprogram);
 
 	m_lic_func.resolve_safe();
 
@@ -581,23 +579,23 @@ void m6809_base_device::execute_run()
 
 uint8_t m6809_base_device::mi_default::read(uint16_t adr)
 {
-	return m_program->read_byte(adr);
+	return program.read_byte(adr);
 }
 
 uint8_t m6809_base_device::mi_default::read_opcode(uint16_t adr)
 {
-	return m_scache->read_byte(adr);
+	return csprogram.read_byte(adr);
 }
 
 uint8_t m6809_base_device::mi_default::read_opcode_arg(uint16_t adr)
 {
-	return m_cache->read_byte(adr);
+	return cprogram.read_byte(adr);
 }
 
 
 void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 {
-	m_program->write_byte(adr, val);
+	program.write_byte(adr, val);
 }
 
 

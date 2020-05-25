@@ -141,7 +141,7 @@ device_memory_interface::space_config_vector dsp56156_device::memory_space_confi
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpustate->cache->read_word(pc)
+#define ROPCODE(pc)   cpustate->cache.read_word(pc)
 
 
 /***************************************************************************
@@ -291,9 +291,9 @@ void dsp56156_device::device_start()
 
 	save_item(NAME(m_core.peripheral_ram));
 
-	m_core.program = &space(AS_PROGRAM);
-	m_core.cache = m_core.program->cache<1, -1, ENDIANNESS_LITTLE>();
-	m_core.data = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_core.cache);
+	space(AS_PROGRAM).specific(m_core.program);
+	space(AS_DATA).specific(m_core.data);
 
 	state_add(DSP56156_PC,     "PC", m_core.PCU.pc).formatstr("%04X");
 	state_add(DSP56156_SR,     "SR", m_core.PCU.sr).formatstr("%04X");
@@ -445,7 +445,7 @@ void dsp56156_device::device_reset()
 	m_core.ppc = m_core.PCU.pc;
 
 	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU locked to the instruction at address 0x0000 */
-	m_core.program->write_word(0x0000, 0x0124);
+	m_core.program.write_word(0x0000, 0x0124);
 }
 
 

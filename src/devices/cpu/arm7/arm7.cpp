@@ -622,13 +622,13 @@ void arm7_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	if(m_program->endianness() == ENDIANNESS_LITTLE) {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		m_program->cache(m_cachele);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
+		m_prptr = [this](offs_t address) -> const void * { return m_cachele.read_ptr(address); };
 	} else {
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		m_program->cache(m_cachebe);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
+		m_prptr = [this](offs_t address) -> const void * { return m_cachebe.read_ptr(address); };
 	}
 
 	save_item(NAME(m_insn_prefetch_depth));

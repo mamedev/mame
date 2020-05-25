@@ -146,13 +146,13 @@ protected:
 	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
 	int m_mi;
 	bool m_halt;
-	address_space *m_program;
-	address_space *m_data;
-	address_space *m_stack;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_opcache;
-	address_space *m_io;
-	address_space *m_sio;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_opcache;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access<23, 1, 0, ENDIANNESS_BIG>::specific m_stack;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_io;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_sio;
 	int m_icount;
 	const int m_vector_mult;
 
@@ -167,12 +167,12 @@ protected:
 	inline uint32_t get_addr_operand(int opnum);
 	inline uint32_t get_raw_addr_operand(int opnum);
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr);
-	inline uint8_t RDMEM_B(address_space &space, uint32_t addr);
-	inline uint16_t RDMEM_W(address_space &space, uint32_t addr);
-	inline uint32_t RDMEM_L(address_space &space, uint32_t addr);
-	inline void WRMEM_B(address_space &space, uint32_t addr, uint8_t value);
-	inline void WRMEM_W(address_space &space, uint32_t addr, uint16_t value);
-	inline void WRMEM_L(address_space &space, uint32_t addr, uint32_t value);
+	inline uint8_t RDMEM_B(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr);
+	inline uint16_t RDMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr);
+	inline uint32_t RDMEM_L(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr);
+	inline void WRMEM_B(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr, uint8_t value);
+	inline void WRMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr, uint16_t value);
+	inline void WRMEM_L(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr, uint32_t value);
 	inline uint8_t RDPORT_B(int mode, uint16_t addr);
 	inline uint16_t RDPORT_W(int mode, uint16_t addr);
 	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);

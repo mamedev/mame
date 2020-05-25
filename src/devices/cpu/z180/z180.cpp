@@ -484,18 +484,18 @@ device_memory_interface::space_config_vector z180_device::memory_space_config() 
 
 uint8_t z180_device::z180_read_memory(offs_t addr)
 {
-	return m_program->read_byte(addr);
+	return m_program.read_byte(addr);
 }
 
 void z180_device::z180_write_memory(offs_t addr, uint8_t data)
 {
-	m_program->write_byte(addr, data);
+	m_program.write_byte(addr, data);
 }
 
 uint8_t z180_device::z180_readcontrol(offs_t port)
 {
 	// normal external readport (ignore the data)
-	(void)m_iospace->read_byte(port);
+	(void)m_io.read_byte(port);
 
 	// read the internal register
 	return z180_internal_port_read(port & (m_extended_io ? 0x7f : 0x3f));
@@ -861,7 +861,7 @@ uint8_t z180_device::z180_internal_port_read(uint8_t port)
 void z180_device::z180_writecontrol(offs_t port, uint8_t data)
 {
 	// normal external write port
-	m_iospace->write_byte(port, data);
+	m_io.write_byte(port, data);
 
 	// store the data in the internal register
 	z180_internal_port_write(port & (m_extended_io ? 0x7f : 0x3f), data);
@@ -1442,16 +1442,16 @@ int z180_device::z180_dma1()
 	switch (m_dcntl & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:  /* memory MAR1+1 to I/O IAR1 fixed */
-		m_iospace->write_byte(iar1, z180_read_memory(mar1++));
+		m_io.write_byte(iar1, z180_read_memory(mar1++));
 		break;
 	case 0x01:  /* memory MAR1-1 to I/O IAR1 fixed */
-		m_iospace->write_byte(iar1, z180_read_memory(mar1--));
+		m_io.write_byte(iar1, z180_read_memory(mar1--));
 		break;
 	case 0x02:  /* I/O IAR1 fixed to memory MAR1+1 */
-		z180_write_memory(mar1++, m_iospace->read_byte(iar1));
+		z180_write_memory(mar1++, m_io.read_byte(iar1));
 		break;
 	case 0x03:  /* I/O IAR1 fixed to memory MAR1-1 */
-		z180_write_memory(mar1--, m_iospace->read_byte(iar1));
+		z180_write_memory(mar1--, m_io.read_byte(iar1));
 		break;
 	}
 
@@ -1682,11 +1682,10 @@ void z180_device::device_start()
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_ocache = m_oprogram->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_iospace = &space(AS_IO);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_PROGRAM).cache(m_cprogram);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
+	space(AS_IO).specific(m_io);
 
 	/* set up the state table */
 	{

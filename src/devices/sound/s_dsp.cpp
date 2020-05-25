@@ -156,9 +156,9 @@ s_dsp_device::s_dsp_device(const machine_config &mconfig, const char *tag, devic
 
 void s_dsp_device::device_start()
 {
-	m_data = &space(0);
 	// Find our direct access
-	m_cache = m_data->cache<0, 0, ENDIANNESS_LITTLE>();
+	space().cache(m_cache);
+	space().specific(m_data);
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock() / 64);
 

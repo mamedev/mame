@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -14,7 +15,7 @@
 
 class c352_device : public device_t,
 					public device_sound_interface,
-					public device_rom_interface
+					public device_rom_interface<24>
 {
 public:
 	// construction/destruction

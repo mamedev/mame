@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 
 uint8_t n2a03_device::apu_read_mem(offs_t offset)
 {
-	return mintf->program->read_byte(offset);
+	return mintf->program.read_byte(offset);
 }
 
 void n2a03_device::device_add_mconfig(machine_config &config)

@@ -215,7 +215,7 @@ Ux Parts:
 */
 
 m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
-	: m6805_base_device(mconfig, tag, owner, clock, type, { s_hmos_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, address_map_constructor(FUNC(m6805_hmos_device::map), this))
+	: m6805_base_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, address_map_constructor(FUNC(m6805_hmos_device::map), this))
 	, m_timer(*this)
 	, m_port_open_drain{ false, false, false, false }
 	, m_port_mask{ 0x00, 0x00, 0x00, 0x00 }
@@ -471,7 +471,10 @@ void m6805_hmos_device::device_reset()
 	// reset timer/counter
 	m_timer.reset();
 
-	rm16(M6805_VECTOR_RESET, m_pc);
+	if (m_params.m_addr_width > 13)
+		rm16<true>(M6805_VECTOR_RESET, m_pc);
+	else
+		rm16<false>(M6805_VECTOR_RESET, m_pc);
 }
 
 void m68705_device::device_reset()
@@ -484,12 +487,18 @@ void m68705_device::device_reset()
 	if (CLEAR_LINE != m_vihtp)
 	{
 		LOG("loading bootstrap vector\n");
-		rm16(M68705_VECTOR_BOOTSTRAP, m_pc);
+		if (m_params.m_addr_width > 13)
+			rm16<true>(M68705_VECTOR_BOOTSTRAP, m_pc);
+		else
+			rm16<false>(M68705_VECTOR_BOOTSTRAP, m_pc);
 	}
 	else
 	{
 		LOG("loading reset vector\n");
-		rm16(M6805_VECTOR_RESET, m_pc);
+		if (m_params.m_addr_width > 13)
+			rm16<true>(M6805_VECTOR_RESET, m_pc);
+		else
+			rm16<false>(M6805_VECTOR_RESET, m_pc);
 	}
 }
 
@@ -543,10 +552,19 @@ void m6805_hmos_device::interrupt()
 	{
 		if ((CC & IFLAG) == 0)
 		{
-			pushword(m_pc);
-			pushbyte(m_x);
-			pushbyte(m_a);
-			pushbyte(m_cc);
+			if (m_params.m_addr_width > 13) {
+				pushword<true>(m_pc);
+				pushbyte<true>(m_x);
+				pushbyte<true>(m_a);
+				pushbyte<true>(m_cc);
+			}
+			else
+			{
+				pushword<false>(m_pc);
+				pushbyte<false>(m_x);
+				pushbyte<false>(m_a);
+				pushbyte<false>(m_cc);
+			}
 			SEI;
 			standard_irq_callback(0);
 
@@ -554,12 +572,18 @@ void m6805_hmos_device::interrupt()
 			{
 				LOGINT("servicing /INT interrupt\n");
 				m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
-				rm16(M6805_VECTOR_INT, m_pc);
+				if (m_params.m_addr_width > 13)
+					rm16<true>(M6805_VECTOR_INT, m_pc);
+				else
+					rm16<false>(M6805_VECTOR_INT, m_pc);
 			}
 			else if (BIT(m_pending_interrupts, M6805_INT_TIMER))
 			{
 				LOGINT("servicing timer/counter interrupt\n");
-				rm16(M6805_VECTOR_TIMER, m_pc);
+				if (m_params.m_addr_width > 13)
+					rm16<true>(M6805_VECTOR_TIMER, m_pc);
+				else
+					rm16<false>(M6805_VECTOR_TIMER, m_pc);
 			}
 			else
 			{

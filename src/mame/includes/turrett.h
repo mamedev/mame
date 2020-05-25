@@ -129,7 +129,7 @@ protected:
 	const address_space_config  m_space_config;
 
 private:
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<28, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	sound_stream *m_stream;
 
 	struct

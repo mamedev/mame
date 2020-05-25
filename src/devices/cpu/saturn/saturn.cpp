@@ -56,7 +56,6 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 	, m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0)
 	, m_nmi_state(0), m_irq_state(0), m_irq_enable(0), m_in_irq(0), m_pending_irq(0)
 	, m_sleeping(0), m_monitor_id(0), m_monitor_in(0)
-	, m_program(nullptr), m_cache(nullptr)
 	, m_icount(0)
 	, m_debugger_temp(0)
 {
@@ -95,8 +94,8 @@ std::unique_ptr<util::disasm_interface> saturn_device::create_disassembler()
 
 void saturn_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	m_out_func.resolve_safe();
 	m_in_func.resolve_safe(0);

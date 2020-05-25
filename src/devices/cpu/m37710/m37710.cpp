@@ -1307,8 +1307,8 @@ void m37710_cpu_device::device_start()
 	m_watchdog_freq = 0;
 	std::fill(std::begin(m_int_control), std::end(m_int_control), 0);
 
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();

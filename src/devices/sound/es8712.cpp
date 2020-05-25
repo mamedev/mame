@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(ES8712, es8712_device, "es8712", "Excellent Systems ES8712 So
 
 es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ES8712, tag, owner, clock)
-	, device_rom_interface(mconfig, *this, 20) // TODO : 20 address bits?
+	, device_rom_interface(mconfig, *this)
 	, m_adpcm_select(*this, "adpcm_select")
 	, m_msm(*this, finder_base::DUMMY_TAG)
 	, m_reset_handler(*this)

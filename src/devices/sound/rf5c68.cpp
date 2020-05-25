@@ -59,9 +59,8 @@ rf5c164_device::rf5c164_device(const machine_config &mconfig, const char *tag, d
 
 void rf5c68_device::device_start()
 {
-	m_data = &space(0);
 	// Find our direct access
-	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
+	space(0).cache(m_cache);
 	m_sample_end_cb.resolve();
 
 	/* allocate the stream */
@@ -140,11 +139,11 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 
 				/* fetch the sample and handle looping */
-				sample = m_cache->read_byte((chan.addr >> 11) & 0xffff);
+				sample = m_cache.read_byte((chan.addr >> 11) & 0xffff);
 				if (sample == 0xff)
 				{
 					chan.addr = chan.loopst << 11;
-					sample = m_cache->read_byte((chan.addr >> 11) & 0xffff);
+					sample = m_cache.read_byte((chan.addr >> 11) & 0xffff);
 
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
@@ -269,7 +268,7 @@ void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
 
 u8 rf5c68_device::rf5c68_mem_r(offs_t offset)
 {
-	return m_cache->read_byte(m_wbank | offset);
+	return m_cache.read_byte(m_wbank | offset);
 }
 
 
@@ -279,5 +278,5 @@ u8 rf5c68_device::rf5c68_mem_r(offs_t offset)
 
 void rf5c68_device::rf5c68_mem_w(offs_t offset, u8 data)
 {
-	m_data->write_byte(m_wbank | offset, data);
+	m_cache.write_byte(m_wbank | offset, data);
 }

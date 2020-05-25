@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "emupal.h"
 
-class kaneko_grap2_device : public device_t, public device_rom_interface, public device_palette_interface
+// TODO : Unknown Address Bits
+class kaneko_grap2_device : public device_t, public device_rom_interface<32>, public device_palette_interface
 {
 public:
 	static constexpr unsigned PALETTE_SIZE = 256 + 1; // 0x00-0xff is internal palette, 0x100 is background colour

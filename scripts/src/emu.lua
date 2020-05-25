@@ -87,7 +87,7 @@ files {
 	MAME_DIR .. "src/emu/dipalette.h",
 	MAME_DIR .. "src/emu/dipty.cpp",
 	MAME_DIR .. "src/emu/dipty.h",
-	MAME_DIR .. "src/emu/dirom.cpp",
+	MAME_DIR .. "src/emu/dirom.ipp",
 	MAME_DIR .. "src/emu/dirom.h",
 	MAME_DIR .. "src/emu/dirtc.cpp",
 	MAME_DIR .. "src/emu/dirtc.h",

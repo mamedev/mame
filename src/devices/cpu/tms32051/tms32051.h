@@ -160,10 +160,10 @@ protected:
 		int32_t treg2;
 	} m_shadow;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	bool m_idle;

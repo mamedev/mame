@@ -860,10 +860,9 @@ void g65816_device::device_start()
 	m_execute = nullptr;
 	m_debugger_temp = 0;
 
-	address_space &program_space = space(AS_PROGRAM);
-	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
-	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_program);
+	(has_space(AS_OPCODES) ? space(AS_OPCODES) : space(AS_PROGRAM)).cache(m_opcode);
+	(has_space(AS_DATA) ? space(AS_DATA) : space(AS_PROGRAM)).specific(m_data);
 
 	m_wdm_w.resolve_safe();
 

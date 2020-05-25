@@ -139,6 +139,8 @@ protected:
 	virtual bool get_t_flag() const override;
 
 	address_space_config m_program_config;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cachele;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cachebe;
 
 	uint32_t m_r[/*NUM_REGS*/37];
 

@@ -23,8 +23,8 @@ uint8_t lh5801_cpu_device::lh5801_add_generic(int left, int right, int carry)
 
 uint16_t lh5801_cpu_device::lh5801_readop_word()
 {
-	uint16_t r = m_cache->read_byte(P++) << 8;
-	r |= m_cache->read_byte(P++);
+	uint16_t r = m_cache.read_byte(P++) << 8;
+	r |= m_cache.read_byte(P++);
 	return r;
 }
 
@@ -162,7 +162,7 @@ void lh5801_cpu_device::lh5801_lda(uint8_t data)
 void lh5801_cpu_device::lh5801_lde(PAIR *reg)
 {
 	// or z flag depends on reg
-	m_a = m_program->read_byte(reg->w.l--);
+	m_a = m_program.read_byte(reg->w.l--);
 	m_t &= ~Z;
 	if (!m_a)
 	{
@@ -172,13 +172,13 @@ void lh5801_cpu_device::lh5801_lde(PAIR *reg)
 
 void lh5801_cpu_device::lh5801_sde(PAIR *reg)
 {
-	m_program->write_byte(reg->w.l--, m_a);
+	m_program.write_byte(reg->w.l--, m_a);
 }
 
 void lh5801_cpu_device::lh5801_lin(PAIR *reg)
 {
 	// or z flag depends on reg
-	m_a = m_program->read_byte(reg->w.l++);
+	m_a = m_program.read_byte(reg->w.l++);
 	m_t &= ~Z;
 	if (!m_a)
 	{
@@ -188,7 +188,7 @@ void lh5801_cpu_device::lh5801_lin(PAIR *reg)
 
 void lh5801_cpu_device::lh5801_sin(PAIR *reg)
 {
-	m_program->write_byte(reg->w.l++, m_a);
+	m_program.write_byte(reg->w.l++, m_a);
 }
 
 void lh5801_cpu_device::lh5801_dec(uint8_t *adr)
@@ -204,7 +204,7 @@ void lh5801_cpu_device::lh5801_inc(uint8_t *adr)
 void lh5801_cpu_device::lh5801_pop()
 {
 	S++;
-	m_a = m_program->read_byte(S);
+	m_a = m_program.read_byte(S);
 	m_t &= ~Z;
 	if (!m_a)
 	{
@@ -214,33 +214,33 @@ void lh5801_cpu_device::lh5801_pop()
 
 void lh5801_cpu_device::lh5801_pop_word(PAIR *reg)
 {
-	reg->w.l = (m_program->read_byte(S + 1) << 8) | m_program->read_byte(S + 2);
+	reg->w.l = (m_program.read_byte(S + 1) << 8) | m_program.read_byte(S + 2);
 	S += 2;
 	// z flag?
 }
 
 void lh5801_cpu_device::lh5801_rtn()
 {
-	P = (m_program->read_byte(S + 1) << 8) | m_program->read_byte(S + 2);
+	P = (m_program.read_byte(S + 1) << 8) | m_program.read_byte(S + 2);
 	S += 2;
 }
 
 void lh5801_cpu_device::lh5801_rti()
 {
-	P = (m_program->read_byte(S + 1) << 8) | m_program->read_byte(S + 2);
-	m_t = m_program->read_byte(S + 3);
+	P = (m_program.read_byte(S + 1) << 8) | m_program.read_byte(S + 2);
+	m_t = m_program.read_byte(S + 3);
 	S += 3;
 }
 
 void lh5801_cpu_device::lh5801_push(uint8_t data)
 {
-	m_program->write_byte(S--, data);
+	m_program.write_byte(S--, data);
 }
 
 void lh5801_cpu_device::lh5801_push_word(uint16_t data)
 {
-	m_program->write_byte(S--, data & 0xff);
-	m_program->write_byte(S--, data >> 8);
+	m_program.write_byte(S--, data & 0xff);
+	m_program.write_byte(S--, data >> 8);
 }
 
 void lh5801_cpu_device::lh5801_jmp(uint16_t adr)
@@ -250,7 +250,7 @@ void lh5801_cpu_device::lh5801_jmp(uint16_t adr)
 
 void lh5801_cpu_device::lh5801_branch_plus(int taken)
 {
-	uint8_t t = m_cache->read_byte(P++);
+	uint8_t t = m_cache.read_byte(P++);
 	if (taken)
 	{
 		m_icount -= 3;
@@ -260,7 +260,7 @@ void lh5801_cpu_device::lh5801_branch_plus(int taken)
 
 void lh5801_cpu_device::lh5801_branch_minus(int taken)
 {
-	uint8_t t = m_cache->read_byte(P++);
+	uint8_t t = m_cache.read_byte(P++);
 	if (taken)
 	{
 		m_icount -= 3;
@@ -270,7 +270,7 @@ void lh5801_cpu_device::lh5801_branch_minus(int taken)
 
 void lh5801_cpu_device::lh5801_lop()
 {
-	uint8_t t = m_cache->read_byte(P++);
+	uint8_t t = m_cache.read_byte(P++);
 	m_icount -= 8;
 	if (UL--)
 	{
@@ -291,8 +291,8 @@ void lh5801_cpu_device::lh5801_vector(int taken, int nr)
 	if (taken)
 	{
 		lh5801_push_word(P);
-		P = m_program->read_byte(0xff00 + nr) << 8;
-		P |= m_program->read_byte(0xff00 + nr + 1);
+		P = m_program.read_byte(0xff00 + nr) << 8;
+		P |= m_program.read_byte(0xff00 + nr + 1);
 		m_icount -= 13;
 	}
 	m_t &= ~Z; // after the jump?
@@ -397,23 +397,23 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 {
 	int adr;
 
-	int oper = m_cache->read_byte(P++);
+	int oper = m_cache.read_byte(P++);
 	switch (oper)
 	{
 	case 0x01:
-		lh5801_sbc(m_io->read_byte(X));
+		lh5801_sbc(m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x03:
-		lh5801_adc(m_io->read_byte(X));
+		lh5801_adc(m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x05:
-		lh5801_lda(m_io->read_byte(X));
+		lh5801_lda(m_io.read_byte(X));
 		m_icount -= 10;
 		break;
 	case 0x07:
-		lh5801_cpa(m_a, m_io->read_byte(X));
+		lh5801_cpa(m_a, m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x08: // TODO: What does this opcode actually do?
@@ -421,7 +421,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x09:
-		lh5801_and(m_io->read_byte(X));
+		lh5801_and(m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x0a:
@@ -429,39 +429,39 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 15;
 		break;
 	case 0x0b:
-		lh5801_ora(m_io->read_byte(X));
+		lh5801_ora(m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x0c:
-		lh5801_dcs(m_io->read_byte(X));
+		lh5801_dcs(m_io.read_byte(X));
 		m_icount -= 17;
 		break;
 	case 0x0d:
-		lh5801_eor(m_io->read_byte(X));
+		lh5801_eor(m_io.read_byte(X));
 		m_icount -= 11;
 		break;
 	case 0x0e:
-		m_io->write_byte(X, m_a);
+		m_io.write_byte(X, m_a);
 		m_icount -= 10;
 		break;
 	case 0x0f:
-		lh5801_bit(m_io->read_byte(X), m_a);
+		lh5801_bit(m_io.read_byte(X), m_a);
 		m_icount -= 11;
 		break;
 	case 0x11:
-		lh5801_sbc(m_io->read_byte(Y));
+		lh5801_sbc(m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
 	case 0x13:
-		lh5801_adc(m_io->read_byte(Y));
+		lh5801_adc(m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
 	case 0x15:
-		lh5801_lda(m_io->read_byte(Y));
+		lh5801_lda(m_io.read_byte(Y));
 		m_icount -= 10;
 		break;
 	case 0x17:
-		lh5801_cpa(m_a, m_io->read_byte(Y));
+		lh5801_cpa(m_a, m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
 	case 0x18:
@@ -469,7 +469,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x19:
-		lh5801_and(m_io->read_byte(Y));
+		lh5801_and(m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
 	case 0x1a:
@@ -477,38 +477,38 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 15;
 		break;
 	case 0x1b:
-		lh5801_ora(m_io->read_byte(Y));
+		lh5801_ora(m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
 	case 0x1c:
-		lh5801_dcs(m_io->read_byte(Y));
+		lh5801_dcs(m_io.read_byte(Y));
 		m_icount -= 17;
 		break;
 	case 0x1d:
-		lh5801_eor(m_io->read_byte(Y));
+		lh5801_eor(m_io.read_byte(Y));
 		m_icount -= 11;
 		break;
-	case 0x1e: m_io->write_byte(Y,m_a);
+	case 0x1e: m_io.write_byte(Y,m_a);
 		m_icount -= 10;
 		break;
 	case 0x1f:
-		lh5801_bit(m_io->read_byte(Y),m_a);
+		lh5801_bit(m_io.read_byte(Y),m_a);
 		m_icount -= 11;
 		break;
 	case 0x21:
-		lh5801_sbc(m_io->read_byte(U));
+		lh5801_sbc(m_io.read_byte(U));
 		m_icount -= 11;
 		break;
 	case 0x23:
-		lh5801_adc(m_io->read_byte(U));
+		lh5801_adc(m_io.read_byte(U));
 		m_icount -= 11;
 		break;
 	case 0x25:
-		lh5801_lda(m_io->read_byte(U));
+		lh5801_lda(m_io.read_byte(U));
 		m_icount -= 10;
 		break;
 	case 0x27:
-		lh5801_cpa(m_a, m_io->read_byte(U));
+		lh5801_cpa(m_a, m_io.read_byte(U));
 		m_icount -= 11;
 		break;
 	case 0x28:
@@ -516,7 +516,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x29:
-		lh5801_and(m_io->read_byte(U));
+		lh5801_and(m_io.read_byte(U));
 		m_icount -= 11;
 		break;
 	case 0x2a:
@@ -524,22 +524,22 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 15;
 		break;
 	case 0x2b:
-		lh5801_ora(m_io->read_byte(U));
+		lh5801_ora(m_io.read_byte(U));
 		m_icount -= 11;
 		break;
 	case 0x2c:
-		lh5801_dcs(m_io->read_byte(U));
+		lh5801_dcs(m_io.read_byte(U));
 		m_icount -= 17;
 		break;
 	case 0x2d:
-		lh5801_eor(m_io->read_byte(U));
+		lh5801_eor(m_io.read_byte(U));
 		m_icount -= 11;
 		break;
-	case 0x2e: m_io->write_byte(U,m_a);
+	case 0x2e: m_io.write_byte(U,m_a);
 		m_icount -= 10;
 		break;
 	case 0x2f:
-		lh5801_bit(m_io->read_byte(U),m_a);
+		lh5801_bit(m_io.read_byte(U),m_a);
 		m_icount -= 11;
 		break;
 	case 0x40:
@@ -555,7 +555,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x49:
-		lh5801_and_mem(*m_io, X, m_cache->read_byte(P++));
+		lh5801_and_mem(m_io.space(), X, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x4a: // What does this opcode actually do?
@@ -563,7 +563,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x4b:
-		lh5801_ora_mem(*m_io, X, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_io.space(), X, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x4c: /*off*/
@@ -571,7 +571,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 8;
 		break;
 	case 0x4d:
-		lh5801_bit(m_io->read_byte(X), m_cache->read_byte(P++));
+		lh5801_bit(m_io.read_byte(X), m_cache.read_byte(P++));
 		m_icount -= 14;
 		break;
 	case 0x4e:
@@ -579,7 +579,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x4f:
-		lh5801_add_mem(*m_io, X, m_cache->read_byte(P++));
+		lh5801_add_mem(m_io.space(), X, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x50:
@@ -595,7 +595,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x59:
-		lh5801_and_mem(*m_io, Y, m_cache->read_byte(P++));
+		lh5801_and_mem(m_io.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x5a:
@@ -603,11 +603,11 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x5b:
-		lh5801_ora_mem(*m_io, Y, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_io.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x5d:
-		lh5801_bit(m_io->read_byte(Y), m_cache->read_byte(P++));
+		lh5801_bit(m_io.read_byte(Y), m_cache.read_byte(P++));
 		m_icount -= 14;
 		break;
 	case 0x5e:
@@ -615,7 +615,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break; // P=X
 	case 0x5f:
-		lh5801_add_mem(*m_io, Y, m_cache->read_byte(P++));
+		lh5801_add_mem(m_io.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x60:
@@ -627,7 +627,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 9;
 		break;
 	case 0x69:
-		lh5801_and_mem(*m_io, U, m_cache->read_byte(P++));
+		lh5801_and_mem(m_io.space(), U, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x6a:
@@ -635,15 +635,15 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 11;
 		break;
 	case 0x6b:
-		lh5801_ora_mem(*m_io, U, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_io.space(), U, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x6d:
-		lh5801_bit(m_io->read_byte(X), m_cache->read_byte(P++));
+		lh5801_bit(m_io.read_byte(X), m_cache.read_byte(P++));
 		m_icount -= 14;
 		break;
 	case 0x6f:
-		lh5801_add_mem(*m_io, U, m_cache->read_byte(P++));
+		lh5801_add_mem(m_io.space(), U, m_cache.read_byte(P++));
 		m_icount -= 17;
 		break;
 	case 0x81: /*sie*/
@@ -659,7 +659,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 12;
 		break;
 	case 0x8c:
-		lh5801_dca(m_io->read_byte(X));
+		lh5801_dca(m_io.read_byte(X));
 		m_icount -= 19;
 		break;
 	case 0x8e:
@@ -671,23 +671,23 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 14;
 		break;
 	case 0x9c:
-		lh5801_dca(m_io->read_byte(Y));
+		lh5801_dca(m_io.read_byte(Y));
 		m_icount -= 19;
 		break;
 	case 0xa1:
-		lh5801_sbc(m_io->read_byte(lh5801_readop_word()));
+		lh5801_sbc(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xa3:
-		lh5801_adc(m_io->read_byte(lh5801_readop_word()));
+		lh5801_adc(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xa5:
-		lh5801_lda(m_io->read_byte(lh5801_readop_word()));
+		lh5801_lda(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 16;
 		break;
 	case 0xa7:
-		lh5801_cpa(m_a, m_io->read_byte(lh5801_readop_word()));
+		lh5801_cpa(m_a, m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xa8:
@@ -695,7 +695,7 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 14;
 		break;
 	case 0xa9:
-		lh5801_and(m_io->read_byte(lh5801_readop_word()));
+		lh5801_and(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xaa:
@@ -703,23 +703,23 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 9;
 		break;
 	case 0xab:
-		lh5801_ora(m_io->read_byte(lh5801_readop_word()));
+		lh5801_ora(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xac:
-		lh5801_dca(m_io->read_byte(U));
+		lh5801_dca(m_io.read_byte(U));
 		m_icount -= 19;
 		break;
 	case 0xad:
-		lh5801_eor(m_io->read_byte(lh5801_readop_word()));
+		lh5801_eor(m_io.read_byte(lh5801_readop_word()));
 		m_icount -= 17;
 		break;
 	case 0xae:
-		m_io->write_byte(lh5801_readop_word(), m_a);
+		m_io.write_byte(lh5801_readop_word(), m_a);
 		m_icount -= 16;
 		break;
 	case 0xaf:
-		lh5801_bit(m_io->read_byte(lh5801_readop_word()), m_a);
+		lh5801_bit(m_io.read_byte(lh5801_readop_word()), m_a);
 		m_icount -= 17;
 		break;
 	case 0xb1: /*hlt*/
@@ -758,11 +758,11 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		m_icount -= 9;
 		break;
 	case 0xd3:
-		lh5801_drr(*m_io, X);
+		lh5801_drr(m_io.space(), X);
 		m_icount -= 16;
 		break;
 	case 0xd7:
-		lh5801_drl(*m_io, X);
+		lh5801_drl(m_io.space(), X);
 		m_icount -= 16;
 		break;
 	case 0xda:
@@ -779,12 +779,12 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		break;
 	case 0xe9:
 		adr = lh5801_readop_word();
-		lh5801_and_mem(*m_io, adr, m_cache->read_byte(P++));
+		lh5801_and_mem(m_io.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 23;
 		break;
 	case 0xeb:
 		adr = lh5801_readop_word();
-		lh5801_ora_mem(*m_io, adr, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_io.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 23;
 		break;
 	case 0xec:
@@ -793,12 +793,12 @@ void lh5801_cpu_device::lh5801_instruction_fd()
 		break;
 	case 0xed:
 		adr = lh5801_readop_word();
-		lh5801_bit(m_io->read_byte(adr), m_cache->read_byte(P++));
+		lh5801_bit(m_io.read_byte(adr), m_cache.read_byte(P++));
 		m_icount -= 20;
 		break;
 	case 0xef:
 		adr = lh5801_readop_word();
-		lh5801_add_mem(*m_io, adr, m_cache->read_byte(P++));
+		lh5801_add_mem(m_io.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 23;
 		break;
 
@@ -811,14 +811,14 @@ void lh5801_cpu_device::lh5801_instruction()
 {
 	int adr;
 
-	int oper = m_cache->read_byte(P++);
+	int oper = m_cache.read_byte(P++);
 	switch (oper) {
 	case 0x00:
 		lh5801_sbc(XL);
 		m_icount -= 6;
 		break;
 	case 0x01:
-		lh5801_sbc(m_program->read_byte(X));
+		lh5801_sbc(m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x02:
@@ -826,7 +826,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x03:
-		lh5801_adc(m_program->read_byte(X));
+		lh5801_adc(m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x04:
@@ -834,7 +834,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x05:
-		lh5801_lda(m_program->read_byte(X));
+		lh5801_lda(m_program.read_byte(X));
 		m_icount -= 6;
 		break;
 	case 0x06:
@@ -842,7 +842,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x07:
-		lh5801_cpa(m_a, m_program->read_byte(X));
+		lh5801_cpa(m_a, m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x08:
@@ -850,7 +850,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x09:
-		lh5801_and(m_program->read_byte(X));
+		lh5801_and(m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x0a:
@@ -858,23 +858,23 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x0b:
-		lh5801_ora(m_program->read_byte(X));
+		lh5801_ora(m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x0c:
-		lh5801_dcs(m_program->read_byte(X));
+		lh5801_dcs(m_program.read_byte(X));
 		m_icount -= 13;
 		break;
 	case 0x0d:
-		lh5801_eor(m_program->read_byte(X));
+		lh5801_eor(m_program.read_byte(X));
 		m_icount -= 7;
 		break;
 	case 0x0e:
-		m_program->write_byte(X,m_a);
+		m_program.write_byte(X,m_a);
 		m_icount -= 6;
 		break;
 	case 0x0f:
-		lh5801_bit(m_program->read_byte(X),m_a);
+		lh5801_bit(m_program.read_byte(X),m_a);
 		m_icount -= 7;
 		break;
 	case 0x10:
@@ -882,7 +882,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x11:
-		lh5801_sbc(m_program->read_byte(Y));
+		lh5801_sbc(m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
 	case 0x12:
@@ -890,7 +890,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x13:
-		lh5801_adc(m_program->read_byte(Y));
+		lh5801_adc(m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
 	case 0x14:
@@ -898,7 +898,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x15:
-		lh5801_lda(m_program->read_byte(Y));
+		lh5801_lda(m_program.read_byte(Y));
 		m_icount -= 6;
 		break;
 	case 0x16:
@@ -906,7 +906,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x17:
-		lh5801_cpa(m_a, m_program->read_byte(Y));
+		lh5801_cpa(m_a, m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
 	case 0x18:
@@ -914,7 +914,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x19:
-		lh5801_and(m_program->read_byte(Y));
+		lh5801_and(m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
 	case 0x1a:
@@ -922,22 +922,22 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x1b:
-		lh5801_ora(m_program->read_byte(Y));
+		lh5801_ora(m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
 	case 0x1c:
-		lh5801_dcs(m_program->read_byte(Y));
+		lh5801_dcs(m_program.read_byte(Y));
 		m_icount -= 13;
 		break;
 	case 0x1d:
-		lh5801_eor(m_program->read_byte(Y));
+		lh5801_eor(m_program.read_byte(Y));
 		m_icount -= 7;
 		break;
-	case 0x1e: m_program->write_byte(Y,m_a);
+	case 0x1e: m_program.write_byte(Y,m_a);
 		m_icount -= 6;
 		break;
 	case 0x1f:
-		lh5801_bit(m_program->read_byte(Y),m_a);
+		lh5801_bit(m_program.read_byte(Y),m_a);
 		m_icount -= 7;
 		break;
 	case 0x20:
@@ -945,7 +945,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x21:
-		lh5801_sbc(m_program->read_byte(U));
+		lh5801_sbc(m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x22:
@@ -953,7 +953,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x23:
-		lh5801_adc(m_program->read_byte(U));
+		lh5801_adc(m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x24:
@@ -961,7 +961,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x25:
-		lh5801_lda(m_program->read_byte(U));
+		lh5801_lda(m_program.read_byte(U));
 		m_icount -= 6;
 		break;
 	case 0x26:
@@ -969,7 +969,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0x27:
-		lh5801_cpa(m_a, m_program->read_byte(U));
+		lh5801_cpa(m_a, m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x28:
@@ -977,7 +977,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x29:
-		lh5801_and(m_program->read_byte(U));
+		lh5801_and(m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x2a:
@@ -985,23 +985,23 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0x2b:
-		lh5801_ora(m_program->read_byte(U));
+		lh5801_ora(m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x2c:
-		lh5801_dcs(m_program->read_byte(U));
+		lh5801_dcs(m_program.read_byte(U));
 		m_icount -= 13;
 		break;
 	case 0x2d:
-		lh5801_eor(m_program->read_byte(U));
+		lh5801_eor(m_program.read_byte(U));
 		m_icount -= 7;
 		break;
 	case 0x2e:
-		m_program->write_byte(U, m_a);
+		m_program.write_byte(U, m_a);
 		m_icount -= 6;
 		break;
 	case 0x2f:
-		lh5801_bit(m_program->read_byte(U), m_a);
+		lh5801_bit(m_program.read_byte(U), m_a);
 		m_icount -= 7;
 		break;
 	case 0x38: /*nop*/
@@ -1037,34 +1037,34 @@ void lh5801_cpu_device::lh5801_instruction()
 		lh5801_lde(&m_x);
 		m_icount -= 6;
 		break;
-	case 0x48: XH=m_cache->read_byte(P++);
+	case 0x48: XH=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x49:
-		lh5801_and_mem(*m_program, X, m_cache->read_byte(P++));
+		lh5801_and_mem(m_program.space(), X, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
-	case 0x4a: XL=m_cache->read_byte(P++);
+	case 0x4a: XL=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x4b:
-		lh5801_ora_mem(*m_program, X, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_program.space(), X, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x4c:
-		lh5801_cpa(XH, m_cache->read_byte(P++));
+		lh5801_cpa(XH, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x4d:
-		lh5801_bit(m_program->read_byte(X), m_cache->read_byte(P++));
+		lh5801_bit(m_program.read_byte(X), m_cache.read_byte(P++));
 		m_icount -= 10;
 		break;
 	case 0x4e:
-		lh5801_cpa(XL, m_cache->read_byte(P++));
+		lh5801_cpa(XL, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x4f:
-		lh5801_add_mem(*m_program, X, m_cache->read_byte(P++));
+		lh5801_add_mem(m_program.space(), X, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x50:
@@ -1097,34 +1097,34 @@ void lh5801_cpu_device::lh5801_instruction()
 		lh5801_lde(&m_y);
 		m_icount -= 6;
 		break;
-	case 0x58: YH=m_cache->read_byte(P++);
+	case 0x58: YH=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x59:
-		lh5801_and_mem(*m_program, Y, m_cache->read_byte(P++));
+		lh5801_and_mem(m_program.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
-	case 0x5a: YL=m_cache->read_byte(P++);
+	case 0x5a: YL=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x5b:
-		lh5801_ora_mem(*m_program, Y, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_program.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x5c:
-		lh5801_cpa(YH, m_cache->read_byte(P++));
+		lh5801_cpa(YH, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x5d:
-		lh5801_bit(m_program->read_byte(Y), m_cache->read_byte(P++));
+		lh5801_bit(m_program.read_byte(Y), m_cache.read_byte(P++));
 		m_icount -= 10;
 		break;
 	case 0x5e:
-		lh5801_cpa(YL, m_cache->read_byte(P++));
+		lh5801_cpa(YL, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x5f:
-		lh5801_add_mem(*m_program, Y, m_cache->read_byte(P++));
+		lh5801_add_mem(m_program.space(), Y, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x60:
@@ -1157,34 +1157,34 @@ void lh5801_cpu_device::lh5801_instruction()
 		lh5801_lde(&m_u);
 		m_icount -= 6;
 		break;
-	case 0x68: UH=m_cache->read_byte(P++);
+	case 0x68: UH=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x69:
-		lh5801_and_mem(*m_program, U, m_cache->read_byte(P++));
+		lh5801_and_mem(m_program.space(), U, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
-	case 0x6a: UL=m_cache->read_byte(P++);
+	case 0x6a: UL=m_cache.read_byte(P++);
 		m_icount -= 6;
 		break;
 	case 0x6b:
-		lh5801_ora_mem(*m_program, U, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_program.space(), U, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x6c:
-		lh5801_cpa(UH, m_cache->read_byte(P++));
+		lh5801_cpa(UH, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x6d:
-		lh5801_bit(m_program->read_byte(U), m_cache->read_byte(P++));
+		lh5801_bit(m_program.read_byte(U), m_cache.read_byte(P++));
 		m_icount -= 10;
 		break;
 	case 0x6e:
-		lh5801_cpa(UL, m_cache->read_byte(P++));
+		lh5801_cpa(UL, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0x6f:
-		lh5801_add_mem(*m_program, U, m_cache->read_byte(P++));
+		lh5801_add_mem(m_program.space(), U, m_cache.read_byte(P++));
 		m_icount -= 13;
 		break;
 	case 0x80:
@@ -1235,7 +1235,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 8;
 		break;
 	case 0x8c:
-		lh5801_dca(m_program->read_byte(X));
+		lh5801_dca(m_program.read_byte(X));
 		m_icount -= 15;
 		break;
 	case 0x8d:
@@ -1295,7 +1295,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 8;
 		break;
 	case 0x9c:
-		lh5801_dca(m_program->read_byte(Y));
+		lh5801_dca(m_program.read_byte(Y));
 		m_icount -= 15;
 		break;
 	case 0x9d:
@@ -1319,11 +1319,11 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xa1:
-		lh5801_sbc(m_program->read_byte(lh5801_readop_word()));
+		lh5801_sbc(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xa3:
-		lh5801_adc(m_program->read_byte(lh5801_readop_word()));
+		lh5801_adc(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xa4:
@@ -1331,7 +1331,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 5;
 		break;
 	case 0xa5:
-		lh5801_lda(m_program->read_byte(lh5801_readop_word()));
+		lh5801_lda(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 12;
 		break;
 	case 0xa6:
@@ -1339,7 +1339,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xa7:
-		lh5801_cpa(m_a, m_program->read_byte(lh5801_readop_word()));
+		lh5801_cpa(m_a, m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xa8: /*spv*/
@@ -1347,7 +1347,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 4;
 		break;
 	case 0xa9:
-		lh5801_and(m_program->read_byte(lh5801_readop_word()));
+		lh5801_and(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xaa:
@@ -1355,39 +1355,39 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xab:
-		lh5801_ora(m_program->read_byte(lh5801_readop_word()));
+		lh5801_ora(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xac:
-		lh5801_dca(m_program->read_byte(U));
+		lh5801_dca(m_program.read_byte(U));
 		m_icount -= 15;
 		break;
 	case 0xad:
-		lh5801_eor(m_program->read_byte(lh5801_readop_word()));
+		lh5801_eor(m_program.read_byte(lh5801_readop_word()));
 		m_icount -= 13;
 		break;
 	case 0xae:
-		m_program->write_byte(lh5801_readop_word(), m_a);
+		m_program.write_byte(lh5801_readop_word(), m_a);
 		m_icount -= 12;
 		break;
 	case 0xaf:
-		lh5801_bit(m_program->read_byte(lh5801_readop_word()), m_a);
+		lh5801_bit(m_program.read_byte(lh5801_readop_word()), m_a);
 		m_icount -= 13;
 		break;
 	case 0xb1:
-		lh5801_sbc(m_cache->read_byte(P++));
+		lh5801_sbc(m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xb3:
-		lh5801_adc(m_cache->read_byte(P++));
+		lh5801_adc(m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xb5:
-		lh5801_lda(m_cache->read_byte(P++));
+		lh5801_lda(m_cache.read_byte(P++));
 		m_icount -= 6;
 		break;
 	case 0xb7:
-		lh5801_cpa(m_a, m_cache->read_byte(P++));
+		lh5801_cpa(m_a, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xb8: /*rpv*/
@@ -1395,7 +1395,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 4;
 		break;
 	case 0xb9:
-		lh5801_and(m_cache->read_byte(P++));
+		lh5801_and(m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xba:
@@ -1403,11 +1403,11 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 12;
 		break;
 	case 0xbb:
-		lh5801_ora(m_cache->read_byte(P++));
+		lh5801_ora(m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xbd:
-		lh5801_eor(m_cache->read_byte(P++));
+		lh5801_eor(m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xbe:
@@ -1415,39 +1415,39 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 19;
 		break;
 	case 0xbf:
-		lh5801_bit(m_a, m_cache->read_byte(P++));
+		lh5801_bit(m_a, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xc1:
-		lh5801_vector(!(m_t&C), m_cache->read_byte(P++));
+		lh5801_vector(!(m_t&C), m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xc3:
-		lh5801_vector(m_t&C, m_cache->read_byte(P++));
+		lh5801_vector(m_t&C, m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xc5:
-		lh5801_vector(!(m_t&H), m_cache->read_byte(P++));
+		lh5801_vector(!(m_t&H), m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xc7:
-		lh5801_vector(m_t&H, m_cache->read_byte(P++));
+		lh5801_vector(m_t&H, m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xc9:
-		lh5801_vector(!(m_t&Z), m_cache->read_byte(P++));
+		lh5801_vector(!(m_t&Z), m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xcb:
-		lh5801_vector(m_t & Z, m_cache->read_byte(P++));
+		lh5801_vector(m_t & Z, m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xcd:
-		lh5801_vector(1, m_cache->read_byte(P++));
+		lh5801_vector(1, m_cache.read_byte(P++));
 		m_icount -= 7;
 		break;
 	case 0xcf:
-		lh5801_vector(m_t & V, m_cache->read_byte(P++));
+		lh5801_vector(m_t & V, m_cache.read_byte(P++));
 		m_icount -= 8;
 		break;
 	case 0xd1:
@@ -1455,7 +1455,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xd3:
-		lh5801_drr(*m_program, X);
+		lh5801_drr(m_program.space(), X);
 		m_icount -= 12;
 		break;
 	case 0xd5:
@@ -1463,7 +1463,7 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xd7:
-		lh5801_drl(*m_program, X);
+		lh5801_drl(m_program.space(), X);
 		m_icount -= 12;
 		break;
 	case 0xd9:
@@ -1492,22 +1492,22 @@ void lh5801_cpu_device::lh5801_instruction()
 		break;
 	case 0xe9:
 		adr = lh5801_readop_word();
-		lh5801_and_mem(*m_program, adr, m_cache->read_byte(P++));
+		lh5801_and_mem(m_program.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 19;
 		break;
 	case 0xeb:
 		adr = lh5801_readop_word();
-		lh5801_ora_mem(*m_program, adr, m_cache->read_byte(P++));
+		lh5801_ora_mem(m_program.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 19;
 		break;
 	case 0xed:
 		adr = lh5801_readop_word();
-		lh5801_bit(m_program->read_byte(adr), m_cache->read_byte(P++));
+		lh5801_bit(m_program.read_byte(adr), m_cache.read_byte(P++));
 		m_icount -= 16;
 		break;
 	case 0xef:
 		adr = lh5801_readop_word();
-		lh5801_add_mem(*m_program, adr, m_cache->read_byte(P++));
+		lh5801_add_mem(m_program.space(), adr, m_cache.read_byte(P++));
 		m_icount -= 19;
 		break;
 	case 0xf1:
@@ -1515,11 +1515,11 @@ void lh5801_cpu_device::lh5801_instruction()
 		m_icount -= 6;
 		break;
 	case 0xf5: /*tin*/
-		m_program->write_byte(Y++, m_program->read_byte(X++));
+		m_program.write_byte(Y++, m_program.read_byte(X++));
 		m_icount -= 7;
 		break;
 	case 0xf7: /*cin*/
-		lh5801_cpa(m_a, m_program->read_byte(X++));
+		lh5801_cpa(m_a, m_program.read_byte(X++));
 		m_icount -= 7;
 		break;
 	case 0xf9:

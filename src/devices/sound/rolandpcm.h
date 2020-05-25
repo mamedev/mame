@@ -5,7 +5,9 @@
 
 #pragma once
 
-class mb87419_mb87420_device : public device_t, public device_sound_interface, public device_rom_interface
+#include "dirom.h"
+
+class mb87419_mb87420_device : public device_t, public device_sound_interface, public device_rom_interface<22>
 {
 public:
 	mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

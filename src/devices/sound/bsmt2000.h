@@ -14,6 +14,7 @@
 #pragma once
 
 #include "cpu/tms32010/tms32010.h"
+#include "dirom.h"
 
 
 //**************************************************************************
@@ -25,7 +26,7 @@
 
 class bsmt2000_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_rom_interface<32>
 {
 public:
 	typedef device_delegate<void ()> ready_callback;

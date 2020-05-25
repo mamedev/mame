@@ -1937,9 +1937,9 @@ void i386_device::i386_common_init()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
 		// for the 386sx
-		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache16);
 	} else {
-		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache32);
 	}
 
 	m_io = &space(AS_IO);

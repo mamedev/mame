@@ -194,10 +194,10 @@ lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *
 void lc8670_cpu_device::device_start()
 {
 	// find address spaces
-	m_program = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+	space(AS_IO).specific(m_io);
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -973,11 +973,11 @@ uint8_t lc8670_cpu_device::regs_r(offs_t offset)
 		case 0x1d:
 			return m_timer1[1];
 		case 0x44:
-			return (REG_P1 & REG_P1DDR) | (m_io->read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff));
+			return (REG_P1 & REG_P1DDR) | (m_io.read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff));
 		case 0x4c:
-			return (REG_P3 & REG_P3DDR) | (m_io->read_byte(LC8670_PORT3) & (REG_P3DDR ^ 0xff));
+			return (REG_P3 & REG_P3DDR) | (m_io.read_byte(LC8670_PORT3) & (REG_P3DDR ^ 0xff));
 		case 0x5c:
-			return m_io->read_byte(LC8670_PORT7) | 0xf0;    // 4-bit read-only port
+			return m_io.read_byte(LC8670_PORT7) | 0xf0;    // 4-bit read-only port
 		case 0x66:
 		{
 			uint8_t data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
@@ -1041,10 +1041,10 @@ void lc8670_cpu_device::regs_w(offs_t offset, uint8_t data)
 				m_clock_changed = true;
 			break;
 		case 0x44:
-			m_io->write_byte(LC8670_PORT1, ((data | (m_p1_data & REG_P1FCR)) & REG_P1DDR) | (m_io->read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff)));
+			m_io.write_byte(LC8670_PORT1, ((data | (m_p1_data & REG_P1FCR)) & REG_P1DDR) | (m_io.read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff)));
 			break;
 		case 0x4c:
-			m_io->write_byte(LC8670_PORT3, (data & REG_P3DDR) | (m_io->read_byte(LC8670_PORT3) & (REG_P3DDR ^ 0xff)));
+			m_io.write_byte(LC8670_PORT3, (data & REG_P3DDR) | (m_io.read_byte(LC8670_PORT3) & (REG_P3DDR ^ 0xff)));
 			break;
 		case 0x66:
 			m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff] = data;
@@ -1076,7 +1076,7 @@ void lc8670_cpu_device::regs_w(offs_t offset, uint8_t data)
 
 inline uint8_t lc8670_cpu_device::fetch()
 {
-	uint8_t data = m_cache->read_byte(m_pc);
+	uint8_t data = m_cache.read_byte(m_pc);
 
 	set_pc(m_pc + 1);
 
@@ -1085,12 +1085,12 @@ inline uint8_t lc8670_cpu_device::fetch()
 
 inline uint8_t lc8670_cpu_device::read_data(uint16_t offset)
 {
-	return m_data->read_byte(offset);
+	return m_data.read_byte(offset);
 }
 
 inline void lc8670_cpu_device::write_data(uint16_t offset, uint8_t data)
 {
-	m_data->write_byte(offset, data);
+	m_data.write_byte(offset, data);
 }
 
 inline uint8_t lc8670_cpu_device::read_data_latch(uint16_t offset)
@@ -1116,7 +1116,7 @@ inline void lc8670_cpu_device::write_data_latch(uint16_t offset, uint8_t data)
 inline void lc8670_cpu_device::update_port1(uint8_t data)
 {
 	m_p1_data = data;
-	m_io->write_byte(LC8670_PORT1, ((REG_P1 | (m_p1_data & REG_P1FCR)) & REG_P1DDR) | (m_io->read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff)));
+	m_io.write_byte(LC8670_PORT1, ((REG_P1 | (m_p1_data & REG_P1FCR)) & REG_P1DDR) | (m_io.read_byte(LC8670_PORT1) & (REG_P1DDR ^ 0xff)));
 }
 
 inline void lc8670_cpu_device::set_pc(uint16_t new_pc)
@@ -1205,7 +1205,7 @@ inline void lc8670_cpu_device::check_p3int()
 {
 	if (REG_P3INT & 0x04)
 	{
-		if ((m_io->read_byte(LC8670_PORT3) ^ 0xff) & (REG_P3DDR ^ 0xff) & REG_P3)
+		if ((m_io.read_byte(LC8670_PORT3) ^ 0xff) & (REG_P3DDR ^ 0xff) & REG_P3)
 		{
 			REG_P3INT |= 0x02;
 			if (REG_P3INT & 0x01)
@@ -1450,7 +1450,7 @@ int lc8670_cpu_device::op_ldf()
 	uint16_t addr = REG_TRL | (REG_TRH<<8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
-	REG_A = m_program->read_byte(addr);
+	REG_A = m_program.read_byte(addr);
 	CHECK_P();
 	m_bankswitch_func(((REG_EXT & 0x01) ? 1 : (REG_EXT & 0x08) ? 0 : 2));
 
@@ -1462,7 +1462,7 @@ int lc8670_cpu_device::op_stf()
 	uint16_t addr = REG_TRL | (REG_TRH<<8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
-	m_program->write_byte(addr, REG_A);
+	m_program.write_byte(addr, REG_A);
 	m_bankswitch_func(((REG_EXT & 0x01) ? 1 : (REG_EXT & 0x08) ? 0 : 2));
 
 	return 2;
@@ -1687,7 +1687,7 @@ int lc8670_cpu_device::op_ror()
 
 int lc8670_cpu_device::op_ldc()
 {
-	REG_A = m_program->read_byte(((REG_TRH<<8) | REG_TRL) + REG_A);
+	REG_A = m_program.read_byte(((REG_TRH<<8) | REG_TRL) + REG_A);
 	CHECK_P();
 
 	return 2;

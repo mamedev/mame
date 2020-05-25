@@ -64,7 +64,7 @@ private:
 	required_device_array<floppy_connector , 4> m_drives;
 
 	address_space_config m_program_config;
-	memory_access_cache<2 , -2 , ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 2 , -2 , ENDIANNESS_BIG>::cache m_cache;
 
 	address_space *m_mem_space;
 

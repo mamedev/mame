@@ -199,11 +199,9 @@ private:
 	// Address spaces
 	const address_space_config  m_code_config;
 	const address_space_config  m_data_config;
-	address_space *     m_code;
-	address_space *     m_data;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_code_cache;
-	std::function<uint16_t (offs_t)> m_code16;
-	std::function<const void * (offs_t)> m_codeptr;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::cache m_code_cache;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_code;
+	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
 	struct dspp_internal_state
 	{

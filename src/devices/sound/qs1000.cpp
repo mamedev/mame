@@ -167,7 +167,7 @@ ROM_END
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QS1000, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
+		device_rom_interface(mconfig, *this),
 		m_external_rom(false),
 		m_in_p1_cb(*this),
 		m_in_p2_cb(*this),

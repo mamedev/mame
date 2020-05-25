@@ -141,10 +141,10 @@ private:
 	int m_ad_channel;
 
 	uint8_t m_irq_state[2];
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_program;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;
 	devcb_read8::array<8> m_port_input_cb;
 	devcb_write8::array<8> m_port_output_cb;
 	devcb_read8::array<8> m_analog_cb;

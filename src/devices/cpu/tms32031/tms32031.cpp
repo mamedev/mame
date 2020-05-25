@@ -392,8 +392,6 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_irq_pending(false),
 		m_is_idling(false),
 		m_icount(0),
-		m_program(nullptr),
-		m_cache(nullptr),
 		m_internal_rom(*this, "internal_rom"),
 		m_mcbl_mode(false),
 		m_xf0_cb(*this),
@@ -463,7 +461,7 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 
 inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 {
-	return m_cache->read_dword(pc);
+	return m_cache.read_dword(pc);
 }
 
 
@@ -473,7 +471,7 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 
 inline uint32_t tms3203x_device::RMEM(offs_t addr)
 {
-	return m_program->read_dword(addr);
+	return m_program.read_dword(addr);
 }
 
 
@@ -483,7 +481,7 @@ inline uint32_t tms3203x_device::RMEM(offs_t addr)
 
 inline void tms3203x_device::WMEM(offs_t addr, uint32_t data)
 {
-	m_program->write_dword(addr, data);
+	m_program.write_dword(addr, data);
 }
 
 
@@ -494,8 +492,8 @@ inline void tms3203x_device::WMEM(offs_t addr, uint32_t data)
 void tms3203x_device::device_start()
 {
 	// find address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	// resolve devcb handlers
 	m_xf0_cb.resolve_safe();
@@ -507,9 +505,9 @@ void tms3203x_device::device_start()
 	if (m_mcbl_mode)
 	{
 		if (m_internal_rom->base() != nullptr)
-			m_program->install_rom(0x000000, 0x000fff, m_internal_rom->base());
+			m_program.space().install_rom(0x000000, 0x000fff, m_internal_rom->base());
 		else
-			m_program->unmap_read(0x000000, 0x000fff);
+			m_program.space().unmap_read(0x000000, 0x000fff);
 	}
 
 	// save state
@@ -853,9 +851,9 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 		if (m_mcbl_mode != old_mode)
 		{
 			if (m_mcbl_mode && (m_internal_rom->base() != nullptr))
-				m_program->install_rom(0x000000, 0x000fff, m_internal_rom->base());
+				m_program.space().install_rom(0x000000, 0x000fff, m_internal_rom->base());
 			else
-				m_program->unmap_read(0x000000, 0x000fff);
+				m_program.space().unmap_read(0x000000, 0x000fff);
 		}
 		return;
 	}

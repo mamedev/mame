@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "dirom.h"
 #include "scspdsp.h"
 
 #define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
@@ -17,7 +18,7 @@
 
 class scsp_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface
+	public device_rom_interface<20, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP / EG incorrections, etc

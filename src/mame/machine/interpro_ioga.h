@@ -243,7 +243,7 @@ protected:
 	virtual void device_reset() override;
 
 	required_address_space m_memory_space;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_memory;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;

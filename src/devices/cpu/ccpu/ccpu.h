@@ -100,10 +100,10 @@ protected:
 
 	int                 m_icount;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<15, 0,  0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<15, 0,  0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<32, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 5, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
 	uint16_t m_flags;
 };

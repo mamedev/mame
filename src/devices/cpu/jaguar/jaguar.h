@@ -138,9 +138,9 @@ protected:
 	int         m_icount;
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 8, 2, 0, ENDIANNESS_BIG>::specific m_io;
 
 	u32      m_internal_ram_start;
 	u32      m_internal_ram_end;

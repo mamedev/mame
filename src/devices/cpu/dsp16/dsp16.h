@@ -275,7 +275,7 @@ private:
 	// memory system access
 	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_pcache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_pcache;
 	u16                         m_workram_mask;
 
 	// recompiler stuff

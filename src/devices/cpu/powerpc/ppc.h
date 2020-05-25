@@ -292,6 +292,8 @@ protected:
 
 	address_space_config m_program_config;
 	address_space *m_program;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
+	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
 
 	struct internal_ppc_state

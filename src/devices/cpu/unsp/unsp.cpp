@@ -41,12 +41,11 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_core(nullptr)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1, internal)
-	, m_program(nullptr)
 	, m_debugger_temp(0)
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	, m_log_ops(0)
 #endif
-	, m_cache(CACHE_SIZE + sizeof(unsp_device))
+	, m_drccache(CACHE_SIZE + sizeof(unsp_device))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -193,7 +192,7 @@ void unsp_device::unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm
 void unsp_device::device_start()
 {
 
-	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
+	m_core = (internal_unsp_state *)m_drccache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
 
 #if ENABLE_UNSP_DRC
@@ -211,13 +210,11 @@ void unsp_device::device_start()
 
 	m_debugger_temp = 0;
 
-	m_program = &space(AS_PROGRAM);
-	auto cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
-	m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
-	m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 23, 0);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
 
 	// add UML symbols-
 	m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");

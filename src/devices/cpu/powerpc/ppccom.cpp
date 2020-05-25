@@ -722,24 +722,24 @@ void ppc_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if(m_cap & PPCCAP_4XX)
 	{
-		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+		m_program->cache(m_cache32);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache32.read_dword(address); };
+		m_prptr = [this](offs_t address) -> const void * { return m_cache32.read_ptr(address); };
 	}
 	else
 	{
-		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_program->cache(m_cache64);
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache64.read_dword(address); };
 		if(space_config()->m_endianness != ENDIANNESS_NATIVE)
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(m_cache64.read_ptr(address & ~7));
 				if(!(address & 4))
 					ptr++;
 				return ptr;
 			};
 		else
-			m_prptr = [cache](offs_t address) -> const void * {
-				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+			m_prptr = [this](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(m_cache64.read_ptr(address & ~7));
 				if(address & 4)
 					ptr++;
 				return ptr;

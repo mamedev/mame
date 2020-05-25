@@ -612,7 +612,6 @@ protected:
 	required_device<ncr53c90a_device> m_scsi;
 
 	required_device<address_map_bank_device> m_type1space;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_type1_cache;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 

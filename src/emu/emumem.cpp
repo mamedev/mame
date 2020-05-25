@@ -80,103 +80,103 @@ void handler_entry::enumerate_references(handler_entry::reflist &refs) const
 {
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::get_dispatch(handler_entry_read<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const
+template<int Width, int AddrShift, endianness_t Endian> const handler_entry_read<Width, AddrShift, Endian> *const *handler_entry_read<Width, AddrShift, Endian>::get_dispatch() const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const
 {
 	fatalerror("lookup called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void *handler_entry_read<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
+template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_read<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
 	return nullptr;
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_read<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_read<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	fatalerror("detach called on non-dispatching class\n");
 }
 
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const
+template<int Width, int AddrShift, endianness_t Endian> const handler_entry_write<Width, AddrShift, Endian> *const *handler_entry_write<Width, AddrShift, Endian>::get_dispatch() const
 {
 	fatalerror("get_dispatch called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler)
 {
 	fatalerror("populate called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_mismatched called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings)
 {
 	fatalerror("populate_passthrough called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const
 {
 	fatalerror("lookup called on non-dispatching class\n");
 }
 
-template<int Width, int AddrShift, int Endian> void *handler_entry_write<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
+template<int Width, int AddrShift, endianness_t Endian> void *handler_entry_write<Width, AddrShift, Endian>::get_ptr(offs_t offset) const
 {
 	return nullptr;
 }
 
-template<int Width, int AddrShift, int Endian> void handler_entry_write<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write<Width, AddrShift, Endian>::detach(const std::unordered_set<handler_entry *> &handlers)
 {
 	fatalerror("detach called on non-dispatching class\n");
 }
@@ -283,12 +283,12 @@ const int MEMORY_BLOCK_CHUNK = 65536;                   // minimum chunk size of
 // ======================> address_space_specific
 
 // this is a derived class of address_space with specific width, endianness, and table size
-template<int Width, int AddrShift, endianness_t Endian>
+template<int Level, int Width, int AddrShift, endianness_t Endian>
 class address_space_specific : public address_space
 {
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using NativeType = uX;
-	using this_type = address_space_specific<Width, AddrShift, Endian>;
+	using this_type = address_space_specific<Level, Width, AddrShift, Endian>;
 
 	// constants describing the native size
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
@@ -299,10 +299,8 @@ class address_space_specific : public address_space
 	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 public:
-	handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
-	handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
-	u8 m_shift_read;
-	u8 m_shift_write;
+	const handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
+	const handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
 
 	std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const override;
 	void dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const override;
@@ -519,16 +517,22 @@ public:
 			default: fatalerror("Unhandled address bus width %d\n", address_width);
 		}
 
-		m_root_read->get_dispatch(m_dispatch_read, m_shift_read);
-		m_root_write->get_dispatch(m_dispatch_write, m_shift_write);
+		m_dispatch_read  = m_root_read ->get_dispatch();
+		m_dispatch_write = m_root_write->get_dispatch();
 	}
 
-	void *create_cache() override {
-		return new memory_access_cache<Width, AddrShift, Endian>(*this, m_root_read, m_root_write);
+	std::pair<void *, void *> get_cache_info() override {
+		std::pair<void *, void *> rw;
+		rw.first  = m_root_read;
+		rw.second = m_root_write;
+		return rw;
 	}
 
-	void *create_specific() override {
-		return new memory_access_specific<Width, AddrShift, Endian>(*this, m_dispatch_read, m_shift_read, m_dispatch_write, m_shift_write);
+	std::pair<const void *, const void *> get_specific_info() override {
+		std::pair<const void *, const void *> rw;
+		rw.first  = m_dispatch_read;
+		rw.second = m_dispatch_write;
+		return rw;
 	}
 
 	void delayed_ref(handler_entry *e) {
@@ -595,25 +599,25 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Width, AddrShift, Endian>(offs_t(-1), m_shift_read, offset & m_addrmask, mask, m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift, Endian>(m_addrmask, offset, mask, m_dispatch_read);;
 	}
 
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
-		return dispatch_read<Width, AddrShift, Endian>(offs_t(-1), m_shift_read, offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift, Endian>(m_addrmask, offset, uX(0xffffffffffffffffU), m_dispatch_read);
 	}
 
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Width, AddrShift, Endian>(offs_t(-1), m_shift_write, offset & m_addrmask, data, mask, m_dispatch_write);
+		dispatch_write<Level, Width, AddrShift, Endian>(m_addrmask, offset, data, mask, m_dispatch_write);;
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Width, AddrShift, Endian>(offs_t(-1), m_shift_write, offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
+		dispatch_write<Level, Width, AddrShift, Endian>(m_addrmask, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
 	}
 
 	// virtual access to these functions
@@ -907,92 +911,69 @@ void memory_manager::allocate(device_memory_interface &memory)
 		address_space_config const *const spaceconfig = memory.space_config(spacenum);
 		if (spaceconfig)
 		{
+			int level = emu::detail::handler_entry_dispatch_level(spaceconfig->addr_width());
 			// allocate one of the appropriate type
-			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
+			switch ((level << 8) | (spaceconfig->endianness() == ENDIANNESS_BIG ? 0x1000 : 0) |spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
-				case  8|(4+1):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000| 8|(4+1): memory.allocate<address_space_specific<0, 0,  1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000| 8|(4+1): memory.allocate<address_space_specific<0, 0,  1, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100| 8|(4+1): memory.allocate<address_space_specific<1, 0,  1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100| 8|(4+1): memory.allocate<address_space_specific<1, 0,  1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case  8|(4-0):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<0,  0, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000| 8|(4-0): memory.allocate<address_space_specific<0, 0,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000| 8|(4-0): memory.allocate<address_space_specific<0, 0,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100| 8|(4-0): memory.allocate<address_space_specific<1, 0,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100| 8|(4-0): memory.allocate<address_space_specific<1, 0,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 16|(4+3):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<1,  3, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<1,  3, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|16|(4+3): memory.allocate<address_space_specific<0, 1,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|16|(4+3): memory.allocate<address_space_specific<0, 1,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|16|(4+3): memory.allocate<address_space_specific<1, 1,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|16|(4+3): memory.allocate<address_space_specific<1, 1,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 16|(4-0):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<1,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<1,  0, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|16|(4-0): memory.allocate<address_space_specific<0, 1,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|16|(4-0): memory.allocate<address_space_specific<0, 1,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|16|(4-0): memory.allocate<address_space_specific<1, 1,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|16|(4-0): memory.allocate<address_space_specific<1, 1,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 16|(4-1):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<1, -1, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<1, -1, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|16|(4-1): memory.allocate<address_space_specific<0, 1, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|16|(4-1): memory.allocate<address_space_specific<0, 1, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 32|(4-0):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<2,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<2,  0, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|32|(4-0): memory.allocate<address_space_specific<1, 2,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|32|(4-0): memory.allocate<address_space_specific<1, 2,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 32|(4-1):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<2, -1, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<2, -1, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|32|(4-1): memory.allocate<address_space_specific<0, 2, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|32|(4-1): memory.allocate<address_space_specific<0, 2, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|32|(4-1): memory.allocate<address_space_specific<1, 2, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|32|(4-1): memory.allocate<address_space_specific<1, 2, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 32|(4-2):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<2, -2, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<2, -2, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|32|(4-2): memory.allocate<address_space_specific<0, 2, -2, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|32|(4-2): memory.allocate<address_space_specific<0, 2, -2, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|32|(4-2): memory.allocate<address_space_specific<1, 2, -2, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|32|(4-2): memory.allocate<address_space_specific<1, 2, -2, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 64|(4-0):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<3,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<3,  0, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|64|(4-0): memory.allocate<address_space_specific<0, 3,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|64|(4-0): memory.allocate<address_space_specific<0, 3,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|64|(4-0): memory.allocate<address_space_specific<1, 3,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|64|(4-0): memory.allocate<address_space_specific<1, 3,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 64|(4-1):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<3, -1, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<3, -1, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|64|(4-1): memory.allocate<address_space_specific<0, 3, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|64|(4-1): memory.allocate<address_space_specific<0, 3, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|64|(4-1): memory.allocate<address_space_specific<1, 3, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|64|(4-1): memory.allocate<address_space_specific<1, 3, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 64|(4-2):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<3, -2, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<3, -2, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|64|(4-2): memory.allocate<address_space_specific<0, 3, -2, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|64|(4-2): memory.allocate<address_space_specific<0, 3, -2, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|64|(4-2): memory.allocate<address_space_specific<1, 3, -2, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|64|(4-2): memory.allocate<address_space_specific<1, 3, -2, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
-				case 64|(4-3):
-					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
-						memory.allocate<address_space_specific<3, -3, ENDIANNESS_LITTLE>>(*this, spacenum);
-					else
-						memory.allocate<address_space_specific<3, -3, ENDIANNESS_BIG   >>(*this, spacenum);
-					break;
+				case 0x0000|0x000|64|(4-3): memory.allocate<address_space_specific<0, 3, -3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|64|(4-3): memory.allocate<address_space_specific<0, 3, -3, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|64|(4-3): memory.allocate<address_space_specific<1, 3, -3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|64|(4-3): memory.allocate<address_space_specific<1, 3, -3, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
 				default:
 					throw emu_fatalerror("Invalid width %d/shift %d specified for address_space::allocate", spaceconfig->data_width(), spaceconfig->addr_shift());
@@ -1885,7 +1866,7 @@ memory_passthrough_handler *address_space::install_readwrite_tap(offs_t addrstar
 //  describing the handler at a particular offset
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> std::string address_space_specific<Width, AddrShift, Endian>::get_handler_string(read_or_write readorwrite, offs_t address) const
+template<int Level, int Width, int AddrShift, endianness_t Endian> std::string address_space_specific<Level, Width, AddrShift, Endian>::get_handler_string(read_or_write readorwrite, offs_t address) const
 {
 	if (readorwrite == read_or_write::READ) {
 		offs_t start, end;
@@ -1900,7 +1881,7 @@ template<int Width, int AddrShift, endianness_t Endian> std::string address_spac
 	}
 }
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::dump_maps(std::vector<memory_entry> &read_map, std::vector<memory_entry> &write_map) const
 {
 	read_map.clear();
 	write_map.clear();
@@ -1917,7 +1898,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  unmap - unmap a section of address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
 	VPRINTF(("address_space::unmap(%s-%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -1949,7 +1930,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  install_read_tap - install a read tap on the bus
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Width, AddrShift, Endian>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_read_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -1971,7 +1952,7 @@ template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handl
 //  install_write_tap - install a write tap on the bus
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Width, AddrShift, Endian>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_write_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -1992,7 +1973,7 @@ template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handl
 //  install_write_tap - install a read and a write tap on the bus
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Width, AddrShift, Endian>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *address_space_specific<Level, Width, AddrShift, Endian>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -2023,7 +2004,7 @@ template<int Width, int AddrShift, endianness_t Endian> memory_passthrough_handl
 //  of a live device into this address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth)
 {
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, unitmask, cswidth, m_device, delegate);
@@ -2038,7 +2019,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  handler into this address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2082,7 +2063,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  mapping to a particular bank
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2118,7 +2099,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2153,7 +2134,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  RAM region into the given address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
+template<int Level, int Width, int AddrShift, endianness_t Endian> void address_space_specific<Level, Width, AddrShift, Endian>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	VPRINTF(("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2367,80 +2348,6 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	membank->add_reference(*this, readorwrite);
 	return *membank;
 }
-
-
-//**************************************************************************
-//  CACHE MEMORY RANGES
-//**************************************************************************
-
-//-------------------------------------------------
-//  memory_access_cache - constructor
-//-------------------------------------------------
-
-template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrShift, Endian>::memory_access_cache(address_space &space,
-																												  handler_entry_read <Width, AddrShift, Endian> *root_read,
-																												  handler_entry_write<Width, AddrShift, Endian> *root_write)
-	: m_space(space),
-	  m_addrmask(space.addrmask()),
-	  m_addrstart_r(1),
-	  m_addrend_r(0),
-	  m_addrstart_w(1),
-	  m_addrend_w(0),
-	  m_cache_r(nullptr),
-	  m_cache_w(nullptr),
-	  m_root_read(root_read),
-	  m_root_write(root_write)
-{
-	m_notifier_id = space.add_change_notifier([this](read_or_write mode) {
-												  if(u32(mode) & u32(read_or_write::READ)) {
-													  m_addrend_r = 0;
-													  m_addrstart_r = 1;
-													  m_cache_r = nullptr;
-												  }
-												  if(u32(mode) & u32(read_or_write::WRITE)) {
-													  m_addrend_w = 0;
-													  m_addrstart_w = 1;
-													  m_cache_w = nullptr;
-												  }
-											  });
-}
-
-
-//-------------------------------------------------
-//  ~memory_access_cache - destructor
-//-------------------------------------------------
-
-template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrShift, Endian>::~memory_access_cache()
-{
-	m_space.remove_change_notifier(m_notifier_id);
-}
-
-
-template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
-template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
-template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
-template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
-template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;
-template class memory_access_cache<1,  3, ENDIANNESS_BIG>;
-template class memory_access_cache<1,  0, ENDIANNESS_LITTLE>;
-template class memory_access_cache<1,  0, ENDIANNESS_BIG>;
-template class memory_access_cache<1, -1, ENDIANNESS_LITTLE>;
-template class memory_access_cache<1, -1, ENDIANNESS_BIG>;
-template class memory_access_cache<2,  0, ENDIANNESS_LITTLE>;
-template class memory_access_cache<2,  0, ENDIANNESS_BIG>;
-template class memory_access_cache<2, -1, ENDIANNESS_LITTLE>;
-template class memory_access_cache<2, -1, ENDIANNESS_BIG>;
-template class memory_access_cache<2, -2, ENDIANNESS_LITTLE>;
-template class memory_access_cache<2, -2, ENDIANNESS_BIG>;
-template class memory_access_cache<3,  0, ENDIANNESS_LITTLE>;
-template class memory_access_cache<3,  0, ENDIANNESS_BIG>;
-template class memory_access_cache<3, -1, ENDIANNESS_LITTLE>;
-template class memory_access_cache<3, -1, ENDIANNESS_BIG>;
-template class memory_access_cache<3, -2, ENDIANNESS_LITTLE>;
-template class memory_access_cache<3, -2, ENDIANNESS_BIG>;
-template class memory_access_cache<3, -3, ENDIANNESS_LITTLE>;
-template class memory_access_cache<3, -3, ENDIANNESS_BIG>;
-
 
 
 //**************************************************************************

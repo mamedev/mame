@@ -227,7 +227,7 @@ protected:
 
 	struct translated_t
 	{
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *const cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache *const cache;
 		const u32 address;
 	};
 
@@ -240,7 +240,7 @@ protected:
 	struct memory_t
 	{
 		address_space *space;
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache cache;
 	};
 
 	// address translation
@@ -562,7 +562,7 @@ private:
 		u32 ra; // real address field
 		u32 va; // virtual address field
 
-		memory_access_cache<2, 0, ENDIANNESS_LITTLE> *cache;
+		memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache cache;
 	};
 	struct tlb_set_t
 	{

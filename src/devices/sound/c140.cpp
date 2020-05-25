@@ -95,7 +95,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 c140_device::c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_BIG, 16) // Verified from schematics (24 bit address, 12(16? for C219) bit data)
+	, device_rom_interface(mconfig, *this)
 	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)

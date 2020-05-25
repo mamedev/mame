@@ -143,7 +143,7 @@ m68hc05_device::m68hc05_device(
 			owner,
 			clock,
 			type,
-			{ s_hc_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
+			{ addr_width > 13 ? s_hc_b_ops : s_hc_s_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
 			internal_map)
 	, m_port_cb_r(*this)
 	, m_port_cb_w(*this)
@@ -582,10 +582,19 @@ void m68hc05_device::interrupt()
 {
 	if ((m_pending_interrupts & M68HC05_INT_MASK) && !(CC & IFLAG))
 	{
-		pushword(m_pc);
-		pushbyte(m_x);
-		pushbyte(m_a);
-		pushbyte(m_cc);
+		if (m_params.m_addr_width > 13) {
+			pushword<true>(m_pc);
+			pushbyte<true>(m_x);
+			pushbyte<true>(m_a);
+			pushbyte<true>(m_cc);
+		}
+		else
+		{
+			pushword<false>(m_pc);
+			pushbyte<false>(m_x);
+			pushbyte<false>(m_a);
+			pushbyte<false>(m_cc);
+		}
 		SEI;
 		standard_irq_callback(0);
 
@@ -594,12 +603,18 @@ void m68hc05_device::interrupt()
 			LOGINT("servicing external interrupt\n");
 			m_irq_latch = 0;
 			m_pending_interrupts &= ~M68HC05_INT_IRQ;
-			rm16(M68HC05_VECTOR_IRQ & m_params.m_vector_mask, m_pc);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_IRQ & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_IRQ & m_params.m_vector_mask, m_pc);
 		}
 		else if (m_pending_interrupts & M68HC05_INT_TIMER)
 		{
 			LOGINT("servicing timer interrupt\n");
-			rm16(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 		}
 		else
 		{
@@ -965,8 +980,8 @@ void m68hc705c8a_device::device_reset()
 	m68hc705_device::device_reset();
 
 	// latch MOR registers on reset
-	set_port_interrupt(std::array<u8, PORT_COUNT>{{ 0x00, u8(rdmem(0xfff0)), 0x00, 0x00 }});
-	set_ncope(BIT(rdmem(0xfff1), 0));
+	set_port_interrupt(std::array<u8, PORT_COUNT>{{ 0x00, u8(rdmem<false>(0xfff0)), 0x00, 0x00 }});
+	set_ncope(BIT(rdmem<false>(0xfff1), 0));
 
 	// RAM disabled, IRQ negative edge and level sensitive
 	m_option = 0x02;
@@ -1064,7 +1079,7 @@ void m68hc705j1a_device::device_reset()
 	m68hc705_device::device_reset();
 
 	// latch MOR register on reset
-	set_ncope(BIT(rdmem(0x07f1), 0)); // FIXME: this is more like C8A's PCOP
+	set_ncope(BIT(rdmem<false>(0x07f1), 0)); // FIXME: this is more like C8A's PCOP
 }
 
 

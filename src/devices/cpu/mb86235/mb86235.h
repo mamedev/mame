@@ -74,8 +74,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	memory_access_cache<3, -3, ENDIANNESS_LITTLE> *m_pcache;
-
 private:
 
 	struct mb86235_flags
@@ -174,9 +172,10 @@ private:
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<mb86235_frontend> m_drcfe;
 
-	address_space *m_program;
-	address_space *m_dataa;
-	address_space *m_datab;
+	memory_access<32, 3, -3, ENDIANNESS_LITTLE>::cache m_pcache;
+	memory_access<32, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_dataa;
+	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::specific m_datab;
 
 	/* internal compiler state */
 	struct compiler_state

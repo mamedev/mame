@@ -191,9 +191,9 @@ struct dsp56156_core
 	int             interrupt_cycles;
 	void            (*output_pins_changed)(uint32_t pins);
 	cpu_device *device;
-	address_space *program;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *cache;
-	address_space *data;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific program;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific data;
 
 	uint16_t peripheral_ram[0x40];
 	uint16_t *program_ram;

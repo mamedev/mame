@@ -109,8 +109,8 @@ protected:
 	public:
 		virtual u8 read_vector(u16 adr) = 0;
 
-		address_space *data;
-		memory_access_cache<0, 0, ENDIANNESS_LITTLE> *dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific data;
 
 		bool irq_service;
 		bool irr_enable;

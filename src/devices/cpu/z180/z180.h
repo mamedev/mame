@@ -203,11 +203,9 @@ private:
 	uint8_t   m_timer_cnt;                      // timer counter / divide by 20
 	uint8_t   m_dma0_cnt;                       // DMA0 counter / divide by 20
 	uint8_t   m_dma1_cnt;                       // DMA1 counter / divide by 20
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_oprogram;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ocache;
-	address_space *m_iospace;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;
 	int m_icount;

@@ -127,10 +127,10 @@ protected:
 	required_shared_ptr<uint16_t> m_b2;
 	optional_shared_ptr<uint16_t> m_b3;
 
-	address_space *m_program;
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
-	address_space *m_data;
-	address_space *m_io;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
 	typedef void ( tms32025_device::*opcode_func ) ();
 	struct tms32025_opcode

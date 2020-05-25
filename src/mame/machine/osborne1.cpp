@@ -130,7 +130,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	}
 
 	// Now that's sorted out we can call the normal read handler
-	return m_mem_cache->read_byte(offset);
+	return m_mem_cache.read_byte(offset);
 }
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )
@@ -287,7 +287,7 @@ void osborne1_state::machine_start()
 
 	m_acia_rxc_txc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::acia_rxc_txc_callback), this));
 
-	m_mem_cache = m_maincpu->space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
+	m_maincpu->space(AS_PROGRAM).cache(m_mem_cache);
 
 	save_item(NAME(m_acia_rxc_txc_div));
 	save_item(NAME(m_acia_rxc_txc_p_low));

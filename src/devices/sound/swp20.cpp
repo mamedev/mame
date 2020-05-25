@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(SWP20, swp20_device, "swp20", "Yamaha SWP20 sound chip")
 swp20_device::swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SWP20, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
-	  device_rom_interface(mconfig, *this, 23+2, ENDIANNESS_LITTLE, 16)
+	  device_rom_interface(mconfig, *this)
 {
 }
 

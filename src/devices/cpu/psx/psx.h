@@ -208,8 +208,8 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE>* m_instruction;
-	memory_access_specific<2, 0, ENDIANNESS_LITTLE> *m_data;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_instruction;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// other internal states
 	int m_icount;

@@ -94,7 +94,7 @@ const int k053260_device::pan_mul[8][2] = {
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K053260, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 21)
+	, device_rom_interface(mconfig, *this)
 	, m_sh1_cb(*this)
 	, m_sh2_cb(*this)
 	, m_stream(nullptr)

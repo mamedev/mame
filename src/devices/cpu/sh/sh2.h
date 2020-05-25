@@ -244,6 +244,8 @@ private:
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
+
+
 	// SCI
 	uint8_t m_smr = 0, m_brr = 0, m_scr = 0, m_tdr = 0, m_ssr = 0;
 	// FRT / FRC

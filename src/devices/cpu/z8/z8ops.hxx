@@ -139,7 +139,7 @@ INSTRUCTION( ld_IR2_R1 )        { mode_IR2_R1(load) }
 INSTRUCTION( ld_R1_IM )         { mode_R1_IM(load) }
 INSTRUCTION( ld_IR1_IM )        { mode_IR1_IM(load) }
 
-void z8_device::load_from_memory(address_space &space)
+void z8_device::load_from_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space)
 {
 	uint8_t operands = fetch();
 	uint8_t dst = get_working_register(operands >> 4);
@@ -148,29 +148,29 @@ void z8_device::load_from_memory(address_space &space)
 	uint16_t address = register_pair_read(src);
 
 	uint8_t data;
-	if (&space == m_program && address < m_rom_size)
-		data = m_cache->read_byte(address);
+	if (space.space().spacenum() == AS_PROGRAM && address < m_rom_size)
+		data = m_cache.read_byte(address);
 	else
 		data = space.read_byte(mask_external_address(address));
 
 	register_write(dst, data);
 }
 
-void z8_device::load_to_memory(address_space &space)
+void z8_device::load_to_memory(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space)
 {
 	uint8_t operands = fetch();
 	uint8_t src = get_working_register(operands >> 4);
 	uint8_t dst = get_working_register(operands & 0x0f);
 
 	uint16_t address = register_pair_read(dst);
-	if (&space != m_program || address >= m_rom_size)
+	if (space.space().spacenum() != AS_PROGRAM || address >= m_rom_size)
 		address = mask_external_address(address);
 
 	uint8_t data = register_read(src);
 	space.write_byte(address, data);
 }
 
-void z8_device::load_from_memory_autoinc(address_space &space)
+void z8_device::load_from_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space)
 {
 	uint8_t operands = fetch();
 	uint8_t dst = get_working_register(operands >> 4);
@@ -180,8 +180,8 @@ void z8_device::load_from_memory_autoinc(address_space &space)
 	uint16_t address = register_pair_read(src);
 
 	uint8_t data;
-	if (&space == m_program && address < m_rom_size)
-		data = m_cache->read_byte(address);
+	if (space.space().spacenum() == AS_PROGRAM && address < m_rom_size)
+		data = m_cache.read_byte(address);
 	else
 		data = space.read_byte(mask_external_address(address));
 	register_write(real_dst, data);
@@ -190,7 +190,7 @@ void z8_device::load_from_memory_autoinc(address_space &space)
 	register_pair_write(src, address + 1);
 }
 
-void z8_device::load_to_memory_autoinc(address_space &space)
+void z8_device::load_to_memory_autoinc(memory_access<16, 0, 0, ENDIANNESS_BIG>::specific &space)
 {
 	uint8_t operands = fetch();
 	uint8_t src = get_working_register(operands >> 4);
@@ -200,7 +200,7 @@ void z8_device::load_to_memory_autoinc(address_space &space)
 	uint16_t address = register_pair_read(dst);
 	uint8_t data = register_read(real_src);
 
-	if (&space != m_program || address >= m_rom_size)
+	if (space.space().spacenum() == AS_PROGRAM || address >= m_rom_size)
 		address = mask_external_address(address);
 	space.write_byte(address, data);
 
@@ -208,14 +208,14 @@ void z8_device::load_to_memory_autoinc(address_space &space)
 	register_write(src, real_src + 1);
 }
 
-INSTRUCTION( ldc_r1_Irr2 )      { load_from_memory(*m_program); }
-INSTRUCTION( ldc_r2_Irr1 )      { load_to_memory(*m_program); }
-INSTRUCTION( ldci_Ir1_Irr2 )    { load_from_memory_autoinc(*m_program); }
-INSTRUCTION( ldci_Ir2_Irr1 )    { load_to_memory_autoinc(*m_program); }
-INSTRUCTION( lde_r1_Irr2 )      { load_from_memory(*m_data); }
-INSTRUCTION( lde_r2_Irr1 )      { load_to_memory(*m_data); }
-INSTRUCTION( ldei_Ir1_Irr2 )    { load_from_memory_autoinc(*m_data); }
-INSTRUCTION( ldei_Ir2_Irr1 )    { load_to_memory_autoinc(*m_data); }
+INSTRUCTION( ldc_r1_Irr2 )      { load_from_memory(m_program); }
+INSTRUCTION( ldc_r2_Irr1 )      { load_to_memory(m_program); }
+INSTRUCTION( ldci_Ir1_Irr2 )    { load_from_memory_autoinc(m_program); }
+INSTRUCTION( ldci_Ir2_Irr1 )    { load_to_memory_autoinc(m_program); }
+INSTRUCTION( lde_r1_Irr2 )      { load_from_memory(m_data); }
+INSTRUCTION( lde_r2_Irr1 )      { load_to_memory(m_data); }
+INSTRUCTION( ldei_Ir1_Irr2 )    { load_from_memory_autoinc(m_data); }
+INSTRUCTION( ldei_Ir2_Irr1 )    { load_to_memory_autoinc(m_data); }
 
 void z8_device::pop(uint8_t dst)
 {

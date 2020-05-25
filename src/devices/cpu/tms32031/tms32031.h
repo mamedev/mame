@@ -768,8 +768,8 @@ protected:
 	int                 m_icount;
 
 	uint32_t            m_iotemp;
-	address_space *     m_program;
-	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
 
 	optional_memory_region m_internal_rom;
 

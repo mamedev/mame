@@ -385,6 +385,9 @@ public:
 	std::function<u16 (offs_t)> m_pr16;
 	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_program;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
+	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64be;
+	memory_access<32, 3, 0, ENDIANNESS_LITTLE>::cache m_cache64le;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	uint32_t              m_drcoptions;         /* configurable DRC options */

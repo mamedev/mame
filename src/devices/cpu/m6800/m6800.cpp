@@ -122,26 +122,26 @@ TODO:
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define RM(Addr) ((unsigned)m_program->read_byte(Addr))
+#define RM(Addr) (m_program.read_byte(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define WM(Addr,Value) (m_program->write_byte(Addr,Value))
+#define WM(Addr,Value) (m_program.write_byte(Addr,Value))
 
 /****************************************************************************/
 /* M6800_RDOP() is identical to M6800_RDMEM() except it is used for reading */
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)m_opcodes_cache->read_byte(Addr))
+#define M_RDOP(Addr) (m_copcodes.read_byte(Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)m_cache->read_byte(Addr))
+#define M_RDOP_ARG(Addr) (m_cprogram.read_byte(Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)  b = M_RDOP_ARG(PCD); PC++
@@ -546,10 +546,9 @@ void m6800_cpu_device::EAT_CYCLES()
 
 void m6800_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_opcodes_cache = m_opcodes->cache<0, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cprogram);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
+	space(AS_PROGRAM).specific(m_program);
 
 	m_pc.d = 0;
 	m_s.d = 0;

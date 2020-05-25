@@ -5,7 +5,7 @@
 
 // dispatches an access among multiple handlers indexed on part of the address
 
-template<int HighBits, int Width, int AddrShift, int Endian> class handler_entry_write_dispatch : public handler_entry_write<Width, AddrShift, Endian>
+template<int HighBits, int Width, int AddrShift, endianness_t Endian> class handler_entry_write_dispatch : public handler_entry_write<Width, AddrShift, Endian>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -15,7 +15,7 @@ public:
 	handler_entry_write_dispatch(address_space *space, const handler_entry::range &init, handler_entry_write<Width, AddrShift, Endian> *handler);
 	~handler_entry_write_dispatch();
 
-	void write(offs_t offset, uX data, uX mem_mask) override;
+	void write(offs_t offset, uX data, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 	void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const override;
 
@@ -35,9 +35,10 @@ public:
 
 	void enumerate_references(handler_entry::reflist &refs) const override;
 
-	virtual void get_dispatch(handler_entry_write<Width, AddrShift, Endian> *const *&dispatch, u8 &shift) const override;
+	virtual const handler_entry_write<Width, AddrShift, Endian> *const *get_dispatch() const override;
 
 protected:
+	static constexpr int    Level    = emu::detail::handler_entry_dispatch_level(HighBits);
 	static constexpr u32    LowBits  = emu::detail::handler_entry_dispatch_lowbits(HighBits, Width, AddrShift);
 	static constexpr u32    BITCOUNT = HighBits > LowBits ? HighBits - LowBits : 0;
 	static constexpr u32    COUNT    = 1 << BITCOUNT;

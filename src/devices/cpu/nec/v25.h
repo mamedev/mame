@@ -78,6 +78,9 @@ private:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	/* internal RAM and register banks */
 	required_shared_ptr<uint16_t> m_internal_ram;
 

@@ -5,7 +5,10 @@
 
 #pragma once
 
-class sknsspr_device : public device_t, public device_video_interface, public device_rom_interface
+#include "dirom.h"
+
+ // TODO : Unknown address bits; maybe 27?
+class sknsspr_device : public device_t, public device_video_interface, public device_rom_interface<27>
 {
 public:
 	sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

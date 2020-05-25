@@ -196,8 +196,8 @@ device_memory_interface::space_config_vector tms7000_device::memory_space_config
 void tms7000_device::device_start()
 {
 	// init/zerofill
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	set_icountptr(m_icount);
 
@@ -635,7 +635,7 @@ void tms7000_device::execute_run()
 	{
 		debugger_instruction_hook(m_pc);
 
-		m_op = m_cache->read_byte(m_pc++);
+		m_op = m_cache.read_byte(m_pc++);
 		execute_one(m_op);
 	} while (m_icount > 0);
 }

@@ -80,7 +80,7 @@ const uint32_t okim9810_device::s_sampling_freq_div_table[16] =
 okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM9810, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
+		device_rom_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),

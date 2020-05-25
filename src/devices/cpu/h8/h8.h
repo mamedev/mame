@@ -113,8 +113,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config program_config, io_config;
-	address_space *program, *io;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *cache;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache cache;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific io;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;

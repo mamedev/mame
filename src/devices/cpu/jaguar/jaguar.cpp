@@ -76,13 +76,13 @@ inline u8 jaguar_cpu_device::CONDITION(u8 x)
 	return condition_table[x + ((m_flags & 7) << 5)];
 }
 
-inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program->read_byte(a); }
-inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program->read_word(a); }
-inline u32 jaguar_cpu_device::READLONG(offs_t a) { return m_program->read_dword(a); }
+inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program.read_byte(a); }
+inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program.read_word(a); }
+inline u32 jaguar_cpu_device::READLONG(offs_t a) { return m_program.read_dword(a); }
 
-inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program->write_byte(a, v); }
-inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program->write_word(a, v); }
-inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v) { m_program->write_dword(a, v); }
+inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program.write_byte(a, v); }
+inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program.write_word(a, v); }
+inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v) { m_program.write_dword(a, v); }
 
 
 /***************************************************************************
@@ -142,7 +142,7 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-inline u16 jaguar_cpu_device::ROPCODE(offs_t pc) { return m_cache->read_word(pc); }
+inline u16 jaguar_cpu_device::ROPCODE(offs_t pc) { return m_cache.read_word(pc); }
 
 // SC414200AT
 DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari Jaguar GPU \"Tom\"")
@@ -355,9 +355,9 @@ void jaguar_cpu_device::device_start()
 {
 	init_tables();
 
-	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));
@@ -1481,12 +1481,12 @@ READ32_MEMBER(jaguardsp_cpu_device::high_accum_r)
 
 u32 jaguar_cpu_device::iobus_r(offs_t offset, u32 mem_mask)
 {
-	return m_io->read_dword(offset*4, mem_mask);
+	return m_io.read_dword(offset*4, mem_mask);
 }
 
 void jaguar_cpu_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_io->write_dword(offset*4, data, mem_mask);
+	m_io.write_dword(offset*4, data, mem_mask);
 }
 
 /***************************************************************************

@@ -113,7 +113,7 @@ m6510_device::mi_6510::mi_6510(m6510_device *_base)
 
 uint8_t m6510_device::mi_6510::read(uint16_t adr)
 {
-	uint8_t res = program->read_byte(adr);
+	uint8_t res = program.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -123,7 +123,7 @@ uint8_t m6510_device::mi_6510::read(uint16_t adr)
 
 uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 {
-	uint8_t res = scache->read_byte(adr);
+	uint8_t res = csprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -133,7 +133,7 @@ uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 
 uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -143,7 +143,7 @@ uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 
 void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 	if(adr == 0x0000)
 		base->dir_w(val);
 	else if(adr == 0x0001)
@@ -175,7 +175,7 @@ m6508_device::mi_6508::mi_6508(m6508_device *_base)
 
 uint8_t m6508_device::mi_6508::read(uint16_t adr)
 {
-	uint8_t res = program->read_byte(adr);
+	uint8_t res = program.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -187,7 +187,7 @@ uint8_t m6508_device::mi_6508::read(uint16_t adr)
 
 uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 {
-	uint8_t res = scache->read_byte(adr);
+	uint8_t res = csprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -199,7 +199,7 @@ uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 
 uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -211,7 +211,7 @@ uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 
 void m6508_device::mi_6508::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr, val);
+	program.write_byte(adr, val);
 	if(adr == 0x0000)
 		base->dir_w(val);
 	else if(adr == 0x0001)

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -14,10 +15,11 @@
 
 
 // ======================> c140_device
+ // Verified from schematics (24 bit address, 12(16? for C219) bit data)
 
 class c140_device : public device_t,
-	public device_sound_interface,
-	public device_rom_interface
+					public device_sound_interface,
+					public device_rom_interface<25, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

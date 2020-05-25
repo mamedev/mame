@@ -64,7 +64,7 @@ ROM_END
 bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BSMT2000, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 32)
+	, device_rom_interface(mconfig, *this)
 	, m_ready_callback(*this)
 	, m_stream(nullptr)
 	, m_cpu(*this, "bsmt2000")

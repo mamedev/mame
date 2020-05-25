@@ -29,20 +29,20 @@ void m6504_device::device_start()
 
 uint8_t m6504_device::mi_6504::read(uint16_t adr)
 {
-	return program->read_byte(adr & 0x1fff);
+	return program.read_byte(adr & 0x1fff);
 }
 
 uint8_t m6504_device::mi_6504::read_sync(uint16_t adr)
 {
-	return scache->read_byte(adr & 0x1fff);
+	return csprogram.read_byte(adr & 0x1fff);
 }
 
 uint8_t m6504_device::mi_6504::read_arg(uint16_t adr)
 {
-	return cache->read_byte(adr & 0x1fff);
+	return cprogram.read_byte(adr & 0x1fff);
 }
 
 void m6504_device::mi_6504::write(uint16_t adr, uint8_t val)
 {
-	program->write_byte(adr & 0x1fff, val);
+	program.write_byte(adr & 0x1fff, val);
 }

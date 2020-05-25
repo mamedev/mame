@@ -72,8 +72,8 @@ score7_cpu_device::score7_cpu_device(const machine_config &mconfig, const char *
 void score7_cpu_device::device_start()
 {
 	// find address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -283,37 +283,37 @@ int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
 
 uint32_t score7_cpu_device::fetch()
 {
-	return m_cache->read_dword(m_pc & ~3);
+	return m_cache.read_dword(m_pc & ~3);
 }
 
 uint8_t score7_cpu_device::read_byte(offs_t offset)
 {
-	return m_program->read_byte(offset);
+	return m_program.read_byte(offset);
 }
 
 uint16_t score7_cpu_device::read_word(offs_t offset)
 {
-	return m_program->read_word(offset & ~1);
+	return m_program.read_word(offset & ~1);
 }
 
 uint32_t score7_cpu_device::read_dword(offs_t offset)
 {
-	return m_program->read_dword(offset & ~3);
+	return m_program.read_dword(offset & ~3);
 }
 
 void score7_cpu_device::write_byte(offs_t offset, uint8_t data)
 {
-	m_program->write_byte(offset, data);
+	m_program.write_byte(offset, data);
 }
 
 void score7_cpu_device::write_word(offs_t offset, uint16_t data)
 {
-	m_program->write_word(offset & ~1, data);
+	m_program.write_word(offset & ~1, data);
 }
 
 void score7_cpu_device::write_dword(offs_t offset, uint32_t data)
 {
-	m_program->write_dword(offset & ~3, data);
+	m_program.write_dword(offset & ~3, data);
 }
 
 void score7_cpu_device::check_irq()

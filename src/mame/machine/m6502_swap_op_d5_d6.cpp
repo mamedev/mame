@@ -39,7 +39,7 @@ uint8_t m6502_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 
 uint8_t m6502_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cache->read_byte(adr);
+	uint8_t res = cprogram.read_byte(adr);
 
 	res = descramble(res);
 

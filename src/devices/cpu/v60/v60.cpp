@@ -412,17 +412,17 @@ void v60_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if (m_program->data_width() == 16)
 	{
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+		m_program->cache(m_cache16);
+		m_pr8  = [this](offs_t address) -> u8  { return m_cache16.read_byte(address); };
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache16.read_word_unaligned(address); };
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache16.read_dword_unaligned(address); };
 	}
 	else
 	{
-		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-		m_pr8  = [cache](offs_t address) -> u8  { return cache->read_byte(address); };
-		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word_unaligned(address); };
-		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword_unaligned(address); };
+		m_program->cache(m_cache32);
+		m_pr8  = [this](offs_t address) -> u8  { return m_cache32.read_byte(address); };
+		m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word_unaligned(address); };
+		m_pr32 = [this](offs_t address) -> u32 { return m_cache32.read_dword_unaligned(address); };
 	}
 
 	m_io = &space(AS_IO);

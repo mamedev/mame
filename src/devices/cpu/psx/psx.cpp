@@ -386,7 +386,7 @@ uint8_t psxcpu_device::readbyte( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_data->read_byte( address );
+		return m_data.read_byte( address );
 	}
 
 	return cache_readword( address ) >> ( ( address & 3 ) * 8 );
@@ -396,7 +396,7 @@ uint16_t psxcpu_device::readhalf( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_data->read_word( address );
+		return m_data.read_word( address );
 	}
 
 	return cache_readword( address ) >> ( ( address & 2 ) * 8 );
@@ -406,7 +406,7 @@ uint32_t psxcpu_device::readword( uint32_t address )
 {
 	if( m_bus_attached )
 	{
-		return m_data->read_dword( address );
+		return m_data.read_dword( address );
 	}
 
 	return cache_readword( address );
@@ -416,7 +416,7 @@ uint32_t psxcpu_device::readword_masked( uint32_t address, uint32_t mask )
 {
 	if( m_bus_attached )
 	{
-		return m_data->read_dword( address, mask );
+		return m_data.read_dword( address, mask );
 	}
 
 	return cache_readword( address );
@@ -426,7 +426,7 @@ void psxcpu_device::writeword( uint32_t address, uint32_t data )
 {
 	if( m_bus_attached )
 	{
-		m_data->write_dword( address, data );
+		m_data.write_dword( address, data );
 	}
 	else
 	{
@@ -438,7 +438,7 @@ void psxcpu_device::writeword_masked( uint32_t address, uint32_t data, uint32_t 
 {
 	if( m_bus_attached )
 	{
-		m_data->write_dword( address, data, mask );
+		m_data.write_dword( address, data, mask );
 	}
 	else
 	{
@@ -1462,7 +1462,7 @@ void psxcpu_device::update_cop0(int reg)
 			//if (ip & CAUSE_IP5) debugger_interrupt_hook(PSXCPU_IRQ3);
 			//if (ip & CAUSE_IP6) debugger_interrupt_hook(PSXCPU_IRQ4);
 			//if (ip & CAUSE_IP7) debugger_interrupt_hook(PSXCPU_IRQ5);
-			m_op = m_instruction->read_dword(m_pc);
+			m_op = m_instruction.read_dword(m_pc);
 			execute_unstoppable_instructions(1);
 			exception(EXC_INT);
 		}
@@ -1490,11 +1490,11 @@ void psxcpu_device::fetch_next_op()
 	{
 		uint32_t safepc = m_delayv & ~m_bad_word_address_mask;
 
-		m_op = m_instruction->read_dword( safepc );
+		m_op = m_instruction.read_dword( safepc );
 	}
 	else
 	{
-		m_op = m_instruction->read_dword( m_pc + 4 );
+		m_op = m_instruction.read_dword( m_pc + 4 );
 	}
 }
 
@@ -1837,8 +1837,8 @@ void psxcpu_device::device_start()
 {
 	// get our address spaces
 	m_program = &space( AS_PROGRAM );
-	m_instruction = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-	m_data = m_program->specific<2, 0, ENDIANNESS_LITTLE>();
+	m_program->cache(m_instruction);
+	m_program->specific(m_data);
 
 	save_item( NAME( m_op ) );
 	save_item( NAME( m_pc ) );
@@ -2350,7 +2350,7 @@ void psxcpu_device::execute_run()
 		}
 		else
 		{
-			m_op = m_instruction->read_dword(m_pc);
+			m_op = m_instruction.read_dword(m_pc);
 
 			if( m_berr )
 			{

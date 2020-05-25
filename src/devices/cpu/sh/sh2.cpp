@@ -532,18 +532,18 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.resolve();
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	auto cache = m_decrypted_program->cache<2, 0, ENDIANNESS_BIG>();
-	m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+	m_decrypted_program->cache(m_cache32);
+	m_pr16 = [this](offs_t address) -> u16 { return m_cache32.read_word(address); };
 	if (m_decrypted_program->endianness() != ENDIANNESS_NATIVE)
-		m_prptr = [cache](offs_t address) -> const void * {
-			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+		m_prptr = [this](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 			if(!(address & 2))
 				ptr++;
 			return ptr;
 		};
 	else
-		m_prptr = [cache](offs_t address) -> const void * {
-			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+		m_prptr = [this](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(m_cache32.read_ptr(address & ~3));
 			if(address & 2)
 				ptr++;
 			return ptr;

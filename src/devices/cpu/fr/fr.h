@@ -43,8 +43,8 @@ protected:
 private:
 	// address space
 	address_space_config m_space_config;
-	address_space *m_space;
-	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_space;
 
 	// internal state
 	u32 m_regs[17]; // includes both SSP and USP

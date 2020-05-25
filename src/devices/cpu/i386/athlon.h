@@ -55,10 +55,10 @@ private:
 	DECLARE_READ32_MEMBER(debug_read_memory);
 
 	address_space_config m_data_config;
-	address_space *m_data;
 	address_space_config m_opcodes_config;
-	address_space *m_opcodes;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *mmacache32;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache mmacache32;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_opcodes;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_data;
 	uint8_t m_processor_name_string[48];
 	offs_t m_msr_top_mem;
 	uint64_t m_msr_sys_cfg;

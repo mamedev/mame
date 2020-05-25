@@ -57,8 +57,7 @@ public:
 		m_p_chargen(*this, "chargen"),
 		m_video_timer(nullptr),
 		m_tilemap(nullptr),
-		m_acia_rxc_txc_timer(nullptr),
-		m_mem_cache(nullptr)
+		m_acia_rxc_txc_timer(nullptr)
 	{
 	}
 
@@ -166,7 +165,7 @@ private:
 	u8              m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
 
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_mem_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_mem_cache;
 };
 
 

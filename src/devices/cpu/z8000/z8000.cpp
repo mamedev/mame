@@ -42,7 +42,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_sio_config("special I/O", ENDIANNESS_BIG, 16, 16, 0)
 	, m_iack_in(*this)
 	, m_mo_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
@@ -96,7 +96,7 @@ uint32_t z8002_device::addr_sub(uint32_t addr, uint32_t subtrahend)
 
 uint16_t z8002_device::RDOP()
 {
-	uint16_t res = m_opcache->read_word(m_pc);
+	uint16_t res = m_opcache.read_word(m_pc);
 	m_pc += 2;
 	return res;
 }
@@ -112,7 +112,7 @@ uint32_t z8002_device::get_operand(int opnum)
 
 	if (! (m_op_valid & (1 << opnum)))
 	{
-		m_op[opnum] = m_cache->read_word(m_pc);
+		m_op[opnum] = m_cache.read_word(m_pc);
 		m_pc += 2;
 		m_op_valid |= (1 << opnum);
 	}
@@ -130,13 +130,13 @@ uint32_t z8002_device::get_addr_operand(int opnum)
 
 	if (! (m_op_valid & (1 << opnum)))
 	{
-		uint32_t seg = m_cache->read_word(m_pc);
+		uint32_t seg = m_cache.read_word(m_pc);
 		m_pc += 2;
 		if (get_segmented_mode())
 		{
 			if (seg & 0x8000)
 			{
-				m_op[opnum] = ((seg & 0x7f00) << 8) | m_cache->read_word(m_pc);
+				m_op[opnum] = ((seg & 0x7f00) << 8) | m_cache.read_word(m_pc);
 				m_pc += 2;
 			}
 			else
@@ -160,13 +160,13 @@ uint32_t z8002_device::get_raw_addr_operand(int opnum)
 
 	if (! (m_op_valid & (1 << opnum)))
 	{
-		uint32_t seg = m_cache->read_word(m_pc);
+		uint32_t seg = m_cache.read_word(m_pc);
 		m_pc += 2;
 		if (get_segmented_mode())
 		{
 			if (seg & 0x8000)
 			{
-				m_op[opnum] = (seg << 16) | m_cache->read_word(m_pc);
+				m_op[opnum] = (seg << 16) | m_cache.read_word(m_pc);
 				m_pc += 2;
 			}
 			else
@@ -196,13 +196,13 @@ uint32_t z8001_device::adjust_addr_for_nonseg_mode(uint32_t addr)
 	}
 }
 
-uint8_t z8002_device::RDMEM_B(address_space &space, uint32_t addr)
+uint8_t z8002_device::RDMEM_B(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	return space.read_byte(addr);
 }
 
-uint16_t z8002_device::RDMEM_W(address_space &space, uint32_t addr)
+uint16_t z8002_device::RDMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -214,7 +214,7 @@ uint16_t z8002_device::RDMEM_W(address_space &space, uint32_t addr)
 	return space.read_word(addr);
 }
 
-uint32_t z8002_device::RDMEM_L(address_space &space, uint32_t addr)
+uint32_t z8002_device::RDMEM_L(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr)
 {
 	uint32_t result;
 	addr = adjust_addr_for_nonseg_mode(addr);
@@ -223,21 +223,21 @@ uint32_t z8002_device::RDMEM_L(address_space &space, uint32_t addr)
 	return result + space.read_word(addr_add(addr, 2));
 }
 
-void z8002_device::WRMEM_B(address_space &space, uint32_t addr, uint8_t value)
+void z8002_device::WRMEM_B(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	uint16_t value16 = value | (value << 8);
 	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
-void z8002_device::WRMEM_W(address_space &space, uint32_t addr, uint16_t value)
+void z8002_device::WRMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific  &space, uint32_t addr, uint16_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
 	space.write_word(addr, value);
 }
 
-void z8002_device::WRMEM_L(address_space &space, uint32_t addr, uint32_t value)
+void z8002_device::WRMEM_L(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific &space, uint32_t addr, uint32_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -247,13 +247,13 @@ void z8002_device::WRMEM_L(address_space &space, uint32_t addr, uint32_t value)
 
 uint8_t z8002_device::RDPORT_B(int mode, uint16_t addr)
 {
-	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	return space.read_byte(addr);
 }
 
 uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
-	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
 		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
 	else
@@ -262,14 +262,14 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 
 void z8002_device::WRPORT_B(int mode, uint16_t addr, uint8_t value)
 {
-	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	uint16_t value16 = value | (value << 8);
 	space.write_word(addr & ~1, value16, BIT(addr, 0) ? 0x00ff : 0xff00);
 }
 
 void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
-	address_space &space = (mode == 0) ? *m_io : *m_sio;
+	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
 		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
 	else
@@ -297,32 +297,32 @@ void z8001_device::PUSH_PC()
 
 uint32_t z8002_device::GET_PC(uint32_t VEC)
 {
-	return RDMEM_W(*m_program, VEC + 2);
+	return RDMEM_W(m_program, VEC + 2);
 }
 
 uint32_t z8001_device::GET_PC(uint32_t VEC)
 {
-	return segmented_addr(RDMEM_L(*m_program, VEC + 4));
+	return segmented_addr(RDMEM_L(m_program, VEC + 4));
 }
 
 uint32_t z8002_device::get_reset_pc()
 {
-	return RDMEM_W(*m_program, 4);
+	return RDMEM_W(m_program, 4);
 }
 
 uint32_t z8001_device::get_reset_pc()
 {
-	return segmented_addr(RDMEM_L(*m_program, 4));
+	return segmented_addr(RDMEM_L(m_program, 4));
 }
 
 uint16_t z8002_device::GET_FCW(uint32_t VEC)
 {
-	return RDMEM_W(*m_program, VEC);
+	return RDMEM_W(m_program, VEC);
 }
 
 uint16_t z8001_device::GET_FCW(uint32_t VEC)
 {
-	return RDMEM_W(*m_program, VEC + 2);
+	return RDMEM_W(m_program, VEC + 2);
 }
 
 uint32_t z8002_device::F_SEG_Z8001()
@@ -353,7 +353,7 @@ void z8002_device::Interrupt()
 	if (m_irq_req & Z8000_RESET)
 	{
 		m_irq_req &= Z8000_NVI | Z8000_VI;
-		CHANGE_FCW(RDMEM_W(*m_program, 2)); /* get reset m_fcw */
+		CHANGE_FCW(RDMEM_W(m_program, 2)); /* get reset m_fcw */
 		m_pc = get_reset_pc(); /* get reset m_pc  */
 	}
 	else
@@ -419,7 +419,7 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = RDMEM_W(*m_program, NMI);
+		m_pc = RDMEM_W(m_program, NMI);
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
 		m_pc = GET_PC(NMI);
@@ -461,13 +461,13 @@ void z8002_device::Interrupt()
 
 uint32_t z8002_device::read_irq_vector()
 {
-	return RDMEM_W(*m_program, VEC00 + 2 * (m_irq_vec & 0xff));
+	return RDMEM_W(m_program, VEC00 + 2 * (m_irq_vec & 0xff));
 }
 
 
 uint32_t z8001_device::read_irq_vector()
 {
-	return segmented_addr(RDMEM_L(*m_program, VEC00 + 2 * (m_irq_vec & 0xff)));
+	return segmented_addr(RDMEM_L(m_program, VEC00 + 2 * (m_irq_vec & 0xff)));
 }
 
 
@@ -492,7 +492,7 @@ void z8002_device::clear_internal_state()
 
 void z8002_device::register_debug_state()
 {
-	state_add( Z8000_PC,      "PC",      m_pc      ).mask(m_program->addrmask());
+	state_add( Z8000_PC,      "PC",      m_pc      ).mask(m_program.space().addrmask());
 	state_add( Z8000_NSPOFF,  "NSPOFF",  m_nspoff  ).formatstr("%04X");
 	state_add( Z8000_NSPSEG,  "NSPSEG",  m_nspseg  ).formatstr("%04X");
 	state_add( Z8000_FCW,     "FCW",     m_fcw     ).formatstr("%04X");
@@ -573,27 +573,16 @@ void z8002_device::register_save_state()
 
 void z8002_device::init_spaces()
 {
-	m_program = &space(AS_PROGRAM);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+
 	/* If the system decodes STn lines to distinguish between data and program memory fetches,
 	   install the data space. If it doesn't, install the program memory into data memory space. */
-	if (has_space(AS_DATA))
-		m_data = &space(AS_DATA);
-	else
-		m_data = m_program;
-	if (has_space(AS_STACK))
-		m_stack = &space(AS_STACK);
-	else
-		m_stack = m_data;
-	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
-	if (has_space(AS_OPCODES))
-		m_opcache = space(AS_OPCODES).cache<1, 0, ENDIANNESS_BIG>();
-	else
-		m_opcache = m_cache;
-	m_io = &space(AS_IO);
-	if (has_space(AS_SIO))
-		m_sio = &space(AS_SIO);
-	else
-		m_sio = m_io;
+	space(has_space(AS_DATA) ? AS_DATA : AS_PROGRAM).specific(m_data);
+	space(has_space(AS_STACK) ? AS_STACK : has_space(AS_DATA) ? AS_DATA : AS_PROGRAM).specific(m_stack);
+	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcache);
+	space(AS_IO).specific(m_io);
+	space(has_space(AS_SIO) ? AS_SIO : AS_IO).specific(m_sio);
 }
 
 void z8002_device::init_tables()
