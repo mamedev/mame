@@ -82,9 +82,6 @@ public:
 #endif
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-
 	u8 unknown_status_r();
 
 	void w30_mem_map(address_map &map);
@@ -118,7 +115,7 @@ void roland_s50_state::ioga_out_w(u8 data)
 
 u8 roland_s50_state::floppy_status_r()
 {
-	return m_fdc->intrq_r() << 2;
+	return m_fdc->intrq_r() << 2 | m_fdc->drq_r() << 3;
 }
 
 u8 roland_s50_state::floppy_unknown_r()
@@ -134,14 +131,6 @@ u16 roland_s50_state::key_r(offs_t offset)
 void roland_s50_state::key_w(offs_t offset, u16 data)
 {
 	m_keyscan->write(offset, data >> 1);
-}
-
-WRITE_LINE_MEMBER(roland_w30_state::fdc_irq_w)
-{
-}
-
-WRITE_LINE_MEMBER(roland_w30_state::fdc_drq_w)
-{
 }
 
 u8 roland_w30_state::unknown_status_r()
@@ -188,6 +177,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("program", 0);
 	map(0x4000, 0x7fff).ram().share("common");
 	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16)); // TODO: banking differs
+	map(0xc200, 0xc200).r(FUNC(roland_w30_state::floppy_status_r));
 	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
 	//map(0xe000, 0xe01f).rw("scsic", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
@@ -316,8 +306,6 @@ void roland_w30_state::w30(machine_config &config)
 	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
-	m_fdc->intrq_wr_callback().set(FUNC(roland_w30_state::fdc_irq_w));
-	m_fdc->drq_wr_callback().set(FUNC(roland_w30_state::fdc_drq_w));
 
 	// Floppy unit: FX-354 (307F1JC)
 	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
@@ -344,8 +332,6 @@ void roland_w30_state::s330(machine_config &config)
 	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
-	m_fdc->intrq_wr_callback().set(FUNC(roland_w30_state::fdc_irq_w));
-	m_fdc->drq_wr_callback().set(FUNC(roland_w30_state::fdc_drq_w));
 
 	// Floppy unit: ND-362S-A
 	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
