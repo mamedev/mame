@@ -599,25 +599,25 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(m_addrmask, offset, mask, m_dispatch_read);;
+		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);;
 	}
 
 	// mask-less native read
 	NativeType read_native(offs_t offset)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(m_addrmask, offset, uX(0xffffffffffffffffU), m_dispatch_read);
+		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, uX(0xffffffffffffffffU), m_dispatch_read);
 	}
 
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(m_addrmask, offset, data, mask, m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);;
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(m_addrmask, offset, data, uX(0xffffffffffffffffU), m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);;
 	}
 
 	// virtual access to these functions

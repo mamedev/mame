@@ -355,7 +355,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			const offs_t address = memView->addressAtCursorPosition(clickViewPosition);
 			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
 			address_space* addressSpace = source->space();
-			offs_t a = address & space->logaddrmask();
+			offs_t a = address & addressSpace->logaddrmask();
 			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), TRANSLATE_READ_DEBUG, a))
 			{
 				QToolTip::showText(QCursor::pos(), "Bad address", nullptr);
@@ -367,19 +367,19 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 				switch (addressSpace->data_width())
 				{
 				case 8:
-					memValue = space->read_byte(a);
+					memValue = addressSpace->read_byte(a);
 					break;
 
 				case 16:
-					memValue = space->read_word_unaligned(a);
+					memValue = addressSpace->read_word_unaligned(a);
 					break;
 
 				case 32:
-					memValue = space->read_dword_unaligned(a);
+					memValue = addressSpace->read_dword_unaligned(a);
 					break;
 
 				case 64:
-					memValue = space->read_qword_unaligned(a);
+					memValue = addressSpace->read_qword_unaligned(a);
 					break;
 				}
 

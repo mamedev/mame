@@ -19,30 +19,3 @@ m6504_device::m6504_device(const machine_config &mconfig, const char *tag, devic
 	program_config.m_addr_width = 13;
 	sprogram_config.m_addr_width = 13;
 }
-
-void m6504_device::device_start()
-{
-	mintf = std::make_unique<mi_6504>();
-
-	init();
-}
-
-uint8_t m6504_device::mi_6504::read(uint16_t adr)
-{
-	return program.read_byte(adr & 0x1fff);
-}
-
-uint8_t m6504_device::mi_6504::read_sync(uint16_t adr)
-{
-	return csprogram.read_byte(adr & 0x1fff);
-}
-
-uint8_t m6504_device::mi_6504::read_arg(uint16_t adr)
-{
-	return cprogram.read_byte(adr & 0x1fff);
-}
-
-void m6504_device::mi_6504::write(uint16_t adr, uint8_t val)
-{
-	program.write_byte(adr & 0x1fff, val);
-}

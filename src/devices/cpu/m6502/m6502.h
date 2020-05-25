@@ -35,8 +35,9 @@ protected:
 	public:
 		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
 		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
 
-		virtual ~memory_interface() {}
+		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
 		virtual uint8_t read_9(uint16_t adr);
 		virtual uint8_t read_sync(uint16_t adr) = 0;
@@ -47,10 +48,17 @@ protected:
 
 	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default() {}
+		virtual ~mi_default() = default;
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+	};
+
+	class mi_default14 : public mi_default {
+	public:
+		virtual ~mi_default14() = default;
+		virtual uint8_t read(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 

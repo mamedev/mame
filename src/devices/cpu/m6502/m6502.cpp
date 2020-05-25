@@ -37,16 +37,19 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 
 void m6502_device::device_start()
 {
-	mintf = std::make_unique<mi_default>();
+	mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
 
 	init();
 }
 
 void m6502_device::init()
-{
+{	
 	space(AS_PROGRAM).cache(mintf->cprogram);
-	space(AS_PROGRAM).specific(mintf->program);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
+	if(space(AS_PROGRAM).addr_width() > 14)
+		space(AS_PROGRAM).specific(mintf->program);
+	else
+		space(AS_PROGRAM).specific(mintf->program14);
 
 	sync_w.resolve_safe();
 
@@ -544,6 +547,15 @@ void m6502_device::mi_default::write(uint16_t adr, uint8_t val)
 	program.write_byte(adr, val);
 }
 
+uint8_t m6502_device::mi_default14::read(uint16_t adr)
+{
+	return program14.read_byte(adr);
+}
+
+void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
+{
+	program14.write_byte(adr, val);
+}
 
 m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock)

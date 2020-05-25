@@ -1053,11 +1053,11 @@ private:
 	const handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read<Level, Width, AddrShift, Endian>(m_addrmask, address, mask, m_dispatch_read);;
+		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);;
 	}
 
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		dispatch_write<Level, Width, AddrShift, Endian>(m_addrmask, address, data, mask, m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);;
 	}
 
 	void set(address_space *space, std::pair<const void *, const void *> rw);
@@ -1272,7 +1272,7 @@ public:
 
 	template<int Level, int Width, int AddrShift, endianness_t Endian> void specific(emu::detail::memory_access_specific<Level, Width, AddrShift, Endian> &v) {
 		if(Level != emu::detail::handler_entry_dispatch_level(m_config.addr_width()))
-			fatalerror("Requesting specific() with wrong level, bad address witdh (the config says %d\n", m_config.addr_width());
+			fatalerror("Requesting specific() with wrong level, bad address width (the config says %d)\n", m_config.addr_width());
 		if(AddrShift != m_config.addr_shift())
 			fatalerror("Requesting specific() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
 		if(8 << Width != m_config.data_width())
