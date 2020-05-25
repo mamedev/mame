@@ -205,7 +205,7 @@ void stuntcyc_state::machine_reset()
 void atarikee_state::atarikee(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_atarikee);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -244,7 +244,7 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 void gtrak10_state::gtrak10(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(netlist_gtrak10);
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(netlist_gtrak10);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 

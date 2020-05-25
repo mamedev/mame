@@ -217,7 +217,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_fptype cur = m_in();
+		netlist::nl_fptype cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
@@ -234,7 +234,7 @@ private:
 	netlist::analog_input_t m_in;
 	std::unique_ptr<netlist_mame_analog_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<nl_fptype> m_last;
+	netlist::state_var<netlist::nl_fptype> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -456,7 +456,7 @@ protected:
 
 	NETLIB_UPDATEI()
 	{
-		nl_fptype val = m_in() * m_mult() + m_offset();
+		netlist::nl_fptype val = m_in() * m_mult() + m_offset();
 		sound_update(exec().time());
 		/* ignore spikes */
 		if (plib::abs(val) < 32767.0)
@@ -557,7 +557,7 @@ protected:
 			{
 				if (m_channels[i].m_buffer == nullptr)
 					break; // stop, called outside of stream_update
-				const nl_fptype v = m_channels[i].m_buffer[m_pos];
+				const netlist::nl_fptype v = m_channels[i].m_buffer[m_pos];
 				m_channels[i].m_param->set(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
 			}
 		}

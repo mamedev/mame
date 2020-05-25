@@ -480,12 +480,13 @@ namespace netlist
 				try
 				{
 					auto ret(store().find(obj));
-					nl_assert(ret != store().end());
+					if (ret == store().end())
+						return nullptr;
 					return &ret->second;
 				}
 				catch (...)
 				{
-					nl_assert_always(true, "exception in property_store_t.get()");
+					plib::terminate("exception in property_store_t.get()");
 					return static_cast<value_type *>(nullptr);
 				}
 			}

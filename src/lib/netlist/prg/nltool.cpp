@@ -128,7 +128,7 @@ private:
 	plib::option_str    opt_out;
 
 	plib::option_group  opt_grp4;
-	plib::option_num<nl_fptype> opt_ttr;
+	plib::option_num<netlist::nl_fptype> opt_ttr;
 	plib::option_str    opt_boostlib;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
@@ -351,7 +351,7 @@ struct input_t
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &val);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
-		m_value = static_cast<nl_fptype>(val);
+		m_value = static_cast<netlist::nl_fptype>(val);
 		m_time = netlist::netlist_time_ext::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()));
 	}
@@ -377,7 +377,7 @@ struct input_t
 
 	netlist::netlist_time_ext m_time;
 	netlist::param_ref_t m_param;
-	nl_fptype m_value;
+	netlist::nl_fptype m_value;
 };
 
 static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
@@ -436,7 +436,7 @@ void tool_app_t::run()
 	}
 
 
-	pout("startup time ==> {1:5.3f}\n", t.as_seconds<nl_fptype>() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds<netlist::nl_fptype>() );
 
 	// FIXME: error handling
 	if (opt_loadstate.was_specified())
@@ -494,10 +494,10 @@ void tool_app_t::run()
 	}
 	nt.exec().stop();
 
-	auto emutime(t.as_seconds<nl_fptype>());
+	auto emutime(t.as_seconds<netlist::nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(ttr - nlstart).as_fp<nl_fptype>(), emutime,
-			(ttr - nlstart).as_fp<nl_fptype>() / emutime * netlist::nlconst::hundred());
+			(ttr - nlstart).as_fp<netlist::nl_fptype>(), emutime,
+			(ttr - nlstart).as_fp<netlist::nl_fptype>() / emutime * netlist::nlconst::hundred());
 }
 
 void tool_app_t::validate()

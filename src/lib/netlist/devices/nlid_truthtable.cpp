@@ -474,7 +474,7 @@ namespace factory
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name,
 		properties &&props)
 	: factory::element_t(name, std::move(props))
-	, m_family_name(NETLIST_DEFAULT_LOGIC_FAMILY)
+	, m_family_name(config::DEFAULT_LOGIC_FAMILY())
 	{
 	}
 
@@ -511,7 +511,7 @@ namespace factory
 				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = (desc.family != "" ? desc.family : pstring(NETLIST_DEFAULT_LOGIC_FAMILY));
+		ret->m_family_name = (desc.family != "" ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
 
 		return ret;
 	}
