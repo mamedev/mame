@@ -296,70 +296,70 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram0000_r);
-	DECLARE_WRITE8_MEMBER(ram0000_w);
-	DECLARE_READ8_MEMBER(ram0200_r);
-	DECLARE_WRITE8_MEMBER(ram0200_w);
-	DECLARE_READ8_MEMBER(ram0400_r);
-	DECLARE_WRITE8_MEMBER(ram0400_w);
-	DECLARE_READ8_MEMBER(ram0800_r);
-	DECLARE_WRITE8_MEMBER(ram0800_w);
-	DECLARE_READ8_MEMBER(ram2000_r);
-	DECLARE_WRITE8_MEMBER(ram2000_w);
-	DECLARE_READ8_MEMBER(ram4000_r);
-	DECLARE_WRITE8_MEMBER(ram4000_w);
-	DECLARE_READ8_MEMBER(cec4000_r);
-	DECLARE_READ8_MEMBER(cec8000_r);
-	DECLARE_WRITE8_MEMBER(ram8000_w);
-	DECLARE_READ8_MEMBER(auxram0000_r);
-	DECLARE_WRITE8_MEMBER(auxram0000_w);
-	DECLARE_READ8_MEMBER(auxram0200_r);
-	DECLARE_WRITE8_MEMBER(auxram0200_w);
-	DECLARE_READ8_MEMBER(auxram0400_r);
-	DECLARE_WRITE8_MEMBER(auxram0400_w);
-	DECLARE_READ8_MEMBER(auxram0800_r);
-	DECLARE_WRITE8_MEMBER(auxram0800_w);
-	DECLARE_READ8_MEMBER(auxram2000_r);
-	DECLARE_WRITE8_MEMBER(auxram2000_w);
-	DECLARE_READ8_MEMBER(auxram4000_r);
-	DECLARE_WRITE8_MEMBER(auxram4000_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c000_iic_r);
-	DECLARE_WRITE8_MEMBER(c000_iic_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_READ8_MEMBER(c100_int_r);
-	DECLARE_READ8_MEMBER(c100_int_bank_r);
-	DECLARE_READ8_MEMBER(c100_cec_r);
-	DECLARE_READ8_MEMBER(c100_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
-	DECLARE_READ8_MEMBER(c300_r);
-	DECLARE_READ8_MEMBER(c300_int_r);
-	DECLARE_READ8_MEMBER(c300_int_bank_r);
-	DECLARE_READ8_MEMBER(c300_cec_r);
-	DECLARE_READ8_MEMBER(c300_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c300_w);
-	DECLARE_READ8_MEMBER(c400_r);
-	DECLARE_READ8_MEMBER(c400_int_r);
-	DECLARE_READ8_MEMBER(c400_int_bank_r);
-	DECLARE_READ8_MEMBER(c400_cec_r);
-	DECLARE_READ8_MEMBER(c400_cec_bank_r);
-	DECLARE_WRITE8_MEMBER(c400_w);
-	DECLARE_WRITE8_MEMBER(c400_cec_w);
-	DECLARE_READ8_MEMBER(c800_r);
-	DECLARE_READ8_MEMBER(c800_int_r);
-	DECLARE_READ8_MEMBER(c800_cec_r);
-	DECLARE_READ8_MEMBER(c800_cec_bank_r);
-	DECLARE_READ8_MEMBER(c800_b2_int_r);
-	DECLARE_WRITE8_MEMBER(c800_w);
-	DECLARE_READ8_MEMBER(inh_r);
-	DECLARE_WRITE8_MEMBER(inh_w);
-	DECLARE_READ8_MEMBER(lc_r);
-	DECLARE_WRITE8_MEMBER(lc_w);
-	DECLARE_READ8_MEMBER(lc_romswitch_r);
-	DECLARE_WRITE8_MEMBER(lc_romswitch_w);
+	uint8_t ram0000_r(offs_t offset);
+	void ram0000_w(offs_t offset, uint8_t data);
+	uint8_t ram0200_r(offs_t offset);
+	void ram0200_w(offs_t offset, uint8_t data);
+	uint8_t ram0400_r(offs_t offset);
+	void ram0400_w(offs_t offset, uint8_t data);
+	uint8_t ram0800_r(offs_t offset);
+	void ram0800_w(offs_t offset, uint8_t data);
+	uint8_t ram2000_r(offs_t offset);
+	void ram2000_w(offs_t offset, uint8_t data);
+	uint8_t ram4000_r(offs_t offset);
+	void ram4000_w(offs_t offset, uint8_t data);
+	uint8_t cec4000_r(offs_t offset);
+	uint8_t cec8000_r(offs_t offset);
+	void ram8000_w(offs_t offset, uint8_t data);
+	uint8_t auxram0000_r(offs_t offset);
+	void auxram0000_w(offs_t offset, uint8_t data);
+	uint8_t auxram0200_r(offs_t offset);
+	void auxram0200_w(offs_t offset, uint8_t data);
+	uint8_t auxram0400_r(offs_t offset);
+	void auxram0400_w(offs_t offset, uint8_t data);
+	uint8_t auxram0800_r(offs_t offset);
+	void auxram0800_w(offs_t offset, uint8_t data);
+	uint8_t auxram2000_r(offs_t offset);
+	void auxram2000_w(offs_t offset, uint8_t data);
+	uint8_t auxram4000_r(offs_t offset);
+	void auxram4000_w(offs_t offset, uint8_t data);
+	uint8_t c000_r(offs_t offset);
+	void c000_w(offs_t offset, uint8_t data);
+	uint8_t c000_iic_r(offs_t offset);
+	void c000_iic_w(offs_t offset, uint8_t data);
+	uint8_t c080_r(offs_t offset);
+	void c080_w(offs_t offset, uint8_t data);
+	uint8_t c100_r(offs_t offset);
+	uint8_t c100_int_r(offs_t offset);
+	uint8_t c100_int_bank_r(offs_t offset);
+	uint8_t c100_cec_r(offs_t offset);
+	uint8_t c100_cec_bank_r(offs_t offset);
+	void c100_w(offs_t offset, uint8_t data);
+	uint8_t c300_r(offs_t offset);
+	uint8_t c300_int_r(offs_t offset);
+	uint8_t c300_int_bank_r(offs_t offset);
+	uint8_t c300_cec_r(offs_t offset);
+	uint8_t c300_cec_bank_r(offs_t offset);
+	void c300_w(offs_t offset, uint8_t data);
+	uint8_t c400_r(offs_t offset);
+	uint8_t c400_int_r(offs_t offset);
+	uint8_t c400_int_bank_r(offs_t offset);
+	uint8_t c400_cec_r(offs_t offset);
+	uint8_t c400_cec_bank_r(offs_t offset);
+	void c400_w(offs_t offset, uint8_t data);
+	void c400_cec_w(offs_t offset, uint8_t data);
+	uint8_t c800_r(offs_t offset);
+	uint8_t c800_int_r(offs_t offset);
+	uint8_t c800_cec_r(offs_t offset);
+	uint8_t c800_cec_bank_r(offs_t offset);
+	uint8_t c800_b2_int_r(offs_t offset);
+	void c800_w(offs_t offset, uint8_t data);
+	uint8_t inh_r(offs_t offset);
+	void inh_w(offs_t offset, uint8_t data);
+	uint8_t lc_r(offs_t offset);
+	void lc_w(offs_t offset, uint8_t data);
+	uint8_t lc_romswitch_r(offs_t offset);
+	void lc_romswitch_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -367,8 +367,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
-	DECLARE_READ8_MEMBER(memexp_r);
-	DECLARE_WRITE8_MEMBER(memexp_w);
+	uint8_t memexp_r(offs_t offset);
+	void memexp_w(offs_t offset, uint8_t data);
 	uint8_t nsc_backing_r(offs_t offset);
 
 	void apple2cp(machine_config &config);
@@ -662,7 +662,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::memexp_r)
+uint8_t apple2e_state::memexp_r(offs_t offset)
 {
 	uint8_t retval = m_exp_regs[offset];
 
@@ -690,7 +690,7 @@ READ8_MEMBER(apple2e_state::memexp_r)
 	return retval;
 }
 
-WRITE8_MEMBER(apple2e_state::memexp_w)
+void apple2e_state::memexp_w(offs_t offset, uint8_t data)
 {
 	if (!m_exp_ram)
 	{
@@ -1640,7 +1640,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c000_r)
+uint8_t apple2e_state::c000_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -1754,7 +1754,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c000_w)
+void apple2e_state::c000_w(offs_t offset, uint8_t data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -1882,7 +1882,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c000_iic_r)
+uint8_t apple2e_state::c000_iic_r(offs_t offset)
 {
 	if(machine().side_effects_disabled()) return read_floatingbus();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
@@ -2007,7 +2007,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c000_iic_w)
+void apple2e_state::c000_iic_w(offs_t offset, uint8_t data)
 {
 	if(machine().side_effects_disabled()) return;
 
@@ -2235,7 +2235,7 @@ void apple2e_state::update_iic_mouse()
 	}
 }
 
-READ8_MEMBER(apple2e_state::c080_r)
+uint8_t apple2e_state::c080_r(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -2272,7 +2272,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::c080_w)
+void apple2e_state::c080_w(offs_t offset, uint8_t data)
 {
 	int slot;
 
@@ -2382,15 +2382,15 @@ uint8_t apple2e_state::read_int_rom(int slotbias, int offset)
 
 uint8_t apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
 
-READ8_MEMBER(apple2e_state::c100_r)  { return read_slot_rom(1, offset); }
-READ8_MEMBER(apple2e_state::c100_int_r)  { return read_int_rom(0x100, offset); }
-READ8_MEMBER(apple2e_state::c100_int_bank_r)  { return read_int_rom(0x4100, offset); }
-READ8_MEMBER(apple2e_state::c100_cec_r)  { return m_rom_ptr[0xc100 + offset]; }
-READ8_MEMBER(apple2e_state::c100_cec_bank_r)  { return m_rom_ptr[0x4100 + offset]; }
-WRITE8_MEMBER(apple2e_state::c100_w) { write_slot_rom(1, offset, data); }
-READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(3, offset); }
+uint8_t apple2e_state::c100_r(offs_t offset)  { return read_slot_rom(1, offset); }
+uint8_t apple2e_state::c100_int_r(offs_t offset)  { return read_int_rom(0x100, offset); }
+uint8_t apple2e_state::c100_int_bank_r(offs_t offset)  { return read_int_rom(0x4100, offset); }
+uint8_t apple2e_state::c100_cec_r(offs_t offset)  { return m_rom_ptr[0xc100 + offset]; }
+uint8_t apple2e_state::c100_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4100 + offset]; }
+void apple2e_state::c100_w(offs_t offset, uint8_t data) { write_slot_rom(1, offset, data); }
+uint8_t apple2e_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 
-READ8_MEMBER(apple2e_state::c300_int_r)
+uint8_t apple2e_state::c300_int_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2400,7 +2400,7 @@ READ8_MEMBER(apple2e_state::c300_int_r)
 	return read_int_rom(0x300, offset);
 }
 
-READ8_MEMBER(apple2e_state::c300_int_bank_r)
+uint8_t apple2e_state::c300_int_bank_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2410,7 +2410,7 @@ READ8_MEMBER(apple2e_state::c300_int_bank_r)
 	return read_int_rom(0x4300, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c300_w)
+void apple2e_state::c300_w(offs_t offset, uint8_t data)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
@@ -2421,11 +2421,11 @@ WRITE8_MEMBER(apple2e_state::c300_w)
 	write_slot_rom(3, offset, data);
 }
 
-READ8_MEMBER(apple2e_state::c300_cec_r)  { return m_rom_ptr[0xc300 + offset]; }
-READ8_MEMBER(apple2e_state::c300_cec_bank_r)  { return m_rom_ptr[0x4300 + offset]; }
+uint8_t apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
+uint8_t apple2e_state::c300_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4300 + offset]; }
 
-READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(4, offset); }
-READ8_MEMBER(apple2e_state::c400_int_r)
+uint8_t apple2e_state::c400_r(offs_t offset)  { return read_slot_rom(4, offset); }
+uint8_t apple2e_state::c400_int_r(offs_t offset)
 {
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
@@ -2435,7 +2435,7 @@ READ8_MEMBER(apple2e_state::c400_int_r)
 	return read_int_rom(0x400, offset);
 }
 
-READ8_MEMBER(apple2e_state::c400_int_bank_r)
+uint8_t apple2e_state::c400_int_bank_r(offs_t offset)
 {
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
@@ -2445,7 +2445,7 @@ READ8_MEMBER(apple2e_state::c400_int_bank_r)
 	return read_int_rom(0x4400, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c400_w)
+void apple2e_state::c400_w(offs_t offset, uint8_t data)
 {
 	if ((m_isiic) && (offset < 0x100))
 	{
@@ -2455,10 +2455,10 @@ WRITE8_MEMBER(apple2e_state::c400_w)
 	write_slot_rom(4, offset, data);
 }
 
-READ8_MEMBER(apple2e_state::c400_cec_r)  { return m_rom_ptr[0xc400 + offset]; }
-READ8_MEMBER(apple2e_state::c400_cec_bank_r)  { return m_rom_ptr[0x4400 + offset]; }
+uint8_t apple2e_state::c400_cec_r(offs_t offset)  { return m_rom_ptr[0xc400 + offset]; }
+uint8_t apple2e_state::c400_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4400 + offset]; }
 
-WRITE8_MEMBER(apple2e_state::c400_cec_w)
+void apple2e_state::c400_cec_w(offs_t offset, uint8_t data)
 {
 	if ((m_iscecm))
 	{
@@ -2466,7 +2466,7 @@ WRITE8_MEMBER(apple2e_state::c400_cec_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c800_r)
+uint8_t apple2e_state::c800_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
@@ -2490,7 +2490,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 	return read_floatingbus();
 }
 
-READ8_MEMBER(apple2e_state::c800_int_r)
+uint8_t apple2e_state::c800_int_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
@@ -2507,7 +2507,7 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 	return m_rom_ptr[0x800 + offset];
 }
 
-READ8_MEMBER(apple2e_state::c800_b2_int_r)
+uint8_t apple2e_state::c800_b2_int_r(offs_t offset)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
@@ -2524,7 +2524,7 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 	return m_rom_ptr[0x4800 + offset];
 }
 
-WRITE8_MEMBER(apple2e_state::c800_w)
+void apple2e_state::c800_w(offs_t offset, uint8_t data)
 {
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
@@ -2548,10 +2548,10 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::c800_cec_r)  { return m_rom_ptr[0xc800 + offset]; }
-READ8_MEMBER(apple2e_state::c800_cec_bank_r)  { return m_rom_ptr[0x4800 + offset]; }
+uint8_t apple2e_state::c800_cec_r(offs_t offset)  { return m_rom_ptr[0xc800 + offset]; }
+uint8_t apple2e_state::c800_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4800 + offset]; }
 
-READ8_MEMBER(apple2e_state::inh_r)
+uint8_t apple2e_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2562,7 +2562,7 @@ READ8_MEMBER(apple2e_state::inh_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(apple2e_state::inh_w)
+void apple2e_state::inh_w(offs_t offset, uint8_t data)
 {
 	if (m_inh_slot != -1)
 	{
@@ -2570,17 +2570,17 @@ WRITE8_MEMBER(apple2e_state::inh_w)
 	}
 }
 
-READ8_MEMBER(apple2e_state::lc_romswitch_r)
+uint8_t apple2e_state::lc_romswitch_r(offs_t offset)
 {
 	return m_rom_ptr[0x5000 + offset];
 }
 
-WRITE8_MEMBER(apple2e_state::lc_romswitch_w)
+void apple2e_state::lc_romswitch_w(offs_t offset, uint8_t data)
 {
-	lc_w(space, offset, data);
+	lc_w(offset, data);
 }
 
-READ8_MEMBER(apple2e_state::lc_r)
+uint8_t apple2e_state::lc_r(offs_t offset)
 {
 	if ((m_altzp) && (!m_iscec))
 	{
@@ -2623,7 +2623,7 @@ READ8_MEMBER(apple2e_state::lc_r)
 	}
 }
 
-WRITE8_MEMBER(apple2e_state::lc_w)
+void apple2e_state::lc_w(offs_t offset, uint8_t data)
 {
 	if (!m_lcwriteenable)
 	{
@@ -2803,26 +2803,26 @@ uint8_t apple2e_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(apple2e_state::ram0000_r)  { return m_ram_ptr[offset]; }
-WRITE8_MEMBER(apple2e_state::ram0000_w) { m_ram_ptr[offset] = data; }
-READ8_MEMBER(apple2e_state::ram0200_r)  { return m_ram_ptr[offset+0x200]; }
-WRITE8_MEMBER(apple2e_state::ram0200_w) { m_ram_ptr[offset+0x200] = data; }
-READ8_MEMBER(apple2e_state::ram0400_r)  { return m_ram_ptr[offset+0x400]; }
-WRITE8_MEMBER(apple2e_state::ram0400_w) { m_ram_ptr[offset+0x400] = data; }
-READ8_MEMBER(apple2e_state::ram0800_r)  { return m_ram_ptr[offset+0x800]; }
-WRITE8_MEMBER(apple2e_state::ram0800_w) { m_ram_ptr[offset+0x800] = data; }
-READ8_MEMBER(apple2e_state::ram2000_r)  { return m_ram_ptr[offset+0x2000]; }
-WRITE8_MEMBER(apple2e_state::ram2000_w) { m_ram_ptr[offset+0x2000] = data; }
-READ8_MEMBER(apple2e_state::ram4000_r)  { return m_ram_ptr[offset+0x4000]; }
-WRITE8_MEMBER(apple2e_state::ram4000_w) { m_ram_ptr[offset+0x4000] = data; }
-WRITE8_MEMBER(apple2e_state::ram8000_w) { m_ram_ptr[offset+0x8000] = data; }
-READ8_MEMBER(apple2e_state::cec4000_r)
+uint8_t apple2e_state::ram0000_r(offs_t offset)  { return m_ram_ptr[offset]; }
+void apple2e_state::ram0000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset] = data; }
+uint8_t apple2e_state::ram0200_r(offs_t offset)  { return m_ram_ptr[offset+0x200]; }
+void apple2e_state::ram0200_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x200] = data; }
+uint8_t apple2e_state::ram0400_r(offs_t offset)  { return m_ram_ptr[offset+0x400]; }
+void apple2e_state::ram0400_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x400] = data; }
+uint8_t apple2e_state::ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800]; }
+void apple2e_state::ram0800_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x800] = data; }
+uint8_t apple2e_state::ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x2000]; }
+void apple2e_state::ram2000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x2000] = data; }
+uint8_t apple2e_state::ram4000_r(offs_t offset)  { return m_ram_ptr[offset+0x4000]; }
+void apple2e_state::ram4000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x4000] = data; }
+void apple2e_state::ram8000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x8000] = data; }
+uint8_t apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
 	return m_cec_remap[((m_cec_bank & 0xf) << 14) + offset];
 }
 
-READ8_MEMBER(apple2e_state::cec8000_r)
+uint8_t apple2e_state::cec8000_r(offs_t offset)
 {
 	//printf("cec8000_r: ofs %x\n", offset);
 	if (m_cec_bank & 0x20)
@@ -2835,18 +2835,18 @@ READ8_MEMBER(apple2e_state::cec8000_r)
 	}
 }
 
-READ8_MEMBER(apple2e_state::auxram0000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
-READ8_MEMBER(apple2e_state::auxram0200_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0200_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
-READ8_MEMBER(apple2e_state::auxram0400_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0400_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
-READ8_MEMBER(apple2e_state::auxram0800_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram0800_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
-READ8_MEMBER(apple2e_state::auxram2000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram2000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
-READ8_MEMBER(apple2e_state::auxram4000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
-WRITE8_MEMBER(apple2e_state::auxram4000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
+uint8_t apple2e_state::auxram0000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset] = data; } }
+uint8_t apple2e_state::auxram0200_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x200]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0200_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x200] = data; } }
+uint8_t apple2e_state::auxram0400_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x400]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0400_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x400] = data; } }
+uint8_t apple2e_state::auxram0800_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x800]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram0800_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x800] = data; } }
+uint8_t apple2e_state::auxram2000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x2000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram2000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x2000] = data; } }
+uint8_t apple2e_state::auxram4000_r(offs_t offset)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
+void apple2e_state::auxram4000_w(offs_t offset, uint8_t data) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
 void apple2e_state::apple2e_map(address_map &map)
 {

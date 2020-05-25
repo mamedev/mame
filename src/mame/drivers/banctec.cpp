@@ -39,7 +39,7 @@ public:
 protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(u8 data);
 
 	virtual void machine_reset() override;
 	void banctec_mcu_mem(address_map &map);
@@ -77,7 +77,7 @@ void banctec_state::machine_reset()
 * Video/Character functions *
 ****************************/
 
-WRITE8_MEMBER( banctec_state::videoram_w )
+void banctec_state::videoram_w(u8 data)
 {
 	m_videoram[m_video_address] = data;
 	m_video_address++;

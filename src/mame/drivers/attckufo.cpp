@@ -32,8 +32,8 @@ public:
 	void attckufo(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	void cpu_map(address_map &map);
 	void vic_colorram_map(address_map &map);
@@ -104,12 +104,12 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER(attckufo_state::vic_videoram_r)
+uint8_t attckufo_state::vic_videoram_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(attckufo_state::vic_colorram_r)
+uint8_t attckufo_state::vic_colorram_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x400);
 }

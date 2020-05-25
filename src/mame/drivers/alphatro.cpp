@@ -82,12 +82,12 @@ protected:
 private:
 	uint8_t ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER (ram6000_r);
-	DECLARE_WRITE8_MEMBER(ram6000_w);
-	DECLARE_READ8_MEMBER (rama000_r);
-	DECLARE_WRITE8_MEMBER(rama000_w);
-	DECLARE_READ8_MEMBER (rame000_r);
-	DECLARE_WRITE8_MEMBER(rame000_w);
+	uint8_t ram6000_r(offs_t offset);
+	void ram6000_w(offs_t offset, uint8_t data);
+	uint8_t rama000_r(offs_t offset);
+	void rama000_w(offs_t offset, uint8_t data);
+	uint8_t rame000_r(offs_t offset);
+	void rame000_w(offs_t offset, uint8_t data);
 	uint8_t port10_r();
 	void port10_w(uint8_t data);
 	void port20_w(uint8_t data);
@@ -213,12 +213,12 @@ void alphatro_state::ram0000_w(offs_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER (alphatro_state::ram6000_r) { return m_ram_ptr[offset+0x6000]; }
-WRITE8_MEMBER(alphatro_state::ram6000_w) { m_ram_ptr[offset+0x6000] = data; }
-READ8_MEMBER (alphatro_state::rama000_r) { return m_ram_ptr[offset+0xa000]; }
-WRITE8_MEMBER(alphatro_state::rama000_w) { m_ram_ptr[offset+0xa000] = data; }
-READ8_MEMBER (alphatro_state::rame000_r) { return m_ram_ptr[offset+0xe000]; }
-WRITE8_MEMBER(alphatro_state::rame000_w) { m_ram_ptr[offset+0xe000] = data; }
+uint8_t alphatro_state::ram6000_r(offs_t offset) { return m_ram_ptr[offset+0x6000]; }
+void alphatro_state::ram6000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0x6000] = data; }
+uint8_t alphatro_state::rama000_r(offs_t offset) { return m_ram_ptr[offset+0xa000]; }
+void alphatro_state::rama000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0xa000] = data; }
+uint8_t alphatro_state::rame000_r(offs_t offset) { return m_ram_ptr[offset+0xe000]; }
+void alphatro_state::rame000_w(offs_t offset, uint8_t data) { m_ram_ptr[offset+0xe000] = data; }
 
 uint8_t alphatro_state::port10_r()
 {

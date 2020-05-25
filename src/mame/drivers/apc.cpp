@@ -131,20 +131,20 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
-	DECLARE_READ8_MEMBER(apc_port_28_r);
-	DECLARE_WRITE8_MEMBER(apc_port_28_w);
-	DECLARE_READ8_MEMBER(apc_gdc_r);
-	DECLARE_WRITE8_MEMBER(apc_gdc_w);
-	DECLARE_READ8_MEMBER(apc_kbd_r);
-	DECLARE_WRITE8_MEMBER(apc_kbd_w);
-	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
-	DECLARE_READ8_MEMBER(apc_dma_r);
-	DECLARE_WRITE8_MEMBER(apc_dma_w);
-	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
-	DECLARE_READ8_MEMBER(apc_rtc_r);
-	DECLARE_WRITE8_MEMBER(apc_rtc_w);
-//  DECLARE_READ8_MEMBER(aux_pcg_r);
-//  DECLARE_WRITE8_MEMBER(aux_pcg_w);
+	uint8_t apc_port_28_r(offs_t offset);
+	void apc_port_28_w(offs_t offset, uint8_t data);
+	uint8_t apc_gdc_r(offs_t offset);
+	void apc_gdc_w(offs_t offset, uint8_t data);
+	uint8_t apc_kbd_r(offs_t offset);
+	void apc_kbd_w(offs_t offset, uint8_t data);
+	void apc_dma_segments_w(offs_t offset, uint8_t data);
+	uint8_t apc_dma_r(offs_t offset);
+	void apc_dma_w(offs_t offset, uint8_t data);
+	void apc_irq_ack_w(uint8_t data);
+	uint8_t apc_rtc_r();
+	void apc_rtc_w(uint8_t data);
+//  uint8_t aux_pcg_r();
+//  void aux_pcg_w(uint8_t data);
 
 	struct {
 		uint8_t status; //status
@@ -303,7 +303,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 	}
 }
 
-READ8_MEMBER(apc_state::apc_port_28_r)
+uint8_t apc_state::apc_port_28_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -323,7 +323,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_port_28_w)
+void apc_state::apc_port_28_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_pit->write((offset & 6) >> 1, data);
@@ -337,7 +337,7 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 }
 
 
-READ8_MEMBER(apc_state::apc_gdc_r)
+uint8_t apc_state::apc_gdc_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -349,7 +349,7 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_gdc_w)
+void apc_state::apc_gdc_w(offs_t offset, uint8_t data)
 {
 	if(offset & 1)
 		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
@@ -357,7 +357,7 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
-READ8_MEMBER(apc_state::apc_kbd_r)
+uint8_t apc_state::apc_kbd_r(offs_t offset)
 {
 	uint8_t res = 0;
 
@@ -372,12 +372,12 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_kbd_w)
+void apc_state::apc_kbd_w(offs_t offset, uint8_t data)
 {
 	printf("KEYB %08x %02x\n",offset,data);
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_segments_w)
+void apc_state::apc_dma_segments_w(offs_t offset, uint8_t data)
 {
 	m_dma_offset[offset & 3] = data & 0x0f;
 }
@@ -412,17 +412,17 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 ... apparently, they rotated right the offset, compared to normal hook-up.
 */
 
-READ8_MEMBER(apc_state::apc_dma_r)
+uint8_t apc_state::apc_dma_r(offs_t offset)
 {
 	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_w)
+void apc_state::apc_dma_w(offs_t offset, uint8_t data)
 {
 	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
-WRITE8_MEMBER(apc_state::apc_irq_ack_w)
+void apc_state::apc_irq_ack_w(uint8_t data)
 {
 	/*
 	    x--- GDC
@@ -437,7 +437,7 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 		logerror("IRQ ACK %02x\n",data);
 }
 
-READ8_MEMBER(apc_state::apc_rtc_r)
+uint8_t apc_state::apc_rtc_r()
 {
 	/*
 	bit 1 high: low battery.
@@ -446,7 +446,7 @@ READ8_MEMBER(apc_state::apc_rtc_r)
 	return m_rtc->data_out_r();
 }
 
-WRITE8_MEMBER(apc_state::apc_rtc_w)
+void apc_state::apc_rtc_w(uint8_t data)
 {
 /*
 RTC write: 0x01 0001

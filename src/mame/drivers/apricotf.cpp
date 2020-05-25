@@ -111,12 +111,12 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(system_w);
+	u16 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void system_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE8_MEMBER(m1_w);
+	void m1_w(u8 data);
 
 	int m_40_80;
 	int m_200_256;
@@ -174,12 +174,12 @@ u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 	return 0;
 }
 
-READ16_MEMBER(f1_state::palette_r)
+u16 f1_state::palette_r(offs_t offset)
 {
 	return m_p_paletteram[offset];
 }
 
-WRITE16_MEMBER(f1_state::palette_w)
+void f1_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u8 i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
@@ -213,7 +213,7 @@ static GFXDECODE_START( gfx_act_f1 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(f1_state::system_w)
+void f1_state::system_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -328,7 +328,7 @@ WRITE_LINE_MEMBER(f1_state::ctc_z2_w)
 	m_sio->txca_w(state);
 }
 
-WRITE8_MEMBER(f1_state::m1_w)
+void f1_state::m1_w(u8 data)
 {
 	m_ctc->z80daisy_decode(data);
 	m_sio->z80daisy_decode(data);

@@ -236,7 +236,7 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE16_MEMBER( write_protect_w );
+	void write_protect_w(u16 data);
 
 	void a1000(machine_config &config);
 	void a1000n(machine_config &config);
@@ -270,8 +270,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	u16 clock_r(offs_t offset);
+	void clock_w(offs_t offset, u16 data);
 
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
@@ -344,8 +344,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	u16 clock_r(offs_t offset);
+	void clock_w(offs_t offset, u16 data);
 
 	uint8_t dmac_scsi_data_read(offs_t offset);
 	void dmac_scsi_data_write(offs_t offset, uint8_t data);
@@ -385,10 +385,10 @@ public:
 		amiga_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ32_MEMBER( scsi_r );
-	DECLARE_WRITE32_MEMBER( scsi_w );
-	DECLARE_READ32_MEMBER( motherboard_r );
-	DECLARE_WRITE32_MEMBER( motherboard_w );
+	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
+	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
+	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void init_pal();
 	void init_ntsc();
@@ -412,8 +412,8 @@ public:
 		m_side_int6(0)
 	{ }
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	u16 clock_r(offs_t offset);
+	void clock_w(offs_t offset, u16 data);
 
 	void init_pal();
 	void init_ntsc();
@@ -501,13 +501,13 @@ public:
 		m_ide_interrupt(0)
 	{ }
 
-	DECLARE_READ32_MEMBER( scsi_r );
-	DECLARE_WRITE32_MEMBER( scsi_w );
-	DECLARE_READ16_MEMBER( ide_r );
-	DECLARE_WRITE16_MEMBER( ide_w );
+	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
+	void scsi_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 ide_r(offs_t offset, u16 mem_mask = ~0);
+	void ide_w(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
-	DECLARE_READ32_MEMBER( motherboard_r );
-	DECLARE_WRITE32_MEMBER( motherboard_w );
+	u32 motherboard_r(offs_t offset, u32 mem_mask = ~0);
+	void motherboard_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void init_pal();
 	void init_ntsc();
@@ -576,32 +576,32 @@ private:
 //  REAL TIME CLOCK
 //**************************************************************************
 
-READ16_MEMBER( cdtv_state::clock_r )
+u16 cdtv_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-WRITE16_MEMBER( cdtv_state::clock_w )
+void cdtv_state::clock_w(offs_t offset, u16 data)
 {
 	m_rtc->write(offset / 2, data);
 }
 
-READ16_MEMBER( a2000_state::clock_r )
+u16 a2000_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-WRITE16_MEMBER( a2000_state::clock_w )
+void a2000_state::clock_w(offs_t offset, u16 data)
 {
 	m_rtc->write(offset / 2, data);
 }
 
-READ16_MEMBER( a500p_state::clock_r )
+u16 a500p_state::clock_r(offs_t offset)
 {
 	return m_rtc->read(offset / 2);
 }
 
-WRITE16_MEMBER( a500p_state::clock_w )
+void a500p_state::clock_w(offs_t offset, u16 data)
 {
 	m_rtc->write(offset / 2, data);
 }
@@ -797,7 +797,7 @@ void a1000_state::machine_reset()
 }
 
 // any write to this area will write protect the wom and disable the bootrom
-WRITE16_MEMBER( a1000_state::write_protect_w )
+void a1000_state::write_protect_w(u16 data)
 {
 	m_bootrom->set_bank(1);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc0000, 0xffffff);
@@ -885,26 +885,26 @@ bool cdtv_state::int6_pending()
 	return m_cia_1_irq;
 }
 
-READ32_MEMBER( a3000_state::scsi_r )
+u32 a3000_state::scsi_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a3000_state::scsi_w )
+void a3000_state::scsi_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-READ32_MEMBER( a3000_state::motherboard_r )
+u32 a3000_state::motherboard_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a3000_state::motherboard_w )
+void a3000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
@@ -950,19 +950,19 @@ WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 	update_int2();
 }
 
-READ32_MEMBER( a4000_state::scsi_r )
+u32 a4000_state::scsi_r(offs_t offset, u32 mem_mask)
 {
 	u16 data = 0xffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a4000_state::scsi_w )
+void a4000_state::scsi_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-READ16_MEMBER( a4000_state::ide_r )
+u16 a4000_state::ide_r(offs_t offset, u16 mem_mask)
 {
 	u16 data = 0xffff;
 
@@ -985,7 +985,7 @@ READ16_MEMBER( a4000_state::ide_r )
 	return data;
 }
 
-WRITE16_MEMBER( a4000_state::ide_w )
+void a4000_state::ide_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// ide interrupt register, read only
 	if (offset == 0x1010)
@@ -1007,7 +1007,7 @@ WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
 	m_ide_interrupt = state;
 }
 
-READ32_MEMBER( a4000_state::motherboard_r )
+u32 a4000_state::motherboard_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
@@ -1030,7 +1030,7 @@ READ32_MEMBER( a4000_state::motherboard_r )
 	return data;
 }
 
-WRITE32_MEMBER( a4000_state::motherboard_w )
+void a4000_state::motherboard_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset == 0)
 	{

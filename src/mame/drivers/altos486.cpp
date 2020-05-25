@@ -30,10 +30,10 @@ public:
 private:
 	uint8_t read_rmx_ack(offs_t offset);
 
-	DECLARE_READ16_MEMBER(mmu_ram_r);
-	DECLARE_READ16_MEMBER(mmu_io_r);
-	DECLARE_WRITE16_MEMBER(mmu_ram_w);
-	DECLARE_WRITE16_MEMBER(mmu_io_w);
+	uint16_t mmu_ram_r(offs_t offset);
+	uint16_t mmu_io_r(offs_t offset);
+	void mmu_ram_w(offs_t offset, uint16_t data);
+	void mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void altos486_io(address_map &map);
@@ -57,7 +57,7 @@ uint8_t altos486_state::read_rmx_ack(offs_t offset)
 	return 0;
 }
 
-READ16_MEMBER(altos486_state::mmu_ram_r)
+uint16_t altos486_state::mmu_ram_r(offs_t offset)
 {
 	if (offset < 0x7e000)
 		return m_ram[offset]; // TODO
@@ -65,7 +65,7 @@ READ16_MEMBER(altos486_state::mmu_ram_r)
 		return m_rom->as_u16(offset - 0x7e000);
 }
 
-READ16_MEMBER(altos486_state::mmu_io_r)
+uint16_t altos486_state::mmu_io_r(offs_t offset)
 {
 	if (!m_sys_mode)
 	{
@@ -77,13 +77,13 @@ READ16_MEMBER(altos486_state::mmu_io_r)
 	return 0; // TODO
 }
 
-WRITE16_MEMBER(altos486_state::mmu_ram_w)
+void altos486_state::mmu_ram_w(offs_t offset, uint16_t data)
 {
 	//uint16_t entry = m_prot[offset >> 11];
 	//if(!m_sys_mode)
 }
 
-WRITE16_MEMBER(altos486_state::mmu_io_w)
+void altos486_state::mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!m_sys_mode)
 	{

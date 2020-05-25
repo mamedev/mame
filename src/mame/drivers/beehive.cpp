@@ -36,8 +36,8 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	DECLARE_READ8_MEMBER(beehive_60_r);
-	DECLARE_WRITE8_MEMBER(beehive_62_w);
+	uint8_t beehive_60_r();
+	void beehive_62_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void beehive(machine_config &config);
@@ -51,7 +51,7 @@ private:
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER(beehive_state::beehive_60_r)
+uint8_t beehive_state::beehive_60_r()
 {
 	if (BIT(m_keyline, 4))
 	{
@@ -63,7 +63,7 @@ READ8_MEMBER(beehive_state::beehive_60_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(beehive_state::beehive_62_w)
+void beehive_state::beehive_62_w(uint8_t data)
 {
 	m_keyline = data;
 }

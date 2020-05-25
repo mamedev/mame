@@ -137,17 +137,16 @@ private:
 	optional_ioport_array<8> m_io_analog;
 	emu_timer *m_adc_ready_timer;
 
-	READ8_MEMBER(cmos_r);
-	WRITE8_MEMBER(cmos_w);
+	uint8_t cmos_r(offs_t offset);
+	void cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint32_t m_cmos_write_enabled;
 	uint32_t m_serial_count;
 
 
-	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_WRITE32_MEMBER(dcs3_fifo_full_w);
+	void asic_fifo_w(uint32_t data); // unused?
 
-	READ8_MEMBER (exprom_r);
-	WRITE8_MEMBER(exprom_w);
+	uint8_t exprom_r(offs_t offset);
+	void exprom_w(offs_t offset, uint8_t data);
 
 	void user_io_output(uint32_t data);
 	uint32_t user_io_input();
@@ -159,8 +158,8 @@ private:
 		IRQ_EN = 7, CAUSE, STATUS, SIZE, LED, CMOS_UNLOCK, WDOG, TRACKBALL_CTL,
 		CTRL_SIZE
 	};
-	DECLARE_READ32_MEMBER(board_ctrl_r);
-	DECLARE_WRITE32_MEMBER(board_ctrl_w);
+	uint32_t board_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void board_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t m_irq_state;
 	uint32_t board_ctrl[CTRL_SIZE];
 	void update_asic_irq();
@@ -175,19 +174,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_callback);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
-	DECLARE_READ16_MEMBER(port_ctrl_r);
-	DECLARE_WRITE16_MEMBER(port_ctrl_w);
+	uint16_t port_ctrl_r(offs_t offset);
+	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m_port_data;
 	uint16_t m_a2d_data;
 
-	DECLARE_READ16_MEMBER(a2d_ctrl_r);
-	DECLARE_WRITE16_MEMBER(a2d_ctrl_w);
+	uint16_t a2d_ctrl_r();
+	void a2d_ctrl_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER(a2d_data_r);
-	DECLARE_WRITE16_MEMBER(a2d_data_w);
+	uint16_t a2d_data_r();
+	void a2d_data_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER(parallel_r);
-	DECLARE_WRITE8_MEMBER(parallel_w);
+	uint8_t parallel_r(offs_t offset);
+	void parallel_w(offs_t offset, uint8_t data);
 
 	void map0(address_map &map);
 	void map1(address_map &map);
@@ -196,32 +195,32 @@ private:
 };
 
 // Parallel Port
-READ8_MEMBER(atlantis_state::parallel_r)
+uint8_t atlantis_state::parallel_r(offs_t offset)
 {
 	uint8_t result = 0x7;
 	logerror("%s: parallel_r %08x = %02x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
-WRITE8_MEMBER(atlantis_state::parallel_w)
+void atlantis_state::parallel_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: parallel_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Expansion ROM
-READ8_MEMBER (atlantis_state::exprom_r)
+uint8_t atlantis_state::exprom_r(offs_t offset)
 {
 	logerror("%s: exprom_r %08x = %02x\n", machine().describe_context(), offset, 0xff);
 	return 0xff;
 }
 
-WRITE8_MEMBER(atlantis_state::exprom_w)
+void atlantis_state::exprom_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: exprom_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Board PLD
-READ32_MEMBER(atlantis_state::board_ctrl_r)
+uint32_t atlantis_state::board_ctrl_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t data = board_ctrl[newOffset];
@@ -244,7 +243,7 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 	return data;
 }
 
-WRITE32_MEMBER(atlantis_state::board_ctrl_w)
+void atlantis_state::board_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t changeData = board_ctrl[newOffset] ^ data;
@@ -343,7 +342,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 }
 
 
-READ8_MEMBER(atlantis_state::cmos_r)
+uint8_t atlantis_state::cmos_r(offs_t offset)
 {
 	uint8_t result = m_rtc->read(offset);
 	// Initial RTC check expects reads to the RTC to take some time
@@ -354,7 +353,7 @@ READ8_MEMBER(atlantis_state::cmos_r)
 	return result;
 }
 
-WRITE8_MEMBER(atlantis_state::cmos_w)
+void atlantis_state::cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	system_time systime;
 	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
@@ -374,14 +373,9 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	}
 }
 
-WRITE32_MEMBER(atlantis_state::asic_fifo_w)
+void atlantis_state::asic_fifo_w(uint32_t data)
 {
 	m_ioasic->fifo_w(data);
-}
-
-WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
-{
-	m_ioasic->fifo_full_w(data);
 }
 
 /*************************************
@@ -542,7 +536,7 @@ void atlantis_state::update_asic_irq()
 /*************************************
 *  I/O Port control
 *************************************/
-READ16_MEMBER(atlantis_state::port_ctrl_r)
+uint16_t atlantis_state::port_ctrl_r(offs_t offset)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t result = m_port_data;
@@ -551,7 +545,7 @@ READ16_MEMBER(atlantis_state::port_ctrl_r)
 	return result;
 }
 
-WRITE16_MEMBER(atlantis_state::port_ctrl_w)
+void atlantis_state::port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 
@@ -590,12 +584,12 @@ WRITE16_MEMBER(atlantis_state::port_ctrl_w)
 #define A2D_CTRL_CHAN_MASK  0x70
 #define A2D_CTRL_START      0x80
 
-READ16_MEMBER(atlantis_state::a2d_ctrl_r)
+uint16_t atlantis_state::a2d_ctrl_r()
 {
 	return A2D_CTRL_COMPLETE;
 }
 
-WRITE16_MEMBER(atlantis_state::a2d_ctrl_w)
+void atlantis_state::a2d_ctrl_w(offs_t offset, uint16_t data)
 {
 	int index = (data & A2D_CTRL_CHAN_MASK) >> A2D_CTRL_CHAN_SHIFT;
 	m_a2d_data = (m_io_analog[index].read_safe(0));
@@ -606,7 +600,7 @@ WRITE16_MEMBER(atlantis_state::a2d_ctrl_w)
 	//logerror("a2d_ctrl_w: offset = %08x index = %d data = %04x\n", offset, index, data);
 }
 
-READ16_MEMBER(atlantis_state::a2d_data_r)
+uint16_t atlantis_state::a2d_data_r()
 {
 	// Clear interrupt if enabled
 	if (board_ctrl[IRQ_EN] & (1 << A2D_IRQ_SHIFT)) {
@@ -616,7 +610,7 @@ READ16_MEMBER(atlantis_state::a2d_data_r)
 	return m_a2d_data;
 }
 
-WRITE16_MEMBER(atlantis_state::a2d_data_w)
+void atlantis_state::a2d_data_w(uint16_t data)
 {
 
 }
@@ -689,7 +683,7 @@ void atlantis_state::map0(address_map &map)
 void atlantis_state::map1(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00200000, 0x00200003).w(FUNC(atlantis_state::dcs3_fifo_full_w));
+	map(0x00200000, 0x00200003).w(m_ioasic, FUNC(midway_ioasic_device::fifo_full_w));
 	map(0x00400000, 0x00400003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w));
 	map(0x00600000, 0x00600003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w));
 	map(0x00800000, 0x00900003).rw(FUNC(atlantis_state::port_ctrl_r), FUNC(atlantis_state::port_ctrl_w)).umask32(0x0000ffff);

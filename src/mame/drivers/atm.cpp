@@ -33,10 +33,10 @@ public:
 	void atmtb2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
-	DECLARE_READ8_MEMBER(beta_neutral_r);
-	DECLARE_READ8_MEMBER(beta_enable_r);
-	DECLARE_READ8_MEMBER(beta_disable_r);
+	void atm_port_7ffd_w(uint8_t data);
+	uint8_t beta_neutral_r(offs_t offset);
+	uint8_t beta_enable_r(offs_t offset);
+	uint8_t beta_disable_r(offs_t offset);
 	DECLARE_MACHINE_RESET(atm);
 
 	void atm_io(address_map &map);
@@ -72,7 +72,7 @@ void atm_state::atm_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
+void atm_state::atm_port_7ffd_w(uint8_t data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -85,12 +85,12 @@ WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 	atm_update_memory();
 }
 
-READ8_MEMBER(atm_state::beta_neutral_r)
+uint8_t atm_state::beta_neutral_r(offs_t offset)
 {
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER(atm_state::beta_enable_r)
+uint8_t atm_state::beta_enable_r(offs_t offset)
 {
 	if(m_ROMSelection == 1) {
 		m_ROMSelection = 3;
@@ -102,7 +102,7 @@ READ8_MEMBER(atm_state::beta_enable_r)
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-READ8_MEMBER(atm_state::beta_disable_r)
+uint8_t atm_state::beta_disable_r(offs_t offset)
 {
 	if (m_beta->started() && m_beta->is_active()) {
 		m_ROMSelection = BIT(m_port_7ffd_data, 4);

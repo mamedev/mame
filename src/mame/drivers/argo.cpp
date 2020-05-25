@@ -64,9 +64,9 @@ private:
 		TIMER_BOOT
 	};
 
-	DECLARE_WRITE8_MEMBER(argo_videoram_w);
-	DECLARE_READ8_MEMBER(argo_io_r);
-	DECLARE_WRITE8_MEMBER(argo_io_w);
+	void argo_videoram_w(offs_t offset, uint8_t data);
+	uint8_t argo_io_r(offs_t offset);
+	void argo_io_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(z0_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	void argo_palette(palette_device &palette) const;
@@ -97,7 +97,7 @@ private:
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
-WRITE8_MEMBER(argo_state::argo_videoram_w)
+void argo_state::argo_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *RAM;
 	if (m_ram_ctrl)
@@ -109,7 +109,7 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 	}
 }
 
-READ8_MEMBER(argo_state::argo_io_r)
+uint8_t argo_state::argo_io_r(offs_t offset)
 {
 	uint8_t low_io = offset;
 
@@ -147,7 +147,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	}
 }
 
-WRITE8_MEMBER(argo_state::argo_io_w)
+void argo_state::argo_io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -112,33 +112,33 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ16_MEMBER(applix_inputs_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE16_MEMBER(analog_latch_w);
-	DECLARE_WRITE16_MEMBER(dac_latch_w);
-	DECLARE_WRITE16_MEMBER(video_latch_w);
+	uint8_t applix_inputs_r();
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void analog_latch_w(uint16_t data);
+	void dac_latch_w(uint16_t data);
+	void video_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t applix_pb_r();
 	void applix_pa_w(uint8_t data);
 	void applix_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port18_r);
-	DECLARE_READ8_MEMBER(port20_r);
-	DECLARE_READ8_MEMBER(port60_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port20_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_READ16_MEMBER(fdc_data_r);
-	DECLARE_READ16_MEMBER(fdc_stat_r);
-	DECLARE_WRITE16_MEMBER(fdc_data_w);
-	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
+	uint8_t port00_r();
+	uint8_t port08_r();
+	uint8_t port10_r();
+	uint8_t port18_r();
+	uint8_t port20_r();
+	uint8_t port60_r();
+	void port08_w(uint8_t data);
+	void port10_w(uint8_t data);
+	void port18_w(offs_t offset, uint8_t data);
+	void port20_w(uint8_t data);
+	void port60_w(uint8_t data);
+	uint16_t fdc_data_r();
+	uint16_t fdc_stat_r(offs_t offset);
+	void fdc_data_w(uint16_t data);
+	void fdc_cmd_w(uint16_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
+	uint8_t internal_data_read(offs_t offset);
+	void internal_data_write(offs_t offset, uint8_t data);
 	uint8_t p1_read();
 	void p1_write(uint8_t data);
 	uint8_t p2_read();
@@ -226,7 +226,7 @@ d3     = cassette LED, low=on
 d4,5,6 = audio select
 d7     = cassette relay, low=on
 */
-WRITE16_MEMBER( applix_state::analog_latch_w )
+void applix_state::analog_latch_w(uint16_t data)
 {
 	data &= 0xff;
 	if (data != m_analog_latch)
@@ -238,7 +238,7 @@ WRITE16_MEMBER( applix_state::analog_latch_w )
 	}
 }
 
-WRITE16_MEMBER( applix_state::dac_latch_w )
+void applix_state::dac_latch_w(uint16_t data)
 {
 	data &= 0xff;
 	m_dac_latch = data;
@@ -251,7 +251,7 @@ WRITE16_MEMBER( applix_state::dac_latch_w )
 }
 
 //cent = odd, video = even
-WRITE16_MEMBER( applix_state::palette_w )
+void applix_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
@@ -262,7 +262,7 @@ WRITE16_MEMBER( applix_state::palette_w )
 		m_palette_latch[offset] = (data >> 8) & 15;
 }
 
-WRITE16_MEMBER( applix_state::video_latch_w )
+void applix_state::video_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_video_latch = data;
@@ -274,7 +274,7 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-READ16_MEMBER( applix_state::applix_inputs_r )
+uint8_t applix_state::applix_inputs_r()
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
@@ -341,7 +341,7 @@ d1 = H if 68000 sent a byte
 d2 = H if 68000 has read last byte
 d3 = test switch
 */
-READ8_MEMBER( applix_state::port00_r )
+uint8_t applix_state::port00_r()
 {
 	return (uint8_t)m_data_or_cmd | ((uint8_t)m_data << 1) | ((uint8_t)m_buffer_empty << 2) | m_io_fdc->read();
 }
@@ -356,7 +356,7 @@ d5 = SIDE
 d6 = BANK
 d7 = MAP
 */
-READ8_MEMBER( applix_state::port08_r )
+uint8_t applix_state::port08_r()
 {
 	return m_port08 | 3;
 }
@@ -366,7 +366,7 @@ d0 = /INUSE
 d1 = /EJECT
 d2-7 same as for port08_r
 */
-WRITE8_MEMBER( applix_state::port08_w )
+void applix_state::port08_w(uint8_t data)
 {
 	m_port08 = data;
 	membank("bank1")->set_entry(BIT(data, 6));
@@ -384,47 +384,47 @@ WRITE8_MEMBER( applix_state::port08_w )
 	}
 }
 
-READ8_MEMBER( applix_state::port10_r )
+uint8_t applix_state::port10_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port10_w )
+void applix_state::port10_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( applix_state::port18_r )
+uint8_t applix_state::port18_r()
 {
 	m_data = 0;
 	return m_data_to_fdc;
 }
 
-WRITE8_MEMBER( applix_state::port18_w )
+void applix_state::port18_w(offs_t offset, uint8_t data)
 {
 	m_data_from_fdc = data;
 	m_buffer_empty = 0;
 	m_fdc_cmd = BIT(offset, 2);
 }
 
-READ8_MEMBER( applix_state::port20_r )
+uint8_t applix_state::port20_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port20_w )
+void applix_state::port20_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( applix_state::port60_r )
+uint8_t applix_state::port60_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port60_w )
+void applix_state::port60_w(uint8_t data)
 {
 }
 
-READ16_MEMBER( applix_state::fdc_stat_r )
+uint16_t applix_state::fdc_stat_r(offs_t offset)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -436,20 +436,20 @@ READ16_MEMBER( applix_state::fdc_stat_r )
 	return data << 7;
 }
 
-READ16_MEMBER( applix_state::fdc_data_r )
+uint16_t applix_state::fdc_data_r()
 {
 	m_buffer_empty = 1;
 	return m_data_from_fdc;
 }
 
-WRITE16_MEMBER( applix_state::fdc_data_w )
+void applix_state::fdc_data_w(uint16_t data)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
 	m_data_or_cmd = 0;
 }
 
-WRITE16_MEMBER( applix_state::fdc_cmd_w )
+void applix_state::fdc_cmd_w(uint16_t data)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
@@ -465,7 +465,7 @@ void applix_state::applix_mem(address_map &map)
 	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
 	map(0x600000, 0x60007f).w(FUNC(applix_state::palette_w));
 	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
-	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
+	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nibble; video base, low nibble) (odd)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
@@ -999,7 +999,7 @@ COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, 
 
 /**************************************************** KEYBOARD MODULE *****************************************/
 
-READ8_MEMBER( applix_state::internal_data_read )
+uint8_t applix_state::internal_data_read(offs_t offset)
 {
 	m_via->write_cb2( BIT(offset, 8) ); // data
 	bool cp = !BIT(offset, 9);
@@ -1016,7 +1016,7 @@ READ8_MEMBER( applix_state::internal_data_read )
 }
 
 
-WRITE8_MEMBER( applix_state::internal_data_write )
+void applix_state::internal_data_write(offs_t offset, uint8_t data)
 {
 	/* Check for low->high transition on AD8 */
 	if ( ! ( m_last_write_addr & 0x0100 ) && ( offset & 0x0100 ) )

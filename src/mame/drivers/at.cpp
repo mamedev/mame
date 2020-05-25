@@ -179,9 +179,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	DECLARE_READ16_MEMBER(ps1_unk_r);
-	DECLARE_WRITE16_MEMBER(ps1_unk_w);
-	DECLARE_READ8_MEMBER(ps1_portb_r);
+	uint16_t ps1_unk_r(offs_t offset);
+	void ps1_unk_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t ps1_portb_r();
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
@@ -301,12 +301,12 @@ void at_state::at16_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
 }
 
-READ16_MEMBER( at_state::ps1_unk_r )
+uint16_t at_state::ps1_unk_r(offs_t offset)
 {
 	return m_ps1_reg[offset];
 }
 
-WRITE16_MEMBER( at_state::ps1_unk_w )
+void at_state::ps1_unk_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if((offset == 0) && (data == 0x60))
 		data = 0x68;
@@ -314,7 +314,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 	COMBINE_DATA(&m_ps1_reg[offset]);
 }
 
-READ8_MEMBER( at_state::ps1_portb_r )
+uint8_t at_state::ps1_portb_r()
 {
 	uint8_t data = m_mb->portb_r();
 	/* 0x10 is the dram refresh line bit, 15.085us. */
