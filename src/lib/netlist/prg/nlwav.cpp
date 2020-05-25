@@ -1,8 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 #include "netlist/plib/pstring.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/plists.h"
+//#include "netlist/nl_setup.h"
 #include "netlist/plib/pmain.h"
 #include "netlist/plib/ppmf.h"
 #include "netlist/plib/pstream.h"
@@ -724,8 +723,8 @@ static void open_ostream_and_exec(pstring fname, bool binary, F func)
 	if (fname != "-")
 	{
 		// FIXME: binary depends on format!
-		auto outstrm(std::ofstream(plib::filesystem::u8path(fname),
-			binary ? (std::ios::out | std::ios::binary) : std::ios::out));
+		std::ofstream outstrm(plib::filesystem::u8path(fname),
+			binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 		if (outstrm.fail())
 			throw plib::file_open_e(fname);
 		outstrm.imbue(std::locale::classic());

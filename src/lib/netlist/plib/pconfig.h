@@ -113,20 +113,29 @@
 //============================================================
 
 
-#if NVCCBUILD
-#define C14CONSTEXPR
+#ifdef NVCCBUILD
+	#define C14CONSTEXPR constexpr
+	#if NVCCBUILD == 101
+		#define NVCC_CONSTEXPR constexpr
+	#else
+		#define NVCC_CONSTEXPR constexpr
+	#endif
+	#if __cplusplus != 201402L
+		#error nvcc - something is wrong
+	#endif
 #else
-#if __cplusplus == 201103L
-#define C14CONSTEXPR
-#elif __cplusplus == 201402L
-#define C14CONSTEXPR constexpr
-#elif __cplusplus == 201703L
-#define C14CONSTEXPR constexpr
-#elif defined(_MSC_VER)
-#define C14CONSTEXPR
-#else
-#error "C++ version not supported"
-#endif
+	#define NVCC_CONSTEXPR constexpr
+	#if __cplusplus == 201103L
+		#define C14CONSTEXPR
+	#elif __cplusplus == 201402L
+		#define C14CONSTEXPR constexpr
+	#elif __cplusplus == 201703L
+		#define C14CONSTEXPR constexpr
+	#elif defined(_MSC_VER)
+		#define C14CONSTEXPR
+	#else
+		#error "C++ version not supported"
+	#endif
 #endif
 
 #if (PHAS_INT128)

@@ -52,6 +52,7 @@ namespace devices
 			init(desc);
 		}
 
+	private:
 		void init(const std::vector<pstring> &desc);
 
 		NETLIB_RESETI()
@@ -108,8 +109,6 @@ namespace devices
 				m_I[i].inactivate();
 			m_ign = (1<<m_NI)-1;
 		}
-
-	protected:
 
 	private:
 

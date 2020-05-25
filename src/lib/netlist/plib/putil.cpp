@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 
 #include "putil.h"
-#include "plists.h"
 #include "pstrutil.h"
 #include "ptypes.h"
 #include "penum.h"

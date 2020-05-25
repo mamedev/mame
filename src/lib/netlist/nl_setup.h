@@ -116,7 +116,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.ni = in;                                                          \
 		desc.no = out;                                                         \
 		desc.family = "";                                                      \
-		auto props(netlist::factory::properties(def_params, PSOURCELOC()));
+		netlist::factory::properties props(def_params, PSOURCELOC());
 
 #define TT_HEAD(x) \
 		desc.desc.emplace_back(x);

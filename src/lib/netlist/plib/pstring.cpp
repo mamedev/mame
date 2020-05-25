@@ -3,7 +3,6 @@
 
 #include "pstring.h"
 #include "palloc.h"
-#include "plists.h"
 
 #include <algorithm>
 #include <atomic>

@@ -298,7 +298,7 @@ namespace plib {
 		do
 		{
 			repeat = false;
-			auto elems(simple_iter<ppreprocessor>(this, tokenize(tmpret, m_expr_sep, false, true)));
+			simple_iter<ppreprocessor> elems(this, tokenize(tmpret, m_expr_sep, false, true));
 			tmpret = "";
 			while (!elems.eod())
 			{
@@ -342,7 +342,7 @@ namespace plib {
 					repeat = true;
 					if (def->m_params.size() != rep.size())
 						error(pfmt("Expected {1} parameters, got {2}")(def->m_params.size(), rep.size()));
-					auto r(simple_iter<ppreprocessor>(this, tokenize(def->m_replace, m_expr_sep, false, false)));
+					simple_iter<ppreprocessor> r(this, tokenize(def->m_replace, m_expr_sep, false, false));
 					bool stringify_next = false;
 					while (!r.eod())
 					{
@@ -460,7 +460,7 @@ namespace plib {
 			{
 				m_if_level++;
 				lt = replace_macros(lt);
-				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(3), m_expr_sep, true, true)));
+				simple_iter<ppreprocessor> t(this, tokenize(lt.substr(3), m_expr_sep, true, true));
 				auto val = static_cast<int>(prepro_expr(t, 255));
 				t.skip_ws();
 				if (!t.eod())
@@ -488,7 +488,7 @@ namespace plib {
 			{
 				m_if_flag ^= (1 << m_if_level);
 				lt = replace_macros(lt);
-				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(5), m_expr_sep, true, true)));
+				simple_iter<ppreprocessor> t(this, tokenize(lt.substr(5), m_expr_sep, true, true));
 				auto val = static_cast<int>(prepro_expr(t, 255));
 				t.skip_ws();
 				if (!t.eod())
@@ -552,7 +552,7 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("define needs at least one argument");
-					auto args(simple_iter<ppreprocessor>(this, tokenize(lt.substr(8), m_expr_sep, false, false)));
+					simple_iter<ppreprocessor> args(this, tokenize(lt.substr(8), m_expr_sep, false, false));
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
@@ -604,7 +604,7 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("undef needs at least one argument");
-					auto args(simple_iter<ppreprocessor>(this, tokenize(lt.substr(7), m_expr_sep, false, false)));
+					simple_iter<ppreprocessor> args(this, tokenize(lt.substr(7), m_expr_sep, false, false));
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("undef expected identifier");

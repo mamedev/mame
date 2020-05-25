@@ -8,7 +8,6 @@
 /// \file ptokenizer.h
 ///
 
-#include "plists.h"
 #include "pstream.h"
 #include "pstring.h"
 

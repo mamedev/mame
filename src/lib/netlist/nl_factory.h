@@ -12,7 +12,6 @@
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 #include "plib/putil.h"
-#include "plib/penum.h"
 
 #include <vector>
 
@@ -30,7 +29,7 @@
 			() \
 	{ \
 		using devtype = factory::device_element_t<ns :: NETLIB_NAME(chip)>; \
-		auto sl(factory::properties(p_def_param, PSOURCELOC())); \
+		factory::properties sl(p_def_param, PSOURCELOC()); \
 		return devtype::create(p_name, std::move(sl)); \
 	} \
 	\

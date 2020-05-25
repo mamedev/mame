@@ -608,7 +608,7 @@ void tool_app_t::static_compile()
 
 		for (auto &e : mp)
 		{
-			auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
+			std::ofstream sout(opt_dir() + "/" + e.first + ".c" );
 			sout << e.second.m_code;
 		}
 	}

@@ -24,6 +24,7 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/ptimed_queue.h"
 #include "plib/ptypes.h"
 
 #include "nl_errstr.h"
@@ -748,15 +749,15 @@ namespace netlist
 			}
 
 			void push_to_queue(const netlist_time &delay) noexcept;
-			constexpr bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+			NVCC_CONSTEXPR bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
-			void update_devs() noexcept;
+			inline void update_devs() noexcept;
 
 			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			constexpr bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
+			NVCC_CONSTEXPR bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
 
 			bool has_connections() const noexcept { return !m_core_terms.empty(); }
@@ -785,7 +786,7 @@ namespace netlist
 		protected:
 
 			// only used for logic nets
-			constexpr netlist_sig_t Q() const noexcept { return m_cur_Q; }
+			NVCC_CONSTEXPR netlist_sig_t Q() const noexcept { return m_cur_Q; }
 
 			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
@@ -1368,7 +1369,7 @@ namespace netlist
 
 		param_rom_t(core_device_t &device, const pstring &name);
 
-		ST operator[] (std::size_t n) const noexcept { return m_data[n]; }
+		const ST & operator[] (std::size_t n) const noexcept { return m_data[n]; }
 	protected:
 		void changed() noexcept override
 		{
@@ -2372,7 +2373,7 @@ namespace netlist
 			for (auto &p : m_list_active)
 			{
 				p.set_copied_input(sig);
-				if ((p.terminal_state() & mask))
+				if ((p.terminal_state() & mask) != 0)
 					p.run_delegate();
 			}
 		}

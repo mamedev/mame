@@ -105,7 +105,7 @@ namespace netlist
 				{
 					if (ptok == ptok_end)
 					{
-						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 						//break;
@@ -127,7 +127,7 @@ namespace netlist
 				{
 					if (ptok == params_and_connections.end())
 					{
-						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 					}
@@ -142,7 +142,7 @@ namespace netlist
 			}
 			if (ptok != params_and_connections.end())
 			{
-				auto err(MF_PARAM_COUNT_EXCEEDED_2(name, params_and_connections.size()));
+				MF_PARAM_COUNT_EXCEEDED_2 err(name, params_and_connections.size());
 				log().fatal(err);
 				throw nl_exception(err);
 			}
