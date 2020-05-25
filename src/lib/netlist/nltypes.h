@@ -114,7 +114,7 @@ namespace netlist
 	///
 
 #if (NL_USE_MEMPOOL)
-	using nlmempool = plib::mempool;
+	using nlmempool = plib::mempool_arena;
 #else
 	using nlmempool = plib::aligned_arena;
 #endif

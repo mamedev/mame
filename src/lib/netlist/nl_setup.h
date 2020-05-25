@@ -173,8 +173,8 @@ namespace netlist
 
 	struct param_ref_t
 	{
-		param_ref_t() : m_device(nullptr), m_param(nullptr) {}
-		param_ref_t(core_device_t &device, param_t &param)
+		param_ref_t() noexcept : m_device(nullptr), m_param(nullptr) {}
+		param_ref_t(core_device_t &device, param_t &param) noexcept
 		: m_device(&device)
 		, m_param(&param)
 		{ }
@@ -185,7 +185,7 @@ namespace netlist
 		const core_device_t &device() const noexcept { return *m_device; }
 		param_t &param() const noexcept { return *m_param; }
 
-		bool is_valid() const { return (m_device != nullptr) && (m_param != nullptr); }
+		bool is_valid() const noexcept { return (m_device != nullptr) && (m_param != nullptr); }
 	private:
 		core_device_t *m_device;
 		param_t *m_param;

@@ -38,11 +38,11 @@ namespace plib {
 
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<!P::is_stateless>::type>
+	struct arena_deleter<P, T, typename std::enable_if<!P::has_static_deallocator>::type>
 	{
-		using arena_storage_type = P *;
+		using arena_storage_type = P;
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		constexpr arena_deleter(arena_storage_type *a = nullptr) noexcept
 		: m_a(a) { }
 
 		template<typename U, typename = typename
@@ -57,15 +57,15 @@ namespace plib {
 			m_a->deallocate(p, sizeof(T));
 		}
 	//private:
-		arena_storage_type m_a;
+		arena_storage_type *m_a;
 	};
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<P::is_stateless>::type>
+	struct arena_deleter<P, T, typename std::enable_if<P::has_static_deallocator>::type>
 	{
 		using arena_storage_type = P;
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		constexpr arena_deleter(arena_storage_type *a = nullptr) noexcept
 		{
 			plib::unused_var(a);
 		}
@@ -277,7 +277,7 @@ namespace plib {
 
 	struct aligned_arena
 	{
-		static constexpr const bool is_stateless = true;
+		static constexpr const bool has_static_deallocator = true;
 		using size_type = std::size_t;
 
 		template <class T, size_type ALIGN = alignof(T)>
@@ -339,7 +339,7 @@ namespace plib {
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(*this));
+				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(this));
 			}
 			catch (...)
 			{
@@ -480,6 +480,7 @@ namespace plib {
 		{
 			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
 		}
+
 		constexpr const_reference operator[](size_type i) const noexcept
 		{
 			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
