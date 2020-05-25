@@ -1002,7 +1002,7 @@ void bbc_state::bbca(machine_config &config)
 	BBC_ROMSLOT16(config, m_rom[3], bbc_rom_devices, nullptr); /* ic52 */
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cass_ls_a").set_original("bbca_cass");
+	SOFTWARE_LIST(config, "cass_ls").set_original("bbc_cass").set_filter("A");
 	SOFTWARE_LIST(config, "rom_ls").set_original("bbc_rom").set_filter("B");
 }
 
@@ -1089,7 +1089,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_irqs->output_handler().append(m_internal, FUNC(bbc_internal_slot_device::irq6502_w));
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cass_ls_b").set_original("bbcb_cass");
+	subdevice<software_list_device>("cass_ls")->set_filter("A,B");
 	SOFTWARE_LIST(config, "flop_ls_b").set_original("bbcb_flop");
 	SOFTWARE_LIST(config, "flop_ls_b_orig").set_original("bbcb_flop_orig");
 }
@@ -1110,9 +1110,6 @@ void bbc_state::bbcb_de(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-
-	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_b_de").set_original("bbcb_cass_de");
 }
 
 
@@ -1266,8 +1263,7 @@ void bbcbp_state::abc110(machine_config &config)
 	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
 }
@@ -1289,8 +1285,7 @@ void bbcbp_state::acw443(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
 }
@@ -1311,8 +1306,7 @@ void bbcbp_state::abc310(machine_config &config)
 	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_b");
 }
 
@@ -1349,8 +1343,7 @@ void bbcbp_state::reutapm(machine_config &config)
 	config.device_remove("wd1770");
 
 	/* software lists */
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
 
@@ -1385,8 +1378,7 @@ void bbcbp_state::econx25(machine_config &config)
 	//m_tube->set_fixed(true);
 
 	/* software lists */
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
 }
@@ -1571,11 +1563,9 @@ void bbcm_state::bbcm(machine_config &config)
 	m_modem->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<9>));
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cass_ls_m").set_original("bbcm_cass");
+	SOFTWARE_LIST(config, "cass_ls").set_original("bbc_cass").set_filter("A,B,M");
 	SOFTWARE_LIST(config, "flop_ls_m").set_original("bbcm_flop");
 	SOFTWARE_LIST(config, "cart_ls_m").set_original("bbcm_cart");
-	SOFTWARE_LIST(config, "cass_ls_a").set_compatible("bbca_cass");
-	SOFTWARE_LIST(config, "cass_ls_b").set_compatible("bbcb_cass");
 	SOFTWARE_LIST(config, "flop_ls_b").set_compatible("bbcb_flop");
 	SOFTWARE_LIST(config, "flop_ls_b_orig").set_compatible("bbcb_flop_orig");
 	SOFTWARE_LIST(config, "rom_ls").set_original("bbc_rom").set_filter("M");
@@ -1625,9 +1615,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.device_remove("romslot6");
 
 	/* software lists */
-	config.device_remove("cass_ls_m");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_m");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
@@ -1698,9 +1686,7 @@ void bbcm_state::discmon(machine_config &config)
 	/* Add coin slot */
 
 	/* software lists */
-	config.device_remove("cass_ls_m");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_m");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
@@ -1715,9 +1701,7 @@ void bbcm_state::discmate(machine_config &config)
 	/* Add interface boards connected to cassette and RS423 */
 
 	/* software lists */
-	config.device_remove("cass_ls_m");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_m");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
@@ -1751,9 +1735,7 @@ void bbcm_state::cfa3000(machine_config &config)
 	m_analog->set_fixed(true);
 
 	/* software lists */
-	config.device_remove("cass_ls_m");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("flop_ls_m");
 	config.device_remove("flop_ls_b");
 	config.device_remove("flop_ls_b_orig");
@@ -1810,9 +1792,7 @@ void bbcm_state::bbcmc(machine_config &config)
 	SOFTWARE_LIST(config, "flop_ls_mc").set_original("bbcmc_flop");
 	SOFTWARE_LIST(config, "flop_ls_pro128s").set_compatible("pro128s_flop");
 	subdevice<software_list_device>("flop_ls_m")->set_compatible("bbcm_flop");
-	config.device_remove("cass_ls_m");
-	config.device_remove("cass_ls_a");
-	config.device_remove("cass_ls_b");
+	config.device_remove("cass_ls");
 	config.device_remove("cart_ls_m");
 
 	/* expansion ports */
