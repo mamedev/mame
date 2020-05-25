@@ -1581,7 +1581,6 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 		m2ptr         pt_UserData;        /* user-private data            */
 	};
 
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_ppc1->space();
 	uint64_t addr;
@@ -1603,14 +1602,14 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 
 	Task task;
 
-	task.t.pn_Next = cpu.read_dword(space, address + offsetof(ItemNode, pn_Next), true);
-	task.t.pn_Prev = cpu.read_dword(space, address + offsetof(ItemNode, pn_Prev), true);
-	task.t.n_SubsysType = cpu.read_byte(space, address + offsetof(ItemNode, n_SubsysType), true);
-	task.t.n_Type = cpu.read_byte(space, address + offsetof(ItemNode, n_Type), true);
-	task.t.n_Priority = cpu.read_byte(space, address + offsetof(ItemNode, n_Priority), true);
-	task.t.n_Flags = cpu.read_byte(space, address + offsetof(ItemNode, n_Flags), true);
-	task.t.n_Size = cpu.read_dword(space, address + offsetof(ItemNode, n_Size), true);
-	task.t.pn_Name = cpu.read_dword(space, address + offsetof(ItemNode, pn_Name), true);
+	task.t.pn_Next = space.read_dword(address + offsetof(ItemNode, pn_Next));
+	task.t.pn_Prev = space.read_dword(address + offsetof(ItemNode, pn_Prev));
+	task.t.n_SubsysType = space.read_byte(address + offsetof(ItemNode, n_SubsysType));
+	task.t.n_Type = space.read_byte(address + offsetof(ItemNode, n_Type));
+	task.t.n_Priority = space.read_byte(address + offsetof(ItemNode, n_Priority));
+	task.t.n_Flags = space.read_byte(address + offsetof(ItemNode, n_Flags));
+	task.t.n_Size = space.read_dword(address + offsetof(ItemNode, n_Size));
+	task.t.pn_Name = space.read_dword(address + offsetof(ItemNode, pn_Name));
 
 	char name[128];
 	char *ptr = name;
@@ -1618,31 +1617,31 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 
 	do
 	{
-		*ptr = cpu.read_byte(space, nameptr++, true);
+		*ptr = space.read_byte(nameptr++);
 	} while (*ptr++ != 0);
 
-	task.t.n_Version = cpu.read_byte(space, address + offsetof(ItemNode, n_Version), true);
-	task.t.n_Revision = cpu.read_byte(space, address + offsetof(ItemNode, n_Revision), true);
-	task.t.n_Reserved0 = cpu.read_byte(space, address + offsetof(ItemNode, n_Reserved0), true);
-	task.t.n_ItemFlags = cpu.read_byte(space, address + offsetof(ItemNode, n_ItemFlags), true);
-	task.t.n_Item = cpu.read_dword(space, address + offsetof(ItemNode, n_Item), true);
-	task.t.n_Owner = cpu.read_dword(space, address + offsetof(ItemNode, n_Owner), true);
-	task.t.pn_Reserved1 = cpu.read_dword(space, address + offsetof(ItemNode, pn_Reserved1), true);
+	task.t.n_Version = space.read_byte(address + offsetof(ItemNode, n_Version));
+	task.t.n_Revision = space.read_byte(address + offsetof(ItemNode, n_Revision));
+	task.t.n_Reserved0 = space.read_byte(address + offsetof(ItemNode, n_Reserved0));
+	task.t.n_ItemFlags = space.read_byte(address + offsetof(ItemNode, n_ItemFlags));
+	task.t.n_Item = space.read_dword(address + offsetof(ItemNode, n_Item));
+	task.t.n_Owner = space.read_dword(address + offsetof(ItemNode, n_Owner));
+	task.t.pn_Reserved1 = space.read_dword(address + offsetof(ItemNode, pn_Reserved1));
 
-	task.pt_ThreadTask = cpu.read_dword(space, address + offsetof(Task, pt_ThreadTask), true);
-	task.t_WaitBits = cpu.read_dword(space, address + offsetof(Task, t_WaitBits), true);
-	task.t_SigBits = cpu.read_dword(space, address + offsetof(Task, t_SigBits), true);
-	task.t_AllocatedSigs = cpu.read_dword(space, address + offsetof(Task, t_AllocatedSigs), true);
-	task.pt_StackBase = cpu.read_dword(space, address + offsetof(Task, pt_StackBase), true);
-	task.t_StackSize = cpu.read_dword(space, address + offsetof(Task, t_StackSize), true);
-	task.t_MaxUSecs = cpu.read_dword(space, address + offsetof(Task, t_MaxUSecs), true);
-	task.t_ElapsedTime.tt_Hi = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+0, true);
-	task.t_ElapsedTime.tt_Lo = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+4, true);
-	task.t_NumTaskLaunch = cpu.read_dword(space, address + offsetof(Task, t_NumTaskLaunch), true);
-	task.t_Flags = cpu.read_dword(space, address + offsetof(Task, t_Flags), true);
-	task.t_Module = cpu.read_dword(space, address + offsetof(Task, t_Module), true);
-	task.t_DefaultMsgPort = cpu.read_dword(space, address + offsetof(Task, t_DefaultMsgPort), true);
-	task.pt_UserData = cpu.read_dword(space, address + offsetof(Task, pt_UserData), true);
+	task.pt_ThreadTask = space.read_dword(address + offsetof(Task, pt_ThreadTask));
+	task.t_WaitBits = space.read_dword(address + offsetof(Task, t_WaitBits));
+	task.t_SigBits = space.read_dword(address + offsetof(Task, t_SigBits));
+	task.t_AllocatedSigs = space.read_dword(address + offsetof(Task, t_AllocatedSigs));
+	task.pt_StackBase = space.read_dword(address + offsetof(Task, pt_StackBase));
+	task.t_StackSize = space.read_dword(address + offsetof(Task, t_StackSize));
+	task.t_MaxUSecs = space.read_dword(address + offsetof(Task, t_MaxUSecs));
+	task.t_ElapsedTime.tt_Hi = space.read_dword(address + offsetof(Task, t_ElapsedTime)+0);
+	task.t_ElapsedTime.tt_Lo = space.read_dword(address + offsetof(Task, t_ElapsedTime)+4);
+	task.t_NumTaskLaunch = space.read_dword(address + offsetof(Task, t_NumTaskLaunch));
+	task.t_Flags = space.read_dword(address + offsetof(Task, t_Flags));
+	task.t_Module = space.read_dword(address + offsetof(Task, t_Module));
+	task.t_DefaultMsgPort = space.read_dword(address + offsetof(Task, t_DefaultMsgPort));
+	task.pt_UserData = space.read_dword(address + offsetof(Task, pt_UserData));
 
 //  m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
 //  uint32_t     t_WaitBits;        /* signals being waited for     */

@@ -14,6 +14,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 #include "debug/textbuf.h"
 #include "drivenum.h"
 #include "emuopts.h"
@@ -1577,8 +1578,8 @@ void lua_engine::initialize()
 	debugger_type.set("consolelog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); }));
 	debugger_type.set("errorlog", sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); }));
 	debugger_type.set("visible_cpu", sol::property(
-		[](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
-		[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }));
+		[](debugger_manager &debug) { debug.console().get_visible_cpu(); },
+		[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); }));
 	debugger_type.set("execution_state", sol::property(
 		[](debugger_manager &debug) {
 			return debug.cpu().is_stopped() ? "stop" : "run";
@@ -1616,7 +1617,7 @@ void lua_engine::initialize()
  * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
  *                                            expressions. returns breakpoint index
  * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints (k=index, v=device_debug::breakpoint)
+ * debug:bplist()[] - table of breakpoints (k=index, v=debug_breakpoint)
  * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
  *                                                              are debugger expressions.
  *                                                              returns watchpoint index
@@ -1636,8 +1637,9 @@ void lua_engine::initialize()
 	device_debug_type.set("bpclr", &device_debug::breakpoint_clear);
 	device_debug_type.set("bplist", [this](device_debug &dev) {
 			sol::table table = sol().create_table();
-			for(const device_debug::breakpoint &bpt : dev.breakpoint_list())
+			for(const auto &bpp : dev.breakpoint_list())
 			{
+				const debug_breakpoint &bpt = *bpp.second;
 				sol::table bp = sol().create_table();
 				bp["enabled"] = bpt.enabled();
 				bp["address"] = bpt.address();

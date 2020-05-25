@@ -14,6 +14,7 @@
 #import "debugview.h"
 
 #include "debugger.h"
+#include "debug/debugcon.h"
 
 #include "util/xmlfile.h"
 
@@ -189,12 +190,12 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 - (IBAction)debugBreak:(id)sender {
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
+		machine->debugger().console().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 }
 
 
 - (IBAction)debugRun:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 
@@ -203,43 +204,43 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 														object:self
 													  userInfo:[NSDictionary dictionaryWithObject:[NSValue valueWithPointer:machine]
 																						   forKey:@"MAMEDebugMachine"]];
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 
 - (IBAction)debugRunToNextCPU:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+	machine->debugger().console().get_visible_cpu()->debug()->go_next_device();
 }
 
 
 - (IBAction)debugRunToNextInterrupt:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+	machine->debugger().console().get_visible_cpu()->debug()->go_interrupt();
 }
 
 
 - (IBAction)debugRunToNextVBLANK:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+	machine->debugger().console().get_visible_cpu()->debug()->go_vblank();
 }
 
 
 - (IBAction)debugStepInto:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step();
 }
 
 
 - (IBAction)debugStepOver:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
 }
 
 
 - (IBAction)debugStepOut:(id)sender {
-	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step_out();
 }
 
 
 - (IBAction)debugSoftReset:(id)sender {
 	machine->schedule_soft_reset();
-	machine->debugger().cpu().get_visible_cpu()->debug()->go();
+	machine->debugger().console().get_visible_cpu()->debug()->go();
 }
 
 

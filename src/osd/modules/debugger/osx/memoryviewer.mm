@@ -14,7 +14,7 @@
 #import "memoryview.h"
 
 #include "debugger.h"
-#include "debug/debugcpu.h"
+#include "debug/debugcon.h"
 #include "debug/dvmemory.h"
 
 #include "util/xmlfile.h"
@@ -108,7 +108,7 @@
 	[actionButton release];
 
 	// set default state
-	[memoryView selectSubviewForDevice:machine->debugger().cpu().get_visible_cpu()];
+	[memoryView selectSubviewForDevice:machine->debugger().console().get_visible_cpu()];
 	[memoryView setExpression:@"0"];
 	[expressionField setStringValue:@"0"];
 	[expressionField selectText:self];

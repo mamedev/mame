@@ -107,6 +107,10 @@ public:
 		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	device_t *get_visible_cpu() { return m_visiblecpu; }
+	void set_visible_cpu(device_t *visiblecpu) { m_visiblecpu = visiblecpu; }
+	symbol_table &visible_symtable();
+
 	static std::string cmderr_to_string(CMDERR error);
 
 private:
@@ -133,6 +137,9 @@ private:
 	};
 
 	running_machine &m_machine;
+
+	// visible CPU device (the one that commands should apply to)
+	device_t        *m_visiblecpu;
 
 	text_buffer     *m_console_textbuf;
 	text_buffer     *m_errorlog_textbuf;

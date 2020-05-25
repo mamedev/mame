@@ -83,7 +83,6 @@ void xbox_base_state::find_debug_params()
 
 void xbox_base_state::dump_string_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -101,11 +100,10 @@ void xbox_base_state::dump_string_command(int ref, const std::vector<std::string
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 
-	uint32_t length = cpu.read_word(space, address, true);
-	uint32_t maximumlength = cpu.read_word(space, address + 2, true);
-	offs_t buffer = cpu.read_dword(space, address + 4, true);
+	uint32_t length = space.read_word_unaligned(address);
+	uint32_t maximumlength = space.read_word_unaligned(address + 2);
+	offs_t buffer = space.read_dword_unaligned(address + 4);
 	con.printf("Length %d word\n", length);
 	con.printf("MaximumLength %d word\n", maximumlength);
 	con.printf("Buffer %08X byte* ", buffer);
@@ -114,17 +112,19 @@ void xbox_base_state::dump_string_command(int ref, const std::vector<std::string
 	if (length > 256)
 		length = 256;
 
-	for (int a = 0; a < length; a++)
+	if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, buffer))
 	{
-		uint8_t c = cpu.read_byte(space, buffer + a, true);
-		con.printf("%c", c);
+		for (int a = 0; a < length; a++)
+		{
+			uint8_t c = space.read_byte(buffer + a);
+			con.printf("%c", c);
+		}
 	}
 	con.printf("\n");
 }
 
 void xbox_base_state::dump_process_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -142,21 +142,19 @@ void xbox_base_state::dump_process_command(int ref, const std::vector<std::strin
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 
-	con.printf("ReadyListHead {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address, true), cpu.read_dword(space, address + 4, true));
-	con.printf("ThreadListHead {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("StackCount %d dword\n", cpu.read_dword(space, address + 16, true));
-	con.printf("ThreadQuantum %d dword\n", cpu.read_dword(space, address + 20, true));
-	con.printf("BasePriority %d byte\n", cpu.read_byte(space, address + 24, true));
-	con.printf("DisableBoost %d byte\n", cpu.read_byte(space, address + 25, true));
-	con.printf("DisableQuantum %d byte\n", cpu.read_byte(space, address + 26, true));
-	con.printf("_padding %d byte\n", cpu.read_byte(space, address + 27, true));
+	con.printf("ReadyListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword(address), space.read_dword_unaligned(address + 4));
+	con.printf("ThreadListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword(address + 8), space.read_dword_unaligned(address + 12));
+	con.printf("StackCount %d dword\n", space.read_dword_unaligned(address + 16));
+	con.printf("ThreadQuantum %d dword\n", space.read_dword_unaligned(address + 20));
+	con.printf("BasePriority %d byte\n", space.read_byte(address + 24));
+	con.printf("DisableBoost %d byte\n", space.read_byte(address + 25));
+	con.printf("DisableQuantum %d byte\n", space.read_byte(address + 26));
+	con.printf("_padding %d byte\n", space.read_byte(address + 27));
 }
 
 void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -184,7 +182,6 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
 	if (params.size() >= 3)
 		con.printf("Entry    Object\n");
 	else
@@ -198,7 +195,7 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		else
 			con.printf("%08X\n", (uint32_t)addr);
 		old = addr;
-		addr = cpu.read_dword(space, address, true);
+		addr = space.read_dword_unaligned(address);
 		if (addr == start)
 			break;
 		if (addr == old)
@@ -206,13 +203,11 @@ void xbox_base_state::dump_list_command(int ref, const std::vector<std::string> 
 		address = (offs_t)addr;
 		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 			break;
-		address = (offs_t)addr;
 	}
 }
 
 void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -230,20 +225,18 @@ void xbox_base_state::dump_dpc_command(int ref, const std::vector<std::string> &
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
-	con.printf("Type %d word\n", cpu.read_word(space, address, true));
-	con.printf("Inserted %d byte\n", cpu.read_byte(space, address + 2, true));
-	con.printf("Padding %d byte\n", cpu.read_byte(space, address + 3, true));
-	con.printf("DpcListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 4, true), cpu.read_dword(space, address + 8, true));
-	con.printf("DeferredRoutine %08X dword\n", cpu.read_dword(space, address + 12, true));
-	con.printf("DeferredContext %08X dword\n", cpu.read_dword(space, address + 16, true));
-	con.printf("SystemArgument1 %08X dword\n", cpu.read_dword(space, address + 20, true));
-	con.printf("SystemArgument2 %08X dword\n", cpu.read_dword(space, address + 24, true));
+	con.printf("Type %d word\n", space.read_word_unaligned(address));
+	con.printf("Inserted %d byte\n", space.read_byte(address + 2));
+	con.printf("Padding %d byte\n", space.read_byte(address + 3));
+	con.printf("DpcListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 4), space.read_dword_unaligned(address + 8, true));
+	con.printf("DeferredRoutine %08X dword\n", space.read_dword_unaligned(address + 12));
+	con.printf("DeferredContext %08X dword\n", space.read_dword_unaligned(address + 16));
+	con.printf("SystemArgument1 %08X dword\n", space.read_dword_unaligned(address + 20));
+	con.printf("SystemArgument2 %08X dword\n", space.read_dword_unaligned(address + 24));
 }
 
 void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	uint64_t addr;
@@ -261,22 +254,20 @@ void xbox_base_state::dump_timer_command(int ref, const std::vector<std::string>
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)addr;
-	con.printf("Header.Type %d byte\n", cpu.read_byte(space, address, true));
-	con.printf("Header.Absolute %d byte\n", cpu.read_byte(space, address + 1, true));
-	con.printf("Header.Size %d byte\n", cpu.read_byte(space, address + 2, true));
-	con.printf("Header.Inserted %d byte\n", cpu.read_byte(space, address + 3, true));
-	con.printf("Header.SignalState %08X dword\n", cpu.read_dword(space, address + 4, true));
-	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 8, true), cpu.read_dword(space, address + 12, true));
-	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)cpu.read_qword(space, address + 16, true)).c_str());
-	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", cpu.read_dword(space, address + 24, true), cpu.read_dword(space, address + 28, true));
-	con.printf("Dpc %08X dword\n", cpu.read_dword(space, address + 32, true));
-	con.printf("Period %d dword\n", cpu.read_dword(space, address + 36, true));
+	con.printf("Header.Type %d byte\n", space.read_byte(address));
+	con.printf("Header.Absolute %d byte\n", space.read_byte(address + 1));
+	con.printf("Header.Size %d byte\n", space.read_byte(address + 2));
+	con.printf("Header.Inserted %d byte\n", space.read_byte(address + 3));
+	con.printf("Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
+	con.printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
+	con.printf("%s", string_format("DueTime %x qword\n", (int64_t)space.read_qword_unaligned(address + 16)).c_str());
+	con.printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
+	con.printf("Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
+	con.printf("Period %d dword\n", space.read_dword_unaligned(address + 36));
 }
 
 void xbox_base_state::curthread_command(int ref, const std::vector<std::string> &params)
 {
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 	address_space &space = m_maincpu->space();
 	offs_t address;
@@ -288,26 +279,29 @@ void xbox_base_state::curthread_command(int ref, const std::vector<std::string> 
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)fsbase + (offs_t)debugc_bios->parameter[7-1];
 
-	uint32_t kthrd = cpu.read_dword(space, address, true);
+	uint32_t kthrd = space.read_dword_unaligned(address);
 	con.printf("Current thread is %08X\n", kthrd);
 	address = (offs_t)(kthrd + debugc_bios->parameter[8-1]);
-	uint32_t topstack = cpu.read_dword(space, address, true);
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		return;
+	uint32_t topstack = space.read_dword_unaligned(address);
 	con.printf("Current thread stack top is %08X\n", topstack);
 	address = (offs_t)(kthrd + debugc_bios->parameter[4-1]);
-	uint32_t tlsdata = cpu.read_dword(space, address, true);
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		return;
+	uint32_t tlsdata = space.read_dword_unaligned(address);
 	if (tlsdata == 0)
 		address = (offs_t)(topstack - debugc_bios->parameter[5-1] - debugc_bios->parameter[6-1]);
 	else
 		address = (offs_t)(tlsdata - debugc_bios->parameter[6-1]);
-	con.printf("Current thread function is %08X\n", cpu.read_dword(space, address, true));
+	if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+		con.printf("Current thread function is %08X\n", space.read_dword_unaligned(address));
 }
 
 void xbox_base_state::threadlist_command(int ref, const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
-	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
 
 	con.printf("Pri. _KTHREAD   Stack  Function\n");
@@ -315,20 +309,31 @@ void xbox_base_state::threadlist_command(int ref, const std::vector<std::string>
 	for (int pri = 0; pri < 16; pri++)
 	{
 		uint32_t curr = debugc_bios->parameter[1 - 1] + pri * 8;
-		uint32_t next = cpu.read_dword(space, curr, true);
+		uint32_t addr = curr;
+		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+			continue;
+		uint32_t next = space.read_dword_unaligned(addr);
 
 		while ((next != curr) && (next != 0))
 		{
 			uint32_t kthrd = next - debugc_bios->parameter[2 - 1];
-			uint32_t topstack = cpu.read_dword(space, kthrd + debugc_bios->parameter[3 - 1], true);
-			uint32_t tlsdata = cpu.read_dword(space, kthrd + debugc_bios->parameter[4 - 1], true);
-			uint32_t function;
+			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, kthrd))
+				break;
+			uint32_t topstack = space.read_dword_unaligned(kthrd + debugc_bios->parameter[3 - 1]);
+			uint32_t tlsdata = space.read_dword_unaligned(kthrd + debugc_bios->parameter[4 - 1]);
+			uint32_t function = 0;
 			if (tlsdata == 0)
-				function = cpu.read_dword(space, topstack - debugc_bios->parameter[5 - 1] - debugc_bios->parameter[6 - 1], true);
+				addr = topstack - debugc_bios->parameter[5 - 1] - debugc_bios->parameter[6 - 1];
 			else
-				function = cpu.read_dword(space, tlsdata - debugc_bios->parameter[6 - 1], true);
+				addr = tlsdata - debugc_bios->parameter[6 - 1];
+			if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+				function = space.read_dword_unaligned(addr);
 			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = cpu.read_dword(space, next, true);
+			addr = next;
+			if (m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
+				next = space.read_dword_unaligned(addr);
+			else
+				break;
 		}
 	}
 }

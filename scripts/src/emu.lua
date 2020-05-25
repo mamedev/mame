@@ -244,6 +244,8 @@ files {
 	MAME_DIR .. "src/emu/debug/dvtext.h",
 	MAME_DIR .. "src/emu/debug/express.cpp",
 	MAME_DIR .. "src/emu/debug/express.h",
+	MAME_DIR .. "src/emu/debug/points.cpp",
+	MAME_DIR .. "src/emu/debug/points.h",
 	MAME_DIR .. "src/emu/debug/textbuf.cpp",
 	MAME_DIR .. "src/emu/debug/textbuf.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",

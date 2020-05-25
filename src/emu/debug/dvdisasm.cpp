@@ -360,13 +360,7 @@ void debug_view_disasm::complete_information(const debug_view_disasm_source &sou
 
 		dasm.m_is_pc = adr == pc;
 
-		dasm.m_is_bp = false;
-		for(const device_debug::breakpoint &bp : source.device()->debug()->breakpoint_list())
-			if(adr == (bp.address() & source.m_space.logaddrmask())) {
-				dasm.m_is_bp = true;
-				break;
-			}
-
+		dasm.m_is_bp = source.device()->debug()->breakpoint_find(adr) != nullptr;
 		dasm.m_is_visited = source.device()->debug()->track_pc_visited(adr);
 
 		const char *comment = source.device()->debug()->comment_text(adr);

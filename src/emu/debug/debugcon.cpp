@@ -35,6 +35,7 @@
 
 debugger_console::debugger_console(running_machine &machine)
 	: m_machine(machine)
+	, m_visiblecpu(nullptr)
 	, m_console_textbuf(nullptr)
 	, m_errorlog_textbuf(nullptr)
 {
@@ -60,6 +61,17 @@ debugger_console::debugger_console(running_machine &machine)
 
 	/* register our own custom-command help */
 	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
+
+	/* first CPU is visible by default */
+	for (device_t &device : device_iterator(m_machine.root_device()))
+	{
+		auto *cpu = dynamic_cast<cpu_device *>(&device);
+		if (cpu != nullptr)
+		{
+			m_visiblecpu = cpu;
+			break;
+		}
+	}
 }
 
 
@@ -119,6 +131,18 @@ void debugger_console::execute_help_custom(int ref, const std::vector<std::strin
 		}
 	}
 }
+
+
+//-------------------------------------------------
+//  visible_symtable - return the locally-visible
+//  symbol table
+//-------------------------------------------------
+
+symbol_table &debugger_console::visible_symtable()
+{
+	return m_visiblecpu->debug()->symtable();
+}
+
 
 
 /*-------------------------------------------------
@@ -334,7 +358,7 @@ CMDERR debugger_console::internal_parse_command(const std::string &original_comm
 		{
 			try
 			{
-				parsed_expression(m_machine.debugger().cpu().visible_symtable(), command_start).execute();
+				parsed_expression(visible_symtable(), command_start).execute();
 			}
 			catch (expression_error &err)
 			{

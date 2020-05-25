@@ -96,6 +96,11 @@ class debug_view_manager;
 class parsed_expression;
 class symbol_table;
 
+// declared in debug/points.h
+class debug_breakpoint;
+class debug_watchpoint;
+class debug_registerpoint;
+
 // declared in debugger.h
 class debugger_manager;
 
