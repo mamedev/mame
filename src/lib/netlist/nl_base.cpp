@@ -484,7 +484,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		if (exec().stats_enabled())
-			m_stats = owner.make_object<stats_t>();
+			m_stats = owner.make_pool_object<stats_t>();
 	}
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -492,9 +492,10 @@ namespace netlist
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
+		//printf("owned device: %s\n", this->name().c_str());
 		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
 		if (exec().stats_enabled())
-			m_stats = owner.state().make_object<stats_t>();
+			m_stats = owner.state().make_pool_object<stats_t>();
 	}
 
 	void core_device_t::set_default_delegate(detail::core_terminal_t &term)

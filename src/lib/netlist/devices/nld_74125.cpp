@@ -21,7 +21,7 @@ namespace netlist
 
 		template<typename O, typename... Args>
 		uptr(O &owner, const pstring &name, Args&&... args)
-		: unique_pool_ptr<T>(owner.template make_object<T>(owner, name, std::forward<Args>(args)...))
+		: unique_pool_ptr<T>(owner.template make_pool_object<T>(owner, name, std::forward<Args>(args)...))
 		{ }
 
 		C14CONSTEXPR auto operator ()() noexcept -> decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }

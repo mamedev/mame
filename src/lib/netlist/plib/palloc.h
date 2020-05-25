@@ -247,6 +247,19 @@ namespace plib {
 			m_a.deallocate(p, n);
 		}
 
+		template<typename U, typename... Args>
+		void construct(U* p, Args&&... args)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+			::new (static_cast<void *>(p)) U(std::forward<Args>(args)...);
+		}
+
+		template<typename U>
+		void destroy(U* p)
+		{
+			p->~U();
+		}
+
 		template <class AR1, class T1, std::size_t A1, class AR2, class T2, std::size_t A2>
 		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs, // NOLINT
 			const arena_allocator<AR2, T2, A2>& rhs) noexcept;
@@ -459,11 +472,11 @@ namespace plib {
 	//============================================================
 
 	// FIXME: needs a separate file
-	template <class T, std::size_t ALIGN = PALIGN_VECTOROPT>
-	class aligned_vector : public std::vector<T, aligned_allocator<T, ALIGN>>
+	template <typename T, std::size_t ALIGN = PALIGN_VECTOROPT, typename A = aligned_allocator<T, ALIGN>>
+	class aligned_vector : public std::vector<T, A>
 	{
 	public:
-		using base = std::vector<T, aligned_allocator<T, ALIGN>>;
+		using base = std::vector<T, A>;
 
 		using reference = typename base::reference;
 		using const_reference = typename base::const_reference;

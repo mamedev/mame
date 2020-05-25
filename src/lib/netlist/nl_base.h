@@ -575,7 +575,7 @@ namespace netlist
 
 			// to ease template design
 			template<typename T, typename... Args>
-			unique_pool_ptr<T> make_object(Args&&... args);
+			unique_pool_ptr<T> make_pool_object(Args&&... args);
 
 		private:
 			netlist_t & m_netlist;
@@ -1753,7 +1753,7 @@ namespace netlist
 		family_collection_type &family_cache() { return m_family_cache; }
 
 		template<typename T, typename... Args>
-		unique_pool_ptr<T> make_object(Args&&... args)
+		unique_pool_ptr<T> make_pool_object(Args&&... args)
 		{
 			return m_pool.make_unique<T>(std::forward<Args>(args)...);
 		}
@@ -2476,9 +2476,9 @@ namespace netlist
 	}
 
 	template<typename T, typename... Args>
-	inline unique_pool_ptr<T> detail::netlist_object_t::make_object(Args&&... args)
+	inline unique_pool_ptr<T> detail::netlist_object_t::make_pool_object(Args&&... args)
 	{
-		return state().make_object<T>(std::forward<Args>(args)...);
+		return state().make_pool_object<T>(std::forward<Args>(args)...);
 	}
 
 	inline void param_t::update_param() noexcept
@@ -2546,7 +2546,7 @@ namespace netlist
 	template<class O, class C, typename... Args>
 	void base_device_t::create_and_register_subdevice(O &owner, const pstring &name, unique_pool_ptr<C> &dev, Args&&... args)
 	{
-		dev = state().make_object<C>(owner, name, std::forward<Args>(args)...);
+		dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);
 	}
 
 	inline netlist_state_t &detail::device_object_t::state() noexcept

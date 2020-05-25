@@ -1314,9 +1314,9 @@ public:
 			case family_type::CMOS:
 			case family_type::NMOS:
 			case family_type::PMOS:
-				return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+				return anetlist.make_pool_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 		}
-		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return anetlist.make_pool_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 
 	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override
@@ -1329,9 +1329,9 @@ public:
 			case family_type::CMOS:
 			case family_type::NMOS:
 			case family_type::PMOS:
-				return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+				return anetlist.make_pool_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 		}
-		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+		return anetlist.make_pool_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 private:
 	family_type m_family_type;

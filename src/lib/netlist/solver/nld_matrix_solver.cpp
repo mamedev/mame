@@ -121,7 +121,7 @@ namespace solver
 							{
 								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = state().make_object<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
 								net_proxy_output = net_proxy_output_u.get();
 								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}

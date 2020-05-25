@@ -535,9 +535,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			m_channels[i].m_param_name = anetlist.make_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
-			m_channels[i].m_param_mult = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
-			m_channels[i].m_param_offset = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
+			m_channels[i].m_param_name = anetlist.make_pool_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
+			m_channels[i].m_param_mult = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
+			m_channels[i].m_param_offset = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
 	}
 
@@ -808,7 +808,7 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
+	auto dev = nlstate.make_pool_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);
@@ -841,7 +841,7 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
+	auto dev = nlstate.make_pool_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);

@@ -353,7 +353,7 @@ namespace devices
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring inpname = plib::pfmt("A{1}")(i);
-				m_I.push_back(state().make_object<analog_input_t>(*this, inpname));
+				m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname));
 				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
@@ -376,13 +376,14 @@ namespace devices
 		}
 
 	private:
+		using pf_type = plib::pfunction<nl_fptype>;
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
 		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
-		std::vector<nl_fptype> m_vals;
-		state_var<plib::pfunction<nl_fptype>> m_compiled;
+		pf_type::values_container m_vals;
+		state_var<pf_type> m_compiled;
 
 	};
 
