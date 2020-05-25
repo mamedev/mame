@@ -74,13 +74,6 @@ namespace factory {
 		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
 	}
 
-	void library_element_t::macro_actions(nlparse_t &nparser, const pstring &name)
-	{
-		nparser.namespace_push(name);
-		nparser.include(this->name());
-		nparser.namespace_pop();
-	}
-
 
 } // namespace factory
  } // namespace netlist

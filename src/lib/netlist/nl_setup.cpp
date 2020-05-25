@@ -75,7 +75,14 @@ namespace netlist
 		// make sure we parse macro library entries
 		// FIXME: this could be done here if e.g. f
 		//        would have an indication that this is macro element.
-		f->macro_actions(*this, name);
+		if (f->type() == factory::element_type::MACRO)
+		{
+			namespace_push(name);
+			include(f->name());
+			namespace_pop();
+		}
+		//f->macro_actions(*this, name);
+
 		pstring key = build_fqn(name);
 		if (device_exists(key))
 		{

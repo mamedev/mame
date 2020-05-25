@@ -12,6 +12,7 @@
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 #include "plib/putil.h"
+#include "plib/penum.h"
 
 #include <vector>
 
@@ -38,33 +39,47 @@
 
 namespace netlist {
 	class core_device_t;
-	class nlparse_t;
 	class netlist_state_t;
 
 namespace factory {
+
+	PENUM(element_type,
+		BUILTIN,
+		MACRO
+	)
 
 	struct properties
 	{
 		properties(const pstring &defparam, plib::source_location &&sourceloc)
 		: m_defparam(defparam)
 		, m_sourceloc(std::move(sourceloc))
+		, m_type(element_type::BUILTIN)
 		{ }
 
 		~properties() = default;
 		PCOPYASSIGNMOVE(properties, default)
 
-		const pstring &defparam() const noexcept
+		pstring defparam() const noexcept
 		{
 			return m_defparam;
 		}
 
-		const plib::source_location &source() const noexcept
+		plib::source_location source() const noexcept
 		{
 			return m_sourceloc;
+		}
+
+		element_type type() const noexcept { return m_type; }
+
+		properties &set_type(element_type t) noexcept
+		{
+			m_type = t;
+			return *this;
 		}
 	private:
 		pstring m_defparam;
 		plib::source_location m_sourceloc;
+		element_type m_type;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -83,16 +98,10 @@ namespace factory {
 			netlist_state_t &anetlist,
 			const pstring &name) = 0;
 
-		virtual void macro_actions(nlparse_t &nparser, const pstring &name)
-		{
-			plib::unused_var(nparser);
-			plib::unused_var(name);
-		}
-
-		const pstring &name() const noexcept { return m_name; }
-		const pstring &param_desc() const noexcept { return m_properties.defparam(); }
-		const plib::source_location &source() const noexcept { return m_properties.source(); }
-
+		pstring name() const noexcept { return m_name; }
+		pstring param_desc() const noexcept { return m_properties.defparam(); }
+		plib::source_location source() const noexcept { return m_properties.source(); }
+		element_type type() const noexcept { return m_properties.type(); }
 	private:
 		pstring m_name;                             ///< device name
 		properties m_properties;                    ///< source file and other information and settings
@@ -171,15 +180,13 @@ namespace factory {
 	public:
 
 		library_element_t(const pstring &name, properties &&props)
-		: element_t(name, std::move(props))
+		: element_t(name, std::move(properties(props).set_type(element_type::MACRO)))
 		{
 		}
 
 		unique_pool_ptr<core_device_t> make_device(nlmempool &pool,
 			netlist_state_t &anetlist,
 			const pstring &name) override;
-
-		void macro_actions(nlparse_t &nparser, const pstring &name) override;
 
 	private:
 	};
