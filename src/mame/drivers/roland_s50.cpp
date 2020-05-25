@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "audio/bu3905.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "imagedev/floppy.h"
@@ -199,6 +200,9 @@ void roland_s50_state::s550_io_map(address_map &map)
 	map(0x1000, 0x1000).r(m_vdp, FUNC(tms3556_device::vram_r));
 	map(0x1002, 0x1002).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
 	map(0x1004, 0x1004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
+	//map(0x1800, 0x181f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
+	map(0x2800, 0x281f).w("outas", FUNC(bu3905_device::write)).umask16(0x00ff);
+	//map(0x3800, 0x381f).rw(m_scsic, FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
 	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
 }
 
@@ -212,7 +216,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0xc600, 0xc600).rw(FUNC(roland_w30_state::psram_bank_r), FUNC(roland_w30_state::psram_bank_w));
 	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
-	//map(0xe000, 0xe01f).rw("scsic", FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
+	//map(0xe000, 0xe01f).rw(m_scsic, FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
 	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	//map(0xe800, 0xe83f).w("output", FUNC(upd65006gf_376_3b8_device::write)).umask16(0x00ff);
 	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
@@ -336,6 +340,13 @@ void roland_s50_state::s550(machine_config &config)
 	//UPD7537(config.device_replace(), "fipcpu", 400_kHz_XTAL);
 
 	config.device_remove("keyscan");
+
+	//MB89352(config, m_scsic, 8_MHz_XTAL); // on Option Board
+	//m_scsic->intr_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+
+	BU3905(config, "outas");
+
+	//MB654419U(config, m_tvf, 20_MHz_XTAL);
 }
 
 void roland_w30_state::w30(machine_config &config)
@@ -365,7 +376,7 @@ void roland_w30_state::w30(machine_config &config)
 	// Floppy unit: FX-354 (307F1JC)
 	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	//MB89352(config, "scsic", 8_MHz_XTAL); // by option
+	//MB89352(config, m_scsic, 8_MHz_XTAL); // by option
 
 	LM24014H(config, "lcd"); // LCD unit: LM240142
 
@@ -423,7 +434,7 @@ void roland_w30_state::s330(machine_config &config)
 	//R15229874(config, m_wave, 26.88_MHz_XTAL);
 	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 
-	//BU3905S(config, "output");
+	BU3905(config, "outas");
 
 	//MB654419U(config, m_tvf, 20_MHz_XTAL);
 }

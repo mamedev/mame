@@ -3323,6 +3323,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_u20.cpp",
+	MAME_DIR .. "src/mame/audio/bu3905.cpp",
+	MAME_DIR .. "src/mame/audio/bu3905.h",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
 	MAME_DIR .. "src/mame/machine/mb62h195.cpp",
