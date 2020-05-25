@@ -33,6 +33,7 @@ public:
 	void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
 	void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
+	void set_pal_back(int pal_back) { m_pal_back = pal_back; }
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
@@ -271,6 +272,7 @@ protected:
 
 	int m_pal_displaybank_high;
 	int m_pal_sprites;
+	int m_pal_back;
 	int m_alt_tile_addressing;
 };
 
