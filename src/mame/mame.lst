@@ -9393,6 +9393,7 @@ ragtimea                        // MBD (c) 1992 (Japan, v1.3)
 se70                            //
 
 @source:boss_sx700.cpp
+gx700                           //
 sx700                           //
 
 @source:bottom9.cpp
