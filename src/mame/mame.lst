@@ -9389,6 +9389,12 @@ boogwingu                       // MBD (c) 1992 (USA, v1.7)
 ragtime                         // MBD (c) 1992 (Japan, v1.5)
 ragtimea                        // MBD (c) 1992 (Japan, v1.3)
 
+@source:boss_se70.cpp
+se70                            //
+
+@source:boss_sx700.cpp
+sx700                           //
+
 @source:bottom9.cpp
 bottom9                         // GX891 (c) 1989
 bottom9n                        // GX891 (c) 1989
