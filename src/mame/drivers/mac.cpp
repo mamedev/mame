@@ -2042,7 +2042,6 @@ ROM_START( maclc520 )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
-//COMP( 1983, mactw,     0,        0,      mac128k,  macplus, mac_state, init_mac128k512k,   "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
 COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  MACHINE_NOT_WORKING )
 COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
 COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_NOT_WORKING )
