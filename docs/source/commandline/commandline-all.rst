@@ -2873,10 +2873,10 @@ Core Sound Options
 
     The default is ``1``. 
 
-    | PortAudio calculates audio_latency as 20ms steps.
-    | XAudio2 calculates audio_latency as 100ms steps.
+    | For PortAudio, see :ref:`mame-commandline-pa-latency`.
+    | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
-    | CoreAudio calculates audio_latency as 40ms steps.
+    | CoreAudio calculates audio_latency as 25ms steps.
     | SDL calculates audio_latency as Xms steps.
 
     Example:
@@ -3775,6 +3775,7 @@ Scripting Options
 
             mame64 alcon -noplugin cheat
 
+
 HTTP Server Options
 -------------------
 .. _mame-commandline-http:
@@ -3815,3 +3816,94 @@ HTTP Server Options
         .. code-block:: bash
 
             mame64 apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
+
+
+PortAudio Options
+-----------------
+
+.. _mame-commandline-pa-api:
+
+**-pa_api** *API*
+
+    Choose which API that PortAudio should use to talk to your sound hardware. You can use **-verbose** to see which APIs are available.
+
+    The default is ``none``.
+
+    Example 1:
+        .. code-block:: bash
+
+            mame64 -sound portaudio -verbose
+            Attempting load of mame.ini
+            ...
+            PortAudio: API MME has 20 devices
+            PortAudio: MME: " - Input"
+            PortAudio: MME: "Microphone (3- USB Camera-B4.09"
+            PortAudio: MME: "Line (AVerMedia Live Gamer HD 2"
+            PortAudio: MME: "Digital Audio Interface (AVerMe"
+            PortAudio: MME: "Headset Microphone (Razer Krake"
+            ...
+            PortAudio: MME: " - Output"
+            PortAudio: MME: "Headset Earphone (Razer Kraken "
+            PortAudio: MME: "Digital Audio (S/PDIF) (High De"
+            PortAudio: MME: "NX-EDG27 (NVIDIA High Definitio"
+            ...
+            PortAudio: API Windows DirectSound has 20 devices
+            PortAudio: Windows DirectSound: "Primary Sound Capture Driver"
+            PortAudio: Windows DirectSound: "Headset Microphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows DirectSound: "Primary Sound Driver" (default)
+            PortAudio: Windows DirectSound: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows DirectSound: "Digital Audio (S/PDIF) (High Definition Audio Device)"
+            PortAudio: Windows DirectSound: "NX-EDG27 (NVIDIA High Definition Audio)"
+            ...
+            PortAudio: API Windows WASAPI has 18 devices
+            PortAudio: Windows WASAPI: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WASAPI: "Digital Audio (S/PDIF) (High Definition Audio Device)"
+            PortAudio: Windows WASAPI: "NX-EDG27 (NVIDIA High Definition Audio)"
+            PortAudio: Windows WASAPI: "Headset Microphone (Razer Kraken 7.1 V2)"
+            ...
+            PortAudio: API Windows WDM-KS has 22 devices
+            PortAudio: Windows WDM-KS: "Output (NVIDIA High Definition Audio)"
+            PortAudio: Windows WDM-KS: "SPDIF Out (HD Audio SPDIF out)"
+            PortAudio: Windows WDM-KS: "Headset Microphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WDM-KS: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WDM-KS: "Microphone (VDVAD Wave)"
+            PortAudio: Windows WDM-KS: "Speakers (VDVAD Wave)"
+            ...
+            PortAudio: Sample rate is 48000 Hz, device output latency is 218.67 ms
+            PortAudio: Allowed additional buffering latency is 18.00 ms/864 frames
+
+    Example 2:
+        .. code-block:: bash
+
+            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI"
+
+.. _mame-commandline-pa-device:
+
+**-pa_device** *device*
+
+    Choose which sound device to output through. This would typically be one of
+    the outputs on your sound card or a USB headset.
+
+    The default is ``none``.
+
+    Example:
+        .. code-block:: bash
+
+            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
+
+.. _mame-commandline-pa-latency:
+
+**-pa_latency** *latency*
+
+    Choose the buffer size for PortAudio output; this is specified in seconds.
+    Lower numbers have less latency but may increase stutter in the sound.
+    Decimal places are supported. Try starting from 0.20 and decrease or
+    increase until you find the best number your hardware and OS are capable of
+    handling.
+
+    The default is ``0``.
+
+    Example:
+        .. code-block:: bash
+
+            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)" -pa_latency 0.20
