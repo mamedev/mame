@@ -284,7 +284,10 @@ Note that if you set the autofire button to an input button that's also defined 
 Does MAME support G-Sync or FreeSync? How do I configure MAME to use them?
 --------------------------------------------------------------------------
 
-MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux and requires no special configuration. macOS does not support G-Sync or FreeSync.
+MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux, however macOS does not support G-Sync or FreeSync.
 
-Be sure to leave triple buffering turned off, as that is unnecessary with variable refresh rate support. Variable Refresh Rate also requires fullscreen mode.
+* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver. 
+* Be sure to leave triple buffering turned off.
+* Turning VSync on is suggested in general with G-Sync and FreeSync.
 
+The effects of G-Sync and FreeSync will be most noticeable in drivers that run at refresh rates that are very different from normal PC refresh rates. For instance, the first three *Mortal Kombat* titles run at 54.706841Hz.
