@@ -85,14 +85,14 @@ private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(c000_ram_r);
-	DECLARE_WRITE8_MEMBER(c000_ram_w);
-	DECLARE_READ8_MEMBER(e0_latch_r);
-	DECLARE_WRITE8_MEMBER(e0_latch_w);
+	u8 c000_ram_r(offs_t offset);
+	void c000_ram_w(offs_t offset, u8 data);
+	u8 e0_latch_r();
+	void e0_latch_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(blink_w);
-	DECLARE_WRITE8_MEMBER(screen_control_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	void screen_control_w(u8 data);
+	void brightness_w(u8 data);
 
 	void nvr_address_w(u8 data);
 	void nvr_control_w(u8 data);
@@ -217,25 +217,25 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 }
 
 
-READ8_MEMBER(cit101_state::c000_ram_r)
+u8 cit101_state::c000_ram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_e0_latch = m_extraram[offset];
 	return m_mainram[offset];
 }
 
-WRITE8_MEMBER(cit101_state::c000_ram_w)
+void cit101_state::c000_ram_w(offs_t offset, u8 data)
 {
 	m_extraram[offset] = m_e0_latch;
 	m_mainram[offset] = data;
 }
 
-READ8_MEMBER(cit101_state::e0_latch_r)
+u8 cit101_state::e0_latch_r()
 {
 	return m_e0_latch;
 }
 
-WRITE8_MEMBER(cit101_state::e0_latch_w)
+void cit101_state::e0_latch_w(u8 data)
 {
 	m_e0_latch = data;
 }
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER(cit101_state::blink_w)
 	m_blink = state;
 }
 
-WRITE8_MEMBER(cit101_state::screen_control_w)
+void cit101_state::screen_control_w(u8 data)
 {
 	if ((m_extraram[0] & 0x06) != (data & 0x06))
 	{
@@ -268,7 +268,7 @@ WRITE8_MEMBER(cit101_state::screen_control_w)
 	m_extraram[0] = data;
 }
 
-WRITE8_MEMBER(cit101_state::brightness_w)
+void cit101_state::brightness_w(u8 data)
 {
 	// Function of upper 3 bits is unknown
 	m_brightness = pal5bit(~data & 0x1f);

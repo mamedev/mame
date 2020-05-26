@@ -108,8 +108,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
@@ -649,7 +649,7 @@ void c64_state::write(offs_t offset, uint8_t data)
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_videoram_r )
+uint8_t c64_state::vic_videoram_r(offs_t offset)
 {
 	int aec = m_vic->aec_r(), ba = m_vic->ba_r();
 	offs_t va = offset;
@@ -665,7 +665,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::vic_colorram_r )
+uint8_t c64_state::vic_colorram_r(offs_t offset)
 {
 	uint8_t data;
 

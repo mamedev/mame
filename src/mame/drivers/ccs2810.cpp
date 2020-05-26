@@ -97,19 +97,19 @@ public:
 	void ccs2422(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(memory_read);
-	DECLARE_WRITE8_MEMBER(memory_write);
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t memory_read(offs_t offset);
+	void memory_write(offs_t offset, uint8_t data);
+	uint8_t io_read(offs_t offset);
+	void io_write(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(port34_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port34_w);
-	DECLARE_WRITE8_MEMBER(port40_w);
+	uint8_t port04_r();
+	uint8_t port34_r();
+	void port04_w(uint8_t data);
+	void port34_w(uint8_t data);
+	void port40_w(uint8_t data);
 
 	void ccs2422_io(address_map &map);
 	void ccs2810_io(address_map &map);
@@ -138,7 +138,7 @@ private:
 	floppy_image_device *m_floppy;
 };
 
-READ8_MEMBER(ccs_state::memory_read)
+uint8_t ccs_state::memory_read(offs_t offset)
 {
 	uint8_t result = m_ram->read(offset);
 
@@ -164,12 +164,12 @@ READ8_MEMBER(ccs_state::memory_read)
 	return result;
 }
 
-WRITE8_MEMBER(ccs_state::memory_write)
+void ccs_state::memory_write(offs_t offset, uint8_t data)
 {
 	m_ram->write(offset, data);
 }
 
-READ8_MEMBER(ccs_state::io_read)
+uint8_t ccs_state::io_read(offs_t offset)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
@@ -178,7 +178,7 @@ READ8_MEMBER(ccs_state::io_read)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ccs_state::io_write)
+void ccs_state::io_write(offs_t offset, uint8_t data)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
@@ -792,7 +792,7 @@ d6 : autoboot (1=go to monitor)
 d7 : drq
 */
 
-READ8_MEMBER( ccs_state::port34_r )
+uint8_t ccs_state::port34_r()
 {
 	//return (uint8_t)m_drq | (m_ds << 1) | ((uint8_t)fdc->hld_r() << 5) | 0x40 | ((uint8_t)m_intrq << 7);
 	return (uint8_t)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((uint8_t)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
@@ -809,7 +809,7 @@ d6 : double (0 = a double-sided 20cm disk is in the drive)
 d7 : drq
 */
 
-READ8_MEMBER( ccs_state::port04_r )
+uint8_t ccs_state::port04_r()
 {
 	bool trk00=1,wprt=0,dside=1;
 	int idx=1;
@@ -835,7 +835,7 @@ d6 : dden
 d7 : autowait (0=ignore drq)
 */
 
-WRITE8_MEMBER( ccs_state::port34_w )
+void ccs_state::port34_w(uint8_t data)
 {
 	m_ds = data & 15;
 	m_dsize = BIT(data, 4);
@@ -860,7 +860,7 @@ d7 : rom enable (1=firmware enabled)
 other bits not used
 */
 
-WRITE8_MEMBER( ccs_state::port04_w )
+void ccs_state::port04_w(uint8_t data)
 {
 	m_ss = BIT(data, 6);
 	if (m_floppy)
@@ -873,7 +873,7 @@ WRITE8_MEMBER( ccs_state::port04_w )
 //  Machine
 //
 //*************************************
-WRITE8_MEMBER( ccs_state::port40_w )
+void ccs_state::port40_w(uint8_t data)
 {
 	//membank("bankr0")->set_entry( (data) ? 1 : 0);
 }

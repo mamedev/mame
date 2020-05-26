@@ -78,7 +78,7 @@ private:
 	void cd2650_data(address_map &map);
 	void cd2650_io(address_map &map);
 	void cd2650_mem(address_map &map);
-	DECLARE_READ8_MEMBER(keyin_r);
+	uint8_t keyin_r();
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -138,7 +138,7 @@ READ_LINE_MEMBER(cd2650_state::cass_r)
 	return m_cass_data[2];
 }
 
-READ8_MEMBER(cd2650_state::keyin_r)
+uint8_t cd2650_state::keyin_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = ret | 0x80;

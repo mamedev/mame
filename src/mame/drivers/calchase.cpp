@@ -167,17 +167,17 @@ private:
 	uint8_t m_piix4_config_reg[4][256];
 
 	uint32_t m_idle_skip_ram;
-	DECLARE_WRITE32_MEMBER(bios_ext_ram_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
-	DECLARE_READ16_MEMBER(calchase_iocard1_r);
-	DECLARE_READ16_MEMBER(calchase_iocard2_r);
-	DECLARE_READ16_MEMBER(calchase_iocard3_r);
-	DECLARE_READ16_MEMBER(calchase_iocard4_r);
-	DECLARE_READ16_MEMBER(calchase_iocard5_r);
-	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
-	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
+	uint16_t calchase_iocard1_r();
+	uint16_t calchase_iocard2_r();
+	uint16_t calchase_iocard3_r();
+	uint16_t calchase_iocard4_r();
+	uint16_t calchase_iocard5_r();
+	uint32_t calchase_idle_skip_r();
+	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -351,7 +351,7 @@ void calchase_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 	}
 }
 
-WRITE32_MEMBER(calchase_state::bios_ram_w)
+void calchase_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
 	{
@@ -359,7 +359,7 @@ WRITE32_MEMBER(calchase_state::bios_ram_w)
 	}
 }
 
-WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
+void calchase_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
 	{
@@ -377,28 +377,28 @@ void calchase_state::nvram_w(offs_t offset, uint8_t data)
 	m_nvram_data[offset] = data;
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard1_r)
+uint16_t calchase_state::calchase_iocard1_r()
 {
 	return ioport("IOCARD1")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard2_r)
+uint16_t calchase_state::calchase_iocard2_r()
 {
 	return ioport("IOCARD2")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard3_r)
+uint16_t calchase_state::calchase_iocard3_r()
 {
 	return ioport("IOCARD3")->read();
 }
 
 /* These two controls wheel pot or whatever this game uses ... */
-READ16_MEMBER(calchase_state::calchase_iocard4_r)
+uint16_t calchase_state::calchase_iocard4_r()
 {
 	return ioport("IOCARD4")->read();
 }
 
-READ16_MEMBER(calchase_state::calchase_iocard5_r)
+uint16_t calchase_state::calchase_iocard5_r()
 {
 	return ioport("IOCARD5")->read();
 }
@@ -763,7 +763,7 @@ void calchase_state::hostinv(machine_config &config)
 }
 
 
-READ32_MEMBER(calchase_state::calchase_idle_skip_r)
+uint32_t calchase_state::calchase_idle_skip_r()
 {
 	if(m_maincpu->pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
@@ -771,7 +771,7 @@ READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 	return m_idle_skip_ram;
 }
 
-WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
+void calchase_state::calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_idle_skip_ram);
 }
@@ -782,7 +782,8 @@ void calchase_state::init_calchase()
 
 	intel82439tx_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)), write32_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3f0b160, 0x3f0b163, read32smo_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3f0b160, 0x3f0b163, write32s_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
 }
 
 void calchase_state::init_hostinv()

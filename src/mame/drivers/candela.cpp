@@ -150,8 +150,8 @@ public:
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER (read);
-	DECLARE_WRITE8_MEMBER (write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	uint8_t syspia_A_r();
 	uint8_t syspia_B_r();
 	void syspia_B_w(uint8_t data);
@@ -257,7 +257,7 @@ void can09t_state::machine_start()
 	memset(m_ram2, 0, sizeof(m_ram2));
 };
 
-READ8_MEMBER( can09t_state::read )
+uint8_t can09t_state::read(offs_t offset)
 {
 	LOG("%s %02x\n", FUNCNAME, offset);
 	uint8_t pla_offset = 0;
@@ -340,7 +340,7 @@ READ8_MEMBER( can09t_state::read )
 	return byte;
 }
 
-WRITE8_MEMBER( can09t_state::write )
+void can09t_state::write(offs_t offset, uint8_t data)
 {
 	LOG("%s() %04x : %02x\n", FUNCNAME, offset, data);
 	uint8_t pla_offset = 0;

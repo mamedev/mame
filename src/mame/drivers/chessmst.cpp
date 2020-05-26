@@ -57,7 +57,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( digits_w );
+	void digits_w(uint8_t data);
 	void pio1_port_a_w(uint8_t data);
 	void pio1_port_b_w(uint8_t data);
 	void pio1_port_b_dm_w(uint8_t data);
@@ -203,7 +203,7 @@ void chessmst_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( chessmst_state::digits_w )
+void chessmst_state::digits_w(uint8_t data)
 {
 	m_digit = (m_digit << 4) | (data & 0x0f);
 	m_digit_matrix = (data >> 4) & 0x0f;

@@ -666,22 +666,22 @@ void viper_state::mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
-	return m_lpci->read_64be(space, 0, 0xffffffff00000000U);
+	return m_lpci->read_64be(0, 0xffffffff00000000U);
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
-	m_lpci->write_64be(space, 0, data, 0xffffffff00000000U);
+	m_lpci->write_64be(0, data, 0xffffffff00000000U);
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
-	return m_lpci->read_64be(space, 1, 0x00000000ffffffffU) << 32;
+	return m_lpci->read_64be(1, 0x00000000ffffffffU) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
-	m_lpci->write_64be(space, 1, data >> 32, 0x00000000ffffffffU);
+	m_lpci->write_64be(1, data >> 32, 0x00000000ffffffffU);
 }
 
 

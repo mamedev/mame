@@ -129,14 +129,14 @@ public:
 	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
-	DECLARE_READ8_MEMBER( z80_r );
-	DECLARE_WRITE8_MEMBER( z80_w );
-	DECLARE_READ8_MEMBER( z80_io_r );
-	DECLARE_WRITE8_MEMBER( z80_io_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t z80_r(offs_t offset);
+	void z80_w(offs_t offset, uint8_t data);
+	uint8_t z80_io_r(offs_t offset);
+	void z80_io_w(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( mmu_z80en_w );
 	DECLARE_WRITE_LINE_MEMBER( mmu_fsdir_w );
@@ -540,7 +540,7 @@ void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, i
 //  z80_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_r )
+uint8_t c128_state::z80_r(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -553,7 +553,7 @@ READ8_MEMBER( c128_state::z80_r )
 //  z80_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_w )
+void c128_state::z80_w(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -566,7 +566,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 //  z80_io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_io_r )
+uint8_t c128_state::z80_io_r(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -579,7 +579,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 //  z80_io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_io_w )
+void c128_state::z80_io_w(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -592,7 +592,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::read )
+uint8_t c128_state::read(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -605,7 +605,7 @@ READ8_MEMBER( c128_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::write )
+void c128_state::write(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -618,7 +618,7 @@ WRITE8_MEMBER( c128_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_videoram_r )
+uint8_t c128_state::vic_videoram_r(offs_t offset)
 {
 	int ba = 0, aec = 0, z80io = 1;
 
@@ -630,7 +630,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_colorram_r )
+uint8_t c128_state::vic_colorram_r(offs_t offset)
 {
 	return m_color_ram[(m_clrbank << 10) | offset];
 }

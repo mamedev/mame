@@ -49,7 +49,7 @@ private:
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(port40_w);
+	void port40_w(uint8_t data);
 };
 
 void ccs300_state::ccs300_mem(address_map &map)
@@ -91,7 +91,7 @@ static const z80_daisy_config daisy_chain[] =
 //  Machine
 //
 //*************************************
-WRITE8_MEMBER( ccs300_state::port40_w )
+void ccs300_state::port40_w(uint8_t data)
 {
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }

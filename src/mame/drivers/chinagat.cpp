@@ -281,16 +281,16 @@ protected:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_WRITE8_MEMBER(interrupt_w);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sub_irq_ack_w);
+	void interrupt_w(offs_t offset, uint8_t data);
+	void video_ctrl_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void sub_bankswitch_w(uint8_t data);
+	void sub_irq_ack_w(uint8_t data);
 	uint8_t saiyugoub1_mcu_command_r();
-	DECLARE_WRITE8_MEMBER(saiyugoub1_mcu_command_w);
+	void saiyugoub1_mcu_command_w(uint8_t data);
 	void saiyugoub1_adpcm_rom_addr_w(uint8_t data);
 	void saiyugoub1_adpcm_control_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(saiyugoub1_m5205_clk_w);
+	void saiyugoub1_m5205_clk_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 
@@ -355,7 +355,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
 		scanline = 0;
 }
 
-WRITE8_MEMBER(chinagat_state::interrupt_w)
+void chinagat_state::interrupt_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -381,7 +381,7 @@ WRITE8_MEMBER(chinagat_state::interrupt_w)
 	}
 }
 
-WRITE8_MEMBER(chinagat_state::video_ctrl_w)
+void chinagat_state::video_ctrl_w(uint8_t data)
 {
 	/***************************
 	---- ---x   X Scroll MSB
@@ -395,17 +395,17 @@ WRITE8_MEMBER(chinagat_state::video_ctrl_w)
 	flip_screen_set(~data & 0x04);
 }
 
-WRITE8_MEMBER(chinagat_state::bankswitch_w)
+void chinagat_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::sub_bankswitch_w)
+void chinagat_state::sub_bankswitch_w(uint8_t data)
 {
 	membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::sub_irq_ack_w)
+void chinagat_state::sub_irq_ack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
@@ -421,7 +421,7 @@ uint8_t chinagat_state::saiyugoub1_mcu_command_r()
 	return m_mcu_command;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
+void chinagat_state::saiyugoub1_mcu_command_w(uint8_t data)
 {
 	m_mcu_command = data;
 #if 0
@@ -484,7 +484,7 @@ void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 	m_i8748_P2 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
+void chinagat_state::saiyugoub1_m5205_clk_w(uint8_t data)
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */

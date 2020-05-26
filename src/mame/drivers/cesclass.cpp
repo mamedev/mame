@@ -41,10 +41,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq3_ack_w);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_WRITE16_MEMBER(outputs_w);
+	void irq2_ack_w(uint16_t data);
+	void irq3_ack_w(uint16_t data);
+	void lamps_w(uint16_t data);
+	void outputs_w(uint16_t data);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -97,22 +97,22 @@ uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE16_MEMBER( cesclassic_state::irq2_ack_w )
+void cesclassic_state::irq2_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::irq3_ack_w )
+void cesclassic_state::irq3_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::lamps_w )
+void cesclassic_state::lamps_w(uint16_t data)
 {
 	//popmessage("%04x",data);
 }
 
-WRITE16_MEMBER( cesclassic_state::outputs_w )
+void cesclassic_state::outputs_w(uint16_t data)
 {
 	/*
 	-x-- ---- OKI bankswitch

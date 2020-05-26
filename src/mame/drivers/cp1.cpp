@@ -50,8 +50,8 @@ private:
 	void port2_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	DECLARE_READ8_MEMBER(i8155_read);
-	DECLARE_WRITE8_MEMBER(i8155_write);
+	uint8_t i8155_read(offs_t offset);
+	void i8155_write(offs_t offset, uint8_t data);
 	void i8155_porta_w(uint8_t data);
 	uint8_t i8155_portb_r();
 	void i8155_portb_w(uint8_t data);
@@ -120,7 +120,7 @@ void cp1_state::port2_w(uint8_t data)
 	m_port2 = data;
 }
 
-READ8_MEMBER(cp1_state::i8155_read)
+uint8_t cp1_state::i8155_read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -139,7 +139,7 @@ READ8_MEMBER(cp1_state::i8155_read)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_write)
+void cp1_state::i8155_write(offs_t offset, uint8_t data)
 {
 	if (!(m_port2 & 0x10))
 	{

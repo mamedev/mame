@@ -78,7 +78,7 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t rom_r(offs_t offset);
 
 	void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -289,7 +289,7 @@ void clickstart_state::update_mouse_buffer()
 	uart_tx_fifo_push((uint8_t)sum);
 }
 
-READ16_MEMBER(clickstart_state::rom_r)
+uint16_t clickstart_state::rom_r(offs_t offset)
 {
 	if (offset < 0x400000 / 2)
 	{

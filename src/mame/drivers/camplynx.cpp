@@ -191,15 +191,15 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
-	DECLARE_WRITE8_MEMBER(port7f_w); // banking 48k
-	DECLARE_READ8_MEMBER(port80_r); // cassin for 48k
-	DECLARE_WRITE8_MEMBER(port80_w); // control port 48k
-	DECLARE_READ8_MEMBER(port82_r); // cassin for 128k
-	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
-	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
+	void bank1_w(offs_t offset, uint8_t data);
+	void bank6_w(offs_t offset, uint8_t data);
+	void port58_w(uint8_t data); // drive select etc
+	void port7f_w(uint8_t data); // banking 48k
+	uint8_t port80_r(); // cassin for 48k
+	void port80_w(uint8_t data); // control port 48k
+	uint8_t port82_r(); // cassin for 128k
+	void port82_w(uint8_t data); // banking 128k
+	void port84_w(uint8_t data); // dac port 48k
 	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
 	DECLARE_MACHINE_RESET(lynx48k);
 	DECLARE_MACHINE_RESET(lynx128k);
@@ -236,7 +236,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 };
 
-WRITE8_MEMBER( camplynx_state::port7f_w )
+void camplynx_state::port7f_w(uint8_t data)
 {
 /*
 d0 = write to bank 1
@@ -357,7 +357,7 @@ d7 = read from bank 4 */
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port82_w )
+void camplynx_state::port82_w(uint8_t data)
 {
 /* Almost the same as the 48k, except the bit order is reversed.
 d7 = write to bank 1
@@ -631,7 +631,7 @@ INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
 	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER( camplynx_state::bank1_w )
+void camplynx_state::bank1_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -643,7 +643,7 @@ WRITE8_MEMBER( camplynx_state::bank1_w )
 		m_p_ram[offset+0x40000] = data;
 }
 
-WRITE8_MEMBER( camplynx_state::bank6_w )
+void camplynx_state::bank6_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -667,7 +667,7 @@ WRITE8_MEMBER( camplynx_state::bank6_w )
 	}
 }
 
-READ8_MEMBER( camplynx_state::port80_r )
+uint8_t camplynx_state::port80_r()
 {
 	uint8_t data = ioport("LINE0")->read();
 	// when reading tape, bit 0 becomes cass-in signal
@@ -688,12 +688,12 @@ d3 = cass motor on
 d2 = cass enable
 d1 = serial h/s out
 d0 = speaker */
-WRITE8_MEMBER( camplynx_state::port80_w )
+void camplynx_state::port80_w(uint8_t data)
 {
 	m_port80 = data;
 	m_cass->change_state( BIT(data, (m_is_128k) ? 3 : 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	if (!m_is_128k)
-		port7f_w(space, 0, m_bankdata);
+		port7f_w(m_bankdata);
 }
 
 /* DAC port (6-bit). If writing cassette, output goes to tape as a sine wave, otherwise it goes to speaker.
@@ -702,7 +702,7 @@ WRITE8_MEMBER( camplynx_state::port80_w )
    MESS can load PALE's wav files though.
    Currently square wave output is selected. */
 
-WRITE8_MEMBER( camplynx_state::port84_w )
+void camplynx_state::port84_w(uint8_t data)
 {
 	if (BIT(m_port80, (m_is_128k) ? 3 : 1)) // for 128k, bit 2 might be ok too
 	{
@@ -722,7 +722,7 @@ d7 = clock
 d2 = cass-in
 d1 = serial data in
 d0 = serial h/s in */
-READ8_MEMBER( camplynx_state::port82_r )
+uint8_t camplynx_state::port82_r()
 {
 	uint8_t data = 0xfb; // guess
 	data |= (m_cass->input() > +0.02) ? 4 : 0;
@@ -731,19 +731,17 @@ READ8_MEMBER( camplynx_state::port82_r )
 
 MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
 	m_port80 = 0;
-	port7f_w( mem, 0, 0 );
+	port7f_w( 0 );
 	m_maincpu->reset();
 }
 
 MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
 	m_port80 = 0;
-	port82_w( mem, 0, 0 );
+	port82_w( 0 );
 	m_maincpu->reset();
 }
 
@@ -804,7 +802,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port58_w )
+void camplynx_state::port58_w(uint8_t data)
 {
 /*
 d0,d1 = drive select
@@ -819,9 +817,9 @@ d7 = 125ns or 250ns */
 	{
 		m_port58 = data;
 		if (m_is_128k)
-			port82_w(space, 0, m_bankdata);
+			port82_w(m_bankdata);
 		else
-			port7f_w(space, 0, m_bankdata);
+			port7f_w(m_bankdata);
 	}
 
 	floppy_image_device *floppy = nullptr;

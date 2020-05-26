@@ -68,8 +68,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(romsw_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
-	DECLARE_READ8_MEMBER(pio_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t pio_r(offs_t offset);
+	uint8_t keyboard_r(offs_t offset);
 	void init_init();
 
 	void cortex(machine_config &config);
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( cortex )
 	PORT_DIPSETTING(    0x00, "Single")
 INPUT_PORTS_END
 
-READ8_MEMBER( cortex_state::pio_r )
+uint8_t cortex_state::pio_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -138,7 +138,7 @@ READ8_MEMBER( cortex_state::pio_r )
 	}
 }
 
-READ8_MEMBER( cortex_state::keyboard_r )
+uint8_t cortex_state::keyboard_r(offs_t offset)
 {
 	return BIT(m_term_data, offset);
 }

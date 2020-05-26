@@ -641,12 +641,12 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		}
 		case 0xcf8:
 		{
-			m_pci->write(space, 0, data, mem_mask);
+			m_pci->write(0, data, mem_mask);
 			break;
 		}
 		case 0xcfc:
 		{
-			m_pci->write(space, 1, data, mem_mask);
+			m_pci->write(1, data, mem_mask);
 			break;
 		}
 //      default:
@@ -678,12 +678,12 @@ READ32_MEMBER( magictg_state::f0_r )
 
 		case 0xcf8:
 		{
-			val = m_pci->read(space, 0, swapendian_int32(mem_mask));
+			val = m_pci->read(0, swapendian_int32(mem_mask));
 			break;
 		}
 		case 0xcfc:
 		{
-			val = m_pci->read(space, 1, swapendian_int32(mem_mask));
+			val = m_pci->read(1, swapendian_int32(mem_mask));
 			break;
 		}
 //      default:

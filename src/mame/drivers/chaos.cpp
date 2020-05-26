@@ -46,10 +46,10 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(port1e_r);
-	DECLARE_WRITE8_MEMBER(port1f_w);
-	DECLARE_READ8_MEMBER(port90_r);
-	DECLARE_READ8_MEMBER(port91_r);
+	uint8_t port1e_r();
+	void port1f_w(uint8_t data);
+	uint8_t port90_r();
+	uint8_t port91_r();
 	void kbd_put(u8 data);
 	void chaos(machine_config &config);
 	void data_map(address_map &map);
@@ -96,12 +96,12 @@ INPUT_PORTS_END
 
 // Port 1E - Bit 0 indicates key pressed, Bit 1 indicates ok to output
 
-READ8_MEMBER( chaos_state::port1e_r )
+uint8_t chaos_state::port1e_r()
 {
 	return (m_term_data) ? 1 : 0;
 }
 
-WRITE8_MEMBER( chaos_state::port1f_w )
+void chaos_state::port1f_w(uint8_t data)
 {
 	// make the output readable on our terminal
 	if (data == 0x09)
@@ -116,7 +116,7 @@ WRITE8_MEMBER( chaos_state::port1f_w )
 		m_terminal->write(0x0a);
 }
 
-READ8_MEMBER( chaos_state::port90_r )
+uint8_t chaos_state::port90_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -128,7 +128,7 @@ READ8_MEMBER( chaos_state::port90_r )
 // Bit 3 = key pressed
 // Bit 7 = ok to output
 
-READ8_MEMBER( chaos_state::port91_r )
+uint8_t chaos_state::port91_r()
 {
 	uint8_t ret = 0x80 | ioport("CONFIG")->read();
 	ret |= (m_term_data) ? 8 : 0;

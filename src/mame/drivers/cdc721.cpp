@@ -49,9 +49,8 @@ private:
 	void cdc721_palette(palette_device &palette) const;
 	void interrupt_mask_w(u8 data);
 	void misc_w(u8 data);
-	DECLARE_WRITE8_MEMBER(lights_w);
-	DECLARE_WRITE8_MEMBER(block_select_w);
-	DECLARE_WRITE8_MEMBER(nvram_w);
+	void block_select_w(u8 data);
+	void nvram_w(offs_t offset, u8 data);
 
 	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
 	TIMER_CALLBACK_MEMBER(update_interrupts);
@@ -136,7 +135,7 @@ void cdc721_state::misc_w(u8 data)
 	logerror("%s: %d-column display selected\n", machine().describe_context(), BIT(data, 3) ? 132 : 80);
 }
 
-WRITE8_MEMBER(cdc721_state::block_select_w)
+void cdc721_state::block_select_w(u8 data)
 {
 	logerror("%s: Bank select = %02X\n", machine().describe_context(), data);
 	for (int b = 0; b < 4; b++)
@@ -146,7 +145,7 @@ WRITE8_MEMBER(cdc721_state::block_select_w)
 	}
 }
 
-WRITE8_MEMBER(cdc721_state::nvram_w)
+void cdc721_state::nvram_w(offs_t offset, u8 data)
 {
 	m_nvram[offset] = data & 0x0f;
 }

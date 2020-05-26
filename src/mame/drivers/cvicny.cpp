@@ -46,9 +46,9 @@ public:
 
 	void cvicny(machine_config &config);
 	void cvicny_mem(address_map &map);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w );
+	uint8_t key_r();
+	void digit_w(uint8_t data);
+	void segment_w(uint8_t data);
 private:
 	uint8_t m_digit;
 	uint8_t m_seg;
@@ -57,19 +57,19 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 };
 
-WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
+void cvicny_state::segment_w(uint8_t data) // output segments on the selected digit
 {
 	m_seg = data;
 	m_display->matrix(1<<m_digit, m_seg);
 }
 
-WRITE8_MEMBER( cvicny_state::digit_w ) // set keyboard scanning row; set digit to display
+void cvicny_state::digit_w(uint8_t data) // set keyboard scanning row; set digit to display
 {
 	m_digit = data & 7;
 	m_display->matrix(1<<m_digit, m_seg);
 }
 
-READ8_MEMBER( cvicny_state::key_r )
+uint8_t cvicny_state::key_r()
 {
 	u8 data = m_io_keyboard[m_digit]->read();
 	return ((data << 4) ^ 0xf0) | data;

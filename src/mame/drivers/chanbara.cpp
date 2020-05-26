@@ -84,10 +84,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
+	void chanbara_videoram_w(offs_t offset, uint8_t data);
+	void chanbara_colorram_w(offs_t offset, uint8_t data);
+	void chanbara_videoram2_w(offs_t offset, uint8_t data);
+	void chanbara_colorram2_w(offs_t offset, uint8_t data);
 	void chanbara_ay_out_0_w(uint8_t data);
 	void chanbara_ay_out_1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -131,25 +131,25 @@ void chanbara_state::chanbara_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
+void chanbara_state::chanbara_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
+void chanbara_state::chanbara_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
+void chanbara_state::chanbara_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
+void chanbara_state::chanbara_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);

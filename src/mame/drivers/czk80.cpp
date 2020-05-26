@@ -67,9 +67,9 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(czk80_reset);
-	DECLARE_READ8_MEMBER(port80_r);
-	DECLARE_READ8_MEMBER(port81_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
+	uint8_t port80_r();
+	uint8_t port81_r();
+	void port40_w(uint8_t data);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
@@ -83,19 +83,19 @@ private:
 };
 
 
-WRITE8_MEMBER( czk80_state::port40_w )
+void czk80_state::port40_w(uint8_t data)
 {
 	membank("bankr1")->set_entry(BIT(data, 1));
 }
 
-READ8_MEMBER( czk80_state::port80_r )
+uint8_t czk80_state::port80_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( czk80_state::port81_r )
+uint8_t czk80_state::port81_r()
 {
 	return (m_term_data) ? 3 : 1;
 }

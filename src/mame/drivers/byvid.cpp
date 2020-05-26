@@ -76,8 +76,8 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
+	uint8_t sound_data_r();
+	void sound_data_w(uint8_t data);
 	uint8_t m6803_port2_r();
 	void m6803_port2_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	DECLARE_WRITE8_MEMBER(granny_crtc_w);
+	void granny_crtc_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void babypac(machine_config &config);
 	void granny(machine_config &config);
@@ -531,18 +531,18 @@ static INPUT_PORTS_START( granny )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( by133_state::granny_crtc_w )
+void by133_state::granny_crtc_w(offs_t offset, uint8_t data)
 {
 	m_crtc->write(offset, data);
 	m_crtc2->write(offset, data);
 }
 
-READ8_MEMBER( by133_state::sound_data_r )
+uint8_t by133_state::sound_data_r()
 {
 	return m_mpu_to_vid;
 }
 
-WRITE8_MEMBER( by133_state::sound_data_w )
+void by133_state::sound_data_w(uint8_t data)
 {
 	m_vid_to_mpu = data;
 }

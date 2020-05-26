@@ -48,8 +48,8 @@ public:
 private:
 	void bob85_io(address_map &map);
 	void bob85_mem(address_map &map);
-	DECLARE_READ8_MEMBER(bob85_keyboard_r);
-	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
+	uint8_t bob85_keyboard_r();
+	void bob85_7seg_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -69,7 +69,7 @@ private:
 
 
 
-READ8_MEMBER(bob85_state::bob85_keyboard_r)
+uint8_t bob85_state::bob85_keyboard_r()
 {
 	uint8_t retVal = 0;
 	uint8_t line0 = m_line0->read();
@@ -140,7 +140,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 	}
 }
 
-WRITE8_MEMBER(bob85_state::bob85_7seg_w)
+void bob85_state::bob85_7seg_w(offs_t offset, uint8_t data)
 {
 	m_digits[offset] = bitswap<8>( data,3,2,1,0,7,6,5,4 );
 }

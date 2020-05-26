@@ -190,10 +190,10 @@ public:
 	optional_ioport m_fakey;
 	uint8_t    m_last_trackball_val[2];
 
-	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_READ8_MEMBER(trackball_reset_r);
-	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
-	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
+	uint8_t trackball_r();
+	uint8_t trackball_reset_r();
+	void champbwl_misc_w(uint8_t data);
+	void doraemon_outputs_w(uint8_t data);
 	DECLARE_MACHINE_START(champbwl);
 	DECLARE_MACHINE_RESET(champbwl);
 	DECLARE_MACHINE_START(doraemon);
@@ -219,7 +219,7 @@ void champbwl_state::champbwl_palette(palette_device &palette) const
 }
 
 
-READ8_MEMBER(champbwl_state::trackball_r)
+uint8_t champbwl_state::trackball_r()
 {
 	uint8_t ret;
 	uint8_t port4 = m_fakex->read();
@@ -230,7 +230,7 @@ READ8_MEMBER(champbwl_state::trackball_r)
 	return ret;
 }
 
-READ8_MEMBER(champbwl_state::trackball_reset_r)
+uint8_t champbwl_state::trackball_reset_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -240,7 +240,7 @@ READ8_MEMBER(champbwl_state::trackball_reset_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
+void champbwl_state::champbwl_misc_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -278,7 +278,7 @@ void champbwl_state::champbwl_map(address_map &map)
 
 
 
-WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
+void champbwl_state::doraemon_outputs_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in counter
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // gift out counter

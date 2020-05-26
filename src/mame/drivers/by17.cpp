@@ -111,8 +111,8 @@ private:
 	uint8_t u11_a_r();
 	void u11_a_w(uint8_t data);
 	void u11_b_w(uint8_t data);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
+	uint8_t nibble_nvram_r(offs_t offset);
+	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
 	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
@@ -519,12 +519,12 @@ READ_LINE_MEMBER( by17_state::drop_target_x2 )
 }
 
 
-READ8_MEMBER(by17_state::nibble_nvram_r)
+uint8_t by17_state::nibble_nvram_r(offs_t offset)
 {
 	return (m_nvram[offset] | 0x0f);
 }
 
-WRITE8_MEMBER(by17_state::nibble_nvram_w)
+void by17_state::nibble_nvram_w(offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = (data | 0x0f);
 }

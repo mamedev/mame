@@ -238,24 +238,24 @@ public:
 	// CPU card
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq );
 	DECLARE_WRITE_LINE_MEMBER( q133_ptm_irq_w );
-	DECLARE_WRITE8_MEMBER( i8214_cpu1_w );
-	DECLARE_WRITE8_MEMBER( i8214_cpu2_w );
+	void i8214_cpu1_w(uint8_t data);
+	void i8214_cpu2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( maincpu1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( maincpu2_irq0_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_1_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_2_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_3_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_3_enlg );
-	DECLARE_READ8_MEMBER( shared_ram_r );
-	DECLARE_WRITE8_MEMBER( shared_ram_w );
-	template<int cpunum> DECLARE_READ8_MEMBER( perr_r );
-	template<int cpunum> DECLARE_WRITE8_MEMBER( perr_w );
+	uint8_t shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, uint8_t data);
+	template<int cpunum> uint8_t perr_r(offs_t offset);
+	template<int cpunum> void perr_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( aic_ad574_r );
-	template<int Dac> DECLARE_WRITE8_MEMBER( aic_dac_w );
-	DECLARE_WRITE8_MEMBER( aic_mux_latch_w );
-	DECLARE_WRITE8_MEMBER( aic_ad565_msb_w );
-	DECLARE_WRITE8_MEMBER( aic_ad565_lsb_w );
+	uint8_t aic_ad574_r();
+	template<int Dac> void aic_dac_w(uint8_t data);
+	void aic_mux_latch_w(uint8_t data);
+	void aic_ad565_msb_w(uint8_t data);
+	void aic_ad565_lsb_w(uint8_t data);
 
 	uint8_t q133_1_porta_r();
 	void q133_1_porta_w(uint8_t data);
@@ -266,51 +266,51 @@ public:
 	IRQ_CALLBACK_MEMBER( cpu2_interrupt_callback );
 
 	// Video-related
-	DECLARE_READ8_MEMBER( video_r );
-	DECLARE_READ8_MEMBER( lightpen_r );
+	uint8_t video_r(offs_t offset);
+	uint8_t lightpen_r(offs_t offset);
 	uint8_t pia_q219_b_r();
-	DECLARE_WRITE8_MEMBER( video_w );
+	void video_w(offs_t offset, uint8_t data);
 	void vscroll_w(uint8_t data);
 	void video_attr_w(uint8_t data);
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_READ8_MEMBER( tvt_r );
-	DECLARE_WRITE8_MEMBER( tvt_w );
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t tvt_r();
+	void tvt_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
 	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
 	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
-	template<int cpunum> DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( map_ram_w );
-	template<int cpunum> DECLARE_READ8_MEMBER( vector_r );
-	template<int cpunum> DECLARE_READ8_MEMBER( map_r );
-	template<int cpunum> DECLARE_WRITE8_MEMBER( map_w );
-	DECLARE_READ8_MEMBER( atomic_r );
-	DECLARE_WRITE8_MEMBER( cpufunc_w );
-	DECLARE_READ8_MEMBER( parity_r );
-	DECLARE_WRITE8_MEMBER( mapsel_w );
-	template<int cpunum> DECLARE_READ8_MEMBER( irq_ram_r );
-	template<int cpunum> DECLARE_WRITE8_MEMBER( irq_ram_w );
+	template<int cpunum> uint8_t rom_r(offs_t offset);
+	void map_ram_w(offs_t offset, uint8_t data);
+	template<int cpunum> uint8_t vector_r(offs_t offset);
+	template<int cpunum> uint8_t map_r();
+	template<int cpunum> void map_w(uint8_t data);
+	uint8_t atomic_r();
+	void cpufunc_w(uint8_t data);
+	uint8_t parity_r(offs_t offset);
+	void mapsel_w(offs_t offset, uint8_t data);
+	template<int cpunum> uint8_t irq_ram_r(offs_t offset);
+	template<int cpunum> void irq_ram_w(offs_t offset, uint8_t data);
 
 	// MIDI/SMPTE
-	DECLARE_WRITE16_MEMBER( midi_dma_w );
-	DECLARE_READ16_MEMBER( midi_dma_r );
+	void midi_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midi_dma_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( midi_ptm0_c3_w );
 	DECLARE_WRITE_LINE_MEMBER( midi_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( midi_acia_irq );
-	DECLARE_WRITE8_MEMBER( midi_latch_w );
+	void midi_latch_w(uint8_t data);
 
 	// Floppy
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_READ8_MEMBER( fdc_r );
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( wd1791_irq );
 	DECLARE_WRITE_LINE_MEMBER( wd1791_drq );
 
 	// Master card
-	DECLARE_READ8_MEMBER( cmi02_r );
-	DECLARE_WRITE8_MEMBER( cmi02_w );
+	uint8_t cmi02_r(offs_t offset);
+	void cmi02_w(offs_t offset, uint8_t data);
 	void cmi02_chsel_w(uint8_t data);
 	void master_tune_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
@@ -320,8 +320,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_cb2_w );
 
 	// ???
-	DECLARE_READ8_MEMBER( cmi07_r );
-	DECLARE_WRITE8_MEMBER( cmi07_w );
+	uint8_t cmi07_r();
+	void cmi07_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( msm5832_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi07_irq );
@@ -575,7 +575,7 @@ void cmi_state::video_write(int offset)
 	}
 }
 
-READ8_MEMBER( cmi_state::video_r )
+uint8_t cmi_state::video_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_video_data;
@@ -586,7 +586,7 @@ READ8_MEMBER( cmi_state::video_r )
 	return m_video_data;
 }
 
-READ8_MEMBER( cmi_state::lightpen_r )
+uint8_t cmi_state::lightpen_r(offs_t offset)
 {
 	if (offset & 2)
 		return m_lp_y;
@@ -600,7 +600,7 @@ uint8_t cmi_state::pia_q219_b_r()
 }
 
 
-WRITE8_MEMBER( cmi_state::video_w )
+void cmi_state::video_w(offs_t offset, uint8_t data)
 {
 	m_video_data = data;
 	video_write(offset);
@@ -616,12 +616,12 @@ void cmi_state::video_attr_w(uint8_t data)
 	// TODO
 }
 
-WRITE8_MEMBER( cmi_state::vram_w )
+void cmi_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 }
 
-WRITE8_MEMBER( cmi_state::tvt_w )
+void cmi_state::tvt_w(uint8_t data)
 {
 	if ((data >= 0x20 && data <= 0x7e) || data == 0x0a || data == 0x0d)
 	{
@@ -629,12 +629,12 @@ WRITE8_MEMBER( cmi_state::tvt_w )
 	}
 }
 
-READ8_MEMBER( cmi_state::tvt_r )
+uint8_t cmi_state::tvt_r()
 {
 	return 0;
 }
 
-READ8_MEMBER( cmi_state::vram_r )
+uint8_t cmi_state::vram_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_video_ram[offset];
@@ -650,13 +650,13 @@ READ8_MEMBER( cmi_state::vram_r )
 
 /* Memory handling */
 
-template<int cpunum> READ8_MEMBER( cmi_state::rom_r )
+template<int cpunum> uint8_t cmi_state::rom_r(offs_t offset)
 {
 	uint16_t base = (cpunum ? 0x1000 : 0x2000);
 	return *(((uint8_t *)m_q133_region->base()) + base + offset);
 }
 
-WRITE8_MEMBER( cmi_state::map_ram_w )
+void cmi_state::map_ram_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 1) == 0)
 	{
@@ -682,23 +682,23 @@ WRITE8_MEMBER( cmi_state::map_ram_w )
 	}
 }
 
-template<int cpunum> READ8_MEMBER( cmi_state::vector_r )
+template<int cpunum> uint8_t cmi_state::vector_r(offs_t offset)
 {
 	return m_q133_rom[(cpunum ? 0xbfe : 0xffe) + offset];
 }
 
-template<int cpunum> READ8_MEMBER( cmi_state::map_r )
+template<int cpunum> uint8_t cmi_state::map_r()
 {
 	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 	return data;
 }
 
-template<int cpunum> WRITE8_MEMBER( cmi_state::map_w )
+template<int cpunum> void cmi_state::map_w(uint8_t data)
 {
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), cpunum);
 }
 
-template<int cpunum> READ8_MEMBER( cmi_state::irq_ram_r )
+template<int cpunum> uint8_t cmi_state::irq_ram_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_scratch_ram[cpunum][0xf8 + offset];
@@ -712,7 +712,7 @@ template<int cpunum> READ8_MEMBER( cmi_state::irq_ram_r )
 	return m_scratch_ram[cpunum][0xf8 + offset];
 }
 
-template<int cpunum> WRITE8_MEMBER( cmi_state::irq_ram_w )
+template<int cpunum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
 {
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
 }
@@ -743,14 +743,14 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-READ8_MEMBER( cmi_state::atomic_r )
+uint8_t cmi_state::atomic_r()
 {
 	// TODO
 	//osd_printf_debug("atomic access\n");
 	return 0;
 }
 
-WRITE8_MEMBER( cmi_state::cpufunc_w )
+void cmi_state::cpufunc_w(uint8_t data)
 {
 	int cpunum = data & 1;
 	int idx = data & 6;
@@ -773,14 +773,14 @@ WRITE8_MEMBER( cmi_state::cpufunc_w )
 	}
 }
 
-READ8_MEMBER( cmi_state::parity_r )
+uint8_t cmi_state::parity_r(offs_t offset)
 {
 	m_maincpu2_irq0_merger->in_w<1>(0);
 	LOG("%s: parity_r %04x\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-WRITE8_MEMBER( cmi_state::mapsel_w )
+void cmi_state::mapsel_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: mapsel_w: %02x = %02x\n", machine().describe_context(), offset, data);
 
@@ -800,7 +800,7 @@ WRITE8_MEMBER( cmi_state::mapsel_w )
 
 
 
-WRITE16_MEMBER( cmi_state::midi_dma_w )
+void cmi_state::midi_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
@@ -811,7 +811,7 @@ WRITE16_MEMBER( cmi_state::midi_dma_w )
 		cmi_space->write_byte(offset * 2, data >> 8);
 }
 
-READ16_MEMBER( cmi_state::midi_dma_r )
+uint16_t cmi_state::midi_dma_r(offs_t offset)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
@@ -835,7 +835,7 @@ WRITE_LINE_MEMBER( cmi_state::midi_acia_irq )
 	m_midicpu->set_input_line(M68K_IRQ_3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( cmi_state::midi_latch_w )
+void cmi_state::midi_latch_w(uint8_t data)
 {
 	const uint8_t bit_offset = data & 0x7;
 	const uint8_t bit_value = BIT(data, 3);
@@ -958,11 +958,11 @@ void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 	{
 		if (cpunum == CPU_1)
 		{
-			space->install_readwrite_handler(0x0000, 0xffff, read8_delegate(*this, FUNC(cmi_state::perr_r<CPU_1>)), write8_delegate(*this, FUNC(cmi_state::perr_w<CPU_1>)));
+			space->install_readwrite_handler(0x0000, 0xffff, read8sm_delegate(*this, FUNC(cmi_state::perr_r<CPU_1>)), write8sm_delegate(*this, FUNC(cmi_state::perr_w<CPU_1>)));
 		}
 		else
 		{
-			space->install_readwrite_handler(0x0000, 0xffff, read8_delegate(*this, FUNC(cmi_state::perr_r<CPU_2>)), write8_delegate(*this, FUNC(cmi_state::perr_w<CPU_2>)));
+			space->install_readwrite_handler(0x0000, 0xffff, read8sm_delegate(*this, FUNC(cmi_state::perr_r<CPU_2>)), write8sm_delegate(*this, FUNC(cmi_state::perr_w<CPU_2>)));
 		}
 	}
 
@@ -1025,7 +1025,7 @@ void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 		install_peripherals(cpunum);
 }
 
-WRITE8_MEMBER( cmi_state::cmi07_w )
+void cmi_state::cmi07_w(uint8_t data)
 {
 	LOG("%s: cmi07_w: %02x\n", machine().describe_context(), data);
 
@@ -1044,7 +1044,7 @@ WRITE8_MEMBER( cmi_state::cmi07_w )
 	update_address_space(1, map_info);
 }
 
-READ8_MEMBER( cmi_state::cmi07_r )
+uint8_t cmi_state::cmi07_r()
 {
 	LOG("%s: cmi07_r: %02x\n", machine().describe_context(), 0xff);
 	return 0xff;
@@ -1123,7 +1123,7 @@ void cmi_state::write_fdc_ctrl(uint8_t data)
 	m_fdc_ctrl = data;
 }
 
-WRITE8_MEMBER( cmi_state::fdc_w )
+void cmi_state::fdc_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 		m_fdc_addr = data;
 }
 
-READ8_MEMBER( cmi_state::fdc_r )
+uint8_t cmi_state::fdc_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -1319,7 +1319,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_cb2_w )
 	m_cmi02_pia[1]->ca1_w(0);
 }
 
-READ8_MEMBER( cmi_state::cmi02_r )
+uint8_t cmi_state::cmi02_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -1369,7 +1369,7 @@ READ8_MEMBER( cmi_state::cmi02_r )
 	}
 }
 
-WRITE8_MEMBER( cmi_state::cmi02_w )
+void cmi_state::cmi02_w(offs_t offset, uint8_t data)
 {
 	if (offset <= 0x1f)
 	{
@@ -1436,10 +1436,10 @@ void cmi_state::install_video_ram(int cpunum)
 {
 	address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
-	space->install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(cmi_state::vram_r)), write8_delegate(*this, FUNC(cmi_state::vram_w)));
+	space->install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(cmi_state::vram_r)), write8sm_delegate(*this, FUNC(cmi_state::vram_w)));
 }
 
-WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
+void cmi_state::i8214_cpu1_w(uint8_t data)
 {
 	LOG("%s: i8214_cpu1_w, clearing IRQ merger bit 0: %02x\n", machine().describe_context(), data);
 	m_maincpu1_irq_merger->in_w<0>(0);
@@ -1447,14 +1447,14 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 }
 
 
-WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
+void cmi_state::i8214_cpu2_w(uint8_t data)
 {
 	LOG("%s: i8214_cpu2_w, clearing CPU2 IRQ line: %02x\n", machine().describe_context(), data);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_i8214[1]->b_sgs_w(~(data & 0xf));
 }
 
-template<int cpunum> READ8_MEMBER( cmi_state::perr_r )
+template<int cpunum> uint8_t cmi_state::perr_r(offs_t offset)
 {
 	m_maincpu2_irq0_merger->in_w<1>(1);
 	const uint8_t ram_index = m_ram_indices[cpunum][offset / PAGE_SIZE];
@@ -1463,51 +1463,51 @@ template<int cpunum> READ8_MEMBER( cmi_state::perr_r )
 	return data;
 }
 
-template<int cpunum> WRITE8_MEMBER( cmi_state::perr_w )
+template<int cpunum> void cmi_state::perr_w(offs_t offset, uint8_t data)
 {
 	const uint8_t ram_index = m_ram_indices[cpunum][offset / PAGE_SIZE];
 	m_q256_ram[BIT(ram_index, 7)][(ram_index & 0x7f) * PAGE_SIZE + offset % PAGE_SIZE] = data;
 }
 
 // TODO: replace with share()
-READ8_MEMBER( cmi_state::shared_ram_r )
+uint8_t cmi_state::shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER( cmi_state::shared_ram_w )
+void cmi_state::shared_ram_w(offs_t offset, uint8_t data)
 {
 	//logerror("shared_ram_w: %04x = %02x\n", 0xfe00 + offset, data);
 	m_shared_ram[offset] = data;
 }
 
-READ8_MEMBER( cmi_state::aic_ad574_r )
+uint8_t cmi_state::aic_ad574_r()
 {
 	LOG("%s: AIC AD574 read\n", machine().describe_context());
 	// To Do
 	return 0;
 }
 
-template<int Dac> WRITE8_MEMBER( cmi_state::aic_dac_w )
+template<int Dac> void cmi_state::aic_dac_w(uint8_t data)
 {
 	LOG("%s: AIC DAC%d write: %02x\n", machine().describe_context(), Dac + 1, data);
 	// To Do
 }
 
-WRITE8_MEMBER( cmi_state::aic_mux_latch_w )
+void cmi_state::aic_mux_latch_w(uint8_t data)
 {
 	LOG("%s: AIC mux latch write: %02x\n", machine().describe_context(), data);
 	set_interrupt(CPU_1, IRQ_AIC_LEVEL, (BIT(data, 6) && BIT(data, 7)) ? ASSERT_LINE : CLEAR_LINE);
 	// To Do
 }
 
-WRITE8_MEMBER( cmi_state::aic_ad565_msb_w )
+void cmi_state::aic_ad565_msb_w(uint8_t data)
 {
 	LOG("%s: AIC AD565 MSB write: %02x\n", machine().describe_context(), data);
 	// To Do
 }
 
-WRITE8_MEMBER( cmi_state::aic_ad565_lsb_w )
+void cmi_state::aic_ad565_lsb_w(uint8_t data)
 {
 	LOG("%s: AIC AD565 LSB write: %02x\n", machine().describe_context(), data);
 	// To Do
@@ -1517,22 +1517,22 @@ void cmi_state::install_peripherals(int cpunum)
 {
 	address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
-	space->install_readwrite_handler(0xe000, 0xe03f, read8_delegate(*this, FUNC(cmi_state::cmi02_r)), write8_delegate(*this, FUNC(cmi_state::cmi02_w)));
+	space->install_readwrite_handler(0xe000, 0xe03f, read8sm_delegate(*this, FUNC(cmi_state::cmi02_r)), write8sm_delegate(*this, FUNC(cmi_state::cmi02_w)));
 
 	if (cpunum)
-		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(*this, FUNC(cmi_state::rom_r<1>)), write8_delegate(*this, FUNC(cmi_state::map_ram_w)));
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8sm_delegate(*this, FUNC(cmi_state::rom_r<1>)), write8sm_delegate(*this, FUNC(cmi_state::map_ram_w)));
 	else
-		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(*this, FUNC(cmi_state::rom_r<0>)), write8_delegate(*this, FUNC(cmi_state::map_ram_w)));
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8sm_delegate(*this, FUNC(cmi_state::rom_r<0>)), write8sm_delegate(*this, FUNC(cmi_state::map_ram_w)));
 
 	space->install_rom(0xf800, 0xfbff, m_q133_rom + (cpunum == CPU_2 ? 0x1800 : 0x2800));
 
-	space->install_readwrite_handler(0xfc40, 0xfc4f, read8_delegate(*this, FUNC(cmi_state::parity_r)), write8_delegate(*this, FUNC(cmi_state::mapsel_w)));
+	space->install_readwrite_handler(0xfc40, 0xfc4f, read8sm_delegate(*this, FUNC(cmi_state::parity_r)), write8sm_delegate(*this, FUNC(cmi_state::mapsel_w)));
 	space->nop_readwrite(0xfc5a, 0xfc5b); // Q077 HDD controller - not installed
-	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8_delegate(*this, FUNC(cmi_state::atomic_r)), write8_delegate(*this, FUNC(cmi_state::cpufunc_w)));
+	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8smo_delegate(*this, FUNC(cmi_state::atomic_r)), write8smo_delegate(*this, FUNC(cmi_state::cpufunc_w)));
 	if (cpunum)
-		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(*this, FUNC(cmi_state::map_r<1>)), write8_delegate(*this, FUNC(cmi_state::map_w<1>)));
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8smo_delegate(*this, FUNC(cmi_state::map_r<1>)), write8smo_delegate(*this, FUNC(cmi_state::map_w<1>)));
 	else
-		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(*this, FUNC(cmi_state::map_r<0>)), write8_delegate(*this, FUNC(cmi_state::map_w<0>)));
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8smo_delegate(*this, FUNC(cmi_state::map_r<0>)), write8smo_delegate(*this, FUNC(cmi_state::map_w<0>)));
 
 	space->install_readwrite_handler(0xfc80, 0xfc83, read8sm_delegate(*m_q133_acia[0], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[0], FUNC(mos6551_device::write)));
 	space->install_readwrite_handler(0xfc84, 0xfc87, read8sm_delegate(*m_q133_acia[1], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[1], FUNC(mos6551_device::write)));
@@ -1540,37 +1540,37 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::write)));
 	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::write)));
 
-	space->install_write_handler(0xfca0, 0xfca0, write8_delegate(*this, FUNC(cmi_state::midi_latch_w)));
+	space->install_write_handler(0xfca0, 0xfca0, write8smo_delegate(*this, FUNC(cmi_state::midi_latch_w)));
 
-	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(*this, FUNC(cmi_state::cmi07_r)), write8_delegate(*this, FUNC(cmi_state::cmi07_w)));
+	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8smo_delegate(*this, FUNC(cmi_state::cmi07_r)), write8smo_delegate(*this, FUNC(cmi_state::cmi07_w)));
 
-	space->install_read_handler(0xfcc0, 0xfcc3, read8_delegate(*this, FUNC(cmi_state::lightpen_r)));
+	space->install_read_handler(0xfcc0, 0xfcc3, read8sm_delegate(*this, FUNC(cmi_state::lightpen_r)));
 	space->install_readwrite_handler(0xfcc4, 0xfcc7, read8sm_delegate(*m_q219_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_q219_pia, FUNC(pia6821_device::write)));
 	space->install_readwrite_handler(0xfcc8, 0xfccf, read8sm_delegate(*m_q219_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q219_ptm, FUNC(ptm6840_device::write)));
-	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8_delegate(*this, FUNC(cmi_state::video_r)), write8_delegate(*this, FUNC(cmi_state::video_w)));
-	space->install_readwrite_handler(0xfce0, 0xfce1, read8_delegate(*this, FUNC(cmi_state::fdc_r)), write8_delegate(*this, FUNC(cmi_state::fdc_w)));
+	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8sm_delegate(*this, FUNC(cmi_state::video_r)), write8sm_delegate(*this, FUNC(cmi_state::video_w)));
+	space->install_readwrite_handler(0xfce0, 0xfce1, read8sm_delegate(*this, FUNC(cmi_state::fdc_r)), write8sm_delegate(*this, FUNC(cmi_state::fdc_w)));
 	space->nop_readwrite(0xfce2, 0xfcef); // Monitor ROM will attempt to detect floppy disk controller cards in this entire range
 	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8sm_delegate(*m_q133_pia[0], FUNC(pia6821_device::read)), write8sm_delegate(*m_q133_pia[0], FUNC(pia6821_device::write)));
 	space->install_readwrite_handler(0xfcf8, 0xfcff, read8sm_delegate(*m_q133_pia[1], FUNC(pia6821_device::read)), write8sm_delegate(*m_q133_pia[1], FUNC(pia6821_device::write)));
 
-	space->install_write_handler(0xfcfc, 0xfcfc, write8_delegate(*this, FUNC(cmi_state::i8214_cpu1_w)));
-	space->install_write_handler(0xfcfd, 0xfcfd, write8_delegate(*this, FUNC(cmi_state::i8214_cpu2_w)));
+	space->install_write_handler(0xfcfc, 0xfcfc, write8smo_delegate(*this, FUNC(cmi_state::i8214_cpu1_w)));
+	space->install_write_handler(0xfcfd, 0xfcfd, write8smo_delegate(*this, FUNC(cmi_state::i8214_cpu2_w)));
 
-	space->install_readwrite_handler(0xfd00, 0xfeff, read8_delegate(*this, FUNC(cmi_state::shared_ram_r)), write8_delegate(*this, FUNC(cmi_state::shared_ram_w)));
+	space->install_readwrite_handler(0xfd00, 0xfeff, read8sm_delegate(*this, FUNC(cmi_state::shared_ram_r)), write8sm_delegate(*this, FUNC(cmi_state::shared_ram_w)));
 
 	space->install_ram(0xff00, 0xfff7, &m_scratch_ram[cpunum][0]);
 	space->install_ram(0xfffa, 0xfffd, &m_scratch_ram[cpunum][0xfa]);
 
 	if (cpunum)
 	{
-		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(*this, FUNC(cmi_state::irq_ram_r<1>)), write8_delegate(*this, FUNC(cmi_state::irq_ram_w<1>)));
-		space->install_read_handler(0xfffe, 0xffff, read8_delegate(*this, FUNC(cmi_state::vector_r<1>)));
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8sm_delegate(*this, FUNC(cmi_state::irq_ram_r<1>)), write8sm_delegate(*this, FUNC(cmi_state::irq_ram_w<1>)));
+		space->install_read_handler(0xfffe, 0xffff, read8sm_delegate(*this, FUNC(cmi_state::vector_r<1>)));
 	}
 	else
 	{
-		space->install_readwrite_handler(0xd000, 0xdfff, read8_delegate(*this, FUNC(cmi_state::tvt_r)), write8_delegate(*this, FUNC(cmi_state::tvt_w)));
-		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(*this, FUNC(cmi_state::irq_ram_r<0>)), write8_delegate(*this, FUNC(cmi_state::irq_ram_w<0>)));
-		space->install_read_handler(0xfffe, 0xffff, read8_delegate(*this, FUNC(cmi_state::vector_r<0>)));
+		space->install_readwrite_handler(0xd000, 0xdfff, read8smo_delegate(*this, FUNC(cmi_state::tvt_r)), write8smo_delegate(*this, FUNC(cmi_state::tvt_w)));
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8sm_delegate(*this, FUNC(cmi_state::irq_ram_r<0>)), write8sm_delegate(*this, FUNC(cmi_state::irq_ram_w<0>)));
+		space->install_read_handler(0xfffe, 0xffff, read8sm_delegate(*this, FUNC(cmi_state::vector_r<0>)));
 	}
 }
 

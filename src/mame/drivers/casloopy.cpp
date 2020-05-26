@@ -196,17 +196,16 @@ private:
 	int m_gfx_index;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER(vregs_r);
-	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_READ16_MEMBER(pal_r);
-	DECLARE_WRITE16_MEMBER(pal_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(cart_r);
-	DECLARE_READ16_MEMBER(sh7021_r);
-	DECLARE_WRITE16_MEMBER(sh7021_w);
-	DECLARE_READ8_MEMBER(bitmap_r);
-	DECLARE_WRITE8_MEMBER(bitmap_w);
+	uint16_t vregs_r(offs_t offset);
+	void vregs_w(offs_t offset, uint16_t data);
+	uint16_t pal_r(offs_t offset);
+	void pal_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint16_t sh7021_r(offs_t offset);
+	void sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t bitmap_r(offs_t offset);
+	void bitmap_w(offs_t offset, uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void casloopy_map(address_map &map);
@@ -314,7 +313,7 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ16_MEMBER(casloopy_state::vregs_r)
+uint16_t casloopy_state::vregs_r(offs_t offset)
 {
 	if(offset == 4/2)
 	{
@@ -332,18 +331,18 @@ READ16_MEMBER(casloopy_state::vregs_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(casloopy_state::vregs_w)
+void casloopy_state::vregs_w(offs_t offset, uint16_t data)
 {
 //  if(offset != 6/2)
 //      printf("%08x %08x\n",offset*2,data);
 }
 
-READ16_MEMBER(casloopy_state::pal_r)
+uint16_t casloopy_state::pal_r(offs_t offset)
 {
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(casloopy_state::pal_w)
+void casloopy_state::pal_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -355,12 +354,12 @@ WRITE16_MEMBER(casloopy_state::pal_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ8_MEMBER(casloopy_state::vram_r)
+uint8_t casloopy_state::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::vram_w)
+void casloopy_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 
@@ -369,12 +368,12 @@ WRITE8_MEMBER(casloopy_state::vram_w)
 }
 
 /* TODO: all of this should be internal to the SH core, this is just to check what it enables. */
-READ16_MEMBER(casloopy_state::sh7021_r)
+uint16_t casloopy_state::sh7021_r(offs_t offset)
 {
 	return sh7021_regs[offset];
 }
 
-WRITE16_MEMBER(casloopy_state::sh7021_w)
+void casloopy_state::sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&sh7021_regs[offset]);
 
@@ -409,21 +408,15 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 //  printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
 }
 
-READ8_MEMBER(casloopy_state::bitmap_r)
+uint8_t casloopy_state::bitmap_r(offs_t offset)
 {
 	return m_bitmap_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::bitmap_w)
+void casloopy_state::bitmap_w(offs_t offset, uint8_t data)
 {
 	m_bitmap_vram[offset] = data;
 }
-
-READ32_MEMBER(casloopy_state::cart_r)
-{
-	return m_cart->read32_rom(offset, mem_mask);
-}
-
 
 void casloopy_state::casloopy_map(address_map &map)
 {
@@ -437,10 +430,10 @@ void casloopy_state::casloopy_map(address_map &map)
 	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
 //  map(0x05ffff00, 0x05ffffff).rw(FUNC(casloopy_state::sh7021_r), FUNC(casloopy_state::sh7021_w));
 //  map(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	map(0x06000000, 0x062fffff).r(FUNC(casloopy_state::cart_r));
+	map(0x06000000, 0x062fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
 	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
 	map(0x09000000, 0x0907ffff).ram().share("wram");
-	map(0x0e000000, 0x0e2fffff).r(FUNC(casloopy_state::cart_r));
+	map(0x0e000000, 0x0e2fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
 	map(0x0f000000, 0x0f0003ff).ram().share("oram");
 }
 

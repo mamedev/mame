@@ -157,10 +157,10 @@ public:
 	uint8_t read_keyboard();
 	void set_busy2(int state);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ext_read );
-	DECLARE_WRITE8_MEMBER( ext_write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t ext_read(offs_t offset);
+	void ext_write(offs_t offset, uint8_t data);
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
@@ -287,11 +287,11 @@ public:
 	uint8_t read_memory(offs_t offset, offs_t va, int ba, int ae);
 	void write_memory(offs_t offset, uint8_t data, int ba, int ae);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
 	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
@@ -460,7 +460,7 @@ void cbm2_state::bankswitch(offs_t offset, int eras, int ecas, int refen, int ca
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::read )
+uint8_t cbm2_state::read(offs_t offset)
 {
 	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
@@ -563,7 +563,7 @@ READ8_MEMBER( cbm2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm2_state::write )
+void cbm2_state::write(offs_t offset, uint8_t data)
 {
 	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
@@ -654,7 +654,7 @@ WRITE8_MEMBER( cbm2_state::write )
 //  ext_read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm2_state::ext_read )
+uint8_t cbm2_state::ext_read(offs_t offset)
 {
 #ifdef USE_PLA_DECODE
 	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
@@ -693,7 +693,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 //  ext_write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm2_state::ext_write )
+void cbm2_state::ext_write(offs_t offset, uint8_t data)
 {
 #ifdef USE_PLA_DECODE
 	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
@@ -1036,7 +1036,7 @@ void p500_state::write_memory(offs_t offset, uint8_t data, int ba, int ae)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::read )
+uint8_t p500_state::read(offs_t offset)
 {
 	int ba = 0, ae = 1;
 	offs_t va = 0xffff;
@@ -1049,7 +1049,7 @@ READ8_MEMBER( p500_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( p500_state::write )
+void p500_state::write(offs_t offset, uint8_t data)
 {
 	int ba = 0, ae = 1;
 
@@ -1061,7 +1061,7 @@ WRITE8_MEMBER( p500_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::vic_videoram_r )
+uint8_t p500_state::vic_videoram_r(offs_t offset)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
@@ -1108,7 +1108,7 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::vic_colorram_r )
+uint8_t p500_state::vic_colorram_r(offs_t offset)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();

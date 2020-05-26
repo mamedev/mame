@@ -112,15 +112,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(test_led_w);
-	DECLARE_WRITE8_MEMBER(port_bank_w);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_READ8_MEMBER(philips_code_r);
-	DECLARE_WRITE8_MEMBER(philips_clear_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
-	DECLARE_READ8_MEMBER(irq_ack_r);
-	DECLARE_WRITE8_MEMBER(ldwire_w);
-	DECLARE_WRITE8_MEMBER(sound_overlay_w);
+	void test_led_w(offs_t offset, uint8_t data);
+	void port_bank_w(uint8_t data);
+	uint8_t port_r();
+	uint8_t philips_code_r(offs_t offset);
+	void philips_clear_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
+	uint8_t irq_ack_r();
+	void ldwire_w(uint8_t data);
+	void sound_overlay_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(irq_callback);
 
 	required_device<pioneer_pr8210_device> m_laserdisc;
@@ -143,12 +143,12 @@ private:
 
 /********************************************************/
 
-WRITE8_MEMBER(cliffhgr_state::test_led_w)
+void cliffhgr_state::test_led_w(offs_t offset, uint8_t data)
 {
 	m_led = offset ^ 1;
 }
 
-WRITE8_MEMBER(cliffhgr_state::port_bank_w)
+void cliffhgr_state::port_bank_w(uint8_t data)
 {
 	/* writing 0x0f clears the LS174 flip flop */
 	if (data == 0x0f)
@@ -157,7 +157,7 @@ WRITE8_MEMBER(cliffhgr_state::port_bank_w)
 		m_port_bank = data & 0x0f; /* only D3-D0 are connected */
 }
 
-READ8_MEMBER(cliffhgr_state::port_r)
+uint8_t cliffhgr_state::port_r()
 {
 	if (m_port_bank < 7)
 		return m_banks[m_port_bank]->read();
@@ -166,22 +166,22 @@ READ8_MEMBER(cliffhgr_state::port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(cliffhgr_state::philips_code_r)
+uint8_t cliffhgr_state::philips_code_r(offs_t offset)
 {
 	return (m_philips_code >> (8 * offset)) & 0xff;
 }
 
-WRITE8_MEMBER(cliffhgr_state::philips_clear_w)
+void cliffhgr_state::philips_clear_w(uint8_t data)
 {
 	/* reset serial to parallel converters */
 }
 
-WRITE8_MEMBER(cliffhgr_state::coin_counter_w)
+void cliffhgr_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0 );
 }
 
-READ8_MEMBER(cliffhgr_state::irq_ack_r)
+uint8_t cliffhgr_state::irq_ack_r()
 {
 	/* deassert IRQ on the CPU */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -189,7 +189,7 @@ READ8_MEMBER(cliffhgr_state::irq_ack_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(cliffhgr_state::sound_overlay_w)
+void cliffhgr_state::sound_overlay_w(uint8_t data)
 {
 	/* audio */
 	m_discrete->write(CLIFF_ENABLE_SND_1, data & 1);
@@ -198,7 +198,7 @@ WRITE8_MEMBER(cliffhgr_state::sound_overlay_w)
 	// bit 4 (data & 0x10) is overlay related?
 }
 
-WRITE8_MEMBER(cliffhgr_state::ldwire_w)
+void cliffhgr_state::ldwire_w(uint8_t data)
 {
 	m_laserdisc->control_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
