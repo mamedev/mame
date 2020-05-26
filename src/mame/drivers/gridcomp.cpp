@@ -72,6 +72,7 @@
 #include "machine/i7220.h"
 #include "machine/i80130.h"
 #include "machine/i8255.h"
+#include "machine/mm58174.h"
 #include "machine/ram.h"
 #include "machine/tms9914.h"
 #include "machine/z80sio.h"
@@ -104,6 +105,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_osp(*this, I80130_TAG)
+		, m_rtc(*this, "rtc")
 		, m_modem(*this, "modem")
 		, m_uart8274(*this, "uart8274")
 		, m_speaker(*this, "speaker")
@@ -123,6 +125,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
+	required_device<mm58174_device> m_rtc;
 	required_device<i8255_device> m_modem;
 	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
@@ -307,7 +310,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
-	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xe0000, 0xeffff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
@@ -326,7 +329,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
-	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
@@ -362,6 +365,8 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
+
+	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
