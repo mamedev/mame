@@ -512,8 +512,8 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		{
 			// 2bpp
 			// 4bpp
-			if (m_pal_displaybank_high) // how is this set?
-				current_palette_offset |= 0x0800;
+		//	if (m_pal_displaybank_high) // how is this set?
+		//		current_palette_offset |= 0x0800;
 
 		}
 		else if (nc_bpp < 8)
@@ -564,7 +564,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	}
 }
 
-void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll)
+void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which)
 {
 	uint32_t xscroll = scroll[0];
 	uint32_t yscroll = scroll[1];
@@ -574,12 +574,12 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	uint32_t palette_map = regs[3];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	if (!(ctrl_reg & PAGE_ENABLE_MASK))
+	if (!(ctrl_reg & 0x0008))
 	{
 		return;
 	}
 
-	if (((attr_reg & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	if (((attr_reg & 0x3000) >> 12) != priority)
 	{
 		return;
 	}
@@ -655,8 +655,8 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	}
 	else
 	{
-		uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+		uint32_t tile_h = 8 << ((attr_reg & 0x00c0) >> 6);
+		uint32_t tile_w = 8 << ((attr_reg & 0x0030) >> 4);
 
 		int total_width;
 		int use_alt_drawmode = m_alt_tile_addressing;
@@ -687,17 +687,13 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		{
 			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & y_mask) - 0x10;
 			uint32_t xx = (tile_w * x0 - xscroll) & (total_width-1);
-			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
-
-
+			uint32_t tile = (ctrl_reg & 0x0004) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
 			if (!tile)
 				continue;
 
-
 			uint32_t tileattr = attr_reg;
 			uint32_t tilectrl = ctrl_reg;
-
 
 			bool blend;
 			bool row_scroll;
@@ -711,7 +707,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 			if ((ctrl_reg & 2) == 0) // RegSet:0
 			{
-				uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+				uint16_t palette = (ctrl_reg & 0x0004) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 				if (x0 & 1)
 					palette >>= 8;
 
@@ -727,27 +723,23 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 				if (m_alt_tile_addressing == 0)
 				{
 					// smartfp needs the attribute table to contain extra tile bits even if regset is 1
-					uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+					uint16_t palette = (ctrl_reg & 0x0004) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 					if (x0 & 1)
 						palette >>= 8;
 
 					tile |= (palette & 0x0007) << 16;
-
-					flip_x = (tileattr & TILE_X_FLIP);
-					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-					palette_offset = (tileattr & 0x0f00) >> 4;
-
 				}
-				else
-				{
-					flip_x = (tileattr & TILE_X_FLIP);
-					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-					palette_offset = (tileattr & 0x0f00) >> 4;
-				}
+
+				flip_x = (tileattr & 0x0004);
+				yflipmask = tileattr & 0x0008 ? tile_h - 1 : 0;
+				palette_offset = (tileattr & 0x0f00) >> 4;
 			}
 
 
-			//palette_offset |= 0x0900;
+			if (which == 1)
+				palette_offset |= 0x800;
+
+
 			palette_offset |= m_pal_back;
 
 			const uint8_t bpp = tileattr & 0x0003;
@@ -832,22 +824,31 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	if (addressing_mode == 0) // smartfp, paccon
 		tile |= m_spriteextra[base_addr / 4] << 16;
 
-	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	if (((attr & 0x3000) >> 12) != priority)
 	{
 		return;
 	}
 
-	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	// attr             PBzz pppp hhww ffdd
+	
+	// P = high palette bit
+	// b = blend enable
+	// zz = priority
+	// pppp = palette
+	// hh = height
+	// ww = width
+	// ff = flips
+	// dd = depth
+
+	const uint32_t h = 8 << ((attr & 0x00c0) >> 6);
+	const uint32_t w = 8 << ((attr & 0x0030) >> 4);
 
 
-
-	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
+	if (!(m_7042_sprite & 0x0002))
 	{
 		x = ((screenwidth / 2) + x) - w / 2;
 		y = ((screenheight / 2) - y) - (h / 2) + 8;
 	}
-
 
 	x &= (x_max - 1);
 	y &= 0x01ff;
@@ -872,9 +873,9 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	// different attribute use?
 	if (screenwidth == 320)
 	{
-		flip_x = (attr & TILE_X_FLIP);
+		flip_x = (attr & 0x0004);
 		bpp = attr & 0x0003;
-		yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+		yflipmask = attr & 0x0008 ? h - 1 : 0;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 	else
@@ -885,8 +886,10 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 
-	//palette_offset |= 0x0d00;
 	palette_offset |= m_pal_sprites;
+
+	if (attr & 0x8000)
+		palette_offset |= 0x800;
 
 	if (blend)
 	{
@@ -955,10 +958,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 			if (1)
 			{
-				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll, 0);
+				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll, 1);
+				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll, 2);
+				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll, 3);
 
 			}
 			if ((!(machine().input().code_pressed(KEYCODE_T))) || draw_all) draw_sprites(cliprect, scanline, i);

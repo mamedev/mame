@@ -134,24 +134,6 @@ public:
 
 protected:
 
-	enum
-	{
-		PAGE_ENABLE_MASK        = 0x0008,
-		PAGE_WALLPAPER_MASK     = 0x0004,
-
-		SPRITE_ENABLE_MASK      = 0x0001,
-		SPRITE_COORD_TL_MASK    = 0x0002,
-
-		PAGE_PRIORITY_FLAG_MASK    = 0x3000,
-		PAGE_PRIORITY_FLAG_SHIFT   = 12,
-		PAGE_TILE_HEIGHT_MASK   = 0x00c0,
-		PAGE_TILE_HEIGHT_SHIFT  = 6,
-		PAGE_TILE_WIDTH_MASK    = 0x0030,
-		PAGE_TILE_WIDTH_SHIFT   = 4,
-		TILE_X_FLIP             = 0x0004,
-		TILE_Y_FLIP             = 0x0008
-	};
-
 	static const device_timer_id TIMER_SCREENPOS = 2;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -181,7 +163,7 @@ protected:
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
 	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll);
+	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which);
 	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
 	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 
