@@ -21865,6 +21865,8 @@ alice                           // Matra & Hachette Ordinateur Alice
 alice32                         // Matra & Hachette Alice 32
 alice90                         // Matra & Hachette Alice 90
 mc10                            // MC-10
+mcx128                          // MCX-128
+alice128                        // Alice with a MCX-128
 
 @source:mc1000.cpp
 mc1000                          //
