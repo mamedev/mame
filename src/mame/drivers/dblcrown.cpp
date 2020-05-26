@@ -84,20 +84,20 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bank_w(uint8_t data);
-	DECLARE_READ8_MEMBER(irq_source_r);
-	DECLARE_WRITE8_MEMBER(irq_source_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_bank_r);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
+	uint8_t irq_source_r();
+	void irq_source_w(uint8_t data);
+	uint8_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t vram_bank_r(offs_t offset);
+	void vram_bank_w(offs_t offset, uint8_t data);
 	void mux_w(uint8_t data);
-	DECLARE_READ8_MEMBER(in_mux_r);
-	DECLARE_READ8_MEMBER(in_mux_type_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t in_mux_r();
+	uint8_t in_mux_type_r();
+	void output_w(uint8_t data);
 	void lamps_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
+	void watchdog_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 	void dblcrown_palette(palette_device &palette) const;
@@ -175,17 +175,17 @@ void dblcrown_state::bank_w(uint8_t data)
 	membank("rom_bank")->set_entry(m_bank & 0x1f);
 }
 
-READ8_MEMBER( dblcrown_state::irq_source_r)
+uint8_t dblcrown_state::irq_source_r()
 {
 	return m_irq_src;
 }
 
-WRITE8_MEMBER( dblcrown_state::irq_source_w)
+void dblcrown_state::irq_source_w(uint8_t data)
 {
 	m_irq_src = data; // this effectively acks the irq, by writing 0
 }
 
-READ8_MEMBER( dblcrown_state::palette_r)
+uint8_t dblcrown_state::palette_r(offs_t offset)
 {
 	//if(m_bank & 8) /* TODO: verify this */
 	//  offset+=0x200;
@@ -193,7 +193,7 @@ READ8_MEMBER( dblcrown_state::palette_r)
 	return m_pal_ram[offset];
 }
 
-WRITE8_MEMBER( dblcrown_state::palette_w)
+void dblcrown_state::palette_w(offs_t offset, uint8_t data)
 {
 	int r,g,b,datax;
 
@@ -213,7 +213,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 }
 
 
-READ8_MEMBER( dblcrown_state::vram_r)
+uint8_t dblcrown_state::vram_r(offs_t offset)
 {
 	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
@@ -221,7 +221,7 @@ READ8_MEMBER( dblcrown_state::vram_r)
 	return m_vram[(offset & 0xfff) | hi_offs];
 }
 
-WRITE8_MEMBER( dblcrown_state::vram_w)
+void dblcrown_state::vram_w(offs_t offset, uint8_t data)
 {
 	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
@@ -238,12 +238,12 @@ WRITE8_MEMBER( dblcrown_state::vram_w)
 	#endif
 }
 
-READ8_MEMBER( dblcrown_state::vram_bank_r)
+uint8_t dblcrown_state::vram_bank_r(offs_t offset)
 {
 	return m_vram_bank[offset];
 }
 
-WRITE8_MEMBER( dblcrown_state::vram_bank_w)
+void dblcrown_state::vram_bank_w(offs_t offset, uint8_t data)
 {
 	m_vram_bank[offset] = data & 0xf;
 
@@ -256,14 +256,11 @@ void dblcrown_state::mux_w(uint8_t data)
 	m_mux_data = data;
 }
 
-READ8_MEMBER( dblcrown_state::in_mux_r )
+uint8_t dblcrown_state::in_mux_r()
 {
-	int i;
-	uint8_t res;
+	uint8_t res = 0;
 
-	res = 0;
-
-	for(i = 0; i < 4; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if(m_mux_data & 1 << i)
 			res |= m_inputs[i]->read();
@@ -272,14 +269,11 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 	return res;
 }
 
-READ8_MEMBER( dblcrown_state::in_mux_type_r )
+uint8_t dblcrown_state::in_mux_type_r()
 {
-	int i;
-	uint8_t res;
+	uint8_t res = 0xff;
 
-	res = 0xff;
-
-	for(i = 0; i < 4; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if (m_inputs[i]->read() != 0xff)
 			res &= ~(1 << i);
@@ -288,7 +282,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 	return res;
 }
 
-WRITE8_MEMBER( dblcrown_state::output_w )
+void dblcrown_state::output_w(uint8_t data)
 {
 /*  bits
   7654 3210
@@ -323,7 +317,7 @@ void dblcrown_state::lamps_w(uint8_t data)
 		m_lamps[n] = BIT(data, n);
 }
 
-WRITE8_MEMBER(dblcrown_state::watchdog_w)
+void dblcrown_state::watchdog_w(uint8_t data)
 /*
   Always 0x01...
 */

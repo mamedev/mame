@@ -57,15 +57,15 @@ private:
 	void lamp1_w(uint8_t data) { }
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
+	void sol2_w(uint8_t data) { } // solenoids 8-15
+	void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(dac_w) { }
+	void dac_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	uint8_t dmd_status_r();
 
-//  DECLARE_READ8_MEMBER(sound_latch_r);
-//  DECLARE_WRITE8_MEMBER(sample_bank_w);
+//  uint8_t sound_latch_r();
+//  void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
 	uint8_t display_r(offs_t offset);
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( de_3 )
 INPUT_PORTS_END
 
 // 6821 PIA at 0x2000
-WRITE8_MEMBER( de_3_state::sol3_w )
+void de_3_state::sol3_w(uint8_t data)
 {
 }
 

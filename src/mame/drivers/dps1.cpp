@@ -42,15 +42,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(portb2_w);
-	DECLARE_WRITE8_MEMBER(portb4_w);
-	DECLARE_WRITE8_MEMBER(portb6_w);
-	DECLARE_WRITE8_MEMBER(portb8_w);
-	DECLARE_WRITE8_MEMBER(portba_w);
-	DECLARE_WRITE8_MEMBER(portbc_w);
-	DECLARE_WRITE8_MEMBER(portbe_w);
-	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(portff_w);
+	void portb2_w(uint8_t data);
+	void portb4_w(uint8_t data);
+	void portb6_w(uint8_t data);
+	void portb8_w(uint8_t data);
+	void portba_w(uint8_t data);
+	void portbc_w(uint8_t data);
+	void portbe_w(uint8_t data);
+	uint8_t portff_r();
+	void portff_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void io_map(address_map &map);
@@ -97,54 +97,54 @@ void dps1_state::io_map(address_map &map)
 
 
 // read from disk, to memory
-WRITE8_MEMBER( dps1_state::portb2_w )
+void dps1_state::portb2_w(uint8_t data)
 {
 	m_dma_dir = 1;
 }
 
 // write to disk, from memory
-WRITE8_MEMBER( dps1_state::portb4_w )
+void dps1_state::portb4_w(uint8_t data)
 {
 	m_dma_dir = 0;
 }
 
 // enable eprom
-WRITE8_MEMBER( dps1_state::portb6_w )
+void dps1_state::portb6_w(uint8_t data)
 {
 	membank("bankr0")->set_entry(1); // point at rom
 }
 
 // set A16-23
-WRITE8_MEMBER( dps1_state::portb8_w )
+void dps1_state::portb8_w(uint8_t data)
 {
 }
 
 // set A8-15
-WRITE8_MEMBER( dps1_state::portba_w )
+void dps1_state::portba_w(uint8_t data)
 {
 	m_dma_adr = (data << 8) | (m_dma_adr & 0xff);
 }
 
 // set A0-7
-WRITE8_MEMBER( dps1_state::portbc_w )
+void dps1_state::portbc_w(uint8_t data)
 {
 	m_dma_adr = (m_dma_adr & 0xff00) | data;
 }
 
 // disable eprom
-WRITE8_MEMBER( dps1_state::portbe_w )
+void dps1_state::portbe_w(uint8_t data)
 {
 	membank("bankr0")->set_entry(0); // point at ram
 }
 
 // read 8 front-panel switches
-READ8_MEMBER( dps1_state::portff_r )
+uint8_t dps1_state::portff_r()
 {
 	return 0x0e;
 }
 
 // write to 8 leds
-WRITE8_MEMBER( dps1_state::portff_w )
+void dps1_state::portff_w(uint8_t data)
 {
 }
 

@@ -121,8 +121,8 @@ public:
 	void d6809(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( term_w );
+	uint8_t term_r();
+	void term_w(uint8_t data);
 	void kbd_put(u8 data);
 
 	void mem_map(address_map &map);
@@ -135,14 +135,14 @@ private:
 	required_device<floppy_connector> m_floppy0;
 };
 
-READ8_MEMBER( d6809_state::term_r )
+uint8_t d6809_state::term_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( d6809_state::term_w )
+void d6809_state::term_w(uint8_t data)
 {
 	if ((data > 0) && (data < 0x80))
 		m_terminal->write(data);

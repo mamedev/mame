@@ -713,11 +713,11 @@ WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 {
 	switch(data)
 	{
-		case 0x00:  dynax_blit_romregion_w(space, 0, 0);    return;
-		case 0x01:  dynax_blit_romregion_w(space, 0, 1);    return;
-		case 0x80:  dynax_blit_romregion_w(space, 0, 2);    return;
-		case 0x81:  dynax_blit_romregion_w(space, 0, 3);    return;
-		case 0x82:  dynax_blit_romregion_w(space, 0, 4);    return; // mjcomv1
+		case 0x00:  dynax_blit_romregion_w(0);    return;
+		case 0x01:  dynax_blit_romregion_w(1);    return;
+		case 0x80:  dynax_blit_romregion_w(2);    return;
+		case 0x81:  dynax_blit_romregion_w(3);    return;
+		case 0x82:  dynax_blit_romregion_w(4);    return; // mjcomv1
 	}
 	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
@@ -1220,9 +1220,9 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 {
 	switch (data)
 	{
-		case 0x00:  dynax_blit_romregion_w(space, 0, 0);    return;
-		case 0x83:  dynax_blit_romregion_w(space, 0, 1);    return;
-		case 0x80:  dynax_blit_romregion_w(space, 0, 2);    return;
+		case 0x00:  dynax_blit_romregion_w(0);    return;
+		case 0x83:  dynax_blit_romregion_w(1);    return;
+		case 0x80:  dynax_blit_romregion_w(2);    return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }

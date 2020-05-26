@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
 
 
 
-WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
+void dynax_state::dynax_blit_romregion_w(uint8_t data)
 {
 	if (data < 8)
 		m_blitter->set_rom_bank(data);

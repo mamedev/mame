@@ -60,10 +60,10 @@ private:
 	uint32_t screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	DECLARE_READ16_MEMBER( dreambal_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( dreambal_protection_region_0_104_w );
+	uint16_t dreambal_protection_region_0_104_r(offs_t offset);
+	void dreambal_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( dreambal_eeprom_w )
+	void dreambal_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		if (data&0xfff8)
 		{
@@ -97,7 +97,7 @@ uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_in
 }
 
 
-READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
+uint16_t dreambal_state::dreambal_protection_region_0_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -106,7 +106,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
+void dreambal_state::dreambal_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;

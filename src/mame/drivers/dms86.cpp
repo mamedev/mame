@@ -54,10 +54,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 private:
-	DECLARE_WRITE8_MEMBER(m1_ack_w);
+	void m1_ack_w(u8 data);
 
-	DECLARE_READ16_MEMBER(port9a_r);
-	DECLARE_READ16_MEMBER(port9c_r);
+	u16 port9a_r();
+	u16 port9c_r();
 	void kbd_put(u8 data);
 
 	void io_map(address_map &map);
@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(dms86_state::nmi_w)
 }
 
 
-WRITE8_MEMBER(dms86_state::m1_ack_w)
+void dms86_state::m1_ack_w(u8 data)
 {
 	m_sio[0]->z80daisy_decode(data);
 	m_sio[1]->z80daisy_decode(data);
@@ -86,14 +86,14 @@ WRITE8_MEMBER(dms86_state::m1_ack_w)
 }
 
 
-READ16_MEMBER(dms86_state::port9a_r)
+u16 dms86_state::port9a_r()
 {
 	return m_term_data ? 0x40 : 0;
 }
 
-READ16_MEMBER(dms86_state::port9c_r)
+u16 dms86_state::port9c_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

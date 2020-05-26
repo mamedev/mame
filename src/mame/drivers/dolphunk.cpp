@@ -106,9 +106,9 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
+	uint8_t port07_r();
+	void port00_w(offs_t offset, uint8_t data);
+	void port06_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	void dauphin_io(address_map &map);
 	void dauphin_mem(address_map &map);
@@ -129,18 +129,18 @@ READ_LINE_MEMBER( dauphin_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( dauphin_state::port00_w )
+void dauphin_state::port00_w(offs_t offset, uint8_t data)
 {
 	m_display->matrix(1<<offset, data);
 }
 
-WRITE8_MEMBER( dauphin_state::port06_w )
+void dauphin_state::port06_w(uint8_t data)
 {
 	m_speaker_state ^=1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( dauphin_state::port07_r )
+uint8_t dauphin_state::port07_r()
 {
 	uint8_t keyin, i, data = 0x40;
 

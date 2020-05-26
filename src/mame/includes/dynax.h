@@ -104,7 +104,7 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	void dynax_blit_dest_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
+	void dynax_blit_romregion_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrollx_w);
 	DECLARE_WRITE8_MEMBER(dynax_extra_scrolly_w);
 

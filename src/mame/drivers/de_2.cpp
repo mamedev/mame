@@ -58,7 +58,7 @@ private:
 	void de_2_map(address_map &map);
 	void de_2_audio_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(sample_w);
+	void sample_w(uint8_t data);
 	void pia34_pa_w(uint8_t data);
 	void type2alpha3_pia34_pa_w(uint8_t data);
 	void alpha3_pia34_pa_w(uint8_t data);
@@ -77,13 +77,13 @@ private:
 	void lamp1_w(uint8_t data) { }
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { } // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
+	void sol2_w(uint8_t data) { } // solenoids 8-15
+	void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(sample_bank_w);
+	uint8_t sound_latch_r();
+	void sample_bank_w(uint8_t data);
 
 	// devcb callbacks
 	uint8_t display_r(offs_t offset);
@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 }
 
 // 6821 PIA at 0x2100
-WRITE8_MEMBER( de_2_state::sol3_w )
+void de_2_state::sol3_w(uint8_t data)
 {
 }
 
@@ -410,18 +410,18 @@ void de_2_state::alpha3_pia34_pa_w(uint8_t data)
 
 
 // Sound board
-WRITE8_MEMBER(de_2_state::sample_w)
+void de_2_state::sample_w(uint8_t data)
 {
 	m_sample_data = data;
 }
 
-READ8_MEMBER( de_2_state::sound_latch_r )
+uint8_t de_2_state::sound_latch_r()
 {
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( de_2_state::sample_bank_w )
+void de_2_state::sample_bank_w(uint8_t data)
 {
 	static constexpr uint8_t prescale[4] = { msm5205_device::S96_4B, msm5205_device::S48_4B, msm5205_device::S64_4B, 0 };
 

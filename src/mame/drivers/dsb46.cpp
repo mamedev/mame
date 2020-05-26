@@ -50,7 +50,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port1a_w);
+	void port1a_w(uint8_t data);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
 	required_device<z80_device> m_maincpu;
@@ -94,7 +94,7 @@ void dsb46_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dsb46_state::port1a_w )
+void dsb46_state::port1a_w(uint8_t data)
 {
 	membank("read")->set_entry(data & 1);
 }

@@ -456,15 +456,15 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(sda5708_reset);
-	DECLARE_WRITE8_MEMBER(sda5708_clk);
+	void sda5708_reset(uint8_t data);
+	void sda5708_clk(uint8_t data);
 	void write_pa(uint8_t data);
 
 	void dbox_map(address_map &map);
 
 #if LOCALFLASH
-	DECLARE_READ16_MEMBER(sysflash_r);
-	DECLARE_WRITE16_MEMBER(sysflash_w);
+	uint16_t sysflash_r(offs_t offset);
+	void sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 private:
 	uint16_t * m_sysflash;
 	uint32_t m_sf_mode;
@@ -492,11 +492,11 @@ void dbox_state::machine_reset()
 }
 
 // TODO: Hookup the reset latch correctly
-WRITE8_MEMBER (dbox_state::sda5708_reset){
+void dbox_state::sda5708_reset(uint8_t data) {
 	LOGDISPLAY("%s - not implemented\n", FUNCNAME);
 }
 
-WRITE8_MEMBER (dbox_state::sda5708_clk){
+void dbox_state::sda5708_clk(uint8_t data) {
 	LOGDISPLAY("%s\n", FUNCNAME);
 	m_display->sdclk_w(CLEAR_LINE);
 	m_display->data_w((0x80 & data) != 0 ? ASSERT_LINE : CLEAR_LINE);
@@ -511,7 +511,7 @@ void dbox_state::write_pa(uint8_t data) {
 #if LOCALFLASH
 /* Local emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallel */
 /* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
-WRITE16_MEMBER (dbox_state::sysflash_w){
+void dbox_state::sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
 
 	/*Data bits DQ15–DQ8 are don’t cares for unlock and command cycles.*/
@@ -549,7 +549,7 @@ WRITE16_MEMBER (dbox_state::sysflash_w){
 	}
 }
 
-READ16_MEMBER (dbox_state::sysflash_r){
+uint16_t dbox_state::sysflash_r(offs_t offset) {
 
   if (m_sf_mode == 0)
   {
