@@ -88,27 +88,12 @@ protected:
 
 	virtual void machine_reset() override;
 
-	/*
-	virtual DECLARE_READ16_MEMBER(porta_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_READ16_MEMBER(portb_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override
-	{
-	}
-	*/
-
 private:
 	int m_upperbase;
 
 	virtual DECLARE_READ16_MEMBER(cs0_r) override;
 
+	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 

@@ -34,17 +34,23 @@ public:
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
 		m_internalrom(*this, "internal"),
+		m_mainram(*this, "mainram"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_portc_in(*this),
+		m_portd_in(*this),
 		m_porta_out(*this),
+		m_portb_out(*this),
+		m_portc_out(*this),
+		m_portd_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
 		m_romtype(0),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_boot_mode(0),
-		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback)),
+		m_speedup_address(-1)
 	{
 	}
 
@@ -53,8 +59,12 @@ public:
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
+	auto portd_in() { return m_portd_in.bind(); }
 
 	auto porta_out() { return m_porta_out.bind(); }
+	auto portb_out() { return m_portb_out.bind(); }
+	auto portc_out() { return m_portc_out.bind(); }
+	auto portd_out() { return m_portd_out.bind(); }
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
@@ -80,6 +90,8 @@ public:
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
+	void install_speedup_hack(int address, int pc);
+
 protected:
 
 	virtual void device_start() override;
@@ -94,12 +106,17 @@ protected:
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 	optional_memory_region m_internalrom;
+	required_shared_ptr<u16> m_mainram;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
+	devcb_read16 m_portd_in;
 
 	devcb_write16 m_porta_out;
+	devcb_write16 m_portb_out;
+	devcb_write16 m_portc_out;
+	devcb_write16 m_portd_out;
 
 	uint16_t m_dma_params[8][4];
 
@@ -132,12 +149,16 @@ protected:
 	uint16_t m_786a_portb_direction;
 	uint16_t m_786b_portb_attribute;
 
+	uint16_t m_7872_portc_direction;
+	uint16_t m_7873_portc_attribute;
+
+	uint16_t m_787a_portd_direction;
+	uint16_t m_787b_portd_attribute;
+
 	uint16_t m_7870;
 
 	//uint16_t m_7871;
 
-	uint16_t m_7872_portc_direction;
-	uint16_t m_7873_portc_attribute;
 
 	uint16_t m_7882;
 	uint16_t m_7883;
@@ -230,6 +251,9 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
 
+	DECLARE_READ16_MEMBER(unkarea_782d_r);
+	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
+
 	// Port A
 	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
@@ -250,20 +274,25 @@ private:
 	DECLARE_READ16_MEMBER(ioarea_786b_portb_attribute_r);
 	DECLARE_WRITE16_MEMBER(ioarea_786b_portb_attribute_w);
 
-	DECLARE_READ16_MEMBER(unkarea_782d_r);
-	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
-
-
-
+	// Port C
 	DECLARE_READ16_MEMBER(ioarea_7870_portc_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7870_portc_w);
-
 	DECLARE_READ16_MEMBER(ioarea_7871_portc_buffer_r);
-
+	DECLARE_WRITE16_MEMBER(ioarea_7871_portc_buffer_w);
 	DECLARE_READ16_MEMBER(ioarea_7872_portc_direction_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7872_portc_direction_w);
 	DECLARE_READ16_MEMBER(ioarea_7873_portc_attribute_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7873_portc_attribute_w);
+
+	// Port D
+	DECLARE_READ16_MEMBER(ioarea_7878_portd_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7878_portd_w);
+	DECLARE_READ16_MEMBER(ioarea_7879_portd_buffer_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7879_portd_buffer_w);
+	DECLARE_READ16_MEMBER(ioarea_787a_portd_direction_r);
+	DECLARE_WRITE16_MEMBER(ioarea_787a_portd_direction_w);
+	DECLARE_READ16_MEMBER(ioarea_787b_portd_attribute_r);
+	DECLARE_WRITE16_MEMBER(ioarea_787b_portd_attribute_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7882_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7882_w);
@@ -330,6 +359,10 @@ private:
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
+	
+	DECLARE_READ16_MEMBER(speedup_hack_r);
+	int m_speedup_address;
+	int m_speedup_pc;
 };
 
 
