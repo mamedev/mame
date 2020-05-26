@@ -329,7 +329,7 @@ static INPUT_PORTS_START( tkmag220 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )   // set 0x0001 and 0x0002 on to get a test mode (some of the ROM banks fail their test, but dumps were repeatable, should be verified on another unit) 
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -396,7 +396,7 @@ ROM_START( tkmag220 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) )
+	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, BAD_DUMP CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) ) // several sections of ROM appear to be erased, and fails ROM test, some games have missing graphics pulling from those areas, others crash due to missing code
 ROM_END
 
 
@@ -448,40 +448,6 @@ void tkmag220_game_state::machine_reset()
 	m_maincpu->set_pal_sprites_hack(0x000);
 	m_maincpu->set_pal_back_hack(0x000);
 	m_maincpu->set_alt_tile_addressing_hack(1);
-
-/*
-000500: r1 = [7840]
-000502: r1 &= 01
-000503: [7840] = r1
-000505: r1 = [7841]
-000507: r1 = r1 & 00ff
-000509: [7841] = r1
-00050B: r1 = [787a]
-00050D: r1 = r1 & 7ff1
-00050F: r1 = r1 | 800e
-000511: [787a] = r1
-000513: r1 = [787b]
-000515: r1 = r1 & 7ff1
-000517: r1 = r1 | 800e
-000519: [787b] = r1
-00051B: r1 = [7878]
-00051D: r1 = r1 & 7ff1
-00051F: r1 = r1 | [0600]
-000521: [7878] = r1
-000523: r1 = 00ff
-000525: r1 -= 01
-000526: jne 0525
-000525: r1 -= 01
-000526: jne 0525
-
-   (loops for 506 instructions)
-
-000527: r1 = [fff7]
-000529: push r1, r1 to [sp]
-00052A: r1 = 00
-00052B: push r1, r1 to [sp]
-00052C: retf
-*/
 }
 
 void gormiti_game_state::machine_reset()
