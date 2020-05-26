@@ -133,7 +133,7 @@ void gaplus_base_state::starfield_init()
 	/* precalculate the star background */
 	/* this comes from the Galaxian hardware, Gaplus is probably different */
 
-	for (int y = 0; y < height; y++)
+	for (int y = 0; y < height - STARFIELD_CLIPPING_X * 2; y++)
 	{
 		for (int x = width - 1; x >= 0; x--)
 		{
@@ -164,7 +164,7 @@ void gaplus_base_state::starfield_init()
 				if (color && m_total_stars < MAX_STARS)
 				{
 					m_stars[m_total_stars].x = x;
-					m_stars[m_total_stars].y = y;
+					m_stars[m_total_stars].y = y + STARFIELD_CLIPPING_X;
 					m_stars[m_total_stars].col = color_base + color;
 					m_stars[m_total_stars].set = set++;
 
