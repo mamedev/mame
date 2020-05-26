@@ -870,7 +870,7 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	uint32_t palette_offset;
 
 	// different attribute use?
-	if (addressing_mode == 0) // smartfp, paccon
+	if (screenwidth == 320)
 	{
 		flip_x = (attr & TILE_X_FLIP);
 		bpp = attr & 0x0003;
@@ -879,9 +879,9 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	}
 	else
 	{
-		flip_x = 0;// (attr & TILE_X_FLIP); // wrlshunt, jak_totm, jak_s550 do not want this to be flip bit, gormiti does.  also configurable, or error in spriteram content?
+		flip_x = 0;// (attr & TILE_X_FLIP);
 		bpp = attr & 0x0003;
-		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0; // see flipx comment
+		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 

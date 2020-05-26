@@ -456,6 +456,7 @@ void gormiti_game_state::machine_reset()
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
+
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

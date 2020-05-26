@@ -34,6 +34,7 @@ public:
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
 		m_internalrom(*this, "internal"),
+		m_mainram(*this, "mainram"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_portc_in(*this),
@@ -48,7 +49,8 @@ public:
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_boot_mode(0),
-		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback)),
+		m_speedup_address(-1)
 	{
 	}
 
@@ -88,6 +90,8 @@ public:
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
+	void install_speedup_hack(int address, int pc);
+
 protected:
 
 	virtual void device_start() override;
@@ -102,6 +106,7 @@ protected:
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
 	optional_memory_region m_internalrom;
+	required_shared_ptr<u16> m_mainram;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -354,6 +359,10 @@ private:
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
+	
+	DECLARE_READ16_MEMBER(speedup_hack_r);
+	int m_speedup_address;
+	int m_speedup_pc;
 };
 
 

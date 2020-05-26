@@ -713,7 +713,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 
 void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {
-	map(0x000000, 0x006fff).ram();
+	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
 
 	// ######################################################################################################################################################################################
@@ -1625,6 +1625,9 @@ uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 	return val;
 }
 
+
+
+
 void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
 {
 	address_space& space = this->space(AS_PROGRAM);
@@ -1638,6 +1641,23 @@ void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
 	}
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::speedup_hack_r)
+{
+	u32 const pc = this->pc();
+
+	if (pc == m_speedup_pc)
+		this->spin_until_time(this->cycles_to_attotime(2000));
+
+	return m_mainram[m_speedup_address];
+}
+
+
+void sunplus_gcm394_base_device::install_speedup_hack(int address, int pc)
+{
+	this->space(AS_PROGRAM).install_read_handler(address, address, read16_delegate(*this, FUNC(sunplus_gcm394_base_device::speedup_hack_r)));
+	m_speedup_address = address;
+	m_speedup_pc = pc;
+}
 
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
