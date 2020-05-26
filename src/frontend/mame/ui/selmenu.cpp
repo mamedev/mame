@@ -572,11 +572,8 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 		reselect_last::set_driver(driver);
 	}
 
-	// Overwrite any old BIOS every time we launch
 	if (bios)
 		moptions.set_value(OPTION_BIOS, *bios, OPTION_PRIORITY_CMDLINE);
-	else
-		moptions.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);		
 
 	mame_machine_manager::instance()->schedule_new_driver(driver);
 	mui.machine().schedule_hard_reset();

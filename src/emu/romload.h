@@ -413,6 +413,9 @@ public:
 	/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
 	int knownbad() const { return m_knownbad; }
 
+	/* return true if the bios option doesn't match this driver */
+	bool biosmismatch() const { return m_biosmismatch; }
+
 	/* ----- disk handling ----- */
 
 	/* return a pointer to the CHD file associated with the given region */
@@ -458,6 +461,7 @@ private:
 	int                 m_warnings;           // warning count during processing
 	int                 m_knownbad;           // BAD_DUMP/NO_DUMP count during processing
 	int                 m_errors;             // error count during processing
+	int					m_biosmismatch;		  // BIOS option doesn't match this driver
 
 	int                 m_romsloaded;         // current ROMs loaded count
 	int                 m_romstotal;          // total number of ROMs to read

@@ -271,12 +271,7 @@ int mame_machine_manager::execute()
 		else
 		{
 			if (machine.exit_pending())
-			{
 				m_options.set_system_name("");
-				// In this case, we are going back to the __empty driver
-				// so we need to clear this here
-				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
-			}
 		}
 
 		if (machine.exit_pending() && (!started_empty || is_empty))

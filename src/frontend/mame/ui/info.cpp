@@ -180,12 +180,13 @@ machine_info::machine_info(running_machine &machine)
 //  text to the given buffer
 //-------------------------------------------------
 
-std::string machine_info::warnings_string() const
+std::string machine_info::warnings_string(bool first_time) const
 {
 	std::ostringstream buf;
 
-	// add a warning if any ROMs were loaded with warnings
-	if (m_machine.rom_load().warnings() > 0)
+	// Warn if bios mismatch and this is the first launch, or
+	// if any ROMs were loaded with warnings
+	if ((first_time && m_machine.rom_load().biosmismatch()) || (m_machine.rom_load().warnings() > 0))
 		buf << _("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
 
 	if (!m_machine.rom_load().software_load_warnings_message().empty())

@@ -330,7 +330,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		{
 		case 0:
 			if (show_warnings)
-				messagebox_text = machine_info().warnings_string();
+				messagebox_text = machine_info().warnings_string(first_time);
 			if (!messagebox_text.empty())
 			{
 				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
