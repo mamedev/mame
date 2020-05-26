@@ -38,8 +38,6 @@ namespace netlist
 
 		static inline constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
 
-		static inline constexpr std::size_t max_queue_size() { return 512; } // NOLINT
-
 		/// \brief constant startup gmin
 		///
 		/// This should be used during object creation to initialize
@@ -116,7 +114,7 @@ namespace netlist
 	///
 
 #if (NL_USE_MEMPOOL)
-	using nlmempool = plib::mempool;
+	using nlmempool = plib::mempool_arena;
 #else
 	using nlmempool = plib::aligned_arena;
 #endif
@@ -145,10 +143,10 @@ namespace netlist
 	} // namespace detail
 
 #if (PHAS_INT128)
-	using netlist_time = plib::ptime<std::int64_t, NETLIST_INTERNAL_RES>;
-	using netlist_time_ext = plib::ptime<INT128, NETLIST_INTERNAL_RES>;
+	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
+	using netlist_time_ext = plib::ptime<INT128, config::INTERNAL_RES::value>;
 #else
-	using netlist_time = plib::ptime<std::int64_t, NETLIST_INTERNAL_RES>;
+	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
 	using netlist_time_ext = netlist_time;
 #endif
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");

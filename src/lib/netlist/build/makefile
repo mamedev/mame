@@ -232,7 +232,7 @@ ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc clang-libc
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -242,7 +242,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc
 # PHONY
 #-------------------------------------------------
 
-.PHONY: clang clang-5 mingw doc native maketree depend $(DEPEND)
+.PHONY: clang clang-5 mingw doc native maketree $(DEPEND) depend 
 
 #-------------------------------------------------
 # all
@@ -287,7 +287,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -finline-limit=100 -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -finline-limit=100 -fpermissive -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
@@ -299,13 +299,25 @@ clang:
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
 
+clang-libc:
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-libc++ LD=clang++-libc++ OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+		-mllvm -inline-threshold=2000 \
+		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
+		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
+
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 nvcc:
-	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
-		OBJ=obj/nvcc CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda \
-		--expt-relaxed-constexpr --default-stream per-thread --restrict" \
+	$(MAKE) CC=/usr/local/cuda-10.2/bin/nvcc LD=/usr/local/cuda-10.2/bin/nvcc \
+		OBJ=obj/nvcc CEXTRAFLAGS="--std c++14 -x cu  -DNVCCBUILD=102 --expt-extended-lambda \
+		--expt-relaxed-constexpr --default-stream per-thread --restrict \
+		--ftemplate-depth 1024 \
+		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix

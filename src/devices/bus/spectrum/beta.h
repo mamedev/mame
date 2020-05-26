@@ -56,6 +56,10 @@ protected:
 	int m_romcs;
 	int m_romlatch;
 //  int m_masterportdisable;
+	u8 m_control;
+	bool m_motor_active;
+	void fdc_hld_w(int state);
+	void motors_control();
 
 	void fetch(offs_t offset);
 };

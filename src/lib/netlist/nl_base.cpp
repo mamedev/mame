@@ -39,11 +39,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl, const pstring &name)
-		: timed_queue<plib::pqentry_t<netlist_time_ext, net_t *>, false>(nlconst::max_queue_size())
+		: timed_queue<plib::pqentry_t<netlist_time_ext, net_t *>, false>(config::MAX_QUEUE_SIZE::value)
 		, netlist_object_t(nl, name)
 		, m_qsize(0)
-		, m_times(nlconst::max_queue_size())
-		, m_net_ids(nlconst::max_queue_size())
+		, m_times(config::MAX_QUEUE_SIZE::value)
+		, m_net_ids(config::MAX_QUEUE_SIZE::value)
 	{
 	}
 
@@ -484,7 +484,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		if (exec().stats_enabled())
-			m_stats = owner.make_object<stats_t>();
+			m_stats = owner.make_pool_object<stats_t>();
 	}
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -492,9 +492,10 @@ namespace netlist
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
+		//printf("owned device: %s\n", this->name().c_str());
 		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
 		if (exec().stats_enabled())
-			m_stats = owner.state().make_object<stats_t>();
+			m_stats = owner.state().make_pool_object<stats_t>();
 	}
 
 	void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -556,7 +557,7 @@ namespace netlist
 
 	device_t::device_t(netlist_state_t &owner, const pstring &name)
 	: base_device_t(owner, name)
-	, m_model(*this, "MODEL", pstring(NETLIST_DEFAULT_LOGIC_FAMILY))
+	, m_model(*this, "MODEL", pstring(config::DEFAULT_LOGIC_FAMILY()))
 	{
 		set_logic_family(state().setup().family_from_model(m_model()));
 		if (logic_family() == nullptr)

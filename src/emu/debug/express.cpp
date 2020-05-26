@@ -552,8 +552,8 @@ void symbol_table::notify_memory_modified()
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
-		if (symtable->m_memory_modified != nullptr)
-			m_memory_modified();
+		if (symtable->m_memory_modified)
+			symtable->m_memory_modified();
 }
 
 

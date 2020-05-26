@@ -339,7 +339,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_num_t<nl_fptype> *m_param;
+	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_for_device_timer;

@@ -24,6 +24,7 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/ptimed_queue.h"
 #include "plib/ptypes.h"
 
 #include "nl_errstr.h"
@@ -480,12 +481,13 @@ namespace netlist
 				try
 				{
 					auto ret(store().find(obj));
-					nl_assert(ret != store().end());
+					if (ret == store().end())
+						return nullptr;
 					return &ret->second;
 				}
 				catch (...)
 				{
-					nl_assert_always(true, "exception in property_store_t.get()");
+					plib::terminate("exception in property_store_t.get()");
 					return static_cast<value_type *>(nullptr);
 				}
 			}
@@ -574,7 +576,7 @@ namespace netlist
 
 			// to ease template design
 			template<typename T, typename... Args>
-			unique_pool_ptr<T> make_object(Args&&... args);
+			unique_pool_ptr<T> make_pool_object(Args&&... args);
 
 		private:
 			netlist_t & m_netlist;
@@ -747,15 +749,15 @@ namespace netlist
 			}
 
 			void push_to_queue(const netlist_time &delay) noexcept;
-			constexpr bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+			NVCC_CONSTEXPR bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
-			void update_devs() noexcept;
+			inline void update_devs() noexcept;
 
 			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			constexpr bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
+			NVCC_CONSTEXPR bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
 
 			bool has_connections() const noexcept { return !m_core_terms.empty(); }
@@ -784,7 +786,7 @@ namespace netlist
 		protected:
 
 			// only used for logic nets
-			constexpr netlist_sig_t Q() const noexcept { return m_cur_Q; }
+			NVCC_CONSTEXPR netlist_sig_t Q() const noexcept { return m_cur_Q; }
 
 			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
@@ -1367,7 +1369,7 @@ namespace netlist
 
 		param_rom_t(core_device_t &device, const pstring &name);
 
-		ST operator[] (std::size_t n) const noexcept { return m_data[n]; }
+		const ST & operator[] (std::size_t n) const noexcept { return m_data[n]; }
 	protected:
 		void changed() noexcept override
 		{
@@ -1752,7 +1754,7 @@ namespace netlist
 		family_collection_type &family_cache() { return m_family_cache; }
 
 		template<typename T, typename... Args>
-		unique_pool_ptr<T> make_object(Args&&... args)
+		unique_pool_ptr<T> make_pool_object(Args&&... args)
 		{
 			return m_pool.make_unique<T>(std::forward<Args>(args)...);
 		}
@@ -2371,7 +2373,7 @@ namespace netlist
 			for (auto &p : m_list_active)
 			{
 				p.set_copied_input(sig);
-				if ((p.terminal_state() & mask))
+				if ((p.terminal_state() & mask) != 0)
 					p.run_delegate();
 			}
 		}
@@ -2475,9 +2477,9 @@ namespace netlist
 	}
 
 	template<typename T, typename... Args>
-	inline unique_pool_ptr<T> detail::netlist_object_t::make_object(Args&&... args)
+	inline unique_pool_ptr<T> detail::netlist_object_t::make_pool_object(Args&&... args)
 	{
-		return state().make_object<T>(std::forward<Args>(args)...);
+		return state().make_pool_object<T>(std::forward<Args>(args)...);
 	}
 
 	inline void param_t::update_param() noexcept
@@ -2545,7 +2547,7 @@ namespace netlist
 	template<class O, class C, typename... Args>
 	void base_device_t::create_and_register_subdevice(O &owner, const pstring &name, unique_pool_ptr<C> &dev, Args&&... args)
 	{
-		dev = state().make_object<C>(owner, name, std::forward<Args>(args)...);
+		dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);
 	}
 
 	inline netlist_state_t &detail::device_object_t::state() noexcept

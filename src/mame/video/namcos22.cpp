@@ -1936,9 +1936,7 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 	// prepare spot
 	bool spot_enabled = (m_spotram_enable & 1) && (m_chipselect & 0xc000);
 	int spot_factor = (m_spot_factor < 0x100) ? 0 : m_spot_factor & 0xff;
-	rgbaint_t spot_color(0, spot_factor, spot_factor, spot_factor);
 	int spot_palbase = m_text_palbase >> 8 & 3; // src[x] >> 8 & 3
-	int spot_shift = 0;
 
 	// prepare fader
 	bool fade_enabled = (m_mixer_flags & 2) && m_screen_fade_factor;
@@ -1959,16 +1957,11 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 				if (spot_enabled)
 				{
 					// remap pen
-					int spot_data = m_spotram[(src[x] << 2 | spot_palbase) & 0x3ff];
-					pen = spot_data;
-
-					if (pen >= 0x80)
-					{
-						spot_shift = spot_data >> 8 & 7;
-						rgb.set(spot_color);
-					}
-					else
+					pen = m_spotram[(src[x] << 2 | spot_palbase) & 0x3ff];
+					if (pen < 0x80)
 						rgb.set(pens[pen | m_text_palbase]);
+					else if (prival != 6)
+						continue;
 				}
 				else
 				{
@@ -1976,17 +1969,23 @@ void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb
 					pen = src[x];
 				}
 
-				// apply fade
-				if (fade_enabled)
-					rgb.blend(fade_color, fade_factor);
-
 				// spot pen becomes brightness factor
 				if (spot_enabled && pen >= 0x80)
-					rgb.blend(rgbaint_t(dest[x]), (~pen & 0x7f) >> spot_shift);
+				{
+					rgb.set(rgbaint_t(dest[x]));
+					u16 factor = (spot_factor * (pen & 0x7f)) >> 7;
+					rgb.scale_imm_and_clamp(0x100 - factor);
+				}
+				else
+				{
+					// apply fade
+					if (fade_enabled)
+						rgb.blend(fade_color, fade_factor);
 
-				// otherwise apply alpha
-				else if (alpha_factor && ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13)))
-					rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
+					// apply alpha
+					if (alpha_factor && ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13)))
+						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
+				}
 
 				dest[x] = rgb.to_rgba();
 			}

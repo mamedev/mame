@@ -8,7 +8,6 @@
 /// \file poptions.h
 ///
 
-#include "plists.h"
 #include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"

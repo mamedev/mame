@@ -38,11 +38,11 @@ namespace plib {
 
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<!P::is_stateless>::type>
+	struct arena_deleter<P, T, typename std::enable_if<!P::has_static_deallocator>::type>
 	{
-		using arena_storage_type = P *;
+		using arena_storage_type = P;
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		constexpr arena_deleter(arena_storage_type *a = nullptr) noexcept
 		: m_a(a) { }
 
 		template<typename U, typename = typename
@@ -57,15 +57,15 @@ namespace plib {
 			m_a->deallocate(p, sizeof(T));
 		}
 	//private:
-		arena_storage_type m_a;
+		arena_storage_type *m_a;
 	};
 
 	template <typename P, typename T>
-	struct arena_deleter<P, T, typename std::enable_if<P::is_stateless>::type>
+	struct arena_deleter<P, T, typename std::enable_if<P::has_static_deallocator>::type>
 	{
 		using arena_storage_type = P;
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		constexpr arena_deleter(arena_storage_type *a = nullptr) noexcept
 		{
 			plib::unused_var(a);
 		}
@@ -247,6 +247,19 @@ namespace plib {
 			m_a.deallocate(p, n);
 		}
 
+		template<typename U, typename... Args>
+		void construct(U* p, Args&&... args)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+			::new (static_cast<void *>(p)) U(std::forward<Args>(args)...);
+		}
+
+		template<typename U>
+		void destroy(U* p)
+		{
+			p->~U();
+		}
+
 		template <class AR1, class T1, std::size_t A1, class AR2, class T2, std::size_t A2>
 		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs, // NOLINT
 			const arena_allocator<AR2, T2, A2>& rhs) noexcept;
@@ -277,7 +290,7 @@ namespace plib {
 
 	struct aligned_arena
 	{
-		static constexpr const bool is_stateless = true;
+		static constexpr const bool has_static_deallocator = true;
 		using size_type = std::size_t;
 
 		template <class T, size_type ALIGN = alignof(T)>
@@ -339,7 +352,7 @@ namespace plib {
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
-				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(*this));
+				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(this));
 			}
 			catch (...)
 			{
@@ -459,11 +472,11 @@ namespace plib {
 	//============================================================
 
 	// FIXME: needs a separate file
-	template <class T, std::size_t ALIGN = PALIGN_VECTOROPT>
-	class aligned_vector : public std::vector<T, aligned_allocator<T, ALIGN>>
+	template <typename T, std::size_t ALIGN = PALIGN_VECTOROPT, typename A = aligned_allocator<T, ALIGN>>
+	class aligned_vector : public std::vector<T, A>
 	{
 	public:
-		using base = std::vector<T, aligned_allocator<T, ALIGN>>;
+		using base = std::vector<T, A>;
 
 		using reference = typename base::reference;
 		using const_reference = typename base::const_reference;
@@ -480,6 +493,7 @@ namespace plib {
 		{
 			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];
 		}
+
 		constexpr const_reference operator[](size_type i) const noexcept
 		{
 			return assume_aligned_ptr<T, ALIGN>(&(base::operator[](0)))[i];

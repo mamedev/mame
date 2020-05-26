@@ -75,7 +75,14 @@ namespace netlist
 		// make sure we parse macro library entries
 		// FIXME: this could be done here if e.g. f
 		//        would have an indication that this is macro element.
-		f->macro_actions(*this, name);
+		if (f->type() == factory::element_type::MACRO)
+		{
+			namespace_push(name);
+			include(f->name());
+			namespace_pop();
+		}
+		//f->macro_actions(*this, name);
+
 		pstring key = build_fqn(name);
 		if (device_exists(key))
 		{
@@ -98,7 +105,7 @@ namespace netlist
 				{
 					if (ptok == ptok_end)
 					{
-						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 						//break;
@@ -120,7 +127,7 @@ namespace netlist
 				{
 					if (ptok == params_and_connections.end())
 					{
-						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						auto err = MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 					}
@@ -135,7 +142,7 @@ namespace netlist
 			}
 			if (ptok != params_and_connections.end())
 			{
-				auto err(MF_PARAM_COUNT_EXCEEDED_2(name, params_and_connections.size()));
+				MF_PARAM_COUNT_EXCEEDED_2 err(name, params_and_connections.size());
 				log().fatal(err);
 				throw nl_exception(err);
 			}
@@ -1307,9 +1314,9 @@ public:
 			case family_type::CMOS:
 			case family_type::NMOS:
 			case family_type::PMOS:
-				return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+				return anetlist.make_pool_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 		}
-		return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+		return anetlist.make_pool_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
 
 	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *proxied) const override
@@ -1322,9 +1329,9 @@ public:
 			case family_type::CMOS:
 			case family_type::NMOS:
 			case family_type::PMOS:
-				return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+				return anetlist.make_pool_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 		}
-		return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+		return anetlist.make_pool_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 private:
 	family_type m_family_type;

@@ -90,12 +90,12 @@ FLOPPY_FORMATS_END
 
 ROM_START(beta128)
 	ROM_REGION(0x4000, "rom", 0)
-	ROM_DEFAULT_BIOS("trd504")
+	ROM_DEFAULT_BIOS("trd503")
 	ROM_SYSTEM_BIOS(0, "trd501", "TR-DOS v5.01")
 	ROMX_LOAD("trd501.rom", 0x0000, 0x4000, CRC(3e3cdd4c) SHA1(8303ba0cc79daa6c04cd1e6ce27e8b6886a3f0de), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "trd503", "TR-DOS v5.03")
 	ROMX_LOAD("trd503.rom", 0x0000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "trd504", "TR-DOS v5.04")
+	ROM_SYSTEM_BIOS(2, "trd504", "TR-DOS v5.04 (hack)")
 	ROMX_LOAD("trd504.rom", 0x0000, 0x4000, CRC(ba310874) SHA1(05e55e37df8eee6c68601ba9cf6c92195852ce3f), ROM_BIOS(2))
 ROM_END
 
@@ -106,6 +106,7 @@ ROM_END
 void spectrum_beta128_device::device_add_mconfig(machine_config &config)
 {
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->hld_wr_callback().set(FUNC(spectrum_beta128_device::fdc_hld_w));
 	//KR1818VG93(config, m_fdc, 4_MHz_XTAL / 4);
 
 	FLOPPY_CONNECTOR(config, "fdc:0", beta_floppies, "525qd", spectrum_beta128_device::floppy_formats).enable_sound(true);
@@ -141,6 +142,8 @@ spectrum_beta128_device::spectrum_beta128_device(const machine_config &mconfig, 
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_exp(*this, "exp")
 	, m_switch(*this, "SWITCH")
+	, m_control(0)
+	, m_motor_active(false)
 {
 }
 
@@ -151,6 +154,8 @@ spectrum_beta128_device::spectrum_beta128_device(const machine_config &mconfig, 
 void spectrum_beta128_device::device_start()
 {
 	save_item(NAME(m_romcs));
+	save_item(NAME(m_control));
+	save_item(NAME(m_motor_active));
 }
 
 //-------------------------------------------------
@@ -164,6 +169,8 @@ void spectrum_beta128_device::device_reset()
 		m_romcs = 1;
 	else
 		m_romcs = 0;
+
+	m_control = 0;
 }
 
 //**************************************************************************
@@ -224,6 +231,7 @@ void spectrum_beta128_device::iorq_w(offs_t offset, uint8_t data)
 		case 0xff:
 			floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
+			m_control = data;
 			m_fdc->set_floppy(floppy);
 			if (floppy)
 				floppy->ss_w(BIT(data, 4) ? 0 : 1);
@@ -232,18 +240,8 @@ void spectrum_beta128_device::iorq_w(offs_t offset, uint8_t data)
 			// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
 			//m_fdc->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
 
-			if (BIT(data, 2) == 0) // reset
-			{
-				m_fdc->reset();
-				if (floppy)
-					floppy->mon_w(ASSERT_LINE);
-			}
-			else
-			{
-				// TODO: implement correct motor control, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-				if (floppy)
-				 floppy->mon_w(CLEAR_LINE);
-			}
+			m_fdc->mr_w(BIT(data, 2));
+			motors_control();
 			break;
 		}
 	}
@@ -280,5 +278,26 @@ INPUT_CHANGED_MEMBER(spectrum_beta128_device::magic_button)
 	else
 	{
 		m_slot->nmi_w(CLEAR_LINE);
+	}
+}
+
+void spectrum_beta128_device::fdc_hld_w(int state)
+{
+	// TODO: HLD connected to RDY pin (current wd_fdc have no external RDY control)
+	m_motor_active = state;
+	motors_control();
+}
+
+void spectrum_beta128_device::motors_control()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		floppy_image_device* floppy = m_floppy[i]->get_device();
+		if (!floppy)
+			continue;
+		if (m_motor_active && (m_control & 3) == i)
+			floppy->mon_w(CLEAR_LINE);
+		else
+			floppy->mon_w(ASSERT_LINE);
 	}
 }

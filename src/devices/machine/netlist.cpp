@@ -217,7 +217,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_fptype cur = m_in();
+		netlist::nl_fptype cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
@@ -234,7 +234,7 @@ private:
 	netlist::analog_input_t m_in;
 	std::unique_ptr<netlist_mame_analog_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<nl_fptype> m_last;
+	netlist::state_var<netlist::nl_fptype> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -456,7 +456,7 @@ protected:
 
 	NETLIB_UPDATEI()
 	{
-		nl_fptype val = m_in() * m_mult() + m_offset();
+		netlist::nl_fptype val = m_in() * m_mult() + m_offset();
 		sound_update(exec().time());
 		/* ignore spikes */
 		if (plib::abs(val) < 32767.0)
@@ -535,9 +535,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			m_channels[i].m_param_name = anetlist.make_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
-			m_channels[i].m_param_mult = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
-			m_channels[i].m_param_offset = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
+			m_channels[i].m_param_name = anetlist.make_pool_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
+			m_channels[i].m_param_mult = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
+			m_channels[i].m_param_offset = anetlist.make_pool_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
 	}
 
@@ -557,7 +557,7 @@ protected:
 			{
 				if (m_channels[i].m_buffer == nullptr)
 					break; // stop, called outside of stream_update
-				const nl_fptype v = m_channels[i].m_buffer[m_pos];
+				const netlist::nl_fptype v = m_channels[i].m_buffer[m_pos];
 				m_channels[i].m_param->set(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
 			}
 		}
@@ -808,7 +808,7 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
+	auto dev = nlstate.make_pool_object<NETLIB_NAME(analog_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);
@@ -841,7 +841,7 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 	if (owner()->has_running_machine())
 		m_delegate.resolve();
 
-	auto dev = nlstate.make_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
+	auto dev = nlstate.make_pool_object<NETLIB_NAME(logic_callback)>(nlstate, dname);
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dname, std::move(dev));
 	nlstate.parser().register_link(dname + ".IN", pin);

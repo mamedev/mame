@@ -116,7 +116,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.ni = in;                                                          \
 		desc.no = out;                                                         \
 		desc.family = "";                                                      \
-		auto props(netlist::factory::properties(def_params, PSOURCELOC()));
+		netlist::factory::properties props(def_params, PSOURCELOC());
 
 #define TT_HEAD(x) \
 		desc.desc.emplace_back(x);
@@ -146,6 +146,7 @@ namespace netlist
 
 	class core_device_t;
 	class param_t;
+	class nlparse_t;
 	class setup_t;
 	class netlist_state_t;
 	class netlist_t;
@@ -172,8 +173,8 @@ namespace netlist
 
 	struct param_ref_t
 	{
-		param_ref_t() : m_device(nullptr), m_param(nullptr) {}
-		param_ref_t(core_device_t &device, param_t &param)
+		param_ref_t() noexcept : m_device(nullptr), m_param(nullptr) {}
+		param_ref_t(core_device_t &device, param_t &param) noexcept
 		: m_device(&device)
 		, m_param(&param)
 		{ }
@@ -184,7 +185,7 @@ namespace netlist
 		const core_device_t &device() const noexcept { return *m_device; }
 		param_t &param() const noexcept { return *m_param; }
 
-		bool is_valid() const { return (m_device != nullptr) && (m_param != nullptr); }
+		bool is_valid() const noexcept { return (m_device != nullptr) && (m_param != nullptr); }
 	private:
 		core_device_t *m_device;
 		param_t *m_param;

@@ -23,32 +23,34 @@ TODO:
 - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
 - where is the steering wheel motor torque output for dirtdash? Answer: The data comes from the Serial Port on the MOTHER PCB at J2 Pin 7 /TXD
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
-      it used to be much worse with the legacy_poly_manager
+  it used to be much worse with the legacy_poly_manager
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - improve ss22 lighting:
-      + mountains in alpinr2b selection screen
-      + ridgerac waving flag shadowing
-      + cybrcomm enemies should flash white when you shoot them, probably lighting related
-      + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
-- improve ss22 spot:
-      + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
-      + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
-      + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
+  + mountains in alpinr2b selection screen
+  + ridgerac waving flag shadowing
+  + cybrcomm enemies should flash white when you shoot them, probably lighting related
+  + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
+- improve ss22 spot, only used in dirtdash and testmode, not understood well:
+  + should probably be done before global fade
+  + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
+  + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
+  + what is the high bit in spot_factor for? not used anywhere
+  + high bits in spot_data are unknown, maybe blend mode
+  + testmode looks wrong, spot_data high bits is 0 here (2 in dirtdash)
 - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snow melting effect)
 - support for text layer video partial updates after posirq, alpinesa does raster effects on it
-- alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
+- alpha blended sprite/poly with priority over alpha blended text doesn't work right
 - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
-- cybrcycc speed dial needle is missing
+- cybrcycc speed dial needle polygon is missing
 - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
-- ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
-      czram contents is rather odd here and partly cleared (probably the cause?):
-       $0000-$0d7f - gradual increase from $00-$7c
-       $0d80-$0fff - $73, huh, why lower?
-       $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
-       $1a00-$0dff - $77
-       $1e00-$1fff - $78
-
+- ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
+  czram contents is rather odd here and partly cleared (probably the cause?):
+  + $0000-$0d7f - gradual increase from $00-$7c
+  + $0d80-$0fff - $73, huh, why lower?
+  + $1000-$19ff - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
+  + $1a00-$0dff - $77
+  + $1e00-$1fff - $78
 - lots of smaller issues
 
 ***********************************************************************************************************

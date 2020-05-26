@@ -63,7 +63,7 @@ namespace netlist
 					if (D::ASYNC::value && !CLRQ && (m_cnt>0))
 					{
 						m_cnt = 0;
-						m_Q.push(m_cnt, D::tCLR::value(0));
+						m_Q.push(0, D::tCLR::value(0));
 					}
 				}
 				m_RC.push(m_ent && (m_cnt == D::MAXCNT::value), D::tRC::value(0));
@@ -78,7 +78,6 @@ namespace netlist
 				}
 				else
 				{
-					//const auto cnt = (m_loadq ? (m_cnt + 1) & D::MAXCNT::value : m_abcd);
 					const auto cnt = (m_loadq ? rollover<D::MAXCNT::value>(m_cnt + 1) : m_abcd);
 					m_RC.push(m_ent && (cnt == D::MAXCNT::value), D::tRC::value(0));
 					m_Q.push(cnt, D::tLDCNT::value(0));

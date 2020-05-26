@@ -8,7 +8,6 @@
 /// \file nl_convert.h
 ///
 
-#include "plib/plists.h"
 #include "plib/pstring.h"
 #include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
