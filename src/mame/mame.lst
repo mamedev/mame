@@ -3261,6 +3261,8 @@ autoc15                         // 1988 Autocue 1500
 reutapm                         // 1985 Reuters APM Board
 torchf                          // 1982 Torch CF240
 torchh                          // 1982 Torch CH240
+torch301                        // 1984 Torch Model 301
+torch725                        // 1984 Torch Model 725
 
 @source:bbcbc.cpp
 bbcbc                           // 1985 BBC Bridge Companion

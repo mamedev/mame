@@ -392,6 +392,8 @@ public:
 
 	void torchf(machine_config &config);
 	void torchh(machine_config &config);
+	void torch301(machine_config &config);
+	void torch725(machine_config &config);
 };
 
 
