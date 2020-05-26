@@ -109,6 +109,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_starfield_control[4];
 	int m_total_stars;
+	int m_starfield_framecount;
 	struct star m_stars[MAX_STARS];
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
