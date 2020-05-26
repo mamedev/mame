@@ -599,6 +599,14 @@ ROM_START(theraid)
 	ROM_LOAD("theraid.snd", 0x0000, 0x2000, CRC(e33f8363) SHA1(e7f251c334b15e12b1eb7e079c2e9a5f64338052))
 ROM_END
 
+ROM_START(theraida)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("ph_6_1a0.u13", 0x0000, 0x2000, CRC(cc2b1872) SHA1(e61071450cc6b0fa5e6297f75bca0391039dca10))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("mrd_1a0.u3",   0x0000, 0x2000, CRC(e33f8363) SHA1(e7f251c334b15e12b1eb7e079c2e9a5f64338052))
+ROM_END
+
 /*-------------------------------------------------------------------
 / 11/84 UFO-X
 /-------------------------------------------------------------------*/
@@ -765,8 +773,9 @@ ROM_START(msdisco)
 	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
-
-// Terrific Lake (Sport Matic)
+/*-------------------------------------------------------------------
+/ ??/87 Terrific Lake (Sport Matic)
+/-------------------------------------------------------------------*/
 ROM_START(terrlake)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("jtl_2a3.u9", 0x0000, 0x2000, CRC(f6d3cedd) SHA1(31e0daac1e9215ad0e1557d31d520745ead0f396))
@@ -781,6 +790,7 @@ GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, R
 GAME(1983,  megaatona, megaaton, megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton (alternate set)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1984,  nautilus,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Nautilus",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1984,  theraid,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1984,  theraida,  theraid,  play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid (alternate set)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1984,  ufo_x,     0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "UFO-X",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1984,  kz26,      0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "KZ-26",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1985,  rock2500,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Rock 2500",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
