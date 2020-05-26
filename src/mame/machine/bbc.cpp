@@ -1443,7 +1443,7 @@ void bbc_state::init_bbc()
 	/* light pen strobe detect (not emulated) */
 	m_via6522_0->write_cb2(1);
 
-	m_monitortype = monitor_type_t::COLOUR;
+	update_palette(monitor_type::COLOUR);
 }
 
 void bbc_state::init_ltmp()
@@ -1451,14 +1451,14 @@ void bbc_state::init_ltmp()
 	init_bbc();
 
 	/* LTM machines used a 9" Hantarex MT3000 green monitor */
-	m_monitortype = monitor_type_t::GREEN;
+	update_palette(monitor_type::GREEN);
 }
 
 void bbc_state::init_cfa()
 {
 	init_bbc();
 
-	m_monitortype = monitor_type_t::GREEN;
+	update_palette(monitor_type::GREEN);
 }
 
 
@@ -1672,6 +1672,18 @@ void bbc_state::setup_device_roms()
 void bbc_state::machine_start()
 {
 	setup_device_roms();
+
+	/* register save states */
+	save_item(NAME(m_vula_ctrl));
+	save_item(NAME(m_vula_palette));
+	save_item(NAME(m_vula_palette_lookup));
+	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
+	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
+	save_item(STRUCT_MEMBER(m_vnula, left_blank));
+	save_item(STRUCT_MEMBER(m_vnula, disable));
+	save_item(STRUCT_MEMBER(m_vnula, flash));
+	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
+	save_item(STRUCT_MEMBER(m_vnula, palette_write));
 }
 
 void bbc_state::machine_reset()

@@ -105,12 +105,12 @@ public:
 		, m_bbcconfig(*this, "BBCCONFIG")
 	{ }
 
-	enum monitor_type_t
+	enum class monitor_type
 	{
-		COLOUR = 0,
-		BLACKWHITE = 1,
-		GREEN = 2,
-		AMBER = 3
+		COLOUR,
+		BLACKWHITE,
+		GREEN,
+		AMBER
 	};
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -152,7 +152,6 @@ public:
 
 	DECLARE_VIDEO_START(bbc);
 
-	void bbc_colours(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);
@@ -173,7 +172,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_palette);
+	void update_palette(monitor_type monitor_type);
 
 	void update_acia_rxd();
 	void update_acia_dcd();
@@ -218,6 +218,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -265,7 +266,6 @@ protected:
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
 
-	int m_monitortype;      // monitor type (colour, green, amber)
 	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
@@ -355,27 +355,25 @@ protected:
 	int m_vsync;
 
 	uint8_t m_teletext_latch;
+	uint8_t m_vula_ctrl;
 
-	struct {
-		// control register
-		int master_cursor_size;
-		int width_of_cursor;
-		int clock_rate_6845;
-		int characters_per_line;
-		int teletext_normal_select;
-		int flash_colour_select;
-		// inputs
-		int de;
-	} m_video_ula;
+	struct video_nula {
+		uint8_t palette_mode;
+		uint8_t horiz_offset;
+		uint8_t left_blank;
+		uint8_t disable;
+		uint8_t attr_mode;
+		uint8_t attr_text;
+		uint8_t flash[8];
+		uint8_t palette_byte;
+		uint8_t palette_write;
+	} m_vnula;
 
 	int m_pixels_per_byte;
 	int m_cursor_size;
 
-	int m_videoULA_palette0[16];
-	int m_videoULA_palette1[16];
-	int *m_videoULA_palette_lookup;
-
-	rgb_t out_rgb(rgb_t entry);
+	uint8_t m_vula_palette[16];
+	uint8_t m_vula_palette_lookup[16];
 
 	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();

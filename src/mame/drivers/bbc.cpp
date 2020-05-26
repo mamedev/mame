@@ -782,36 +782,31 @@ static INPUT_PORTS_START(bbcbp_links)
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
+INPUT_CHANGED_MEMBER(bbc_state::reset_palette)
 {
-	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_vnula.disable = !BIT(m_bbcconfig.read_safe(0), 3);
+	if (m_vnula.disable)
+		update_palette((monitor_type)(m_bbcconfig.read_safe(0) & 0x03));
+	else
+		update_palette(monitor_type::COLOUR);
 }
 
 
 static INPUT_PORTS_START(bbc_config)
 	PORT_START("BBCCONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, monitor_changed, 0)
+	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0) PORT_CONDITION("BBCCONFIG", 0x08, EQUALS, 0x00)
 	PORT_CONFSETTING(    0x00, "Colour")
 	PORT_CONFSETTING(    0x01, "B&W")
 	PORT_CONFSETTING(    0x02, "Green")
 	PORT_CONFSETTING(    0x03, "Amber")
-	PORT_CONFNAME( 0x04, 0x00, "Econet fitted")
+	PORT_CONFNAME( 0x04, 0x00, "Econet")
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
 	PORT_CONFSETTING(    0x04, DEF_STR( Yes ))
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START(bbcb_config)
-	PORT_START("BBCCONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, monitor_changed, 0)
-	PORT_CONFSETTING(    0x00, "Colour")
-	PORT_CONFSETTING(    0x01, "B&W")
-	PORT_CONFSETTING(    0x02, "Green")
-	PORT_CONFSETTING(    0x03, "Amber")
-	PORT_CONFNAME( 0x04, 0x00, "Econet fitted")
+	PORT_CONFNAME( 0x08, 0x00, "VideoNuLA") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, reset_palette, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( No ))
-	PORT_CONFSETTING(    0x04, DEF_STR( Yes ))
+	PORT_CONFSETTING(    0x08, DEF_STR( Yes ))
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START(bbca)
 	PORT_INCLUDE(bbc_config)
@@ -820,7 +815,7 @@ static INPUT_PORTS_START(bbca)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcb)
-	PORT_INCLUDE(bbcb_config)
+	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcb_links)
@@ -937,7 +932,7 @@ void bbc_state::bbca(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
 
-	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
@@ -1421,7 +1416,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
 
-	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
