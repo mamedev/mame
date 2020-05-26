@@ -1699,6 +1699,7 @@ void lua_engine::initialize()
  * device.spaces[] - device address spaces table (k=name, v=addr_space)
  * device.state[] - device state entries table (k=name, v=device_state_entry)
  * device.items[] - device save state items table (k=name, v=index)
+ * device.roms[] - device rom entry table (k=name, v=rom_entry)
  */
 
 	auto device_type = sol().registry().create_simple_usertype<device_t>("new", sol::no_constructor);
@@ -1752,6 +1753,13 @@ void lua_engine::initialize()
 					table[name] = i;
 				}
 			}
+			return table;
+		}));
+	device_type.set("roms", sol::property([this](device_t &dev) {
+			sol::table table = sol().create_table();
+			for(auto rom : dev.rom_region_vector())
+				if(!rom.name().empty())
+					table[rom.name()] = rom;
 			return table;
 		}));
 	sol().registry().set_usertype("device", device_type);
@@ -2762,6 +2770,26 @@ void lua_engine::initialize()
 	dev_space_type.set("is_visible", &device_state_entry::visible);
 	dev_space_type.set("is_divider", &device_state_entry::divider);
 	sol().registry().set_usertype("dev_space", dev_space_type);
+
+
+/*  rom_entry library
+ *
+ * manager:machine().devices[device_tag].roms[rom]
+ *
+ * rom:name()
+ * rom:hashdata() - see hash.h
+ * rom:offset()
+ * rom:length()
+ * rom:flags() - see romentry.h
+ */
+
+	auto rom_entry_type = sol().registry().create_simple_usertype<rom_entry>("new", sol::no_constructor);
+	rom_entry_type.set("name", &rom_entry::name);
+	rom_entry_type.set("hashdata", &rom_entry::hashdata);
+	rom_entry_type.set("offset", &rom_entry::get_offset);
+	rom_entry_type.set("length", &rom_entry::get_length);
+	rom_entry_type.set("flags", &rom_entry::get_flags);
+	sol().registry().set_usertype("rom_entry", rom_entry_type);
 
 
 /*  memory_manager library
