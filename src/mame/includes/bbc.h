@@ -21,7 +21,6 @@
 #include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
-#include "machine/i8271.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
 #include "machine/mc146818.h"
@@ -92,7 +91,6 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
 		, m_fdc(*this, "fdc")
-		, m_i8271(*this, "i8271")
 		, m_wd1770(*this, "wd1770")
 		, m_wd1772(*this, "wd1772")
 		, m_rom(*this, "romslot%u", 0U)
@@ -187,8 +185,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	int get_analogue_input(int channel_number);
 	void upd7002_eoc(int data);
@@ -207,7 +203,6 @@ public:
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
 	void bbcb_mem(address_map &map);
-	void bbcb_nofdc_mem(address_map &map);
 
 	void init_bbc();
 	void init_ltmp();
@@ -253,7 +248,6 @@ protected:
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<bbc_fdc_slot_device> m_fdc;
-	optional_device<i8271_device> m_i8271;
 	optional_device<wd1770_device> m_wd1770;
 	optional_device<wd1772_device> m_wd1772;
 	optional_device_array<bbc_romslot_device, 16> m_rom;

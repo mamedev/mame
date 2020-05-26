@@ -168,17 +168,6 @@ void bbc_state::bbcb_mem(address_map &map)
 	map(0x0000, 0x7fff).rw(FUNC(bbc_state::bbc_ram_r), FUNC(bbc_state::bbc_ram_w));                                   //    0000-7fff                 Regular RAM
 	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbc_paged_r), FUNC(bbc_state::bbc_paged_w));                               //    8000-bfff                 Paged ROM/RAM
 	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_romsel_r), FUNC(bbc_state::bbc_romsel_w));                             // W: fe30-fe3f  84LS161        Paged ROM selector
-	map(0xfe80, 0xfe83).mirror(0x08).m(m_i8271, FUNC(i8271_device::map));                                             //    fe80-fe83  8271 FDC       Floppy disc controller
-	map(0xfe84, 0xfe87).mirror(0x08).rw(m_i8271, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));             //    fe84-fe9f  8271 FDC       Floppy disc controller
-}
-
-
-void bbc_state::bbcb_nofdc_mem(address_map &map)
-{
-	bbc_base(map);
-	map(0x0000, 0x7fff).rw(FUNC(bbc_state::bbc_ram_r), FUNC(bbc_state::bbc_ram_w));                                   //    0000-7fff                 Regular RAM
-	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbc_paged_r), FUNC(bbc_state::bbc_paged_w));                               //    8000-bfff                 Paged ROM/RAM
-	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_romsel_r), FUNC(bbc_state::bbc_romsel_w));                             // W: fe30-fe3f  84LS161        Paged ROM selector
 	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe84-fe9f  8271 FDC       Floppy disc controller
 }
 
@@ -346,7 +335,6 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 		if (m_adlc) m_adlc->reset();
 		if (m_rtc) m_rtc->reset();
 		if (m_fdc) m_fdc->reset();
-		if (m_i8271) m_i8271->reset();
 		if (m_wd1770) m_wd1770->reset();
 		if (m_wd1772) m_wd1772->reset();
 		if (m_1mhzbus) m_1mhzbus->reset();
@@ -1006,7 +994,7 @@ void bbc_state::bbcb(machine_config &config)
 {
 	bbca(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_nofdc_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* addressable latch */
 	m_latch->q_out_cb<1>().set(FUNC(bbc_state::speech_rsq_w));
@@ -1093,39 +1081,23 @@ void bbc_state::bbcb(machine_config &config)
 void bbc_state::bbcb_de(machine_config &config)
 {
 	bbcb(config);
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* fdc */
-	I8271(config, m_i8271, 16_MHz_XTAL / 8);
-	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
-	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
-	config.device_remove("fdc");
-
-	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	m_fdc->set_fixed(true);
+	m_fdc->set_insert_rom(false);
 }
 
 
 void bbc_state::bbcb_us(machine_config &config)
 {
 	bbcb(config);
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* video hardware */
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
 
 	/* fdc */
-	I8271(config, m_i8271, 16_MHz_XTAL / 8);
-	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
-	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
-	config.device_remove("fdc");
-
-	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	m_fdc->set_fixed(true);
+	m_fdc->set_insert_rom(false);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_flop_us");
@@ -1142,18 +1114,10 @@ void bbc_state::bbcb_us(machine_config &config)
 void torch_state::torchf(machine_config &config)
 {
 	bbcb(config);
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* fdc */
-	I8271(config, m_i8271, 16_MHz_XTAL / 8);
-	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
-	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
-	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
-	config.device_remove("fdc");
-
-	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats, true).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	m_fdc->set_fixed(true);
+	m_fdc->set_insert_rom(false);
 
 	/* Torch Z80 Communicator co-processor */
 	m_tube->set_default_option("zep100");
@@ -1164,8 +1128,9 @@ void torch_state::torchf(machine_config &config)
 void torch_state::torchh(machine_config &config)
 {
 	torchf(config);
+
 	/* fdc */
-	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	//m_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 10MB or 21MB HDD */
 	//m_1mhzbus->set_default_option("sasi");

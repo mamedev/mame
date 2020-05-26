@@ -1279,32 +1279,6 @@ WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
 
 
 /**************************************
-   i8271 disc control function
-***************************************/
-
-
-WRITE_LINE_MEMBER(bbc_state::motor_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->mon_w(!state);
-	if (floppy1) floppy1->mon_w(!state);
-
-	m_i8271->ready_w(!state);
-}
-
-WRITE_LINE_MEMBER(bbc_state::side_w)
-{
-	floppy_image_device *floppy0 = m_i8271->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_i8271->subdevice<floppy_connector>("1")->get_device();
-
-	if (floppy0) floppy0->ss_w(state);
-	if (floppy1) floppy1->ss_w(state);
-}
-
-
-/**************************************
    WD1770 disc control function
 ***************************************/
 
@@ -1548,7 +1522,7 @@ void bbc_state::setup_device_roms()
 	}
 
 	/* insert ROM for FDC devices (BBC Model B only), always place into romslot 0 */
-	if (m_fdc && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
+	if (m_fdc && m_fdc->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
 	{
 		if (exp_device->memregion("dfs_rom"))
 		{
@@ -1632,15 +1606,15 @@ void bbc_state::setup_device_roms()
 	}
 
 	/* insert ROM(s) for Tube devices */
-	if (m_tube && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
+	if (m_tube && m_tube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_intube && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
+	if (m_intube && m_intube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
-	if (m_extube && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
+	if (m_extube && m_extube->insert_rom() && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
 	{
 		insert_device_rom(exp_device->memregion("exp_rom"));
 	}
