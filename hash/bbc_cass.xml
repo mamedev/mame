@@ -321,7 +321,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>9 Classic Card and Board Games Vol.1</description>
 		<year>198?</year>
 		<publisher>Database Publications</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="33879">
 				<rom name="9classiccardandboardgamesvol1_be(database).uef" size="33879" crc="446f66f5" sha1="b179c2ed7ce9534e8e74b8069ab956dfed3fb6eb" />
@@ -333,7 +333,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>9 Classic Card and Board Games Vol.2</description>
 		<year>1986</year>
 		<publisher>Database Publications</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="38434">
 				<rom name="9classiccardandboardgames2_be(database).uef" size="38434" crc="6eae50a8" sha1="58aa71564cb815c2bb2a6c216ac0c155261d989e" />
@@ -345,7 +345,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Abyss</description>
 		<year>1984</year>
 		<publisher>CCS</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9031">
 				<rom name="abyss_be(1984)(ccs).uef" size="9031" crc="2288e891" sha1="5819e83b7166520b127800d5c8b7d250c49d2406" />
@@ -717,7 +717,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>American Suds</description>
 		<year>1986</year>
 		<publisher>Riverdale</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="10645">
@@ -748,7 +748,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Anarchy Zone</description>
 		<year>1988</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18846">
 				<rom name="anarchyzone_be(1988)(atlantis).uef" size="18846" crc="cc9200b9" sha1="2820ad843d1a20e41c4a4295bd18e50de6309a3c" />
@@ -772,7 +772,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Annabel Gray</description>
 		<year>198?</year>
 		<publisher>Anthony Lee</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12533">
@@ -792,7 +792,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Answer Back - General Knowledge Junior Quiz</description>
 		<year>1984</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="44893">
 				<rom name="answerbackgeneralknowledgejuniorquiz_be(1984)(kosmos).uef" size="44893" crc="4c6402be" sha1="8312ef689067999f3a3fecad4dc49a5462a55024" />
@@ -804,7 +804,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Answer Back - General Knowledge Senior Quiz</description>
 		<year>1984</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="50459">
 				<rom name="answerbackgeneralknowledgeseniorquiz_be(1984)(kosmos).uef" size="50459" crc="10af9fb4" sha1="1eb71cd63b8046831dcbae01cbfffa105620c99b" />
@@ -816,7 +816,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Answer Back - Sports Quiz</description>
 		<year>1984</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="49263">
 				<rom name="answerbacksportsquiz_be(1984)(kosmos).uef" size="49263" crc="6880855b" sha1="636114d1ac2935cfef8046e2a462db5132fe8636" />
@@ -1153,7 +1153,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Auf Wiedersehen Pet</description>
 		<year>1984</year>
 		<publisher>Tynesoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8547">
 				<rom name="aufwiedersehenpet_be(1984)(tynesoft).uef" size="8547" crc="d96e694a" sha1="f8a2488eb33f492bdfc6c39e15d1aeac1e12144d" />
@@ -1178,7 +1178,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>A Vous La France!</description>
 		<year>1986</year>
 		<publisher>BBC Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="186960">
 				<rom name="avouslafrance_be.uef" size="186960" crc="be118e9b" sha1="26a0f5bb2dc892c41216f9360507936dc23e4d7c" />
@@ -1202,7 +1202,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Axe of Kolt</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="14406">
@@ -1408,7 +1408,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Battlefields</description>
 		<year>1985</year>
 		<publisher>BBC Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17693">
 				<rom name="battlefields_be(bbc).uef" size="17693" crc="72254a84" sha1="521cea8eec76908f66ec79e163223d6a79a7d7fc" />
@@ -1576,7 +1576,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Beebtrek</description>
 		<year>1983</year>
 		<publisher>Software For All</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7235">
 				<rom name="beebtrek_be(softwareforall).uef" size="7235" crc="0d25509e" sha1="512adbb3cb8d1846f06fe9b4474e35ef711bd752" />
@@ -1792,7 +1792,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>MP Software</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20769">
 				<rom name="bluedragon_run_be(1983)(mpsoft).uef" size="20769" crc="3d66b1d7" sha1="cfe35122482ceebaa294ecc071f694c07ba1e523" />
@@ -2075,7 +2075,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Bridge Master</description>
 		<year>1983</year>
 		<publisher>J.Keyne</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Tape A"/>
 			<dataarea name="cass" size="5041">
@@ -2755,7 +2755,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Chess (Superior Software)</description>
 		<year>1984</year>
 		<publisher>Superior Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10559">
 				<rom name="chess_be(superior).uef" size="10559" crc="fcad0b1c" sha1="85748bfdb78eb4c6e2a09bb88c655cbef8dd16be" />
@@ -2840,7 +2840,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Chukee The Upgrade</description>
 		<year>1984</year>
 		<publisher>Bit Twiddlers</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4162">
 				<rom name="chukee(1984)(bittwiddlers).uef" size="4162" crc="4007f957" sha1="bf381f48f88eeae829a2ec416bb30f14ac8b2013" />
@@ -2938,7 +2938,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>Melbourne House</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15315">
 				<rom name="classicadventure_run_be(1984)(melbourne).uef" size="15315" crc="490129e0" sha1="5ba069331d5816d2785a0ccf5fcea38d2d0f2b1b" />
@@ -3306,7 +3306,8 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Confuzion</description>
 		<year>1985</year>
 		<publisher>Incentive</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<!-- Re-release in 198? by Alternative is identical -->
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8743">
 				<rom name="confuzion_be(1985)(incentive).uef" size="8743" crc="989ddd27" sha1="5b189c0a1e23705bd39c3df7bc05f714142daf85" />
@@ -3366,7 +3367,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Cops n' Robbers</description>
 		<year>1987</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7661">
 				<rom name="copsnrobbers_be(1987)(atlantis).uef" size="7661" crc="8a7a9026" sha1="5576140bfb362192b6203ecd9b423bccdafa6d25" />
@@ -3617,7 +3618,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Crazy Er*bert</description>
 		<year>1987</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8008">
 				<rom name="crazyerbert_be(1987)(alternative).uef" size="8008" crc="2cd641c3" sha1="4f72dd4df5beab04e13e5dee6ab23bc7dcaf2945" />
@@ -3667,7 +3668,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Creepy Cave</description>
 		<year>1987</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11752">
 				<rom name="creepycave_be(1987)(atlantis).uef" size="11752" crc="d835f9b9" sha1="5a0080e2b1fc0a4b2355789db0fb43089a16ec61" />
@@ -3692,7 +3693,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Cricket</description>
 		<year>1986</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11598">
 				<rom name="cricket_be.uef" size="11598" crc="1fb0a611" sha1="6d9bd3a2c9b4bfbc0b16a482afaff08b03472947"/>
@@ -3705,7 +3706,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>Acornsoft/Ivan Berg</publisher>
 		<info name="release" value="XBX02" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="56292">
 				<rom name="crimedetectionquiz_be(1983)(ivanberg).uef" size="56292" crc="1af0f115" sha1="805e3c0cef96a294851909a25c5b9feb35dbcc06" />
@@ -3987,7 +3988,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>Acornsoft/Ivan Berg</publisher>
 		<info name="release" value="XBX08" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18349">
 				<rom name="datinggame_be(1983)(ivanberg).uef" size="18349" crc="d85ba7f9" sha1="f876136f0025e31dc41cda98e63c188b5ee6f868" />
@@ -3999,7 +4000,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Dead or Alive</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7921">
 				<rom name="deadoralive_be(1988)(alterative).uef" size="7921" crc="683d7f2f" sha1="198a16a7bb3d909b8a3fb3dd82bc7a8cf219d556" />
@@ -4160,7 +4161,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Depot Master Finsbury Park</description>
 		<year>1989</year>
 		<publisher>Ashley Greenup</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7563">
 				<rom name="depotmasterfinsburypark_be(ashleygreenup).uef" size="7563" crc="797fde02" sha1="b5b57309815c113ccdf9016f1fd7a79ce526f8cf" />
@@ -4172,7 +4173,8 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Depot Master Old Oak Common</description>
 		<year>1989</year>
 		<publisher>Ashley Greenup</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<!-- Re-release in 198? by Dee-Kay is identical -->
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7612">
 				<rom name="depotmasteroldoakcommon_be(ashleygreenup).uef" size="7612" crc="bdb72a54" sha1="02d9cc85959937597ec80e88a819e2ae6f37bf95" />
@@ -4336,7 +4338,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Dodgy Geezers</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="59343">
 				<rom name="dodgygeezers_be(1986)(melbourne).uef" size="59343" crc="fdd7636c" sha1="64c0b66637de07ffad66d7f5ee30127c3b7e9d41" />
@@ -4360,7 +4362,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Dominoes (Garland)</description>
 		<year>1984</year>
 		<publisher>Garland Computing</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10583">
 				<rom name="dominoes_be(garland).uef" size="10583" crc="4734ec77" sha1="b98482401f571ece2a3e91846520172f70424fe3" />
@@ -4445,7 +4447,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Draughts (Computer Concepts)</description>
 		<year>1983</year>
 		<publisher>Computer Concepts</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9292">
 				<rom name="draughts_be(computerconcepts).uef" size="9292" crc="3bb34dc1" sha1="b2fb6cb6cf82a3d615f6ad41670029e8ca984a7d" />
@@ -4551,7 +4553,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Druids Circle</description>
 		<year>1984</year>
 		<publisher>Holl-Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9266">
 				<rom name="druidscircle_e(1984)(hollsoft).uef" size="9266" crc="9154b8a4" sha1="de5b7eff6294131a7e74c85cca3d11513982643c" />
@@ -4794,7 +4796,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Empire</description>
 		<year>1985</year>
 		<publisher>Shards Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7886">
 				<rom name="empire_be(1985)(shards).uef" size="7886" crc="ed04cf14" sha1="16840742a068bbfce34f166b13bae83041a35132" />
@@ -4934,7 +4936,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Ewgeebez</description>
 		<year>1984</year>
 		<publisher>Software Projects</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8365">
 				<rom name="ewgeebez(1984)(softwareprojects).uef" size="8365" crc="495b927c" sha1="ef58977e38d4b18c1dae3d5c6cb8ccefcfc093b4" />
@@ -4977,7 +4979,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Eye of Zolton</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14263">
 				<rom name="eyeofzolton_be(softek).uef" size="14263" crc="164729a6" sha1="0a8e7b9a15abec0295222fef1db87317cb798fd4" />
@@ -5008,7 +5010,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Factfile 500 - Junior General Knowledge</description>
 		<year>1985</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25992">
 				<rom name="factfile500-juniorgeneralknowledge_be(1985)(kosmos).uef" size="25992" crc="a5edf090" sha1="01e27f9d9c2e7f99fb4b3e906b53f71e8b0f5390" />
@@ -5020,7 +5022,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Factfile 500 - Senior General Knowledge</description>
 		<year>1985</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="29897">
 				<rom name="factfile500-seniorgeneralknowledge_be(1985)(kosmos).uef" size="29897" crc="886c83fc" sha1="5c973c02de2e9898a4548eaf90b33dcfa3991578" />
@@ -5032,7 +5034,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Factfile 500 - Super Sports</description>
 		<year>1985</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="28369">
 				<rom name="factfile500-supersports_be(1985)(kosmos).uef" size="28369" crc="f6e390b5" sha1="586da7830c814185297954500ecb87a306c6f83b" />
@@ -5124,7 +5126,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fantasia Diamond</description>
 		<year>1984</year>
 		<publisher>Hewson Consultants</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14023">
 				<rom name="fantasiadiamond_be(1984)(hewson).uef" size="14023" crc="05abfffb" sha1="b71f2539c76be388560585ccca602b36d0b0d831" />
@@ -5257,7 +5259,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fire Island</description>
 		<year>1984</year>
 		<publisher>Holl-Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10298">
 				<rom name="fireisland_e(1984)(hollsoft).uef" size="10298" crc="7875509b" sha1="6f9ba787788f55ba793d645f6d2aee2c3a3597cf" />
@@ -5294,7 +5296,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>First Moves Chess</description>
 		<year>1985</year>
 		<publisher>Longman</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14409">
 				<rom name="firstmoveschess_be(1985)(longman).uef" size="14409" crc="5bc94acc" sha1="4c0b105738ac00b7f373b8d5cf014d82e32c73ff" />
@@ -5330,7 +5332,8 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Five Doctors</description>
 		<year>1984</year>
 		<publisher>DW Gore</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<!-- "The Five Doctors & The Twin Dilemma" by W Games (1984) is identical -->
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13324">
 				<rom name="fivedoctors_be(1984)(dwgore).uef" size="13324" crc="4008f86c" sha1="1937a5c4899ec572cdab9411d50fd45afd7db3fa" />
@@ -5373,7 +5376,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Five Stones of Anadon</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15460">
 				<rom name="fivestonesofanadon_be(1983)(softek).uef" size="15460" crc="eb54926a" sha1="4472b402898e587f47cb1ab8cc651380186b5217" />
@@ -5666,7 +5669,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fruit Catcher</description>
 		<year>198?</year>
 		<publisher>Live Wire</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9366">
 				<rom name="fruitcatcher_be(livewire).uef" size="9366" crc="f3d7a43b" sha1="c6c6057ffed14fd2c1de3a9f534fbc33455292d7" />
@@ -5759,7 +5762,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>FSS1 - Super Spy Flint</description>
 		<year>1983</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8271">
 				<rom name="fss1-superspyflint_be(potter).uef" size="8271" crc="7604bb35" sha1="91a7555f8095642bf7fd7e24eaad34a15bf4dea1" />
@@ -5771,7 +5774,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>FSS2 - Return of Flint</description>
 		<year>1983</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10006">
 				<rom name="fss2-returnofflint_be(potter).uef" size="10006" crc="b6a90c4d" sha1="5e0f7cc6d8e80337186d53f33e6f080f1878363e" />
@@ -5783,7 +5786,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>FSS3 - Flint Strikes Back</description>
 		<year>1983</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7821">
 				<rom name="fss3-flintstrikesback_be(potter).uef" size="7821" crc="4f648c4d" sha1="f35d01cd0da0763a2f4b678898c361900ba1a201" />
@@ -5919,7 +5922,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Galadriel in Distress</description>
 		<year>1984</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7558">
 				<rom name="galadrielindistress_be(1984)(potter).uef" size="7558" crc="bcdb4599" sha1="527b957bec5b23535fb6cf975e9858ee0e23a4ee" />
@@ -5993,7 +5996,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Galilee</description>
 		<year>1985</year>
 		<publisher>Shards Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19971">
 				<rom name="galilee_be(1985)(shards).uef" size="19971" crc="d1649b13" sha1="06e8d9c1ac749cc6313eaec078ba135158bed16d" />
@@ -6240,7 +6243,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Golden Figurine</description>
 		<year>1988</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12784">
 				<rom name="goldenfigurine_be(1988)(atlantis).uef" size="12784" crc="6e3b3194" sha1="339bf02618299562ab796f198ac177a0fc1ad284" />
@@ -6288,7 +6291,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Golf (Yes Software)</description>
 		<year>1986</year>
 		<publisher>Yes Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4664">
 				<rom name="golf_be(1986)(yes).uef" size="4664" crc="4ec31ff5" sha1="973afe143cb87f2859a45be4a5a56e69d9ee5ac3" />
@@ -6361,7 +6364,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Adventure Creator</description>
 		<year>1986</year>
 		<publisher>Incentive</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1: AC, QS, ADVMAN"/>
 			<dataarea name="cass" size="11147">
@@ -6404,7 +6407,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Great Wall</description>
 		<year>1984</year>
 		<publisher>Artic</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12961">
 				<rom name="greatwall_be(1984)(artic).uef" size="12961" crc="9cea38f1" sha1="049626d50624f041df80af11e272c8e2e552efda" />
@@ -6448,6 +6451,18 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		</part>
 	</software>
 
+	<software name="gridiron">
+		<description>Grid Iron</description>
+		<year>1988</year>
+		<publisher>Top Ten</publisher>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7803">
+				<rom name="gridiron_be(1988)(topten).uef" size="7803" crc="28567486" sha1="aef086d4b2fb114dd17f43596d7a02a5a3c4118e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gridironm" cloneof="gridiron">
 		<description>Grid Iron (Authors Master Copy)</description>
 		<year>1988</year>
@@ -6464,22 +6479,10 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Grid Iron 2</description>
 		<year>1991</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11437">
 				<rom name="gridiron2_be(1991)(alternative).uef" size="11437" crc="dabeea7f" sha1="ee92a4eff2e97e4a73f5616050a1db84599bff22" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gridiron">
-		<description>Grid Iron</description>
-		<year>1988</year>
-		<publisher>Top Ten</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7803">
-				<rom name="gridiron_be(1988)(topten).uef" size="7803" crc="28567486" sha1="aef086d4b2fb114dd17f43596d7a02a5a3c4118e" />
 			</dataarea>
 		</part>
 	</software>
@@ -6524,7 +6527,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Gunfighter</description>
 		<year>1991</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14858">
 				<rom name="gunfighter_be.uef" size="14858" crc="f7c32692" sha1="79f0c00f8c5edcd32309662e964cc54edb4e6a6d" />
@@ -6620,7 +6623,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Hampstead</description>
 		<year>1984</year>
 		<publisher>Melbourne House</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18337">
 				<rom name="hampstead_be(1984)(melbourne).uef" size="18337" crc="336d96d2" sha1="71aa2ee910251b5d9839b2f0a6094efde2b5340b" />
@@ -6668,7 +6671,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Harlequin</description>
 		<year>1984</year>
 		<publisher>Kansas</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10106">
 				<rom name="harlequin(1984)(kansas).uef" size="10106" crc="86515ca0" sha1="8818e12fcd96ab25dd3173183c0f4f9f75212718" />
@@ -6742,7 +6745,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Hercules</description>
 		<year>1987</year>
 		<publisher>The Power House</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6500">
 				<rom name="hercules_be(powerhouse).uef" size="6500" crc="412929cd" sha1="26a8508a498d497406c48550efb63528ffc8fb2c" />
@@ -6755,7 +6758,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1988</year>
 		<publisher>Larsoft</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11052">
 				<rom name="hex_run_be(1988)(larsoft).uef" size="11052" crc="a33ae13d" sha1="74082078172915c34f79fb7d149ba572a033b6da" />
@@ -6767,7 +6770,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Hexagram of Trutania Valley</description>
 		<year>1986</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10702">
 				<rom name="hexagramoftrutaniavalley_be(1986)(potter).uef" size="10702" crc="7ca1379e" sha1="91a21f1b7aa7e668c946dd1c1bb2700ced749ba9" />
@@ -6804,7 +6807,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>Acornsoft/Ivan Berg</publisher>
 		<info name="release" value="XBX04" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="49953">
 				<rom name="historyquiz_be(1983)(ivanberg).uef" size="49953" crc="749b31c3" sha1="b50d2993ea9394c3225c93297d6e794f92a2ba63" />
@@ -7063,7 +7066,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Hunkidory</description>
 		<year>1986</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12720">
 				<rom name="hunkidory_be(1986)(bugbyte).uef" size="12720" crc="99441907" sha1="38f1d5550739b1fa19917f5b306c6f5a8ee8af79" />
@@ -7143,7 +7146,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Ice Hockey</description>
 		<year>1986</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7056">
 				<rom name="icehockey_be(1986)(bugbyte).uef" size="7056" crc="ce41bdee" sha1="9e70f094b749395e08e34477c9b5638c50b0d980" />
@@ -7168,7 +7171,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Identify Europe</description>
 		<year>198?</year>
 		<publisher>Kosmos</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11576">
 				<rom name="identifyeurope_be(kosmos).uef" size="11576" crc="d274b8df" sha1="bd8465fea4785d5250a96a4e95a407e8efc380ce" />
@@ -7180,7 +7183,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Identikit</description>
 		<year>1984</year>
 		<publisher>Stell</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5726">
 				<rom name="identikit_be(1984)(stell).uef" size="5726" crc="c3a01ad5" sha1="9a20789222750d4339eef8ca60ba453c9267111a" />
@@ -7253,7 +7256,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Inca Treasure</description>
 		<year>1989</year>
 		<publisher>DW Gore</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10510">
 				<rom name="incatreasure_be(1989)(dwgore).uef" size="10510" crc="511498a3" sha1="ebf37a02fd955635a3b002a59283e51609fe473d" />
@@ -7265,7 +7268,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Indoor Soccer</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15358">
 				<rom name="indoorsoccer_be(1988)(alternative).uef" size="15358" crc="6b9695d8" sha1="28fda895a1d093e03558ce64863e1b911185b9a7" />
@@ -7325,7 +7328,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Inner Space</description>
 		<year>1986</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10752">
 				<rom name="innerspace_be(potter).uef" size="10752" crc="6aff0cbb" sha1="27db31f925b5a662bdc01a641b0fc40832abbc9d" />
@@ -7337,7 +7340,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>In Search of Atahaulpa</description>
 		<year>1988</year>
 		<publisher>Anthony Lee</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12851">
@@ -7392,7 +7395,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Inu</description>
 		<year>19??</year>
 		<publisher>MRJ</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3475">
 				<rom name="inu_be(mrj).uef" size="3475" crc="e358fdbc" sha1="40264fc65bba2224ff2212f63451b1cf01406235" />
@@ -7671,7 +7674,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Johnny Reb</description>
 		<year>1983</year>
 		<publisher>Lothlorien</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8604">
 				<rom name="johnnyreb_be(1983)(lothlorien).uef" size="8604" crc="203794a7" sha1="d58e4253d08b19cf080b642edd03cc5c1a4f9033" />
@@ -7744,7 +7747,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Kane</description>
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10525">
 				<rom name="kane_be(1986)(nastertronic).uef" size="10525" crc="0513803f" sha1="71026356066afd4d8a954ef599e8b22c3eb0fee6" />
@@ -7816,7 +7819,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Ket Trilogy</description>
 		<year>1985</year>
 		<publisher>Incentive</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="42920">
 				<rom name="kettrilogy_be(1985)(incentive).uef" size="42920" crc="38c8fa1e" sha1="2e98321f9dedfa7210c274b4033017b2b74dc39e" />
@@ -7876,7 +7879,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Killapede</description>
 		<year>1986</year>
 		<publisher>Players</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7792">
 				<rom name="killapede_be(1986)(players).uef" size="7792" crc="d8a5cb96" sha1="3b693f3e8cace3a30f937736db3c931728ffffb7" />
@@ -7999,7 +8002,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Know Your Own PSI-Q</description>
 		<year>1984</year>
 		<publisher>Mirrorsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18158">
 				<rom name="knowyourownpsi-q_be(1984)(mirrorsoft).uef" size="18158" crc="eccd0da5" sha1="59a8ff08fc0a3ed5d1aa3cd1b4474f3d0da2b117" />
@@ -8208,7 +8211,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>League Challenge</description>
 		<year>1986</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8706">
 				<rom name="leaguechallenge_be(1986)(atlantis).uef" size="8706" crc="156c9881" sha1="c28b55db37eb3514f220e9987a0197a825b39b62" />
@@ -8412,7 +8415,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Look Sharp!</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Old MacDonalds Farm"/>
 			<dataarea name="cass" size="7497">
@@ -8620,7 +8623,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Magnetic Moon</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12224">
@@ -8839,7 +8842,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Mendips Stone</description>
 		<year>1986</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7945">
 				<rom name="mendipsstone_be(1986)(deekay).uef" size="7945" crc="bc59d28b" sha1="8ccaff6be99b48c0a827e20414dd6d4ccb8b5fa4" />
@@ -8933,7 +8936,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Microball</description>
 		<year>1986</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6691">
 				<rom name="microball_be(1986)(alternative).uef" size="6691" crc="c9605892" sha1="a43dd11ea91b4ec72094e9410b4492c88b35abfa" />
@@ -9153,7 +9156,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Mission XP2</description>
 		<year>1984</year>
 		<publisher>Holl-Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8463">
 				<rom name="missionxp2_e(1984)(hollsoft).uef" size="8463" crc="e1d7e35d" sha1="0b09dd32476793feebcb97f53c82cc5563f51976" />
@@ -9177,7 +9180,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Monkey Nuts</description>
 		<year>1988</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5939">
 				<rom name="monkeynuts_be(1988)(bugbyte).uef" size="5939" crc="db99bc0c" sha1="8af887dd4c8f430da8aab97a9713f244ee7afe0c" />
@@ -10097,7 +10100,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Panik</description>
 		<year>1987</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6747">
 				<rom name="panik_be(1987)(atlantis).uef" size="6747" crc="52635e7e" sha1="ab2b0423d25f675c96eff6138fc61136ee57368d" />
@@ -10133,7 +10136,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Paras</description>
 		<year>1983</year>
 		<publisher>Lothlorien</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6556">
 				<rom name="paras_be(1983)(lothlorien).uef" size="6556" crc="237d2802" sha1="7980839b0e89ec348b081f85fc7a876922706be3" />
@@ -10438,26 +10441,26 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		</part>
 	</software>
 
-	<software name="planb2">
-		<description>Plan B2</description>
-		<year>1987</year>
-		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="13657">
-				<rom name="planb2_be(1987)(bugbyte).uef" size="13657" crc="6b826f62" sha1="8051d6651c19c757840435473890b05b1b500e03" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="planb">
 		<description>Plan B</description>
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14068">
 				<rom name="planb_be(1987)(bugbyte).uef" size="14068" crc="10ab9c08" sha1="78522bb8943ef4c9356dfc62959d4ec8e28875cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planb2">
+		<description>Plan B2</description>
+		<year>1987</year>
+		<publisher>Bug Byte</publisher>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="13657">
+				<rom name="planb2_be(1987)(bugbyte).uef" size="13657" crc="6b826f62" sha1="8051d6651c19c757840435473890b05b1b500e03" />
 			</dataarea>
 		</part>
 	</software>
@@ -10466,7 +10469,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Plane Crash</description>
 		<year>1989</year>
 		<publisher>Labyrinth</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19956">
 				<rom name="planecrash_be(1989)(labyrinth).uef" size="19956" crc="6c7ef044" sha1="4183019362053f16370e3993cddac424e325bc0c" />
@@ -10578,7 +10581,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Play Your Cards Right</description>
 		<year>1985</year>
 		<publisher>Britannia</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10226">
 				<rom name="playyourcardsright(britannia).uef" size="10226" crc="1991b78f" sha1="532bf7b4e29ea3d5cb798b6f15e2a21926704e8e" />
@@ -10626,7 +10629,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Poker</description>
 		<year>1986</year>
 		<publisher>Duckworth</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16407">
 				<rom name="poker_be(1986)(duckworth).uef" size="16407" crc="6f751ed1" sha1="0a8da36718e45b44f5e881855c0d024466059985" />
@@ -10706,7 +10709,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Pony Express</description>
 		<year>1984</year>
 		<publisher>Holl-Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9030">
 				<rom name="ponyexpress_e(1984)(hollsoft).uef" size="9030" crc="fa5532e8" sha1="a138bbf06c90054713a81e5e038586f55fd6a096" />
@@ -10838,7 +10841,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Pro Golf</description>
 		<year>1988</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="32395">
 				<rom name="progolf_be(1988)(atlantis).uef" size="32395" crc="15819f50" sha1="adf75311b703786d9551145d6d1f8fa1df285ec9" />
@@ -10948,7 +10951,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1987</year>
 		<publisher>Larsoft</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10818">
 				<rom name="puppetman_run_be(1987)(larsoft).uef" size="10818" crc="8d7c3753" sha1="32cdcf829baac9e5480bb6a2c5709f3fbc8419e8" />
@@ -11202,7 +11205,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Reluctant Hero</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="14192">
@@ -11507,7 +11510,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Rik the Roadie</description>
 		<year>1987</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13639">
 				<rom name="riktheroadie_be(1987)(alternative ).uef" size="13639" crc="3ccdf2a0" sha1="2e743dda56e4be861327dc4335ae3a0572ef1f13" />
@@ -11532,7 +11535,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>Larsoft</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="The Prophecy"/>
 			<dataarea name="cass" size="9223">
@@ -11701,7 +11704,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12915">
@@ -11756,7 +11759,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Round Ones</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19294">
 				<rom name="roundones_be(1988)(alternative).uef" size="19294" crc="16f34fdf" sha1="1bd9baa99c04d167f2f3804627e2a390db0e047e" />
@@ -11768,7 +11771,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Row of Four</description>
 		<year>1982</year>
 		<publisher>Software For All</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4581">
 				<rom name="rowoffour_be(softwareforall).uef" size="4581" crc="fdaf772b" sha1="80ac6f1832f123fe3c70d96aef646389570bf516" />
@@ -11792,7 +11795,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>RTC Birmingham</description>
 		<year>1987</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8222">
 				<rom name="rtcbirmingham_be(deekay).uef" size="8222" crc="ef8b2908" sha1="4c18a4b2f63e4f811ea54b2ed03710f18e20a402" />
@@ -11816,7 +11819,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>RTC Crewe</description>
 		<year>1987</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8527">
 				<rom name="rtccrewe_be(1987)(deekay).uef" size="8527" crc="56eec158" sha1="785f4f2fa8fedc287e80c0ea60675e884dc95402" />
@@ -11828,7 +11831,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>RTC Doncaster</description>
 		<year>1988</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7551">
 				<rom name="rtcdoncaster_be(1988)(deekay).uef" size="7551" crc="abced791" sha1="750cf1971d166bff1d08229a416160439c74c6a0" />
@@ -11957,7 +11960,8 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Sadim Castle</description>
 		<year>1984</year>
 		<publisher>MP Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<info name="usage" value="Load with *RUN" />
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20252">
 				<rom name="sadimcastle_run_be(1984)(mpsoft).uef" size="20252" crc="4f26b1c8" sha1="de2cf82eecb1d18d2dc5a045735a588cd34b4c5c" />
@@ -12078,7 +12082,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>Acornsoft/Ivan Berg</publisher>
 		<info name="release" value="XBX05" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="55315">
 				<rom name="sciencefictionquiz_be(1983)(ivanberg).uef" size="55315" crc="67f74c65" sha1="351eedce83d731fad6ac908d3fe7687fba4dbed5" />
@@ -12162,8 +12166,8 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	<software name="seaqueen">
 		<description>Sea Queen</description>
 		<year>1988</year>
-		<publisher>Unreleased</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<publisher>Danosoft</publisher>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13589">
 				<rom name="seaqueen_be(unreleased).uef" size="13589" crc="c83e6bb5" sha1="65092d1c9574082caf99c40640a14e3e131db520" />
@@ -12332,7 +12336,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Shedmaster Bounds Green</description>
 		<year>1987</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7782">
 				<rom name="shedmasterboundsgreen_be(1987)(deekay).uef" size="7782" crc="3b4b1e8c" sha1="7b89e3a903d026d2a380e1855b953e5ebf610cde" />
@@ -12344,7 +12348,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Shedmaster Finsbury Park</description>
 		<year>1989</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7479">
 				<rom name="shedmasterfinsburypark_be(deekay).uef" size="7479" crc="d611e533" sha1="88970796ea38b34f3809ffb2d2dfa642c700c396" />
@@ -12465,7 +12469,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Skyhawk</description>
 		<year>1986</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5491">
 				<rom name="skyhawk_be(1986)(bugbyte).uef" size="5491" crc="80d12790" sha1="87ced191b307d55ec7c38b380ba134d4475832d2" />
@@ -12583,18 +12587,6 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		</part>
 	</software>
 
-	<software name="smashgrasc" cloneof="smashgra">
-		<description>Smash and Grab (The Superior Collection Vol.1)</description>
-		<year>1987</year>
-		<publisher>Superior Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8561">
-				<rom name="smashandgrab-scrr(198x)(superior).uef" size="8561" crc="dd04d7a5" sha1="85cd02a220e8ec8e98f1bce468963bea7a7aa27f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smashgra">
 		<description>Smash and Grab</description>
 		<year>1984</year>
@@ -12603,6 +12595,18 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8671">
 				<rom name="smashandgrab(1984)(superior).uef" size="8671" crc="65af54de" sha1="459155275b9ad1fd2cec1a1dfdc525bd23f1cecf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smashgrasc" cloneof="smashgra">
+		<description>Smash and Grab (The Superior Collection Vol.1)</description>
+		<year>1987</year>
+		<publisher>Superior Software</publisher>
+		<sharedfeat name="compatibility" value="B,M"/>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8561">
+				<rom name="smashandgrab-scrr(198x)(superior).uef" size="8561" crc="dd04d7a5" sha1="85cd02a220e8ec8e98f1bce468963bea7a7aa27f" />
 			</dataarea>
 		</part>
 	</software>
@@ -12762,7 +12766,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Soccer Boss</description>
 		<year>1989</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8806">
 				<rom name="soccerboss_be(1989)(alternative).uef" size="8806" crc="098d960c" sha1="923c4f65eb252eb685a66da0a6a9fb0fb930e8cc" />
@@ -12799,7 +12803,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>South Devon Hydraulics</description>
 		<year>1986</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9817">
 				<rom name="southdevonhydraulics_be(1986)(deekay).uef" size="9817" crc="077ca5a1" sha1="3740634d311e3c629fca3ddc9bb2c7f2fb096100" />
@@ -13088,7 +13092,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Special Operations</description>
 		<year>1984</year>
 		<publisher>Lothlorien</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20282">
 				<rom name="specialoperations_be(1984)(lothlorien).uef" size="20282" crc="a5f811fc" sha1="d6a1d9eec0389855e3c97b6310ef94beaacf2040" />
@@ -13266,7 +13270,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Sporting Triangles</description>
 		<year>1990</year>
 		<publisher>CDS</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="38897">
@@ -13352,7 +13356,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Staff of Law</description>
 		<year>1984</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8981">
 				<rom name="staffoflaw_be(1984)(potter).uef" size="8981" crc="fe177a23" sha1="8303349aa60bd331216424770c164fbaa1dd8ff9" />
@@ -13570,7 +13574,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Starship Quest</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12656">
@@ -13754,7 +13758,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Stolen Lamp</description>
 		<year>1984</year>
 		<publisher>Lothlorien</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11040">
 				<rom name="stolenlamp_be(1984)(lothlorien).uef" size="11040" crc="7ca49f5c" sha1="7cf2706abc9e843a81b743b1c0555f557945793c" />
@@ -13790,7 +13794,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Stranded on Iloofrax</description>
 		<year>1986</year>
 		<publisher>Potter Programs</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12404">
 				<rom name="strandedoniloofrax_be(potter).uef" size="12404" crc="a46bdf11" sha1="dc86bf0362c3e8125308d4ac174a549ae965351a" />
@@ -13879,7 +13883,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Strip Poker II Plus</description>
 		<year>1989</year>
 		<publisher>Anco</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="46260">
 				<rom name="strippokeriiplus_be(1989)(anco).uef" size="46260" crc="e81d48d6" sha1="87c9850f784ead3c638e04a5845aa58291964d25" />
@@ -13946,7 +13950,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Suds</description>
 		<year>1986</year>
 		<publisher>Riverdale</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="10780">
@@ -14102,7 +14106,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Superman: The Game</description>
 		<year>1988</year>
 		<publisher>First Star</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15357">
 				<rom name="supermanthegame_be(firststar).uef" size="15357" crc="860d0e26" sha1="4153e20a68d95ed47a9d832b79c5af8b361afe89" />
@@ -14164,7 +14168,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Survivors</description>
 		<year>1987</year>
 		<publisher>Atlantis</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8444">
 				<rom name="survivors_be(1987)(atlantis).uef" size="8444" crc="a58f3496" sha1="14e19156a333e4ae8afb366224a45bd9f718352e" />
@@ -14274,7 +14278,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tales of the Arabian Nights</description>
 		<year>1985</year>
 		<publisher>Interceptor</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9777">
 				<rom name="talesofthearabiannights_be(1983)(interceptor).uef" size="9777" crc="5c7a784d" sha1="ba02ec2b041ad0f6692cbcb727536b089898c87d" />
@@ -14298,7 +14302,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tank Attack (CDS)</description>
 		<year>1989</year>
 		<publisher>CDS</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12961">
 				<rom name="tankattack_be(1989)(cds).uef" size="12961" crc="e267006e" sha1="c15e57b3792d7bb1c5f385f5c32e6066537640c3" />
@@ -14406,7 +14410,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Templeton</description>
 		<year>1986</year>
 		<publisher>Bug Byte</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6644">
 				<rom name="templeton_be(1986)(bugbyte).uef" size="6644" crc="d8abc060" sha1="ad2b9ce1f6b85bb69a7edba59fa3c78b66ce2165" />
@@ -14430,7 +14434,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Terrormolinos</description>
 		<year>1985</year>
 		<publisher>Melbourne House</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22823">
 				<rom name="terrormolinos_be(1985)(melbourne).uef" size="22823" crc="b9dfb7e5" sha1="7b6c405998f1f28818d1db11447b10347f3d4396" />
@@ -14493,7 +14497,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>Mirrorsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6120">
 				<rom name="tetris_be(1988)(mirrorsoft).uef" size="6120" crc="ff711e11" sha1="21effa836b3c9e4ed3039c1be205f4e78c86762c" />
@@ -14577,7 +14581,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Boss</description>
 		<year>1985</year>
 		<publisher>Peaksoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8808">
 				<rom name="theboss_be(1985)(peaksoft).uef" size="8808" crc="2832b1c3" sha1="36af9eb1243039d46f8a0040196d2bcb4f35c5a5" />
@@ -14601,7 +14605,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Four Wands</description>
 		<year>1988</year>
 		<publisher>DW Gore</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="11465">
@@ -14787,7 +14791,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1986</year>
 		<publisher>Larsoft</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10622">
 				<rom name="theninedancers_run_be(1986)(larsoft).uef" size="10622" crc="1f7088cd" sha1="cacd4da33cb303023fc0ba590e9eeda2ec724174" />
@@ -14823,7 +14827,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Quill</description>
 		<year>1986</year>
 		<publisher>Gilsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7792">
 				<rom name="thequill_be(gilsoft).uef" size="7792" crc="1e50751c" sha1="975ff668923867f865644028c8170681f1c7ad22" />
@@ -14860,7 +14864,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Thames Local</description>
 		<year>1986</year>
 		<publisher>Dee-Kay</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9334">
 				<rom name="thameslocal_be(1986)(deekay).uef" size="9334" crc="d313a3de" sha1="20db76cc4073b56e2a1049aa3f28b753b07fe8f7" />
@@ -15018,7 +15022,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tomb of Death</description>
 		<year>1984</year>
 		<publisher>Holl-Soft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8855">
 				<rom name="tombofdeath_e(1984)(hollsoft).uef" size="8855" crc="dbaab767" sha1="e9738e67d8f32ebc840294f2f51ae94d5c5ecdcc" />
@@ -15030,7 +15034,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tomcat</description>
 		<year>1989</year>
 		<publisher>Players</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="28659">
 				<rom name="tomcat_be(1989)(players).uef" size="28659" crc="9a3708b0" sha1="684dacd343d7483673ea7832f28bbced572d7f4c" />
@@ -15066,7 +15070,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Traditional Games</description>
 		<year>1983</year>
 		<publisher>Gemini</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Accordion"/>
 			<dataarea name="cass" size="2672">
@@ -15167,36 +15171,11 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		</part>
 	</software>
 
-	<software name="triple10">
-		<description>Triple Decker 10: Rockfall, Money Maze &amp; Bunny Blitz</description>
-		<year>1988</year>
-		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
-		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Rock Fall"/>
-			<dataarea name="cass" size="5148">
-				<rom name="td10-rockfall_be(1988)(alternative).uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Money Maze"/>
-			<dataarea name="cass" size="2856">
-				<rom name="td10-moneymaze_be(1988)(alternative).uef" size="2856" crc="63772dac" sha1="12ab136d164ff5e4229df1e5386adb0d5050c4a3" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="bbc_cass">
-			<feature name="part_id" value="Bunny Blitz"/>
-			<dataarea name="cass" size="1660">
-				<rom name="td10-bunnyblitz_be(1988)(alternative).uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="triple1">
 		<description>Triple Decker 1: Grand Prix, Day at the Races &amp; Manic Mole</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Grand Prix"/>
 			<dataarea name="cass" size="3106">
@@ -15221,7 +15200,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 2: Invasion Force, Haunted &amp; Parachute</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Invasion Force"/>
 			<dataarea name="cass" size="3817">
@@ -15246,7 +15225,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 3: Lunar Invasion, Jam Butty &amp; Lander</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Lunar Invasion"/>
 			<dataarea name="cass" size="5597">
@@ -15271,7 +15250,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 4: Howzat!, Fishing &amp; Golf</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Howzat"/>
 			<dataarea name="cass" size="5319">
@@ -15296,7 +15275,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 5: Star Fight, Skramble &amp; Karate Warrior</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Star Fight"/>
 			<dataarea name="cass" size="4024">
@@ -15321,7 +15300,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 6: Cavern Capers, Snap Dragon &amp; Castle of Sand</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Cavern Capers"/>
 			<dataarea name="cass" size="6890">
@@ -15346,7 +15325,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 7: Atom Smash, Knockout &amp; Reaction Tester</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Atom Smash"/>
 			<dataarea name="cass" size="6959">
@@ -15371,7 +15350,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Triple Decker 9: Break Free, Missile Jammer &amp; Code Breaker</description>
 		<year>1988</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Break Free"/>
 			<dataarea name="cass" size="3517">
@@ -15388,6 +15367,31 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 			<feature name="part_id" value="Code Breaker"/>
 			<dataarea name="cass" size="2108">
 				<rom name="td9-codebreaker_be(1988)(alternative).uef" size="2108" crc="b260db2f" sha1="b1593a47c0c991b92099a4083175e375b2e49222" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triple10">
+		<description>Triple Decker 10: Rockfall, Money Maze &amp; Bunny Blitz</description>
+		<year>1988</year>
+		<publisher>Alternative</publisher>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Rock Fall"/>
+			<dataarea name="cass" size="5148">
+				<rom name="td10-rockfall_be(1988)(alternative).uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Money Maze"/>
+			<dataarea name="cass" size="2856">
+				<rom name="td10-moneymaze_be(1988)(alternative).uef" size="2856" crc="63772dac" sha1="12ab136d164ff5e4229df1e5386adb0d5050c4a3" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Bunny Blitz"/>
+			<dataarea name="cass" size="1660">
+				<rom name="td10-bunnyblitz_be(1988)(alternative).uef" size="1660" crc="99f1a92b" sha1="abecf28d379e97dd2b436996713a16e995e75d6d" />
 			</dataarea>
 		</part>
 	</software>
@@ -15409,7 +15413,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1988</year>
 		<publisher>Blue Ribbon</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4744">
 				<rom name="turfform_run(1988)(blueribbon).uef" size="4744" crc="78e32978" sha1="8620242ea420e0541ee241d536abf1b8628142c3" />
@@ -15434,7 +15438,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1985</year>
 		<publisher>Potter Programs</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19284">
 				<rom name="twinorbsofaalinor_run_be(1985)(potter).uef" size="19284" crc="4742c3e4" sha1="5aaee6fba903d89fcc71971df99001641db3e020" />
@@ -15576,7 +15580,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1985</year>
 		<publisher>MP Software</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17674">
 				<rom name="valleyofthekings_run_be(1985)(mpsoft).uef" size="17674" crc="b1effaaa" sha1="a0aa6a7059ef0dd5bd3d4bac15c6137281b81602" />
@@ -15613,7 +15617,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Vegas Jackpot</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4746">
 				<rom name="vegasjackpot_be(1984)(mastertronic).uef" size="4746" crc="8e911cc8" sha1="1a091378dbc3e369a690b0dc318ac5a5ee925064" />
@@ -15649,7 +15653,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Video Pinball</description>
 		<year>1987</year>
 		<publisher>Alternative</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7202">
 				<rom name="videopinball_be(1987)(alternative).uef" size="7202" crc="8968f16c" sha1="c0f8fe9d4953bc1947b9e888f1999b34f90a68d1" />
@@ -15787,7 +15791,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Warehouse</description>
 		<year>1988</year>
 		<publisher>Top Ten</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20040">
 				<rom name="warehouse_be(topten).uef" size="20040" crc="2037f76e" sha1="3d0f5a26dbfbf2c203a694253a58b8752839506d" />
@@ -15884,7 +15888,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Weetabix versus The Titchies</description>
 		<year>1984</year>
 		<publisher>Romik</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5066">
 				<rom name="weetabixversusthetitchies_be(1984)(romik).uef" size="5066" crc="7cf373b6" sha1="ffc962e699bce8e8dbb39a115ee421d392dde095" />
@@ -16072,7 +16076,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Whoopsy</description>
 		<year>1985</year>
 		<publisher>Shards Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7888">
 				<rom name="whoopsy_be(1985)(shards).uef" size="7888" crc="290c038d" sha1="21e15caa15046002e8b392fd32a7b8108978d90e" />
@@ -16170,7 +16174,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Woks</description>
 		<year>1984</year>
 		<publisher>Artic</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12790">
 				<rom name="woks_be(1984)(artic).uef" size="12790" crc="a395efb0" sha1="ba0c99bd64dc4a4b68c799c3d03fe0c6c178777e" />
@@ -16231,23 +16235,10 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Woodbury End</description>
 		<year>1986</year>
 		<publisher>Shards Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13437">
 				<rom name="woodburyend_be(1986)(shards).uef" size="13437" crc="ab628f1e" sha1="e39f8fb6e6a0826d0a4fc6530780ed5dd4e97a3b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="woodlandearly" cloneof="woodland">
-		<description>Woodland Terror (early)</description>
-		<year>1984</year>
-		<publisher>MP Software</publisher>
-		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="18286">
-				<rom name="woodlandterror-early_run_be(1984)(mpsoft).uef" size="18286" crc="445505a0" sha1="4aab34f0c203811bd78796f0497eac2626c7341a" />
 			</dataarea>
 		</part>
 	</software>
@@ -16257,10 +16248,23 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>MP Software</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19936">
 				<rom name="woodlandterror_run_be(1984)(mpsoft).uef" size="19936" crc="41dc9054" sha1="2a34167159c2bb14267d75cc0032c870b748c04e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woodlandearly" cloneof="woodland">
+		<description>Woodland Terror (early)</description>
+		<year>1984</year>
+		<publisher>MP Software</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="18286">
+				<rom name="woodlandterror-early_run_be(1984)(mpsoft).uef" size="18286" crc="445505a0" sha1="4aab34f0c203811bd78796f0497eac2626c7341a" />
 			</dataarea>
 		</part>
 	</software>
@@ -16306,7 +16310,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1987</year>
 		<publisher>Larsoft</publisher>
 		<info name="usage" value="Load with *RUN" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10541">
 				<rom name="wychwood_run_be(1987)(larsoft).uef" size="10541" crc="7fbdf797" sha1="4ae3955e01f4aad1bd23d4e0aec2d8a964da66c1" />
@@ -16318,7 +16322,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Xadomy</description>
 		<year>1984</year>
 		<publisher>Brassington Enterprises</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6340">
 				<rom name="xadomy_be(1984)(brassington).uef" size="6340" crc="9b36857d" sha1="f2ddb08b1728c46bd8211ee6eacb5b99493b2171" />
@@ -16354,7 +16358,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Xanagrams</description>
 		<year>1984</year>
 		<publisher>Postern</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27303">
 				<rom name="xanagrams.uef" size="27303" crc="e947995c" sha1="2be283661c44204a0847cc1ffae37c3d1b3b5efc" />
@@ -16910,7 +16914,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Best Four: Language</description>
 		<year>1985</year>
 		<publisher>ASK</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Facemaker"/>
 			<dataarea name="cass" size="12006">
@@ -16942,7 +16946,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1983</year>
 		<publisher>Acornsoft/Ivan Berg</publisher>
 		<info name="release" value="XBX11" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="51155">
 				<rom name="biology_be(1983)(ivanberg).uef" size="51155" crc="57e129ee" sha1="ee7371e89a264a0f9af5042b65b4db59fc5d2145" />
@@ -17003,7 +17007,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Castles and Clowns</description>
 		<year>1985</year>
 		<publisher>Macmillian</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Clown"/>
 			<dataarea name="cass" size="8622">
@@ -17086,7 +17090,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Count with Oliver</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Lollipops"/>
 			<dataarea name="cass" size="7814">
@@ -17294,7 +17298,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fun School 2 (For 6-8 year olds)</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23020">
 				<rom name="funschool2-6to8_be(1989)(database).uef" size="23020" crc="e4a90cf1" sha1="e5c219e2df219baae6adb56b1294837fbbff598f" />
@@ -17306,7 +17310,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fun School 2 (For the Over-8s)</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25666">
 				<rom name="funschool2-over8_be(1989)(database).uef" size="25666" crc="3b0179fa" sha1="7f68ae668e2771116fac37bf57c8448195a6e79d" />
@@ -17318,7 +17322,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fun School 2 (For Under 6s)</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19488">
 				<rom name="funschool2-under6_be(1989)(database).uef" size="19488" crc="5b96b37a" sha1="5da6422a91a4016f6eea1bd0ee81673e4290f00e" />
@@ -17330,7 +17334,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Fun With Numbers</description>
 		<year>1984</year>
 		<publisher>Golem</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10065">
 				<rom name="funwithnumbers_be(1984)(golem).uef" size="10065" crc="972d444c" sha1="8cb66a645655cff1b16ec5b0d7ba4290013476f8" />
@@ -17366,7 +17370,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Honey Logo</description>
 		<year>1985</year>
 		<publisher>Glentop Publishers</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9301">
 				<rom name="honeylogo_be(glentop).uef" size="9301" crc="89897c5e" sha1="90b4cdb626712f58dda0846637535b5e28aff182" />
@@ -17392,7 +17396,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
 		<info name="release" value="XBE27" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8139">
 				<rom name="jugglepuzzle_be(1984)(acornsoftask).uef" size="8139" crc="1569b7c6" sha1="ad458c1d2a24879f61c1b4574c767c26a93fd08e" />
@@ -17501,7 +17505,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Maths Invaders</description>
 		<year>1984</year>
 		<publisher>Stell</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4226">
 				<rom name="mathsinvaders_be(stell).uef" size="4226" crc="8b6ffbc6" sha1="2fb93666cfc0182b9c8b57d79b22bc26f51a6b89" />
@@ -17513,7 +17517,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Maths Tutor</description>
 		<year>1985</year>
 		<publisher>Century</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14594">
 				<rom name="mathstutor_be(1985)(century).uef" size="14594" crc="f1da555d" sha1="ad2bbcb4f857a41150519e7182e859f02bdb537f" />
@@ -17570,7 +17574,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Here &amp; There with the Mr.Men</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14708">
 				<rom name="mrmen-hereandthere_be(1985)(mirrorsoft).uef" size="14708" crc="f858ccff" sha1="b0cc45aa86f9e4e0b4565c5516d86d6fe6c7fc66" />
@@ -17583,7 +17587,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
 		<info name="release" value="XBE13" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11352">
 				<rom name="numbergulper_be(1984)(acornsoftask).uef" size="11352" crc="5cda773f" sha1="9f037647ff6bf5107f3282e231098125b5b548d1" />
@@ -17672,7 +17676,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
 		<info name="release" value="XBE26" />
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10487">
 				<rom name="podd_be(1984)(acornsoftask).uef" size="10487" crc="dac846b0" sha1="3b1d08c721338a38c4d2b74c91ddfed4986eb079" />
@@ -17783,7 +17787,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Symmetry</description>
 		<year>1983</year>
 		<publisher>Garland Computing</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6781">
 				<rom name="symmetry_be(garland).uef" size="6781" crc="825eb59d" sha1="4e0e12e537d77cccfddab088118527c92e848c12" />
@@ -17855,7 +17859,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Tops and Tails</description>
 		<year>1985</year>
 		<publisher>Macmillian</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Snakes and Ladders"/>
 			<dataarea name="cass" size="9665">
@@ -18241,7 +18245,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>The Art Studio</description>
 		<year>1989</year>
 		<publisher>Impact</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1 MODE4"/>
 			<dataarea name="cass" size="12647">
@@ -18345,7 +18349,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Graphito</description>
 		<year>1984</year>
 		<publisher>Addison-Wesley</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side One"/>
 			<dataarea name="cass" size="22943">
@@ -19252,7 +19256,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Let's Compute Issue 1</description>
 		<year>1990</year>
 		<publisher>Let's Compute</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="40745">
 				<rom name="letscompute1_be(letscompute).uef" size="40745" crc="f2e9082c" sha1="df7722636cbef766d6941f22423598c7589d8826" />
@@ -20252,7 +20256,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 		<description>Stripper II</description>
 		<year>1984</year>
 		<publisher>Aggressive</publisher>
-		<sharedfeat name="compatibility" value="B,M"/>
+		<sharedfeat name="compatibility" value="B,M,ELK"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="919">
 				<rom name="stripperii_be(aggressive).uef" size="919" crc="71afdc6e" sha1="1f5b5120a20119d0ec5a001fabecf33e99cf6457" />

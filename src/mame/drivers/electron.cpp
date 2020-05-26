@@ -274,7 +274,7 @@ void electron_state::electron(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(bbc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
-	m_cassette->set_interface("electron_cass");
+	m_cassette->set_interface("bbc_cass");
 
 	/* expansion port */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, electron_expansion_devices, "plus3");
@@ -283,6 +283,7 @@ void electron_state::electron(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("electron_cass");
+	SOFTWARE_LIST(config, "cass_list_bbc").set_compatible("bbc_cass").set_filter("ELK");
 	SOFTWARE_LIST(config, "cart_list").set_original("electron_cart");
 	SOFTWARE_LIST(config, "flop_list").set_original("electron_flop");
 	SOFTWARE_LIST(config, "rom_list").set_original("electron_rom");
