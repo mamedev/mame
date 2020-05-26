@@ -1924,12 +1924,16 @@ ROM_END
 /************************************************** DTK-Group PC-XT-Clones ***
 
 identical to the Olivetti M18P (one online source shows a ROM version 3.06 with the Olivetti)
+a BIOS version 1.53 exists
 
 *****************************************************************************/
 
 ROM_START( coppc21 )
 	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD( "corona_ppc_21_3,10_8k_rom.bin", 0xe000, 0x2000, CRC(4c243424) SHA1(55910035b49679beddb43a0728a10dc32c73e3e8))
+	ROM_SYSTEM_BIOS( 0, "v3.10", "V3.10" )
+	ROMX_LOAD( "corona_ppc_21_3.10_8k_rom.bin", 0xe000, 0x2000, CRC(4c243424) SHA1(55910035b49679beddb43a0728a10dc32c73e3e8), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v4.23cg", "V4.23CG" )
+	ROMX_LOAD( "corona_ppc21_16k_4.23cg.bin", 0xc000, 0x4000, CRC(4fd3b8fa) SHA1(faeec1d91b7f83ebea05dc80a1961d7d6ddd1a67), ROM_BIOS(1))
 ROM_END
 
 /***************************************************************************
