@@ -408,7 +408,27 @@ void tkmag220_game_state::tkmag220(machine_config &config)
 	m_maincpu->porta_in().set_ioport("IN0");
 	m_maincpu->portb_in().set_ioport("IN1");
 	m_maincpu->portc_in().set_ioport("IN2");
+
+	m_maincpu->portd_out().set(FUNC(tkmag220_game_state::tkmag220_portd_w));
 }
+
+void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (m_maincpu->pc() < 0x10000)
+	{
+		logerror("%s: port write %04x\n", machine().describe_context().c_str(), data);
+
+		int newbank = 0;
+
+		if (data & 0x8000) newbank |= 1;
+		if (data & 0x0002) newbank |= 2;
+		if (data & 0x0004) newbank |= 4;
+
+		m_upperbase = newbank * (0x1000000 / 2);
+	}
+
+}
+
 
 READ16_MEMBER(tkmag220_game_state::cs0_r)
 {
@@ -424,17 +444,44 @@ void tkmag220_game_state::machine_reset()
 	m_upperbase = 0 * (0x1000000 / 2);
 	gcm394_game_state::machine_reset();
 
-	// 2 has homward journy + trampoline
-	// 3 has piggy golf
-	// 4 has fencing and running
-	// 5 has telescopes
-	// 6 has bike race + learning fruits
-	// 7 has find the largest number
 	m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_pal_sprites_hack(0x000);
 	m_maincpu->set_pal_back_hack(0x000);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 
+/*
+000500: r1 = [7840]
+000502: r1 &= 01
+000503: [7840] = r1
+000505: r1 = [7841]
+000507: r1 = r1 & 00ff
+000509: [7841] = r1
+00050B: r1 = [787a]
+00050D: r1 = r1 & 7ff1
+00050F: r1 = r1 | 800e
+000511: [787a] = r1
+000513: r1 = [787b]
+000515: r1 = r1 & 7ff1
+000517: r1 = r1 | 800e
+000519: [787b] = r1
+00051B: r1 = [7878]
+00051D: r1 = r1 & 7ff1
+00051F: r1 = r1 | [0600]
+000521: [7878] = r1
+000523: r1 = 00ff
+000525: r1 -= 01
+000526: jne 0525
+000525: r1 -= 01
+000526: jne 0525
+
+   (loops for 506 instructions)
+
+000527: r1 = [fff7]
+000529: push r1, r1 to [sp]
+00052A: r1 = 00
+00052B: push r1, r1 to [sp]
+00052C: retf
+*/
 }
 
 void gormiti_game_state::machine_reset()
