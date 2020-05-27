@@ -2018,6 +2018,14 @@ set(address_space *space, std::pair<void *, void *> rw)
 											  });
 	m_root_read  = (handler_entry_read <Width, AddrShift, Endian> *)(rw.first);
 	m_root_write = (handler_entry_write<Width, AddrShift, Endian> *)(rw.second);
+
+	// Protect against a wandering memset
+	m_addrstart_r = 1;
+	m_addrend_r = 0;
+	m_cache_r = nullptr;
+	m_addrstart_w = 1;
+	m_addrend_w = 0;
+	m_cache_w = nullptr;
 }
 
 template<int Width, int AddrShift, endianness_t Endian>
