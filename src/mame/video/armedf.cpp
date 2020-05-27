@@ -114,13 +114,13 @@ TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(armedf_state,terraf)
 {
-	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type == 2 || m_scroll_type == 3 || m_scroll_type == 4) ? 0 : 128;  /* legion, legion bootlegs, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_nb1414m4_tx_tile_info)),
-			(m_scroll_type == 2) ? tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type3)) : tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type2)), 8, 8, 64, 32);
+			(m_scroll_type == 2 || m_scroll_type == 3) ? tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type3)) : tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type2)), 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(0xf);
 	m_fg_tilemap->set_transparent_pen(0xf);
@@ -132,7 +132,7 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 
 VIDEO_START_MEMBER(armedf_state,armedf)
 {
-	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
+	m_sprite_offy = (m_scroll_type == 2 || m_scroll_type == 3 || m_scroll_type == 4) ? 0 : 128;  /* legion, legion bootlegs, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
@@ -363,7 +363,8 @@ u32 armedf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		case 0: /* terra force, kozure ookami */
 		case 2: /* legion */
-		case 3: /* crazy climber 2 */
+		case 3: /* legion bootlegs */
+		case 4: /* crazy climber 2 */
 			m_fg_tilemap->set_scrollx(0, (m_fg_scrollx & 0x3ff));
 			m_fg_tilemap->set_scrolly(0, (m_fg_scrolly & 0x3ff));
 			break;
@@ -378,10 +379,20 @@ u32 armedf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0xff, cliprect);
 
-	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 1);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 4);
+	if (m_scroll_type == 2) /* legion */
+	{
+		if ((m_legion_reg_7c00e & 0x30) == 0x30) m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+		if ((m_legion_reg_7c00e & 0x30) == 0x00) m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 4);
+	}
+	else
+	{
+		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 4);
+	}
 
 	if (sprite_enable)
 		draw_sprites(bitmap, cliprect, screen.priority());

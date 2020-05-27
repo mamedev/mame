@@ -409,6 +409,13 @@ void armedf_state::irq_lv2_ack_w(u16 data)
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
+void armedf_state::irq_lv2_ack_legion_w(u16 data)
+{
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
+	m_maincpu->set_input_line(2, CLEAR_LINE);
+	m_legion_reg_7c00e = data;
+}
 
 /*************************************
  *
@@ -516,7 +523,6 @@ void armedf_state::legion_common_map(address_map &map)
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
 	map(0x07c00c, 0x07c00d).nopw();        /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
 void armedf_state::legion_map(address_map &map)
@@ -525,6 +531,7 @@ void armedf_state::legion_map(address_map &map)
 
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_legion_w));
 }
 
 void armedf_state::legionjb_fg_scroll_w(offs_t offset, u8 data)
@@ -543,6 +550,7 @@ void armedf_state::legionjb_map(address_map &map)
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
+	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
 void armedf_state::legionjb2_map(address_map &map)
@@ -552,6 +560,7 @@ void armedf_state::legionjb2_map(address_map &map)
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
+	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
 
@@ -1085,6 +1094,7 @@ void armedf_state::machine_reset()
 	m_fg_scrolly = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
+	m_legion_reg_7c00e = 0;
 }
 
 void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
@@ -1911,6 +1921,8 @@ void armedf_state::init_legion()
 #endif
 
 	m_scroll_type = 2;
+
+	save_item(NAME(m_legion_reg_7c00e));
 }
 
 void armedf_state::init_legionjb()
@@ -1923,14 +1935,14 @@ void armedf_state::init_legionjb()
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	m_scroll_type = 2;
+	m_scroll_type = 3;
 
 	save_item(NAME(m_legion_cmd));
 }
 
 void armedf_state::init_cclimbr2()
 {
-	m_scroll_type = 3;
+	m_scroll_type = 4;
 }
 
 /*************************************

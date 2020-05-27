@@ -86,6 +86,7 @@ protected:
 	int   m_sprite_offy;
 	int   m_old_mcu_mode;
 	int   m_waiting_msb;
+	int   m_legion_reg_7c00e;	// legion and legionj only
 
 	// read/write handlers
 	void terraf_io_w(offs_t offset, u16 data, u16 mem_mask);
@@ -95,6 +96,7 @@ protected:
 	u8 soundlatch_clear_r();
 	void irq_lv1_ack_w(u16 data);
 	void irq_lv2_ack_w(u16 data);
+	void irq_lv2_ack_legion_w(u16 data);
 
 	// video handlers
 	void legionjb_fg_scroll_w(offs_t offset, u8 data);
