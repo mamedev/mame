@@ -208,7 +208,7 @@ void cmmb_state::cmmb_map(address_map &map)
 	map(0x1000, 0x1fff).ram().share("videoram");
 	map(0x2000, 0x9fff).m(m_bnk2000, FUNC(address_map_bank_device::amap8));
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).w(FUNC(cmmb_state::cmmb_charram_w)).share(m_charram);
+	map(0xb000, 0xbfff).ram().w(FUNC(cmmb_state::cmmb_charram_w)).share(m_charram);
 	map(0xc000, 0xc00f).rw(FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
 	map(0xc010, 0xffff).rom().region("maincpu", 0x1c010);
 }
