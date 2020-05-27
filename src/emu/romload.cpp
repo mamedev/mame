@@ -1421,7 +1421,7 @@ void rom_load_manager::process_region_list()
 -------------------------------------------------*/
 
 rom_load_manager::rom_load_manager(running_machine &machine)
-	: m_machine(machine), m_biosmismatch(false)
+	: m_machine(machine)
 {
 	// figure out which BIOS we are using
 	std::map<std::string, std::string> card_bios;
