@@ -833,3 +833,4 @@ COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state,   empty_init, 
 COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state,   empty_init, "Matra & Hachette",    "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 2011, mcx128,  mc10,    0,      mcx128,  mc10,  mcx128_state, empty_init, "Tandy Radio Shack",   "MCX-128",   MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 2011, alice128,mc10,    0,      mcx128,  alice, mcx128_state, empty_init, "Matra & Hachette",    "Alice with MCX-128", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+
