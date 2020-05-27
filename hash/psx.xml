@@ -1140,8 +1140,10 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="apescape">
-		<!-- Original images (Redump)
+	<!-- doesn't detect dual shock pad even if it's selected, hangs after selecting new game with white screen -->
+	<software name="apescape" supported="no">
+		<!-- 
+		Original images (Redump)
 		<rom name="Ape Escape (USA).cue" size="82" crc="8e306ae4" sha1="580593c474ec29a0fa88ade27b407e049de12433"/>
 		<rom name="Ape Escape (USA).bin" size="432238800" crc="c6f455bc" sha1="466cce4bcd6992f57227abd270323bcdad2fb7fc"/>
 		-->
@@ -3160,8 +3162,10 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="bluemarl">
-		<!-- Original images (Redump)
+	<!-- boot OK -->
+	<software name="bluemarl" supported="yes">
+		<!-- 
+		Original images (Redump)
 		<rom name="Black Bass with Blue Marlin (USA).cue" size="99" crc="a5f580b3" sha1="b3980190232110b7ba81eff6cbf428b153adf2dc"/>
 		<rom name="Black Bass with Blue Marlin (USA).bin" size="252959952" crc="c15b5280" sha1="bfd3d5ed42edd6d5f7f93e6f8ee1ce55690f6e2f"/>
 		-->
@@ -37714,7 +37718,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="afragean" supported="no">
 		<!-- 
 		Unknown source
@@ -37950,8 +37954,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- black screen after PS logo -->
 	<software name="alabama" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Alabama (Japan) [SLPS-02961].bin" size="709753632" crc="48cc5ab1" sha1="b969892a3be8a9d061e70da3594617d9f96c76d2"/>
 		<rom name="Alabama (Japan) [SLPS-02961].cue" size="528" crc="3b96b795" sha1="ad322671ed8e2a9d0ee792785c901cac626f699b"/>
 		-->
@@ -37964,13 +37970,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alabama (japan) [slps-02961]" sha1="9b930eb42cbd094febb3e3a6ab27f5761f00ce82"/>
+				<disk name="alabama (japan) [slps-02961]" sha1="9b930eb42cbd094febb3e3a6ab27f5761f00ce82" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- boot OK, runs too slow on title and gameplay -->
 	<software name="albalea" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Arubarea no Otome - Uruwashi no Seikishitachi (Japan) (Track 1) [SLPS-01578].bin" size="718230240" crc="fb2a6837" sha1="be881bc4bec903fb5076276086c36a0a0262cf8d"/>
 		<rom name="Arubarea no Otome - Uruwashi no Seikishitachi (Japan) (Track 2) [SLPS-01578].bin" size="23181312" crc="49d791c5" sha1="38aaa75113b4943f4ad860d2aa22fbfb9cdbd4f1"/>
 		<rom name="Arubarea no Otome - Uruwashi no Seikishitachi (Japan) [SLPS-01578].cue" size="279" crc="4d65d966" sha1="50609837d108da50d4e3e132705bcf87470ffe28"/>
@@ -37984,7 +37992,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="arubarea no otome - uruwashi no seikishitachi (japan) [slps-01578]" sha1="cae3c71afe8ca63d5c6052bcfd2641f2a48e94e2"/>
+				<disk name="arubarea no otome - uruwashi no seikishitachi (japan) [slps-01578]" sha1="cae3c71afe8ca63d5c6052bcfd2641f2a48e94e2" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38047,8 +38055,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="altemis" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="altemis" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Gensou no Artemis - Actress School Mystery Adventure (Japan) [SLPS-02563].bin" size="491043504" crc="e9e637ea" sha1="b0026578305428fe8399e73a56bf68929a3fcff9"/>
 		<rom name="Gensou no Artemis - Actress School Mystery Adventure (Japan) [SLPS-02563].cue" size="137" crc="5e99f4d8" sha1="3196aa8de3d3ba48044497fd38d3706b7213e70f"/>
 		-->
@@ -38061,13 +38071,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="gensou no artemis - actress school mystery adventure (japan) [slps-02563]" sha1="3d980874e7d4b22f8e31f6759bec9656e6b3292c"/>
+				<disk name="gensou no artemis - actress school mystery adventure (japan) [slps-02563]" sha1="3d980874e7d4b22f8e31f6759bec9656e6b3292c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="alundra2j" cloneof="alundra2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="alundra2j" cloneof="alundra2" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Alundra 2 (Japan) [SCPS-10115].bin" size="636919248" crc="6b444cab" sha1="2867caf4b7435d88022fd9b7f3f0a2778912376a"/>
 		<rom name="Alundra 2 (Japan) [SCPS-10115].cue" size="94" crc="46cf2d41" sha1="5a1d78b1a0971234cb36b2df53fc4ba6015afd1b"/>
 		-->
@@ -38080,7 +38092,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alundra 2 (japan) [scps-10115]" sha1="ce58f2c42c5268d17d7bef57543895c3e1d5a278"/>
+				<disk name="alundra 2 (japan) [scps-10115]" sha1="ce58f2c42c5268d17d7bef57543895c3e1d5a278" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38177,8 +38189,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, input doesn't get recognized properly on memory card screen -->
 	<software name="angelbld" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Angel Blade - Neo Tokyo Guardians (Japan) (Track 1) [SLPS-00894].bin" size="265362048" crc="92a5bff6" sha1="6188788923155656e9258f40148a02eda007bc15"/>
 		<rom name="Angel Blade - Neo Tokyo Guardians (Japan) (Track 2) [SLPS-00894].bin" size="30893520" crc="ce935154" sha1="55ffb00513c9669dae8540d0a0d0967bf8a8793e"/>
 		<rom name="Angel Blade - Neo Tokyo Guardians (Japan) (Track 3) [SLPS-00894].bin" size="30357264" crc="36c85b94" sha1="695472095cd6380d7c0f3cb631d975a95cb483e8"/>
@@ -38193,7 +38207,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel blade - neo tokyo guardians (japan) [slps-00894]" sha1="71b446c8422f3c7b7230046d1ee216cb494ba85b"/>
+				<disk name="angel blade - neo tokyo guardians (japan) [slps-00894]" sha1="71b446c8422f3c7b7230046d1ee216cb494ba85b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38285,8 +38299,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="angtreq" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="angtreq" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Angelique Tenkuu no Requiem (Japan) [SLPM-86165].bin" size="722115744" crc="8e900f6d" sha1="a58cba144d286891d81088fbd230233bc176f722"/>
 		<rom name="Angelique Tenkuu no Requiem (Japan) [SLPM-86165].cue" size="112" crc="4cff565f" sha1="d752c2504e1c10e19086c0b45e9566a8a7f001f8"/>
 		-->
@@ -38299,7 +38315,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="angelique tenkuu no requiem (japan) [slpm-86165]" sha1="cbd6d9d980cb7034a75a09879ad5fe20ac042d06"/>
+				<disk name="angelique tenkuu no requiem (japan) [slpm-86165]" sha1="cbd6d9d980cb7034a75a09879ad5fe20ac042d06" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38333,8 +38349,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="anpanmn2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="anpanmn2" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kids Station - Soreike! Anpanman 2 (Japan) [SLPS-03197].bin" size="163212336" crc="a473dd66" sha1="21a04b6641f1af44891e22d40c39eb02b0c05261"/>
 		<rom name="Kids Station - Soreike! Anpanman 2 (Japan) [SLPS-03197].cue" size="121" crc="0fbc7104" sha1="c3d3c53b46398bf5727257d2c9ad24dc7165a444"/>
 		-->
@@ -38347,7 +38365,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kids station - soreike! anpanman 2 (japan) [slps-03197]" sha1="94a2ecfa790a4bca617a5bae8bd3c35211b5f087"/>
+				<disk name="kids station - soreike! anpanman 2 (japan) [slps-03197]" sha1="94a2ecfa790a4bca617a5bae8bd3c35211b5f087" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38400,8 +38418,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Hangs at PS logo -->
 	<software name="apescapej" cloneof="apescape" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Saru! Get You! (Japan) [SCPS-10091].bin" size="433259568" crc="42c397f4" sha1="f2ba74eb7d0bbb97e7da2846930c656abc62ad15"/>
 		<rom name="Saru! Get You! (Japan) [SCPS-10091].cue" size="101" crc="aeb1b45b" sha1="b3cd98efffc7a5a353df7e532efc59d2675109a5"/>
 		-->
@@ -38414,7 +38434,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="saru! get you! (japan) [scps-10091]" sha1="c956fd585b246e72e204f4710d2b60245228d560"/>
+				<disk name="saru! get you! (japan) [scps-10091]" sha1="c956fd585b246e72e204f4710d2b60245228d560" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38508,7 +38528,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- hangs at Sony logo (boots with US bios) -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="aresshz" supported="no">
 		<!-- 
 		Unknown source
@@ -38598,7 +38618,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- hangs at PS logo, boots with US BIOS -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="armstrng" supported="no">
 		<!-- 
 		Unknown source
@@ -38619,8 +38639,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- hangs at Alpha-Unit logo -->
 	<software name="artcam" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Art Camion - Geijutsuden (Japan) [SLPM-87186].bin" size="721471296" crc="5f91cc5f" sha1="14dd48e5d5f4e026f33e921df4205ae0e8e38d65"/>
 		<rom name="Art Camion - Geijutsuden (Japan) [SLPM-87186].cue" size="111" crc="15108c4c" sha1="a84e5b8807ecb2413ef5bae06882e3f992aa2428"/>
 		-->
@@ -38633,13 +38655,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="art camion - geijutsuden (japan) [slpm-87186]" sha1="5182f3ebf97d3c1a47bddb7adcf9cb22dc884823"/>
+				<disk name="art camion - geijutsuden (japan) [slpm-87186]" sha1="5182f3ebf97d3c1a47bddb7adcf9cb22dc884823" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- hangs at TYO logo -->
 	<software name="artcama" cloneof="artcam" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Art Camion - Geijutsuden (Japan) [SLPS-02405].bin" size="721824096" crc="f369c244" sha1="adc5db51895b30a25424a4c3fb05b099f8904f2a"/>
 		<rom name="Art Camion - Geijutsuden (Japan) [SLPS-02405].cue" size="109" crc="a99688a2" sha1="5a48ef0817cc30001a20023c388359ae373294c9"/>
 		-->
@@ -38652,7 +38676,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="art camion - geijutsuden (japan) [slps-02405]" sha1="00fdad90e6b821c082207cfb75e30a3be8173cce"/>
+				<disk name="art camion - geijutsuden (japan) [slps-02405]" sha1="00fdad90e6b821c082207cfb75e30a3be8173cce" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39161,8 +39185,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="baroqsyn" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="baroqsyn" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Baroque Syndrome (Japan) [SLPM-86540].bin" size="524893488" crc="85245744" sha1="8154de707fda937fd0a836f613bc4916d0c89300"/>
 		<rom name="Baroque Syndrome (Japan) [SLPM-86540].cue" size="101" crc="dedfd01f" sha1="2585f72f5774ad7d841988a425f40b3ddeeeb996"/>
 		-->
@@ -39175,7 +39201,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="baroque syndrome (japan) [slpm-86540]" sha1="a3547d5ad686cf54dea936abcc79fc4fca323a4c"/>
+				<disk name="baroque syndrome (japan) [slpm-86540]" sha1="a3547d5ad686cf54dea936abcc79fc4fca323a4c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39201,8 +39227,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="bassrisej" cloneof="bassrise" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, screen trails on top when capturing a fish -->
+	<software name="bassrisej" cloneof="bassrise" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Fishing Freaks - BassRise (Japan) [SLPS-01931].bin" size="330869952" crc="8e0a70aa" sha1="0f23d0a4f6e5880e4761de2941f2218c603e1fe5"/>
 		<rom name="Fishing Freaks - BassRise (Japan) [SLPS-01931].cue" size="462" crc="5095cc31" sha1="9a000781f697d919099ac4268014997212341fea"/>
 		-->
@@ -39215,7 +39243,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fishing freaks - bassrise (japan) [slps-01931]" sha1="4b76c9378e478e0a066cd9958af7a0b1da71354b"/>
+				<disk name="fishing freaks - bassrise (japan) [slps-01931]" sha1="4b76c9378e478e0a066cd9958af7a0b1da71354b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39381,8 +39409,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="bftexas" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bftexas" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Bass Fisherman (Japan) [SLPS-01304].bin" size="142886352" crc="0141ba12" sha1="b739a52d0fabd5403f621c1a31010711740327b2"/>
 		<rom name="Bass Fisherman (Japan) [SLPS-01304].cue" size="99" crc="ed9bc870" sha1="47138a67e9a8b231da0dd19f67bf5016717b86de"/>
 		-->
@@ -39395,7 +39425,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bass fisherman (japan) [slps-01304]" sha1="b5fb491ef676f80e1f677b89360345718d6dde4b"/>
+				<disk name="bass fisherman (japan) [slps-01304]" sha1="b5fb491ef676f80e1f677b89360345718d6dde4b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39627,8 +39657,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, doesn't save properly on new game -->
+	<!-- (doesn't complete save, picks up last deleted save and expand it for 15 blocks) -->
 	<software name="blendxbr" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Blend X Brand (Japan) [SLPS-02818].bin" size="187532016" crc="8d244667" sha1="1fb7df25575dcc5f5b0b4420853242ffb7c1c71c"/>
 		<rom name="Blend X Brand (Japan) [SLPS-02818].cue" size="100" crc="5b5a54d3" sha1="16a23849e854151efa3e5b51e2fdddc6c9a254ab"/>
 		-->
@@ -39638,10 +39671,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="serial" value="SLPS-02818" />
 		<info name="release" value="20000629" />
 		<info name="alt_title" value="ブレンド×ブランド おでかけ合成RPG"/>
+		<info name="usage" value="Requires 15 free blocks on memory card to start (PocketStation)"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blend x brand (japan) [slps-02818]" sha1="f4ef9b25dc30de6f475e9ffe1a84a6347dfdc3b2"/>
+				<disk name="blend x brand (japan) [slps-02818]" sha1="f4ef9b25dc30de6f475e9ffe1a84a6347dfdc3b2" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39709,8 +39743,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="blue" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="blue" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="b.l.u.e. - Legend of Water (Japan) [SLPS-01459].bin" size="450445632" crc="17286c73" sha1="48770cce71511bd6c8d82cddfd9682792688fc9d"/>
 		<rom name="b.l.u.e. - Legend of Water (Japan) [SLPS-01459].cue" size="169" crc="494f1da3" sha1="84dcfb351d00ce30c737d25c2f09f5d07704df98"/>
 		-->
@@ -39723,13 +39759,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="b.l.u.e. - legend of water (japan) [slps-01459]" sha1="e6bf35d13f3076c98e8b1f6886e6f5fbb13ed3f1"/>
+				<disk name="b.l.u.e. - legend of water (japan) [slps-01459]" sha1="e6bf35d13f3076c98e8b1f6886e6f5fbb13ed3f1" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="bluebrkb" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bluebrkb" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Blue Breaker Burst - Egao no Asu ni (Japan) [SLPS-01580].bin" size="699181392" crc="d71e8135" sha1="ff207395978700b62a39bc305a8edb9610eec174"/>
 		<rom name="Blue Breaker Burst - Egao no Asu ni (Japan) [SLPS-01580].cue" size="122" crc="63e07d5e" sha1="6006680873549dedb6491c3641c30f4ca296a1cc"/>
 		-->
@@ -39742,13 +39780,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blue breaker burst - egao no asu ni (japan) [slps-01580]" sha1="c1d42e0238b529d1c100c2dd57c0f20d0c428851"/>
+				<disk name="blue breaker burst - egao no asu ni (japan) [slps-01580]" sha1="c1d42e0238b529d1c100c2dd57c0f20d0c428851" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="bluemarlj" cloneof="bluemarl" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bluemarlj" cloneof="bluemarl" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Blue Marlin, The (Japan) [SLPS-02752].bin" size="250640880" crc="ab461505" sha1="0a9882077674ce3d603b9ca6da3d622d52028bf6"/>
 		<rom name="Blue Marlin, The (Japan) [SLPS-02752].cue" size="101" crc="b3953d27" sha1="f0502d6426966271f31320a65a5cc7e701279f9a"/>
 		-->
@@ -39761,7 +39801,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blue marlin, the (japan) [slps-02752]" sha1="ecf70699d173e754d70aaf247c4af3c6abeded0b"/>
+				<disk name="blue marlin, the (japan) [slps-02752]" sha1="ecf70699d173e754d70aaf247c4af3c6abeded0b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40144,8 +40184,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="bravesag" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bravesag" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Brave Saga - Shin Sedai Robot Senki (Japan) [SLPS-01756].bin" size="685528032" crc="dbe6c16a" sha1="cce6a2b9eaae75b770260c0faacbc84deb94a6a9"/>
 		<rom name="Brave Saga - Shin Sedai Robot Senki (Japan) [SLPS-01756].cue" size="120" crc="15eda12c" sha1="20916c2a02f9ed03500c5a28a6eb12a3cc1927d8"/>
 		-->
@@ -40158,13 +40200,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="brave saga - shin sedai robot senki (japan) [slps-01756]" sha1="5d6d10c54b65a98324fc137147b0efe71fc0cf91"/>
+				<disk name="brave saga - shin sedai robot senki (japan) [slps-01756]" sha1="5d6d10c54b65a98324fc137147b0efe71fc0cf91" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump), locks up on starfield screen when starting new game with voice sample playback -->
 	<software name="bravesg2" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Brave Saga 2 (Japan) (Disc 1) [SLPS-02580].bin" size="748655712" crc="ee882417" sha1="a3deff5fd357a386917094ced4693d5adb18ae5b"/>
 		<rom name="Brave Saga 2 (Japan) (Disc 1) [SLPS-02580].cue" size="104" crc="7e5a250d" sha1="631a24932e9efaa585bb7e4b3827556549c78e84"/>
 
@@ -40180,12 +40224,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="brave saga 2 (japan) (disc 1) [slps-02580]" sha1="257177184b98b8970a7ef3397f14aef0b05d5bc4"/>
+				<disk name="brave saga 2 (japan) (disc 1) [slps-02580]" sha1="257177184b98b8970a7ef3397f14aef0b05d5bc4" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="brave saga 2 (japan) (disc 2) [slps-02581]" sha1="f20acc35f3e9d8398bfd25890defe27b3e7e993d"/>
+				<disk name="brave saga 2 (japan) (disc 2) [slps-02581]" sha1="f20acc35f3e9d8398bfd25890defe27b3e7e993d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40421,8 +40465,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="caromsh2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="caromsh2" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Carom Shot 2 (Japan) [SLPS-01486].bin" size="452129664" crc="52e76caa" sha1="6a766cadde33a4bbfc4f25a35dfb772b33e9fe93"/>
 		<rom name="Carom Shot 2 (Japan) [SLPS-01486].cue" size="97" crc="28fc36ad" sha1="dcf049b139990796746464ba094ce752531ff38d"/>
 		-->
@@ -40435,7 +40481,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="carom shot 2 (japan) [slps-01486]" sha1="64d4804d54ef55ef1c16b3881686fb9f740eac69"/>
+				<disk name="carom shot 2 (japan) [slps-01486]" sha1="64d4804d54ef55ef1c16b3881686fb9f740eac69" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40609,8 +40655,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="cielgris" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="cielgris" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Cielgris Fantasm - Noir Yeux Noire - Kuroi Hitomi no Noir (Noir's Dark Eyes) (Japan) [SLPS-01450].bin" size="305016768" crc="481e9e0c" sha1="370d62e04f41c543d869ae23df04c2dca39587ed"/>
 		<rom name="Cielgris Fantasm - Noir Yeux Noire - Kuroi Hitomi no Noir (Noir's Dark Eyes) (Japan) [SLPS-01450].cue" size="225" crc="4a18a5ea" sha1="d3eeac37476fdc16ffca939823e8826e211f7bb6"/>
 		-->
@@ -40623,7 +40671,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cielgris fantasm - noir yeux noire - kuroi hitomi no noir (noir's dark eyes) (japan) [slps-01450]" sha1="6d4226bdafbb63e5a7f2d2d805019acf9af6b372"/>
+				<disk name="cielgris fantasm - noir yeux noire - kuroi hitomi no noir (noir's dark eyes) (japan) [slps-01450]" sha1="6d4226bdafbb63e5a7f2d2d805019acf9af6b372" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40691,8 +40739,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="clocktgh" cloneof="clocktw2" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, no mouse support, every time you enter into a room there's a spurious sample playback (not supposed to happen) -->
+	<software name="clocktgh" cloneof="clocktw2" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Clock Tower - Ghost Head (Japan) [SLPS-01290].bin" size="428541456" crc="96b5452f" sha1="6766f3d37b2a215572bf7ee3bbc358b17c00c050"/>
 		<rom name="Clock Tower - Ghost Head (Japan) [SLPS-01290].cue" size="109" crc="814ae14f" sha1="5db55997366498f05a106d3fc178a1d0ce31e49f"/>
 		-->
@@ -40705,7 +40755,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="clock tower - ghost head (japan) [slps-01290]" sha1="28f77a9178f9d23a7090f242ce47310c112108bb"/>
+				<disk name="clock tower - ghost head (japan) [slps-01290]" sha1="28f77a9178f9d23a7090f242ce47310c112108bb" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40815,9 +40865,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- re-release of above? -->
 	<!-- boot OK, hangs while trying to load or save -->
 	<software name="compomod" supported="partial">
+		<!-- re-release of above? -->
 		<!-- 
 		Unknown source
 		<rom name="Community Pom - Omoide wo Dakishimete (Japan) [SLPS-02116].bin" size="186577104" crc="257f9974" sha1="192ccc686d0650ade84e78d38790cc57da2efd63"/>
@@ -41005,9 +41055,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK, hangs after first spoken dialogue -->
 	<software name="crtant1k" supported="no">
 		<!-- part 2 of the re-release of SLPM-86280~1, unsure whether discs are the same... -->
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Cross Tantei Monogatari 1 (Cross Detective Story) - Kouhen (Japan) [SLPM-86639].bin" size="640313184" crc="17bcfc33" sha1="8efb56bfb4c10a7c0eb1fa31fea47e81fbae029d"/>
 		<rom name="Cross Tantei Monogatari 1 (Cross Detective Story) - Kouhen (Japan) [SLPM-86639].cue" size="145" crc="19f94ed5" sha1="f577bb0b2af044a92715bdfb09d8daa7a78d9677"/>
 		-->
@@ -41020,7 +41072,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="cross tantei monogatari 1 (cross detective story) - kouhen (japan) [slpm-86639]" sha1="cc5b223e1cae8f2db662d98e84be9dc5b8151f54"/>
+				<disk name="cross tantei monogatari 1 (cross detective story) - kouhen (japan) [slpm-86639]" sha1="cc5b223e1cae8f2db662d98e84be9dc5b8151f54" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41076,7 +41128,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- hangs at Sony logo (boots with US bios with no voice samples and most BGMs) -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump), missing voice samples and most BGMs -->
 	<software name="ctsubaj" supported="no">
 		<!-- 
 		Unknown source
@@ -41575,7 +41627,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="ddrextm" supported="no">
 		<!-- 
 		Unknown source
@@ -42366,7 +42418,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- Hangs, black screen with US BIOS and with hacked PS logo (bootleg dump) -->
+	<!-- hangs at PS logo, black screen after Bandai logo with US BIOS and with hacked PS logo (bootleg dump) -->
 	<software name="drslump" supported="no">
 		<!-- 
 		Unknown source
@@ -43698,7 +43750,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="frisktom" supported="no">
 		<!-- 
 		Unknown source
@@ -53587,7 +53639,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- Doesn't boot with JP BIOS, it does with US but bootleg dump -->
+	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
 	<software name="salarymc" supported="no">
 		<!-- 
 		Unknown source
