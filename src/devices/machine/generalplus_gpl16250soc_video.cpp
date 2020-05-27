@@ -132,6 +132,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 //	m_pal_displaybank_high(0),
 //	m_pal_sprites(0x100),
 //	m_pal_back(0x000),
+	m_alt_extrasprite_hack(0),
 	m_alt_tile_addressing(0)
 {
 }
@@ -861,8 +862,12 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	else
 		addressing_mode = 1;
 
-	if (addressing_mode == 0) // smartfp, paccon
-		tile |= m_spriteextra[base_addr / 4] << 16;
+	if (m_alt_extrasprite_hack == 0)
+		if (addressing_mode == 0) // smartfp, paccon
+			tile |= m_spriteextra[base_addr / 4] << 16;
+
+	if (m_alt_extrasprite_hack == 1) // jak_prft
+		tile |= (m_spriteextra[base_addr] & 0x000f) << 16;
 
 	if (((attr & 0x3000) >> 12) != priority)
 	{
@@ -913,16 +918,26 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	// different attribute use?
 	if (screenwidth == 320)
 	{
-		flip_x = (attr & 0x0004);
+		if (m_alt_extrasprite_hack == 0)
+		{
+			flip_x = (attr & 0x0004);
+			yflipmask = attr & 0x0008 ? h - 1 : 0;
+		}
+		else
+		{
+			flip_x = 0;
+			yflipmask = 0;
+		}
+
 		bpp = attr & 0x0003;
-		yflipmask = attr & 0x0008 ? h - 1 : 0;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 	else
 	{
 		flip_x = 0;// (attr & TILE_X_FLIP);
-		bpp = attr & 0x0003;
 		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0;
+
+		bpp = attr & 0x0003;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 
@@ -971,7 +986,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
-	if (1)
+	if (0)
 	{
 		uint16_t attr0 = m_tmap0_regs[0];
 		uint16_t attr1 = m_tmap1_regs[0];
@@ -1746,7 +1761,9 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 
 	if (m_video_irq_enable & 1)
 	{
-		m_video_irq_status |= 1;
+		// jak_prft expects 0x800 to be set in the status register or most of the main vblank code is skipped, why?
+
+		m_video_irq_status |= 1 | 0x800;
 		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 	}

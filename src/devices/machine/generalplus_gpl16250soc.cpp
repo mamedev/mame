@@ -67,9 +67,24 @@ void sunplus_gcm394_base_device::write_dma_params(int channel, int offset, uint1
 
 	m_dma_params[offset][channel] = data;
 
+	// TODO: very likely DMA happens whenever the length is not 0, as long as it's been enabled previously
+	// jak_prft doesn't rewrite the offset 0 register between requests, and instead writes the length
+	// as the final thing for each new request.  other games do not write the length last, but turn off
+	// register 0 before writing params, and enable it again afterwards
+	// if that's the case, this code can be refactored to work on 'length' instead of the m_dma_latched
+
+	if (offset == 3)
+	{
+		m_dma_latched[channel] = true;
+
+		if (m_dma_params[0][channel] & 1)
+			trigger_systemm_dma(space, channel);
+	}
+
 	if (offset == 0 && (data & 1))
 	{
-		trigger_systemm_dma(space, channel);
+		if (m_dma_latched[channel])
+			trigger_systemm_dma(space, channel);
 	}
 
 }
@@ -204,8 +219,13 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 
 	// clear params after operation
-	m_dma_params[0][channel] = m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
+	m_dma_params[0][channel] = m_dma_params[0][channel] & 0x00f7;
+
+	m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
+	m_dma_latched[channel] = false;
+
 	//machine().debug_break();
+
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_7abf_unk_w)
@@ -1446,6 +1466,7 @@ void sunplus_gcm394_base_device::device_reset()
 		{
 			m_dma_params[i][j] = 0x0000;
 		}
+		m_dma_latched[j] = false;
 	}
 
 	// 78xx unknown
