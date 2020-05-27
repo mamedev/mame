@@ -317,7 +317,7 @@ void jak_s500_game_state::machine_reset()
 void lazertag_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->set_pal_sprites_hack(0x800);
+	//m_maincpu->set_pal_sprites_hack(0x800);
 }
 
 void paccon_game_state::machine_reset()

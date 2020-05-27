@@ -195,11 +195,11 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 
 	// what is it waiting for when we need these? (needed on some service mode screens)
-	if (mem.read_word(0x3f368) == 0x4840)
-		mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+	//if (mem.read_word(0x3f368) == 0x4840)
+	//	mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-	if (mem.read_word(0x4d8d4) == 0x4840)
-		mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+	//if (mem.read_word(0x4d8d4) == 0x4840)
+	//	mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
 
 	// clear params after operation
@@ -772,7 +772,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// these don't exist on older SPG
 	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port-based data upload?
 
-	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
+	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_707e_spritebank_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
 
 	// another set of registers for something?
