@@ -35,28 +35,25 @@ public:
 	{ }
 
 	void dps1(machine_config &config);
-
 	void init_dps1();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	void portb2_w(uint8_t data);
-	void portb4_w(uint8_t data);
-	void portb6_w(uint8_t data);
-	void portb8_w(uint8_t data);
-	void portba_w(uint8_t data);
-	void portbc_w(uint8_t data);
-	void portbe_w(uint8_t data);
-	uint8_t portff_r();
-	void portff_w(uint8_t data);
+	virtual void machine_reset() override;
+	void portb2_w(u8 data);
+	void portb4_w(u8 data);
+	void portb6_w(u8 data);
+	void portb8_w(u8 data);
+	void portba_w(u8 data);
+	void portbc_w(u8 data);
+	void portbe_w(u8 data);
+	u8 portff_r();
+	void portff_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	bool m_dma_dir;
-	uint16_t m_dma_adr;
+	u16 m_dma_adr;
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -97,54 +94,54 @@ void dps1_state::io_map(address_map &map)
 
 
 // read from disk, to memory
-void dps1_state::portb2_w(uint8_t data)
+void dps1_state::portb2_w(u8 data)
 {
 	m_dma_dir = 1;
 }
 
 // write to disk, from memory
-void dps1_state::portb4_w(uint8_t data)
+void dps1_state::portb4_w(u8 data)
 {
 	m_dma_dir = 0;
 }
 
 // enable eprom
-void dps1_state::portb6_w(uint8_t data)
+void dps1_state::portb6_w(u8 data)
 {
 	membank("bankr0")->set_entry(1); // point at rom
 }
 
 // set A16-23
-void dps1_state::portb8_w(uint8_t data)
+void dps1_state::portb8_w(u8 data)
 {
 }
 
 // set A8-15
-void dps1_state::portba_w(uint8_t data)
+void dps1_state::portba_w(u8 data)
 {
 	m_dma_adr = (data << 8) | (m_dma_adr & 0xff);
 }
 
 // set A0-7
-void dps1_state::portbc_w(uint8_t data)
+void dps1_state::portbc_w(u8 data)
 {
 	m_dma_adr = (m_dma_adr & 0xff00) | data;
 }
 
 // disable eprom
-void dps1_state::portbe_w(uint8_t data)
+void dps1_state::portbe_w(u8 data)
 {
 	membank("bankr0")->set_entry(0); // point at ram
 }
 
 // read 8 front-panel switches
-uint8_t dps1_state::portff_r()
+u8 dps1_state::portff_r()
 {
 	return 0x0e;
 }
 
 // write to 8 leds
-void dps1_state::portff_w(uint8_t data)
+void dps1_state::portff_w(u8 data)
 {
 }
 
@@ -183,7 +180,7 @@ void dps1_state::machine_reset()
 
 void dps1_state::init_dps1()
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x0400]);

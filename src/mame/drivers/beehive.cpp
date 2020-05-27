@@ -36,22 +36,22 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	uint8_t beehive_60_r();
-	void beehive_62_w(uint8_t data);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void beehive(machine_config &config);
+
+private:
 	void beehive_io(address_map &map);
 	void beehive_mem(address_map &map);
-private:
+	u8 beehive_60_r();
+	void beehive_62_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	uint8_t m_keyline;
+	u8 m_keyline;
 	virtual void machine_reset() override;
 };
 
-uint8_t beehive_state::beehive_60_r()
+u8 beehive_state::beehive_60_r()
 {
 	if (BIT(m_keyline, 4))
 	{
@@ -63,7 +63,7 @@ uint8_t beehive_state::beehive_60_r()
 		return 0xff;
 }
 
-void beehive_state::beehive_62_w(uint8_t data)
+void beehive_state::beehive_62_w(u8 data)
 {
 	m_keyline = data;
 }
@@ -241,12 +241,12 @@ void beehive_state::machine_reset()
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
-uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t cursor_pos = (m_p_videoram[0xcaf] | (m_p_videoram[0xcb0] << 8)) & 0xfff;
 	uint16_t p_linelist;
-	uint8_t line_length;
-	uint8_t y,ra,chr,gfx,inv;
+	u8 line_length;
+	u8 y,ra,chr,gfx,inv;
 	uint16_t sy=0,ma,x;
 
 	for (y = 0; y < 25; y++)
@@ -258,7 +258,7 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		for (ra = 0; ra < 10; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
-			uint8_t chars = 0;
+			u8 chars = 0;
 
 			for (x = ma; x < ma + line_length; x++)
 			{

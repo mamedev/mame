@@ -121,13 +121,13 @@ public:
 	void d6809(machine_config &config);
 
 private:
-	uint8_t term_r();
-	void term_w(uint8_t data);
+	u8 term_r();
+	void term_w(u8 data);
 	void kbd_put(u8 data);
 
 	void mem_map(address_map &map);
 
-	uint8_t m_term_data;
+	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -135,14 +135,14 @@ private:
 	required_device<floppy_connector> m_floppy0;
 };
 
-uint8_t d6809_state::term_r()
+u8 d6809_state::term_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-void d6809_state::term_w(uint8_t data)
+void d6809_state::term_w(u8 data)
 {
 	if ((data > 0) && (data < 0x80))
 		m_terminal->write(data);

@@ -45,34 +45,42 @@ public:
 		{ }
 
 	void cvicny(machine_config &config);
-	void cvicny_mem(address_map &map);
-	uint8_t key_r();
-	void digit_w(uint8_t data);
-	void segment_w(uint8_t data);
+
 private:
-	uint8_t m_digit;
-	uint8_t m_seg;
+	void cvicny_mem(address_map &map);
+	virtual void machine_start() override;
+	u8 key_r();
+	void digit_w(u8 data);
+	void segment_w(u8 data);
+	u8 m_digit;
+	u8 m_seg;
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<8> m_io_keyboard;
 };
 
-void cvicny_state::segment_w(uint8_t data) // output segments on the selected digit
+void cvicny_state::segment_w(u8 data) // output segments on the selected digit
 {
 	m_seg = data;
 	m_display->matrix(1<<m_digit, m_seg);
 }
 
-void cvicny_state::digit_w(uint8_t data) // set keyboard scanning row; set digit to display
+void cvicny_state::digit_w(u8 data) // set keyboard scanning row; set digit to display
 {
 	m_digit = data & 7;
 	m_display->matrix(1<<m_digit, m_seg);
 }
 
-uint8_t cvicny_state::key_r()
+u8 cvicny_state::key_r()
 {
 	u8 data = m_io_keyboard[m_digit]->read();
 	return ((data << 4) ^ 0xf0) | data;
+}
+
+void cvicny_state::machine_start()
+{
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
 }
 
 void cvicny_state::cvicny_mem(address_map &map)
@@ -150,4 +158,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME        FLAGS
-COMP( 1984, cvicny, 0,      0,      cvicny,  cvicny, cvicny_state, empty_init, "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)
+COMP( 1984, cvicny, 0,      0,      cvicny,  cvicny, cvicny_state, empty_init, "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

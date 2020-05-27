@@ -74,21 +74,20 @@ ToDo:
 class ccs_state : public driver_device
 {
 public:
-	ccs_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_rom(*this, "maincpu"),
-		m_ins8250(*this, "ins8250"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_jump_addr_sel(*this, {"ADDRLO", "ADDRHI"}),
-		m_ser_addr_sel(*this, "SERADDR"),
-		m_jump_en(*this, "JMPEN"),
-		m_rom_en(*this, "ROMEN"),
-		m_ser_en(*this, "SEREN")
-	{
-	}
+	ccs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, "maincpu")
+		, m_ins8250(*this, "ins8250")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_jump_addr_sel(*this, {"ADDRLO", "ADDRHI"})
+		, m_ser_addr_sel(*this, "SERADDR")
+		, m_jump_en(*this, "JMPEN")
+		, m_rom_en(*this, "ROMEN")
+		, m_ser_en(*this, "SEREN")
+	{ }
 
 	void init_ccs2810();
 	void init_ccs2422();
@@ -96,29 +95,28 @@ public:
 	void ccs2810(machine_config &config);
 	void ccs2422(machine_config &config);
 
-protected:
-	uint8_t memory_read(offs_t offset);
-	void memory_write(offs_t offset, uint8_t data);
-	uint8_t io_read(offs_t offset);
-	void io_write(offs_t offset, uint8_t data);
+private:
+	u8 memory_read(offs_t offset);
+	void memory_write(offs_t offset, u8 data);
+	u8 io_read(offs_t offset);
+	void io_write(offs_t offset, u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t port04_r();
-	uint8_t port34_r();
-	void port04_w(uint8_t data);
-	void port34_w(uint8_t data);
-	void port40_w(uint8_t data);
+	u8 port04_r();
+	u8 port34_r();
+	void port04_w(u8 data);
+	void port34_w(u8 data);
+	void port40_w(u8 data);
 
 	void ccs2422_io(address_map &map);
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<u8> m_rom;
 	required_device<ins8250_device> m_ins8250;
 	optional_device<mb8877_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
@@ -129,18 +127,18 @@ private:
 	required_ioport m_rom_en;
 	required_ioport m_ser_en;
 
-	uint8_t m_power_on_status;
+	u8 m_power_on_status;
 
 	bool m_ss;
 	bool m_dden;
 	bool m_dsize;
-	uint8_t m_ds;
+	u8 m_ds;
 	floppy_image_device *m_floppy;
 };
 
-uint8_t ccs_state::memory_read(offs_t offset)
+u8 ccs_state::memory_read(offs_t offset)
 {
-	uint8_t result = m_ram->read(offset);
+	u8 result = m_ram->read(offset);
 
 	if (!BIT(m_power_on_status, 0))
 	{
@@ -164,12 +162,12 @@ uint8_t ccs_state::memory_read(offs_t offset)
 	return result;
 }
 
-void ccs_state::memory_write(offs_t offset, uint8_t data)
+void ccs_state::memory_write(offs_t offset, u8 data)
 {
 	m_ram->write(offset, data);
 }
 
-uint8_t ccs_state::io_read(offs_t offset)
+u8 ccs_state::io_read(offs_t offset)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
@@ -178,7 +176,7 @@ uint8_t ccs_state::io_read(offs_t offset)
 	return 0xff;
 }
 
-void ccs_state::io_write(offs_t offset, uint8_t data)
+void ccs_state::io_write(offs_t offset, u8 data)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
@@ -792,10 +790,10 @@ d6 : autoboot (1=go to monitor)
 d7 : drq
 */
 
-uint8_t ccs_state::port34_r()
+u8 ccs_state::port34_r()
 {
-	//return (uint8_t)m_drq | (m_ds << 1) | ((uint8_t)fdc->hld_r() << 5) | 0x40 | ((uint8_t)m_intrq << 7);
-	return (uint8_t)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((uint8_t)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
+	//return (u8)m_drq | (m_ds << 1) | ((u8)fdc->hld_r() << 5) | 0x40 | ((u8)m_intrq << 7);
+	return (u8)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((u8)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
 }
 
 /* Status 2
@@ -809,7 +807,7 @@ d6 : double (0 = a double-sided 20cm disk is in the drive)
 d7 : drq
 */
 
-uint8_t ccs_state::port04_r()
+u8 ccs_state::port04_r()
 {
 	bool trk00=1,wprt=0,dside=1;
 	int idx=1;
@@ -820,8 +818,8 @@ uint8_t ccs_state::port04_r()
 		idx = m_floppy->idx_r()^1;
 		dside = m_floppy->twosid_r();
 	}
-	return (uint8_t)trk00 | 0 | ((uint8_t)wprt << 2) | ((uint8_t)m_ss << 3) |
-		idx << 4 | ((uint8_t)m_dden << 5) | ((uint8_t)dside << 6) | ((uint8_t)m_fdc->drq_r() << 7);
+	return (u8)trk00 | 0 | ((u8)wprt << 2) | ((u8)m_ss << 3) |
+		idx << 4 | ((u8)m_dden << 5) | ((u8)dside << 6) | ((u8)m_fdc->drq_r() << 7);
 }
 
 /* Control 1
@@ -835,7 +833,7 @@ d6 : dden
 d7 : autowait (0=ignore drq)
 */
 
-void ccs_state::port34_w(uint8_t data)
+void ccs_state::port34_w(u8 data)
 {
 	m_ds = data & 15;
 	m_dsize = BIT(data, 4);
@@ -860,7 +858,7 @@ d7 : rom enable (1=firmware enabled)
 other bits not used
 */
 
-void ccs_state::port04_w(uint8_t data)
+void ccs_state::port04_w(u8 data)
 {
 	m_ss = BIT(data, 6);
 	if (m_floppy)
@@ -873,7 +871,7 @@ void ccs_state::port04_w(uint8_t data)
 //  Machine
 //
 //*************************************
-void ccs_state::port40_w(uint8_t data)
+void ccs_state::port40_w(u8 data)
 {
 	//membank("bankr0")->set_entry( (data) ? 1 : 0);
 }

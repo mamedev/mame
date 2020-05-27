@@ -64,13 +64,13 @@ private:
 		TIMER_BOOT
 	};
 
-	void argo_videoram_w(offs_t offset, uint8_t data);
-	uint8_t argo_io_r(offs_t offset);
-	void argo_io_w(offs_t offset, uint8_t data);
+	void argo_videoram_w(offs_t offset, u8 data);
+	u8 argo_io_r(offs_t offset);
+	void argo_io_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(z0_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	void argo_palette(palette_device &palette) const;
-	uint8_t dma_r(offs_t offset);
+	u8 dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -87,9 +87,9 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_ioport_array<11> m_io_keyboard;
-	uint8_t m_framecnt;
+	u8 m_framecnt;
 	bool m_ram_ctrl;
-	uint8_t m_scroll_ctrl;
+	u8 m_scroll_ctrl;
 	bool m_txe, m_txd, m_rts, m_casspol;
 	u8 m_cass_data[4];
 	virtual void machine_reset() override;
@@ -97,9 +97,9 @@ private:
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
-void argo_state::argo_videoram_w(offs_t offset, uint8_t data)
+void argo_state::argo_videoram_w(offs_t offset, u8 data)
 {
-	uint8_t *RAM;
+	u8 *RAM;
 	if (m_ram_ctrl)
 		m_p_videoram[offset] = data;
 	else
@@ -109,9 +109,9 @@ void argo_state::argo_videoram_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t argo_state::argo_io_r(offs_t offset)
+u8 argo_state::argo_io_r(offs_t offset)
 {
-	uint8_t low_io = offset;
+	u8 low_io = offset;
 
 	switch (low_io)
 	{
@@ -147,7 +147,7 @@ uint8_t argo_state::argo_io_r(offs_t offset)
 	}
 }
 
-void argo_state::argo_io_w(offs_t offset, uint8_t data)
+void argo_state::argo_io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -204,7 +204,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( argo_state::kansas_r )
 	m_cass_data[1]++;
 	m_cass_data[2]++;
 
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(argo_state::z0_w)
 	// read - incoming 2514Hz
 }
 
-uint8_t argo_state::dma_r(offs_t offset)
+u8 argo_state::dma_r(offs_t offset)
 {
 	if (offset < 0xf800)
 		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -254,7 +254,7 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 		m_framecnt++;
 
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
+	u8 gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
 	if (vsp)
 		gfx = 0;
@@ -269,7 +269,7 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(uint8_t i=0;i<7;i++)
+	for(u8 i=0;i<7;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
 }
 
@@ -446,7 +446,7 @@ void argo_state::machine_reset()
 
 void argo_state::init_argo()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
+	u8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 

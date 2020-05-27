@@ -107,54 +107,52 @@ public:
 
 	void init_applix();
 
-protected:
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-private:
-	uint8_t applix_inputs_r();
-	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void analog_latch_w(uint16_t data);
-	void dac_latch_w(uint16_t data);
-	void video_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t applix_pb_r();
-	void applix_pa_w(uint8_t data);
-	void applix_pb_w(uint8_t data);
+	u8 applix_inputs_r();
+	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void analog_latch_w(u16 data);
+	void dac_latch_w(u16 data);
+	void video_latch_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 applix_pb_r();
+	void applix_pa_w(u8 data);
+	void applix_pb_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	uint8_t port00_r();
-	uint8_t port08_r();
-	uint8_t port10_r();
-	uint8_t port18_r();
-	uint8_t port20_r();
-	uint8_t port60_r();
-	void port08_w(uint8_t data);
-	void port10_w(uint8_t data);
-	void port18_w(offs_t offset, uint8_t data);
-	void port20_w(uint8_t data);
-	void port60_w(uint8_t data);
-	uint16_t fdc_data_r();
-	uint16_t fdc_stat_r(offs_t offset);
-	void fdc_data_w(uint16_t data);
-	void fdc_cmd_w(uint16_t data);
+	u8 port00_r();
+	u8 port08_r();
+	u8 port10_r();
+	u8 port18_r();
+	u8 port20_r();
+	u8 port60_r();
+	void port08_w(u8 data);
+	void port10_w(u8 data);
+	void port18_w(offs_t offset, u8 data);
+	void port20_w(u8 data);
+	void port60_w(u8 data);
+	u16 fdc_data_r();
+	u16 fdc_stat_r(offs_t offset);
+	void fdc_data_w(u16 data);
+	void fdc_cmd_w(u16 data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	uint8_t internal_data_read(offs_t offset);
-	void internal_data_write(offs_t offset, uint8_t data);
-	uint8_t p1_read();
-	void p1_write(uint8_t data);
-	uint8_t p2_read();
-	void p2_write(uint8_t data);
-	uint8_t p3_read();
-	void p3_write(uint8_t data);
+	u8 internal_data_read(offs_t offset);
+	void internal_data_write(offs_t offset, u8 data);
+	u8 p1_read();
+	void p1_write(u8 data);
+	u8 p2_read();
+	void p2_write(u8 data);
+	u8 p3_read();
+	void p3_write(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_BEGIN_UPDATE(crtc_update_border);
 	void applix_palette(palette_device &palette) const;
 
-	uint8_t m_video_latch;
-	uint8_t m_pa;
-	uint8_t m_palette_latch[4];
-	required_shared_ptr<uint16_t> m_base;
+	u8 m_video_latch;
+	u8 m_pa;
+	u8 m_palette_latch[4];
+	required_shared_ptr<u16> m_base;
 
 	void applix_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
@@ -162,24 +160,24 @@ private:
 	void subcpu_io(address_map &map);
 	void subcpu_mem(address_map &map);
 
-	uint8_t m_pb;
-	uint8_t m_analog_latch;
-	uint8_t m_dac_latch;
-	uint8_t m_port08;
-	uint8_t m_data_to_fdc;
-	uint8_t m_data_from_fdc;
+	u8 m_pb;
+	u8 m_analog_latch;
+	u8 m_dac_latch;
+	u8 m_port08;
+	u8 m_data_to_fdc;
+	u8 m_data_from_fdc;
 	bool m_data;
 	bool m_data_or_cmd;
 	bool m_buffer_empty;
 	bool m_fdc_cmd;
-	uint8_t m_clock_count;
+	u8 m_clock_count;
 	bool m_cp;
-	uint8_t   m_p1;
-	uint8_t   m_p1_data;
-	uint8_t   m_p2;
-	uint8_t   m_p3;
-	uint16_t  m_last_write_addr;
-	uint8_t m_cass_data[4];
+	u8   m_p1;
+	u8   m_p1_data;
+	u8   m_p2;
+	u8   m_p3;
+	u16  m_last_write_addr;
+	u8 m_cass_data[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
@@ -215,7 +213,7 @@ private:
 	required_ioport m_io_k3a0;
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
-	required_shared_ptr<uint16_t> m_expansion;
+	required_shared_ptr<u16> m_expansion;
 
 	required_device<palette_device> m_palette;
 };
@@ -226,7 +224,7 @@ d3     = cassette LED, low=on
 d4,5,6 = audio select
 d7     = cassette relay, low=on
 */
-void applix_state::analog_latch_w(uint16_t data)
+void applix_state::analog_latch_w(u16 data)
 {
 	data &= 0xff;
 	if (data != m_analog_latch)
@@ -238,7 +236,7 @@ void applix_state::analog_latch_w(uint16_t data)
 	}
 }
 
-void applix_state::dac_latch_w(uint16_t data)
+void applix_state::dac_latch_w(u16 data)
 {
 	data &= 0xff;
 	m_dac_latch = data;
@@ -251,7 +249,7 @@ void applix_state::dac_latch_w(uint16_t data)
 }
 
 //cent = odd, video = even
-void applix_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void applix_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
@@ -262,7 +260,7 @@ void applix_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_palette_latch[offset] = (data >> 8) & 15;
 }
 
-void applix_state::video_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void applix_state::video_latch_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_video_latch = data;
@@ -274,12 +272,12 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-uint8_t applix_state::applix_inputs_r()
+u8 applix_state::applix_inputs_r()
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
 
-uint8_t applix_state::applix_pb_r()
+u8 applix_state::applix_pb_r()
 {
 	return m_pb;
 }
@@ -294,7 +292,7 @@ d5 = /(out) clear cass IRQ and output line
 d6 = /(out) reset keyboard by pulling kbd clock low
 d7 = /(out) reset keyboard flipflop
 */
-void applix_state::applix_pa_w(uint8_t data)
+void applix_state::applix_pa_w(u8 data)
 {
 	// Reset flipflop counter
 	if (!BIT(data, 7))
@@ -325,7 +323,7 @@ void applix_state::applix_pa_w(uint8_t data)
 d0-6 = user
 d7   = square wave output for cassette IRQ
 */
-void applix_state::applix_pb_w(uint8_t data)
+void applix_state::applix_pb_w(u8 data)
 {
 	// low-to-high of PB7 when writing cassette - CLK on IC49
 	if (!BIT(m_pb, 7) && BIT(data, 7))
@@ -341,9 +339,9 @@ d1 = H if 68000 sent a byte
 d2 = H if 68000 has read last byte
 d3 = test switch
 */
-uint8_t applix_state::port00_r()
+u8 applix_state::port00_r()
 {
-	return (uint8_t)m_data_or_cmd | ((uint8_t)m_data << 1) | ((uint8_t)m_buffer_empty << 2) | m_io_fdc->read();
+	return (u8)m_data_or_cmd | ((u8)m_data << 1) | ((u8)m_buffer_empty << 2) | m_io_fdc->read();
 }
 
 /*
@@ -356,7 +354,7 @@ d5 = SIDE
 d6 = BANK
 d7 = MAP
 */
-uint8_t applix_state::port08_r()
+u8 applix_state::port08_r()
 {
 	return m_port08 | 3;
 }
@@ -366,7 +364,7 @@ d0 = /INUSE
 d1 = /EJECT
 d2-7 same as for port08_r
 */
-void applix_state::port08_w(uint8_t data)
+void applix_state::port08_w(u8 data)
 {
 	m_port08 = data;
 	membank("bank1")->set_entry(BIT(data, 6));
@@ -384,72 +382,72 @@ void applix_state::port08_w(uint8_t data)
 	}
 }
 
-uint8_t applix_state::port10_r()
+u8 applix_state::port10_r()
 {
 	return 0;
 }
 
-void applix_state::port10_w(uint8_t data)
+void applix_state::port10_w(u8 data)
 {
 }
 
-uint8_t applix_state::port18_r()
+u8 applix_state::port18_r()
 {
 	m_data = 0;
 	return m_data_to_fdc;
 }
 
-void applix_state::port18_w(offs_t offset, uint8_t data)
+void applix_state::port18_w(offs_t offset, u8 data)
 {
 	m_data_from_fdc = data;
 	m_buffer_empty = 0;
 	m_fdc_cmd = BIT(offset, 2);
 }
 
-uint8_t applix_state::port20_r()
+u8 applix_state::port20_r()
 {
 	return 0;
 }
 
-void applix_state::port20_w(uint8_t data)
+void applix_state::port20_w(u8 data)
 {
 }
 
-uint8_t applix_state::port60_r()
+u8 applix_state::port60_r()
 {
 	return 0;
 }
 
-void applix_state::port60_w(uint8_t data)
+void applix_state::port60_w(u8 data)
 {
 }
 
-uint16_t applix_state::fdc_stat_r(offs_t offset)
+u16 applix_state::fdc_stat_r(offs_t offset)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 	switch (offset)
 	{
-	case 0: data = (uint8_t)m_buffer_empty^1; break;
-	case 1: data = (uint8_t)m_data^1; break;
-	default: data = (uint8_t)m_fdc_cmd; // case 2
+	case 0: data = (u8)m_buffer_empty^1; break;
+	case 1: data = (u8)m_data^1; break;
+	default: data = (u8)m_fdc_cmd; // case 2
 	}
 	return data << 7;
 }
 
-uint16_t applix_state::fdc_data_r()
+u16 applix_state::fdc_data_r()
 {
 	m_buffer_empty = 1;
 	return m_data_from_fdc;
 }
 
-void applix_state::fdc_data_w(uint16_t data)
+void applix_state::fdc_data_w(u16 data)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
 	m_data_or_cmd = 0;
 }
 
-void applix_state::fdc_cmd_w(uint16_t data)
+void applix_state::fdc_cmd_w(u16 data)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
@@ -743,7 +741,7 @@ INPUT_PORTS_END
 
 void applix_state::machine_reset()
 {
-	uint8_t* ROM = memregion("maincpu")->base();
+	u8* ROM = memregion("maincpu")->base();
 	memcpy(m_expansion, ROM, 8);
 	membank("bank1")->set_entry(0);
 	m_p3 = 0xff;
@@ -798,13 +796,13 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	// There is a monochrome mode, but no info found as yet.
 	// The 6845 cursor signal is not used at all.
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	u32 const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
+	u32 *p = &bitmap.pix32(y + vbp, hbp);
 
-	for (uint16_t x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		uint32_t const mem = vidbase | ((ma + x) & 0xfff);
-		uint16_t chr = m_base[mem];
+		u32 const mem = vidbase | ((ma + x) & 0xfff);
+		u16 chr = m_base[mem];
 
 		if (BIT(m_pa, 3))
 		{
@@ -842,7 +840,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 {
 	/* cassette - turn 2500/5000Hz to a bit */
 	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -985,7 +983,7 @@ ROM_END
 
 void applix_state::init_applix()
 {
-	uint8_t *RAM = memregion("subcpu")->base();
+	u8 *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
 }
 
@@ -999,7 +997,7 @@ COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, 
 
 /**************************************************** KEYBOARD MODULE *****************************************/
 
-uint8_t applix_state::internal_data_read(offs_t offset)
+u8 applix_state::internal_data_read(offs_t offset)
 {
 	m_via->write_cb2( BIT(offset, 8) ); // data
 	bool cp = !BIT(offset, 9);
@@ -1016,7 +1014,7 @@ uint8_t applix_state::internal_data_read(offs_t offset)
 }
 
 
-void applix_state::internal_data_write(offs_t offset, uint8_t data)
+void applix_state::internal_data_write(offs_t offset, u8 data)
 {
 	/* Check for low->high transition on AD8 */
 	if ( ! ( m_last_write_addr & 0x0100 ) && ( offset & 0x0100 ) )
@@ -1115,33 +1113,33 @@ void applix_state::internal_data_write(offs_t offset, uint8_t data)
 }
 
 
-uint8_t applix_state::p1_read()
+u8 applix_state::p1_read()
 {
 	return m_p1 & m_p1_data;
 }
 
 
-void applix_state::p1_write(uint8_t data)
+void applix_state::p1_write(u8 data)
 {
 	m_p1 = data;
 }
 
 
-uint8_t applix_state::p2_read()
+u8 applix_state::p2_read()
 {
 	return m_p2;
 }
 
 
-void applix_state::p2_write(uint8_t data)
+void applix_state::p2_write(u8 data)
 {
 	m_p2 = data;
 }
 
 
-uint8_t applix_state::p3_read()
+u8 applix_state::p3_read()
 {
-	uint8_t data = m_p3;
+	u8 data = m_p3;
 
 	data &= ~0x14;
 
@@ -1155,7 +1153,7 @@ uint8_t applix_state::p3_read()
 }
 
 
-void applix_state::p3_write(uint8_t data)
+void applix_state::p3_write(u8 data)
 {
 	m_p3 = data;
 }

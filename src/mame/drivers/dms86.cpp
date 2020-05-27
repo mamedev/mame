@@ -50,7 +50,6 @@ public:
 	{ }
 
 	void dms86(machine_config &config);
-
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 private:
@@ -145,14 +144,7 @@ void dms86_state::dms86(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms86_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dms86_state::io_map);
 
-	// According to the manual the clock is 14,765,600 / 4 but that couldn't possibly work.
-	// By maths, clock should be 9600*32*4*16 = 19,660,800 but not working either
-	// So, commented out because it makes the whole thing crawl, only get 18% on my machine
-	//clock_device &ctc_clock(CLOCK(config, "ctc_clock", 19660800)); //XTAL(14'745'600) / 4
-	//ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	//ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	//ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-
+	// According to the manual the clock is 14,765,600 / 4 but that's wrong
 	Z80CTC(config, m_ctc, XTAL(14'745'600) / 3);
 	//m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);             // frame rate interrupt to maincpu
 	m_ctc->zc_callback<0>().set(m_sio[0], FUNC(z80sio_device::rxtxcb_w));  // SIO1 Ch B
@@ -188,4 +180,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS */
-COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

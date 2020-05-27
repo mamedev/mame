@@ -43,23 +43,23 @@ public:
 		, m_terminal(*this, "terminal")
 		, m_p_ram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
-	{
-	}
+	{ }
 
-	uint8_t port1e_r();
-	void port1f_w(uint8_t data);
-	uint8_t port90_r();
-	uint8_t port91_r();
-	void kbd_put(u8 data);
 	void chaos(machine_config &config);
+
+private:
+	u8 port1e_r();
+	void port1f_w(u8 data);
+	u8 port90_r();
+	u8 port91_r();
+	void kbd_put(u8 data);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	uint8_t m_term_data;
+	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<u8> m_p_ram;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -96,12 +96,12 @@ INPUT_PORTS_END
 
 // Port 1E - Bit 0 indicates key pressed, Bit 1 indicates ok to output
 
-uint8_t chaos_state::port1e_r()
+u8 chaos_state::port1e_r()
 {
 	return (m_term_data) ? 1 : 0;
 }
 
-void chaos_state::port1f_w(uint8_t data)
+void chaos_state::port1f_w(u8 data)
 {
 	// make the output readable on our terminal
 	if (data == 0x09)
@@ -116,9 +116,9 @@ void chaos_state::port1f_w(uint8_t data)
 		m_terminal->write(0x0a);
 }
 
-uint8_t chaos_state::port90_r()
+u8 chaos_state::port90_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -128,9 +128,9 @@ uint8_t chaos_state::port90_r()
 // Bit 3 = key pressed
 // Bit 7 = ok to output
 
-uint8_t chaos_state::port91_r()
+u8 chaos_state::port91_r()
 {
-	uint8_t ret = 0x80 | ioport("CONFIG")->read();
+	u8 ret = 0x80 | ioport("CONFIG")->read();
 	ret |= (m_term_data) ? 8 : 0;
 	return ret;
 }
@@ -143,7 +143,7 @@ void chaos_state::kbd_put(u8 data)
 void chaos_state::machine_reset()
 {
 	// copy the roms into ram
-	uint8_t* ROM = memregion("roms")->base();
+	u8* ROM = memregion("roms")->base();
 	memcpy(m_p_ram, ROM, 0x3000);
 	memcpy(m_p_ram+0x7000, ROM+0x3000, 0x1000);
 }

@@ -64,21 +64,21 @@ public:
 		, m_io_dsw(*this, "DSW")
 	{ }
 
+	void cortex(machine_config &config);
+	void init_init();
+
+private:
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(romsw_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
-	uint8_t pio_r(offs_t offset);
-	uint8_t keyboard_r(offs_t offset);
-	void init_init();
-
-	void cortex(machine_config &config);
+	u8 pio_r(offs_t offset);
+	u8 keyboard_r(offs_t offset);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
 	bool m_kbd_ack;
 	bool m_vdp_int;
-	uint8_t m_term_data;
+	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_device<beep_device>    m_beep;
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( cortex )
 	PORT_DIPSETTING(    0x00, "Single")
 INPUT_PORTS_END
 
-uint8_t cortex_state::pio_r(offs_t offset)
+u8 cortex_state::pio_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -138,7 +138,7 @@ uint8_t cortex_state::pio_r(offs_t offset)
 	}
 }
 
-uint8_t cortex_state::keyboard_r(offs_t offset)
+u8 cortex_state::keyboard_r(offs_t offset)
 {
 	return BIT(m_term_data, offset);
 }
@@ -182,7 +182,7 @@ void cortex_state::machine_reset()
 
 void cortex_state::init_init()
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x10000]);
 	membank("bankr0")->configure_entry(0, &main[0x00000]);

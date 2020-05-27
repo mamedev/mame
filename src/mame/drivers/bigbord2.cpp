@@ -109,9 +109,12 @@ public:
 		, m_bankr(*this, "bankr")
 		, m_bankv(*this, "bankv")
 		, m_banka(*this, "banka")
-	{
-	}
+	{ }
 
+	void bigbord2(machine_config &config);
+	void init_bigbord2();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(side_select_w);
 	DECLARE_WRITE_LINE_MEMBER(smc1_w);
 	DECLARE_WRITE_LINE_MEMBER(smc2_w);
@@ -127,17 +130,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	void init_bigbord2();
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-
-	void bigbord2(machine_config &config);
 	void bigbord2_io(address_map &map);
 	void bigbord2_mem(address_map &map);
-private:
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data;
 	u8 m_term_status;

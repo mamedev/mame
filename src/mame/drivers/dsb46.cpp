@@ -43,14 +43,11 @@ public:
 	{ }
 
 	void dsb46(machine_config &config);
-
 	void init_dsb46();
 
-protected:
-	virtual void machine_reset() override;
-
 private:
-	void port1a_w(uint8_t data);
+	virtual void machine_reset() override;
+	void port1a_w(u8 data);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
 	required_device<z80_device> m_maincpu;
@@ -81,7 +78,7 @@ INPUT_PORTS_END
 
 void dsb46_state::init_dsb46()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
+	u8 *RAM = memregion("maincpu")->base();
 	membank("read")->configure_entry(0, &RAM[0x10000]);
 	membank("read")->configure_entry(1, &RAM[0x00000]);
 	membank("write")->configure_entry(0, &RAM[0x00000]);
@@ -94,7 +91,7 @@ void dsb46_state::machine_reset()
 	m_maincpu->reset();
 }
 
-void dsb46_state::port1a_w(uint8_t data)
+void dsb46_state::port1a_w(u8 data)
 {
 	membank("read")->set_entry(data & 1);
 }
