@@ -574,6 +574,29 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	uint32_t palette_map = regs[3];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
+	// attr_reg bits
+	// -Bzz pppp hhww ffbb
+	//
+	// B = blend
+	// zz = depth
+	// pppp = palette
+	// ff = flips
+	// bb = bpp
+	// hh = height
+	// ww = width
+
+	// ctrl_reg bits
+	// ---- ---B h--r ewRl
+	//
+	// e = enable
+	// l = bitmape/line mode
+	// r = rowscroll
+	// w = wallpaper mode
+	// R = regset mode
+	// h = high colour
+	// B = blend
+	
+	
 	if (!(ctrl_reg & 0x0008))
 	{
 		return;
@@ -584,9 +607,9 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		return;
 	}
 
-	if (ctrl_reg & 0x01) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
+	if (ctrl_reg & 0x0001) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
 	{
-		if (ctrl_reg & 0x10)
+		if (ctrl_reg & 0x0010)
 			popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
 		else
 			popmessage("bitmap mode %08x\n", bitmap_addr);
@@ -663,7 +686,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		int y_mask = 0;
 
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
-		if ((attr_reg >> 14) & 0x2)
+		if ((attr_reg >> 15) & 0x1)
 		{
 			total_width = 1024;
 			y_mask = 0x1ff;
@@ -692,31 +715,30 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			if (!tile)
 				continue;
 
-			uint32_t tileattr = attr_reg;
-			uint32_t tilectrl = ctrl_reg;
-
 			bool blend;
 			bool row_scroll;
 			bool flip_x;
 			uint32_t yflipmask;
 			uint32_t palette_offset;
 
-			blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-			row_scroll = (tilectrl & 0x0010);
+			blend = (attr_reg & 0x4000 || ctrl_reg & 0x0100);
+			row_scroll = (ctrl_reg & 0x0010);
 
-
-			if ((ctrl_reg & 2) == 0) // RegSet:0
+			if ((ctrl_reg & 0x0002) == 0) // RegSet:0
 			{
 				uint16_t palette = (ctrl_reg & 0x0004) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 				if (x0 & 1)
 					palette >>= 8;
 
-				flip_x = palette & 0x0010;
-				yflipmask = (palette & 0x0020) ? tile_h - 1 : 0;
-				palette_offset = (palette & 0x0f) << 4;
+				// 'palette' format
+				// -ff pppp
+				//
+				// f = flip bits
+				// p = palette
 
-				//tilectrl &= ~0x0100;
-				//tilectrl |= (palette << 2) & 0x0100;    // blend
+				flip_x = palette & 0x10;
+				yflipmask = (palette & 0x20) ? tile_h - 1 : 0;
+				palette_offset = (palette & 0x0f) << 4;
 			}
 			else // RegSet:1
 			{
@@ -727,22 +749,25 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 					if (x0 & 1)
 						palette >>= 8;
 
+					// 'palette' format
+					// -- -ttt
+					//
+					// t = extra tile number bits
+
 					tile |= (palette & 0x0007) << 16;
 				}
 
-				flip_x = (tileattr & 0x0004);
-				yflipmask = tileattr & 0x0008 ? tile_h - 1 : 0;
-				palette_offset = (tileattr & 0x0f00) >> 4;
+				flip_x = (attr_reg & 0x0004);
+				yflipmask = attr_reg & 0x0008 ? tile_h - 1 : 0;
+				palette_offset = (attr_reg & 0x0f00) >> 4;
 			}
-
 
 			if (which == 1)
 				palette_offset |= 0x800;
 
-
 			palette_offset |= m_pal_back;
 
-			const uint8_t bpp = tileattr & 0x0003;
+			const uint8_t bpp = attr_reg & 0x0003;
 
 
 			if (blend)
@@ -929,6 +954,33 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
+
+	uint16_t attr0 = m_tmap0_regs[0];
+	uint16_t attr1 = m_tmap1_regs[0];
+	uint16_t attr2 = m_tmap2_regs[0];
+	uint16_t attr3 = m_tmap3_regs[0];
+	uint16_t ctrl0 = m_tmap0_regs[1];
+	uint16_t ctrl1 = m_tmap1_regs[1];
+	uint16_t ctrl2 = m_tmap2_regs[1];
+	uint16_t ctrl3 = m_tmap3_regs[1];
+
+	popmessage("p0ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+		       "p1ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+		       "p2ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+		       "p3ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+		       "p0attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			   "p1attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+		       "p2attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+		       "p3attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d",
+			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0),
+			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0),
+			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0),
+			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0),
+			(attr0 & 0xc000) >> 14, (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1),
+			(attr1 & 0xc000) >> 14, (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1),
+			(attr2 & 0xc000) >> 14, (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1),
+			(attr3 & 0xc000) >> 14, (attr3 >> 12) & 3, (attr3 >> 8) & 15, 8 << ((attr3 >> 6) & 3), 8 << ((attr3 >> 4) & 3), BIT(attr3, 3), BIT(attr3, 2), 2 * ((attr3 & 3) + 1));
+
 
 	//const uint16_t bgcol = 0x7c1f; // magenta
 	const uint16_t bgcol = 0x0000; // black
