@@ -182,6 +182,7 @@ public:
 	void init_azurian();
 	void init_pisces();
 	void init_batman2();
+	void init_highroll();
 	void init_frogg();
 	void init_mooncrst();
 	void init_mooncrsu();
@@ -314,6 +315,7 @@ public:
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
+	void highroll(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
 	void froggervd(machine_config &config);
