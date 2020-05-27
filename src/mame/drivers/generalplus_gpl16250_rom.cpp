@@ -444,7 +444,7 @@ void tkmag220_game_state::machine_reset()
 	m_upperbase = 0 * (0x1000000 / 2);
 	gcm394_game_state::machine_reset();
 
-	m_maincpu->set_paldisplaybank_high_hack(0);
+	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
 	m_maincpu->set_alt_tile_addressing_hack(1);

@@ -30,7 +30,7 @@ public:
 
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
-	void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
+	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
 	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
 	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }
@@ -252,7 +252,7 @@ protected:
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
 
-	int m_pal_displaybank_high;
+	//int m_pal_displaybank_high;
 	//int m_pal_sprites;
 	//int m_pal_back;
 	int m_alt_tile_addressing;

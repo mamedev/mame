@@ -129,7 +129,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_pal_displaybank_high(0),
+//	m_pal_displaybank_high(0),
 //	m_pal_sprites(0x100),
 //	m_pal_back(0x000),
 	m_alt_tile_addressing(0)
@@ -366,7 +366,7 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_pal_displaybank_high));
+//	save_item(NAME(m_pal_displaybank_high));
 	save_item(NAME(m_alt_tile_addressing));
 }
 

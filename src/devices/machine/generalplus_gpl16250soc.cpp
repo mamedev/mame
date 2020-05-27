@@ -152,7 +152,6 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
-	address_space& mem = this->space(AS_PROGRAM);
 	source &= 0x0fffffff;
 	length &= 0x0fffffff; // gormiti
 
@@ -187,6 +186,8 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	// HACKS to get into service mode for debugging
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+
+	//address_space& mem = this->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x4368c) == 0x4846)
 	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
