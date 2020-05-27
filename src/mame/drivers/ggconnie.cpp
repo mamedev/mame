@@ -47,8 +47,8 @@ protected:
 
 private:
 	void lamp_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	void output_w(uint8_t data);
+	void oki_bank_w(uint8_t data);
 	void sgx_io(address_map &map);
 	void sgx_mem(address_map &map);
 	void oki_map(address_map &map);
@@ -69,13 +69,13 @@ void ggconnie_state::lamp_w(uint8_t data)
 	output().set_value("lamp", !BIT(data,0));
 }
 
-WRITE8_MEMBER(ggconnie_state::output_w)
+void ggconnie_state::output_w(uint8_t data)
 {
 	// written in "Output Test" in test mode
 }
 
 // TODO: banking not understood for ggconnie (writes to 0x01f7400-03 range, while smf only to 00). Is the ROM dumped correctly btw?
-WRITE8_MEMBER(ggconnie_state::oki_bank_w)
+void ggconnie_state::oki_bank_w(uint8_t data)
 {
 	m_okibank->set_entry(data & 0x07);
 	// popmessage("offset: %02x, bank: %02x\n", offset, data);

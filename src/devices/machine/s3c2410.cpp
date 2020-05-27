@@ -280,7 +280,7 @@ void s3c2410_device::device_start()
 	space.install_readwrite_handler( 0x4b000080, 0x4b0000a3, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_dma_2_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_dma_2_w)));
 	space.install_readwrite_handler( 0x4b0000c0, 0x4b0000e3, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_dma_3_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_dma_3_w)));
 	space.install_readwrite_handler( 0x4c000000, 0x4c000017, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_clkpow_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_clkpow_w)));
-	space.install_readwrite_handler( 0x4d000000, 0x4d000063, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_w)));
+	space.install_readwrite_handler( 0x4d000000, 0x4d000063, read32s_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_r)), write32s_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_w)));
 	space.install_readwrite_handler( 0x4d000400, 0x4d0007ff, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_palette_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_lcd_palette_w)));
 	space.install_readwrite_handler( 0x4e000000, 0x4e000017, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_nand_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_nand_w)));
 	space.install_readwrite_handler( 0x50000000, 0x5000002b, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_uart_0_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_uart_0_w)));

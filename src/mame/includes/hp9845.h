@@ -32,14 +32,14 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) = 0;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) = 0;
+	virtual uint16_t graphic_r(offs_t offset) = 0;
+	virtual void graphic_w(offs_t offset, uint16_t data) = 0;
 	attotime time_to_gv_mem_availability() const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
-	DECLARE_READ16_MEMBER(kb_scancode_r);
-	DECLARE_READ16_MEMBER(kb_status_r);
-	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
+	uint16_t kb_scancode_r();
+	uint16_t kb_status_r();
+	void kb_irq_clear_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);

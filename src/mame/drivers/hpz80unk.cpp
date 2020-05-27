@@ -61,11 +61,11 @@ public:
 	void hpz80unk(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port02_r);
-	DECLARE_READ8_MEMBER(port03_r);
-	DECLARE_READ8_MEMBER(port0d_r);
-	DECLARE_READ8_MEMBER(portfc_r);
+	uint8_t port00_r();
+	uint8_t port02_r();
+	uint8_t port03_r();
+	uint8_t port0d_r();
+	uint8_t portfc_r();
 
 	void hpz80unk_io(address_map &map);
 	void hpz80unk_mem(address_map &map);
@@ -77,28 +77,28 @@ private:
 	required_device_array<ay51013_device, 3> m_uart;
 };
 
-READ8_MEMBER( hpz80unk_state::port00_r )
+uint8_t hpz80unk_state::port00_r()
 {
 	return (m_uart[0]->dav_r() << 1) | (m_uart[0]->tbmt_r()) | 0xfc;
 }
 
-READ8_MEMBER( hpz80unk_state::port02_r )
+uint8_t hpz80unk_state::port02_r()
 {
 	m_port02_data ^= 1;
 	return m_port02_data;
 }
 
-READ8_MEMBER( hpz80unk_state::port03_r )
+uint8_t hpz80unk_state::port03_r()
 {
 	return (m_uart[1]->dav_r() << 1) | (m_uart[1]->tbmt_r()) | 0xfc;
 }
 
-READ8_MEMBER( hpz80unk_state::port0d_r )
+uint8_t hpz80unk_state::port0d_r()
 {
 	return (m_uart[2]->dav_r() << 1) | (m_uart[2]->tbmt_r()) | 0xfc;
 }
 
-READ8_MEMBER( hpz80unk_state::portfc_r )
+uint8_t hpz80unk_state::portfc_r()
 {
 	return 0xfe; // or it halts
 }

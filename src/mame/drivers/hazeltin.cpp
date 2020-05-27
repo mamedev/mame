@@ -147,23 +147,23 @@ private:
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(system_test_r); // noted as "for use with auto test equip" in flowchart on pg. 30, ref[1], jumps to 0x8000 if bit 0 is unset
-	DECLARE_READ8_MEMBER(status_reg_2_r);
-	DECLARE_WRITE8_MEMBER(status_reg_3_w);
+	uint8_t system_test_r(); // noted as "for use with auto test equip" in flowchart on pg. 30, ref[1], jumps to 0x8000 if bit 0 is unset
+	uint8_t status_reg_2_r();
+	void status_reg_3_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(uart_r);
-	DECLARE_WRITE8_MEMBER(uart_w);
+	uint8_t uart_r();
+	void uart_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(kbd_status_latch_r);
-	DECLARE_READ8_MEMBER(kbd_encoder_r);
+	uint8_t kbd_status_latch_r();
+	uint8_t kbd_encoder_r();
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
-	DECLARE_WRITE8_MEMBER(refresh_address_w);
+	void refresh_address_w(uint8_t data);
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
@@ -282,7 +282,7 @@ uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER( hazl1500_state::ram_r )
+uint8_t hazl1500_state::ram_r(offs_t offset)
 {
 	const uint8_t* chips[2][8] =
 	{
@@ -301,7 +301,7 @@ READ8_MEMBER( hazl1500_state::ram_r )
 	return ret;
 }
 
-WRITE8_MEMBER( hazl1500_state::ram_w )
+void hazl1500_state::ram_w(offs_t offset, uint8_t data)
 {
 	uint8_t* chips[2][8] =
 	{
@@ -320,12 +320,12 @@ WRITE8_MEMBER( hazl1500_state::ram_w )
 	}
 }
 
-READ8_MEMBER( hazl1500_state::system_test_r )
+uint8_t hazl1500_state::system_test_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER( hazl1500_state::status_reg_2_r )
+uint8_t hazl1500_state::status_reg_2_r()
 {
 	uint8_t misc_dips = m_misc_dips->read();
 	uint8_t status = 0;
@@ -338,28 +338,28 @@ READ8_MEMBER( hazl1500_state::status_reg_2_r )
 	return status ^ 0xff;
 }
 
-WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
+void hazl1500_state::status_reg_3_w(uint8_t data)
 {
 	m_status_reg_3 = data;
 	m_uart->write_rdav(BIT(data, 2));
 }
 
-READ8_MEMBER( hazl1500_state::uart_r )
+uint8_t hazl1500_state::uart_r()
 {
 	return (m_uart->receive() & 0x7f) | (m_uart->pe_r() << 7);
 }
 
-WRITE8_MEMBER( hazl1500_state::uart_w )
+void hazl1500_state::uart_w(uint8_t data)
 {
 	m_uart->transmit((data & 0x7f) | (BIT(m_misc_dips->read(), 3) ? 0x00 : 0x80));
 }
 
-READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
+uint8_t hazl1500_state::kbd_status_latch_r()
 {
 	return m_kbd_status_latch;
 }
 
-READ8_MEMBER(hazl1500_state::kbd_encoder_r)
+uint8_t hazl1500_state::kbd_encoder_r()
 {
 	return m_kbdc->b_r() & 0xff; // TODO: This should go through an 8048, but we have no dump of it currently.
 }
@@ -460,7 +460,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 	m_last_fraction = pixel_fraction;
 }
 
-WRITE8_MEMBER(hazl1500_state::refresh_address_w)
+void hazl1500_state::refresh_address_w(uint8_t data)
 {
 	synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());

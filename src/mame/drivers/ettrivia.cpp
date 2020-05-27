@@ -66,13 +66,13 @@ private:
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_WRITE8_MEMBER(ettrivia_fg_w);
-	DECLARE_WRITE8_MEMBER(ettrivia_bg_w);
-	DECLARE_WRITE8_MEMBER(ettrivia_control_w);
-	DECLARE_READ8_MEMBER(ettrivia_question_r);
-	DECLARE_WRITE8_MEMBER(b000_w);
-	DECLARE_READ8_MEMBER(b000_r);
-	DECLARE_WRITE8_MEMBER(b800_w);
+	void ettrivia_fg_w(offs_t offset, uint8_t data);
+	void ettrivia_bg_w(offs_t offset, uint8_t data);
+	void ettrivia_control_w(uint8_t data);
+	uint8_t ettrivia_question_r(offs_t offset);
+	void b000_w(uint8_t data);
+	uint8_t b000_r();
+	void b800_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	void ettrivia_palette(palette_device &palette) const;
@@ -87,19 +87,19 @@ private:
 };
 
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_fg_w)
+void ettrivia_state::ettrivia_fg_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_bg_w)
+void ettrivia_state::ettrivia_bg_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
+void ettrivia_state::ettrivia_control_w(uint8_t data)
 {
 	machine().tilemap().mark_all_dirty();
 
@@ -113,18 +113,18 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(ettrivia_state::ettrivia_question_r)
+uint8_t ettrivia_state::ettrivia_question_r(offs_t offset)
 {
 	uint8_t *QUESTIONS = memregion("user1")->base();
 	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
-WRITE8_MEMBER(ettrivia_state::b000_w)
+void ettrivia_state::b000_w(uint8_t data)
 {
 	m_b000_val = data;
 }
 
-READ8_MEMBER(ettrivia_state::b000_r)
+uint8_t ettrivia_state::b000_r()
 {
 	if(m_b800_prev)
 		return m_b000_ret;
@@ -132,7 +132,7 @@ READ8_MEMBER(ettrivia_state::b000_r)
 		return m_b000_val;
 }
 
-WRITE8_MEMBER(ettrivia_state::b800_w)
+void ettrivia_state::b800_w(uint8_t data)
 {
 	switch(data)
 	{

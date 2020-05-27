@@ -271,13 +271,13 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	void init_cpu33();
 
 private:
-	DECLARE_WRITE8_MEMBER (fdc_w);
-	DECLARE_READ8_MEMBER (fdc_r);
-	DECLARE_WRITE8_MEMBER (scsi_w);
-	DECLARE_READ8_MEMBER (scsi_r);
-	DECLARE_READ8_MEMBER (slot1_status_r);
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void scsi_w(offs_t offset, uint8_t data);
+	uint8_t scsi_r(offs_t offset);
+	uint8_t slot1_status_r();
+	uint32_t bootvect_r(offs_t offset);
+	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	/* Interrupt  support */
 	void cpu_space_map(address_map &map);
@@ -299,10 +299,10 @@ private:
 	void pit2c_w(uint8_t data);
 
 	/* VME bus accesses */
-	//DECLARE_READ16_MEMBER (vme_a24_r);
-	//DECLARE_WRITE16_MEMBER (vme_a24_w);
-	//DECLARE_READ16_MEMBER (vme_a16_r);
-	//DECLARE_WRITE16_MEMBER (vme_a16_w);
+	//uint16_t vme_a24_r();
+	//void vme_a24_w(uint16_t data);
+	//uint16_t vme_a16_r();
+	//void vme_a16_w(uint16_t data);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
@@ -395,38 +395,38 @@ void cpu30_state::init_cpu30lite8()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0
 void cpu30_state::init_cpu33()       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
-READ8_MEMBER (cpu30_state::fdc_r){
+uint8_t cpu30_state::fdc_r(offs_t offset){
 	LOG("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
-WRITE8_MEMBER (cpu30_state::fdc_w){
+void cpu30_state::fdc_w(offs_t offset, uint8_t data){
 	LOG("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* Mock SCSI driver */
-READ8_MEMBER (cpu30_state::scsi_r){
+uint8_t cpu30_state::scsi_r(offs_t offset){
 	LOG("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
-WRITE8_MEMBER (cpu30_state::scsi_w){
+void cpu30_state::scsi_w(offs_t offset, uint8_t data){
 	LOG("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* 1 = board is in slot 1, 0 = board is NOT in slot 1 */
-READ8_MEMBER (cpu30_state::slot1_status_r){
+uint8_t cpu30_state::slot1_status_r(){
 	LOG("%s\n", FUNCNAME);
 	return 1;
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (cpu30_state::bootvect_r){
+uint32_t cpu30_state::bootvect_r(offs_t offset){
 	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (cpu30_state::bootvect_w){
+void cpu30_state::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
@@ -602,21 +602,21 @@ void cpu30_state::pit2c_w(uint8_t data){
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (cpu30_state::vme_a24_r){
+uint16_t cpu30_state::vme_a24_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (cpu30_state::vme_a24_w){
+void cpu30_state::vme_a24_w(uint16_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
-READ16_MEMBER (cpu30_state::vme_a16_r){
+uint16_t cpu30_state::vme_a16_r(){
 	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (cpu30_state::vme_a16_w){
+void cpu30_state::vme_a16_w(uint16_t data){
 	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 #endif

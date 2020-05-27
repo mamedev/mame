@@ -79,8 +79,8 @@ private:
 	uint32_t screen_update_giclassic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(vrom_r);
+	void control_w(uint16_t data);
+	uint16_t vrom_r(offs_t offset);
 
 	void satellite_main(address_map &map);
 
@@ -122,7 +122,7 @@ INTERRUPT_GEN_MEMBER(giclassic_state::giclassic_interrupt)
 	}
 }
 
-WRITE16_MEMBER(giclassic_state::control_w)
+void giclassic_state::control_w(uint16_t data)
 {
 	// bits:
 	// 0 = ?
@@ -134,7 +134,7 @@ WRITE16_MEMBER(giclassic_state::control_w)
 	m_control = data & 0xff;
 }
 
-READ16_MEMBER(giclassic_state::vrom_r)
+uint16_t giclassic_state::vrom_r(offs_t offset)
 {
 	if (m_control & 8)
 	{
@@ -197,21 +197,21 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K055673_CB_MEMBER(sprite_callback);
 
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(control_r);
+	void control_w(uint16_t data);
+	uint16_t control_r();
 
 	void giclassvr(machine_config &config);
 	void server_main(address_map &map);
 private:
-	uint16 m_control;
+	uint16_t m_control;
 };
 
-WRITE16_MEMBER(giclassicsvr_state::control_w)
+void giclassicsvr_state::control_w(uint16_t data)
 {
 	m_control = data;
 }
 
-READ16_MEMBER(giclassicsvr_state::control_r)
+uint16_t giclassicsvr_state::control_r()
 {
 	return m_control;
 }

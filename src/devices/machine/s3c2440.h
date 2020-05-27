@@ -220,14 +220,14 @@ protected:
 	void s3c24xx_video_start();
 	void bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2);
 	uint32_t s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	READ32_MEMBER( s3c24xx_lcd_r );
+	uint32_t s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask = ~0);
 	int s3c24xx_lcd_configure_tft();
 	int s3c24xx_lcd_configure_stn();
 	int s3c24xx_lcd_configure();
 	void s3c24xx_lcd_start();
 	void s3c24xx_lcd_stop();
 	void s3c24xx_lcd_recalc();
-	WRITE32_MEMBER( s3c24xx_lcd_w );
+	void s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	READ32_MEMBER( s3c24xx_lcd_palette_r );
 	WRITE32_MEMBER( s3c24xx_lcd_palette_w );
 	void s3c24xx_clkpow_reset();

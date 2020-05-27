@@ -130,13 +130,13 @@ private:
 	uint16_t m_layer_en;
 	uint16_t m_scrollram[6];
 
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_READ16_MEMBER(mahjong_panel_r);
-	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
+	void gfxbank_w(uint16_t data);
+	uint16_t mahjong_panel_r();
+	void mahjong_panel_w(uint16_t data);
+	void seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_en_w(uint16_t data);
 	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -205,25 +205,25 @@ private:
 *
 *******************************/
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc0vram_w )
+void goodejan_state::seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc2vram_w )
+void goodejan_state::seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	m_sc2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc1vram_w )
+void goodejan_state::seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
+void goodejan_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap->mark_tile_dirty(offset);
@@ -361,13 +361,13 @@ uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #define GOODEJAN_MHZ3 12000000
 
 
-WRITE16_MEMBER(goodejan_state::gfxbank_w)
+void goodejan_state::gfxbank_w(uint16_t data)
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);
 }
 
 /* Multiplexer device for the mahjong panel */
-READ16_MEMBER(goodejan_state::mahjong_panel_r)
+uint16_t goodejan_state::mahjong_panel_r()
 {
 	u16 ret;
 	ret = 0xffff;
@@ -381,7 +381,7 @@ READ16_MEMBER(goodejan_state::mahjong_panel_r)
 	return ret;
 }
 
-WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
+void goodejan_state::mahjong_panel_w(uint16_t data)
 {
 	m_mux_data = data;
 }

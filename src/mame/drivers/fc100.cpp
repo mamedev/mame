@@ -73,12 +73,12 @@ public:
 
 private:
 	uint8_t mc6847_videoram_r(offs_t offset);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port33_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
+	uint8_t port00_r(offs_t offset);
+	void port31_w(uint8_t data);
+	void port33_w(uint8_t data);
+	void port43_w(uint8_t data);
+	void port60_w(offs_t offset, uint8_t data);
+	void port70_w(offs_t offset, uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( fc100 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( fc100_state::port00_r )
+uint8_t fc100_state::port00_r(offs_t offset)
 {
 	return m_keyboard[offset]->read();
 }
@@ -331,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
 
 //********************* AUDIO **********************************
 #if 0
-WRITE8_MEMBER( fc100_state::ay_port_a_w )
+void fc100_state::ay_port_a_w(uint8_t data)
 {
 	m_ag = BIT(data, 4);
 	m_gm2 = BIT(data, 6);
@@ -401,7 +401,7 @@ GFXDECODE_END
 
 //********************** CENTRONICS PRINTER ***********************************
 
-WRITE8_MEMBER( fc100_state::port43_w )
+void fc100_state::port43_w(uint8_t data)
 {
 	m_centronics->write_strobe(BIT(data, 2));
 	m_centronics->write_init(BIT(data, 3));
@@ -409,13 +409,13 @@ WRITE8_MEMBER( fc100_state::port43_w )
 
 //********************** UART/CASSETTE ***********************************
 
-WRITE8_MEMBER( fc100_state::port31_w )
+void fc100_state::port31_w(uint8_t data)
 {
 	if (data == 8)
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( fc100_state::port33_w )
+void fc100_state::port33_w(uint8_t data)
 {
 	if (data == 0)
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -488,13 +488,13 @@ void fc100_state::machine_reset()
 	m_uart->write_cts(0);
 }
 
-WRITE8_MEMBER( fc100_state::port60_w )
+void fc100_state::port60_w(offs_t offset, uint8_t data)
 {
 	if (m_banksw_unlocked)
 		membank("bankr")->set_entry(offset);
 }
 
-WRITE8_MEMBER( fc100_state::port70_w )
+void fc100_state::port70_w(offs_t offset, uint8_t data)
 {
 	m_banksw_unlocked = (bool)offset;
 }

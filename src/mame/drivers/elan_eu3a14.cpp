@@ -108,13 +108,13 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 
-	DECLARE_WRITE8_MEMBER(porta_dir_w);
-	DECLARE_WRITE8_MEMBER(portb_dir_w);
-	DECLARE_WRITE8_MEMBER(portc_dir_w);
+	void porta_dir_w(uint8_t data);
+	void portb_dir_w(uint8_t data);
+	void portc_dir_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(porta_dat_w);
-	DECLARE_WRITE8_MEMBER(portb_dat_w);
-	DECLARE_WRITE8_MEMBER(portc_dat_w);
+	void porta_dat_w(uint8_t data);
+	void portb_dat_w(uint8_t data);
+	void portc_dat_w(uint8_t data);
 
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -172,33 +172,33 @@ uint8_t elan_eu3a14_state::read_full_space(offs_t offset)
 	return fullbankspace.read_byte(offset);
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::porta_dir_w)
+void elan_eu3a14_state::porta_dir_w(uint8_t data)
 {
 	m_portdir[0] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portb_dir_w)
+void elan_eu3a14_state::portb_dir_w(uint8_t data)
 {
 	m_portdir[1] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portc_dir_w)
+void elan_eu3a14_state::portc_dir_w(uint8_t data)
 {
 	m_portdir[2] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::porta_dat_w)
+void elan_eu3a14_state::porta_dat_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portb_dat_w)
+void elan_eu3a14_state::portb_dat_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portc_dat_w)
+void elan_eu3a14_state::portc_dat_w(uint8_t data)
 {
 }
 

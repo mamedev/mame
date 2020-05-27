@@ -622,17 +622,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 		memcpy(&m_kb_state[ 0 ] , &input[ 0 ] , sizeof(m_kb_state));
 }
 
-READ16_MEMBER(hp9845_base_state::kb_scancode_r)
+uint16_t hp9845_base_state::kb_scancode_r()
 {
 		return ~m_kb_scancode & 0x7f;
 }
 
-READ16_MEMBER(hp9845_base_state::kb_status_r)
+uint16_t hp9845_base_state::kb_status_r()
 {
 		return m_kb_status;
 }
 
-WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
+void hp9845_base_state::kb_irq_clear_w(uint16_t data)
 {
 		BIT_CLR(m_kb_status, 0);
 		update_kb_prt_irq();
@@ -755,8 +755,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -820,7 +820,7 @@ void hp9845b_state::machine_reset()
 	update_graphic_bits();
 }
 
-READ16_MEMBER(hp9845b_state::graphic_r)
+uint16_t hp9845b_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -859,7 +859,7 @@ READ16_MEMBER(hp9845b_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845b_state::graphic_w)
+void hp9845b_state::graphic_w(offs_t offset, uint16_t data)
 {
 		//logerror("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -1983,8 +1983,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -2081,7 +2081,7 @@ void hp9845c_state::machine_reset()
 	m_gv_sk_int_latched = false;
 }
 
-READ16_MEMBER(hp9845c_state::graphic_r)
+uint16_t hp9845c_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2133,7 +2133,7 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845c_state::graphic_w)
+void hp9845c_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -2721,8 +2721,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(graphic_r) override;
-	virtual DECLARE_WRITE16_MEMBER(graphic_w) override;
+	virtual uint16_t graphic_r(offs_t offset) override;
+	virtual void graphic_w(offs_t offset, uint16_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
@@ -2792,7 +2792,7 @@ void hp9845t_state::machine_reset()
 	set_video_mar(0);
 }
 
-READ16_MEMBER(hp9845t_state::graphic_r)
+uint16_t hp9845t_state::graphic_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -2848,7 +2848,7 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9845t_state::graphic_w)
+void hp9845t_state::graphic_w(offs_t offset, uint16_t data)
 {
 	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 

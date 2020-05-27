@@ -68,12 +68,12 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<m3002_device> m_rtc;
 
-	DECLARE_WRITE8_MEMBER( europc_pio_w );
-	DECLARE_READ8_MEMBER( europc_pio_r );
+	void europc_pio_w(offs_t offset, uint8_t data);
+	uint8_t europc_pio_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER ( europc_jim_w );
-	DECLARE_READ8_MEMBER ( europc_jim_r );
-	DECLARE_READ8_MEMBER ( europc_jim2_r );
+	void europc_jim_w(offs_t offset, uint8_t data);
+	uint8_t europc_jim_r(offs_t offset);
+	uint8_t europc_jim2_r();
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
@@ -164,7 +164,7 @@ private:
 
 */
 
-WRITE8_MEMBER( europc_pc_state::europc_jim_w )
+void europc_pc_state::europc_jim_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -202,7 +202,7 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 	m_jim_data[offset] = data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim_r )
+uint8_t europc_pc_state::europc_jim_r(offs_t offset)
 {
 	int data = 0;
 	switch(offset)
@@ -214,7 +214,7 @@ READ8_MEMBER( europc_pc_state::europc_jim_r )
 	return data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim2_r )
+uint8_t europc_pc_state::europc_jim2_r()
 {
 	switch (m_jim_state)
 	{
@@ -276,7 +276,7 @@ void europc_pc_state::init_europc()
 	}
 }
 
-WRITE8_MEMBER( europc_pc_state::europc_pio_w )
+void europc_pc_state::europc_pio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -294,7 +294,7 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 }
 
 
-READ8_MEMBER( europc_pc_state::europc_pio_r )
+uint8_t europc_pc_state::europc_pio_r(offs_t offset)
 {
 	int data = 0;
 	switch (offset)

@@ -791,7 +791,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rg
 }
 
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
@@ -953,7 +953,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_recalc()
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
+void S3C24_CLASS_NAME::s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
 	LOGMASKED(LOG_LCD_REGS, "%s: lcd write: %08X = %08X & %08x\n", machine().describe_context(), S3C24XX_BASE_LCD + (offset << 2), data, mem_mask);

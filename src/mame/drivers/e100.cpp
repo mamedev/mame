@@ -168,8 +168,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
+	uint8_t pia_r(offs_t offset);
+	void pia_w(offs_t offset, uint8_t data);
 	uint8_t pia1_kbA_r();
 	void pia1_kbA_w(uint8_t data);
 	uint8_t pia1_kbB_r();
@@ -248,7 +248,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 /* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-WRITE8_MEMBER( e100_state::pia_w )
+void e100_state::pia_w(offs_t offset, uint8_t data)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 	if ((offset & 0x08) == 0x08)
@@ -272,7 +272,7 @@ WRITE8_MEMBER( e100_state::pia_w )
 }
 
 /* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-READ8_MEMBER( e100_state::pia_r )
+uint8_t e100_state::pia_r(offs_t offset)
 {
 	uint8_t data = 0;
 

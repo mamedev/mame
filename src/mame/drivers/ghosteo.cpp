@@ -119,8 +119,8 @@ private:
 	int m_security_count;
 	uint32_t m_bballoon_port[20];
 	struct nand_t m_nand;
-	DECLARE_READ32_MEMBER(bballoon_speedup_r);
-	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
+	uint32_t bballoon_speedup_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t touryuu_port_10000000_r();
 
 	void qs1000_p1_w(uint8_t data);
 	void qs1000_p2_w(uint8_t data);
@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_w )
 	m_i2cmem->write_sda(state);
 }
 
-READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
+uint32_t ghosteo_state::touryuu_port_10000000_r()
 {
 	uint32_t port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
 	uint32_t data = 0xFFFFFFFF;
@@ -567,9 +567,9 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
+uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
+	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(offset+0x10/4, mem_mask);
 
 
 	int pc = m_maincpu->pc();
@@ -600,7 +600,7 @@ void ghosteo_state::machine_start()
 
 void ghosteo_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(*this, FUNC(ghosteo_state::bballoon_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32s_delegate(*this, FUNC(ghosteo_state::bballoon_speedup_r)));
 }
 
 void ghosteo_state::ghosteo(machine_config &config)

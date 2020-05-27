@@ -42,7 +42,7 @@ private:
 
 	uint16_t lights_changed;
 
-	DECLARE_READ8_MEMBER(gigatron_random)
+	uint8_t gigatron_random()
 	{
 		return machine().rand() & 0xff;
 	}

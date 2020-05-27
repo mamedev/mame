@@ -40,16 +40,16 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint32_t> m_maincpu_region;
-	DECLARE_READ32_MEMBER(gp2x_lcdc_r);
-	DECLARE_WRITE32_MEMBER(gp2x_lcdc_w);
-	DECLARE_READ32_MEMBER(nand_r);
-	DECLARE_WRITE32_MEMBER(nand_w);
-	DECLARE_READ32_MEMBER(tx_status_r);
-	DECLARE_WRITE32_MEMBER(tx_xmit_w);
-	DECLARE_READ32_MEMBER(timer_r);
-	DECLARE_READ32_MEMBER(nand_ctrl_r);
-	DECLARE_WRITE32_MEMBER(nand_ctrl_w);
-	DECLARE_READ32_MEMBER(sdcard_r);
+	uint32_t gp2x_lcdc_r(offs_t offset);
+	void gp2x_lcdc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t nand_r(offs_t offset, uint32_t mem_mask = ~0);
+	void nand_w(offs_t offset, uint32_t data);
+	uint32_t tx_status_r();
+	void tx_xmit_w(uint32_t data);
+	uint32_t timer_r();
+	uint32_t nand_ctrl_r();
+	void nand_ctrl_w(uint32_t data);
+	uint32_t sdcard_r();
 	required_shared_ptr<uint32_t> m_ram;
 	uint16_t m_vidregs[0x200/2];
 	uint32_t m_nand_ptr;
@@ -187,12 +187,12 @@ uint32_t gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-READ32_MEMBER( gp2x_state::gp2x_lcdc_r )
+uint32_t gp2x_state::gp2x_lcdc_r(offs_t offset)
 {
 	return m_vidregs[offset*2] | m_vidregs[(offset*2)+1]<<16;
 }
 
-WRITE32_MEMBER( gp2x_state::gp2x_lcdc_w )
+void gp2x_state::gp2x_lcdc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -210,7 +210,7 @@ WRITE32_MEMBER( gp2x_state::gp2x_lcdc_w )
 	}
 }
 
-READ32_MEMBER( gp2x_state::nand_r )
+uint32_t gp2x_state::nand_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = m_maincpu_region;
 	uint32_t ret;
@@ -270,7 +270,7 @@ READ32_MEMBER( gp2x_state::nand_r )
 	return 0;
 }
 
-WRITE32_MEMBER( gp2x_state::nand_w )
+void gp2x_state::nand_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
@@ -316,32 +316,32 @@ WRITE32_MEMBER( gp2x_state::nand_w )
 	}
 }
 
-READ32_MEMBER( gp2x_state::tx_status_r )
+uint32_t gp2x_state::tx_status_r()
 {
 	return 0x6; // tx ready, tx empty
 }
 
-WRITE32_MEMBER( gp2x_state::tx_xmit_w )
+void gp2x_state::tx_xmit_w(uint32_t data)
 {
 	printf("%c", data&0xff);
 }
 
-READ32_MEMBER( gp2x_state::timer_r )
+uint32_t gp2x_state::timer_r()
 {
 	return m_timer++;
 }
 
-READ32_MEMBER( gp2x_state::nand_ctrl_r )
+uint32_t gp2x_state::nand_ctrl_r()
 {
 	return 0x8000<<16;      // timed out
 }
 
-WRITE32_MEMBER( gp2x_state::nand_ctrl_w )
+void gp2x_state::nand_ctrl_w(uint32_t data)
 {
 //  printf("%08x to nand_ctrl_w\n", data);
 }
 
-READ32_MEMBER( gp2x_state::sdcard_r )
+uint32_t gp2x_state::sdcard_r()
 {
 	return 0xffff<<16;  // at 3e146b0 - indicate timeout & CRC error
 }

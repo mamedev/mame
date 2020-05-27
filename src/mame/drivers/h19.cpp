@@ -102,10 +102,10 @@ public:
 	void h19(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
-	DECLARE_WRITE8_MEMBER(h19_bell_w);
-	DECLARE_READ8_MEMBER(kbd_key_r);
-	DECLARE_READ8_MEMBER(kbd_flags_r);
+	void h19_keyclick_w(uint8_t data);
+	void h19_bell_w(uint8_t data);
+	uint8_t kbd_key_r();
+	uint8_t kbd_flags_r();
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
 	DECLARE_READ_LINE_MEMBER(mm5740_control_r);
 	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
@@ -374,7 +374,7 @@ void h19_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( h19_state::h19_keyclick_w )
+void h19_state::h19_keyclick_w(uint8_t data)
 {
 /* Keyclick - 6 mSec */
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER( h19_state::h19_keyclick_w )
 	timer_set(attotime::from_msec(6), TIMER_KEY_CLICK_OFF);
 }
 
-WRITE8_MEMBER( h19_state::h19_bell_w )
+void h19_state::h19_bell_w(uint8_t data)
 {
 /* Bell (^G) - 200 mSec */
 
@@ -414,7 +414,7 @@ uint16_t h19_state::translate_mm5740_b(uint16_t b)
 	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
 }
 
-READ8_MEMBER(h19_state::kbd_key_r)
+uint8_t h19_state::kbd_key_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_strobe = false;
@@ -423,7 +423,7 @@ READ8_MEMBER(h19_state::kbd_key_r)
 	return m_transchar;
 }
 
-READ8_MEMBER(h19_state::kbd_flags_r)
+uint8_t h19_state::kbd_flags_r()
 {
 	uint16_t modifiers = m_kbspecial->read();
 	uint8_t rv = modifiers & 0x7f;

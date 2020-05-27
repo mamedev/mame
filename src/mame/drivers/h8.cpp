@@ -75,9 +75,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_0);
 
 private:
-	DECLARE_READ8_MEMBER(portf0_r);
-	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_WRITE8_MEMBER(portf1_w);
+	uint8_t portf0_r();
+	void portf0_w(uint8_t data);
+	void portf1_w(uint8_t data);
 	void h8_status_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
@@ -115,7 +115,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // I8080
 }
 
-READ8_MEMBER( h8_state::portf0_r )
+uint8_t h8_state::portf0_r()
 {
 	// reads the keyboard
 
@@ -145,7 +145,7 @@ READ8_MEMBER( h8_state::portf0_r )
 	return data;
 }
 
-WRITE8_MEMBER( h8_state::portf0_w )
+void h8_state::portf0_w(uint8_t data)
 {
 	// this will always turn off int10 that was set by the timer
 	// d0-d3 = digit select
@@ -166,7 +166,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	if (!BIT(data, 4)) m_irq_ctl |= 2;
 }
 
-WRITE8_MEMBER( h8_state::portf1_w )
+void h8_state::portf1_w(uint8_t data)
 {
 	//d7 segment dot
 	//d6 segment f

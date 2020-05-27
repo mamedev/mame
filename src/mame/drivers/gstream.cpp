@@ -184,15 +184,15 @@ private:
 	int       m_toggle;
 	int       m_xoffset;
 
-	DECLARE_WRITE32_MEMBER(vram_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(scrollx_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(scrolly_w);
-	DECLARE_WRITE32_MEMBER(gstream_oki_banking_w);
-	DECLARE_WRITE32_MEMBER(gstream_oki_4040_w);
-	DECLARE_WRITE32_MEMBER(x2222_sound_w);
-	DECLARE_READ32_MEMBER(gstream_speedup_r);
-	DECLARE_READ32_MEMBER(x2222_speedup_r);
-	DECLARE_READ32_MEMBER(x2222_speedup2_r);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Layer> void scrollx_w(uint16_t data);
+	template<int Layer> void scrolly_w(uint16_t data);
+	void gstream_oki_banking_w(uint32_t data);
+	void gstream_oki_4040_w(uint32_t data);
+	void x2222_sound_w(uint32_t data);
+	uint32_t gstream_speedup_r();
+	uint32_t x2222_speedup_r();
+	uint32_t x2222_speedup2_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -249,19 +249,19 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 
 
 
-WRITE32_MEMBER(gstream_state::vram_w)
+void gstream_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
 template<int Layer>
-WRITE16_MEMBER(gstream_state::scrollx_w)
+void gstream_state::scrollx_w(uint16_t data)
 {
 	m_scrollx[Layer] = data;
 }
 
 template<int Layer>
-WRITE16_MEMBER(gstream_state::scrolly_w)
+void gstream_state::scrolly_w(uint16_t data)
 {
 	m_scrolly[Layer] = data;
 }
@@ -283,7 +283,7 @@ void gstream_state::gstream_32bit_map(address_map &map)
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0); // boot rom
 }
 
-WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
+void gstream_state::gstream_oki_banking_w(uint32_t data)
 {
 /*
     ****OKI BANKING****
@@ -343,7 +343,7 @@ WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 }
 
 // Some clocking?
-WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
+void gstream_state::gstream_oki_4040_w(uint32_t data)
 {
 	// data == 0 or data == 0x81
 }
@@ -379,7 +379,7 @@ void gstream_state::x2222_32bit_map(address_map &map)
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0); // boot rom
 }
 
-WRITE32_MEMBER(gstream_state::x2222_sound_w)
+void gstream_state::x2222_sound_w(uint32_t data)
 {
 	// maybe sound in low 8-bits? but we have no samples anyway assuming it's an OKI
 	if (data & 0xffffff00)
@@ -1059,7 +1059,7 @@ ROM_START( x2222o )
 ROM_END
 
 
-READ32_MEMBER(gstream_state::gstream_speedup_r)
+uint32_t gstream_state::gstream_speedup_r()
 {
 	if (m_maincpu->pc() == 0xc0001592)
 	{
@@ -1070,7 +1070,7 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 }
 
 
-READ32_MEMBER(gstream_state::x2222_speedup_r)
+uint32_t gstream_state::x2222_speedup_r()
 {
 	if (m_maincpu->pc() == 0x22064)
 	{
@@ -1080,7 +1080,7 @@ READ32_MEMBER(gstream_state::x2222_speedup_r)
 	return m_workram[0x7ffac / 4];
 }
 
-READ32_MEMBER(gstream_state::x2222_speedup2_r)
+uint32_t gstream_state::x2222_speedup2_r()
 {
 	if (m_maincpu->pc() == 0x23f44)
 	{
@@ -1093,7 +1093,7 @@ READ32_MEMBER(gstream_state::x2222_speedup2_r)
 
 void gstream_state::init_gstream()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(*this, FUNC(gstream_state::gstream_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32smo_delegate(*this, FUNC(gstream_state::gstream_speedup_r)));
 
 	m_xoffset = 2;
 }
@@ -1121,8 +1121,8 @@ void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t*
 
 void gstream_state::init_x2222()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(*this, FUNC(gstream_state::x2222_speedup_r))); // older
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(*this, FUNC(gstream_state::x2222_speedup2_r))); // newer
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32smo_delegate(*this, FUNC(gstream_state::x2222_speedup_r))); // older
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32smo_delegate(*this, FUNC(gstream_state::x2222_speedup2_r))); // newer
 
 	rearrange_sprite_data(memregion("sprites")->base(), (uint32_t*)memregion("gfx1")->base(), (uint32_t*)memregion("gfx1_lower")->base()  );
 	rearrange_tile_data(memregion("bg1")->base(), (uint32_t*)memregion("gfx2")->base(), (uint32_t*)memregion("gfx2_lower")->base());

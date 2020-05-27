@@ -102,9 +102,9 @@ private:
 	optional_region_ptr<uint8_t> m_colors;
 	optional_region_ptr<uint8_t> m_stars;
 
-	DECLARE_READ8_MEMBER(dip_switch_r);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
+	uint8_t dip_switch_r(offs_t offset);
+	void sound_data_w(uint8_t data);
+	void enigma2_flip_screen_w(uint8_t data);
 	uint8_t sound_latch_r();
 	void protection_data_w(uint8_t data);
 	virtual void machine_start() override;
@@ -367,7 +367,7 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 
 
 
-READ8_MEMBER(enigma2_state::dip_switch_r)
+uint8_t enigma2_state::dip_switch_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -399,7 +399,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 }
 
 
-WRITE8_MEMBER(enigma2_state::sound_data_w)
+void enigma2_state::sound_data_w(uint8_t data)
 {
 	/* clock sound latch shift register on rising edge of D2 */
 	if (!(data & 0x04) && (m_last_sound_data & 0x04))
@@ -424,7 +424,7 @@ void enigma2_state::protection_data_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER(enigma2_state::enigma2_flip_screen_w)
+void enigma2_state::enigma2_flip_screen_w(uint8_t data)
 {
 	m_flip_screen = ((data >> 5) & 0x01) && ((ioport("DSW")->read() & 0x20) == 0x20);
 }

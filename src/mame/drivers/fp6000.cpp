@@ -97,7 +97,7 @@ private:
 	void port_0f_w(uint8_t data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_READ16_MEMBER(unk_r);
+	uint16_t unk_r();
 
 	void centronics_busy_w(int state) { m_centronics_busy = state; };
 	void centronics_fault_w(int state) { m_centronics_fault = state; };
@@ -227,7 +227,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ16_MEMBER(fp6000_state::unk_r)
+uint16_t fp6000_state::unk_r()
 {
 	// 7-------
 	// -6------  ?

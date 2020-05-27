@@ -87,8 +87,8 @@ private:
 	void main_io(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void control_w(offs_t offset, u8 data);
 
 	u8 m_inp_mux = 0;
 	u8 m_7seg_data = 0;
@@ -109,7 +109,7 @@ void bcc_state::machine_start()
 
 // TTL
 
-WRITE8_MEMBER(bcc_state::control_w)
+void bcc_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
@@ -125,7 +125,7 @@ WRITE8_MEMBER(bcc_state::control_w)
 	m_inp_mux = data & 0xf;
 }
 
-READ8_MEMBER(bcc_state::input_r)
+u8 bcc_state::input_r()
 {
 	u8 data = 0;
 

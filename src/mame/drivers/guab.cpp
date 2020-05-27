@@ -94,8 +94,8 @@ protected:
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
-	DECLARE_WRITE16_MEMBER(tms34061_w);
-	DECLARE_READ16_MEMBER(tms34061_r);
+	void tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tms34061_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void output1_w(uint8_t data);
@@ -233,7 +233,7 @@ EF9369_COLOR_UPDATE( guab_state::ef9369_color_update )
 	m_palette->set_pen_color(entry, pal4bit(ca), pal4bit(cb), pal4bit(cc));
 }
 
-WRITE16_MEMBER( guab_state::tms34061_w )
+void guab_state::tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
@@ -251,7 +251,7 @@ WRITE16_MEMBER( guab_state::tms34061_w )
 		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
-READ16_MEMBER( guab_state::tms34061_r )
+uint16_t guab_state::tms34061_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;

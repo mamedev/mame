@@ -134,14 +134,14 @@ private:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_READ16_MEMBER(grid_9ff0_r);
-	DECLARE_READ16_MEMBER(grid_keyb_r);
-	DECLARE_READ8_MEMBER(grid_modem_r);
-	DECLARE_WRITE16_MEMBER(grid_keyb_w);
-	DECLARE_WRITE8_MEMBER(grid_modem_w);
+	uint16_t grid_9ff0_r(offs_t offset);
+	uint16_t grid_keyb_r(offs_t offset);
+	uint8_t grid_modem_r(offs_t offset);
+	void grid_keyb_w(offs_t offset, uint16_t data);
+	void grid_modem_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(grid_dma_w);
-	DECLARE_READ8_MEMBER(grid_dma_r);
+	void grid_dma_w(offs_t offset, uint8_t data);
+	uint8_t grid_dma_r(offs_t offset);
 
 	uint32_t screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -160,7 +160,7 @@ private:
 };
 
 
-READ16_MEMBER(gridcomp_state::grid_9ff0_r)
+uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -176,7 +176,7 @@ READ16_MEMBER(gridcomp_state::grid_9ff0_r)
 	return data;
 }
 
-READ16_MEMBER(gridcomp_state::grid_keyb_r)
+uint16_t gridcomp_state::grid_keyb_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -199,7 +199,7 @@ READ16_MEMBER(gridcomp_state::grid_keyb_r)
 	return data;
 }
 
-WRITE16_MEMBER(gridcomp_state::grid_keyb_w)
+void gridcomp_state::grid_keyb_w(offs_t offset, uint16_t data)
 {
 	LOGKBD("%02x <- %02x\n", 0xdffc0 + (offset << 1), data);
 }
@@ -213,7 +213,7 @@ void gridcomp_state::kbd_put(u16 data)
 
 
 // reject all commands
-READ8_MEMBER(gridcomp_state::grid_modem_r)
+uint8_t gridcomp_state::grid_modem_r(offs_t offset)
 {
 	uint8_t data = 0;
 	LOG("MDM %02x == %02x\n", 0xdfec0 + (offset << 1), data);
@@ -221,18 +221,18 @@ READ8_MEMBER(gridcomp_state::grid_modem_r)
 	return data;
 }
 
-WRITE8_MEMBER(gridcomp_state::grid_modem_w)
+void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
 {
 	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
-WRITE8_MEMBER(gridcomp_state::grid_dma_w)
+void gridcomp_state::grid_dma_w(offs_t offset, uint8_t data)
 {
 	m_tms9914->write(7, data);
 	// LOG("DMA %02x <- %02x\n", offset, data);
 }
 
-READ8_MEMBER(gridcomp_state::grid_dma_r)
+uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 {
 	int ret = m_tms9914->read(7);
 	// LOG("DMA %02x == %02x\n", offset, ret);

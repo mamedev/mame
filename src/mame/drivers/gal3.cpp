@@ -173,14 +173,14 @@ private:
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
 
-	DECLARE_READ32_MEMBER(led_mst_r);
-	DECLARE_WRITE32_MEMBER(led_mst_w);
-	DECLARE_READ32_MEMBER(led_slv_r);
-	DECLARE_WRITE32_MEMBER(led_slv_w);
-	template<int Screen> DECLARE_READ16_MEMBER(video_enable_r);
-	template<int Screen> DECLARE_WRITE16_MEMBER(video_enable_w);
-	DECLARE_READ16_MEMBER(rso_r);
-	DECLARE_WRITE16_MEMBER(rso_w);
+	uint32_t led_mst_r();
+	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t led_slv_r();
+	void led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Screen> uint16_t video_enable_r();
+	template<int Screen> void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rso_r(offs_t offset);
+	void rso_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -288,39 +288,39 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 
 /***************************************************************************************/
 
-READ32_MEMBER(gal3_state::led_mst_r)
+uint32_t gal3_state::led_mst_r()
 {
 	return m_led_mst;
 }
 
-WRITE32_MEMBER(gal3_state::led_mst_w)
+void gal3_state::led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_mst);
 }
 
-READ32_MEMBER(gal3_state::led_slv_r)
+uint32_t gal3_state::led_slv_r()
 {
 	return m_led_slv;
 }
 
-WRITE32_MEMBER(gal3_state::led_slv_w)
+void gal3_state::led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_slv);
 }
 
 template<int Screen>
-READ16_MEMBER(gal3_state::video_enable_r)
+uint16_t gal3_state::video_enable_r()
 {
 	return m_video_enable[Screen];
 }
 
 template<int Screen>
-WRITE16_MEMBER(gal3_state::video_enable_w)
+void gal3_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_enable[Screen]); // 0xff53, instead of 0x40 in namcos21
 }
 
-READ16_MEMBER(gal3_state::rso_r)
+uint16_t gal3_state::rso_r(offs_t offset)
 {
 	/*store $5555 @$0046, and readback @$0000
 	read @$0144 and store at A6_21e & A4_5c
@@ -329,7 +329,7 @@ READ16_MEMBER(gal3_state::rso_r)
 	return m_rso_shared_ram[offset];
 }
 
-WRITE16_MEMBER(gal3_state::rso_w)
+void gal3_state::rso_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rso_shared_ram[offset]);
 }

@@ -157,7 +157,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( frnb_w );
 
-	READ32_MEMBER( s3c24xx_lcd_r );
+	uint32_t s3c24xx_lcd_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -207,7 +207,7 @@ protected:
 	void s3c24xx_lcd_start();
 	void s3c24xx_lcd_stop();
 	void s3c24xx_lcd_recalc();
-	WRITE32_MEMBER( s3c24xx_lcd_w );
+	void s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	READ32_MEMBER( s3c24xx_lcd_palette_r );
 	WRITE32_MEMBER( s3c24xx_lcd_palette_w );
 	void s3c24xx_clkpow_reset();

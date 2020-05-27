@@ -135,7 +135,7 @@ protected:
 	uint8_t p1read();
 	void p1write(uint8_t data);
 	void p2write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(nvwrite);
+	void nvwrite(offs_t offset, uint8_t data);
 
 	void io_bank(address_map &map);
 	void i8039_io(address_map &map);
@@ -261,7 +261,7 @@ void hp3478a_state::p2write(uint8_t data)
 
 /* CAL RAM write handler, to implement "CAL enable" front panel switch
 */
-WRITE8_MEMBER( hp3478a_state::nvwrite ) {
+void hp3478a_state::nvwrite(offs_t offset, uint8_t data) {
 	if (m_calenable->read()) {
 		m_nvram_raw[offset] = data;
 		LOGMASKED(DEBUG_CAL, "write %02X to cal[%02X]\n", data, offset);

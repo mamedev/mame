@@ -117,14 +117,14 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
-	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
-	DECLARE_READ8_MEMBER(catchall);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(banksel_w) { m_rombank->set_entry(N); }
-	DECLARE_WRITE8_MEMBER(geimulti_bank_w);
-	template <unsigned N> DECLARE_READ8_MEMBER(banksel_r);
-	DECLARE_READ8_MEMBER(signature_r);
-	DECLARE_WRITE8_MEMBER(signature_w);
+	void gei_drawctrl_w(offs_t offset, uint8_t data);
+	void gei_bitmap_w(offs_t offset, uint8_t data);
+	uint8_t catchall(offs_t offset);
+	template <unsigned N> void banksel_w(uint8_t data) { m_rombank->set_entry(N); }
+	void geimulti_bank_w(offs_t offset, uint8_t data);
+	template <unsigned N> uint8_t banksel_r();
+	uint8_t signature_r();
+	void signature_w(uint8_t data);
 	void lamps_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void sound2_w(uint8_t data);
@@ -168,7 +168,7 @@ private:
 };
 
 
-WRITE8_MEMBER(gei_state::gei_drawctrl_w)
+void gei_state::gei_drawctrl_w(offs_t offset, uint8_t data)
 {
 	m_drawctrl[offset] = data;
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(gei_state::gei_drawctrl_w)
 	}
 }
 
-WRITE8_MEMBER(gei_state::gei_bitmap_w)
+void gei_state::gei_bitmap_w(offs_t offset, uint8_t data)
 {
 	m_yadd = (offset == m_prevoffset) ? (m_yadd + 1) : 0;
 	m_prevoffset = offset;
@@ -281,7 +281,7 @@ void gei_state::nmi_w(uint8_t data)
 	m_nmi_mask = data & 0x40;
 }
 
-READ8_MEMBER(gei_state::catchall)
+uint8_t gei_state::catchall(offs_t offset)
 {
 	int pc = m_maincpu->pc();
 
@@ -297,7 +297,7 @@ uint8_t gei_state::portC_r()
 }
 
 
-WRITE8_MEMBER(gei_state::geimulti_bank_w)
+void gei_state::geimulti_bank_w(offs_t offset, uint8_t data)
 {
 	int bank = -1;
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 }
 
 template <unsigned N>
-READ8_MEMBER(gei_state::banksel_r)
+uint8_t gei_state::banksel_r()
 {
 	if (!machine().side_effects_disabled())
 		m_rombank->set_entry(N);
@@ -335,12 +335,12 @@ READ8_MEMBER(gei_state::banksel_r)
 
 /* This signature is used to validate the ROMs in sportauth. Simple protection check? */
 
-READ8_MEMBER(gei_state::signature_r)
+uint8_t gei_state::signature_r()
 {
 	return m_signature_answer;
 }
 
-WRITE8_MEMBER(gei_state::signature_w)
+void gei_state::signature_w(uint8_t data)
 {
 	if (data == 0) m_signature_pos = 0;
 

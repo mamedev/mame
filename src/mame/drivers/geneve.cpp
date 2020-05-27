@@ -333,8 +333,8 @@ private:
 	// Memory bus
 	void setaddress_debug(bool debug, offs_t address, uint8_t busctrl);
 	void setaddress(offs_t address, uint8_t busctrl);
-	DECLARE_READ8_MEMBER( memread );
-	DECLARE_WRITE8_MEMBER( memwrite );
+	uint8_t memread(offs_t offset);
+	void memwrite(offs_t offset, uint8_t data);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -506,7 +506,7 @@ void geneve_state::setaddress_debug(bool debug, offs_t address, uint8_t busctrl)
 	}
 }
 
-READ8_MEMBER( geneve_state::memread )
+uint8_t geneve_state::memread(offs_t offset)
 {
 	uint8_t value = 0;
 	offs_t sramadd;
@@ -617,7 +617,7 @@ READ8_MEMBER( geneve_state::memread )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_state::memwrite )
+void geneve_state::memwrite(offs_t offset, uint8_t data)
 {
 	offs_t sramadd = 0;
 	offs_t dramadd = 0;

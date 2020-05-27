@@ -1365,8 +1365,8 @@ protected:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
+	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
 
 	void witchcrd_palette(palette_device &palette) const;
 	void super21p_palette(palette_device &palette) const;
@@ -1446,8 +1446,8 @@ public:
 	void megadpkr(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
-	DECLARE_WRITE8_MEMBER(mcu_command_w);
+	uint8_t cpubank_decrypt_r(offs_t offset);
+	void mcu_command_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
 	void mcu_portc_w(uint8_t data);
 	void megadpkr_banked_map(address_map &map);
@@ -1468,13 +1468,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_videoram_w)
+void goldnpkr_state::goldnpkr_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
+void goldnpkr_state::goldnpkr_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -4894,12 +4894,12 @@ void goldnpkr_state::caspoker(machine_config &config)
 *                Blitz System                *
 *********************************************/
 
-READ8_MEMBER(blitz_state::cpubank_decrypt_r)
+uint8_t blitz_state::cpubank_decrypt_r(offs_t offset)
 {
 	return m_cpubank[offset] ^ m_cpubank_xor;
 }
 
-WRITE8_MEMBER(blitz_state::mcu_command_w)
+void blitz_state::mcu_command_w(uint8_t data)
 {
 	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))

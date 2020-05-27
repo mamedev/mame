@@ -55,7 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 private:
-	DECLARE_WRITE8_MEMBER(segbank_w);
+	void segbank_w(offs_t offset, uint8_t data);
 	uint8_t u4a_r();
 	uint8_t u4b_r();
 	void u4b_w(uint8_t data);
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( gts3_state::nmi_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
-WRITE8_MEMBER( gts3_state::segbank_w )
+void gts3_state::segbank_w(offs_t offset, uint8_t data)
 {
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;

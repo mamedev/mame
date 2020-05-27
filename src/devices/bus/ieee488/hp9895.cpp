@@ -492,7 +492,7 @@ WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
 
 READ8_MEMBER(hp9895_device::phi_reg_r)
 {
-	uint16_t reg = m_phi->reg16_r(space , offset , mem_mask);
+	uint16_t reg = m_phi->reg16_r(offset);
 
 	// Reading D1=1 from a register sets the Z80 IRQ line
 	if (BIT(reg , 14) && !m_cpu_irq) {

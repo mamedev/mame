@@ -137,12 +137,12 @@ void k037122_device::update_palette_color( uint32_t palette_base, int color )
 	palette().set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
-READ32_MEMBER( k037122_device::sram_r )
+uint32_t k037122_device::sram_r(offs_t offset)
 {
 	return m_tile_ram[offset];
 }
 
-WRITE32_MEMBER( k037122_device::sram_w )
+void k037122_device::sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_tile_ram.get() + offset);
 
@@ -179,14 +179,14 @@ WRITE32_MEMBER( k037122_device::sram_w )
 }
 
 
-READ32_MEMBER( k037122_device::char_r )
+uint32_t k037122_device::char_r(offs_t offset)
 {
 	int bank = m_reg[0x30 / 4] & 0x7;
 
 	return m_char_ram[offset + (bank * (0x40000 / 4))];
 }
 
-WRITE32_MEMBER( k037122_device::char_w )
+void k037122_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int bank = m_reg[0x30 / 4] & 0x7;
 	uint32_t addr = offset + (bank * (0x40000/4));
@@ -195,7 +195,7 @@ WRITE32_MEMBER( k037122_device::char_w )
 	gfx(m_gfx_index)->mark_dirty(addr / 32);
 }
 
-READ32_MEMBER( k037122_device::reg_r )
+uint32_t k037122_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -207,7 +207,7 @@ READ32_MEMBER( k037122_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k037122_device::reg_w )
+void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 }

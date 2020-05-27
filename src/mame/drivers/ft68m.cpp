@@ -32,7 +32,7 @@ public:
 	void ft68m(machine_config &config);
 
 private:
-	DECLARE_READ16_MEMBER(switches_r);
+	uint16_t switches_r();
 
 	void mem_map(address_map &map);
 
@@ -44,7 +44,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-READ16_MEMBER( ft68m_state::switches_r )
+uint16_t ft68m_state::switches_r()
 {
 	return 0x7c00; // bypass self test
 }

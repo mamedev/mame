@@ -320,24 +320,24 @@ private:
 
 	required_ioport_array<4> m_ports;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_tile_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_char_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_char_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_reg_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_WRITE16_MEMBER(gn680_sysctrl_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_tile_r(offs_t offset);
+	void gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_char_r(offs_t offset);
+	void gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gticlub_k001604_reg_r(offs_t offset);
+	void gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	void gn680_sysctrl_w(uint16_t data);
+	uint32_t dsp_dataram0_r(offs_t offset);
+	void dsp_dataram0_w(offs_t offset, uint32_t data);
+	uint32_t dsp_dataram1_r(offs_t offset);
+	void dsp_dataram1_w(offs_t offset, uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_count_w(uint16_t data);
 
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
@@ -369,7 +369,7 @@ private:
 };
 
 
-WRITE32_MEMBER(gticlub_state::paletteram32_w)
+void gticlub_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -386,47 +386,47 @@ WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
+uint32_t gticlub_state::gticlub_k001604_tile_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->tile_r(space, offset, mem_mask);
+	return k001604->tile_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
+void gticlub_state::gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->tile_w(space, offset, data, mem_mask);
+	k001604->tile_w(offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
+uint32_t gticlub_state::gticlub_k001604_char_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->char_r(space, offset, mem_mask);
+	return k001604->char_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
+void gticlub_state::gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->char_w(space, offset, data, mem_mask);
+	k001604->char_w(offset, data, mem_mask);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
+uint32_t gticlub_state::gticlub_k001604_reg_r(offs_t offset)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->reg_r(space, offset, mem_mask);
+	return k001604->reg_r(offset);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
+void gticlub_state::gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(space, offset, data, mem_mask);
+	k001604->reg_w(offset, data);
 }
 
 
 /******************************************************************/
 
-READ8_MEMBER(gticlub_state::sysreg_r)
+uint8_t gticlub_state::sysreg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 	return 0;
 }
 
-WRITE8_MEMBER(gticlub_state::sysreg_w)
+void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -496,7 +496,7 @@ TIMER_CALLBACK_MEMBER(gticlub_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
+void gticlub_state::soundtimer_en_w(uint16_t data)
 {
 	if (data & 1)
 	{
@@ -511,7 +511,7 @@ WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
+void gticlub_state::soundtimer_count_w(uint16_t data)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -583,7 +583,7 @@ void gticlub_state::sound_memmap(address_map &map)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(gticlub_state::gn680_sysctrl_w)
+void gticlub_state::gn680_sysctrl_w(uint16_t data)
 {
 	// bit 15 = watchdog toggle
 	// lower 4 bits = LEDs?
@@ -603,22 +603,22 @@ void gticlub_state::gn680_memmap(address_map &map)
 
 /*****************************************************************************/
 
-READ32_MEMBER(gticlub_state::dsp_dataram0_r)
+uint32_t gticlub_state::dsp_dataram0_r(offs_t offset)
 {
 	return m_sharc_dataram_0[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram0_w)
+void gticlub_state::dsp_dataram0_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram_0[offset] = data;
 }
 
-READ32_MEMBER(gticlub_state::dsp_dataram1_r)
+uint32_t gticlub_state::dsp_dataram1_r(offs_t offset)
 {
 	return m_sharc_dataram_1[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
+void gticlub_state::dsp_dataram1_w(offs_t offset, uint32_t data)
 {
 	m_sharc_dataram_1[offset] = data;
 }

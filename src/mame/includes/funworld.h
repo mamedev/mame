@@ -45,8 +45,8 @@ public:
 	void init_jolycdig();
 
 protected:
-	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
-	DECLARE_WRITE8_MEMBER(funworld_colorram_w);
+	void funworld_videoram_w(offs_t offset, uint8_t data);
+	void funworld_colorram_w(offs_t offset, uint8_t data);
 	void funworld_lamp_a_w(uint8_t data);
 	void funworld_lamp_b_w(uint8_t data);
 
@@ -63,8 +63,8 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 private:
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(question_bank_w);
+	uint8_t questions_r(offs_t offset);
+	void question_bank_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 	uint8_t funquiz_ay8910_a_r();
 	uint8_t funquiz_ay8910_b_r();
@@ -130,7 +130,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(chinatow_r_32f0);
+	uint8_t chinatow_r_32f0(offs_t offset);
 
 	void chinatow_map(address_map &map);
 };
@@ -151,7 +151,7 @@ protected:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(multiwin_opcode_r);
+	uint8_t multiwin_opcode_r(offs_t offset);
 
 	void multiwin_opcodes_map(address_map& map);
 };
@@ -167,7 +167,7 @@ public:
 
 private:
 	cpu_device* _maincpu {};
-	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
+	uint8_t royalcrdf_opcode_r(offs_t offset);
 
 	void royalcrdf_map(address_map& map);
 	void royalcrdf_opcodes_map(address_map& map);

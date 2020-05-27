@@ -65,14 +65,14 @@ public:
 	DECLARE_READ_LINE_MEMBER(cass3_r);
 
 private:
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(cass2_r);
-	DECLARE_READ8_MEMBER(exxx_r);
-	DECLARE_WRITE8_MEMBER(port7f_w);
-	DECLARE_WRITE8_MEMBER(portff_w);
-	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
-	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
+	uint8_t key_r(offs_t offset);
+	void cass_w(offs_t offset, uint8_t data);
+	uint8_t cass2_r();
+	uint8_t exxx_r(offs_t offset);
+	void port7f_w(uint8_t data);
+	void portff_w(uint8_t data);
+	void brailab4_port7f_w(uint8_t data);
+	void brailab4_portff_w(uint8_t data);
 	DECLARE_VIDEO_START(homelab2);
 	DECLARE_MACHINE_RESET(homelab3);
 	DECLARE_VIDEO_START(homelab3);
@@ -103,7 +103,7 @@ INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
+uint8_t homelab_state::key_r(offs_t offset) // offset 27F-2FE
 {
 	if (offset == 0x38) // 0x3838
 	{
@@ -126,12 +126,12 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
-READ8_MEMBER( homelab_state::cass2_r )
+uint8_t homelab_state::cass2_r()
 {
 	return (m_cass->input() > 0.03) ? 0xff : 0;
 }
 
-WRITE8_MEMBER( homelab_state::cass_w )
+void homelab_state::cass_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x73f) // 0x3f3f
 		m_nmi = true;
@@ -152,20 +152,20 @@ MACHINE_RESET_MEMBER(homelab_state,brailab4)
 	membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER( homelab_state::port7f_w )
+void homelab_state::port7f_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( homelab_state::portff_w )
+void homelab_state::portff_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
+void homelab_state::brailab4_port7f_w(uint8_t data)
 {
 	membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER( homelab_state::brailab4_portff_w )
+void homelab_state::brailab4_portff_w(uint8_t data)
 {
 	membank("bank1")->set_entry(1);
 }
@@ -176,7 +176,7 @@ READ_LINE_MEMBER( homelab_state::cass3_r )
 }
 
 
-READ8_MEMBER( homelab_state::exxx_r )
+uint8_t homelab_state::exxx_r(offs_t offset)
 {
 // keys E800-E813 but E810-E813 are not connected
 // cassin E883

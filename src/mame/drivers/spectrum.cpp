@@ -341,7 +341,7 @@ READ8_MEMBER(spectrum_state::spectrum_rom_r)
  bit 2-0: border colour
 */
 
-WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
+void spectrum_state::spectrum_port_fe_w(uint8_t data)
 {
 	unsigned char Changed;
 

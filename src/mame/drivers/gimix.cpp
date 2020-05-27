@@ -89,13 +89,13 @@ public:
 	void gimix(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(system_w);
+	void system_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_WRITE8_MEMBER(dma_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 	uint8_t pia_pa_r();
 	void pia_pa_w(uint8_t data);
 	uint8_t pia_pb_r();
@@ -201,7 +201,7 @@ void gimix_state::refresh_memory()
 	}
 }
 
-WRITE8_MEMBER( gimix_state::system_w )
+void gimix_state::system_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x7f)  // task register
 	{
@@ -233,7 +233,7 @@ WRITE8_MEMBER( gimix_state::system_w )
 	}
 }
 
-READ8_MEMBER(gimix_state::dma_r)
+uint8_t gimix_state::dma_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -255,7 +255,7 @@ READ8_MEMBER(gimix_state::dma_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(gimix_state::dma_w)
+void gimix_state::dma_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -374,7 +374,7 @@ WRITE8_MEMBER(gimix_state::dma_w)
 	}
 }
 
-READ8_MEMBER(gimix_state::fdc_r)
+uint8_t gimix_state::fdc_r(offs_t offset)
 {
 	// motors are switched on on FDC access
 	if(m_selected_drive == 1 && m_floppy0_ready == false)
@@ -404,7 +404,7 @@ READ8_MEMBER(gimix_state::fdc_r)
 	return m_fdc->read(offset);
 }
 
-WRITE8_MEMBER(gimix_state::fdc_w)
+void gimix_state::fdc_w(offs_t offset, uint8_t data)
 {
 	// motors are switched on on FDC access
 	if(m_selected_drive == 1)

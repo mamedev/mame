@@ -83,8 +83,8 @@ private:
 
 	uint8_t m_port1;
 
-	DECLARE_READ8_MEMBER(hostmem_r);
-	DECLARE_WRITE8_MEMBER(hostmem_w);
+	uint8_t hostmem_r(offs_t offset);
+	void hostmem_w(offs_t offset, uint8_t data);
 };
 
 void goldart_state::mcu_port1_w(uint8_t data)
@@ -125,7 +125,7 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 	return 0;
 }
 
-READ8_MEMBER(goldart_state::hostmem_r)
+uint8_t goldart_state::hostmem_r(offs_t offset)
 {
 	// must be some control bits (or DS5002FP memory access isn't correct) as registers map over ROM/RAM with no obvious way to select at the moment
 	// and we need to be able to access full range of each ROM bank at least
@@ -186,7 +186,7 @@ READ8_MEMBER(goldart_state::hostmem_r)
 	return ret;
 }
 
-WRITE8_MEMBER(goldart_state::hostmem_w)
+void goldart_state::hostmem_w(offs_t offset, uint8_t data)
 {
 	// registers seem to control write modes? (palette select bits, overwrite / transparent drawing etc.)
 
