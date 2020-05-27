@@ -30,10 +30,13 @@ public:
 
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
-	void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
+	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
-	void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
-	void set_pal_back(int pal_back) { m_pal_back = pal_back; }
+	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
+
+
+	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
+	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
@@ -79,7 +82,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
 	DECLARE_READ16_MEMBER(video_dma_size_busy_r);
 	DECLARE_WRITE16_MEMBER(video_dma_size_trigger_w);
-	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
+	DECLARE_WRITE16_MEMBER(video_707e_spritebank_w);
 
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
@@ -134,24 +137,6 @@ public:
 
 protected:
 
-	enum
-	{
-		PAGE_ENABLE_MASK        = 0x0008,
-		PAGE_WALLPAPER_MASK     = 0x0004,
-
-		SPRITE_ENABLE_MASK      = 0x0001,
-		SPRITE_COORD_TL_MASK    = 0x0002,
-
-		PAGE_PRIORITY_FLAG_MASK    = 0x3000,
-		PAGE_PRIORITY_FLAG_SHIFT   = 12,
-		PAGE_TILE_HEIGHT_MASK   = 0x00c0,
-		PAGE_TILE_HEIGHT_SHIFT  = 6,
-		PAGE_TILE_WIDTH_MASK    = 0x0030,
-		PAGE_TILE_WIDTH_SHIFT   = 4,
-		TILE_X_FLIP             = 0x0004,
-		TILE_Y_FLIP             = 0x0008
-	};
-
 	static const device_timer_id TIMER_SCREENPOS = 2;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -181,7 +166,7 @@ protected:
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
 	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll);
+	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which);
 	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
 	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 
@@ -199,7 +184,7 @@ protected:
 	uint16_t m_page1_addr_lsb;
 	uint16_t m_page1_addr_msb;
 
-	uint16_t m_707e_videodma_bank;
+	uint16_t m_707e_spritebank;
 	uint16_t m_videodma_size;
 	uint16_t m_videodma_dest;
 	uint16_t m_videodma_source;
@@ -270,10 +255,12 @@ protected:
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
 
-	int m_pal_displaybank_high;
-	int m_pal_sprites;
-	int m_pal_back;
+	//int m_pal_displaybank_high;
+	//int m_pal_sprites;
+	//int m_pal_back;
+	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
+
 };
 
 class gcm394_video_device : public gcm394_base_video_device

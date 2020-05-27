@@ -227,7 +227,7 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(1);
+	//m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
@@ -309,7 +309,7 @@ void jak_s500_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(0);
+	//m_maincpu->set_paldisplaybank_high_hack(0);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
@@ -317,7 +317,7 @@ void jak_s500_game_state::machine_reset()
 void lazertag_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->set_pal_sprites_hack(0x800);
+	//m_maincpu->set_pal_sprites_hack(0x800);
 }
 
 void paccon_game_state::machine_reset()
@@ -326,6 +326,12 @@ void paccon_game_state::machine_reset()
 	m_maincpu->install_speedup_hack(0x6593, 0x30033);
 }
 
+void jak_prft_game_state::machine_reset()
+{
+	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_alt_tile_addressing_hack(0);
+	m_maincpu->set_alt_extrasprite_hack(1);
+}
 
 ROM_START( paccon )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -503,8 +509,8 @@ CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshun
 CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
-CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

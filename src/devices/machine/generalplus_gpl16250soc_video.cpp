@@ -129,9 +129,10 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_pal_displaybank_high(0),
-	m_pal_sprites(0x500),
-	m_pal_back(0x100),
+//	m_pal_displaybank_high(0),
+//	m_pal_sprites(0x100),
+//	m_pal_back(0x000),
+	m_alt_extrasprite_hack(0),
 	m_alt_tile_addressing(0)
 {
 }
@@ -325,7 +326,7 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_page0_addr_msb));
 	save_item(NAME(m_page1_addr_lsb));
 	save_item(NAME(m_page1_addr_msb));
-	save_item(NAME(m_707e_videodma_bank));
+	save_item(NAME(m_707e_spritebank));
 	save_item(NAME(m_videodma_size));
 	save_item(NAME(m_videodma_dest));
 	save_item(NAME(m_videodma_source));
@@ -366,7 +367,7 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_pal_displaybank_high));
+//	save_item(NAME(m_pal_displaybank_high));
 	save_item(NAME(m_alt_tile_addressing));
 }
 
@@ -421,7 +422,7 @@ void gcm394_base_video_device::device_reset()
 	m_7087 = 0x0000;
 	m_7088 = 0x0000;
 
-	m_707e_videodma_bank = 0x0000;
+	m_707e_spritebank = 0x0000;
 	m_videodma_size = 0x0000;
 	m_videodma_dest = 0x0000;
 	m_videodma_source = 0x0000;
@@ -506,28 +507,6 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		int current_palette_offset = palette_offset;
 
-
-		// for planes above 4bpp palette ends up being pulled from different places?
-		if (nc_bpp < 6)
-		{
-			// 2bpp
-			// 4bpp
-			if (m_pal_displaybank_high) // how is this set?
-				current_palette_offset |= 0x0800;
-
-		}
-		else if (nc_bpp < 8)
-		{
-			// 6bpp
-		//  current_palette_offset |= 0x0800;
-
-		}
-		else
-		{
-			//pen = machine().rand() & 0x1f;
-			// 8bpp
-		}
-
 		uint32_t pal = current_palette_offset + pen;
 		bits &= 0xffff;
 
@@ -564,7 +543,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	}
 }
 
-void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll)
+void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll, int which)
 {
 	uint32_t xscroll = scroll[0];
 	uint32_t yscroll = scroll[1];
@@ -574,22 +553,48 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	uint32_t palette_map = regs[3];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	if (!(ctrl_reg & PAGE_ENABLE_MASK))
+	// attr_reg bits
+	// -Bzz pppp hhww ffbb
+	//
+	// B = blend
+	// zz = depth
+	// pppp = palette
+	// ff = flips
+	// bb = bpp
+	// hh = height
+	// ww = width
+
+	// ctrl_reg bits
+	// ---- ---B h--r ewRl
+	//
+	// e = enable
+	// l = bitmape/line mode
+	// r = rowscroll
+	// w = wallpaper mode
+	// R = regset mode
+	// h = high colour
+	// B = blend
+	
+	
+	if (!(ctrl_reg & 0x0008))
 	{
 		return;
 	}
 
-	if (((attr_reg & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	if (((attr_reg & 0x3000) >> 12) != priority)
 	{
 		return;
 	}
 
-	if (ctrl_reg & 0x01) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
+	if (ctrl_reg & 0x0001) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
 	{
-		if (ctrl_reg & 0x10)
-			popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
-		else
-			popmessage("bitmap mode %08x\n", bitmap_addr);
+		if (0)
+		{
+			if (ctrl_reg & 0x0010)
+				popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
+			else
+				popmessage("bitmap mode %08x\n", bitmap_addr);
+		}
 
 		// note, in interlace modes it appears every other line is unused? (480 entry table, but with blank values)
 		// and furthermore the rowscroll and rowzoom tables only have 240 entries, not enough for every line
@@ -655,15 +660,15 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	}
 	else
 	{
-		uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+		uint32_t tile_h = 8 << ((attr_reg & 0x00c0) >> 6);
+		uint32_t tile_w = 8 << ((attr_reg & 0x0030) >> 4);
 
 		int total_width;
 		int use_alt_drawmode = m_alt_tile_addressing;
 		int y_mask = 0;
 
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
-		if ((attr_reg >> 14) & 0x2)
+		if ((attr_reg >> 15) & 0x1)
 		{
 			total_width = 1024;
 			y_mask = 0x1ff;
@@ -687,17 +692,10 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		{
 			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & y_mask) - 0x10;
 			uint32_t xx = (tile_w * x0 - xscroll) & (total_width-1);
-			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
-
-
+			uint32_t tile = (ctrl_reg & 0x0004) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
 			if (!tile)
 				continue;
-
-
-			uint32_t tileattr = attr_reg;
-			uint32_t tilectrl = ctrl_reg;
-
 
 			bool blend;
 			bool row_scroll;
@@ -705,53 +703,88 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			uint32_t yflipmask;
 			uint32_t palette_offset;
 
-			blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-			row_scroll = (tilectrl & 0x0010);
+			blend = (attr_reg & 0x4000 || ctrl_reg & 0x0100);
+			row_scroll = (ctrl_reg & 0x0010);
 
-
-			if ((ctrl_reg & 2) == 0) // RegSet:0
+			if ((ctrl_reg & 0x0002) == 0) // RegSet:0
 			{
-				uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+				uint16_t palette = (ctrl_reg & 0x0004) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 				if (x0 & 1)
 					palette >>= 8;
 
-				flip_x = palette & 0x0010;
-				yflipmask = (palette & 0x0020) ? tile_h - 1 : 0;
-				palette_offset = (palette & 0x0f) << 4;
+				// 'palette' format
+				// --ff pppp
+				//
+				// f = flip bits
+				// p = palette
 
-				//tilectrl &= ~0x0100;
-				//tilectrl |= (palette << 2) & 0x0100;    // blend
+				flip_x = palette & 0x10;
+				yflipmask = (palette & 0x20) ? tile_h - 1 : 0;
+				palette_offset = (palette & 0x0f) << 4;
 			}
 			else // RegSet:1
 			{
 				if (m_alt_tile_addressing == 0)
 				{
 					// smartfp needs the attribute table to contain extra tile bits even if regset is 1
-					uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+					uint16_t palette = (ctrl_reg & 0x0004) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 					if (x0 & 1)
 						palette >>= 8;
 
+					// 'palette' format
+					// -- -ttt
+					//
+					// t = extra tile number bits
+
 					tile |= (palette & 0x0007) << 16;
-
-					flip_x = (tileattr & TILE_X_FLIP);
-					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-					palette_offset = (tileattr & 0x0f00) >> 4;
-
 				}
-				else
-				{
-					flip_x = (tileattr & TILE_X_FLIP);
-					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-					palette_offset = (tileattr & 0x0f00) >> 4;
-				}
+
+				flip_x = (attr_reg & 0x0004);
+				yflipmask = attr_reg & 0x0008 ? tile_h - 1 : 0;
+				palette_offset = (attr_reg & 0x0f00) >> 4;
 			}
 
+			const uint8_t bpp = attr_reg & 0x0003;
+			
+			// HACKS
+			// There must be a select bit for the tilemap palettes somewhere, but where?!
 
-			//palette_offset |= 0x0900;
-			palette_offset |= m_pal_back;
+			// the different games in paccon also expect a variety of different configs here, maybe a good place to look
 
-			const uint8_t bpp = tileattr & 0x0003;
+			if (m_703a_palettebank & 1) // this actually seems to be the sprite palette bank enable, but for tkmag220 it gives us an easy way to ignore the logic below
+			{
+				if (which == 0) // tilemap 0
+				{
+					if (ctrl_reg & 0x0002)  // RegSet:1
+					{
+						// smartfp has a conflict between the bootlogos and the first screen, it's in regset mode, no obvious difference in registers but needs palette from different places?
+						// not even m_707f changes here, which makes the m_707f case specific hacks for jak_s500 below very unlikely to actually be related
+						if ((bpp + 1) * 2 == 4)
+							if (m_alt_tile_addressing == 0)
+								palette_offset |= 0x200;
+					}
+				}
 
+				if (which == 1)
+				{
+					// can't do this for jak_s500 logos
+					// jak_s500 also uses this tilemap in both 4 and 6bpp modes expecting the same palette base, so the hack used for smartfp on tilemap 0 is not applicable here
+
+					// m_707f != 0x2d3 for jak_S500 main menu
+					if ((m_707f != 0x53) && (m_707f != 0x63) && (m_707f != 0x2d3))
+						palette_offset |= 0x200;
+				}
+
+				// jak_car2 screen transitions use layers 2 and 3 the same way, alternating each frame
+				if (which == 2)
+				{
+					// jak_s500 title screen + loading screen before race
+					if ((m_707f == 0x2d3) || (m_707f == 0x2db))
+						palette_offset |= 0x200;
+				}
+
+			}
+			//palette_offset |= m_pal_back;
 
 			if (blend)
 			{
@@ -829,25 +862,38 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	else
 		addressing_mode = 1;
 
-	if (addressing_mode == 0) // smartfp, paccon
-		tile |= m_spriteextra[base_addr / 4] << 16;
+	if (m_alt_extrasprite_hack == 0)
+		if (addressing_mode == 0) // smartfp, paccon
+			tile |= m_spriteextra[base_addr / 4] << 16;
 
-	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	if (m_alt_extrasprite_hack == 1) // jak_prft
+		tile |= (m_spriteextra[base_addr] & 0x000f) << 16;
+
+	if (((attr & 0x3000) >> 12) != priority)
 	{
 		return;
 	}
 
-	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	// attr             PBzz pppp hhww ffdd
+	
+	// P = high palette bit
+	// b = blend enable
+	// zz = priority
+	// pppp = palette
+	// hh = height
+	// ww = width
+	// ff = flips
+	// dd = depth
+
+	const uint32_t h = 8 << ((attr & 0x00c0) >> 6);
+	const uint32_t w = 8 << ((attr & 0x0030) >> 4);
 
 
-
-	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
+	if (!(m_7042_sprite & 0x0002))
 	{
 		x = ((screenwidth / 2) + x) - w / 2;
 		y = ((screenheight / 2) - y) - (h / 2) + 8;
 	}
-
 
 	x &= (x_max - 1);
 	y &= 0x01ff;
@@ -872,21 +918,34 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	// different attribute use?
 	if (screenwidth == 320)
 	{
-		flip_x = (attr & TILE_X_FLIP);
+		if (m_alt_extrasprite_hack == 0)
+		{
+			flip_x = (attr & 0x0004);
+			yflipmask = attr & 0x0008 ? h - 1 : 0;
+		}
+		else
+		{
+			flip_x = 0;
+			yflipmask = 0;
+		}
+
 		bpp = attr & 0x0003;
-		yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 	else
 	{
 		flip_x = 0;// (attr & TILE_X_FLIP);
-		bpp = attr & 0x0003;
 		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0;
+
+		bpp = attr & 0x0003;
 		palette_offset = (attr & 0x0f00) >> 4;
 	}
 
-	//palette_offset |= 0x0d00;
-	palette_offset |= m_pal_sprites;
+	if (m_703a_palettebank & 1)
+		palette_offset |= 0x100;
+
+	if (attr & 0x8000)
+		palette_offset |= 0x200;
 
 	if (blend)
 	{
@@ -927,6 +986,39 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
+	if (0)
+	{
+		uint16_t attr0 = m_tmap0_regs[0];
+		uint16_t attr1 = m_tmap1_regs[0];
+		uint16_t attr2 = m_tmap2_regs[0];
+		uint16_t attr3 = m_tmap3_regs[0];
+		uint16_t ctrl0 = m_tmap0_regs[1];
+		uint16_t ctrl1 = m_tmap1_regs[1];
+		uint16_t ctrl2 = m_tmap2_regs[1];
+		uint16_t ctrl3 = m_tmap3_regs[1];
+
+		popmessage(
+			"p0ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p1ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p2ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p3ctrl u:%02x Bl:%d HC:%d u:%d u:%d RS:%d E:%d WP:%d Rg:%d Bm:%d\n"
+			"p0attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			"p1attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			"p2attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			"p3attr u:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d\n"
+			"palbank %04x 707e: %04x 707f: %04x\n",
+			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0),
+			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0),
+			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0),
+			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0),
+			(attr0 & 0xc000) >> 14, (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1),
+			(attr1 & 0xc000) >> 14, (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1),
+			(attr2 & 0xc000) >> 14, (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1),
+			(attr3 & 0xc000) >> 14, (attr3 >> 12) & 3, (attr3 >> 8) & 15, 8 << ((attr3 >> 6) & 3), 8 << ((attr3 >> 4) & 3), BIT(attr3, 3), BIT(attr3, 2), 2 * ((attr3 & 3) + 1),
+			m_703a_palettebank, m_707e_spritebank, m_707f
+		);
+	}
+
 	//const uint16_t bgcol = 0x7c1f; // magenta
 	const uint16_t bgcol = 0x0000; // black
 
@@ -955,10 +1047,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 			if (1)
 			{
-				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll, 0);
+				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll, 1);
+				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll, 2);
+				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll, 3);
 
 			}
 			if ((!(machine().input().code_pressed(KEYCODE_T))) || draw_all) draw_sprites(cliprect, scanline, i);
@@ -1327,7 +1419,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_trigger_w %04x\n", machine().describe_context(), data);
 	m_videodma_size = data;
 
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_videodma_bank, m_707f );
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_spritebank, m_707f );
 
 	for (int i = 0; i <= m_videodma_size; i++)
 	{
@@ -1347,10 +1439,10 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
+WRITE16_MEMBER(gcm394_base_video_device::video_707e_spritebank_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
-	m_707e_videodma_bank = data;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707e_spritebank_w %04x\n", machine().describe_context(), data);
+	m_707e_spritebank = data;
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_707c_r)
@@ -1419,6 +1511,10 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 	// neither lazertag or tkmag220 set it
 	// lazertag uses 2 banks (0 and 8)
 	// tkmag220 only uses 1 bank (0)
+
+	// ---- bb-s
+	// bb = write bank?
+	// s = sprite palette bank select?
 
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
@@ -1565,33 +1661,33 @@ WRITE16_MEMBER(gcm394_base_video_device::spriteram_w)
 	// however for 707e only 0/1 is written, and it also gets written before system DMA, so despite being in the video DMA
 	// region seems to operate separate from that.
 
-	if (m_707e_videodma_bank == 0x0000)
+	if (m_707e_spritebank == 0x0000)
 	{
 		m_spriteram[offset] = data;
 	}
-	else if (m_707e_videodma_bank == 0x0001)
+	else if (m_707e_spritebank == 0x0001)
 	{
 		m_spriteextra[offset] = data;
 	}
 	else
 	{
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_w %04x %04x unknown bank %04x\n", machine().describe_context(), offset, data, m_707e_videodma_bank);
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_w %04x %04x unknown bank %04x\n", machine().describe_context(), offset, data, m_707e_spritebank);
 	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 {
-	if (m_707e_videodma_bank == 0x0000)
+	if (m_707e_spritebank == 0x0000)
 	{
 		return m_spriteram[offset];
 	}
-	else if (m_707e_videodma_bank == 0x0001)
+	else if (m_707e_spritebank == 0x0001)
 	{
 		return m_spriteextra[offset];
 	}
 	else
 	{
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_r %04x unknown bank %04x\n", machine().describe_context(), offset,  m_707e_videodma_bank);
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_r %04x unknown bank %04x\n", machine().describe_context(), offset,  m_707e_spritebank);
 		return 0x0000;
 	}
 }
@@ -1606,8 +1702,7 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 	}
 	else
 	{
-		offset |= (m_703a_palettebank & 0x000f) << 8;
-
+		offset |= (m_703a_palettebank & 0x000c) << 6;
 		m_paletteram[offset] = data;
 
 		uint32_t pal = m_rgb555_to_rgb888[data & 0x7fff];
@@ -1627,7 +1722,7 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 	}
 	else
 	{
-		offset |= (m_703a_palettebank & 0x000f) << 8;
+		offset |= (m_703a_palettebank & 0x000c) << 6;
 		return m_paletteram[offset];
 	}
 }
@@ -1666,7 +1761,9 @@ WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 
 	if (m_video_irq_enable & 1)
 	{
-		m_video_irq_status |= 1;
+		// jak_prft expects 0x800 to be set in the status register or most of the main vblank code is skipped, why?
+
+		m_video_irq_status |= 1 | 0x800;
 		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 	}

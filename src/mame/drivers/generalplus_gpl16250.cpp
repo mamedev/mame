@@ -176,7 +176,7 @@ void gcm394_game_state::machine_reset()
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
-	m_maincpu->set_paldisplaybank_high_hack(1);
+	//m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(0);
 }
 

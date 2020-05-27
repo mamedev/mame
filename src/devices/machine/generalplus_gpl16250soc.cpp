@@ -67,9 +67,24 @@ void sunplus_gcm394_base_device::write_dma_params(int channel, int offset, uint1
 
 	m_dma_params[offset][channel] = data;
 
+	// TODO: very likely DMA happens whenever the length is not 0, as long as it's been enabled previously
+	// jak_prft doesn't rewrite the offset 0 register between requests, and instead writes the length
+	// as the final thing for each new request.  other games do not write the length last, but turn off
+	// register 0 before writing params, and enable it again afterwards
+	// if that's the case, this code can be refactored to work on 'length' instead of the m_dma_latched
+
+	if (offset == 3)
+	{
+		m_dma_latched[channel] = true;
+
+		if (m_dma_params[0][channel] & 1)
+			trigger_systemm_dma(space, channel);
+	}
+
 	if (offset == 0 && (data & 1))
 	{
-		trigger_systemm_dma(space, channel);
+		if (m_dma_latched[channel])
+			trigger_systemm_dma(space, channel);
 	}
 
 }
@@ -152,7 +167,6 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
-	address_space& mem = this->space(AS_PROGRAM);
 	source &= 0x0fffffff;
 	length &= 0x0fffffff; // gormiti
 
@@ -188,6 +202,8 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
+	//address_space& mem = this->space(AS_PROGRAM);
+
 	//if (mem.read_word(0x4368c) == 0x4846)
 	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
@@ -195,16 +211,21 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 
 	// what is it waiting for when we need these? (needed on some service mode screens)
-	if (mem.read_word(0x3f368) == 0x4840)
-		mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+	//if (mem.read_word(0x3f368) == 0x4840)
+	//	mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-	if (mem.read_word(0x4d8d4) == 0x4840)
-		mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+	//if (mem.read_word(0x4d8d4) == 0x4840)
+	//	mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
 
 	// clear params after operation
-	m_dma_params[0][channel] = m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
+	m_dma_params[0][channel] = m_dma_params[0][channel] & 0x00f7;
+
+	m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
+	m_dma_latched[channel] = false;
+
 	//machine().debug_break();
+
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_7abf_unk_w)
@@ -772,7 +793,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// these don't exist on older SPG
 	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port-based data upload?
 
-	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
+	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_707e_spritebank_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
 
 	// another set of registers for something?
@@ -1445,6 +1466,7 @@ void sunplus_gcm394_base_device::device_reset()
 		{
 			m_dma_params[i][j] = 0x0000;
 		}
+		m_dma_latched[j] = false;
 	}
 
 	// 78xx unknown

@@ -83,10 +83,11 @@ public:
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
-	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
+	//void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
-	void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
-	void set_pal_back_hack(int pal_back) { m_spg_video->set_pal_back(pal_back); }
+	//void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
+	//void set_pal_back_hack(int pal_back) { m_spg_video->set_pal_back(pal_back); }
+	void set_alt_extrasprite_hack(int alt_extrasprite_hack) { m_spg_video->set_alt_extrasprite(alt_extrasprite_hack); }
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
@@ -119,6 +120,7 @@ protected:
 	devcb_write16 m_portd_out;
 
 	uint16_t m_dma_params[8][4];
+	bool m_dma_latched[4];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -129,7 +131,6 @@ protected:
 
 	uint16_t m_7816;
 	uint16_t m_7817;
-
 
 	uint16_t m_7819;
 

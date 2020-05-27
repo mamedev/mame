@@ -379,7 +379,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 
 		if (r4 & 0x8000)
 		{
-			// r2 undefined (code will check for this and avoid calculations
+			m_core->m_r[REG_R2] = count_leading_ones(0xffff0000 | r4) - 17;
 		}
 		else
 		{
