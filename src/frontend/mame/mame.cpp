@@ -54,6 +54,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 	m_lua(global_alloc(lua_engine)),
 	m_new_driver_pending(nullptr),
 	m_firstrun(true),
+	m_firstgame(true),
 	m_autoboot_timer(nullptr)
 {
 }
@@ -209,8 +210,6 @@ int mame_machine_manager::execute()
 {
 	bool started_empty = false;
 
-	bool firstgame = true;
-
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = EMU_ERR_NONE;
@@ -224,11 +223,9 @@ int mame_machine_manager::execute()
 		if (system == nullptr)
 		{
 			system = &GAME_NAME(___empty);
-			if (firstgame)
+			if (m_firstgame)
 				started_empty = true;
 		}
-
-		firstgame = false;
 
 		// parse any INI files as the first thing
 		if (m_options.read_config())
@@ -260,6 +257,7 @@ int mame_machine_manager::execute()
 		// run the machine
 		error = machine.run(is_empty);
 		m_firstrun = false;
+		m_firstgame = false;
 
 		// check the state of the machine
 		if (m_new_driver_pending)
@@ -320,7 +318,7 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->initialize(machine);
 
 	// display the startup screens
-	m_ui->display_startup_screens(m_firstrun);
+	m_ui->display_startup_screens(m_firstrun, m_firstgame);
 }
 
 void mame_machine_manager::before_load_settings(running_machine& machine)

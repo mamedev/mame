@@ -75,7 +75,8 @@ private:
 	lua_engine *            m_lua;
 
 	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
-	bool                    m_firstrun;
+	bool                    m_firstrun;				// true if first run of a new driver
+	bool                    m_firstgame;			// true if this is the first driver being run
 
 	static mame_machine_manager* m_manager;
 	emu_timer               *m_autoboot_timer;      // autoboot timer

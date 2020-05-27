@@ -298,7 +298,7 @@ static void output_joined_collection(const TColl &collection, TEmitMemberFunc em
 //  various startup screens
 //-------------------------------------------------
 
-void mame_ui_manager::display_startup_screens(bool first_time)
+void mame_ui_manager::display_startup_screens(bool first_time, bool first_game)
 {
 	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
@@ -330,7 +330,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		{
 		case 0:
 			if (show_warnings)
-				messagebox_text = machine_info().warnings_string(first_time);
+				messagebox_text = machine_info().warnings_string(first_game);
 			if (!messagebox_text.empty())
 			{
 				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));

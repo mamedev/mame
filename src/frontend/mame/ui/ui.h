@@ -192,7 +192,7 @@ public:
 
 	void set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback);
 
-	void display_startup_screens(bool first_time);
+	void display_startup_screens(bool first_time, bool first_game);
 	virtual void set_startup_text(const char *text, bool force) override;
 	void update_and_render(render_container &container);
 	render_font *get_font();
