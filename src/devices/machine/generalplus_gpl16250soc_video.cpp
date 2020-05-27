@@ -746,7 +746,9 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			const uint8_t bpp = attr_reg & 0x0003;
 			
 			// HACKS
-			// There must be a select bit for the tilemap palettes somewhere, but where?! 
+			// There must be a select bit for the tilemap palettes somewhere, but where?!
+
+			// the different games in paccon also expect a variety of different configs here, maybe a good place to look
 
 			if (m_703a_palettebank & 1) // this actually seems to be the sprite palette bank enable, but for tkmag220 it gives us an easy way to ignore the logic below
 			{
@@ -758,7 +760,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 						// not even m_707f changes here, which makes the m_707f case specific hacks for jak_s500 below very unlikely to actually be related
 						if ((bpp + 1) * 2 == 4)
 							if (m_alt_tile_addressing == 0)
-								palette_offset |= 0x200; // x
+								palette_offset |= 0x200;
 					}
 				}
 
@@ -768,10 +770,11 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 					// jak_s500 also uses this tilemap in both 4 and 6bpp modes expecting the same palette base, so the hack used for smartfp on tilemap 0 is not applicable here
 
 					// m_707f != 0x2d3 for jak_S500 main menu
-					if ((m_707f != 0x53) && (m_707f != 0x2d3))
-						palette_offset |= 0x200; // x
+					if ((m_707f != 0x53) && (m_707f != 0x63) && (m_707f != 0x2d3))
+						palette_offset |= 0x200;
 				}
 
+				// jak_car2 screen transitions use layers 2 and 3 the same way, alternating each frame
 				if (which == 2)
 				{
 					// jak_s500 title screen + loading screen before race
@@ -924,10 +927,10 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 	}
 
 	if (m_703a_palettebank & 1)
-		palette_offset |= 0x100;;
+		palette_offset |= 0x100;
 
 	if (attr & 0x8000)
-		palette_offset |= 0x200; // x
+		palette_offset |= 0x200;
 
 	if (blend)
 	{
