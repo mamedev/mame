@@ -129,8 +129,6 @@ void cmmb_state::cmmb_charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 
-	offset&=0xfff;
-
 	/* dirty char */
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
@@ -455,5 +453,5 @@ ROM_START( cmmb103 )
 	//ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
 ROM_END
 
-GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

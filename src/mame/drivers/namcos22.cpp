@@ -31,7 +31,7 @@ TODO:
   + cybrcomm enemies should flash white when you shoot them, probably lighting related
   + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
 - improve ss22 spot, only used in dirtdash and testmode, not understood well:
-  + should probably be done before global fade
+  + should be done before global fade, see dirtdash when starting at jungle level
   + should not apply to some of the sprites in dirtdash jungle level (eg. time/position)
   + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
   + what is the high bit in spot_factor for? not used anywhere
