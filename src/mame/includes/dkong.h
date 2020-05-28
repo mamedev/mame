@@ -265,8 +265,6 @@ private:
 	void hb_dma_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(dkong3_coin_counter_w);
 	DECLARE_READ8_MEMBER(dkong_in2_r);
-	DECLARE_READ8_MEMBER(s2650_mirror_r);
-	DECLARE_WRITE8_MEMBER(s2650_mirror_w);
 	DECLARE_READ8_MEMBER(epos_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(s2650_data_w);
 	DECLARE_WRITE_LINE_MEMBER(s2650_fo_w);
