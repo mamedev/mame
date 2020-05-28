@@ -213,12 +213,11 @@ public:
 		m_vics_control(*this, "vics_control"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
-		m_dsw(*this, "DSW"),
 		m_inputs(*this, "INPUTS"),
 		m_custom(*this, "CUSTOM.%u", 0),
 		m_opt(*this, "OPT.%u", 0),
-		m_mcuout(*this, "mcuout%u", 0U),
-		m_cpuled(*this, "cpuled%u", 0U)
+		m_mcu_out(*this, "mcuout%u", 0U),
+		m_cpuled_out(*this, "cpuled%u", 0U)
 	{ }
 
 	void cybrcomm(machine_config &config);
@@ -268,27 +267,26 @@ protected:
 	virtual void video_start() override;
 	virtual void device_post_load() override;
 
-//private:
-	DECLARE_WRITE32_MEMBER(namcos22_textram_w);
-	DECLARE_READ16_MEMBER(namcos22_tilemapattr_r);
-	DECLARE_WRITE16_MEMBER(namcos22_tilemapattr_w);
-	DECLARE_READ32_MEMBER(namcos22_dspram_r);
-	DECLARE_WRITE32_MEMBER(namcos22_dspram_w);
-	DECLARE_WRITE32_MEMBER(namcos22_cgram_w);
-	DECLARE_WRITE32_MEMBER(namcos22_paletteram_w);
-	DECLARE_WRITE16_MEMBER(namcos22_dspram16_bank_w);
-	DECLARE_READ16_MEMBER(namcos22_dspram16_r);
-	DECLARE_WRITE16_MEMBER(namcos22_dspram16_w);
+	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask);
+	u16 namcos22_tilemapattr_r(offs_t offset);
+	void namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask);
+	u32 namcos22_dspram_r(offs_t offset);
+	void namcos22_dspram_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask);
+	void namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 namcos22_dspram16_r(offs_t offset);
+	void namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 pdp_status_r();
-	DECLARE_READ16_MEMBER(pdp_begin_r);
+	u16 pdp_begin_r();
 	u16 dsp_hold_signal_r();
 	void dsp_hold_ack_w(u16 data);
 	void dsp_xf_output_w(u16 data);
-	DECLARE_WRITE16_MEMBER(point_address_w);
-	DECLARE_WRITE16_MEMBER(point_loword_iw);
-	DECLARE_WRITE16_MEMBER(point_hiword_w);
-	DECLARE_READ16_MEMBER(point_loword_r);
-	DECLARE_READ16_MEMBER(point_hiword_ir);
+	void point_address_w(u16 data);
+	void point_loword_iw(u16 data);
+	void point_hiword_w(u16 data);
+	u16 point_loword_r();
+	u16 point_hiword_ir();
 	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
 	DECLARE_READ16_MEMBER(dsp_unk_port3_r);
 	DECLARE_WRITE16_MEMBER(upload_code_to_slave_dsp_w);
@@ -312,14 +310,13 @@ protected:
 	DECLARE_WRITE16_MEMBER(dsp_slave_portb_w);
 	DECLARE_READ32_MEMBER(namcos22_sci_r);
 	DECLARE_WRITE32_MEMBER(namcos22_sci_w);
-	DECLARE_READ16_MEMBER(namcos22_shared_r);
-	DECLARE_WRITE16_MEMBER(namcos22_shared_w);
-	DECLARE_READ16_MEMBER(namcos22_keycus_r);
-	DECLARE_WRITE16_MEMBER(namcos22_keycus_w);
+	u16 namcos22_shared_r(offs_t offset);
+	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 namcos22_keycus_r(offs_t offset);
+	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
-	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
-	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
+	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 mcu_port4_s22_r();
 	u8 iomcu_port4_s22_r();
 	DECLARE_READ16_MEMBER(mcuc74_speedup_r);
@@ -350,9 +347,9 @@ protected:
 	void syscon_irqack(offs_t offset, u8 data);
 	void syscon_dspcontrol(offs_t offset, u8 data);
 	void syscon_mcucontrol(offs_t offset, u8 data);
-	DECLARE_READ8_MEMBER(syscon_r);
-	DECLARE_WRITE8_MEMBER(ss22_syscon_w);
-	DECLARE_WRITE8_MEMBER(s22_syscon_w);
+	u8 syscon_r(offs_t offset);
+	void ss22_syscon_w(offs_t offset, u8 data);
+	void s22_syscon_w(offs_t offset, u8 data);
 
 	void posirq_update();
 	emu_timer *m_posirq_timer;
@@ -424,12 +421,11 @@ protected:
 	optional_shared_ptr<u32> m_vics_control;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
-	required_ioport m_dsw;
 	required_ioport m_inputs;
 	optional_ioport_array<2> m_custom;
 	optional_ioport_array<2> m_opt;
-	output_finder<16> m_mcuout;
-	output_finder<8> m_cpuled;
+	output_finder<16> m_mcu_out;
+	output_finder<8> m_cpuled_out;
 
 	u8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;
@@ -450,6 +446,7 @@ protected:
 	int m_irq_enabled;
 	namcos22_dsp_upload_state m_dsp_upload_state;
 	int m_UploadDestIdx;
+	u32 m_cpuled_data;
 	u16 m_su_82;
 	u16 m_keycus_id;
 	u16 m_keycus_rng;
@@ -553,8 +550,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(namcos22s_czattr_w);
 	DECLARE_READ16_MEMBER(namcos22s_czattr_r);
-	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
-	DECLARE_READ32_MEMBER(namcos22s_czram_r);
+	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 namcos22s_czram_r(offs_t offset);
 	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
 	DECLARE_WRITE32_MEMBER(namcos22s_vics_control_w);
 	DECLARE_READ16_MEMBER(spotram_r);
