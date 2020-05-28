@@ -1754,7 +1754,7 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 	tileinfo.set(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
+void namcos22_state::namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_textram[offset];
 	COMBINE_DATA(&m_textram[offset]);
@@ -1765,7 +1765,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 	}
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
+void namcos22_state::namcos22_cgram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_cgram[offset];
 	COMBINE_DATA(&m_cgram[offset]);
@@ -1805,7 +1805,7 @@ TIMER_CALLBACK_MEMBER(namcos22_state::posirq_callback)
 	posirq_update();
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_tilemapattr_w)
+void namcos22_state::namcos22_tilemapattr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
 	0: R/W - x offset
@@ -1830,7 +1830,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_tilemapattr_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::namcos22_tilemapattr_r)
+u16 namcos22_state::namcos22_tilemapattr_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -2092,7 +2092,7 @@ void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitma
 
 /*********************************************************************************************/
 
-WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
+void namcos22_state::namcos22_paletteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 prev = m_paletteram[offset];
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -2154,7 +2154,7 @@ READ16_MEMBER(namcos22s_state::namcos22s_czattr_r)
 	return m_czattr[offset];
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
+void namcos22s_state::namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	/*
 	czram contents, it's basically a big cz compare table
@@ -2181,7 +2181,7 @@ WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
 	}
 }
 
-READ32_MEMBER(namcos22s_state::namcos22s_czram_r)
+u32 namcos22s_state::namcos22s_czram_r(offs_t offset)
 {
 	int bank = m_czattr[5] & 3;
 	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
