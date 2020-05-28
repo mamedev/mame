@@ -769,6 +769,10 @@ Example:
 
 ..  [#KBIPAutoSDL] ``auto`` on SDL will default to ``sdl``.
 
+.. Tip:: Note that user-mode keyboard emulation tools such as joy2key will
+         almost certainly require the use of **-keyboardprovider win32** on
+         Windows machines.
+
 Example:
     .. code-block:: bash
 
@@ -1050,21 +1054,6 @@ Core Search Path Options
         .. code-block::
 
             mame64 -rompath c:\mame\roms;c:\roms\another
-
-.. _mame-commandline-biospath:
-
-**-biospath** / **-bp** *<path>*
-
-    Specifies one or more paths within which to find BIOS images.
-    Multiple paths can be specified by separating them with semicolons.
-
-    The default is ``roms`` (that is, a directory ``roms`` in the current
-    working directory).
-
-    Example:
-        .. code-block::
-
-            mame64 -biospath c:\mame\roms;c:\roms\bioses
 
 .. _mame-commandline-hashpath:
 
@@ -1417,12 +1406,12 @@ Core State/Playback Options
     Immediately after starting the specified system, will cause the save state
     in the specified <slot> to be loaded.
 
-.. _mame-commandline-noautosave:
-
     Example:
         .. code-block::
 
             mame64 -state 1
+
+.. _mame-commandline-noautosave:
 
 **-[no]autosave**
 
