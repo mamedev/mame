@@ -50,7 +50,7 @@ public:
 	void cb308(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(tms5501_status_r);
+	uint8_t tms5501_status_r();
 
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
@@ -65,7 +65,7 @@ private:
 	required_device<tms5501_device> m_tms5501;
 };
 
-READ8_MEMBER(mcb216_state::tms5501_status_r)
+uint8_t mcb216_state::tms5501_status_r()
 {
 	// D7  D6  D5  D4  D3  D2  D1  D0
 	// TBE RDA IPG TBE RDA SRV ORE FME

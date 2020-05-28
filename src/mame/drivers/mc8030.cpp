@@ -41,23 +41,23 @@ public:
 	void mc8030(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(zve_write_protect_w);
-	DECLARE_WRITE8_MEMBER(vis_w);
-	DECLARE_WRITE8_MEMBER(eprom_prog_w);
+	void zve_write_protect_w(uint8_t data);
+	void vis_w(offs_t offset, uint8_t data);
+	void eprom_prog_w(uint8_t data);
 	uint8_t zve_port_a_r();
 	uint8_t zve_port_b_r();
-	void zve_port_a_w(u8 data);
-	void zve_port_b_w(u8 data);
+	void zve_port_a_w(uint8_t data);
+	void zve_port_b_w(uint8_t data);
 	uint8_t asp_port_a_r();
 	uint8_t asp_port_b_r();
-	void asp_port_a_w(u8 data);
-	void asp_port_b_w(u8 data);
+	void asp_port_a_w(uint8_t data);
+	void asp_port_b_w(uint8_t data);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<uint8_t> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 };
 
@@ -92,11 +92,11 @@ static INPUT_PORTS_START( mc8030 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( mc8030_state::zve_write_protect_w )
+void  mc8030_state::zve_write_protect_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER( mc8030_state::vis_w )
+void mc8030_state::vis_w(offs_t offset, uint8_t data)
 {
 	// reg C
 	// 7 6 5 4 -- module
@@ -111,33 +111,33 @@ WRITE8_MEMBER( mc8030_state::vis_w )
 	// reg B
 	//
 	uint16_t addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
-	u8 c = 1 << (data & 7);
+	uint8_t c = 1 << (data & 7);
 	if (BIT(offset, 0))
 		m_p_videoram[addr] |= c;
 	else
 		m_p_videoram[addr] &= ~c;
 }
 
-WRITE8_MEMBER( mc8030_state::eprom_prog_w )
+void mc8030_state::eprom_prog_w(uint8_t data)
 {
 }
 
-u8 mc8030_state::zve_port_a_r()
-{
-	return 0xff;
-}
-
-u8 mc8030_state::zve_port_b_r()
+uint8_t mc8030_state::zve_port_a_r()
 {
 	return 0xff;
 }
 
-u8 mc8030_state::asp_port_a_r()
+uint8_t mc8030_state::zve_port_b_r()
 {
 	return 0xff;
 }
 
-u8 mc8030_state::asp_port_b_r()
+uint8_t mc8030_state::asp_port_a_r()
+{
+	return 0xff;
+}
+
+uint8_t mc8030_state::asp_port_b_r()
 {
 	return 0xff;
 }

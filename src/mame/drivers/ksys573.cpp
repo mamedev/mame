@@ -511,17 +511,17 @@ public:
 
 private:
 
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_WRITE16_MEMBER( atapi_reset_w );
-	DECLARE_WRITE16_MEMBER( security_w );
-	DECLARE_READ16_MEMBER( security_r );
-	DECLARE_READ16_MEMBER( ge765pwbba_r );
-	DECLARE_WRITE16_MEMBER( ge765pwbba_w );
-	DECLARE_READ16_MEMBER( gx700pwbf_io_r );
-	DECLARE_WRITE16_MEMBER( gx700pwbf_io_w );
-	DECLARE_WRITE16_MEMBER( gunmania_w );
-	DECLARE_READ16_MEMBER( gunmania_r );
+	uint16_t control_r(offs_t offset, uint16_t mem_mask = ~0);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atapi_reset_w(uint16_t data);
+	void security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t security_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t ge765pwbba_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gx700pwbf_io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gunmania_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_RESET( konami573 );
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
 
@@ -708,14 +708,14 @@ void ksys573_state::gbbchmp_map(address_map& map)
 	map(0x1f640000, 0x1f640007).rw(m_duart, FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
 }
 
-READ16_MEMBER( ksys573_state::control_r )
+uint16_t ksys573_state::control_r(offs_t offset, uint16_t mem_mask)
 {
 	verboselog( 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
 	return m_control;
 }
 
-WRITE16_MEMBER( ksys573_state::control_w )
+void ksys573_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_control );
 
@@ -753,7 +753,7 @@ WRITE_LINE_MEMBER( ksys573_state::ata_interrupt )
 	m_psxirq->intin10( state );
 }
 
-WRITE16_MEMBER( ksys573_state::atapi_reset_w )
+void ksys573_state::atapi_reset_w(uint16_t data)
 {
 	if( !( data & 1 ) )
 	{
@@ -780,7 +780,7 @@ void ksys573_state::cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t 
 	m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( n_size / 512 ) ) ) );
 }
 
-WRITE16_MEMBER( ksys573_state::security_w )
+void ksys573_state::security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_n_security_control );
 
@@ -789,7 +789,7 @@ WRITE16_MEMBER( ksys573_state::security_w )
 	m_out1->write( data, mem_mask );
 }
 
-READ16_MEMBER( ksys573_state::security_r )
+uint16_t ksys573_state::security_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_n_security_control;
 	verboselog( 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -940,7 +940,7 @@ todo:
 
 */
 
-READ16_MEMBER( ksys573_state::ge765pwbba_r )
+uint16_t ksys573_state::ge765pwbba_r(offs_t offset, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -957,7 +957,7 @@ READ16_MEMBER( ksys573_state::ge765pwbba_r )
 	return 0;
 }
 
-WRITE16_MEMBER( ksys573_state::ge765pwbba_w )
+void ksys573_state::ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -993,7 +993,7 @@ Analogue I/O board
 
 */
 
-READ16_MEMBER( ksys573_state::gx700pwbf_io_r )
+uint16_t ksys573_state::gx700pwbf_io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0;
 	switch( offset )
@@ -1043,7 +1043,7 @@ void ksys573_state::gx700pwbf_output( int offset, uint8_t data )
 	m_gx700pwbf_output_data[ offset ] = data;
 }
 
-WRITE16_MEMBER( ksys573_state::gx700pwbf_io_w )
+void ksys573_state::gx700pwbf_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog( 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -2037,7 +2037,7 @@ void ksys573_state::init_pnchmn()
 
 /* GunMania */
 
-WRITE16_MEMBER( ksys573_state::gunmania_w )
+void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	char s[ 1024 ] = "";
 
@@ -2142,7 +2142,7 @@ READ_LINE_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
 	return m_cable_holder_release;
 }
 
-READ16_MEMBER( ksys573_state::gunmania_r )
+uint16_t ksys573_state::gunmania_r(offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0;
 

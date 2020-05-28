@@ -71,16 +71,16 @@ public:
 
 private:
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_READ8_MEMBER(portfc_r);
-	DECLARE_READ8_MEMBER(portfd_r);
-	DECLARE_READ8_MEMBER(portfe_r);
+	uint8_t port_r();
+	uint8_t portfc_r();
+	uint8_t portfd_r();
+	uint8_t portfe_r();
 	DECLARE_READ_LINE_MEMBER(sense_r);
 	DECLARE_WRITE_LINE_MEMBER(flag_w);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(portf8_w);
-	DECLARE_WRITE8_MEMBER(portf9_w);
-	DECLARE_WRITE8_MEMBER(portfa_w);
+	void port_w(uint8_t data);
+	void portf8_w(uint8_t data);
+	void portf9_w(uint8_t data);
+	void portfa_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 	void data_map(address_map &map);
@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER( instruct_state::flag_w )
 }
 
 // user port
-WRITE8_MEMBER( instruct_state::port_w )
+void instruct_state::port_w(uint8_t data)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -120,7 +120,7 @@ WRITE8_MEMBER( instruct_state::port_w )
 }
 
 // cassette port
-WRITE8_MEMBER( instruct_state::portf8_w )
+void instruct_state::portf8_w(uint8_t data)
 {
 	if (BIT(data, 4))
 		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
@@ -131,39 +131,39 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 }
 
 // segment output
-WRITE8_MEMBER( instruct_state::portf9_w )
+void instruct_state::portf9_w(uint8_t data)
 {
 	m_seg = data;
 	m_display->matrix(m_digit, m_seg);
 }
 
 // digit & keyrow-scan select
-WRITE8_MEMBER( instruct_state::portfa_w )
+void instruct_state::portfa_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit, m_seg);
 }
 
 // user switches
-READ8_MEMBER( instruct_state::port_r )
+uint8_t instruct_state::port_r()
 {
 	return ioport("USW")->read();
 }
 
 // last address register A0-7 copied to 17E9 at boot
-READ8_MEMBER( instruct_state::portfc_r )
+uint8_t instruct_state::portfc_r()
 {
 	return m_lar;
 }
 
 // last address register A8-14 copied to 17E8 at boot
-READ8_MEMBER( instruct_state::portfd_r )
+uint8_t instruct_state::portfd_r()
 {
 	return (m_lar >> 8) & 0x7f;
 }
 
 // read keyboard
-READ8_MEMBER( instruct_state::portfe_r )
+uint8_t instruct_state::portfe_r()
 {
 	u8 data = 15;
 
@@ -328,8 +328,7 @@ INPUT_PORTS_END
 void instruct_state::machine_reset()
 {
 	m_cassin = 0;
-	address_space &space = m_maincpu->space(AS_IO);
-	port_w(space, 0, 0); // turn round leds off
+	port_w(0); // turn round leds off
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 

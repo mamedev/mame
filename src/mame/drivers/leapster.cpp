@@ -234,7 +234,7 @@ private:
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	DECLARE_READ32_MEMBER(leapster_random_r)
+	uint32_t leapster_random_r()
 	{
 		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
 	}

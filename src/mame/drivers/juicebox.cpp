@@ -58,8 +58,8 @@ private:
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
 	int port_g_read_count;
 	#endif
-	DECLARE_READ32_MEMBER(juicebox_nand_r);
-	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
+	uint32_t juicebox_nand_r(offs_t offset, uint32_t mem_mask = ~0);
+	void juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -69,7 +69,7 @@ private:
 	void smc_write(uint8_t data);
 	uint32_t s3c44b0_gpio_port_r(offs_t offset);
 	void s3c44b0_gpio_port_w(offs_t offset, uint32_t data);
-	//DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
+	//void s3c44b0_i2s_data_w(offs_t offset, uint16_t data);
 	void juicebox_map(address_map &map);
 };
 
@@ -228,7 +228,7 @@ void juicebox_state::s3c44b0_gpio_port_w(offs_t offset, uint32_t data)
 
 // ...
 
-READ32_MEMBER(juicebox_state::juicebox_nand_r)
+uint32_t juicebox_state::juicebox_nand_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	if (ACCESSING_BITS_0_7) data = data | (smc_read() <<  0);
@@ -239,7 +239,7 @@ READ32_MEMBER(juicebox_state::juicebox_nand_r)
 	return data;
 }
 
-WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
+void juicebox_state::juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
 	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xFF);

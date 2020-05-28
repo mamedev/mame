@@ -65,10 +65,10 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
-	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
-	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
-	DECLARE_READ32_MEMBER(crusnexo_leds_r);
-	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
+	uint32_t zeus2_timekeeper_r(offs_t offset);
+	void zeus2_timekeeper_w(offs_t offset, uint32_t data);
+	uint32_t crusnexo_leds_r(offs_t offset);
+	void crusnexo_leds_w(offs_t offset, uint32_t data);
 	void zeus2_map(address_map &map);
 
 	virtual void machine_start() override
@@ -185,12 +185,12 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus2_state::zeus2_timekeeper_r)
+uint32_t midzeus2_state::zeus2_timekeeper_r(offs_t offset)
 {
 	return m_m48t35->read(offset) | 0xffffff00;
 }
 
-WRITE32_MEMBER(midzeus2_state::zeus2_timekeeper_w)
+void midzeus2_state::zeus2_timekeeper_w(offs_t offset, uint32_t data)
 {
 	if (disk_asic_jr[2] && !cmos_protected)
 		m_m48t35->write(offset, data);
@@ -411,14 +411,14 @@ WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus2_state::crusnexo_leds_r)
+uint32_t midzeus2_state::crusnexo_leds_r(offs_t offset)
 {
 	/* reads appear to just be for synchronization */
 	return ~0;
 }
 
 
-WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
+void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 {
 	int bit, led;
 
@@ -1685,7 +1685,7 @@ void midzeus_state::init_invasn()
 void midzeus2_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32sm_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
 }
 

@@ -108,9 +108,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
-	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
-	DECLARE_READ8_MEMBER(rng_r);
+	void jokrwild_videoram_w(offs_t offset, uint8_t data);
+	void jokrwild_colorram_w(offs_t offset, uint8_t data);
+	uint8_t rng_r(offs_t offset);
 	void testa_w(uint8_t data);
 	void testb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -124,13 +124,13 @@ private:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
+void jokrwild_state::jokrwild_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
+void jokrwild_state::jokrwild_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -171,7 +171,7 @@ void jokrwild_state::jokrwild_palette(palette_device &palette) const
 *    Read/Write  Handlers    *
 *****************************/
 
-READ8_MEMBER(jokrwild_state::rng_r)
+uint8_t jokrwild_state::rng_r(offs_t offset)
 {
 	if(m_maincpu->pc() == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;

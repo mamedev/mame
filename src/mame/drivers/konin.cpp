@@ -40,7 +40,6 @@ public:
 	void konin(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
 	void konin_io(address_map &map);
@@ -52,11 +51,6 @@ private:
 	required_device<i8255_device> m_ioppi;
 	required_device<pit8253_device> m_iopit;
 };
-
-WRITE8_MEMBER(konin_state::picu_b_w)
-{
-	m_picu->b_w(data);
-}
 
 WRITE_LINE_MEMBER(konin_state::picu_r3_w)
 {
@@ -79,7 +73,7 @@ void konin_state::konin_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
+	map(0x24, 0x24).w(m_picu, FUNC(i8214_device::b_w));
 	map(0x80, 0x83).lrw8(
 		NAME([this](offs_t offset) { return m_ioppi->read(offset^3); }),
 		NAME([this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); }));

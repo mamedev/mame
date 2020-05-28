@@ -85,9 +85,9 @@ public:
 	void meritum2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(port_ff_w);
-	DECLARE_READ8_MEMBER(port_ff_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	void port_ff_w(uint8_t data);
+	uint8_t port_ff_r();
+	uint8_t keyboard_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER(meritum_state::cassette_data_callback)
 	m_old_cassette_val = new_val;
 }
 
-READ8_MEMBER( meritum_state::port_ff_r )
+uint8_t meritum_state::port_ff_r()
 {
 /* ModeSel and cassette data
     d7 cassette data from tape
@@ -335,7 +335,7 @@ READ8_MEMBER( meritum_state::port_ff_r )
 	return (m_mode ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
 }
 
-WRITE8_MEMBER( meritum_state::port_ff_w )
+void meritum_state::port_ff_w(uint8_t data)
 {
 /* Standard output port of Model I
     d3 ModeSel bit
@@ -359,7 +359,7 @@ WRITE8_MEMBER( meritum_state::port_ff_w )
 	}
 }
 
-READ8_MEMBER( meritum_state::keyboard_r )
+uint8_t meritum_state::keyboard_r(offs_t offset)
 {
 	u8 i, result = 0;
 

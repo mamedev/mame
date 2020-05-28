@@ -33,7 +33,7 @@ public:
 	void init_k8915();
 
 private:
-	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void k8915_a8_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -47,7 +47,7 @@ private:
 };
 
 
-WRITE8_MEMBER( k8915_state::k8915_a8_w )
+void k8915_state::k8915_a8_w(uint8_t data)
 {
 // seems to switch ram and rom around.
 	if (data == 0x87)

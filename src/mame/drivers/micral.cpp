@@ -86,11 +86,11 @@ public:
 
 private:
 	DECLARE_MACHINE_RESET(micral);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
+	u8 keyin_r();
+	u8 status_r();
+	u8 unk_r();
+	u8 video_r(offs_t offset);
+	void video_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_kbd(address_map &map);
@@ -108,17 +108,17 @@ private:
 	required_device<crt5037_device> m_crtc;
 };
 
-READ8_MEMBER( micral_state::status_r )
+u8 micral_state::status_r()
 {
 	return m_uart->dav_r() | 4;
 }
 
-READ8_MEMBER( micral_state::unk_r )
+u8 micral_state::unk_r()
 {
 	return 0x96;
 }
 
-READ8_MEMBER( micral_state::keyin_r )
+u8 micral_state::keyin_r()
 {
 	m_uart->write_rdav(0);
 	u8 result = m_uart->receive();
@@ -126,7 +126,7 @@ READ8_MEMBER( micral_state::keyin_r )
 	return result;
 }
 
-READ8_MEMBER( micral_state::video_r )
+u8 micral_state::video_r(offs_t offset)
 {
 	if (offset)
 		return 0x07;
@@ -134,7 +134,7 @@ READ8_MEMBER( micral_state::video_r )
 		return m_p_videoram[s_curpos];
 }
 
-WRITE8_MEMBER( micral_state::video_w )
+void micral_state::video_w(offs_t offset, u8 data)
 {
 	if (offset)
 	{

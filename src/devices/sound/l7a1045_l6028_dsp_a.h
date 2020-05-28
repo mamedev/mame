@@ -19,11 +19,11 @@ public:
 
 //  void set_base(int8_t* base) { m_base = base; }
 
-	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
-	DECLARE_READ16_MEMBER( l7a1045_sound_r );
+	void l7a1045_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t l7a1045_sound_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(dma_r_cb);
-	DECLARE_WRITE8_MEMBER(dma_w_cb);
+	uint8_t dma_r_cb(offs_t offset);
+	void dma_w_cb(offs_t offset, uint8_t data);
 	uint16_t dma_r16_cb() { m_voice[0].pos++; return 0; }
 	void dma_w16_cb(uint16_t data) { m_voice[0].pos++; }
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
@@ -63,10 +63,10 @@ private:
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];
 
-	DECLARE_WRITE16_MEMBER(sound_select_w);
-	DECLARE_WRITE16_MEMBER(sound_data_w);
-	DECLARE_READ16_MEMBER(sound_data_r);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
+	void sound_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_data_w(offs_t offset, uint16_t data);
+	uint16_t sound_data_r(offs_t offset);
+	void sound_status_w(uint16_t data);
 };
 
 DECLARE_DEVICE_TYPE(L7A1045, l7a1045_sound_device)

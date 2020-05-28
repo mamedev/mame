@@ -68,8 +68,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
 	void port1_w(uint8_t data);
 	void port2_w(uint8_t data);
 	uint8_t port2_r();
@@ -283,7 +283,7 @@ void monzagp_state::monzagp_map(address_map &map)
 }
 
 
-READ8_MEMBER(monzagp_state::port_r)
+uint8_t monzagp_state::port_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (!(m_p1 & 0x01))             // 8350 videoram
@@ -330,7 +330,7 @@ READ8_MEMBER(monzagp_state::port_r)
 	return data;
 }
 
-WRITE8_MEMBER(monzagp_state::port_w)
+void monzagp_state::port_w(offs_t offset, uint8_t data)
 {
 	if (!(m_p1 & 0x01))     // 8350 videoram
 	{

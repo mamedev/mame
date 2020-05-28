@@ -69,18 +69,18 @@ public:
 	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
+	void reel1_ram_w(offs_t offset, uint8_t data);
+	void reel2_ram_w(offs_t offset, uint8_t data);
+	void reel3_ram_w(offs_t offset, uint8_t data);
+	void reel4_ram_w(offs_t offset, uint8_t data);
+	void bg_scroll_w(offs_t offset, uint8_t data);
+	void fg_tile_w(offs_t offset, uint8_t data);
+	void fg_color_w(offs_t offset, uint8_t data);
 	void nmi_and_coins_w(uint8_t data);
 	void video_and_leds_w(uint8_t data);
 	void leds_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(magic_w);
-	DECLARE_READ8_MEMBER(magic_r);
+	void magic_w(offs_t offset, uint8_t data);
+	uint8_t magic_r();
 
 	void show_out();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -142,7 +142,7 @@ private:
 
 
 
-WRITE8_MEMBER(igs009_state::reel1_ram_w)
+void igs009_state::reel1_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(igs009_state::reel2_ram_w)
+void igs009_state::reel2_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -198,7 +198,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel3_ram_w)
+void igs009_state::reel3_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -226,7 +226,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel4_ram_w)
+void igs009_state::reel4_ram_w(offs_t offset, uint8_t data)
 {
 	m_reel4_ram[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
@@ -254,7 +254,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::bg_scroll_w)
+void igs009_state::bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scroll[offset] = data;
 //  bg_tilemap->set_scrolly(offset,data);
@@ -267,13 +267,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 	tileinfo.set(1, code, (4*(code >> 14)+3), 0);
 }
 
-WRITE8_MEMBER(igs009_state::fg_tile_w)
+void igs009_state::fg_tile_w(offs_t offset, uint8_t data)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igs009_state::fg_color_w)
+void igs009_state::fg_color_w(offs_t offset, uint8_t data)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -446,7 +446,7 @@ void igs009_state::leds_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER(igs009_state::magic_w)
+void igs009_state::magic_w(offs_t offset, uint8_t data)
 {
 	m_igs_magic[offset] = data;
 
@@ -464,7 +464,7 @@ WRITE8_MEMBER(igs009_state::magic_w)
 	}
 }
 
-READ8_MEMBER(igs009_state::magic_r)
+uint8_t igs009_state::magic_r()
 {
 	switch(m_igs_magic[0])
 	{

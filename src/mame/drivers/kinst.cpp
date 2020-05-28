@@ -235,12 +235,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
-	DECLARE_READ32_MEMBER(control_r);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(ide_extra_r);
-	DECLARE_WRITE32_MEMBER(ide_extra_w);
+	uint32_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide_extra_r();
+	void ide_extra_w(uint32_t data);
 
 	void main_map(address_map &map);
 };
@@ -372,25 +372,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::ide_r)
+uint32_t kinst_state::ide_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_ata->cs0_r(offset / 2, mem_mask);
 }
 
 
-WRITE32_MEMBER(kinst_state::ide_w)
+void kinst_state::ide_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ata->cs0_w(offset / 2, data, mem_mask);
 }
 
 
-READ32_MEMBER(kinst_state::ide_extra_r)
+uint32_t kinst_state::ide_extra_r()
 {
 	return m_ata->cs1_r(6, 0xff);
 }
 
 
-WRITE32_MEMBER(kinst_state::ide_extra_w)
+void kinst_state::ide_extra_w(uint32_t data)
 {
 	m_ata->cs1_w(6, data, 0xff);
 }
@@ -403,7 +403,7 @@ WRITE32_MEMBER(kinst_state::ide_extra_w)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::control_r)
+uint32_t kinst_state::control_r(offs_t offset)
 {
 	uint32_t result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
@@ -438,7 +438,7 @@ READ32_MEMBER(kinst_state::control_r)
 }
 
 
-WRITE32_MEMBER(kinst_state::control_w)
+void kinst_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];

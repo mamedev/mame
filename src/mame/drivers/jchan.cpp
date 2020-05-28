@@ -215,8 +215,8 @@ private:
 
 	void ctrl_w(u16 data);
 	u16 ctrl_r(offs_t offset);
-	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
-	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
+	void main2sub_cmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sub2main_cmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<int Chip> void sknsspr_sprite32regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	virtual void video_start() override;
@@ -428,14 +428,14 @@ u16 jchan_state::ctrl_r(offs_t offset)
 ***************************************************************************/
 
 /* communications - hacky! */
-WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
+void jchan_state::main2sub_cmd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mainsub_shared_ram[0x03ffe/2]);
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
 // is this called?
-WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
+void jchan_state::sub2main_cmd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
 	m_maincpu->set_input_line(3, HOLD_LINE);
@@ -709,8 +709,8 @@ ROM_END
 
 void jchan_state::init_jchan()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(*this, FUNC(jchan_state::main2sub_cmd_w)));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(*this, FUNC(jchan_state::sub2main_cmd_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16s_delegate(*this, FUNC(jchan_state::main2sub_cmd_w)));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16s_delegate(*this, FUNC(jchan_state::sub2main_cmd_w)));
 }
 
 

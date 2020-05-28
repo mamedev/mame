@@ -145,15 +145,15 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
-	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_READ8_MEMBER(ap5_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
-	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
-	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void sn74259_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
+	void ap5_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	uint8_t ap5_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	void wkb_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void sn74299_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	uint8_t sn74299_r(offs_t offset) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	void txen_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void kbd_reset_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	void dreq_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kron180_iomap(address_map &map);
 	void kron180_mem(address_map &map);
 

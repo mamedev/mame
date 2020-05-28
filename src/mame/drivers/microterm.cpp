@@ -29,7 +29,7 @@ public:
 private:
 	u32 mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(c000_r);
+	u8 c000_r();
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mt420_io_map(address_map &map);
@@ -47,7 +47,7 @@ u32 microterm_state::mt5510_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(microterm_state::c000_r)
+u8 microterm_state::c000_r()
 {
 	return machine().rand() & 0x80;
 }

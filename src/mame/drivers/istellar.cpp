@@ -51,9 +51,9 @@ private:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
-	DECLARE_READ8_MEMBER(z80_2_ldp_read);
-	DECLARE_READ8_MEMBER(z80_2_unknown_read);
-	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
+	uint8_t z80_2_ldp_read();
+	uint8_t z80_2_unknown_read();
+	void z80_2_ldp_write(uint8_t data);
 	virtual void machine_start() override;
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -111,20 +111,20 @@ void istellar_state::machine_start()
 
 
 /* Z80 2 R/W */
-READ8_MEMBER(istellar_state::z80_2_ldp_read)
+uint8_t istellar_state::z80_2_ldp_read()
 {
 	uint8_t readResult = m_laserdisc->status_r();
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
 
-READ8_MEMBER(istellar_state::z80_2_unknown_read)
+uint8_t istellar_state::z80_2_unknown_read()
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
+void istellar_state::z80_2_ldp_write(uint8_t data)
 {
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
 	m_laserdisc->data_w(data);

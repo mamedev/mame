@@ -90,8 +90,8 @@ private:
 
 	void ms0515_bank_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ms0515_halt_r);
-	DECLARE_WRITE16_MEMBER(ms0515_halt_w);
+	uint16_t ms0515_halt_r();
+	void ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void ms0515_porta_w(uint8_t data);
 	uint8_t ms0515_portb_r();
@@ -228,12 +228,12 @@ void ms0515_state::ms0515_bank_w(uint16_t data)
 	}
 }
 
-READ16_MEMBER(ms0515_state::ms0515_halt_r)
+uint16_t ms0515_state::ms0515_halt_r()
 {
 	return m_haltreg;
 }
 
-WRITE16_MEMBER(ms0515_state::ms0515_halt_w)
+void ms0515_state::ms0515_halt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_haltreg);
 }

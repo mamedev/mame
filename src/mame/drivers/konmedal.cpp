@@ -102,12 +102,12 @@ private:
 	void mario_nvram_init(nvram_device &nvram, void *base, size_t size);
 	DECLARE_MACHINE_START(shuriboy);
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_WRITE8_MEMBER(medalcnt_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void control2_w(uint8_t data);
+	void medalcnt_w(uint8_t data);
+	void lamps_w(uint8_t data);
 
 	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -117,15 +117,15 @@ private:
 	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 	void ccu_int_time_w(uint8_t data) { m_ccu_int_time = data; }
-	WRITE8_MEMBER(k056832_w) { m_k056832->write(offset ^ 1, data); }
-	WRITE8_MEMBER(k056832_b_w) { m_k056832->b_w(offset ^ 1, data); }
+	void k056832_w(offs_t offset, uint8_t data) { m_k056832->write(offset ^ 1, data); }
+	void k056832_b_w(offs_t offset, uint8_t data) { m_k056832->b_w(offset ^ 1, data); }
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(shuri_scanline);
-	DECLARE_WRITE8_MEMBER(shuri_bank_w);
-	DECLARE_READ8_MEMBER(shuri_irq_r);
-	DECLARE_WRITE8_MEMBER(shuri_irq_w);
-	DECLARE_WRITE8_MEMBER(mario_scrollhack_w);
+	void shuri_bank_w(uint8_t data);
+	uint8_t shuri_irq_r();
+	void shuri_irq_w(uint8_t data);
+	void mario_scrollhack_w(uint8_t data);
 
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
@@ -155,7 +155,7 @@ private:
 	int m_layer_order[4];
 };
 
-WRITE8_MEMBER(konmedal_state::control2_w)
+void konmedal_state::control2_w(uint8_t data)
 {
 /*  CN3
     ---- ---x uPD7759 /ST (TMNT-based boards)
@@ -177,7 +177,7 @@ WRITE8_MEMBER(konmedal_state::control2_w)
 	machine().bookkeeping().coin_lockout_w(1, (data & 0x20) ? 0 : 1);
 }
 
-WRITE8_MEMBER(konmedal_state::medalcnt_w)
+void konmedal_state::medalcnt_w(uint8_t data)
 {
 /*  CN5
     ---- ---x Medal counter +1 (medal in)
@@ -188,14 +188,14 @@ WRITE8_MEMBER(konmedal_state::medalcnt_w)
 	machine().bookkeeping().coin_lockout_w(2, (data & 4) ? 0 : 1);
 }
 
-WRITE8_MEMBER(konmedal_state::lamps_w)
+void konmedal_state::lamps_w(uint8_t data)
 {
 //  CN6
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-READ8_MEMBER(konmedal_state::vram_r)
+uint8_t konmedal_state::vram_r(offs_t offset)
 {
 	if (!(m_control2 & 0x80))
 	{
@@ -216,7 +216,7 @@ READ8_MEMBER(konmedal_state::vram_r)
 	return 0;
 }
 
-WRITE8_MEMBER(konmedal_state::vram_w)
+void konmedal_state::vram_w(offs_t offset, uint8_t data)
 {
 	// there are (very few) writes above F000 in some screens.
 	// bug?  debug?  this?  who knows.
@@ -354,7 +354,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::konmedal_scanline)
 	}
 }
 
-WRITE8_MEMBER(konmedal_state::bankswitch_w)
+void konmedal_state::bankswitch_w(uint8_t data)
 {
 	//printf("ROM bank %x (full %02x)\n", data>>4, data);
 	membank("bank1")->set_entry(data>>4);
@@ -762,18 +762,18 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 	*color = m_layer_colorbase[layer] + ((*color >> 5) & 7);
 }
 
-WRITE8_MEMBER(konmedal_state::shuri_bank_w)
+void konmedal_state::shuri_bank_w(uint8_t data)
 {
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	membank("bank1")->set_entry(data&0x3);
 }
 
-READ8_MEMBER(konmedal_state::shuri_irq_r)
+uint8_t konmedal_state::shuri_irq_r()
 {
 	return m_shuri_irq;
 }
 
-WRITE8_MEMBER(konmedal_state::shuri_irq_w)
+void konmedal_state::shuri_irq_w(uint8_t data)
 {
 	if ((m_shuri_irq & 0x4) && !(data & 0x4))
 	{
@@ -803,7 +803,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
 	}
 }
 
-WRITE8_MEMBER(konmedal_state::mario_scrollhack_w)
+void konmedal_state::mario_scrollhack_w(uint8_t data)
 {
 	// Mario Roulette enable X and Y scroll in the same time for both layers, which is currently not supported by emulated K052109.
 	// here we hacky disable Y scroll for layer A and X scroll for layer B.

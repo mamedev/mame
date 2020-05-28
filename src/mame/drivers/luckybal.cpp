@@ -305,10 +305,10 @@ public:
 	void init_luckybald();
 
 private:
-	DECLARE_WRITE8_MEMBER(z180_trdr_w);
-	DECLARE_WRITE8_MEMBER(port90_bitswap_w);
-	DECLARE_READ8_MEMBER(ppi_bitswap_r);
-	DECLARE_WRITE8_MEMBER(ppi_bitswap_w);
+	void z180_trdr_w(uint8_t data);
+	void port90_bitswap_w(uint8_t data);
+	uint8_t ppi_bitswap_r(offs_t offset);
+	void ppi_bitswap_w(offs_t offset, uint8_t data);
 	void output_port_a_w(uint8_t data);
 	void output_port_b_w(uint8_t data);
 	uint8_t input_port_c_r();
@@ -381,23 +381,23 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 /**************************************
 *            R/W handlers             *
 **************************************/
-WRITE8_MEMBER(luckybal_state::z180_trdr_w)
+void luckybal_state::z180_trdr_w(uint8_t data)
 {
 	m_trdr = data;
 }
 
-WRITE8_MEMBER(luckybal_state::port90_bitswap_w)
+void luckybal_state::port90_bitswap_w(uint8_t data)
 {
 	data = bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1);
 	membank("bank1")->set_entry(data & 0x3f);
 }
 
-READ8_MEMBER(luckybal_state::ppi_bitswap_r)
+uint8_t luckybal_state::ppi_bitswap_r(offs_t offset)
 {
 	return bitswap<8>(m_ppi->read(offset), 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
-WRITE8_MEMBER(luckybal_state::ppi_bitswap_w)
+void luckybal_state::ppi_bitswap_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset, bitswap<8>(data, 6, 7, 4, 5, 2, 3, 0, 1));
 }

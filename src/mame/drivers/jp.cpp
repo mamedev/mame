@@ -50,14 +50,14 @@ public:
 private:
 	uint8_t porta_r();
 	uint8_t portb_r();
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out2_w);
+	void out1_w(offs_t offset, uint8_t data);
+	void out2_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(disp_data_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_strobe_w);
 	DECLARE_WRITE_LINE_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(sample_bank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	void sample_bank_w(uint8_t data);
+	void adpcm_reset_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
 
@@ -223,13 +223,13 @@ static INPUT_PORTS_START( jp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-WRITE8_MEMBER(jp_state::out1_w)
+void jp_state::out1_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_latch[i]->write_bit(offset, BIT(data, i));
 }
 
-WRITE8_MEMBER(jp_state::out2_w)
+void jp_state::out2_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 2; i++)
 		m_latch[8 + i]->write_bit(offset, BIT(data, i));
@@ -382,12 +382,12 @@ void jp_state::jp(machine_config &config)
 	ay.add_route(ALL_OUTPUTS, "ayvol", 0.9);
 }
 
-WRITE8_MEMBER(jp_state::sample_bank_w)
+void jp_state::sample_bank_w(uint8_t data)
 {
 	m_adpcm_bank->set_entry(data & 15);
 }
 
-WRITE8_MEMBER(jp_state::adpcm_reset_w)
+void jp_state::adpcm_reset_w(uint8_t data)
 {
 	m_msm->reset_w(BIT(data, 0));
 }

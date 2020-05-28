@@ -142,9 +142,9 @@ private:
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(bavaria_w);
-	DECLARE_READ8_MEMBER(bavaria1_r);
-	DECLARE_READ8_MEMBER(bavaria2_r);
+	void bavaria_w(u8 data);
+	u8 bavaria1_r();
+	u8 bavaria2_r();
 
 	u8 spawn_cb(offs_t offset);
 	void set_sbtype(ioport_value newval);
@@ -188,7 +188,7 @@ u8 mmodular_state::spawn_cb(offs_t offset)
 	return (!m_board->get()->is_inductive() && offset > 12) ? 0 : offset;
 }
 
-WRITE8_MEMBER(mmodular_state::bavaria_w)
+void mmodular_state::bavaria_w(u8 data)
 {
 	if (!m_board->get()->is_inductive())
 		return;
@@ -202,7 +202,7 @@ WRITE8_MEMBER(mmodular_state::bavaria_w)
 	m_bav_data = data;
 }
 
-READ8_MEMBER(mmodular_state::bavaria1_r)
+u8 mmodular_state::bavaria1_r()
 {
 	if (!m_board->get()->is_inductive())
 		return 0;
@@ -218,7 +218,7 @@ READ8_MEMBER(mmodular_state::bavaria1_r)
 	return piece_id[m_board->get()->read_sensor(x, y) & 0xf];
 }
 
-READ8_MEMBER(mmodular_state::bavaria2_r)
+u8 mmodular_state::bavaria2_r()
 {
 	if (!m_board->get()->is_inductive())
 		return 0;

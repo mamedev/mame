@@ -52,10 +52,10 @@ private:
 
 	void modena_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digits_w);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	uint8_t input_r();
+	void digits_w(uint8_t data);
+	void io_w(uint8_t data);
+	void led_w(uint8_t data);
 	void update_display();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_on)  { m_maincpu->set_input_line(M6502_NMI_LINE, ASSERT_LINE); }
@@ -85,7 +85,7 @@ void mephisto_modena_state::update_display()
 	m_display->matrix(m_io_ctrl >> 1 & 7, ~m_board_mux);
 }
 
-READ8_MEMBER(mephisto_modena_state::input_r)
+uint8_t mephisto_modena_state::input_r()
 {
 	uint8_t data = 0;
 
@@ -101,14 +101,14 @@ READ8_MEMBER(mephisto_modena_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(mephisto_modena_state::led_w)
+void mephisto_modena_state::led_w(uint8_t data)
 {
 	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mephisto_modena_state::io_w)
+void mephisto_modena_state::io_w(uint8_t data)
 {
 	// d0: button select
 	// d1-d3: led select
@@ -119,7 +119,7 @@ WRITE8_MEMBER(mephisto_modena_state::io_w)
 	m_dac->write(BIT(data, 6));
 }
 
-WRITE8_MEMBER(mephisto_modena_state::digits_w)
+void mephisto_modena_state::digits_w(uint8_t data)
 {
 	m_digits[m_digits_idx] = data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00);
 	m_digits_idx = (m_digits_idx + 1) & 3;

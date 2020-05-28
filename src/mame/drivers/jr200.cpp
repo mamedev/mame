@@ -62,18 +62,18 @@ private:
 	uint8_t m_old_keydata;
 	uint8_t m_freq_reg[2];
 	emu_timer *m_timer_d;
-	DECLARE_READ8_MEMBER(jr200_pcg_1_r);
-	DECLARE_READ8_MEMBER(jr200_pcg_2_r);
-	DECLARE_WRITE8_MEMBER(jr200_pcg_1_w);
-	DECLARE_WRITE8_MEMBER(jr200_pcg_2_w);
-	DECLARE_READ8_MEMBER(jr200_bios_char_r);
-	DECLARE_WRITE8_MEMBER(jr200_bios_char_w);
-	DECLARE_READ8_MEMBER(mcu_keyb_r);
-	DECLARE_WRITE8_MEMBER(jr200_beep_w);
-	DECLARE_WRITE8_MEMBER(jr200_beep_freq_w);
-	DECLARE_WRITE8_MEMBER(jr200_border_col_w);
-	DECLARE_READ8_MEMBER(mn1271_io_r);
-	DECLARE_WRITE8_MEMBER(mn1271_io_w);
+	uint8_t jr200_pcg_1_r(offs_t offset);
+	uint8_t jr200_pcg_2_r(offs_t offset);
+	void jr200_pcg_1_w(offs_t offset, uint8_t data);
+	void jr200_pcg_2_w(offs_t offset, uint8_t data);
+	uint8_t jr200_bios_char_r(offs_t offset);
+	void jr200_bios_char_w(offs_t offset, uint8_t data);
+	uint8_t mcu_keyb_r();
+	void jr200_beep_w(uint8_t data);
+	void jr200_beep_freq_w(offs_t offset, uint8_t data);
+	void jr200_border_col_w(uint8_t data);
+	uint8_t mn1271_io_r(offs_t offset);
+	void mn1271_io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -218,35 +218,35 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ8_MEMBER(jr200_state::jr200_pcg_1_r)
+uint8_t jr200_state::jr200_pcg_1_r(offs_t offset)
 {
 	return m_pcg->base()[offset+0x000];
 }
 
-READ8_MEMBER(jr200_state::jr200_pcg_2_r)
+uint8_t jr200_state::jr200_pcg_2_r(offs_t offset)
 {
 	return m_pcg->base()[offset+0x400];
 }
 
-WRITE8_MEMBER(jr200_state::jr200_pcg_1_w)
+void jr200_state::jr200_pcg_1_w(offs_t offset, uint8_t data)
 {
 	m_pcg->base()[offset+0x000] = data;
 	m_gfxdecode->gfx(1)->mark_dirty((offset+0x000) >> 3);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_pcg_2_w)
+void jr200_state::jr200_pcg_2_w(offs_t offset, uint8_t data)
 {
 	m_pcg->base()[offset+0x400] = data;
 	m_gfxdecode->gfx(1)->mark_dirty((offset+0x400) >> 3);
 }
 
-READ8_MEMBER(jr200_state::jr200_bios_char_r)
+uint8_t jr200_state::jr200_bios_char_r(offs_t offset)
 {
 	return m_gfx_ram->base()[offset];
 }
 
 
-WRITE8_MEMBER(jr200_state::jr200_bios_char_w)
+void jr200_state::jr200_bios_char_w(offs_t offset, uint8_t data)
 {
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  m_gfx_ram->base()[offset] = data;
@@ -259,7 +259,7 @@ I/O Device
 
 */
 
-READ8_MEMBER(jr200_state::mcu_keyb_r)
+uint8_t jr200_state::mcu_keyb_r()
 {
 	int row, col, table = 0;
 	uint8_t keydata = 0;
@@ -306,13 +306,13 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	return keydata;
 }
 
-WRITE8_MEMBER(jr200_state::jr200_beep_w)
+void jr200_state::jr200_beep_w(uint8_t data)
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
 	m_beeper->set_state(((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
+void jr200_state::jr200_beep_freq_w(offs_t offset, uint8_t data)
 {
 	uint32_t beep_freq;
 
@@ -323,7 +323,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 	m_beeper->set_clock(84000 / beep_freq);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_border_col_w)
+void jr200_state::jr200_border_col_w(uint8_t data)
 {
 	m_border_col = data;
 }
@@ -334,7 +334,7 @@ TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(jr200_state::mn1271_io_r)
+uint8_t jr200_state::mn1271_io_r(offs_t offset)
 {
 	uint8_t retVal = m_mn1271_ram[offset];
 	if((offset+0xc800) > 0xca00)
@@ -342,7 +342,7 @@ READ8_MEMBER(jr200_state::mn1271_io_r)
 
 	switch(offset+0xc800)
 	{
-		case 0xc801: retVal= mcu_keyb_r(space,0); break;
+		case 0xc801: retVal= mcu_keyb_r(); break;
 		case 0xc803: retVal= (m_mn1271_ram[0x03] & 0xcf) | 0x30;  break;//---x ---- printer status ready (ACTIVE HIGH)
 		case 0xc807: retVal= (m_mn1271_ram[0x07] & 0x80) | 0x60; break;
 		case 0xc80a: retVal= (m_mn1271_ram[0x0a] & 0xfe); break;
@@ -357,7 +357,7 @@ READ8_MEMBER(jr200_state::mn1271_io_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(jr200_state::mn1271_io_w)
+void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 {
 	m_mn1271_ram[offset] = data;
 	switch(offset+0xc800)
@@ -369,10 +369,10 @@ WRITE8_MEMBER(jr200_state::mn1271_io_w)
 					m_timer_d->adjust(attotime::zero, 0,  attotime::zero);
 				}
 				break;
-		case 0xc819: jr200_beep_w(space,0,data); break;
+		case 0xc819: jr200_beep_w(data); break;
 		case 0xc81a:
-		case 0xc81b: jr200_beep_freq_w(space,offset-0x1a,data); break;
-		case 0xca00: jr200_border_col_w(space,0,data); break;
+		case 0xc81b: jr200_beep_freq_w(offset-0x1a,data); break;
+		case 0xca00: jr200_border_col_w(data); break;
 	}
 }
 

@@ -61,8 +61,8 @@ public:
 	void modellot(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(port77_r);
-	DECLARE_READ8_MEMBER(portff_r);
+	uint8_t port77_r();
+	uint8_t portff_r();
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -97,12 +97,12 @@ void modellot_state::io_map(address_map &map)
 static INPUT_PORTS_START( modellot )
 INPUT_PORTS_END
 
-READ8_MEMBER( modellot_state::port77_r)
+uint8_t modellot_state::port77_r()
 {
 	return 4;
 }
 
-READ8_MEMBER( modellot_state::portff_r)
+uint8_t modellot_state::portff_r()
 {
 	uint8_t data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
 	m_term_data = 0;

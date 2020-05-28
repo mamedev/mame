@@ -123,8 +123,8 @@ private:
 
 	u8 pa_r();
 	void pb_w(u8 data);
-	DECLARE_READ8_MEMBER(kbcdata_r);
-	DECLARE_WRITE8_MEMBER(kbcdata_w);
+	u8 kbcdata_r();
+	void kbcdata_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
@@ -407,14 +407,14 @@ void m24_state::pb_w(u8 data)
 	m_pa = (m_pa & ~3) | (~data & 3);
 }
 
-READ8_MEMBER(m24_state::kbcdata_r)
+u8 m24_state::kbcdata_r()
 {
 	m_kbc->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
 	m_kbcibf = false;
 	return m_kbcin;
 }
 
-WRITE8_MEMBER(m24_state::kbcdata_w)
+void m24_state::kbcdata_w(u8 data)
 {
 	m_pa &= ~0x40;
 	m_pic->ir1_w(1);

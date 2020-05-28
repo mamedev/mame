@@ -38,9 +38,9 @@ public:
 
 private:
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	uint8_t keyin_r();
+	uint8_t status_r();
+	void control_w(uint8_t data);
 
 	void imsai_io(address_map &map);
 	void imsai_mem(address_map &map);
@@ -79,14 +79,14 @@ void imsai_state::imsai_io(address_map &map)
 static INPUT_PORTS_START( imsai )
 INPUT_PORTS_END
 
-READ8_MEMBER( imsai_state::keyin_r )
+uint8_t imsai_state::keyin_r()
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( imsai_state::status_r )
+uint8_t imsai_state::status_r()
 {
 	return (m_term_data) ? 3 : 1;
 }
@@ -96,7 +96,7 @@ void imsai_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-WRITE8_MEMBER( imsai_state::control_w )
+void imsai_state::control_w(uint8_t data)
 {
 }
 

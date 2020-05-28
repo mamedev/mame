@@ -36,8 +36,8 @@ public:
 	void jonos(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(cursor_w);
+	u8 keyboard_r(offs_t offset);
+	void cursor_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
@@ -75,7 +75,7 @@ void jonos_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-READ8_MEMBER( jonos_state::keyboard_r )
+u8 jonos_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -90,7 +90,7 @@ READ8_MEMBER( jonos_state::keyboard_r )
 	return 0;
 }
 
-WRITE8_MEMBER( jonos_state::cursor_w )
+void jonos_state::cursor_w(offs_t offset, u8 data)
 {
 	if (offset == 1) // control byte
 		m_curs_ctrl = (data == 0x80) ? 1 : 0;

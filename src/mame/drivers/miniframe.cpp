@@ -50,10 +50,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(ram_mmu_r);
-	DECLARE_WRITE16_MEMBER(ram_mmu_w);
+	uint16_t ram_mmu_r(offs_t offset);
+	void ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(general_ctrl_w);
+	void general_ctrl_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
@@ -83,7 +83,7 @@ static constexpr uint16_t MMU_STATUS_PRESENT_NOT_ACCESSED = 0x2000;
 static constexpr uint16_t MMU_STATUS_ACCESSED_NOT_WRITTEN = 0x4000;
 static constexpr uint16_t MMU_STATUS_ACCESSED_WRITTEN = 0x6000;
 
-READ16_MEMBER( miniframe_state::ram_mmu_r )
+uint16_t miniframe_state::ram_mmu_r(offs_t offset)
 {
 	uint8_t fc = m_maincpu->get_fc();
 	uint16_t mapentry = m_mapram[(offset >> 11) & 0x7ff];
@@ -113,7 +113,7 @@ READ16_MEMBER( miniframe_state::ram_mmu_r )
 	}
 }
 
-WRITE16_MEMBER( miniframe_state::ram_mmu_w )
+void miniframe_state::ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 	uint16_t mapentry = m_mapram[(offset >> 11) & 0x7ff];
@@ -145,7 +145,7 @@ WRITE16_MEMBER( miniframe_state::ram_mmu_w )
 	}
 }
 
-WRITE16_MEMBER( miniframe_state::general_ctrl_w )
+void miniframe_state::general_ctrl_w(uint16_t data)
 {
 	if (data & 0x1000)  // ROM mirror at 0 if set
 	{

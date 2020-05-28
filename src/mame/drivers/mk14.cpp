@@ -59,8 +59,8 @@ public:
 	void mk14(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(display_w);
+	uint8_t keyboard_r(offs_t offset);
+	void display_w(offs_t offset, uint8_t data);
 	void port_a_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -91,7 +91,7 @@ F00-FFF  256 bytes RAM (Standard) / VDU RAM  Decoded by 1111
 */
 
 
-READ8_MEMBER( mk14_state::keyboard_r )
+uint8_t mk14_state::keyboard_r(offs_t offset)
 {
 	if (offset < 8)
 		return m_io_keyboard[offset]->read();
@@ -99,7 +99,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( mk14_state::display_w )
+void mk14_state::display_w(offs_t offset, uint8_t data)
 {
 	if (offset < 8 )
 		m_display->matrix(1<<offset, data);

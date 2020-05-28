@@ -109,9 +109,9 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( videoram_w );
-	DECLARE_WRITE8_MEMBER( banksel_w );
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void banksel_w(uint8_t data);
 
 	uint8_t m_video_bank;
 	std::unique_ptr<uint8_t[]> m_color_ram_r;
@@ -190,7 +190,7 @@ void jtc_state::p3_w(uint8_t data)
 		m_speaker->level_w(BIT(data, 6));
 }
 
-READ8_MEMBER( jtces40_state::videoram_r )
+uint8_t jtces40_state::videoram_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -202,7 +202,7 @@ READ8_MEMBER( jtces40_state::videoram_r )
 	return data;
 }
 
-WRITE8_MEMBER( jtces40_state::videoram_w )
+void jtces40_state::videoram_w(offs_t offset, uint8_t data)
 {
 	if (BIT(m_video_bank, 7)) m_color_ram_r[offset] = data;
 	if (BIT(m_video_bank, 6)) m_color_ram_g[offset] = data;
@@ -210,7 +210,7 @@ WRITE8_MEMBER( jtces40_state::videoram_w )
 	if (BIT(m_video_bank, 4)) m_video_ram[offset] = data;
 }
 
-WRITE8_MEMBER( jtces40_state::banksel_w )
+void jtces40_state::banksel_w(uint8_t data)
 {
 	m_video_bank = data;
 }

@@ -52,9 +52,9 @@ protected:
 	void mondial68k_mem(address_map &map);
 
 	void lcd_s_w(u32 data);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
-	DECLARE_WRITE8_MEMBER(board_mux_w);
-	DECLARE_READ8_MEMBER(inputs_r);
+	void input_mux_w(uint8_t data);
+	void board_mux_w(uint8_t data);
+	uint8_t inputs_r();
 	void update_display();
 
 	required_device<cpu_device> m_maincpu;
@@ -96,14 +96,14 @@ void mondial68k_state::lcd_s_w(u32 data)
 		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-WRITE8_MEMBER(mondial68k_state::board_mux_w)
+void mondial68k_state::board_mux_w(uint8_t data)
 {
 	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mondial68k_state::input_mux_w)
+void mondial68k_state::input_mux_w(uint8_t data)
 {
 	// d0-d3: button mux
 	// d6,d7: led select
@@ -111,7 +111,7 @@ WRITE8_MEMBER(mondial68k_state::input_mux_w)
 	update_display();
 }
 
-READ8_MEMBER(mondial68k_state::inputs_r)
+uint8_t mondial68k_state::inputs_r()
 {
 	uint8_t data = 0x00;
 

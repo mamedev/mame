@@ -84,7 +84,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r();
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void lola8a_io(address_map &map);
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER( lola8a_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER(lola8a_state::keyboard_r)
+uint8_t lola8a_state::keyboard_r()
 {
 	u8 data = 0xff, kbrow = m_portb & 15;
 

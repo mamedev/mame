@@ -92,7 +92,7 @@ private:
 
 	bool m_bootrom_enabled;
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
-	DECLARE_READ32_MEMBER(bootrom_r) { return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset]; }
+	u32 bootrom_r(offs_t offset) { return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset]; }
 
 	void set_cpu_freq();
 };

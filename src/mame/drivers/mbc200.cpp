@@ -82,7 +82,7 @@ private:
 	void p1_portc_w(uint8_t data);
 	void pm_porta_w(uint8_t data);
 	void pm_portb_w(uint8_t data);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r(offs_t offset);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
@@ -192,7 +192,7 @@ void mbc200_state::mbc200_sub_io(address_map &map)
 static INPUT_PORTS_START( mbc200 )
 INPUT_PORTS_END
 
-READ8_MEMBER( mbc200_state::keyboard_r )
+uint8_t mbc200_state::keyboard_r(offs_t offset)
 {
 	uint8_t data = 0;
 	if (offset)

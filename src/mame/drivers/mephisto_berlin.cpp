@@ -40,7 +40,7 @@ public:
 	void berlinp(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(input_r);
+	u8 input_r();
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
@@ -57,7 +57,7 @@ private:
     I/O
 ******************************************************************************/
 
-READ8_MEMBER(berlin_state::input_r)
+u8 berlin_state::input_r()
 {
 	if (m_board->mux_r() == 0xff)
 		return m_keys->read();

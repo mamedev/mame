@@ -39,7 +39,7 @@ public:
 		, m_keys(*this, "KEY")
 	{ }
 
-	DECLARE_READ8_MEMBER(polgar_keys_r);
+	uint8_t polgar_keys_r(offs_t offset);
 
 	void polgar10(machine_config &config);
 	void polgar(machine_config &config);
@@ -58,8 +58,8 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
-	DECLARE_READ8_MEMBER(chessm_r);
-	DECLARE_WRITE8_MEMBER(chessm_w);
+	uint8_t chessm_r();
+	void chessm_w(uint8_t data);
 
 	void mrisc(machine_config &config);
 	void mrisc_mem(address_map &map);
@@ -82,9 +82,9 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_READ8_MEMBER(milano_input_r);
-	DECLARE_WRITE8_MEMBER(milano_led_w);
-	DECLARE_WRITE8_MEMBER(milano_io_w);
+	uint8_t milano_input_r();
+	void milano_led_w(uint8_t data);
+	void milano_io_w(uint8_t data);
 
 	void milano(machine_config &config);
 	void milano_mem(address_map &map);
@@ -110,8 +110,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(academy_irq);
 	DECLARE_WRITE_LINE_MEMBER(academy_nmi_w);
-	DECLARE_WRITE8_MEMBER(academy_led_w);
-	DECLARE_READ8_MEMBER(academy_input_r);
+	void academy_led_w(uint8_t data);
+	uint8_t academy_input_r();
 
 	void academy(machine_config &config);
 	void academy_mem(address_map &map);
@@ -125,7 +125,7 @@ private:
 	bool m_enable_nmi;
 };
 
-READ8_MEMBER(mephisto_polgar_state::polgar_keys_r)
+uint8_t mephisto_polgar_state::polgar_keys_r(offs_t offset)
 {
 	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
 }
@@ -144,12 +144,12 @@ void mephisto_polgar_state::polgar_mem(address_map &map)
 }
 
 
-READ8_MEMBER(mephisto_risc_state::chessm_r)
+uint8_t mephisto_risc_state::chessm_r()
 {
 	return m_chessm->data_r();
 }
 
-WRITE8_MEMBER(mephisto_risc_state::chessm_w)
+void mephisto_risc_state::chessm_w(uint8_t data)
 {
 	m_chessm->data0_w(data & 1);
 	m_chessm->data1_w(data & 0x80);
@@ -174,18 +174,18 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 }
 
 
-READ8_MEMBER(mephisto_milano_state::milano_input_r)
+uint8_t mephisto_milano_state::milano_input_r()
 {
 	return m_board->input_r() ^ 0xff;
 }
 
-WRITE8_MEMBER(mephisto_milano_state::milano_led_w)
+void mephisto_milano_state::milano_led_w(uint8_t data)
 {
 	m_led_latch = data;
 	m_board->mux_w(data);
 }
 
-WRITE8_MEMBER(mephisto_milano_state::milano_io_w)
+void mephisto_milano_state::milano_io_w(uint8_t data)
 {
 	if ((data & 0xf0) == 0x90 || (data & 0xf0) == 0x60)
 	{
@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER(mephisto_academy_state::academy_nmi_w)
 	m_enable_nmi = state;
 }
 
-WRITE8_MEMBER(mephisto_academy_state::academy_led_w)
+void mephisto_academy_state::academy_led_w(uint8_t data)
 {
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
@@ -238,7 +238,7 @@ WRITE8_MEMBER(mephisto_academy_state::academy_led_w)
 		}
 }
 
-READ8_MEMBER(mephisto_academy_state::academy_input_r)
+uint8_t mephisto_academy_state::academy_input_r()
 {
 	uint8_t data;
 	if (m_board->mux_r() == 0xff)

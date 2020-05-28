@@ -99,8 +99,8 @@ public:
 	void mycom(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vram_data_r);
-	DECLARE_WRITE8_MEMBER(vram_data_w);
+	u8 vram_data_r();
+	void vram_data_w(u8 data);
 	void port00_w(u8 data);
 	void port04_w(u8 data);
 	void port06_w(u8 data);
@@ -209,12 +209,12 @@ void mycom_state::port00_w(u8 data)
 	}
 }
 
-READ8_MEMBER( mycom_state::vram_data_r )
+u8 mycom_state::vram_data_r()
 {
 	return m_vram[m_i_videoram];
 }
 
-WRITE8_MEMBER( mycom_state::vram_data_w )
+void mycom_state::vram_data_w(u8 data)
 {
 	m_vram[m_i_videoram] = data;
 }

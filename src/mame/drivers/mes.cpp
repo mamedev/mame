@@ -33,8 +33,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port08_r);
+	u8 port00_r();
+	u8 port08_r();
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -48,14 +48,14 @@ private:
 };
 
 
-READ8_MEMBER( mes_state::port00_r )
+u8 mes_state::port00_r()
 {
 	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( mes_state::port08_r )
+u8 mes_state::port08_r()
 {
 	return m_port08 | (m_term_data ? 0x80 : 0);
 }

@@ -115,9 +115,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE64_MEMBER(write_ram);
-	template <uint32_t addr_base> DECLARE_READ64_MEMBER(bus_error_r);
-	template <uint32_t addr_base> DECLARE_WRITE64_MEMBER(bus_error_w);
+	void write_ram(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
+	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
@@ -169,7 +169,7 @@ public:
 	void indigo2_4415(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(eisa_io_r);
+	uint32_t eisa_io_r();
 
 	void wd33c93_2(device_t *device);
 
@@ -181,7 +181,7 @@ private:
 };
 
 template <uint32_t addr_base>
-READ64_MEMBER(ip24_state::bus_error_r)
+uint64_t ip24_state::bus_error_r(offs_t offset, uint64_t mem_mask)
 {
 	logerror("Bus error (read)\n");
 	m_maincpu->bus_error();
@@ -190,20 +190,20 @@ READ64_MEMBER(ip24_state::bus_error_r)
 }
 
 template <uint32_t addr_base>
-WRITE64_MEMBER(ip24_state::bus_error_w)
+void ip24_state::bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	logerror("Bus error (write)\n");
 	m_maincpu->bus_error();
 	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 }
 
-READ32_MEMBER(ip22_state::eisa_io_r)
+uint32_t ip22_state::eisa_io_r()
 {
 	return 0xffffffff;
 }
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-WRITE64_MEMBER(ip24_state::write_ram)
+void ip24_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)

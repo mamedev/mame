@@ -28,12 +28,12 @@ public:
 private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
-	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
+	uint16_t mpu4plasma_unk_r()
 	{
 		return machine().rand();
 	}
 
-	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
+	void mpu4plasma_unk_w(uint16_t data)
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

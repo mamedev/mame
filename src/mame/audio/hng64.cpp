@@ -202,7 +202,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 
 	/* TODO: huh? */
 	m_audiocpu->dreq_w<3>(data&0x1);
-	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
+	m_dsp->l7a1045_sound_w(8/2,data,mem_mask);
 //  m_audiocpu->hack_w(1);
 
 }

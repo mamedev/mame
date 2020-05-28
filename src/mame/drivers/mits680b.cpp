@@ -38,14 +38,14 @@ public:
 	void mits680b(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(status_check_r);
+	uint8_t status_check_r();
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
-READ8_MEMBER( mits680b_state::status_check_r )
+uint8_t mits680b_state::status_check_r()
 {
 	return 0; // crashes at start if bit 7 high
 }

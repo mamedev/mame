@@ -210,24 +210,24 @@ private:
 	} m_zr36120;
 
 
-	DECLARE_READ32_MEMBER( zr36120_r );
-	DECLARE_WRITE32_MEMBER( zr36120_w );
+	uint32_t zr36120_r(offs_t offset);
+	void zr36120_w(offs_t offset, uint32_t data);
 
-	DECLARE_READ32_MEMBER( f0_r );
-	DECLARE_WRITE32_MEMBER( f0_w );
+	uint32_t f0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void f0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( unk_r );
-	DECLARE_READ32_MEMBER( unk2_r );
+	uint32_t unk_r();
+	uint32_t unk2_r();
 
-	DECLARE_WRITE32_MEMBER( serial_w );
+	void serial_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( adsp_idma_data_r );
-	DECLARE_WRITE32_MEMBER( adsp_idma_data_w );
-	DECLARE_WRITE32_MEMBER( adsp_idma_addr_w );
+	uint32_t adsp_idma_data_r(offs_t offset, uint32_t mem_mask = ~0);
+	void adsp_idma_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void adsp_idma_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( adsp_status_r );
-	DECLARE_READ16_MEMBER( adsp_control_r );
-	DECLARE_WRITE16_MEMBER( adsp_control_w );
+	uint32_t adsp_status_r();
+	uint16_t adsp_control_r(offs_t offset);
+	void adsp_control_w(offs_t offset, uint16_t data);
 
 	void zr36120_reset();
 
@@ -482,7 +482,7 @@ void magictg_state::zr36120_pci_w(int function, int reg, uint32_t data, uint32_t
 	}
 }
 
-READ32_MEMBER( magictg_state::zr36120_r )
+uint32_t magictg_state::zr36120_r(offs_t offset)
 {
 	uint32_t res = 0;
 
@@ -505,7 +505,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 	return res;
 }
 
-WRITE32_MEMBER( magictg_state::zr36120_w )
+void magictg_state::zr36120_w(offs_t offset, uint32_t data)
 {
 	offset <<= 2;
 
@@ -545,18 +545,18 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
  *
  *************************************/
 
-READ32_MEMBER( magictg_state::unk_r )
+uint32_t magictg_state::unk_r()
 {
 	/* Will not boot otherwise */
 	return 0x6000;
 }
 
-READ32_MEMBER( magictg_state::unk2_r )
+uint32_t magictg_state::unk2_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( magictg_state::serial_w )
+void magictg_state::serial_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -565,7 +565,7 @@ WRITE32_MEMBER( magictg_state::serial_w )
 	}
 }
 
-WRITE32_MEMBER( magictg_state::f0_w )
+void magictg_state::f0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int ch;
 
@@ -617,8 +617,8 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 				while (m_dma_ch[ch].count > 3)
 				{
-					uint32_t src_dword = swapendian_int32(space.read_dword(src_addr));
-					space.write_dword(dst_addr, src_dword);
+					uint32_t src_dword = swapendian_int32(m_mips->space(AS_PROGRAM).read_dword(src_addr));
+					m_mips->space(AS_PROGRAM).write_dword(dst_addr, src_dword);
 					src_addr += 4;
 					dst_addr += 4;
 					m_dma_ch[ch].count -=4;
@@ -627,12 +627,12 @@ WRITE32_MEMBER( magictg_state::f0_w )
 				// FIXME!
 				if (m_dma_ch[ch].count & 3)
 				{
-					uint32_t src_dword = swapendian_int32(space.read_dword(src_addr));
-					uint32_t dst_dword = space.read_dword(dst_addr);
+					uint32_t src_dword = swapendian_int32(m_mips->space(AS_PROGRAM).read_dword(src_addr));
+					uint32_t dst_dword = m_mips->space(AS_PROGRAM).read_dword(dst_addr);
 					uint32_t mask = 0xffffffff >> ((m_dma_ch[ch].count & 3) << 3);
 
 					dst_dword = (dst_dword & ~mask) | (src_dword & mask);
-					space.write_dword(dst_addr, dst_dword);
+					m_mips->space(AS_PROGRAM).write_dword(dst_addr, dst_dword);
 					m_dma_ch[ch].count = 0;
 				}
 			}
@@ -654,7 +654,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 	}
 }
 
-READ32_MEMBER( magictg_state::f0_r )
+uint32_t magictg_state::f0_r(offs_t offset, uint32_t mem_mask)
 {
 	int ch;
 	uint32_t val = 0;
@@ -700,7 +700,7 @@ READ32_MEMBER( magictg_state::f0_r )
  *
  *************************************/
 
-WRITE32_MEMBER( magictg_state::adsp_idma_data_w )
+void magictg_state::adsp_idma_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		m_adsp->idma_addr_w(data >> 16);
@@ -708,7 +708,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_data_w )
 		m_adsp->idma_addr_w(data & 0xffff);
 }
 
-READ32_MEMBER( magictg_state::adsp_idma_data_r )
+uint32_t magictg_state::adsp_idma_data_r(offs_t offset, uint32_t mem_mask)
 {
 	// TODO: Set /IACK appropriately
 	if (ACCESSING_BITS_0_15)
@@ -722,7 +722,7 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	}
 }
 
-WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
+void magictg_state::adsp_idma_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: Set /IACK appropriately
 	if (ACCESSING_BITS_16_31)
@@ -734,13 +734,13 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 		fatalerror("????\n");
 }
 
-READ32_MEMBER( magictg_state::adsp_status_r )
+uint32_t magictg_state::adsp_status_r()
 {
 	// ADSP_IACK = Bit 2
 	return (0 << 2) | (machine().rand() & 1);
 }
 
-READ16_MEMBER( magictg_state::adsp_control_r )
+uint16_t magictg_state::adsp_control_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -758,7 +758,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 	return res;
 }
 
-WRITE16_MEMBER( magictg_state::adsp_control_w )
+void magictg_state::adsp_control_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{

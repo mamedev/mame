@@ -66,10 +66,10 @@ public:
 	void glasgow(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(glasgow_lcd_w);
-	DECLARE_WRITE8_MEMBER(glasgow_lcd_flag_w);
-	DECLARE_READ8_MEMBER(glasgow_keys_r);
-	DECLARE_WRITE8_MEMBER(glasgow_keys_w);
+	void glasgow_lcd_w(uint8_t data);
+	void glasgow_lcd_flag_w(uint8_t data);
+	uint8_t glasgow_keys_r();
+	void glasgow_keys_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,11 +97,11 @@ public:
 	void dallas32(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(write_lcd_flag);
-	DECLARE_WRITE8_MEMBER(write_beeper);
-	DECLARE_WRITE8_MEMBER(write_board);
-	DECLARE_READ8_MEMBER(read_newkeys);
+	void write_lcd(uint8_t data);
+	void write_lcd_flag(uint8_t data);
+	void write_beeper(uint8_t data);
+	void write_board(uint8_t data);
+	uint8_t read_newkeys();
 
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
@@ -109,7 +109,7 @@ protected:
 
 
 
-WRITE8_MEMBER( glasgow_state::glasgow_lcd_w )
+void glasgow_state::glasgow_lcd_w(uint8_t data)
 {
 	if (m_led7 == 0)
 		m_digits[m_lcd_shift_counter] = data;
@@ -118,7 +118,7 @@ WRITE8_MEMBER( glasgow_state::glasgow_lcd_w )
 	m_lcd_shift_counter &= 3;
 }
 
-WRITE8_MEMBER( glasgow_state::glasgow_lcd_flag_w )
+void glasgow_state::glasgow_lcd_flag_w(uint8_t data)
 {
 	uint8_t const lcd_flag = data & 0x81;
 
@@ -130,7 +130,7 @@ WRITE8_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 		m_led7 = 0;
 }
 
-READ8_MEMBER( glasgow_state::glasgow_keys_r )
+uint8_t glasgow_state::glasgow_keys_r()
 {
 	// See if any keys pressed
 	uint8_t data = 3;
@@ -144,12 +144,12 @@ READ8_MEMBER( glasgow_state::glasgow_keys_r )
 	return data;
 }
 
-WRITE8_MEMBER( glasgow_state::glasgow_keys_w )
+void glasgow_state::glasgow_keys_w(uint8_t data)
 {
 	m_key_select = data;
 }
 
-WRITE8_MEMBER( amsterd_state::write_lcd )
+void amsterd_state::write_lcd(uint8_t data)
 {
 	if (m_lcd_shift_counter & 4)
 		m_digits[m_lcd_shift_counter & 3] = data;
@@ -158,7 +158,7 @@ WRITE8_MEMBER( amsterd_state::write_lcd )
 	m_lcd_shift_counter &= 7;
 }
 
-WRITE8_MEMBER( amsterd_state::write_lcd_flag )
+void amsterd_state::write_lcd_flag(uint8_t data)
 {
 	// The key function in the rom expects a value from the
 	// second key row after writing to here
@@ -167,19 +167,19 @@ WRITE8_MEMBER( amsterd_state::write_lcd_flag )
 	m_led7 = data ? 255 : 0;
 }
 
-WRITE8_MEMBER( amsterd_state::write_board )
+void amsterd_state::write_board(uint8_t data)
 {
 	m_key_select = 0;
 	m_board->led_w(0);
 	m_board->mux_w(data);
 }
 
-WRITE8_MEMBER( amsterd_state::write_beeper )
+void amsterd_state::write_beeper(uint8_t data)
 {
 	m_dac->write(BIT(data, 0));
 }
 
-READ8_MEMBER( amsterd_state::read_newkeys )
+uint8_t amsterd_state::read_newkeys()
 {
 	return m_keyboard[m_key_select & 1]->read();
 }

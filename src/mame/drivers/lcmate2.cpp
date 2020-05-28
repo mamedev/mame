@@ -64,21 +64,21 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_kbdlines;
 
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_WRITE8_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	uint8_t key_r(offs_t offset);
+	void speaker_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	void lcmate2_palette(palette_device &palette) const;
 	void lcmate2_io(address_map &map);
 	void lcmate2_mem(address_map &map);
 };
 
-WRITE8_MEMBER( lcmate2_state::speaker_w )
+void lcmate2_state::speaker_w(uint8_t data)
 {
 	m_speaker->level_w(BIT(data, 6));
 }
 
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
-READ8_MEMBER( lcmate2_state::key_r )
+uint8_t lcmate2_state::key_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -91,7 +91,7 @@ READ8_MEMBER( lcmate2_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( lcmate2_state::bankswitch_w )
+void lcmate2_state::bankswitch_w(uint8_t data)
 {
 	membank("rombank")->set_entry(data&0x0f);
 }

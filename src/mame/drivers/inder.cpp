@@ -77,16 +77,16 @@ private:
 	void ppi60b_w(uint8_t data);
 	void ppi64c_w(uint8_t data);
 	uint8_t sw_r();
-	DECLARE_WRITE8_MEMBER(sw_w);
-	DECLARE_WRITE8_MEMBER(sol_brvteam_w);
-	DECLARE_WRITE8_MEMBER(sol_canasta_w);
-	DECLARE_WRITE8_MEMBER(sn_w);
+	void sw_w(offs_t offset, uint8_t data);
+	void sol_brvteam_w(uint8_t data);
+	void sol_canasta_w(uint8_t data);
+	void sn_w(uint8_t data);
 	uint8_t sndcmd_r();
-	DECLARE_WRITE8_MEMBER(sndbank_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(disp_w);
+	void sndbank_w(uint8_t data);
+	void sndcmd_w(uint8_t data);
+	void sndcmd_lapbylap_w(uint8_t data);
+	void lamp_w(uint8_t data) { };
+	void disp_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
@@ -1136,23 +1136,23 @@ uint8_t inder_state::sw_r()
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( inder_state::sw_w )
+void inder_state::sw_w(offs_t offset, uint8_t data)
 {
 	m_row = offset;
 }
 
-WRITE8_MEMBER( inder_state::sn_w )
+void inder_state::sn_w(uint8_t data)
 {
 	m_sn->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-WRITE8_MEMBER( inder_state::sndcmd_lapbylap_w )
+void inder_state::sndcmd_lapbylap_w(uint8_t data)
 {
 	m_sndcmd = data;
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER( inder_state::sndcmd_w )
+void inder_state::sndcmd_w(uint8_t data)
 {
 	m_sndcmd = data;
 }
@@ -1163,7 +1163,7 @@ uint8_t inder_state::sndcmd_r()
 }
 
 // "bobinas"
-WRITE8_MEMBER( inder_state::sol_brvteam_w )
+void inder_state::sol_brvteam_w(uint8_t data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1188,7 +1188,7 @@ WRITE8_MEMBER( inder_state::sol_brvteam_w )
 }
 
 // no slings in this game
-WRITE8_MEMBER( inder_state::sol_canasta_w )
+void inder_state::sol_canasta_w(uint8_t data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1206,7 +1206,7 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 	}
 }
 
-WRITE8_MEMBER( inder_state::disp_w )
+void inder_state::disp_w(offs_t offset, uint8_t data)
 {
 	uint8_t i;
 	if (offset < 8)
@@ -1254,7 +1254,7 @@ void inder_state::ppi64c_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( inder_state::sndbank_w )
+void inder_state::sndbank_w(uint8_t data)
 {
 	m_sndbank = data;
 	uint8_t i;
