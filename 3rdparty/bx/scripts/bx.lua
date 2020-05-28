@@ -3,6 +3,18 @@
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
+local function userdefines()
+	local defines = {}
+	local BX_CONFIG = os.getenv("BX_CONFIG")
+	if BX_CONFIG then
+		for def in BX_CONFIG:gmatch "[^%s:]+" do
+			table.insert(defines, "BX_CONFIG_" .. def)
+		end
+	end
+
+	return defines
+end
+
 project "bx"
 	kind "StaticLib"
 
@@ -17,6 +29,8 @@ project "bx"
 		path.join(BX_DIR, "src/**.cpp"),
 		path.join(BX_DIR, "scripts/**.natvis"),
 	}
+
+	defines (userdefines())
 
 	configuration { "Debug" }
 		defines {
