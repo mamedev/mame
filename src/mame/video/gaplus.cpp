@@ -249,7 +249,11 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 		int x = m_stars[i].x;
 		int y = m_stars[i].y;
 
-		/* Some stars in the second layer will flash erratically when changing their movements */
+		/* Some stars in the second layer will flash erratically when changing their movements.
+		   (It is when at reverse scrolling stage or get elephant head.)
+		   This is based on a guess from the video output of the PCB.
+		   https://www.youtube.com/watch?v=_1x5Oid3uPg (3:35-, 13:12-)
+		   https://www.youtube.com/watch?v=vrmZAUJYXnI (3:14-, 12:40-) */
 		if (m_stars[i].set == 1 && m_starfield_control[2] != 0x85 && i % 2 == 0)
 		{
 			int bit = BIT(m_starfield_framecount + i, 3) ? 1 : 2;
