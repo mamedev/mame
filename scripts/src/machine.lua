@@ -3565,6 +3565,18 @@ if (MACHINES["MM58167"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/mm58174.h,MACHINES["MM58174"] = true
+---------------------------------------------------
+
+if (MACHINES["MM58174"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mm58174.cpp",
+		MAME_DIR .. "src/devices/machine/mm58174.h",
+	}
+end
+
 
 ---------------------------------------------------
 --

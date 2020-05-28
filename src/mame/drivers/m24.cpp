@@ -30,7 +30,7 @@
 #include "machine/i8087.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
@@ -460,7 +460,7 @@ void m24_state::m24_io(address_map &map)
 	map(0x0064, 0x0064).r(FUNC(m24_state::keyboard_status_r));
 	map(0x0065, 0x0065).w(FUNC(m24_state::alt_w));
 	map(0x0066, 0x0067).portr("DSW0");
-	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58174_device::read), FUNC(mm58174_device::write));
 	map(0x0080, 0x0083).mirror(0xc).w(FUNC(m24_state::dma_segment_w));
 	map(0x00a0, 0x00a1).mirror(0xe).w(FUNC(m24_state::nmi_enable_w));
 	map(0x80c1, 0x80c1).rw(m_z8000_apb, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
@@ -607,10 +607,7 @@ void m24_state::olivetti(machine_config &config)
 	M24_KEYBOARD(config, m_keyboard, 0);
 	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
-	mm58274c_device &mm58174an(MM58274C(config, "mm58174an", 32.768_kHz_XTAL));
-	// this is all guess
-	mm58174an.set_mode24(1); // ?
-	mm58174an.set_day1(1);   // ?
+	MM58174(config, "mm58174an", 32.768_kHz_XTAL);
 
 	M24_Z8000(config, m_z8000_apb, 0); // TODO: make this a slot device (uses custom bus connector)
 	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));

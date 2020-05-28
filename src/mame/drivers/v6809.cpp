@@ -56,7 +56,7 @@ ToDo:
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
@@ -128,7 +128,7 @@ void v6809_state::v6809_mem(address_map &map)
 	map(0xf500, 0xf501).mirror(0x36).rw("acia0", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // modem
 	map(0xf508, 0xf509).mirror(0x36).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // printer
 	map(0xf600, 0xf603).mirror(0x3c).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
-	map(0xf640, 0xf64f).mirror(0x30).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0xf640, 0xf64f).mirror(0x30).rw("rtc", FUNC(mm58174_device::read), FUNC(mm58174_device::write));
 	map(0xf680, 0xf683).mirror(0x3c).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf6c0, 0xf6c7).mirror(0x08).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xf6d0, 0xf6d3).mirror(0x0c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -343,10 +343,7 @@ void v6809_state::v6809(machine_config &config)
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
-	mm58274c_device &rtc(MM58274C(config, "rtc", 0));
-// this is all guess
-	rtc.set_mode24(0); // 12 hour
-	rtc.set_day1(1);   // monday
+	MM58174(config, "rtc", 0);
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
 	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);

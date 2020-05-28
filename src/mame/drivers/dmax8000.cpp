@@ -31,7 +31,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -122,7 +122,7 @@ void dmax8000_state::dmax8000_io(address_map &map)
 	map(0x20, 0x23).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x40, 0x40).w(FUNC(dmax8000_state::port40_w)); // memory bank control
 	//map(0x60, 0x67) // optional IEEE488 GPIB
-	map(0x70, 0x7f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)); // optional RTC
+	map(0x70, 0x7f).rw("rtc", FUNC(mm58174_device::read), FUNC(mm58174_device::write)); // optional RTC
 }
 
 /* Input ports */
@@ -195,10 +195,7 @@ void dmax8000_state::dmax8000(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	mm58274c_device &rtc(MM58274C(config, "rtc", 0)); // MM58174
-	// this is all guess
-	rtc.set_mode24(0); // 12 hour
-	rtc.set_day1(1);   // monday
+	MM58174(config, "rtc", 0);
 }
 
 

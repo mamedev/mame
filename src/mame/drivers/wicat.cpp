@@ -28,7 +28,7 @@ Wicat - various systems.
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
 #include "machine/input_merger.h"
-#include "machine/mm58274c.h"
+#include "machine/mm58174.h"
 #include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
 #include "machine/x2212.h"
@@ -92,7 +92,7 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_device<m68000_device> m_maincpu;
-	required_device<mm58274c_device> m_rtc;
+	required_device<mm58174_device> m_rtc;
 	required_device<via6522_device> m_via;
 	required_device_array<scn2661c_device, 7> m_uart;
 	required_device<cpu_device> m_videocpu;
@@ -157,7 +157,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0xf00030, 0xf00037).rw(m_uart[6], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
 	map(0xf0003a, 0xf0003b).nopr();
 	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
-	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
+	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
@@ -644,9 +644,7 @@ void wicat_state::wicat(machine_config &config)
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MM58274C(config, m_rtc, 0);  // actually an MM58174AN, but should be compatible
-	m_rtc->set_mode24(0); // 12 hour
-	m_rtc->set_day1(1);   // monday
+	MM58174(config, m_rtc, 0);
 
 	// internal terminal
 	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
