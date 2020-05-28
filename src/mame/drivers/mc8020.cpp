@@ -45,6 +45,7 @@ private:
 	void mem_map(address_map &map);
 
 	u8 m_row;
+	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
@@ -175,6 +176,11 @@ void mc8020_state::port_a_w(u8 data)
 
 void mc8020_state::port_b_w(u8 data)
 {
+}
+
+void mc8020_state::machine_start()
+{
+	save_item(NAME(m_row));
 }
 
 
@@ -371,4 +377,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )
+COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
