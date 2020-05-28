@@ -23,6 +23,7 @@ TODO:
 #define LOG_READS       (1 << 2)
 #define LOG_WRITES      (1 << 3)
 #define LOG_UNKNOWNS    (1 << 4)
+#define LOG_ALL			(LOG_IRQS | LOG_COMMANDS | LOG_READS | LOG_WRITES | LOG_UNKNOWNS)
 
 #define VERBOSE         (0)
 #include "logmacro.h"

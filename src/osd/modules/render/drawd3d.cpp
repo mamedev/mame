@@ -404,16 +404,6 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during GetDeviceCaps call\n", result);
 
-	// check for dynamic texture support
-	m_dynamic_supported = ((caps.Caps2 & D3DCAPS2_DYNAMICTEXTURES) != 0);
-	if (m_dynamic_supported)
-		osd_printf_verbose("Direct3D: Using dynamic textures\n");
-
-	// check for stretchrect support
-	m_stretch_supported = ((caps.StretchRectFilterCaps & D3DPTFILTERCAPS_MAGFPOINT) != 0);
-	if (m_stretch_supported && video_config.prescale > 1)
-		osd_printf_verbose("Direct3D: Using StretchRect for prescaling\n");
-
 	// get texture caps
 	m_texture_caps = caps.TextureCaps;
 	m_texture_max_aspect = caps.MaxTextureAspectRatio;
@@ -821,28 +811,14 @@ int renderer_d3d9::device_create(HWND hwnd)
 
 	m_texture_manager = global_alloc(d3d_texture_manager(this));
 
-try_again:
 	// try for XRGB first
 	m_screen_format = D3DFMT_X8R8G8B8;
-	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat,
-		m_texture_manager->is_dynamic_supported()
-			? D3DUSAGE_DYNAMIC
-			: 0,
-		D3DRTYPE_TEXTURE, m_screen_format);
+	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, D3DUSAGE_DYNAMIC, D3DRTYPE_TEXTURE, m_screen_format);
 	if (FAILED(result))
 	{
 		// if not, try for ARGB
 		m_screen_format = D3DFMT_A8R8G8B8;
-		result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat,
-			m_texture_manager->is_dynamic_supported()
-				? D3DUSAGE_DYNAMIC
-				: 0,
-			D3DRTYPE_TEXTURE, m_screen_format);
-		if (FAILED(result) && m_texture_manager->is_dynamic_supported())
-		{
-			m_texture_manager->set_dynamic_supported(false);
-			goto try_again;
-		}
+		result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, D3DUSAGE_DYNAMIC, D3DRTYPE_TEXTURE, m_screen_format);
 		if (FAILED(result))
 		{
 			osd_printf_error("Error: unable to configure a screen texture format\n");
@@ -1972,21 +1948,7 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 	}
 	else
 	{
-		if ((m_xprescale == 1 && m_yprescale == 1) || m_renderer->get_shaders()->enabled())
-		{
-			m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-		}
-		else
-		{
-			if (m_texture_manager->is_stretch_supported() && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
-			{
-				m_type = TEXTURE_TYPE_SURFACE;
-			}
-			else
-			{
-				m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-			}
-		}
+		m_type = TEXTURE_TYPE_DYNAMIC;
 	}
 
 	// compute the size
@@ -2006,8 +1968,8 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 	else
 	{
 		D3DFORMAT format;
-		DWORD usage = m_texture_manager->is_dynamic_supported() ? D3DUSAGE_DYNAMIC : 0;
-		D3DPOOL pool = m_texture_manager->is_dynamic_supported() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+		DWORD usage = D3DUSAGE_DYNAMIC;
+		D3DPOOL pool = D3DPOOL_DEFAULT;
 		int maxdim = std::max(m_renderer->get_presentation()->BackBufferWidth, m_renderer->get_presentation()->BackBufferHeight);
 
 		// pick the format
@@ -2072,24 +2034,10 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 			// screen textures with prescaling require two allocations
 			else
 			{
-				// use an offscreen plain surface for stretching if supported
-				// (won't work for YUY textures)
-				if (m_texture_manager->is_stretch_supported() && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
+				result = m_renderer->get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex, nullptr);
+				if (FAILED(result))
 				{
-					result = m_renderer->get_device()->CreateOffscreenPlainSurface(m_rawdims.c.x, m_rawdims.c.y, format, D3DPOOL_DEFAULT, &m_d3dsurface, nullptr);
-					if (FAILED(result))
-					{
-						continue;
-					}
-				}
-				// otherwise, we allocate a dynamic texture for the source
-				else
-				{
-					result = m_renderer->get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex, nullptr);
-					if (FAILED(result))
-					{
-						continue;
-					}
+					continue;
 				}
 
 				// for the target surface, we allocate a render target texture
@@ -2172,8 +2120,8 @@ void texture_info::compute_size(int texwidth, int texheight)
 		if (!wrap_texture)
 		{
 			// note we need 2 pixels in X for YUY textures
-			m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
-			m_yborderpix = 1;
+			//m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
+			//m_yborderpix = 1;
 		}
 	}
 
@@ -2506,115 +2454,89 @@ void texture_info::prescale()
 		osd_printf_verbose("Direct3D: Error %08lX during texture GetSurfaceLevel call\n", result);
 
 	// if we have an offscreen plain surface, we can just StretchRect to it
-	if (m_type == TEXTURE_TYPE_SURFACE)
+	IDirect3DSurface9 *backbuffer;
+
+	assert(m_d3dtex != nullptr);
+
+	// first remember the original render target and set the new one
+	result = m_renderer->get_device()->GetRenderTarget(0, &backbuffer);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device GetRenderTarget call\n", result);
+	result = m_renderer->get_device()->SetRenderTarget(0, scale_surface);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call 1\n", result);
+	m_renderer->reset_render_states();
+
+	// start the scene
+	result = m_renderer->get_device()->BeginScene();
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device BeginScene call\n", result);
+
+	// configure the rendering pipeline
+	m_renderer->set_filter(FALSE);
+	m_renderer->set_blendmode(BLENDMODE_NONE);
+	result = m_renderer->get_device()->SetTexture(0, m_d3dtex);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetTexture call\n", result);
+
+	// lock the vertex buffer
+	vertex *lockedbuf;
+	result = m_renderer->get_vertex_buffer()->Lock(0, 0, (VOID **)&lockedbuf, D3DLOCK_DISCARD);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during vertex buffer lock call\n", result);
+
+	// configure the X/Y coordinates on the target surface
+	lockedbuf[0].x = -0.5f;
+	lockedbuf[0].y = -0.5f;
+	lockedbuf[1].x = (float)((m_texinfo.width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
+	lockedbuf[1].y = -0.5f;
+	lockedbuf[2].x = -0.5f;
+	lockedbuf[2].y = (float)((m_texinfo.height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
+	lockedbuf[3].x = (float)((m_texinfo.width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
+	lockedbuf[3].y = (float)((m_texinfo.height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
+
+	// configure the U/V coordintes on the source texture
+	lockedbuf[0].u0 = 0.0f;
+	lockedbuf[0].v0 = 0.0f;
+	lockedbuf[1].u0 = (float)(m_texinfo.width + 2 * m_xborderpix) / (float)m_rawdims.c.x;
+	lockedbuf[1].v0 = 0.0f;
+	lockedbuf[2].u0 = 0.0f;
+	lockedbuf[2].v0 = (float)(m_texinfo.height + 2 * m_yborderpix) / (float)m_rawdims.c.y;
+	lockedbuf[3].u0 = (float)(m_texinfo.width + 2 * m_xborderpix) / (float)m_rawdims.c.x;
+	lockedbuf[3].v0 = (float)(m_texinfo.height + 2 * m_yborderpix) / (float)m_rawdims.c.y;
+
+	// reset the remaining vertex parameters
+	for (i = 0; i < 4; i++)
 	{
-		assert(m_d3dsurface != nullptr);
-
-		// set the source bounds
-		RECT source;
-		source.left = source.top = 0;
-		source.right = m_texinfo.width + 2 * m_xborderpix;
-		source.bottom = m_texinfo.height + 2 * m_yborderpix;
-
-		// set the target bounds
-		RECT dest;
-		dest = source;
-		dest.right *= m_xprescale;
-		dest.bottom *= m_yprescale;
-
-		// do the stretchrect
-		result = m_renderer->get_device()->StretchRect(m_d3dsurface, &source, scale_surface, &dest, D3DTEXF_POINT);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device stretct_rect call\n", result);
+		lockedbuf[i].z = 0.0f;
+		lockedbuf[i].rhw = 1.0f;
+		lockedbuf[i].color = D3DCOLOR_ARGB(0xff,0xff,0xff,0xff);
 	}
 
-	// if we are using a texture render target, we need to do more preparations
-	else
-	{
-		IDirect3DSurface9 *backbuffer;
+	// unlock the vertex buffer
+	result = m_renderer->get_vertex_buffer()->Unlock();
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during vertex buffer unlock call\n", result);
 
-		assert(m_d3dtex != nullptr);
+	// set the stream and draw the triangle strip
+	result = m_renderer->get_device()->SetStreamSource(0, m_renderer->get_vertex_buffer(), 0, sizeof(vertex));
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetStreamSource call\n", result);
+	result = m_renderer->get_device()->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device DrawPrimitive call\n", result);
 
-		// first remember the original render target and set the new one
-		result = m_renderer->get_device()->GetRenderTarget(0, &backbuffer);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device GetRenderTarget call\n", result);
-		result = m_renderer->get_device()->SetRenderTarget(0, scale_surface);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call 1\n", result);
-		m_renderer->reset_render_states();
+	// end the scene
+	result = m_renderer->get_device()->EndScene();
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device end_scene call\n", result);
 
-		// start the scene
-		result = m_renderer->get_device()->BeginScene();
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device BeginScene call\n", result);
-
-		// configure the rendering pipeline
-		m_renderer->set_filter(FALSE);
-		m_renderer->set_blendmode(BLENDMODE_NONE);
-		result = m_renderer->get_device()->SetTexture(0, m_d3dtex);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetTexture call\n", result);
-
-		// lock the vertex buffer
-		vertex *lockedbuf;
-		result = m_renderer->get_vertex_buffer()->Lock(0, 0, (VOID **)&lockedbuf, D3DLOCK_DISCARD);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during vertex buffer lock call\n", result);
-
-		// configure the X/Y coordinates on the target surface
-		lockedbuf[0].x = -0.5f;
-		lockedbuf[0].y = -0.5f;
-		lockedbuf[1].x = (float)((m_texinfo.width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
-		lockedbuf[1].y = -0.5f;
-		lockedbuf[2].x = -0.5f;
-		lockedbuf[2].y = (float)((m_texinfo.height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
-		lockedbuf[3].x = (float)((m_texinfo.width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
-		lockedbuf[3].y = (float)((m_texinfo.height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
-
-		// configure the U/V coordintes on the source texture
-		lockedbuf[0].u0 = 0.0f;
-		lockedbuf[0].v0 = 0.0f;
-		lockedbuf[1].u0 = (float)(m_texinfo.width + 2 * m_xborderpix) / (float)m_rawdims.c.x;
-		lockedbuf[1].v0 = 0.0f;
-		lockedbuf[2].u0 = 0.0f;
-		lockedbuf[2].v0 = (float)(m_texinfo.height + 2 * m_yborderpix) / (float)m_rawdims.c.y;
-		lockedbuf[3].u0 = (float)(m_texinfo.width + 2 * m_xborderpix) / (float)m_rawdims.c.x;
-		lockedbuf[3].v0 = (float)(m_texinfo.height + 2 * m_yborderpix) / (float)m_rawdims.c.y;
-
-		// reset the remaining vertex parameters
-		for (i = 0; i < 4; i++)
-		{
-			lockedbuf[i].z = 0.0f;
-			lockedbuf[i].rhw = 1.0f;
-			lockedbuf[i].color = D3DCOLOR_ARGB(0xff,0xff,0xff,0xff);
-		}
-
-		// unlock the vertex buffer
-		result = m_renderer->get_vertex_buffer()->Unlock();
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during vertex buffer unlock call\n", result);
-
-		// set the stream and draw the triangle strip
-		result = m_renderer->get_device()->SetStreamSource(0, m_renderer->get_vertex_buffer(), 0, sizeof(vertex));
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetStreamSource call\n", result);
-		result = m_renderer->get_device()->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device DrawPrimitive call\n", result);
-
-		// end the scene
-		result = m_renderer->get_device()->EndScene();
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device end_scene call\n", result);
-
-		// reset the render target and release our reference to the backbuffer
-		result = m_renderer->get_device()->SetRenderTarget(0, backbuffer);
-		if (FAILED(result))
-			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call 2\n", result);
-		backbuffer->Release();
-		m_renderer->reset_render_states();
-	}
+	// reset the render target and release our reference to the backbuffer
+	result = m_renderer->get_device()->SetRenderTarget(0, backbuffer);
+	if (FAILED(result))
+		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call 2\n", result);
+	backbuffer->Release();
+	m_renderer->reset_render_states();
 
 	// release our reference to the target surface
 	scale_surface->Release();
